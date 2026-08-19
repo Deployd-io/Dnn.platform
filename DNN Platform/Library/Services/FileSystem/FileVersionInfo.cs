@@ -12,10 +12,14 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class FileVersionInfo : BaseEntityInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FileVersionInfo));
         /// <summary>Initializes a new instance of the <see cref="FileVersionInfo"/> class.</summary>
         public FileVersionInfo()
         {
+			Logger.LogDebug(">>> Entering FileVersionInfo()");
             this.Version = 1;
+			Logger.LogDebug("FileVersionInfo(): this.Version → {Arg0}", this.Version);
+			Logger.LogDebug("<<< Exiting FileVersionInfo()");
         }
 
         [XmlElement("fileid")]

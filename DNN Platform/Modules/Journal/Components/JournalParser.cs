@@ -27,6 +27,7 @@ namespace DotNetNuke.Modules.Journal.Components
 
     public class JournalParser
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JournalParser));
         private const string ResxPath = "~/DesktopModules/Journal/App_LocalResources/SharedResources.resx";
         private static readonly Regex CdataRegex = new Regex(@"\<\!\[CDATA\[(?<text>[^\]]*)\]\]\>", RegexOptions.Compiled);
         private static readonly Regex TemplateRegex = new Regex("{CanComment}(.*?){/CanComment}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -51,7 +52,9 @@ namespace DotNetNuke.Modules.Journal.Components
             UserInfo userInfo)
             : this(null, portalSettings, moduleId, profileId, socialGroupId, userInfo)
         {
+		Logger.LogDebug(">>> Entering JournalParser(portalSettings={PortalSettings},moduleId={ModuleId},profileId={ProfileId},socialGroupId={SocialGroupId},userInfo={UserInfo})", portalSettings, moduleId, profileId, socialGroupId, userInfo);
         }
+		Logger.LogDebug("<<< Exiting JournalParser(portalSettings={PortalSettings},moduleId={ModuleId},profileId={ProfileId},socialGroupId={SocialGroupId},userInfo={UserInfo})", portalSettings, moduleId, profileId, socialGroupId, userInfo);
 
         /// <summary>Initializes a new instance of the <see cref="JournalParser"/> class.</summary>
         /// <param name="navigationManager">A navigation manager.</param>
@@ -64,13 +67,21 @@ namespace DotNetNuke.Modules.Journal.Components
         {
             this.NavigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
             this.PortalSettings = portalSettings;
+			Logger.LogDebug("JournalParser(navigationManager={NavigationManager},portalSettings={PortalSettings},moduleId={ModuleId},profileId={ProfileId},socialGroupId={SocialGroupId},userInfo={UserInfo}): this.PortalSettings → {Arg6}", navigationManager, portalSettings, moduleId, profileId, socialGroupId, userInfo, this.PortalSettings);
             this.ModuleId = moduleId;
             this.ProfileId = profileId;
+			Logger.LogDebug("JournalParser(navigationManager={NavigationManager},portalSettings={PortalSettings},moduleId={ModuleId},profileId={ProfileId},socialGroupId={SocialGroupId},userInfo={UserInfo}): this.ModuleId → {Arg6}", navigationManager, portalSettings, moduleId, profileId, socialGroupId, userInfo, this.ModuleId);
+			Logger.LogDebug("JournalParser(navigationManager={NavigationManager},portalSettings={PortalSettings},moduleId={ModuleId},profileId={ProfileId},socialGroupId={SocialGroupId},userInfo={UserInfo}): this.ProfileId → {Arg6}", navigationManager, portalSettings, moduleId, profileId, socialGroupId, userInfo, this.ProfileId);
             this.SocialGroupId = socialGroupId;
             this.CurrentUser = userInfo;
             this.url = this.PortalSettings.DefaultPortalAlias;
             this.OwnerPortalId = portalSettings.PortalId;
+			Logger.LogDebug("JournalParser(navigationManager={NavigationManager},portalSettings={PortalSettings},moduleId={ModuleId},profileId={ProfileId},socialGroupId={SocialGroupId},userInfo={UserInfo}): this.SocialGroupId → {Arg6}", navigationManager, portalSettings, moduleId, profileId, socialGroupId, userInfo, this.SocialGroupId);
+			Logger.LogDebug("JournalParser(navigationManager={NavigationManager},portalSettings={PortalSettings},moduleId={ModuleId},profileId={ProfileId},socialGroupId={SocialGroupId},userInfo={UserInfo}): this.CurrentUser → {Arg6}", navigationManager, portalSettings, moduleId, profileId, socialGroupId, userInfo, this.CurrentUser);
+			Logger.LogDebug("JournalParser(navigationManager={NavigationManager},portalSettings={PortalSettings},moduleId={ModuleId},profileId={ProfileId},socialGroupId={SocialGroupId},userInfo={UserInfo}): this.url → {Arg6}", navigationManager, portalSettings, moduleId, profileId, socialGroupId, userInfo, this.url);
+			Logger.LogDebug("JournalParser(navigationManager={NavigationManager},portalSettings={PortalSettings},moduleId={ModuleId},profileId={ProfileId},socialGroupId={SocialGroupId},userInfo={UserInfo}): this.OwnerPortalId → {Arg6}", navigationManager, portalSettings, moduleId, profileId, socialGroupId, userInfo, this.OwnerPortalId);
             ModuleInfo moduleInfo = ModuleController.Instance.GetModule(moduleId, this.PortalSettings.ActiveTab.TabID, false);
+			Logger.LogDebug("JournalParser(navigationManager={NavigationManager},portalSettings={PortalSettings},moduleId={ModuleId},profileId={ProfileId},socialGroupId={SocialGroupId},userInfo={UserInfo}): moduleInfo → {ModuleInfo}", navigationManager, portalSettings, moduleId, profileId, socialGroupId, userInfo, moduleInfo);
             if (moduleInfo.OwnerPortalID != portalSettings.PortalId)
             {
                 this.OwnerPortalId = moduleInfo.OwnerPortalID;
@@ -106,6 +117,7 @@ namespace DotNetNuke.Modules.Journal.Components
 
         public string GetList(int currentIndex, int rows)
         {
+			Logger.LogDebug(">>> Entering GetList(currentIndex={CurrentIndex},rows={Rows})", currentIndex, rows);
             if (this.CurrentUser.UserID > 0)
             {
                 this.isAdmin = this.CurrentUser.IsInRole(this.PortalSettings.AdministratorRoleName);
@@ -115,11 +127,16 @@ namespace DotNetNuke.Modules.Journal.Components
 
             var journalControllerInternal = InternalJournalController.Instance;
             var sb = new StringBuilder();
+			Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): sb → {Sb}", currentIndex, rows, sb);
 
             string statusTemplate = Localization.GetString("journal_status", ResxPath);
+			Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): statusTemplate → {StatusTemplate}", currentIndex, rows, statusTemplate);
             string linkTemplate = Localization.GetString("journal_link", ResxPath);
+			Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): linkTemplate → {LinkTemplate}", currentIndex, rows, linkTemplate);
             string photoTemplate = Localization.GetString("journal_photo", ResxPath);
+			Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): photoTemplate → {PhotoTemplate}", currentIndex, rows, photoTemplate);
             string fileTemplate = Localization.GetString("journal_file", ResxPath);
+			Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): fileTemplate → {FileTemplate}", currentIndex, rows, fileTemplate);
 
             statusTemplate = BaseUrlRegex.Replace(statusTemplate, this.url);
             linkTemplate = BaseUrlRegex.Replace(linkTemplate, this.url);
@@ -127,6 +144,7 @@ namespace DotNetNuke.Modules.Journal.Components
             fileTemplate = BaseUrlRegex.Replace(fileTemplate, this.url);
 
             string comment = Localization.GetString("comment", ResxPath);
+			Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): comment → {Comment}", currentIndex, rows, comment);
 
             IList<JournalItem> journalList;
             if (this.JournalId > 0)
@@ -158,11 +176,14 @@ namespace DotNetNuke.Modules.Journal.Components
             }
 
             var journalIds = journalList.Select(ji => ji.JournalId).ToList();
+			Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): journalIds → {JournalIds}", currentIndex, rows, journalIds);
             IList<CommentInfo> comments = JournalController.Instance.GetCommentsByJournalIds(journalIds);
+			Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): comments → {Comments}", currentIndex, rows, comments);
 
             foreach (JournalItem ji in journalList)
             {
                 string replacement = this.GetStringReplacement(ji);
+				Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): replacement → {Replacement}", currentIndex, rows, replacement);
 
                 string rowTemplate;
                 if (ji.JournalType == "status")
@@ -191,13 +212,17 @@ namespace DotNetNuke.Modules.Journal.Components
                 }
 
                 var ctl = new JournalControl();
+				Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): ctl → {Ctl}", currentIndex, rows, ctl);
 
                 bool isLiked = false;
                 ctl.LikeList = this.GetLikeListHTML(ji, ref isLiked);
                 ctl.LikeLink = string.Empty;
+				Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): ctl.LikeLink → {Arg2}", currentIndex, rows, ctl.LikeLink);
+				Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): ctl.CommentLink → {Arg2}", currentIndex, rows, ctl.CommentLink);
                 ctl.CommentLink = string.Empty;
 
                 var authorLink = this.NavigationManager.NavigateURL(this.PortalSettings.UserTabId, string.Empty, "userId=" + ji.JournalAuthor.Id);
+				Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): authorLink → {AuthorLink}", currentIndex, rows, authorLink);
                 ctl.AuthorNameLink = $"<a href=\"{WebUtility.HtmlEncode(authorLink)}\">{WebUtility.HtmlEncode(ji.JournalAuthor.Name)}</a>";
                 if (this.CurrentUser.UserID > 0 && !this.isUnverifiedUser)
                 {
@@ -231,6 +256,7 @@ namespace DotNetNuke.Modules.Journal.Components
                 }
 
                 var tokenReplace = new JournalItemTokenReplace(ji, ctl);
+				Logger.LogDebug("GetList(currentIndex={CurrentIndex},rows={Rows}): tokenReplace → {TokenReplace}", currentIndex, rows, tokenReplace);
                 string tmp = tokenReplace.ReplaceJournalItemTokens(rowTemplate);
                 tmp = tmp.Replace("<br>", "<br />");
                 sb.Append($"<div class=\"journalrow\" id=\"jid-{ji.JournalId}\">");
@@ -243,11 +269,13 @@ namespace DotNetNuke.Modules.Journal.Components
                 sb.Append("</div>");
             }
 
+			Logger.LogDebug("<<< Exiting GetList(currentIndex={CurrentIndex},rows={Rows})", currentIndex, rows);
             return Utilities.LocalizeControl(sb.ToString());
         }
 
         internal string GetJournalTemplate(string journalType, JournalItem ji)
         {
+			Logger.LogDebug(">>> Entering GetJournalTemplate(journalType={JournalType},ji={Ji})", journalType, ji);
             string template = Localization.GetString("journal_" + journalType, ResxPath);
             if (string.IsNullOrEmpty(template))
             {
@@ -258,19 +286,25 @@ namespace DotNetNuke.Modules.Journal.Components
             template = template.Replace("[journalitem:action]", Localization.GetString(journalType + ".Action", ResxPath));
 
             var replacement = this.GetStringReplacement(ji);
+			Logger.LogDebug("GetJournalTemplate(journalType={JournalType},ji={Ji}): replacement → {Replacement}", journalType, ji, replacement);
+			Logger.LogDebug("<<< Exiting GetJournalTemplate(journalType={JournalType},ji={Ji})", journalType, ji);
             return TemplateRegex.Replace(template, replacement);
         }
 
         internal string GetLikeListHTML(JournalItem ji, ref bool isLiked)
         {
+			Logger.LogDebug(">>> Entering GetLikeListHTML(ji={Ji},isLiked={IsLiked})", ji, isLiked);
             var sb = new StringBuilder();
             isLiked = false;
+			Logger.LogDebug("GetLikeListHTML(ji={Ji},isLiked={IsLiked}): isLiked → {IsLiked1}", ji, isLiked, isLiked);
+			Logger.LogDebug("GetLikeListHTML(ji={Ji},isLiked={IsLiked}): sb → {Sb}", ji, isLiked, sb);
             if (ji.JournalXML == null)
             {
                 return string.Empty;
             }
 
             XmlNodeList xLikes = ji.JournalXML.DocumentElement.SelectNodes("//likes/u");
+			Logger.LogDebug("GetLikeListHTML(ji={Ji},isLiked={IsLiked}): xLikes → {XLikes}", ji, isLiked, xLikes);
             if (xLikes == null)
             {
                 return string.Empty;
@@ -281,6 +315,7 @@ namespace DotNetNuke.Modules.Journal.Components
                 if (Convert.ToInt32(xLike.Attributes["uid"].Value) == this.CurrentUser.UserID)
                 {
                     ji.CurrentUserLikes = true;
+					Logger.LogDebug("GetLikeListHTML(ji={Ji},isLiked={IsLiked}): ji.CurrentUserLikes → {Arg2}", ji, isLiked, ji.CurrentUserLikes);
                     isLiked = true;
                     break;
                 }
@@ -303,6 +338,7 @@ namespace DotNetNuke.Modules.Journal.Components
                 foreach (XmlNode l in xLikes)
                 {
                     int userId = Convert.ToInt32(l.Attributes["uid"].Value);
+					Logger.LogDebug("GetLikeListHTML(ji={Ji},isLiked={IsLiked}): userId → {UserId}", ji, isLiked, userId);
                     string name = l.Attributes["un"].Value;
                     if (userId != this.CurrentUser.UserID)
                     {
@@ -373,17 +409,20 @@ namespace DotNetNuke.Modules.Journal.Components
             }
 
             sb.Append("</div>");
+			Logger.LogDebug("<<< Exiting GetLikeListHTML(ji={Ji},isLiked={IsLiked})", ji, isLiked);
             return sb.ToString();
         }
 
         internal string GetCommentAreaHTML(JournalItem journal, IList<CommentInfo> comments)
         {
+			Logger.LogDebug(">>> Entering GetCommentAreaHTML(journal={Journal},comments={Comments})", journal, comments);
             if (journal.CommentsHidden)
             {
                 return string.Empty;
             }
 
             var sb = new StringBuilder();
+			Logger.LogDebug("GetCommentAreaHTML(journal={Journal},comments={Comments}): sb → {Sb}", journal, comments, sb);
             sb.Append($"<ul class=\"jcmt\" id=\"jcmt-{journal.JournalId}\">");
             foreach (CommentInfo ci in comments)
             {
@@ -403,14 +442,17 @@ namespace DotNetNuke.Modules.Journal.Components
             }
 
             sb.Append("</ul>");
+			Logger.LogDebug("<<< Exiting GetCommentAreaHTML(journal={Journal},comments={Comments})", journal, comments);
             return sb.ToString();
         }
 
         internal string GetCommentRow(JournalItem journal, CommentInfo comment)
         {
+			Logger.LogDebug(">>> Entering GetCommentRow(journal={Journal},comment={Comment})", journal, comment);
             var sb = new StringBuilder();
             string pic = UserController.Instance.GetUserProfilePictureUrl(comment.UserId, 32, 32);
             sb.Append($"<li id=\"cmt-{comment.CommentId}\">");
+			Logger.LogDebug("GetCommentRow(journal={Journal},comment={Comment}): sb → {Sb}", journal, comment, sb);
             if (comment.UserId == this.CurrentUser.UserID || journal.UserId == this.CurrentUser.UserID || this.isAdmin)
             {
                 sb.Append("<div class=\"miniclose\"></div>");
@@ -427,6 +469,7 @@ namespace DotNetNuke.Modules.Journal.Components
                 if (CdataRegex.IsMatch(comment.CommentXML.SelectSingleNode("/root/comment").InnerText))
                 {
                     var match = CdataRegex.Match(comment.CommentXML.SelectSingleNode("/root/comment").InnerText);
+					Logger.LogDebug("GetCommentRow(journal={Journal},comment={Comment}): match → {Match}", journal, comment, match);
                     text = match.Groups["text"].Value;
                 }
                 else
@@ -442,16 +485,19 @@ namespace DotNetNuke.Modules.Journal.Components
             }
 
             var timeFrame = DateUtils.CalculateDateForDisplay(comment.DateCreated);
+			Logger.LogDebug("GetCommentRow(journal={Journal},comment={Comment}): timeFrame → {TimeFrame}", journal, comment, timeFrame);
             comment.DateCreated = this.CurrentUser.LocalTime(comment.DateCreated);
             sb.Append($"<abbr title=\"{comment.DateCreated}\">{WebUtility.HtmlEncode(timeFrame)}</abbr>");
 
             sb.Append("</p>");
             sb.Append("</li>");
+			Logger.LogDebug("<<< Exiting GetCommentRow(journal={Journal},comment={Comment})", journal, comment);
             return sb.ToString();
         }
 
         private string GetStringReplacement(JournalItem journalItem)
         {
+			Logger.LogDebug(">>> Entering GetStringReplacement(journalItem={JournalItem})", journalItem);
             string replacement = string.Empty;
             if (this.CurrentUser.UserID > 0 && this.SocialGroupId <= 0 && !this.isUnverifiedUser)
             {
@@ -463,6 +509,7 @@ namespace DotNetNuke.Modules.Journal.Components
                 replacement = this.CurrentUser.IsInRole(journalItem.JournalOwner.Name) ? "$1" : string.Empty;
             }
 
+			Logger.LogDebug("<<< Exiting GetStringReplacement(journalItem={JournalItem})", journalItem);
             return replacement;
         }
     }

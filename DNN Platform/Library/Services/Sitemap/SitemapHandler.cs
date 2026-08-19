@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.Sitemap
 
     public class SitemapHandler : IHttpHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SitemapHandler));
         /// <inheritdoc />
         public bool IsReusable
         {
@@ -23,14 +24,19 @@ namespace DotNetNuke.Services.Sitemap
         /// <inheritdoc />
         public void ProcessRequest(HttpContext context)
         {
+			Logger.LogDebug(">>> Entering ProcessRequest(context={Context})", context);
             try
             {
                 HttpResponse response = context.Response;
+				Logger.LogDebug("ProcessRequest(context={Context}): response → {Response}", context, response);
 
                 response.ContentType = "text/xml";
+				Logger.LogDebug("ProcessRequest(context={Context}): response.ContentType → {Arg1}", context, response.ContentType);
+				Logger.LogDebug("ProcessRequest(context={Context}): response.ContentEncoding → {Arg1}", context, response.ContentEncoding);
                 response.ContentEncoding = Encoding.UTF8;
 
                 var builder = new SitemapBuilder(PortalSettings.Current);
+				Logger.LogDebug("ProcessRequest(context={Context}): builder → {Builder}", context, builder);
 
                 if (context.Request.QueryString["i"] != null)
                 {
@@ -44,8 +50,10 @@ namespace DotNetNuke.Services.Sitemap
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in ProcessRequest(context={Context}): {Arg1}", context, exc.getMessage());
                 Exceptions.Exceptions.LogException(exc);
             }
+			Logger.LogDebug("<<< Exiting ProcessRequest(context={Context})", context);
         }
     }
 }

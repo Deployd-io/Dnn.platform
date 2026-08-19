@@ -9,15 +9,19 @@ namespace DotNetNuke.UI.WebControls
 
     public class PropertyNameComparer : IComparer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PropertyNameComparer));
         /// <inheritdoc />
         public int Compare(object x, object y)
         {
+			Logger.LogDebug(">>> Entering Compare(x={X},y={Y})", x, y);
             if (x is PropertyInfo && y is PropertyInfo)
             {
                 return string.Compare(((PropertyInfo)x).Name, ((PropertyInfo)y).Name, StringComparison.Ordinal);
             }
             else
             {
+				Logger.LogWarning("Throwing ArgumentException from Compare(x={X},y={Y})", x, y);
+			Logger.LogDebug("<<< Exiting Compare(x={X},y={Y})", x, y);
                 throw new ArgumentException("Object is not of type PropertyInfo");
             }
         }

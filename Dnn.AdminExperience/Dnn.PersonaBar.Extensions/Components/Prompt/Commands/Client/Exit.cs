@@ -36,18 +36,27 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Client
         /// <inheritdoc />
         public void Initialize(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogDebug(">>> Entering Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
+			eventLogger.LogWarning("Throwing NotImplementedException from Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
+			eventLogger.LogDebug("<<< Exiting Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
         public bool IsValid()
         {
+			eventLogger.LogDebug(">>> Entering IsValid()");
+			eventLogger.LogWarning("Throwing NotImplementedException from IsValid()");
+			eventLogger.LogDebug("<<< Exiting IsValid()");
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
         public ConsoleResultModel Run()
         {
+			eventLogger.LogDebug(">>> Entering Run()");
+			eventLogger.LogWarning("Throwing NotImplementedException from Run()");
+			eventLogger.LogDebug("<<< Exiting Run()");
             throw new NotImplementedException();
         }
     }

@@ -4,33 +4,42 @@ import TextArea from "../MultiLineInputWithError";
 import Input from "../SingleLineInputWithError";
 import { EditIcon } from "../SvgIcons";
 import "./style.less";
+const logger = console;
 
 class EditableField extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             editMode: false,
             value: props.value,
             error: false
         };
         this.uniqueId = "editableField-" + (Date.now() * Math.random());
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
     
     toggleEditMode() {
+		logger.debug('>>> Entering toggleEditMode()');
         this.setState({
             editMode: !this.state.editMode
         });
         if (!this.state.editMode) {
             this.editableInputRef.focus();
+			logger.debug('<<< Exiting toggleEditMode()');
         }
     }
 
     getEditableLabelClass() {
+		logger.debug('>>> Entering getEditableLabelClass()');
         const { props, state } = this;
 
         let editableLabelClass = state.editMode ? " in-edit" : "";
+		logger.debug(`getEditableLabelClass(): editableLabelClass → ${editableLabelClass}`);
         let inputTypeClass = props.inputType === "textArea" ? " textArea" : " singleLine";
+		logger.debug(`getEditableLabelClass(): inputTypeClass → ${inputTypeClass}`);
 
+		logger.debug('<<< Exiting getEditableLabelClass()');
         return "dnn-editable-field" + editableLabelClass + inputTypeClass;
     }
 
@@ -41,6 +50,7 @@ class EditableField extends Component {
         }
     }
     getInputFromType() {
+		logger.debug('>>> Entering getInputFromType()');
         const { props, state } = this;
         if (props.inputType && props.inputType === "textArea") {
             return <TextArea
@@ -55,6 +65,7 @@ class EditableField extends Component {
                 errorMessage={props.errorMessage}
             />;
         } else {
+			logger.debug('<<< Exiting getInputFromType()');
             return <Input
                 value={state.value}
                 onKeyDown={this.onKeyDown.bind(this)}
@@ -141,27 +152,33 @@ class EditableField extends Component {
     }
 
     getUrl(text) {
+		logger.debug(`>>> Entering getUrl(text=${text})`);
         if (text.indexOf("http://") !== 0 && text.indexOf("https://") !== 0) {
+		logger.debug(`<<< Exiting getUrl(text=${text})`);
             return "http://" + text;
         }
         return text;
     }
 
     getEditableValue() {
+		logger.debug('>>> Entering getEditableValue()');
         const { props, state } = this;
         if (!props.isUrl) {
+		logger.debug('<<< Exiting getEditableValue()');
             return <span className="editable-value">{state.value}</span>;
         }
         return <span className="editable-value"><a href={this.getUrl(state.value)} target="_blank" rel="noopener noreferrer">{state.value}</a></span>;
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props, refs } = this;
         const editableLabelClass = this.getEditableLabelClass();
         const input = this.getInputFromType();
         const editableValue = this.getEditableValue();
         const editButton = this.getEditButton();
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={editableLabelClass}>
                 <label className="editable-label" htmlFor={refs.input}>{props.label}</label>

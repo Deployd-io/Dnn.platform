@@ -1,9 +1,11 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 //mIRC mode by Ford_Lawnmower :: Based on Velocity mode by Steve O'Hara
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -15,9 +17,13 @@
 
 CodeMirror.defineMIME("text/mirc", "mirc");
 CodeMirror.defineMode("mirc", function() {
+logger.debug('>>> Entering defineMode()');
   function parseWords(str) {
+	logger.debug(`>>> Entering parseWords(str=${str})`);
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.debug(`parseWords(str=${str}): obj → ${obj}`);
+	logger.debug(`<<< Exiting parseWords(str=${str})`);
     return obj;
   }
   var specials = parseWords("$! $$ $& $? $+ $abook $abs $active $activecid " +
@@ -82,18 +88,27 @@ CodeMirror.defineMode("mirc", function() {
                             "elseif else goto menu nicklist status title icon size option text edit " +
                             "button check radio box scroll list combo link tab item");
   var functions = parseWords("if elseif else and not or eq ne in ni for foreach while switch");
+logger.debug(`defineMode(): functions → ${functions}`);
   var isOperatorChar = /[+\-*&%=<>!?^\/\|]/;
   function chain(stream, state, f) {
+	logger.debug(`>>> Entering chain(stream=${stream},state=${state},f=${f})`);
     state.tokenize = f;
+	logger.debug(`chain(stream=${stream},state=${state},f=${f}): state.tokenize → ${state.tokenize}`);
+	logger.debug(`<<< Exiting chain(stream=${stream},state=${state},f=${f})`);
     return f(stream, state);
   }
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     var beforeParams = state.beforeParams;
     state.beforeParams = false;
+	logger.debug(`defineMode(): state.tokenize → ${state.tokenize}`);
     var ch = stream.next();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
     if (/[\[\]{}\(\),\.]/.test(ch)) {
+	logger.debug(`defineMode(): state.beforeParams → ${state.beforeParams}`);
       if (ch == "(" && beforeParams) state.inParams = true;
       else if (ch == ")") state.inParams = false;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.beforeParams → ${state.beforeParams}`);
       return null;
     }
     else if (/\d/.test(ch)) {
@@ -141,31 +156,39 @@ CodeMirror.defineMode("mirc", function() {
     else {
       stream.eatWhile(/[\w\$_{}]/);
       var word = stream.current().toLowerCase();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): word → ${word}`);
       if (keywords && keywords.propertyIsEnumerable(word))
         return "keyword";
       if (functions && functions.propertyIsEnumerable(word)) {
         state.beforeParams = true;
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
         return "keyword";
       }
       return null;
     }
   }
   function tokenComment(stream, state) {
+	logger.debug(`>>> Entering tokenComment(stream=${stream},state=${state})`);
     var maybeEnd = false, ch;
     while (ch = stream.next()) {
+	logger.debug(`tokenComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`);
       if (ch == "/" && maybeEnd) {
         state.tokenize = tokenBase;
+		logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         break;
       }
       maybeEnd = (ch == "*");
     }
+	logger.debug(`<<< Exiting tokenComment(stream=${stream},state=${state})`);
     return "comment";
   }
   function tokenUnparsed(stream, state) {
+	logger.debug(`>>> Entering tokenUnparsed(stream=${stream},state=${state})`);
     var maybeEnd = 0, ch;
     while (ch = stream.next()) {
       if (ch == ";" && maybeEnd == 2) {
         state.tokenize = tokenBase;
+		logger.debug(`tokenUnparsed(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         break;
       }
       if (ch == ")")
@@ -173,18 +196,24 @@ CodeMirror.defineMode("mirc", function() {
       else if (ch != " ")
         maybeEnd = 0;
     }
+	logger.debug(`<<< Exiting tokenUnparsed(stream=${stream},state=${state})`);
     return "meta";
   }
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
+	logger.debug('<<< Exiting defineMode()');
       return {
         tokenize: tokenBase,
         beforeParams: false,
         inParams: false
       };
+	logger.debug('<<< Exiting startState()');
     },
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (stream.eatSpace()) return null;
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return state.tokenize(stream, state);
     }
   };

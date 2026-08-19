@@ -14,8 +14,10 @@ namespace DotNetNuke.Web.DDRMenu
         /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services)
         {
+			eventLogger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
             services.AddScoped<ILocaliser, Localiser>();
             services.TryAddEnumerable(ServiceDescriptor.Scoped<ILocalisation, Generic>());
+			eventLogger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
         }
     }
 }

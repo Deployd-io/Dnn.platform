@@ -9,10 +9,13 @@ namespace Dnn.AuthServices.Jwt.Services
     /// <summary>Registers the API routes for this extension.</summary>
     public class ServiceRouteMapper : IServiceRouteMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ServiceRouteMapper));
         /// <inheritdoc />
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			Logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute("JwtAuth", "default", "{controller}/{action}", new[] { this.GetType().Namespace });
+			Logger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
     }
 }

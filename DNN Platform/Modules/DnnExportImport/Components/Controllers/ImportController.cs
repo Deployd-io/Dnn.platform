@@ -19,11 +19,14 @@ namespace Dnn.ExportImport.Components.Controllers
     /// <summary>The import controller.</summary>
     public class ImportController : BaseController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImportController));
         /// <summary>Initializes a new instance of the <see cref="ImportController"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.0.0. Please use overload with IEnumerable<BasePortableService>. Scheduled removal in v12.0.0.")]
         public ImportController()
             : base(null)
         {
+		Logger.LogDebug(">>> Entering ImportController()");
+		Logger.LogDebug("<<< Exiting ImportController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ImportController"/> class.</summary>
@@ -39,6 +42,7 @@ namespace Dnn.ExportImport.Components.Controllers
         /// <returns>The job ID.</returns>
         public int QueueOperation(int userId, ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering QueueOperation(userId={UserId},importDto={ImportDto})", userId, importDto);
             using (var repository = new ExportImportRepository(GetPackageDbPath(importDto.PackageId)))
             {
                 var exportDto = repository.GetSingleItem<ExportDto>();
@@ -48,6 +52,7 @@ namespace Dnn.ExportImport.Components.Controllers
             importDto.ExportFileInfo =
                 GetExportFileInfo(Path.Combine(ExportFolder, Path.GetFileName(importDto.PackageId), Constants.ExportManifestName));
             var dataObject = JsonConvert.SerializeObject(importDto);
+			Logger.LogDebug("QueueOperation(userId={UserId},importDto={ImportDto}): dataObject → {DataObject}", userId, importDto, dataObject);
             var jobId = DataProvider.Instance().AddNewJob(
                 importDto.PortalId, userId, JobType.Import, null, null, importDto.PackageId, dataObject);
 
@@ -58,6 +63,7 @@ namespace Dnn.ExportImport.Components.Controllers
             }
 
             this.AddEventLog(importDto.PortalId, userId, jobId, Constants.LogTypeSiteImport);
+			Logger.LogDebug("<<< Exiting QueueOperation(userId={UserId},importDto={ImportDto})", userId, importDto);
             return jobId;
         }
 
@@ -76,12 +82,15 @@ namespace Dnn.ExportImport.Components.Controllers
             int pageIndex = 0,
             int pageSize = 10)
         {
+			Logger.LogDebug(">>> Entering GetImportPackages(keyword={Keyword},order={Order},pageIndex={PageIndex},pageSize={PageSize})", keyword, order, pageIndex, pageSize);
             pageSize = pageSize > 100 ? 100 : pageSize;
             var directories = Directory.GetDirectories(ExportFolder);
+			Logger.LogDebug("GetImportPackages(keyword={Keyword},order={Order},pageIndex={PageIndex},pageSize={PageSize}): directories → {Directories}", keyword, order, pageIndex, pageSize, directories);
             var importPackages = from directory in directories.Where(IsValidImportFolder)
                                  select GetPackageInfo(Path.Combine(directory, Constants.ExportManifestName));
 
             var importPackagesList = importPackages as IList<ImportPackageInfo> ?? importPackages.ToList();
+			Logger.LogDebug("GetImportPackages(keyword={Keyword},order={Order},pageIndex={PageIndex},pageSize={PageSize}): importPackagesList → {ImportPackagesList}", keyword, order, pageIndex, pageSize, importPackagesList);
 
             importPackages = !string.IsNullOrEmpty(keyword)
                 ? importPackagesList.Where(GetImportPackageFilterFunc(keyword))
@@ -89,10 +98,13 @@ namespace Dnn.ExportImport.Components.Controllers
 
             total = importPackages.Count();
             string sortOrder;
+			Logger.LogDebug("GetImportPackages(keyword={Keyword},order={Order},pageIndex={PageIndex},pageSize={PageSize}): total → {Total}", keyword, order, pageIndex, pageSize, total);
             var orderByFunc = GetImportPackageOrderByFunc(order, out sortOrder);
+			Logger.LogDebug("GetImportPackages(keyword={Keyword},order={Order},pageIndex={PageIndex},pageSize={PageSize}): orderByFunc → {OrderByFunc}", keyword, order, pageIndex, pageSize, orderByFunc);
             importPackages = sortOrder == "asc"
                 ? importPackages.OrderBy(orderByFunc)
                 : importPackages.OrderByDescending(orderByFunc);
+			Logger.LogDebug("<<< Exiting GetImportPackages(keyword={Keyword},order={Order},pageIndex={PageIndex},pageSize={PageSize})", keyword, order, pageIndex, pageSize);
             return importPackages.Skip(pageIndex * pageSize).Take(pageSize);
         }
 
@@ -103,15 +115,19 @@ namespace Dnn.ExportImport.Components.Controllers
         /// <returns><see langword="true"/> if the package is value, otherwise <see langword="false"/>.</returns>
         public bool VerifyImportPackage(string packageId, ImportExportSummary summary, out string errorMessage)
         {
+			Logger.LogDebug(">>> Entering VerifyImportPackage(packageId={PackageId},summary={Summary})", packageId, summary);
             bool isValid;
             errorMessage = string.Empty;
             var importFolder = Path.Combine(ExportFolder, Path.GetFileName(packageId));
+			Logger.LogDebug("VerifyImportPackage(packageId={PackageId},summary={Summary}): importFolder → {ImportFolder}", packageId, summary, importFolder);
+			Logger.LogDebug("VerifyImportPackage(packageId={PackageId},summary={Summary}): errorMessage → {ErrorMessage}", packageId, summary, errorMessage);
             if (!IsValidImportFolder(importFolder))
             {
                 return false;
             }
 
             var dbPath = UnPackDatabase(importFolder);
+			Logger.LogDebug("VerifyImportPackage(packageId={PackageId},summary={Summary}): dbPath → {DbPath}", packageId, summary, dbPath);
             try
             {
                 using (var ctx = new ExportImportRepository(dbPath))
@@ -126,15 +142,19 @@ namespace Dnn.ExportImport.Components.Controllers
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in VerifyImportPackage(packageId={PackageId},summary={Summary}): {Arg2}", packageId, summary, ex.getMessage());
                 isValid = false;
+				Logger.LogDebug("VerifyImportPackage(packageId={PackageId},summary={Summary}): isValid → {IsValid}", packageId, summary, isValid);
                 errorMessage = "Package is not valid. Technical Details:" + ex.Message;
             }
 
+			Logger.LogDebug("<<< Exiting VerifyImportPackage(packageId={PackageId},summary={Summary})", packageId, summary);
             return isValid;
         }
 
         private static string GetPackageDbPath(string packageId)
         {
+			Logger.LogDebug(">>> Entering GetPackageDbPath(packageId={PackageId})", packageId);
             var importFolder = Path.Combine(ExportFolder, Path.GetFileName(packageId));
             if (!IsValidImportFolder(importFolder))
             {
@@ -142,11 +162,14 @@ namespace Dnn.ExportImport.Components.Controllers
             }
 
             var dbPath = UnPackDatabase(importFolder);
+			Logger.LogDebug("GetPackageDbPath(packageId={PackageId}): dbPath → {DbPath}", packageId, dbPath);
+			Logger.LogDebug("<<< Exiting GetPackageDbPath(packageId={PackageId})", packageId);
             return dbPath;
         }
 
         private static string UnPackDatabase(string folderPath)
         {
+			Logger.LogDebug(">>> Entering UnPackDatabase(folderPath={FolderPath})", folderPath);
             var dbName = Path.Combine(folderPath, Constants.ExportDbName);
             if (File.Exists(dbName))
             {
@@ -154,12 +177,16 @@ namespace Dnn.ExportImport.Components.Controllers
             }
 
             var zipDbName = Path.Combine(folderPath, Constants.ExportZipDbName);
+			Logger.LogDebug("UnPackDatabase(folderPath={FolderPath}): zipDbName → {ZipDbName}", folderPath, zipDbName);
             CompressionUtil.UnZipFileFromArchive(Constants.ExportDbName, zipDbName, folderPath, false);
+			Logger.LogDebug("<<< Exiting UnPackDatabase(folderPath={FolderPath})", folderPath);
             return dbName;
         }
 
         private static bool IsValidImportFolder(string folderPath)
         {
+			Logger.LogDebug(">>> Entering IsValidImportFolder(folderPath={FolderPath})", folderPath);
+			Logger.LogDebug("<<< Exiting IsValidImportFolder(folderPath={FolderPath})", folderPath);
             return File.Exists(Path.Combine(folderPath, Constants.ExportManifestName)) && (File.Exists(Path.Combine(folderPath, Constants.ExportDbName)) ||
                    File.Exists(Path.Combine(folderPath, Constants.ExportZipDbName)));
         }

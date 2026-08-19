@@ -4,20 +4,27 @@ import { FileUpload, GridSystem, GridCell, Label } from "@dnnsoftware/dnn-react-
 import Localization from "../../../localization";
 import util from "../../../utils";
 import styles from "./styles.module.less";
+const logger = console;
 
 export default class PageIcons extends Component {            
     constructor(props) {
         super(props);  
+		logger.debug(`>>> Entering constructor(props=${props})`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }    
 
     onChangeIcon(key, fileInfo) {        
+		logger.debug(`>>> Entering onChangeIcon(key=${key},fileInfo=${fileInfo})`);
         const {onChangeField} = this.props;
         onChangeField(key, fileInfo);
+		logger.debug(`<<< Exiting onChangeIcon(key=${key},fileInfo=${fileInfo})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;  
         util.utilities = util.getUtilities();
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.pageIcons}>
                 <GridSystem>

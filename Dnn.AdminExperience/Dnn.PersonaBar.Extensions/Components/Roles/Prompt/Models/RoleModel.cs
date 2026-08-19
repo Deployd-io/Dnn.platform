@@ -14,6 +14,8 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Models
         /// <summary>Initializes a new instance of the <see cref="RoleModel"/> class.</summary>
         public RoleModel()
         {
+		eventLogger.LogDebug(">>> Entering RoleModel()");
+		eventLogger.LogDebug("<<< Exiting RoleModel()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="RoleModel"/> class.</summary>
@@ -24,6 +26,7 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Models
             this.ModifiedDate = role.LastModifiedOnDate.ToPromptLongDateString();
             this.CreatedDate = role.CreatedOnDate.ToPromptLongDateString();
             this.CreatedBy = role.CreatedByUserID;
+			eventLogger.LogDebug("RoleModel(role={Role}): this.CreatedBy → {Arg1}", role, this.CreatedBy);
             this.Description = role.Description;
         }
 

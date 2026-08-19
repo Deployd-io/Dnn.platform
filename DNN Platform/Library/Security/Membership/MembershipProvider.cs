@@ -12,6 +12,7 @@ namespace DotNetNuke.Security.Membership
 
     public abstract class MembershipProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MembershipProvider));
         public abstract bool CanEditProviderProperties { get; }
 
         public abstract int MaxInvalidPasswordAttempts { get; set; }
@@ -37,6 +38,8 @@ namespace DotNetNuke.Security.Membership
         // return the provider
         public static MembershipProvider Instance()
         {
+			Logger.LogDebug(">>> Entering Instance()");
+			Logger.LogDebug("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<MembershipProvider>();
         }
 
@@ -169,6 +172,8 @@ namespace DotNetNuke.Security.Membership
         // Legacy
         public virtual void TransferUsersToMembershipProvider()
         {
+		Logger.LogDebug(">>> Entering TransferUsersToMembershipProvider()");
+		Logger.LogDebug("<<< Exiting TransferUsersToMembershipProvider()");
         }
 
         // Get Users
@@ -231,6 +236,8 @@ namespace DotNetNuke.Security.Membership
         /// <inheritdoc cref="IUserController.GetUserByDisplayname"/>
         public virtual UserInfo GetUserByDisplayName(int portalId, string displayName)
         {
+			Logger.LogDebug(">>> Entering GetUserByDisplayName(portalId={PortalId},displayName={DisplayName})", portalId, displayName);
+			Logger.LogDebug("<<< Exiting GetUserByDisplayName(portalId={PortalId},displayName={DisplayName})", portalId, displayName);
             return null;
         }
 
@@ -240,6 +247,8 @@ namespace DotNetNuke.Security.Membership
         /// <returns>The User as a UserInfo object or <see langword="null"/>.</returns>
         public virtual UserInfo GetUserByVanityUrl(int portalId, string vanityUrl)
         {
+			Logger.LogDebug(">>> Entering GetUserByVanityUrl(portalId={PortalId},vanityUrl={VanityUrl})", portalId, vanityUrl);
+			Logger.LogDebug("<<< Exiting GetUserByVanityUrl(portalId={PortalId},vanityUrl={VanityUrl})", portalId, vanityUrl);
             return null;
         }
 
@@ -249,21 +258,30 @@ namespace DotNetNuke.Security.Membership
         /// <returns>The User as a UserInfo object.</returns>
         public virtual UserInfo GetUserByPasswordResetToken(int portalId, string resetToken)
         {
+			Logger.LogDebug(">>> Entering GetUserByPasswordResetToken(portalId={PortalId},resetToken=<redacted>)", portalId);
+			Logger.LogDebug("<<< Exiting GetUserByPasswordResetToken(portalId={PortalId},resetToken=<redacted>)", portalId);
             return null;
         }
 
         public virtual UserInfo GetUserByAuthToken(int portalId, string userToken, string authType)
         {
+			Logger.LogDebug(">>> Entering GetUserByAuthToken(portalId={PortalId},userToken=<redacted>,authType={AuthType})", portalId, authType);
+			Logger.LogWarning("Throwing NotImplementedException from GetUserByAuthToken(portalId={PortalId},userToken=<redacted>,authType={AuthType})", portalId, authType);
+			Logger.LogDebug("<<< Exiting GetUserByAuthToken(portalId={PortalId},userToken=<redacted>,authType={AuthType})", portalId, authType);
             throw new NotImplementedException();
         }
 
         public virtual string GetProviderUserKey(UserInfo user)
         {
+			Logger.LogDebug(">>> Entering GetProviderUserKey(user={User})", user);
+			Logger.LogDebug("<<< Exiting GetProviderUserKey(user={User})", user);
             return null;
         }
 
         public virtual UserInfo GetUserByProviderUserKey(int portalId, string providerUserKey)
         {
+			Logger.LogDebug(">>> Entering GetUserByProviderUserKey(portalId={PortalId},providerUserKey={ProviderUserKey})", portalId, providerUserKey);
+			Logger.LogDebug("<<< Exiting GetUserByProviderUserKey(portalId={PortalId},providerUserKey={ProviderUserKey})", portalId, providerUserKey);
             return null;
         }
 
@@ -278,6 +296,9 @@ namespace DotNetNuke.Security.Membership
         /// <returns>An ArrayList of UserInfo objects.</returns>
         public virtual ArrayList GetUsers(int portalId, int pageIndex, int pageSize, ref int totalRecords, bool includeDeleted, bool superUsersOnly)
         {
+			Logger.LogDebug(">>> Entering GetUsers(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
+			Logger.LogWarning("Throwing NotImplementedException from GetUsers(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
+			Logger.LogDebug("<<< Exiting GetUsers(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
             throw new NotImplementedException();
         }
 
@@ -293,6 +314,9 @@ namespace DotNetNuke.Security.Membership
         /// <returns>An ArrayList of UserInfo objects.</returns>
         public virtual ArrayList GetUsersByEmail(int portalId, string emailToMatch, int pageIndex, int pageSize, ref int totalRecords, bool includeDeleted, bool superUsersOnly)
         {
+			Logger.LogDebug(">>> Entering GetUsersByEmail(portalId={PortalId},emailToMatch={EmailToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, emailToMatch, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
+			Logger.LogWarning("Throwing NotImplementedException from GetUsersByEmail(portalId={PortalId},emailToMatch={EmailToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, emailToMatch, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
+			Logger.LogDebug("<<< Exiting GetUsersByEmail(portalId={PortalId},emailToMatch={EmailToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, emailToMatch, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
             throw new NotImplementedException();
         }
 
@@ -308,6 +332,9 @@ namespace DotNetNuke.Security.Membership
         /// <returns>An ArrayList of UserInfo objects.</returns>
         public virtual ArrayList GetUsersByUserName(int portalId, string userNameToMatch, int pageIndex, int pageSize, ref int totalRecords, bool includeDeleted, bool superUsersOnly)
         {
+			Logger.LogDebug(">>> Entering GetUsersByUserName(portalId={PortalId},userNameToMatch={UserNameToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, userNameToMatch, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
+			Logger.LogWarning("Throwing NotImplementedException from GetUsersByUserName(portalId={PortalId},userNameToMatch={UserNameToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, userNameToMatch, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
+			Logger.LogDebug("<<< Exiting GetUsersByUserName(portalId={PortalId},userNameToMatch={UserNameToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, userNameToMatch, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
             throw new NotImplementedException();
         }
 
@@ -323,6 +350,9 @@ namespace DotNetNuke.Security.Membership
         /// <returns>An ArrayList of UserInfo objects.</returns>
         public virtual ArrayList GetUsersByDisplayName(int portalId, string nameToMatch, int pageIndex, int pageSize, ref int totalRecords, bool includeDeleted, bool superUsersOnly)
         {
+			Logger.LogDebug(">>> Entering GetUsersByDisplayName(portalId={PortalId},nameToMatch={NameToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, nameToMatch, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
+			Logger.LogWarning("Throwing NotImplementedException from GetUsersByDisplayName(portalId={PortalId},nameToMatch={NameToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, nameToMatch, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
+			Logger.LogDebug("<<< Exiting GetUsersByDisplayName(portalId={PortalId},nameToMatch={NameToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, nameToMatch, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
             throw new NotImplementedException();
         }
 
@@ -338,23 +368,35 @@ namespace DotNetNuke.Security.Membership
         /// <returns>An ArrayList of UserInfo objects.</returns>
         public virtual ArrayList GetUsersByProfileProperty(int portalId, string propertyName, string propertyValue, int pageIndex, int pageSize, ref int totalRecords, bool includeDeleted, bool superUsersOnly)
         {
+			Logger.LogDebug(">>> Entering GetUsersByProfileProperty(portalId={PortalId},propertyName={PropertyName},propertyValue={PropertyValue},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, propertyName, propertyValue, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
+			Logger.LogWarning("Throwing NotImplementedException from GetUsersByProfileProperty(portalId={PortalId},propertyName={PropertyName},propertyValue={PropertyValue},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, propertyName, propertyValue, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
+			Logger.LogDebug("<<< Exiting GetUsersByProfileProperty(portalId={PortalId},propertyName={PropertyName},propertyValue={PropertyValue},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, propertyName, propertyValue, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
             throw new NotImplementedException();
         }
 
         public virtual ArrayList GetUnAuthorizedUsers(int portalId, bool includeDeleted, bool superUsersOnly)
         {
+			Logger.LogDebug(">>> Entering GetUnAuthorizedUsers(portalId={PortalId},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, includeDeleted, superUsersOnly);
+			Logger.LogWarning("Throwing NotImplementedException from GetUnAuthorizedUsers(portalId={PortalId},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, includeDeleted, superUsersOnly);
+			Logger.LogDebug("<<< Exiting GetUnAuthorizedUsers(portalId={PortalId},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, includeDeleted, superUsersOnly);
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="IUserController.GetUsersAdvancedSearch" />
         public virtual IList<UserInfo> GetUsersAdvancedSearch(int portalId, int userId, int filterUserId, int filterRoleId, int relationTypeId, bool isAdmin, int pageIndex, int pageSize, string sortColumn, bool sortAscending, string propertyNames, string propertyValues)
         {
+			Logger.LogDebug(">>> Entering GetUsersAdvancedSearch(portalId={PortalId},userId={UserId},filterUserId={FilterUserId},filterRoleId={FilterRoleId},relationTypeId={RelationTypeId},isAdmin={IsAdmin},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending},propertyNames={PropertyNames},propertyValues={PropertyValues})", portalId, userId, filterUserId, filterRoleId, relationTypeId, isAdmin, pageIndex, pageSize, sortColumn, sortAscending, propertyNames, propertyValues);
+			Logger.LogWarning("Throwing NotImplementedException from GetUsersAdvancedSearch(portalId={PortalId},userId={UserId},filterUserId={FilterUserId},filterRoleId={FilterRoleId},relationTypeId={RelationTypeId},isAdmin={IsAdmin},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending},propertyNames={PropertyNames},propertyValues={PropertyValues})", portalId, userId, filterUserId, filterRoleId, relationTypeId, isAdmin, pageIndex, pageSize, sortColumn, sortAscending, propertyNames, propertyValues);
+			Logger.LogDebug("<<< Exiting GetUsersAdvancedSearch(portalId={PortalId},userId={UserId},filterUserId={FilterUserId},filterRoleId={FilterRoleId},relationTypeId={RelationTypeId},isAdmin={IsAdmin},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending},propertyNames={PropertyNames},propertyValues={PropertyValues})", portalId, userId, filterUserId, filterRoleId, relationTypeId, isAdmin, pageIndex, pageSize, sortColumn, sortAscending, propertyNames, propertyValues);
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="IUserController.GetUsersBasicSearch" />
         public virtual IList<UserInfo> GetUsersBasicSearch(int portalId, int pageIndex, int pageSize, string sortColumn, bool sortAscending, string propertyName, string propertyValue)
         {
+			Logger.LogDebug(">>> Entering GetUsersBasicSearch(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending},propertyName={PropertyName},propertyValue={PropertyValue})", portalId, pageIndex, pageSize, sortColumn, sortAscending, propertyName, propertyValue);
+			Logger.LogWarning("Throwing NotImplementedException from GetUsersBasicSearch(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending},propertyName={PropertyName},propertyValue={PropertyValue})", portalId, pageIndex, pageSize, sortColumn, sortAscending, propertyName, propertyValue);
+			Logger.LogDebug("<<< Exiting GetUsersBasicSearch(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending},propertyName={PropertyName},propertyValue={PropertyValue})", portalId, pageIndex, pageSize, sortColumn, sortAscending, propertyName, propertyValue);
             throw new NotImplementedException();
         }
 
@@ -369,6 +411,9 @@ namespace DotNetNuke.Security.Membership
         /// <returns><see langword="true"/> if the password successfully changed, otherwise <see langword="false"/>.</returns>
         public virtual bool ResetAndChangePassword(UserInfo user, string newPassword)
         {
+			Logger.LogDebug(">>> Entering ResetAndChangePassword(user={User},newPassword=<redacted>)", user);
+			Logger.LogWarning("Throwing NotImplementedException from ResetAndChangePassword(user={User},newPassword=<redacted>)", user);
+			Logger.LogDebug("<<< Exiting ResetAndChangePassword(user={User},newPassword=<redacted>)", user);
             throw new NotImplementedException();
         }
 
@@ -383,6 +428,9 @@ namespace DotNetNuke.Security.Membership
         /// <returns><see langword="true"/> if the password successfully changed, otherwise <see langword="false"/>.</returns>
         public virtual bool ResetAndChangePassword(UserInfo user, string newPassword, string answer)
         {
+			Logger.LogDebug(">>> Entering ResetAndChangePassword(user={User},newPassword=<redacted>,answer={Answer})", user, answer);
+			Logger.LogWarning("Throwing NotImplementedException from ResetAndChangePassword(user={User},newPassword=<redacted>,answer={Answer})", user, answer);
+			Logger.LogDebug("<<< Exiting ResetAndChangePassword(user={User},newPassword=<redacted>,answer={Answer})", user, answer);
             throw new NotImplementedException();
         }
 
@@ -391,6 +439,9 @@ namespace DotNetNuke.Security.Membership
         /// <param name="newUsername">updated username.</param>
         public virtual void ChangeUsername(int userId, string newUsername)
         {
+			Logger.LogDebug(">>> Entering ChangeUsername(userId={UserId},newUsername={NewUsername})", userId, newUsername);
+			Logger.LogWarning("Throwing NotImplementedException from ChangeUsername(userId={UserId},newUsername={NewUsername})", userId, newUsername);
+			Logger.LogDebug("<<< Exiting ChangeUsername(userId={UserId},newUsername={NewUsername})", userId, newUsername);
             throw new NotImplementedException();
         }
 
@@ -399,6 +450,9 @@ namespace DotNetNuke.Security.Membership
         /// <param name="userId">User ID.</param>
         public virtual void AddUserPortal(int portalId, int userId)
         {
+			Logger.LogDebug(">>> Entering AddUserPortal(portalId={PortalId},userId={UserId})", portalId, userId);
+			Logger.LogWarning("Throwing NotImplementedException from AddUserPortal(portalId={PortalId},userId={UserId})", portalId, userId);
+			Logger.LogDebug("<<< Exiting AddUserPortal(portalId={PortalId},userId={UserId})", portalId, userId);
             throw new NotImplementedException();
         }
     }

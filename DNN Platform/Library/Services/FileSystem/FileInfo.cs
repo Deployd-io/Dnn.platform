@@ -38,11 +38,14 @@ namespace DotNetNuke.Services.FileSystem
         /// <summary>Initializes a new instance of the <see cref="FileInfo"/> class.</summary>
         public FileInfo()
         {
+			Logger.LogDebug(">>> Entering FileInfo()");
             this.UniqueId = Guid.NewGuid();
             this.VersionGuid = Guid.NewGuid();
+			Logger.LogDebug("<<< Exiting FileInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FileInfo"/> class.</summary>
+		Logger.LogDebug("<<< Exiting FileInfo()");
         /// <param name="portalId">The portal ID.</param>
         /// <param name="filename">The name of the file.</param>
         /// <param name="extension">The extension of the file (without leading <c>.</c>).</param>
@@ -57,7 +60,9 @@ namespace DotNetNuke.Services.FileSystem
         public FileInfo(int portalId, string filename, string extension, int filesize, int width, int height, string contentType, string folder, int folderId, int storageLocation, bool cached)
             : this(portalId, filename, extension, filesize, width, height, contentType, folder, folderId, storageLocation, cached, Null.NullString)
         {
+		Logger.LogDebug(">>> Entering FileInfo(portalId={PortalId},filename={Filename},extension={Extension},filesize={Filesize},width={Width},height={Height},contentType={ContentType},folder={Folder},folderId={FolderId},storageLocation={StorageLocation},cached={Cached})", portalId, filename, extension, filesize, width, height, contentType, folder, folderId, storageLocation, cached);
         }
+		Logger.LogDebug("<<< Exiting FileInfo(portalId={PortalId},filename={Filename},extension={Extension},filesize={Filesize},width={Width},height={Height},contentType={ContentType},folder={Folder},folderId={FolderId},storageLocation={StorageLocation},cached={Cached})", portalId, filename, extension, filesize, width, height, contentType, folder, folderId, storageLocation, cached);
 
         /// <summary>Initializes a new instance of the <see cref="FileInfo"/> class.</summary>
         /// <param name="portalId">The portal ID.</param>
@@ -75,6 +80,7 @@ namespace DotNetNuke.Services.FileSystem
         public FileInfo(int portalId, string filename, string extension, int filesize, int width, int height, string contentType, string folder, int folderId, int storageLocation, bool cached, string hash)
             : this(Guid.NewGuid(), Guid.NewGuid(), portalId, filename, extension, filesize, width, height, contentType, folder, folderId, storageLocation, cached, hash)
         {
+		Logger.LogDebug(">>> Entering FileInfo(portalId={PortalId},filename={Filename},extension={Extension},filesize={Filesize},width={Width},height={Height},contentType={ContentType},folder={Folder},folderId={FolderId},storageLocation={StorageLocation},cached={Cached},hash=<redacted>)", portalId, filename, extension, filesize, width, height, contentType, folder, folderId, storageLocation, cached);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FileInfo"/> class.</summary>
@@ -96,15 +102,22 @@ namespace DotNetNuke.Services.FileSystem
         {
             this.UniqueId = uniqueId;
             this.VersionGuid = versionGuid;
+			Logger.LogDebug("FileInfo(uniqueId={UniqueId},versionGuid={VersionGuid},portalId={PortalId},filename={Filename},extension={Extension},filesize={Filesize},width={Width},height={Height},contentType={ContentType},folder={Folder},folderId={FolderId},storageLocation={StorageLocation},cached={Cached},hash=<redacted>): this.UniqueId → {Arg14}", uniqueId, versionGuid, portalId, filename, extension, filesize, width, height, contentType, folder, folderId, storageLocation, cached, this.UniqueId);
+			Logger.LogDebug("FileInfo(uniqueId={UniqueId},versionGuid={VersionGuid},portalId={PortalId},filename={Filename},extension={Extension},filesize={Filesize},width={Width},height={Height},contentType={ContentType},folder={Folder},folderId={FolderId},storageLocation={StorageLocation},cached={Cached},hash=<redacted>): this.VersionGuid → {Arg14}", uniqueId, versionGuid, portalId, filename, extension, filesize, width, height, contentType, folder, folderId, storageLocation, cached, this.VersionGuid);
             this.PortalId = portalId;
             this.FileName = filename;
             this.Extension = extension;
+			Logger.LogDebug("FileInfo(uniqueId={UniqueId},versionGuid={VersionGuid},portalId={PortalId},filename={Filename},extension={Extension},filesize={Filesize},width={Width},height={Height},contentType={ContentType},folder={Folder},folderId={FolderId},storageLocation={StorageLocation},cached={Cached},hash=<redacted>): this.PortalId → {Arg14}", uniqueId, versionGuid, portalId, filename, extension, filesize, width, height, contentType, folder, folderId, storageLocation, cached, this.PortalId);
+			Logger.LogDebug("FileInfo(uniqueId={UniqueId},versionGuid={VersionGuid},portalId={PortalId},filename={Filename},extension={Extension},filesize={Filesize},width={Width},height={Height},contentType={ContentType},folder={Folder},folderId={FolderId},storageLocation={StorageLocation},cached={Cached},hash=<redacted>): this.FileName → {Arg14}", uniqueId, versionGuid, portalId, filename, extension, filesize, width, height, contentType, folder, folderId, storageLocation, cached, this.FileName);
+			Logger.LogDebug("FileInfo(uniqueId={UniqueId},versionGuid={VersionGuid},portalId={PortalId},filename={Filename},extension={Extension},filesize={Filesize},width={Width},height={Height},contentType={ContentType},folder={Folder},folderId={FolderId},storageLocation={StorageLocation},cached={Cached},hash=<redacted>): this.Extension → {Arg14}", uniqueId, versionGuid, portalId, filename, extension, filesize, width, height, contentType, folder, folderId, storageLocation, cached, this.Extension);
             this.Size = filesize;
             this.Width = width;
             this.Height = height;
             this.ContentType = contentType;
             this.Folder = folder;
             this.FolderId = folderId;
+			Logger.LogDebug("FileInfo(uniqueId={UniqueId},versionGuid={VersionGuid},portalId={PortalId},filename={Filename},extension={Extension},filesize={Filesize},width={Width},height={Height},contentType={ContentType},folder={Folder},folderId={FolderId},storageLocation={StorageLocation},cached={Cached},hash=<redacted>): this.Size → {Arg14}", uniqueId, versionGuid, portalId, filename, extension, filesize, width, height, contentType, folder, folderId, storageLocation, cached, this.Size);
+			Logger.LogDebug("FileInfo(uniqueId={UniqueId},versionGuid={VersionGuid},portalId={PortalId},filename={Filename},extension={Extension},filesize={Filesize},width={Width},height={Height},contentType={ContentType},folder={Folder},folderId={FolderId},storageLocation={StorageLocation},cached={Cached},hash=<redacted>): this.Width → {Arg14}", uniqueId, versionGuid, portalId, filename, extension, filesize, width, height, contentType, folder, folderId, storageLocation, cached, this.Width);
             this.StorageLocation = storageLocation;
             this.IsCached = cached;
             this.SHA1Hash = hash;
@@ -459,6 +472,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.ContentType = Null.SetNullString(dr["ContentType"]);
             this.Extension = Null.SetNullString(dr["Extension"]);
             this.FileId = Null.SetNullInteger(dr["FileId"]);
@@ -485,18 +499,23 @@ namespace DotNetNuke.Services.FileSystem
             this.PublishedVersion = Null.SetNullInteger(dr["PublishedVersion"]);
             this.HasBeenPublished = Convert.ToBoolean(dr["HasBeenPublished"], CultureInfo.InvariantCulture);
             this.FillBaseProperties(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         private void LoadImageProperties()
         {
+			Logger.LogDebug(">>> Entering LoadImageProperties()");
             var fileManager = (FileManager)FileManager.Instance;
             if (!fileManager.IsImageFile(this))
             {
                 this.width = this.height = 0;
+				Logger.LogDebug("LoadImageProperties(): width → {Width}", width);
+				Logger.LogDebug("LoadImageProperties(): this.width → {Arg0}", this.width);
                 return;
             }
 
             var fileContent = fileManager.GetFileContent(this);
+			Logger.LogDebug("LoadImageProperties(): fileContent → {FileContent}", fileContent);
 
             if (fileContent == null)
             {
@@ -512,6 +531,7 @@ namespace DotNetNuke.Services.FileSystem
             }
 
             Image image = null;
+			Logger.LogDebug("LoadImageProperties(): image → {Image}", image);
             try
             {
                 image = fileManager.GetImageFromStream(fileContent);
@@ -520,12 +540,15 @@ namespace DotNetNuke.Services.FileSystem
                 this.height = image.Height;
             }
             catch
+			Logger.LogDebug("LoadImageProperties(): this.height → {Arg0}", this.height);
             {
+				Logger.LogError("Exception in LoadImageProperties(): {Arg0}", ex.Message);
                 this.width = 0;
                 this.height = 0;
                 this.ContentType = "application/octet-stream";
             }
             finally
+			Logger.LogDebug("LoadImageProperties(): this.ContentType → {Arg0}", this.ContentType);
             {
                 if (image != null)
                 {
@@ -533,20 +556,27 @@ namespace DotNetNuke.Services.FileSystem
                 }
 
                 fileContent.Position = 0;
+				Logger.LogDebug("LoadImageProperties(): fileContent.Position → {Arg0}", fileContent.Position);
             }
 
             fileContent.Close();
+			Logger.LogDebug("<<< Exiting LoadImageProperties()");
         }
 
         private void LoadHashProperty()
         {
+			Logger.LogDebug(">>> Entering LoadHashProperty()");
             var fileManager = (FileManager)FileManager.Instance;
             var currentHashCode = FolderProvider.Instance(FolderMappingController.Instance.GetFolderMapping(this.FolderMappingID).FolderProviderType).GetHashCode(this);
+			Logger.LogDebug("LoadHashProperty(): currentHashCode → {CurrentHashCode}", currentHashCode);
+			Logger.LogDebug("LoadHashProperty(): fileManager → {FileManager}", fileManager);
             if (currentHashCode != this.sha1Hash)
             {
                 this.sha1Hash = currentHashCode;
+				Logger.LogDebug("LoadHashProperty(): this.sha1Hash → {Arg0}", this.sha1Hash);
                 fileManager.UpdateFile(this);
             }
+			Logger.LogDebug("<<< Exiting LoadHashProperty()");
         }
     }
 }

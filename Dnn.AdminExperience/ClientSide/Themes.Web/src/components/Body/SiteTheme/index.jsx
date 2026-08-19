@@ -13,24 +13,32 @@ import ThemeSettings from "./ThemeSettings";
 import utils from "utils";
 
 import "./style.less";
+const logger = console;
 
 class SiteTheme extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {};
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         props.dispatch(ThemeActions.getCurrentTheme());
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     hasData() {
+		logger.debug('>>> Entering hasData()');
         const {props} = this;
 
         let source = props.themes.layouts;
         let isHost = utils.params.settings.isHost;
         let hasData = source.filter(l => {
+		logger.debug('<<< Exiting hasData()');
             return isHost || l.level === 1 || l.level === 2;
         }).length > 0;
 
@@ -38,13 +46,17 @@ class SiteTheme extends Component {
     }
 
     getTabs() {
+		logger.debug('>>> Entering getTabs()');
+		logger.debug('<<< Exiting getTabs()');
         return this.hasData() ? [Localization.get("Layouts"), Localization.get("Containers"), Localization.get("Settings")]
             : [Localization.get("Layouts"), Localization.get("Containers")];
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
 
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className="site-theme">
                 <GridCell columnSize={25}>
@@ -75,6 +87,8 @@ SiteTheme.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         themes: state.theme.themes,
         currentTheme: state.theme.currentTheme

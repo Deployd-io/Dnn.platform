@@ -49,7 +49,11 @@ namespace log4net.DateFormatter
         /// </remarks>
         public DateTimeDateFormatter()
         {
+			value.LogDebug(">>> Entering DateTimeDateFormatter()");
             this.m_dateTimeFormatInfo = DateTimeFormatInfo.InvariantInfo;
+			value.LogDebug("DateTimeDateFormatter(): this.m_dateTimeFormatInfo → {Arg0}", this.m_dateTimeFormatInfo);
+			value.LogDebug("DateTimeDateFormatter(): m_dateTimeFormatInfo → {M_dateTimeFormatInfo}", m_dateTimeFormatInfo);
+			value.LogDebug("<<< Exiting DateTimeDateFormatter()");
         }
 
         /// <summary>
@@ -69,6 +73,7 @@ namespace log4net.DateFormatter
         /// </remarks>
         protected override void FormatDateWithoutMillis(DateTime dateToFormat, StringBuilder buffer)
         {
+			value.LogDebug(">>> Entering FormatDateWithoutMillis(dateToFormat={DateToFormat},buffer={Buffer})", dateToFormat, buffer);
             int day = dateToFormat.Day;
             if (day < 10) 
             {
@@ -85,6 +90,7 @@ namespace log4net.DateFormatter
 
             // Append the 'HH:mm:ss'
             base.FormatDateWithoutMillis(dateToFormat, buffer);
+			value.LogDebug("<<< Exiting FormatDateWithoutMillis(dateToFormat={DateToFormat},buffer={Buffer})", dateToFormat, buffer);
         }
 
         /// <summary>

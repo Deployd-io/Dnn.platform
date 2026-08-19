@@ -2,12 +2,14 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import "./style.less";
 import Localization from "localization";
+const logger = console;
 
 import {Dropdown, GridCell, SearchBox} from "@dnnsoftware/dnn-react-common";
 
 class FiltersBar extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             selectedJobFilter: {
                 label: Localization.get("SortByDateNewest"),
@@ -15,6 +17,7 @@ class FiltersBar extends Component {
             },
             searchText: ""
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     onSelect(option) {
@@ -30,18 +33,22 @@ class FiltersBar extends Component {
     }
 
     BuildFiltersOptions() {
+		logger.debug('>>> Entering BuildFiltersOptions()');
         const jobFilters = [
             { "Key": Localization.get("SortByDateNewest"), "Value": "newest" },
             { "Key": Localization.get("SortByDateOldest"), "Value": "oldest" },
             { "Key": Localization.get("SortByName"), "Value": "name" }
         ];
+		logger.debug('<<< Exiting BuildFiltersOptions()');
         return jobFilters.map((jobFilters) => {
             return {label: jobFilters.Key, value: jobFilters.Value};
         });
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let jobFiltersOptions = this.BuildFiltersOptions();
+		logger.debug('<<< Exiting render()');
         return <div className="jobs-filter-container">
             <GridCell columnSize={35} >
                 {

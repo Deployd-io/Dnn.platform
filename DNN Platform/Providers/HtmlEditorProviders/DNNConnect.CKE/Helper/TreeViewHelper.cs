@@ -29,21 +29,26 @@ namespace DNNConnect.CKEditorProvider.Helper
         /// <param name="allLeaves"> if passed would be added as leaves to each node.</param>
         internal void LoadNodes<TData>(IEnumerable<TData> treeViewData, TreeNodeCollection treeViewNodes, Func<TData, TIdentifier> getNodeId, Func<TData, TIdentifier> getParentId, Func<TData, string> getNodeText, Func<TData, string> getNodeValue, Func<TData, string> getNodeImageURL, Func<TIdentifier, bool> parentIdCheck, Dictionary<TIdentifier, HashSet<TreeNode>> allLeaves = null)
         {
+			eventLogger.LogDebug(">>> Entering LoadNodes(treeViewData={TreeViewData},treeViewNodes={TreeViewNodes},getNodeId={GetNodeId},getParentId={GetParentId},getNodeText={GetNodeText},getNodeValue={GetNodeValue},getNodeImageURL={GetNodeImageURL},parentIdCheck={ParentIdCheck},allLeaves={AllLeaves})", treeViewData, treeViewNodes, getNodeId, getParentId, getNodeText, getNodeValue, getNodeImageURL, parentIdCheck, allLeaves);
             this.FillNodes(treeViewData, getNodeId, getParentId, getNodeText, getNodeValue, getNodeImageURL);
             this.RefreshTreeViewNodes(treeViewNodes, parentIdCheck, allLeaves);
+			eventLogger.LogDebug("<<< Exiting LoadNodes(treeViewData={TreeViewData},treeViewNodes={TreeViewNodes},getNodeId={GetNodeId},getParentId={GetParentId},getNodeText={GetNodeText},getNodeValue={GetNodeValue},getNodeImageURL={GetNodeImageURL},parentIdCheck={ParentIdCheck},allLeaves={AllLeaves})", treeViewData, treeViewNodes, getNodeId, getParentId, getNodeText, getNodeValue, getNodeImageURL, parentIdCheck, allLeaves);
         }
 
         private void RefreshTreeViewNodes(TreeNodeCollection treeViewNodes, Func<TIdentifier, bool> parentIdCheck, Dictionary<TIdentifier, HashSet<TreeNode>> allLeaves = null)
         {
+			eventLogger.LogDebug(">>> Entering RefreshTreeViewNodes(treeViewNodes={TreeViewNodes},parentIdCheck={ParentIdCheck},allLeaves={AllLeaves})", treeViewNodes, parentIdCheck, allLeaves);
             treeViewNodes.Clear();
             foreach (var id in this.nodes.Keys)
             {
                 var data = this.GetTreeNodeWithParentId(id);
+				eventLogger.LogDebug("RefreshTreeViewNodes(treeViewNodes={TreeViewNodes},parentIdCheck={ParentIdCheck},allLeaves={AllLeaves}): data → {Data}", treeViewNodes, parentIdCheck, allLeaves, data);
                 var node = data.NodeData;
                 var parentId = data.ParentId;
                 if (parentIdCheck(parentId))
                 {
                     var parentNodeWithId = this.GetTreeNodeWithParentId(parentId);
+					eventLogger.LogDebug("RefreshTreeViewNodes(treeViewNodes={TreeViewNodes},parentIdCheck={ParentIdCheck},allLeaves={AllLeaves}): parentNodeWithId → {ParentNodeWithId}", treeViewNodes, parentIdCheck, allLeaves, parentNodeWithId);
                     if (parentNodeWithId == null)
                     {
                         // if node has an invalid parent (e.g. parent page is deleted), it can't be displayed in the tree
@@ -66,6 +71,7 @@ namespace DNNConnect.CKEditorProvider.Helper
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting RefreshTreeViewNodes(treeViewNodes={TreeViewNodes},parentIdCheck={ParentIdCheck},allLeaves={AllLeaves})", treeViewNodes, parentIdCheck, allLeaves);
         }
 
         private void FillNodes<T>(
@@ -76,13 +82,18 @@ namespace DNNConnect.CKEditorProvider.Helper
             Func<T, string> getNodeValue,
             Func<T, string> getNodeImageURL)
         {
+			eventLogger.LogDebug(">>> Entering FillNodes(treeViewData={TreeViewData},getNodeId={GetNodeId},getParentId={GetParentId},getNodeText={GetNodeText},getNodeValue={GetNodeValue},getNodeImageURL={GetNodeImageURL})", treeViewData, getNodeId, getParentId, getNodeText, getNodeValue, getNodeImageURL);
             this.nodes.Clear();
             foreach (var item in treeViewData)
             {
                 var idTab = getNodeId(item);
+				eventLogger.LogDebug("FillNodes(treeViewData={TreeViewData},getNodeId={GetNodeId},getParentId={GetParentId},getNodeText={GetNodeText},getNodeValue={GetNodeValue},getNodeImageURL={GetNodeImageURL}): idTab → {IdTab}", treeViewData, getNodeId, getParentId, getNodeText, getNodeValue, getNodeImageURL, idTab);
                 var displayName = getNodeText(item);
+				eventLogger.LogDebug("FillNodes(treeViewData={TreeViewData},getNodeId={GetNodeId},getParentId={GetParentId},getNodeText={GetNodeText},getNodeValue={GetNodeValue},getNodeImageURL={GetNodeImageURL}): displayName → {DisplayName}", treeViewData, getNodeId, getParentId, getNodeText, getNodeValue, getNodeImageURL, displayName);
                 var imageUrl = getNodeImageURL(item);
+				eventLogger.LogDebug("FillNodes(treeViewData={TreeViewData},getNodeId={GetNodeId},getParentId={GetParentId},getNodeText={GetNodeText},getNodeValue={GetNodeValue},getNodeImageURL={GetNodeImageURL}): imageUrl → {ImageUrl}", treeViewData, getNodeId, getParentId, getNodeText, getNodeValue, getNodeImageURL, imageUrl);
                 var nodeValue = getNodeValue(item);
+				eventLogger.LogDebug("FillNodes(treeViewData={TreeViewData},getNodeId={GetNodeId},getParentId={GetParentId},getNodeText={GetNodeText},getNodeValue={GetNodeValue},getNodeImageURL={GetNodeImageURL}): nodeValue → {NodeValue}", treeViewData, getNodeId, getParentId, getNodeText, getNodeValue, getNodeImageURL, nodeValue);
 
                 var nodeData = new TreeNodeWithParentId<TIdentifier>
                 {
@@ -96,10 +107,13 @@ namespace DNNConnect.CKEditorProvider.Helper
                 };
                 this.nodes.Add(idTab, nodeData);
             }
+			eventLogger.LogDebug("<<< Exiting FillNodes(treeViewData={TreeViewData},getNodeId={GetNodeId},getParentId={GetParentId},getNodeText={GetNodeText},getNodeValue={GetNodeValue},getNodeImageURL={GetNodeImageURL})", treeViewData, getNodeId, getParentId, getNodeText, getNodeValue, getNodeImageURL);
         }
 
         private TreeNodeWithParentId<TIdentifier> GetTreeNodeWithParentId(TIdentifier key)
         {
+			eventLogger.LogDebug(">>> Entering GetTreeNodeWithParentId(key={Key})", key);
+			eventLogger.LogDebug("<<< Exiting GetTreeNodeWithParentId(key={Key})", key);
             return this.nodes.TryGetValue(key, out var node) ? node : null;
         }
 

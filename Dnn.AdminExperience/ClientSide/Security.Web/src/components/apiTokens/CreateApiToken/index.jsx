@@ -5,6 +5,7 @@ import "./style.less";
 import { Dropdown, GridSystem as Grid, Checkbox, Button, Label, SingleLineInput } from "@dnnsoftware/dnn-react-common";
 import resx from "../../../resources";
 import util from "../../../utils";
+const logger = console;
 
 let isHost = false;
 let isAdmin = false;
@@ -12,6 +13,7 @@ let isAdmin = false;
 class CreateApiToken extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             currentScope: 2,
             apiTokenKeysFiltered: [],
@@ -21,14 +23,20 @@ class CreateApiToken extends Component {
             scopeOptions: (props.apiTokenSettings && props.apiTokenSettings.AllowApiTokens) ? props.scopeOptions : props.scopeOptions.slice(2)
         };
         isHost = util.settings.isHost;
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`);
+		logger.debug(`constructor(props=${props}): isHost → ${isHost}`);
         isAdmin = util.settings.isAdmin;
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.resetApiFilterList();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     resetApiFilterList() {
+		logger.debug('>>> Entering resetApiFilterList()');
         const f = this.props.apiTokenKeys.filter((item) => {
             return item.Scope === this.state.currentScope;
         });
@@ -36,9 +44,12 @@ class CreateApiToken extends Component {
             apiTokenKeysFiltered: f,
             selectedKeys: []
         });
+		logger.debug('<<< Exiting resetApiFilterList()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className="apitokens-details">
                 <Grid numberOfColumns={2}>
@@ -168,6 +179,8 @@ CreateApiToken.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         apiTokenSettings: state.security.apiTokenSettings
     };

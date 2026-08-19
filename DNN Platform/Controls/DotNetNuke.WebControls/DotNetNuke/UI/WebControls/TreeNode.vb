@@ -8,21 +8,31 @@ Imports System
 Imports System.ComponentModel
 Imports System.Web.UI
 Imports System.Xml
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     Public Class TreeNode
         Inherits DNNNode
         Implements IStateManager
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Public Sub New()
+		_logger.LogDebug(">>> Entering New()")
+		_logger.LogDebug(">>> Entering New(strText={StrText})", strText)
+		_logger.LogDebug("<<< Exiting New(strText={StrText})", strText)
         End Sub
 
         Public Sub New(ByVal strText As String)
+			_logger.LogDebug(">>> Entering New(strText={StrText})", strText)
             MyBase.New(strText)
+			_logger.LogDebug("<<< Exiting New(strText={StrText})", strText)
+			_logger.LogDebug(">>> Entering New(ctlOwner={CtlOwner})", ctlOwner)
+			_logger.LogDebug("<<< Exiting New(ctlOwner={CtlOwner})", ctlOwner)
         End Sub
 
         Friend Sub New(ByVal ctlOwner As Control)
             Me.m_objDNNTree = DirectCast(ctlOwner, DnnTree)
+			_logger.LogDebug("<<< Exiting New(objXmlNode={ObjXmlNode},ctlOwner={CtlOwner})", objXmlNode, ctlOwner)
         End Sub
 
         Friend Sub New(ByVal objXmlNode As XmlNode, ByVal ctlOwner As Control)
@@ -31,48 +41,66 @@ Namespace DotNetNuke.UI.WebControls
         End Sub
 
         Public Sub Click()
+			_logger.LogDebug(">>> Entering Click()")
+			_logger.LogDebug("Click(): Me.Selected → {Arg0}", Me.Selected)
             Me.Selected = True
             Me.DNNTree.OnNodeClick(New DNNTreeNodeClickEventArgs(Me))
+			_logger.LogDebug("<<< Exiting Click()")
         End Sub
 
         Public Sub Collapse()
+			_logger.LogDebug(">>> Entering Collapse()")
             If Me.HasNodes Then
                 Me.CustomAttribute("expanded") = "0"
                 Me.DNNTree.OnCollapse(New DNNTreeEventArgs(Me))
             End If
+			_logger.LogDebug("<<< Exiting Collapse()")
         End Sub
 
         Public Sub Expand()
+			_logger.LogDebug(">>> Entering Expand()")
             If Me.HasNodes Then
                 Me.CustomAttribute("expanded") = "1"
                 Me.DNNTree.OnExpand(New DNNTreeEventArgs(Me))
             End If
+			_logger.LogDebug("<<< Exiting Expand()")
         End Sub
 
         Public Sub LoadViewState(ByVal state As Object) Implements IStateManager.LoadViewState
+		_logger.LogDebug(">>> Entering LoadViewState(state={State})", state)
         End Sub
 
         Public Sub MakeNodeVisible()
+			_logger.LogDebug(">>> Entering MakeNodeVisible()")
             If Not Object.ReferenceEquals(Me.Parent, Nothing) Then
                 Me.Parent.Expand
                 Me.Parent.MakeNodeVisible
             End If
+			_logger.LogDebug("<<< Exiting MakeNodeVisible()")
         End Sub
 
         Public Overridable Sub Render(ByVal writer As HtmlTextWriter)
+			_logger.LogDebug(">>> Entering Render(writer={Writer})", writer)
             Me.NodeWriter.RenderNode(writer, Me)
+			_logger.LogDebug("<<< Exiting Render(writer={Writer})", writer)
         End Sub
 
         Public Function SaveViewState() As Object Implements IStateManager.SaveViewState
+			_logger.LogDebug(">>> Entering SaveViewState()")
             Dim obj2 As Object = Nothing
+			_logger.LogDebug("<<< Exiting SaveViewState()")
             Return obj2
         End Function
 
         Friend Sub SetDNNTree(ByVal objTree As DnnTree)
+			_logger.LogDebug(">>> Entering SetDNNTree(objTree={ObjTree})", objTree)
+			_logger.LogDebug("SetDNNTree(objTree={ObjTree}): Me.m_objDNNTree → {Arg1}", objTree, Me.m_objDNNTree)
             Me.m_objDNNTree = objTree
+			_logger.LogDebug("<<< Exiting SetDNNTree(objTree={ObjTree})", objTree)
         End Sub
 
         Public Sub TrackViewState() Implements IStateManager.TrackViewState
+		_logger.LogDebug(">>> Entering TrackViewState()")
         End Sub
 
 

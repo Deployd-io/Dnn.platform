@@ -1,9 +1,12 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Button from "../Button";
+const logger = console;
 
 class TransitionModalContent extends Component {
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return <div className="transition-modal-content">
             <h3>{this.props.header}</h3>
             <p>{this.props.message}</p>

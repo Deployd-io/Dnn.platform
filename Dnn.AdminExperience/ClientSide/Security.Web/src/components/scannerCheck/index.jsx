@@ -5,13 +5,17 @@ import { security as SecurityActions } from "../../actions";
 import { SearchBox, TextOverflowWrapper } from "@dnnsoftware/dnn-react-common";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class ScannerCheckPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
 
     renderFileHeader() {
+		logger.debug('>>> Entering renderFileHeader()');
         const fileTableFields = [
             { "name": resx.get("FileName"), "id": "FileName" },
             { "name": resx.get("LastWriteTime"), "id": "LastWriteTime" }
@@ -23,11 +27,15 @@ class ScannerCheckPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderFileHeader(): tableHeaders → ${tableHeaders}`);
+		logger.debug('<<< Exiting renderFileHeader()');
         return <div className="scannerCheckHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderedFileList() {
+		logger.debug('>>> Entering renderedFileList()');
         const {props} = this;
+		logger.debug('<<< Exiting renderedFileList()');
         return props.searchResults.FoundInFiles.map((term, i) => {
             return (
                 <div className="scannerCheckItem" key={i}>
@@ -47,6 +55,7 @@ class ScannerCheckPanelBody extends Component {
     }
 
     renderDatabaseHeader() {
+		logger.debug('>>> Entering renderDatabaseHeader()');
         const fileTableFields = [
             { "name": resx.get("DatabaseInstance"), "id": "DatabaseInstance" },
             { "name": resx.get("DatabaseValue"), "id": "DatabaseValue" }
@@ -58,11 +67,15 @@ class ScannerCheckPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderDatabaseHeader(): tableHeaders → ${tableHeaders}`);
+		logger.debug('<<< Exiting renderDatabaseHeader()');
         return <div className="scannerCheckHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderedDatabaseList() {
+		logger.debug('>>> Entering renderedDatabaseList()');
         const {props} = this;
+		logger.debug('<<< Exiting renderedDatabaseList()');
         return props.searchResults.FoundInDatabase.map((term, i) => {
             return (
                 <div className="scannerCheckItem" key={i}>
@@ -82,6 +95,7 @@ class ScannerCheckPanelBody extends Component {
     }
 
     renderRiskFilesHeader() {
+		logger.debug('>>> Entering renderRiskFilesHeader()');
         const fileTableFields = [
             { "name": resx.get("FileName"), "id": "FileName" },
             { "name": resx.get("LastWriteTime"), "id": "LastWriteTime" }
@@ -93,15 +107,19 @@ class ScannerCheckPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderRiskFilesHeader(): tableHeaders → ${tableHeaders}`);
+		logger.debug('<<< Exiting renderRiskFilesHeader()');
         return <div className="scannerCheckHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderRiskFilesList(risk) {
+		logger.debug(`>>> Entering renderRiskFilesList(risk=${risk})`);
         const {props} = this;
         let list = props.modifiedFiles.HighRiskFiles;
         if (risk === "low") {
             list = props.modifiedFiles.LowRiskFiles;
         }
+		logger.debug(`<<< Exiting renderRiskFilesList(risk=${risk})`);
         return list.map((term, i) => {
             return (
                 <div className="scannerCheckItem" key={i}>
@@ -121,6 +139,7 @@ class ScannerCheckPanelBody extends Component {
     }
 
     renderPortalSettingsHeader() {
+		logger.debug('>>> Entering renderPortalSettingsHeader()');
         const fileTableFields = [
             { "name": resx.get("PortalId"), "id": "PortalId" },
             { "name": resx.get("SettingName"), "id": "SettingName" },
@@ -135,11 +154,15 @@ class ScannerCheckPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderPortalSettingsHeader(): tableHeaders → ${tableHeaders}`);
+		logger.debug('<<< Exiting renderPortalSettingsHeader()');
         return <div className="scannerCheckHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderedPortalSettingsList() {
+		logger.debug('>>> Entering renderedPortalSettingsList()');
         const {props} = this;
+		logger.debug('<<< Exiting renderedPortalSettingsList()');
         return props.modifiedSettings.PortalSettings.map((term, i) => {
             return (
                 <div className="scannerCheckItem" key={i}>
@@ -174,6 +197,7 @@ class ScannerCheckPanelBody extends Component {
     }
 
     renderHostSettingsHeader() {
+		logger.debug('>>> Entering renderHostSettingsHeader()');
         const fileTableFields = [
             { "name": resx.get("SettingName"), "id": "SettingName" },
             { "name": resx.get("SettingValue"), "id": "SettingValue" },
@@ -187,11 +211,15 @@ class ScannerCheckPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderHostSettingsHeader(): tableHeaders → ${tableHeaders}`);
+		logger.debug('<<< Exiting renderHostSettingsHeader()');
         return <div className="scannerCheckHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderedHostSettingsList() {
+		logger.debug('>>> Entering renderedHostSettingsList()');
         const {props} = this;
+		logger.debug('<<< Exiting renderedHostSettingsList()');
         return props.modifiedSettings.PortalSettings.map((term, i) => {
             return (
                 <div className="scannerCheckItem" key={i}>
@@ -221,6 +249,7 @@ class ScannerCheckPanelBody extends Component {
     }
 
     renderTabSettingsHeader() {
+		logger.debug('>>> Entering renderTabSettingsHeader()');
         const fileTableFields = [
             { "name": resx.get("TabId"), "id": "TabId" },
             { "name": resx.get("PortalId"), "id": "PortalId" },
@@ -236,11 +265,15 @@ class ScannerCheckPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderTabSettingsHeader(): tableHeaders → ${tableHeaders}`);
+		logger.debug('<<< Exiting renderTabSettingsHeader()');
         return <div className="scannerCheckHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderedTabSettingsList() {
+		logger.debug('>>> Entering renderedTabSettingsList()');
         const {props} = this;
+		logger.debug('<<< Exiting renderedTabSettingsList()');
         return props.modifiedSettings.TabSettings.map((term, i) => {
             return (
                 <div className="scannerCheckItem" key={i}>
@@ -280,6 +313,7 @@ class ScannerCheckPanelBody extends Component {
     }
 
     renderModuleSettingsHeader() {
+		logger.debug('>>> Entering renderModuleSettingsHeader()');
         const fileTableFields = [
             { "name": resx.get("Type"), "id": "Type" },
             { "name": resx.get("ModuleId"), "id": "ModuleId" },
@@ -296,11 +330,15 @@ class ScannerCheckPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderModuleSettingsHeader(): tableHeaders → ${tableHeaders}`);
+		logger.debug('<<< Exiting renderModuleSettingsHeader()');
         return <div className="scannerCheckHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderedModuleSettingsList() {
+		logger.debug('>>> Entering renderedModuleSettingsList()');
         const {props} = this;
+		logger.debug('<<< Exiting renderedModuleSettingsList()');
         return props.modifiedSettings.ModuleSettings.map((term, i) => {
             return (
                 <div className="scannerCheckItem" key={i}>
@@ -345,6 +383,7 @@ class ScannerCheckPanelBody extends Component {
     }
 
     onKeywordChanged(keyword) {
+		logger.debug(`>>> Entering onKeywordChanged(keyword=${keyword})`);
         const {props} = this;
 
         if (keyword === "" && props.scannerCheckKeyword !== "") {
@@ -364,9 +403,11 @@ class ScannerCheckPanelBody extends Component {
             props.dispatch(SecurityActions.clearFileSystemAndDatabaseSearch());
         }
         props.dispatch(SecurityActions.updatefileSystemAndDatabaseSearchKeyword(keyword));
+		logger.debug(`<<< Exiting onKeywordChanged(keyword=${keyword})`);
     }
 
     getModifiedSettings() {
+		logger.debug('>>> Entering getModifiedSettings()');
         const {props} = this;
         if (props.scannerCheckActiveTab === "settings") {
             return;
@@ -378,9 +419,11 @@ class ScannerCheckPanelBody extends Component {
         }
         props.dispatch(SecurityActions.getLastModifiedSettings(() => {
         }));
+		logger.debug('<<< Exiting getModifiedSettings()');
     }
 
     getModifiedFiles() {
+		logger.debug('>>> Entering getModifiedFiles()');
         const {props} = this;
         if (props.scannerCheckActiveTab === "files") {
             return;
@@ -392,27 +435,34 @@ class ScannerCheckPanelBody extends Component {
         }
         props.dispatch(SecurityActions.getLastModifiedFiles(() => {
         }));
+		logger.debug('<<< Exiting getModifiedFiles()');
     }
 
     showSearchResults() {
+		logger.debug('>>> Entering showSearchResults()');
         const {props} = this;
         if (props.searchResults && props.scannerCheckActiveTab === "search") {
+		logger.debug('<<< Exiting showSearchResults()');
             return true;
         }
         return false;
     }
 
     showModifiedSettings() {
+		logger.debug('>>> Entering showModifiedSettings()');
         const {props} = this;
         if (props.modifiedSettings && props.scannerCheckActiveTab === "settings") {
+		logger.debug('<<< Exiting showModifiedSettings()');
             return true;
         }
         return false;
     }
 
     showModifiedFiles() {
+		logger.debug('>>> Entering showModifiedFiles()');
         const {props} = this;
         if (props.modifiedFiles && props.scannerCheckActiveTab === "files") {
+		logger.debug('<<< Exiting showModifiedFiles()');
             return true;
         }
         return false;
@@ -420,7 +470,9 @@ class ScannerCheckPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.scannerCheckResults}>
                 <div className="scannercheck-topbar">
@@ -551,6 +603,8 @@ ScannerCheckPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         searchResults: state.security.searchResults,

@@ -8,6 +8,7 @@ import { InputGroup, Switch, GridSystem, Dropdown, Label, Button } from "@dnnsof
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let timeIntervalOptions = [];
 let recipientLimitOptions = [];
@@ -15,12 +16,15 @@ let recipientLimitOptions = [];
 class MessagingSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             messagingSettings: undefined
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const {props} = this;
         if (props.messagingSettings) {
             let portalIdChanged = props.portalId !== undefined && prevProps.portalId !== props.portalId;
@@ -28,15 +32,19 @@ class MessagingSettingsPanelBody extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
             }
         }
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.loadData();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     loadData() {
+		logger.debug('>>> Entering loadData()');
         const {props} = this;
         
         timeIntervalOptions = [];
@@ -64,6 +72,7 @@ class MessagingSettingsPanelBody extends Component {
         recipientLimitOptions.push({ "value": 100, "label": "100" });
 
         props.dispatch(SiteBehaviorActions.getMessagingSettings(props.portalId, (data) => {
+			logger.debug('<<< Exiting loadData()');
             this.setState({
                 messagingSettings: Object.assign({}, data.Settings)
             });
@@ -71,8 +80,10 @@ class MessagingSettingsPanelBody extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
         let messagingSettings = Object.assign({}, state.messagingSettings);
+		logger.debug(`onSettingChange(key=${key},event=${event}): messagingSettings → ${messagingSettings}`);
 
         if (key === "ThrottlingInterval" || key === "RecipientLimit") {
             messagingSettings[key] = event.value;
@@ -86,9 +97,11 @@ class MessagingSettingsPanelBody extends Component {
         });
 
         props.dispatch(SiteBehaviorActions.messagingSettingsClientModified(messagingSettings));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
 
@@ -96,13 +109,16 @@ class MessagingSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.debug(`<<< Exiting onUpdate(event=${event})`);
         }));
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SiteBehaviorActions.getMessagingSettings(props.portalId, (data) => {
+				logger.debug('<<< Exiting onCancel()');
                 this.setState({
                     messagingSettings: Object.assign({}, data.Settings)
                 });
@@ -112,6 +128,7 @@ class MessagingSettingsPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {state} = this;
         if (state.messagingSettings) {
             const columnOne = <div key="column-one" className="left-column">
@@ -216,6 +233,7 @@ class MessagingSettingsPanelBody extends Component {
                 </InputGroup>
             </div>;
 
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.messagingSettings}>
                     <GridSystem numberOfColumns={2}>{[columnOne, columnTwo]}</GridSystem>
@@ -250,6 +268,8 @@ MessagingSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         messagingSettings: state.siteBehavior.messagingSettings,

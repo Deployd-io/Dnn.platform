@@ -13,6 +13,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin object to display a message from a module.</summary>
     public class ModuleMessage : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleMessage));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         protected Panel dnnSkinMessage;
@@ -62,6 +63,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             try
@@ -108,17 +110,21 @@ namespace DotNetNuke.UI.Skins.Controls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc, false);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             // set the scroll js only shown for module message and in postback mode.
             this.scrollScript.Visible = this.IsPostBack && this.IsModuleMessage;
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

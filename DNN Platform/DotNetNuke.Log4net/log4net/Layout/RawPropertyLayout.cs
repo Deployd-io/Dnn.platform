@@ -38,6 +38,8 @@ namespace log4net.Layout
         /// <summary>Constructs a RawPropertyLayout</summary>
         public RawPropertyLayout()
         {
+		value.LogDebug(">>> Entering RawPropertyLayout()");
+		value.LogDebug("<<< Exiting RawPropertyLayout()");
         }
 
         private string m_key;
@@ -69,6 +71,8 @@ namespace log4net.Layout
         /// </remarks>
         public virtual object Format(LoggingEvent loggingEvent)
         {
+			value.LogDebug(">>> Entering Format(loggingEvent={LoggingEvent})", loggingEvent);
+			value.LogDebug("<<< Exiting Format(loggingEvent={LoggingEvent})", loggingEvent);
             return loggingEvent.LookupProperty(this.m_key);
         }
     }

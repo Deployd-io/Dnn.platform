@@ -8,12 +8,14 @@ namespace DotNetNuke.ContentSecurityPolicy
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Utility class for parsing Content Security Policy headers into ContentSecurityPolicy objects.
     /// </summary>
     public class ContentSecurityPolicyParser
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private static readonly char[] CommaSeparator = new[] { ',' };
         private static readonly char[] SemicolonsSeparator = new[] { ';' };
         private static readonly char[] SpaceSeparator = new[] { ' ' };
@@ -26,7 +28,10 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="policy">The ContentSecurityPolicy instance to populate with parsed directives.</param>
         public ContentSecurityPolicyParser(IContentSecurityPolicy policy)
         {
+			_logger.LogDebug(">>> Entering ContentSecurityPolicyParser(policy={Policy})", policy);
             this.policy = policy ?? throw new ArgumentNullException(nameof(policy));
+			_logger.LogDebug("ContentSecurityPolicyParser(policy={Policy}): policy → {Policy1}", policy, policy);
+			_logger.LogDebug("<<< Exiting ContentSecurityPolicyParser(policy={Policy})", policy);
         }
 
         /// <summary>
@@ -36,18 +41,22 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <exception cref="ArgumentException">Thrown when the CSP header is invalid or cannot be parsed.</exception>
         public void Parse(string cspHeader)
         {
+			_logger.LogDebug(">>> Entering Parse(cspHeader={CspHeader})", cspHeader);
             if (string.IsNullOrWhiteSpace(cspHeader))
             {
+				_logger.LogWarning("Throwing ArgumentException from Parse(cspHeader={CspHeader})", cspHeader);
                 throw new ArgumentException("CSP header cannot be null or empty", nameof(cspHeader));
             }
 
             // Split the header into individual directives
             var directives = SplitDirectives(cspHeader);
+			_logger.LogDebug("Parse(cspHeader={CspHeader}): directives → {Directives}", cspHeader, directives);
 
             foreach (var directive in directives)
             {
                 this.ParseDirective(directive);
             }
+			_logger.LogDebug("<<< Exiting Parse(cspHeader={CspHeader})", cspHeader);
         }
 
         /// <summary>
@@ -57,6 +66,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>True if parsing was successful, false otherwise.</returns>
         public bool TryParse(string cspHeader)
         {
+			_logger.LogDebug(">>> Entering TryParse(cspHeader={CspHeader})", cspHeader);
             try
             {
                 this.Parse(cspHeader);
@@ -64,6 +74,8 @@ namespace DotNetNuke.ContentSecurityPolicy
             }
             catch
             {
+				_logger.LogError("Exception in TryParse(cspHeader={CspHeader}): {Arg1}", cspHeader, ex.Message);
+				_logger.LogDebug("<<< Exiting TryParse(cspHeader={CspHeader})", cspHeader);
                 return false;
             }
         }
@@ -74,6 +86,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="cspHeader">The CSP header string to parse.</param>
         public void ParseReportingEndpoints(string cspHeader)
         {
+			_logger.LogDebug(">>> Entering ParseReportingEndpoints(cspHeader={CspHeader})", cspHeader);
             if (string.IsNullOrWhiteSpace(cspHeader))
             {
                 return;
@@ -88,6 +101,7 @@ namespace DotNetNuke.ContentSecurityPolicy
             {
                 this.ParseReportingEndpointsDirective(directive);
             }
+			_logger.LogDebug("<<< Exiting ParseReportingEndpoints(cspHeader={CspHeader})", cspHeader);
         }
 
         /// <summary>
@@ -95,7 +109,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private static IEnumerable<string> SplitDirectives(string cspHeader)
         {
+			_logger.LogDebug(">>> Entering SplitDirectives(cspHeader={CspHeader})", cspHeader);
             // CSP directives are separated by semicolons
+			_logger.LogDebug("<<< Exiting SplitDirectives(cspHeader={CspHeader})", cspHeader);
             return cspHeader.Split(SemicolonsSeparator, StringSplitOptions.RemoveEmptyEntries)
                            .Select(d => d.Trim())
                            .Where(d => !string.IsNullOrEmpty(d));
@@ -106,8 +122,10 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private static void ParseAndAddSource(SourceCspContributor contributor, string source)
         {
+			_logger.LogDebug(">>> Entering ParseAndAddSource(contributor={Contributor},source={Source})", contributor, source);
             var trimmedSource = source.Trim();
 
+			_logger.LogDebug("ParseAndAddSource(contributor={Contributor},source={Source}): trimmedSource → {TrimmedSource}", contributor, source, trimmedSource);
             // Check for quoted keywords first
             if (CspSourceTypeNameMapper.IsQuotedKeyword(trimmedSource))
             {
@@ -139,7 +157,9 @@ namespace DotNetNuke.ContentSecurityPolicy
                 else if (CspSourceTypeNameMapper.IsNonceSource(trimmedSource))
                 {
                     var quotedValue = trimmedSource.Substring(1, trimmedSource.Length - 2);
+					_logger.LogDebug("ParseAndAddSource(contributor={Contributor},source={Source}): quotedValue → {QuotedValue}", contributor, source, quotedValue);
                     var nonce = quotedValue.Substring(6); // Remove "nonce-" prefix
+					_logger.LogDebug("ParseAndAddSource(contributor={Contributor},source={Source}): nonce → {Nonce}", contributor, source, nonce);
                     contributor.AddNonce(nonce);
                 }
                 else if (CspSourceTypeNameMapper.IsHashSource(trimmedSource))
@@ -166,6 +186,7 @@ namespace DotNetNuke.ContentSecurityPolicy
                 // Treat as host (domain without protocol)
                 contributor.AddHost(trimmedSource);
             }
+			_logger.LogDebug("<<< Exiting ParseAndAddSource(contributor={Contributor},source={Source})", contributor, source);
         }
 
         /// <summary>
@@ -173,7 +194,10 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private static bool IsScheme(string source)
         {
+			_logger.LogDebug(">>> Entering IsScheme(source={Source})", source);
             var knownSchemes = new string[] { "http:", "https:", "data:", "blob:", "filesystem:", "wss:", "ws:" };
+			_logger.LogDebug("IsScheme(source={Source}): knownSchemes → {KnownSchemes}", source, knownSchemes);
+			_logger.LogDebug("<<< Exiting IsScheme(source={Source})", source);
             return knownSchemes.Contains(source.ToLowerInvariant());
         }
 
@@ -182,6 +206,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private void ParseDirective(string directive)
         {
+			_logger.LogDebug(">>> Entering ParseDirective(directive={Directive})", directive);
             var parts = directive.Split(SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 0)
             {
@@ -189,16 +214,20 @@ namespace DotNetNuke.ContentSecurityPolicy
             }
 
             var directiveName = parts[0].ToLowerInvariant();
+			_logger.LogDebug("ParseDirective(directive={Directive}): directiveName → {DirectiveName}", directive, directiveName);
             var sources = parts.Skip(1).ToArray();
+			_logger.LogDebug("ParseDirective(directive={Directive}): sources → {Sources}", directive, sources);
 
             // Try to get the directive type from the name
             if (!CspDirectiveNameMapper.TryGetDirectiveType(directiveName, out var directiveType))
             {
                 // Unknown directive - ignore for now
+				_logger.LogWarning("Throwing ArgumentException from ParseDirective(directive={Directive})", directive);
                 throw new ArgumentException($"Unknown directive: {directiveName}");
             }
 
             this.ApplyDirectiveToPolicy(directiveType, sources);
+			_logger.LogDebug("<<< Exiting ParseDirective(directive={Directive})", directive);
         }
 
         /// <summary>
@@ -207,6 +236,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="directive">The reporting endpoints directive string to parse.</param>
         private void ParseReportingEndpointsDirective(string directive)
         {
+			_logger.LogDebug(">>> Entering ParseReportingEndpointsDirective(directive={Directive})", directive);
             if (string.IsNullOrWhiteSpace(directive))
             {
                 return;
@@ -214,16 +244,21 @@ namespace DotNetNuke.ContentSecurityPolicy
 
             // Split directive into name=value pairs
             var parts = directive.Split(EqualSeparator, StringSplitOptions.RemoveEmptyEntries);
+			_logger.LogDebug("ParseReportingEndpointsDirective(directive={Directive}): parts → {Parts}", directive, parts);
             if (parts.Length != 2)
             {
+				_logger.LogWarning("Throwing ArgumentException from ParseReportingEndpointsDirective(directive={Directive})", directive);
+				_logger.LogDebug("ParseReportingEndpointsDirective(directive={Directive}): name → {Name}", directive, name);
                 throw new ArgumentException("Invalid reporting endpoint format. Expected format: name=\"value\"");
             }
 
             var name = parts[0].Trim();
             var value = parts[1].Trim().Trim('"');
+			_logger.LogDebug("ParseReportingEndpointsDirective(directive={Directive}): value → {Value}", directive, value);
 
             // Add the reporting endpoint to the policy
             this.policy.AddReportEndpoint(name, value);
+			_logger.LogDebug("<<< Exiting ParseReportingEndpointsDirective(directive={Directive})", directive);
         }
 
         /// <summary>
@@ -231,6 +266,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private void ApplyDirectiveToPolicy(CspDirectiveType directiveType, string[] sources)
         {
+			_logger.LogDebug(">>> Entering ApplyDirectiveToPolicy(directiveType={DirectiveType},sources={Sources})", directiveType, sources);
             switch (directiveType)
             {
                 case CspDirectiveType.SandboxDirective:
@@ -268,6 +304,7 @@ namespace DotNetNuke.ContentSecurityPolicy
                 // Source-based directives
                 default:
                     var contributor = this.GetSourceContributor(directiveType);
+					_logger.LogDebug("ApplyDirectiveToPolicy(directiveType={DirectiveType},sources={Sources}): contributor → {Contributor}", directiveType, sources, contributor);
                     if (contributor != null)
                     {
                         foreach (var source in sources)
@@ -278,6 +315,7 @@ namespace DotNetNuke.ContentSecurityPolicy
 
                     break;
             }
+			_logger.LogDebug("<<< Exiting ApplyDirectiveToPolicy(directiveType={DirectiveType},sources={Sources})", directiveType, sources);
         }
 
         /// <summary>
@@ -285,6 +323,12 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private SourceCspContributor GetSourceContributor(CspDirectiveType directiveType)
         {
+			_logger.LogDebug(">>> Entering GetSourceContributor(directiveType={DirectiveType})", directiveType);
+			_logger.LogDebug("GetSourceContributor(directiveType={DirectiveType}): CspDirectiveType.ConnectSrc → {Arg1}", directiveType, CspDirectiveType.ConnectSrc);
+			_logger.LogDebug("GetSourceContributor(directiveType={DirectiveType}): CspDirectiveType.FormAction → {Arg1}", directiveType, CspDirectiveType.FormAction);
+			_logger.LogDebug("GetSourceContributor(directiveType={DirectiveType}): CspDirectiveType.FrameAncestors → {Arg1}", directiveType, CspDirectiveType.FrameAncestors);
+			_logger.LogDebug("GetSourceContributor(directiveType={DirectiveType}): CspDirectiveType.FontSrc → {Arg1}", directiveType, CspDirectiveType.FontSrc);
+			_logger.LogDebug("<<< Exiting GetSourceContributor(directiveType={DirectiveType})", directiveType);
             return directiveType switch
             {
                 CspDirectiveType.DefaultSrc => this.policy.DefaultSource,

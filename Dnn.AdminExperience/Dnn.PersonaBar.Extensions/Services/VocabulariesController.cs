@@ -41,9 +41,11 @@ namespace Dnn.PersonaBar.Vocabularies.Services
         [HttpGet]
         public HttpResponseMessage GetVocabularies(int pageIndex, int pageSize, int scopeTypeId = -1)
         {
+			Logger.LogDebug(">>> Entering GetVocabularies(pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId})", pageIndex, pageSize, scopeTypeId);
             try
             {
                 int total = 0;
+				Logger.LogDebug("GetVocabularies(pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId}): total → {Total}", pageIndex, pageSize, scopeTypeId, total);
                 var vocabularies = this.controller.GetVocabularies(this.PortalId, pageIndex, pageSize, scopeTypeId, out total).Select(v => new
                 {
                     v.VocabularyId,
@@ -55,6 +57,8 @@ namespace Dnn.PersonaBar.Vocabularies.Services
                     v.ScopeTypeId,
                     v.IsSystem,
                 });
+				Logger.LogDebug("GetVocabularies(pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId}): TypeId → {TypeId}", pageIndex, pageSize, scopeTypeId, TypeId);
+				Logger.LogDebug("GetVocabularies(pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId}): Type → {Type}", pageIndex, pageSize, scopeTypeId, Type);
 
                 var response = new
                 {
@@ -62,11 +66,15 @@ namespace Dnn.PersonaBar.Vocabularies.Services
                     Results = vocabularies,
                     TotalResults = total,
                 };
+				Logger.LogDebug("GetVocabularies(pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId}): Results → {Results}", pageIndex, pageSize, scopeTypeId, Results);
+				Logger.LogDebug("GetVocabularies(pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId}): TotalResults → {TotalResults}", pageIndex, pageSize, scopeTypeId, TotalResults);
+				Logger.LogDebug("GetVocabularies(pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId}): Success → {Success}", pageIndex, pageSize, scopeTypeId, Success);
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetVocabularies(pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId})", pageIndex, pageSize, scopeTypeId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc.Message);
             }
         }
@@ -80,15 +88,19 @@ namespace Dnn.PersonaBar.Vocabularies.Services
         [AdvancedPermission(MenuName = Constants.MenuIdentifier, Permission = "Edit")]
         public HttpResponseMessage CreateVocabulary(VocabularyDto vocabularyDto)
         {
+			Logger.LogDebug(">>> Entering CreateVocabulary(vocabularyDto={VocabularyDto})", vocabularyDto);
             try
             {
                 var vocabulary = new Vocabulary(vocabularyDto.Name, vocabularyDto.Description);
+				Logger.LogDebug("CreateVocabulary(vocabularyDto={VocabularyDto}): vocabulary → {Vocabulary}", vocabularyDto, vocabulary);
                 vocabulary.Type = vocabularyDto.TypeId == 1
                     ? VocabularyType.Simple
                     : VocabularyType.Hierarchy;
                 vocabulary.ScopeTypeId = vocabularyDto.ScopeTypeId;
+				Logger.LogDebug("CreateVocabulary(vocabularyDto={VocabularyDto}): vocabulary.ScopeTypeId → {Arg1}", vocabularyDto, vocabulary.ScopeTypeId);
 
                 int vocabularyId = this.controller.AddVocabulary(vocabulary);
+				Logger.LogDebug("CreateVocabulary(vocabularyDto={VocabularyDto}): vocabularyId → {VocabularyId}", vocabularyDto, vocabularyId);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, VocabularyId = vocabularyId });
             }
             catch (VocabularyNameAlreadyExistsException)
@@ -98,6 +110,7 @@ namespace Dnn.PersonaBar.Vocabularies.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting CreateVocabulary(vocabularyDto={VocabularyDto})", vocabularyDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc.Message);
             }
         }
@@ -111,6 +124,7 @@ namespace Dnn.PersonaBar.Vocabularies.Services
         [AdvancedPermission(MenuName = Constants.MenuIdentifier, Permission = "Edit")]
         public HttpResponseMessage UpdateVocabulary(VocabularyDto vocabularyDto)
         {
+			Logger.LogDebug(">>> Entering UpdateVocabulary(vocabularyDto={VocabularyDto})", vocabularyDto);
             try
             {
                 if (this.controller.IsSystemVocabulary(vocabularyDto.VocabularyId) && !this.UserInfo.IsSuperUser)
@@ -119,8 +133,11 @@ namespace Dnn.PersonaBar.Vocabularies.Services
                 }
 
                 var vocabulary = new Vocabulary(vocabularyDto.Name, vocabularyDto.Description);
+				Logger.LogDebug("UpdateVocabulary(vocabularyDto={VocabularyDto}): vocabulary → {Vocabulary}", vocabularyDto, vocabulary);
                 vocabulary.Type = vocabularyDto.Type == Constants.VocabularyTypeSimple ? VocabularyType.Simple : VocabularyType.Hierarchy;
                 vocabulary.ScopeTypeId = vocabularyDto.ScopeTypeId;
+				Logger.LogDebug("UpdateVocabulary(vocabularyDto={VocabularyDto}): vocabulary.ScopeTypeId → {Arg1}", vocabularyDto, vocabulary.ScopeTypeId);
+				Logger.LogDebug("UpdateVocabulary(vocabularyDto={VocabularyDto}): vocabulary.VocabularyId → {Arg1}", vocabularyDto, vocabulary.VocabularyId);
                 vocabulary.VocabularyId = vocabularyDto.VocabularyId;
 
                 this.controller.UpdateVocabulary(vocabulary);
@@ -133,6 +150,7 @@ namespace Dnn.PersonaBar.Vocabularies.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateVocabulary(vocabularyDto={VocabularyDto})", vocabularyDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc.Message);
             }
         }
@@ -146,6 +164,7 @@ namespace Dnn.PersonaBar.Vocabularies.Services
         [AdvancedPermission(MenuName = Constants.MenuIdentifier, Permission = "Edit")]
         public HttpResponseMessage DeleteVocabulary(int vocabularyId)
         {
+			Logger.LogDebug(">>> Entering DeleteVocabulary(vocabularyId={VocabularyId})", vocabularyId);
             try
             {
                 if (this.controller.IsSystemVocabulary(vocabularyId))
@@ -159,6 +178,7 @@ namespace Dnn.PersonaBar.Vocabularies.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting DeleteVocabulary(vocabularyId={VocabularyId})", vocabularyId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc.Message);
             }
         }
@@ -170,15 +190,19 @@ namespace Dnn.PersonaBar.Vocabularies.Services
         [HttpGet]
         public HttpResponseMessage GetTermsByVocabularyId(int vocabularyId)
         {
+			Logger.LogDebug(">>> Entering GetTermsByVocabularyId(vocabularyId={VocabularyId})", vocabularyId);
             try
             {
                 var terms = this.controller.GetTermsByVocabulary(vocabularyId);
+				Logger.LogDebug("GetTermsByVocabularyId(vocabularyId={VocabularyId}): terms → {Terms}", vocabularyId, terms);
 
                 var response = new
                 {
                     Success = true,
                     Results = terms.Select(t => new
                     {
+						Logger.LogDebug("GetTermsByVocabularyId(vocabularyId={VocabularyId}): Results → {Results}", vocabularyId, Results);
+						Logger.LogDebug("GetTermsByVocabularyId(vocabularyId={VocabularyId}): Success → {Success}", vocabularyId, Success);
                         t.TermId,
                         t.Description,
                         t.Name,
@@ -187,11 +211,14 @@ namespace Dnn.PersonaBar.Vocabularies.Services
                     }),
                     TotalResults = terms.Count,
                 };
+				Logger.LogDebug("GetTermsByVocabularyId(vocabularyId={VocabularyId}): ParentTermId → {ParentTermId}", vocabularyId, ParentTermId);
+				Logger.LogDebug("GetTermsByVocabularyId(vocabularyId={VocabularyId}): TotalResults → {TotalResults}", vocabularyId, TotalResults);
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetTermsByVocabularyId(vocabularyId={VocabularyId})", vocabularyId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc.Message);
             }
         }
@@ -203,9 +230,11 @@ namespace Dnn.PersonaBar.Vocabularies.Services
         [HttpGet]
         public HttpResponseMessage GetTerm(int termId)
         {
+			Logger.LogDebug(">>> Entering GetTerm(termId={TermId})", termId);
             try
             {
                 var term = this.controller.GetTerm(termId);
+				Logger.LogDebug("GetTerm(termId={TermId}): term → {Term}", termId, term);
                 var response = new
                 {
                     term.TermId,
@@ -215,11 +244,13 @@ namespace Dnn.PersonaBar.Vocabularies.Services
                     term.Name,
                     term.Description,
                 };
+				Logger.LogDebug("GetTerm(termId={TermId}): TermPath → {TermPath}", termId, TermPath);
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetTerm(termId={TermId})", termId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc.Message);
             }
         }
@@ -233,6 +264,7 @@ namespace Dnn.PersonaBar.Vocabularies.Services
         [AdvancedPermission(MenuName = Constants.MenuIdentifier, Permission = "Edit")]
         public HttpResponseMessage CreateTerm(TermDto termDto)
         {
+			Logger.LogDebug(">>> Entering CreateTerm(termDto={TermDto})", termDto);
             try
             {
                 if (this.controller.IsSystemVocabulary(termDto.VocabularyId) && !this.UserInfo.IsSuperUser)
@@ -241,12 +273,15 @@ namespace Dnn.PersonaBar.Vocabularies.Services
                 }
 
                 var term = new Term(termDto.Name, termDto.Description, termDto.VocabularyId);
+				Logger.LogDebug("CreateTerm(termDto={TermDto}): term → {Term}", termDto, term);
                 if (termDto.ParentTermId != Null.NullInteger)
                 {
                     term.ParentTermId = termDto.ParentTermId;
+					Logger.LogDebug("CreateTerm(termDto={TermDto}): term.ParentTermId → {Arg1}", termDto, term.ParentTermId);
                 }
 
                 int termId = this.controller.AddTerm(term);
+				Logger.LogDebug("CreateTerm(termDto={TermDto}): termId → {TermId}", termDto, termId);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, TermId = termId });
             }
             catch (TermValidationException)
@@ -256,6 +291,7 @@ namespace Dnn.PersonaBar.Vocabularies.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting CreateTerm(termDto={TermDto})", termDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -269,6 +305,7 @@ namespace Dnn.PersonaBar.Vocabularies.Services
         [AdvancedPermission(MenuName = Constants.MenuIdentifier, Permission = "Edit")]
         public HttpResponseMessage UpdateTerm(TermDto termDto)
         {
+			Logger.LogDebug(">>> Entering UpdateTerm(termDto={TermDto})", termDto);
             try
             {
                 if (this.controller.IsSystemVocabulary(termDto.VocabularyId) && !this.UserInfo.IsSuperUser)
@@ -277,10 +314,13 @@ namespace Dnn.PersonaBar.Vocabularies.Services
                 }
 
                 var term = new Term(termDto.Name, termDto.Description, termDto.VocabularyId);
+				Logger.LogDebug("UpdateTerm(termDto={TermDto}): term → {Term}", termDto, term);
+				Logger.LogDebug("UpdateTerm(termDto={TermDto}): term.TermId → {Arg1}", termDto, term.TermId);
                 term.TermId = termDto.TermId;
                 if (termDto.ParentTermId != Null.NullInteger)
                 {
                     term.ParentTermId = termDto.ParentTermId;
+					Logger.LogDebug("UpdateTerm(termDto={TermDto}): term.ParentTermId → {Arg1}", termDto, term.ParentTermId);
                 }
 
                 this.controller.UpdateTerm(term);
@@ -293,6 +333,7 @@ namespace Dnn.PersonaBar.Vocabularies.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateTerm(termDto={TermDto})", termDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc.Message);
             }
         }
@@ -306,9 +347,11 @@ namespace Dnn.PersonaBar.Vocabularies.Services
         [AdvancedPermission(MenuName = Constants.MenuIdentifier, Permission = "Edit")]
         public HttpResponseMessage DeleteTerm(int termId)
         {
+			Logger.LogDebug(">>> Entering DeleteTerm(termId={TermId})", termId);
             try
             {
                 var term = this.controller.GetTerm(termId);
+				Logger.LogDebug("DeleteTerm(termId={TermId}): term → {Term}", termId, term);
                 if (this.controller.IsSystemVocabulary(term.VocabularyId) && !this.UserInfo.IsSuperUser)
                 {
                     return this.Request.CreateResponse(HttpStatusCode.Forbidden, new { Success = true, Message = AuthFailureMessage });
@@ -320,6 +363,7 @@ namespace Dnn.PersonaBar.Vocabularies.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting DeleteTerm(termId={TermId})", termId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc.Message);
             }
         }

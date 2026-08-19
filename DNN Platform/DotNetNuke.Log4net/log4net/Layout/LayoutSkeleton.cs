@@ -81,6 +81,8 @@ namespace log4net.Layout
         /// </remarks>
         protected LayoutSkeleton()
         {
+		log.DebugFormat(">>> Entering LayoutSkeleton()");
+		log.DebugFormat("<<< Exiting LayoutSkeleton()");
         }
 
         /// <summary>Activate component options</summary>
@@ -120,9 +122,11 @@ namespace log4net.Layout
         /// </remarks>
         public string Format(LoggingEvent loggingEvent)
         {
+			log.DebugFormat(">>> Entering Format(loggingEvent={0})", loggingEvent);
             using (var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture))
             {
                 this.Format(writer, loggingEvent);
+				log.DebugFormat("<<< Exiting Format(loggingEvent={0})", loggingEvent);
                 return writer.ToString();
             }
         }

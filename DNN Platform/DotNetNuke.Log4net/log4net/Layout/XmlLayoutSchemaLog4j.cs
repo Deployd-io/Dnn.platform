@@ -43,6 +43,9 @@ namespace log4net.Layout
         /// <summary>Constructs an XMLLayoutSchemaLog4j</summary>
         public XmlLayoutSchemaLog4j() : base()
         {
+		value.LogDebug(">>> Entering XmlLayoutSchemaLog4j()");
+		value.LogDebug("<<< Exiting XmlLayoutSchemaLog4j()");
+		value.LogDebug(">>> Entering XmlLayoutSchemaLog4j(locationInfo={LocationInfo})", locationInfo);
         }
 
         /// <summary>Constructs an XMLLayoutSchemaLog4j.</summary>
@@ -62,6 +65,7 @@ namespace log4net.Layout
         /// </remarks>
         public XmlLayoutSchemaLog4j(bool locationInfo) :  base(locationInfo)
         {
+		value.LogDebug("<<< Exiting XmlLayoutSchemaLog4j(locationInfo={LocationInfo})", locationInfo);
         }
 
         /// <summary>The version of the log4j schema to use.</summary>
@@ -115,6 +119,7 @@ method="run" file="Generator.java" line="94"/>
         /// </remarks>
         protected override void FormatXml(XmlWriter writer, LoggingEvent loggingEvent)
         {
+			value.LogDebug(">>> Entering FormatXml(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             // Translate logging events for log4j
 
             // Translate hostname property
@@ -169,6 +174,7 @@ method="run" file="Generator.java" line="94"/>
             writer.WriteEndElement();
 
             object ndcObj = loggingEvent.LookupProperty("NDC");
+			value.LogDebug("FormatXml(writer={Writer},loggingEvent={LoggingEvent}): ndcObj → {NdcObj}", writer, loggingEvent, ndcObj);
             if (ndcObj != null)
             {
                 string valueStr = loggingEvent.Repository.RendererMap.FindAndRender(ndcObj);
@@ -184,6 +190,7 @@ method="run" file="Generator.java" line="94"/>
 
             // Append the properties text
             PropertiesDictionary properties = loggingEvent.GetProperties();
+			value.LogDebug("FormatXml(writer={Writer},loggingEvent={LoggingEvent}): properties → {Properties}", writer, loggingEvent, properties);
             if (properties.Count > 0)
             {
                 writer.WriteStartElement("log4j", "properties", "log4net");
@@ -223,6 +230,7 @@ method="run" file="Generator.java" line="94"/>
             }
 
             writer.WriteEndElement();
+			value.LogDebug("<<< Exiting FormatXml(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
     }
 }

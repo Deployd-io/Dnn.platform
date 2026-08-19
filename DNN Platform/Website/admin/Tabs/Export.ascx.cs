@@ -34,6 +34,10 @@ namespace DotNetNuke.Modules.Admin.Tabs
         public Export()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering Export()");
+		Logger.LogDebug("<<< Exiting Export()");
+		Logger.LogDebug(">>> Entering Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager})", businessControllerProvider, navigationManager);
+		Logger.LogDebug("Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager}): navigationManager → {NavigationManager1}", businessControllerProvider, navigationManager, navigationManager);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Export"/> class.</summary>
@@ -43,6 +47,7 @@ namespace DotNetNuke.Modules.Admin.Tabs
         {
             this.businessControllerProvider = businessControllerProvider ?? this.DependencyProvider.GetRequiredService<IBusinessControllerProvider>();
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
+			Logger.LogDebug("<<< Exiting Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager})", businessControllerProvider, navigationManager);
         }
 
         public TabInfo Tab
@@ -61,17 +66,20 @@ namespace DotNetNuke.Modules.Admin.Tabs
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (!TabPermissionController.CanExportPage())
             {
                 this.Response.Redirect(Globals.AccessDeniedURL(), true);
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdExport.Click += this.OnExportClick;
@@ -85,7 +93,9 @@ namespace DotNetNuke.Modules.Admin.Tabs
 
                 this.cmdCancel.NavigateUrl = this.navigationManager.NavigateURL();
                 var folderPath = "Templates/";
+				Logger.LogDebug("OnLoad(e={E}): folderPath → {FolderPath}", e, folderPath);
                 var templateFolder = FolderManager.Instance.GetFolder(this.UserInfo.PortalID, folderPath);
+				Logger.LogDebug("OnLoad(e={E}): templateFolder → {TemplateFolder}", e, templateFolder);
                 this.cboFolders.Services.Parameters.Add("permission", "ADD");
 
                 if (templateFolder != null && this.IsAccessibleByUser(templateFolder))
@@ -100,12 +110,15 @@ namespace DotNetNuke.Modules.Admin.Tabs
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         protected void OnExportClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnExportClick(sender={Sender},e={E})", sender, e);
             try
             {
                 if (!this.Page.IsValid)
@@ -116,15 +129,18 @@ namespace DotNetNuke.Modules.Admin.Tabs
                 if (this.cboFolders.SelectedItem != null)
                 {
                     var folder = FolderManager.Instance.GetFolder(this.cboFolders.SelectedItemValueAsInt);
+					Logger.LogDebug("OnExportClick(sender={Sender},e={E}): folder → {Folder}", sender, e, folder);
                     if (folder != null)
                     {
                         var filename = folder.FolderPath + this.txtFile.Text + ".page.template";
+						Logger.LogDebug("OnExportClick(sender={Sender},e={E}): filename → {Filename}", sender, e, filename);
                         filename = filename.Replace("/", @"\");
 
                         var xmlTemplate = new XmlDocument { XmlResolver = null };
                         XmlNode nodePortal = xmlTemplate.AppendChild(xmlTemplate.CreateElement("portal"));
                         if (nodePortal.Attributes != null)
                         {
+							Logger.LogDebug("OnExportClick(sender={Sender},e={E}): nodePortal → {NodePortal}", sender, e, nodePortal);
                             nodePortal.Attributes.Append(XmlUtils.CreateAttribute(xmlTemplate, "version", "3.0"));
                         }
 
@@ -142,6 +158,8 @@ namespace DotNetNuke.Modules.Admin.Tabs
                         // add file to Files table
                         using (var fileContent = new MemoryStream(Encoding.UTF8.GetBytes(xmlTemplate.OuterXml)))
                         {
+							Logger.LogDebug("OnExportClick(sender={Sender},e={E}): node → {Node}", sender, e, node);
+							Logger.LogDebug("OnExportClick(sender={Sender},e={E}): nodeTabs → {NodeTabs}", sender, e, nodeTabs);
                             Services.FileSystem.FileManager.Instance.AddFile(folder, this.txtFile.Text + ".page.template", fileContent, true, true, "application/octet-stream");
                         }
                     }
@@ -149,7 +167,9 @@ namespace DotNetNuke.Modules.Admin.Tabs
             }
             catch (Exception exc)
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Export.ascx));
                 Exceptions.ProcessModuleLoadException(this, exc);
+				Logger.LogError("Exception in OnExportClick(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
             }
         }
 
@@ -158,13 +178,18 @@ namespace DotNetNuke.Modules.Admin.Tabs
         /// <param name="nodeTabs">Node to add the serialized objects.</param>
         private void SerializeTab(XmlDocument xmlTemplate, XmlNode nodeTabs)
         {
+			Logger.LogDebug(">>> Entering SerializeTab(xmlTemplate={XmlTemplate},nodeTabs={NodeTabs})", xmlTemplate, nodeTabs);
             var xmlTab = new XmlDocument { XmlResolver = null };
             var nodeTab = TabController.SerializeTab(this.businessControllerProvider, xmlTab, this.Tab, this.chkContent.Checked);
+			Logger.LogDebug("SerializeTab(xmlTemplate={XmlTemplate},nodeTabs={NodeTabs}): nodeTab → {NodeTab}", xmlTemplate, nodeTabs, nodeTab);
             nodeTabs.AppendChild(xmlTemplate.ImportNode(nodeTab, true));
+			Logger.LogDebug("<<< Exiting SerializeTab(xmlTemplate={XmlTemplate},nodeTabs={NodeTabs})", xmlTemplate, nodeTabs);
         }
 
         private bool IsAccessibleByUser(IFolderInfo folder)
         {
+			Logger.LogDebug(">>> Entering IsAccessibleByUser(folder={Folder})", folder);
+			Logger.LogDebug("<<< Exiting IsAccessibleByUser(folder={Folder})", folder);
             return FolderPermissionController.Instance.CanAddFolder(folder);
         }
     }

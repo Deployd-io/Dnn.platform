@@ -49,20 +49,26 @@ namespace Dnn.EditBar.UI.Controllers
         /// <inheritdoc />
         protected override Func<ILocalizationController> GetFactory()
         {
+			eventLogger.LogDebug(">>> Entering GetFactory()");
+			eventLogger.LogDebug("<<< Exiting GetFactory()");
             return () => new LocalizationController();
         }
 
         private static string GetNameAttribute(XmlNode node)
         {
+			eventLogger.LogDebug(">>> Entering GetNameAttribute(node={Node})", node);
             if (node.Attributes != null)
             {
                 var attribute = node.Attributes.GetNamedItem("name");
+				eventLogger.LogDebug("GetNameAttribute(node={Node}): attribute → {Attribute}", node, attribute);
                 if (attribute != null)
                 {
                     return attribute.Value;
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetNameAttribute(node={Node})", node);
+			eventLogger.LogDebug("<<< Exiting GetNameAttribute(navigator={Navigator})", navigator);
             return null;
         }
 
@@ -73,16 +79,19 @@ namespace Dnn.EditBar.UI.Controllers
 
         private static void AssertHeaderValue(IEnumerable<XmlNode> headers, string key, string value)
         {
+			eventLogger.LogDebug(">>> Entering AssertHeaderValue(headers={Headers},key={Key},value={Value})", headers, key, value);
             var header = headers.FirstOrDefault(x => GetNameAttribute(x).Equals(key, StringComparison.OrdinalIgnoreCase));
             if (header != null)
             {
                 if (!header.InnerText.Equals(value, StringComparison.OrdinalIgnoreCase))
                 {
+					eventLogger.LogWarning("Throwing LocalizationException from AssertHeaderValue(headers={Headers},key={Key},value={Value})", headers, key, value);
                     throw new LocalizationException($"Resource header '{key}' != '{value}'");
                 }
             }
             else
             {
+			eventLogger.LogDebug("<<< Exiting AssertHeaderValue(headers={Headers},key={Key},value={Value})", headers, key, value);
                 throw new LocalizationException($"Resource header '{key}' is missing");
             }
         }

@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -10,12 +12,16 @@
     mod(CodeMirror);
 })(function(CodeMirror) {
   "use strict";
+logger.debug(`<<< Exiting function(exports=${exports})`);
 
   function forEach(arr, f) {
+	logger.debug(`>>> Entering forEach(arr=${arr},f=${f})`);
     for (var i = 0, e = arr.length; i < e; ++i) f(arr[i]);
+	logger.debug(`<<< Exiting forEach(arr=${arr},f=${f})`);
   }
 
   function arrayContains(arr, item) {
+	logger.debug(`>>> Entering arrayContains(arr=${arr},item=${item})`);
     if (!Array.prototype.indexOf) {
       var i = arr.length;
       while (i--) {
@@ -23,6 +29,7 @@
           return true;
         }
       }
+	logger.debug(`<<< Exiting arrayContains(arr=${arr},item=${item})`);
       return false;
     }
     return arr.indexOf(item) != -1;
@@ -50,6 +57,8 @@
   }
 
   function pythonHint(editor) {
+	logger.debug(`>>> Entering pythonHint(editor=${editor})`);
+	logger.debug(`<<< Exiting pythonHint(editor=${editor})`);
     return scriptHint(editor, pythonKeywordsU, function (e, cur) {return e.getTokenAt(cur);});
   }
   CodeMirror.registerHelper("hint", "python", pythonHint);
@@ -73,14 +82,18 @@
   function getCompletions(token, context) {
     var found = [], start = token.string;
     function maybeAdd(str) {
+	logger.debug(`>>> Entering maybeAdd(str=${str})`);
       if (str.lastIndexOf(start, 0) == 0 && !arrayContains(found, str)) found.push(str);
+	logger.debug(`<<< Exiting maybeAdd(str=${str})`);
     }
 
     function gatherCompletions(_obj) {
+		logger.debug(`>>> Entering gatherCompletions(_obj=${_obj})`);
         forEach(pythonBuiltinsL, maybeAdd);
         forEach(pythonBuiltinsU, maybeAdd);
         forEach(pythonKeywordsL, maybeAdd);
         forEach(pythonKeywordsU, maybeAdd);
+		logger.debug(`<<< Exiting gatherCompletions(_obj=${_obj})`);
     }
 
     if (context) {

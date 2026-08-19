@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class UnknownModuleDefinitionVersionException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UnknownModuleDefinitionVersionException));
     /// <inheritdoc />
     public UnknownModuleDefinitionVersionException()
     {
+	Logger.LogDebug(">>> Entering UnknownModuleDefinitionVersionException()");
+	Logger.LogDebug("<<< Exiting UnknownModuleDefinitionVersionException()");
     }
 
     /// <inheritdoc />
     public UnknownModuleDefinitionVersionException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering UnknownModuleDefinitionVersionException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting UnknownModuleDefinitionVersionException(message={Message})", message);
 
     /// <inheritdoc />
     public UnknownModuleDefinitionVersionException(string message, Exception innerException)

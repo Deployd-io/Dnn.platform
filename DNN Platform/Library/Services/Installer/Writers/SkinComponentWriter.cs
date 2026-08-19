@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The SkinComponentWriter class handles creating the manifest for Skin Component(s).</summary>
     public class SkinComponentWriter : FileComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinComponentWriter));
         private readonly string skinName;
 
         /// <summary>
@@ -24,7 +25,10 @@ namespace DotNetNuke.Services.Installer.Writers
         public SkinComponentWriter(string skinName, string basePath, Dictionary<string, InstallFile> files, PackageInfo package)
             : base(basePath, files, package)
         {
+			Logger.LogDebug(">>> Entering SkinComponentWriter(skinName={SkinName},basePath={BasePath},files={Files},package={Package})", skinName, basePath, files, package);
             this.skinName = skinName;
+			Logger.LogDebug("SkinComponentWriter(skinName={SkinName},basePath={BasePath},files={Files},package={Package}): this.skinName → {Arg4}", skinName, basePath, files, package, this.skinName);
+			Logger.LogDebug("<<< Exiting SkinComponentWriter(skinName={SkinName},basePath={BasePath},files={Files},package={Package})", skinName, basePath, files, package);
         }
 
         /// <summary>Gets the name of the Collection Node ("skinFiles").</summary>
@@ -74,7 +78,9 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="writer">The Xmlwriter to use.</param>
         protected override void WriteCustomManifest(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteCustomManifest(writer={Writer})", writer);
             writer.WriteElementString(this.SkinNameNodeName, this.skinName);
+			Logger.LogDebug("<<< Exiting WriteCustomManifest(writer={Writer})", writer);
         }
     }
 }

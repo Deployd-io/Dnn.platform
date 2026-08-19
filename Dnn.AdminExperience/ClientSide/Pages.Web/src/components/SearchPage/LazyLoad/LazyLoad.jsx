@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+const logger = console;
 
 class LazyLoad extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.addListenerToFindBottom();
         this.state = {
             page: props.pageIndex
@@ -11,14 +13,17 @@ class LazyLoad extends Component {
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         if (this.props.filtersUpdated !== prevProps.filtersUpdated) {
             this.setState({
                 page:0
             });
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
         }        
     }
 
     addListenerToFindBottom() {
+		logger.debug('>>> Entering addListenerToFindBottom()');
         document.onscroll =  () => {
             // Internet Explorer
             let scrollY = window.scrollY ? window.scrollY : document.documentElement.scrollTop;
@@ -31,12 +36,15 @@ class LazyLoad extends Component {
                     }, ()=>{
                         this.props.loadMore(this.state.page);
                     });
+					logger.debug('<<< Exiting addListenerToFindBottom()');
                 }
             }
         }; 
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div>{this.props.children}</div>

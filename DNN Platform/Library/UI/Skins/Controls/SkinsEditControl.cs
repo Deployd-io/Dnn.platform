@@ -22,6 +22,7 @@ namespace DotNetNuke.UI.Skins.Controls
     [ToolboxData("<{0}:SkinsEditControl runat=server></{0}:SkinsEditControl>")]
     public class SkinsEditControl : EditControl, IPostBackEventHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinsEditControl));
         private string addedItem = Null.NullString;
 
         /// <summary>
@@ -30,6 +31,8 @@ namespace DotNetNuke.UI.Skins.Controls
         /// </summary>
         public SkinsEditControl()
         {
+		Logger.LogDebug(">>> Entering SkinsEditControl()");
+		Logger.LogDebug("<<< Exiting SkinsEditControl()");
         }
 
         /// <summary>
@@ -39,7 +42,9 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <param name="type">The type of the property.</param>
         public SkinsEditControl(string type)
         {
+			Logger.LogDebug(">>> Entering SkinsEditControl(type={Type})", type);
             this.SystemType = type;
+			Logger.LogDebug("<<< Exiting SkinsEditControl(type={Type})", type);
         }
 
         /// <summary>Gets oldStringValue returns the String representation of the OldValue.</summary>
@@ -131,12 +136,17 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         public void RaisePostBackEvent(string eventArgument)
         {
+			Logger.LogDebug(">>> Entering RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
             PropertyEditorEventArgs args;
             switch (eventArgument.Substring(0, 3))
             {
                 case "Del":
                     args = new PropertyEditorEventArgs(this.Name);
                     args.Value = this.DictionaryValue;
+					Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): args → {Args}", eventArgument, args);
+					Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): args.Value → {Arg1}", eventArgument, args.Value);
+					Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): args.OldValue → {Arg1}", eventArgument, args.OldValue);
+					Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): args.Changed → {Arg1}", eventArgument, args.Changed);
                     args.OldValue = this.OldDictionaryValue;
                     args.Key = int.Parse(eventArgument.Substring(7), CultureInfo.InvariantCulture);
                     args.Changed = true;
@@ -147,17 +157,22 @@ namespace DotNetNuke.UI.Skins.Controls
                     args.Value = this.AddedItem;
                     args.StringValue = this.AddedItem;
                     args.Changed = true;
+					Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): args.StringValue → {Arg1}", eventArgument, args.StringValue);
                     this.OnItemAdded(args);
                     break;
             }
+			Logger.LogDebug("<<< Exiting RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
         }
 
         /// <inheritdoc />
         public override bool LoadPostData(string postDataKey, NameValueCollection postCollection)
         {
+			Logger.LogDebug(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             bool dataChanged = false;
             string postedValue;
+			Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): dataChanged → {DataChanged}", postDataKey, postCollection, dataChanged);
             var newDictionaryValue = new Dictionary<int, string>();
+			Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): newDictionaryValue → {NewDictionaryValue}", postDataKey, postCollection, newDictionaryValue);
             foreach (KeyValuePair<int, string> kvp in this.DictionaryValue)
             {
                 postedValue = postCollection[this.UniqueID + "_skin" + kvp.Key];
@@ -176,9 +191,12 @@ namespace DotNetNuke.UI.Skins.Controls
             if (!string.IsNullOrEmpty(postedValue))
             {
                 this.AddedItem = postedValue;
+				Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): this.AddedItem → {Arg2}", postDataKey, postCollection, this.AddedItem);
             }
 
             this.DictionaryValue = newDictionaryValue;
+			Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): this.DictionaryValue → {Arg2}", postDataKey, postCollection, this.DictionaryValue);
+			Logger.LogDebug("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             return dataChanged;
         }
 
@@ -186,28 +204,38 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <param name="e">The event arguments.</param>
         protected override void OnDataChanged(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnDataChanged(e={E})", e);
             var args = new PropertyEditorEventArgs(this.Name);
             args.Value = this.DictionaryValue;
+			Logger.LogDebug("OnDataChanged(e={E}): args.Value → {Arg1}", e, args.Value);
+			Logger.LogDebug("OnDataChanged(e={E}): args.OldValue → {Arg1}", e, args.OldValue);
+			Logger.LogDebug("OnDataChanged(e={E}): args.StringValue → {Arg1}", e, args.StringValue);
+			Logger.LogDebug("OnDataChanged(e={E}): args.Changed → {Arg1}", e, args.Changed);
+			Logger.LogDebug("OnDataChanged(e={E}): args → {Args}", e, args);
             args.OldValue = this.OldDictionaryValue;
             args.StringValue = string.Empty;
             args.Changed = true;
             this.OnValueChanged(args);
+			Logger.LogDebug("<<< Exiting OnDataChanged(e={E})", e);
         }
 
         /// <summary>OnPreRender runs just before the control is due to be rendered.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             // Register control for PostBack
             this.Page.RegisterRequiresPostBack(this);
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>RenderEditMode renders the Edit mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderEditMode(writer={Writer})", writer);
             int length = Null.NullInteger;
             if (this.CustomAttributes != null)
             {
@@ -216,6 +244,7 @@ namespace DotNetNuke.UI.Skins.Controls
                     if (attribute is MaxLengthAttribute)
                     {
                         var lengthAtt = (MaxLengthAttribute)attribute;
+						Logger.LogDebug("RenderEditMode(writer={Writer}): lengthAtt → {LengthAtt}", writer, lengthAtt);
                         length = lengthAtt.Length;
                         break;
                     }
@@ -290,12 +319,14 @@ namespace DotNetNuke.UI.Skins.Controls
                 writer.RenderEndTag();
                 writer.WriteBreak();
             }
+			Logger.LogDebug("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
 
         /// <summary>RenderViewMode renders the View (readonly) mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderViewMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderViewMode(writer={Writer})", writer);
             if (this.DictionaryValue != null)
             {
                 foreach (KeyValuePair<int, string> kvp in this.DictionaryValue)
@@ -307,6 +338,7 @@ namespace DotNetNuke.UI.Skins.Controls
                     writer.WriteBreak();
                 }
             }
+			Logger.LogDebug("<<< Exiting RenderViewMode(writer={Writer})", writer);
         }
     }
 }

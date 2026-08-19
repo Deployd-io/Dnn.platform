@@ -15,6 +15,7 @@ namespace DotNetNuke.Services.Users
 
     public class PurgeDeletedUsers : SchedulerClient
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PurgeDeletedUsers));
         private readonly IPortalController portalController;
 
         /// <summary>Initializes a new instance of the <see cref="PurgeDeletedUsers"/> class.</summary>
@@ -23,8 +24,10 @@ namespace DotNetNuke.Services.Users
         public PurgeDeletedUsers(ScheduleHistoryItem objScheduleHistoryItem)
             : this(Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>(), objScheduleHistoryItem)
         {
+		Logger.LogDebug(">>> Entering PurgeDeletedUsers(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
         }
 
+		Logger.LogDebug("<<< Exiting PurgeDeletedUsers(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
         /// <summary>Initializes a new instance of the <see cref="PurgeDeletedUsers"/> class.</summary>
         /// <param name="portalController">The portal controller.</param>
         /// <param name="objScheduleHistoryItem">The schedule history item.</param>
@@ -33,16 +36,19 @@ namespace DotNetNuke.Services.Users
         {
             this.portalController = portalController;
             this.ScheduleHistoryItem = objScheduleHistoryItem;
+			Logger.LogDebug("PurgeDeletedUsers(portalController={PortalController},objScheduleHistoryItem={ObjScheduleHistoryItem}): this.portalController → {Arg2}", portalController, objScheduleHistoryItem, this.portalController);
         }
 
         /// <inheritdoc />
         public override void DoWork()
         {
+			Logger.LogDebug(">>> Entering DoWork()");
             try
             {
                 foreach (IPortalInfo portal in this.portalController.GetPortals())
                 {
                     var settings = new PortalSettings(portal.PortalId);
+					Logger.LogDebug("DoWork(): settings → {Settings}", settings);
                     if (!settings.DataConsentActive || settings.DataConsentUserDeleteAction != PortalSettings.UserDeleteAction.DelayedHardDelete)
                     {
                         continue;
@@ -57,6 +63,7 @@ namespace DotNetNuke.Services.Users
                     };
 
                     var deletedUsers = UserController.GetDeletedUsers(portal.PortalId);
+					Logger.LogDebug("DoWork(): deletedUsers → {DeletedUsers}", deletedUsers);
                     foreach (UserInfo user in deletedUsers)
                     {
                         if (user.LastModifiedOnDate < thresholdDate && user.RequestsRemoval)
@@ -72,6 +79,7 @@ namespace DotNetNuke.Services.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in DoWork(): {Arg0}", exc.getMessage());
                 this.ScheduleHistoryItem.Succeeded = false; // REQUIRED
 
                 this.ScheduleHistoryItem.AddLogNote($"Purging deleted users task failed: {exc}.");
@@ -82,6 +90,7 @@ namespace DotNetNuke.Services.Users
                 // log the exception
                 Exceptions.Exceptions.LogException(exc); // OPTIONAL
             }
+			Logger.LogDebug("<<< Exiting DoWork()");
         }
     }
 }

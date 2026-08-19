@@ -34,21 +34,27 @@ namespace DNNConnect.CKEditorProvider.Module
         public UpgradeController()
             : this(null)
         {
+		eventLogger.LogDebug(">>> Entering UpgradeController()");
         }
+		eventLogger.LogDebug("<<< Exiting UpgradeController()");
 
         /// <summary>Upgrades the module.</summary>
         /// <param name="version">The <paramref name="version"/> number string.</param>
         /// <returns>Returns if Upgrade was Successfully or not.</returns>
         public string UpgradeModule(string version)
         {
+			eventLogger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             try
             {
                 const string ResourceFile =
                     "~/Providers/HtmlEditorProviders/DNNConnect.CKE/App_LocalResources/EditorConfigManager.ascx.resx";
 
                 var pageName = Localization.GetString("EditorMangerPageName.Text", ResourceFile);
+				eventLogger.LogDebug("UpgradeModule(version={Version}): pageName → {PageName}", version, pageName);
                 var moduleTitle = Localization.GetString("EditorMangerName.Text", ResourceFile);
+				eventLogger.LogDebug("UpgradeModule(version={Version}): moduleTitle → {ModuleTitle}", version, moduleTitle);
                 var pageDescription = Localization.GetString("EditorMangerPageDescription.Text", ResourceFile);
+				eventLogger.LogDebug("UpgradeModule(version={Version}): pageDescription → {PageDescription}", version, pageDescription);
 
                 // Remove wrongly created Host Page
                 Upgrade.RemoveHostPage(moduleTitle);
@@ -63,6 +69,7 @@ namespace DNNConnect.CKEditorProvider.Module
 
                 // Add Module To Page
                 var moduleDefId = GetModuleDefinitionID(this.hostSettings);
+				eventLogger.LogDebug("UpgradeModule(version={Version}): moduleDefId → {ModuleDefId}", version, moduleDefId);
 
                 Upgrade.AddModuleToPage(
                     editorManagerPage,
@@ -75,6 +82,7 @@ namespace DNNConnect.CKEditorProvider.Module
             {
                 new ExceptionLogController().AddLog(ex);
 
+			eventLogger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
                 return "Failed";
             }
 
@@ -85,6 +93,7 @@ namespace DNNConnect.CKEditorProvider.Module
         /// <returns>Returns the module definition ID.</returns>
         private static int GetModuleDefinitionID(IHostSettings hostSettings)
         {
+			eventLogger.LogDebug(">>> Entering GetModuleDefinitionID(hostSettings={HostSettings})", hostSettings);
             var editorDesktopModule =
                 DesktopModuleController.GetDesktopModuleByModuleName(hostSettings, "CKEditor.EditorConfigManager", Null.NullInteger);
 
@@ -98,6 +107,7 @@ namespace DNNConnect.CKEditorProvider.Module
                 ModuleDefinitionController.GetModuleDefinitionByFriendlyName(
                     "CKEditor Config Manager", editorDesktopModule.DesktopModuleID);
 
+			eventLogger.LogDebug("<<< Exiting GetModuleDefinitionID(hostSettings={HostSettings})", hostSettings);
             return editorModuleDefinition?.ModuleDefID ?? -1;
         }
     }

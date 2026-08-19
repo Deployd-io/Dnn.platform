@@ -23,6 +23,7 @@ namespace DotNetNuke.UI.UserControls
     [ValidationPropertyAttribute("Text")]
     public class TextEditor : UserControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TextEditor));
         // ReSharper disable InconsistentNaming
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Breaking Change")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
@@ -68,9 +69,13 @@ namespace DotNetNuke.UI.UserControls
         /// <summary>Initializes a new instance of the <see cref="TextEditor"/> class.</summary>
         public TextEditor()
         {
+			Logger.LogDebug(">>> Entering TextEditor()");
             this.HtmlEncode = true;
             this.ChooseRender = true;
+			Logger.LogDebug("TextEditor(): this.HtmlEncode → {Arg0}", this.HtmlEncode);
+			Logger.LogDebug("TextEditor(): this.ChooseRender → {Arg0}", this.ChooseRender);
             this.ChooseMode = true;
+			Logger.LogDebug("<<< Exiting TextEditor()");
         }
 
         public bool IsRichEditorAvailable
@@ -279,34 +284,42 @@ namespace DotNetNuke.UI.UserControls
 
         public void ChangeMode(string mode)
         {
+			Logger.LogDebug(">>> Entering ChangeMode(mode={Mode})", mode);
             this.OptView.SelectedItem.Value = mode;
             this.OptViewSelectedIndexChanged(this.OptView, EventArgs.Empty);
+			Logger.LogDebug("<<< Exiting ChangeMode(mode={Mode})", mode);
         }
 
         public void ChangeTextRenderMode(string textRenderMode)
         {
+			Logger.LogDebug(">>> Entering ChangeTextRenderMode(textRenderMode={TextRenderMode})", textRenderMode);
             this.OptRender.SelectedItem.Value = textRenderMode;
             this.OptRenderSelectedIndexChanged(this.OptRender, EventArgs.Empty);
+			Logger.LogDebug("<<< Exiting ChangeTextRenderMode(textRenderMode={TextRenderMode})", textRenderMode);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.richTextEditor = HtmlEditorProvider.Instance();
+			Logger.LogDebug("OnInit(e={E}): richTextEditor → {RichTextEditor}", e, richTextEditor);
 
             if (this.IsRichEditorAvailable)
             {
                 this.richTextEditor.ControlID = this.ID;
                 this.richTextEditor.Initialize();
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>Page_Load runs when the control is loaded.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.OptRender.SelectedIndexChanged += this.OptRenderSelectedIndexChanged;
@@ -353,8 +366,10 @@ namespace DotNetNuke.UI.UserControls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>optRender_SelectedIndexChanged runs when Basic Text Box mode is changed.</summary>
@@ -362,9 +377,11 @@ namespace DotNetNuke.UI.UserControls
         /// <param name="e">The event arguments.</param>
         protected void OptRenderSelectedIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OptRenderSelectedIndexChanged(sender={Sender},e={E})", sender, e);
             if (this.OptRender.SelectedIndex != -1)
             {
                 this.TextRenderMode = this.OptRender.SelectedItem.Value;
+				Logger.LogDebug("OptRenderSelectedIndexChanged(sender={Sender},e={E}): this.TextRenderMode → {Arg2}", sender, e, this.TextRenderMode);
             }
 
             if (this.Mode == "BASIC")
@@ -373,6 +390,7 @@ namespace DotNetNuke.UI.UserControls
             }
 
             this.SetPanels();
+			Logger.LogDebug("<<< Exiting OptRenderSelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>optView_SelectedIndexChanged runs when Editor Mode is changed.</summary>
@@ -380,9 +398,11 @@ namespace DotNetNuke.UI.UserControls
         /// <param name="e">The event arguments.</param>
         protected void OptViewSelectedIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OptViewSelectedIndexChanged(sender={Sender},e={E})", sender, e);
             if (this.OptView.SelectedIndex != -1)
             {
                 this.Mode = this.OptView.SelectedItem.Value;
+				Logger.LogDebug("OptViewSelectedIndexChanged(sender={Sender},e={E}): this.Mode → {Arg2}", sender, e, this.Mode);
             }
 
             if (this.Mode == "BASIC")
@@ -411,10 +431,13 @@ namespace DotNetNuke.UI.UserControls
             }
 
             this.SetPanels();
+			Logger.LogDebug("<<< Exiting OptViewSelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         private static string RemoveBaseTags(string strInput)
         {
+			Logger.LogDebug(">>> Entering RemoveBaseTags(strInput={StrInput})", strInput);
+			Logger.LogDebug("<<< Exiting RemoveBaseTags(strInput={StrInput})", strInput);
             return Globals.BaseTagRegex.Replace(strInput, " ");
         }
 
@@ -423,6 +446,8 @@ namespace DotNetNuke.UI.UserControls
         /// <returns>The decoded html.</returns>
         private string Decode(string strHtml)
         {
+			Logger.LogDebug(">>> Entering Decode(strHtml={StrHtml})", strHtml);
+			Logger.LogDebug("<<< Exiting Decode(strHtml={StrHtml})", strHtml);
             return this.HtmlEncode ? this.Server.HtmlDecode(strHtml) : strHtml;
         }
 
@@ -431,12 +456,15 @@ namespace DotNetNuke.UI.UserControls
         /// <returns>The encoded html.</returns>
         private string Encode(string strHtml)
         {
+			Logger.LogDebug(">>> Entering Encode(strHtml={StrHtml})", strHtml);
+			Logger.LogDebug("<<< Exiting Encode(strHtml={StrHtml})", strHtml);
             return this.HtmlEncode ? this.Server.HtmlEncode(strHtml) : strHtml;
         }
 
         /// <summary>Builds the radio button lists.</summary>
         private void PopulateLists()
         {
+			Logger.LogDebug(">>> Entering PopulateLists()");
             if (this.OptRender.Items.Count == 0)
             {
                 this.OptRender.Items.Add(new ListItem(Localization.GetString("Text", Localization.GetResourceFile(this, MyFileName)), "T"));
@@ -452,14 +480,17 @@ namespace DotNetNuke.UI.UserControls
                     this.OptView.Items.Add(new ListItem(Localization.GetString("RichTextBox", Localization.GetResourceFile(this, MyFileName)), "RICH"));
                 }
             }
+			Logger.LogDebug("<<< Exiting PopulateLists()");
         }
 
         /// <summary>Sets the Mode displayed.</summary>
         private void SetPanels()
         {
+			Logger.LogDebug(">>> Entering SetPanels()");
             if (this.OptView.SelectedIndex != -1)
             {
                 this.Mode = this.OptView.SelectedItem.Value;
+				Logger.LogDebug("SetPanels(): this.Mode → {Arg0}", this.Mode);
             }
 
             if (!string.IsNullOrEmpty(this.Mode))
@@ -475,6 +506,7 @@ namespace DotNetNuke.UI.UserControls
             if (this.OptRender.SelectedIndex != -1)
             {
                 this.TextRenderMode = this.OptRender.SelectedItem.Value;
+				Logger.LogDebug("SetPanels(): this.TextRenderMode → {Arg0}", this.TextRenderMode);
             }
 
             if (!string.IsNullOrEmpty(this.TextRenderMode))
@@ -498,6 +530,7 @@ namespace DotNetNuke.UI.UserControls
                 this.DivRichTextBox.Visible = true;
                 this.PanelView.CssClass = "dnnTextPanelView";
             }
+			Logger.LogDebug("<<< Exiting SetPanels()");
         }
     }
 }

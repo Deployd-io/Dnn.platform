@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -5,6 +6,7 @@
 // This is a part of CodeMirror from https://github.com/sabaca/CodeMirror_mode_perl (mail@sabaca.com)
 
 (function(mod) {
+logger.debug(`>>> Entering function(stream=${stream},state=${state})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -14,8 +16,10 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("perl",function(){
         // http://perldoc.perl.org
+		logger.debug(`>>> Entering defineMode(http=${http})`);
         var PERL={                                      //   null - magic touch
                                                         //   1 - keyword
                                                         //   2 - def

@@ -10,6 +10,7 @@ using DotNetNuke.UI.Modules;
 /// <summary>Extension methods for <see cref="IBusinessControllerProvider"/>.</summary>
 public static class BusinessControllerProviderExtensions
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(BusinessControllerProviderExtensions));
     /// <summary>Gets an instance of the business controller, if it implements <typeparamref name="T"/>.</summary>
     /// <typeparam name="T">The type the business controller must implement.</typeparam>
     /// <param name="businessControllerProvider">The business controller provider.</param>
@@ -17,6 +18,8 @@ public static class BusinessControllerProviderExtensions
     /// <returns>An instance of <typeparamref name="T"/>, or <see langword="null"/> if the business controller does not implement <typeparamref name="T"/> or the <see cref="DesktopModuleInfo.BusinessControllerClass"/> is <see langword="null"/> or empty.</returns>
     public static T GetInstance<T>(this IBusinessControllerProvider businessControllerProvider, DesktopModuleInfo desktopModule)
         where T : class
+		Logger.LogDebug(">>> Entering GetInstance(businessControllerProvider={BusinessControllerProvider},desktopModule={DesktopModule})", businessControllerProvider, desktopModule);
+		Logger.LogDebug("<<< Exiting GetInstance(businessControllerProvider={BusinessControllerProvider},desktopModule={DesktopModule})", businessControllerProvider, desktopModule);
         => businessControllerProvider.GetInstance<T>(desktopModule.BusinessControllerClass);
 
     /// <summary>Gets an instance of the business controller.</summary>

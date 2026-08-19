@@ -8,10 +8,13 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
 
     public class MemberDirectoryServiceRouteMapper : IServiceRouteMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MemberDirectoryServiceRouteMapper));
         /// <inheritdoc />
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			Logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute("MemberDirectory", "default", "{controller}/{action}", new[] { "DotNetNuke.Modules.MemberDirectory.Services" });
+			Logger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
     }
 }

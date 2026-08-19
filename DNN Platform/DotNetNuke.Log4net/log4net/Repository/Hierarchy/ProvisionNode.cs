@@ -49,7 +49,9 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         internal ProvisionNode(Logger log) : base()
         {
+			value.LogDebug(">>> Entering ProvisionNode(log={Log})", log);
             this.Add(log);
+			value.LogDebug("<<< Exiting ProvisionNode(log={Log})", log);
         }
     }
 }

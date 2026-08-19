@@ -5,26 +5,36 @@ import { GridSystem, GridCell, InputGroup, SingleLineInputWithError, MultiLineIn
 import Localization from "../../../localization";
 import styles from "./style.module.less";
 import Utils from "../../../utils";
+const logger = console;
 
 class PageDetails extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {};
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug('<<< Exiting constructor()');
     }
 
     onChangeField(key, event) {
+		logger.debug(`>>> Entering onChangeField(key=${key},event=${event})`);
         const { onChangeField } = this.props;
         onChangeField(key, event.target.value);
+		logger.debug(`<<< Exiting onChangeField(key=${key},event=${event})`);
     }
 
     onChangeTags(tags) {
+		logger.debug(`>>> Entering onChangeTags(tags=${tags})`);
         const { onChangeField } = this.props;
         onChangeField("tags", tags.join(","));
+		logger.debug(`<<< Exiting onChangeTags(tags=${tags})`);
     }
 
     onChangeParentId(value) {
+		logger.debug(`>>> Entering onChangeParentId(value=${value})`);
         const { onChangeField } = this.props;
         onChangeField("parentId", value);
+		logger.debug(`<<< Exiting onChangeParentId(value=${value})`);
     }
 
     onSelect(parentPageId, parentPageName) {
@@ -37,9 +47,11 @@ class PageDetails extends Component {
 
 
     render() {
+		logger.debug('>>> Entering render()');
         const { page, errors } = this.props;
 
         const tags = page.tags ? page.tags.split(",") : [];
+		logger.debug(`render(): tags → ${tags}`);
         const TabParameters = {
             portalId: -2,
             cultureCode: "",
@@ -55,9 +67,13 @@ class PageDetails extends Component {
             includeDeletedChildren: false
         });
         const sf = Utils.getServiceFramework();
+		logger.debug(`render(): TabParameters_1 → ${TabParameters_1}`);
+		logger.debug(`render(): sf → ${sf}`);
 
         const defaultLabel = page.hierarchy || Localization.get("NoneSpecified");
+		logger.debug(`render(): defaultLabel → ${defaultLabel}`);
         const selectedTabId = page.parentId || -1;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.pageStandard}>
                 <GridSystem>
@@ -145,6 +161,8 @@ PageDetails.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         page : state.pages.selectedPage
     };

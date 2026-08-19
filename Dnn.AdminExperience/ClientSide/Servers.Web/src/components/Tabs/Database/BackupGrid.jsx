@@ -3,10 +3,12 @@ import PropTypes from "prop-types";
 import { GridCell, TextOverflowWrapper as OverflowText } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../../localization";
 import util from "../../../utils";
+const logger = console;
 
 export default class BackupGrid extends Component {
 
     getBackUpsGridRows() {
+		logger.debug('>>> Entering getBackUpsGridRows()');
         if (this.props.backups && this.props.backups.length > 0) {
             const rows = this.props.backups.map((field, i) => {
                 return <div className="row" key={i}>
@@ -17,6 +19,8 @@ export default class BackupGrid extends Component {
                     <GridCell columnSize={15}>{field.backupType}</GridCell>
                 </div>;
             });
+			logger.debug(`getBackUpsGridRows(): rows → ${rows}`);
+		logger.debug('<<< Exiting getBackUpsGridRows()');
             return rows;
         }
         return <div className="row">
@@ -25,8 +29,11 @@ export default class BackupGrid extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const rows = this.getBackUpsGridRows();
 
+		logger.debug(`render(): rows → ${rows}`);
+		logger.debug('<<< Exiting render()');
         return <div className="grid">
             <div className="row header">
                 <GridCell columnSize={45}>{Localization.get("BackupName")}</GridCell>

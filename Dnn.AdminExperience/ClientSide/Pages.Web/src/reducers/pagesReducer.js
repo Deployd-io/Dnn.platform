@@ -1,5 +1,6 @@
 import ActionTypes from "../constants/actionTypes/pageActionTypes";
 import validateFields from "../validation";
+const logger = console;
 
 export default function pagesReducer(state = {
     selectedPage: null,
@@ -14,15 +15,19 @@ export default function pagesReducer(state = {
 
 
     const changeField = function changeField(field, value) {
+		logger.debug(`>>> Entering changeField(field=${field},value=${value})`);
         const newSelectedPage = {
             ...state.selectedPage
         };
         newSelectedPage[field] = value;
+		logger.debug(`<<< Exiting changeField(field=${field},value=${value})`);
         return newSelectedPage;
     };
 
     const changeModuleCopy = function changeModuleCopy(id, key, value) {
+		logger.debug(`>>> Entering changeModuleCopy(id=${id},key=${key},value=${value})`);
         const modules = [...state.selectedPage.modules];
+		logger.debug(`<<< Exiting changeModuleCopy(id=${id},key=${key},value=${value})`);
         return modules.map((m) => {
             if (m.id === id) {                
                 return {

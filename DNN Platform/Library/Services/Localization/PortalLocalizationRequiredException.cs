@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class PortalLocalizationRequiredException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalLocalizationRequiredException));
     /// <inheritdoc />
     public PortalLocalizationRequiredException()
     {
+	Logger.LogDebug(">>> Entering PortalLocalizationRequiredException()");
+	Logger.LogDebug("<<< Exiting PortalLocalizationRequiredException()");
     }
 
     /// <inheritdoc />
     public PortalLocalizationRequiredException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering PortalLocalizationRequiredException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting PortalLocalizationRequiredException(message={Message})", message);
 
     /// <inheritdoc />
     public PortalLocalizationRequiredException(string message, Exception innerException)

@@ -13,22 +13,32 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <summary>Initializes a new instance of the <see cref="CodeMirror" /> class.</summary>
         public CodeMirror()
         {
+			eventLogger.LogDebug(">>> Entering CodeMirror()");
             this.Theme = "default";
             this.LineNumbers = true;
+			eventLogger.LogDebug("CodeMirror(): this.Theme → {Arg0}", this.Theme);
+			eventLogger.LogDebug("CodeMirror(): this.LineNumbers → {Arg0}", this.LineNumbers);
             this.LineWrapping = true;
             this.MatchBrackets = true;
             this.AutoCloseTags = false;
+			eventLogger.LogDebug("CodeMirror(): this.LineWrapping → {Arg0}", this.LineWrapping);
+			eventLogger.LogDebug("CodeMirror(): this.MatchBrackets → {Arg0}", this.MatchBrackets);
+			eventLogger.LogDebug("CodeMirror(): this.AutoCloseTags → {Arg0}", this.AutoCloseTags);
             this.EnableSearchTools = true;
             this.EnableCodeFolding = true;
             this.EnableCodeFormatting = true;
             this.AutoFormatOnStart = false;
             this.AutoFormatOnUncomment = true;
             this.HighlightActiveLine = true;
+			eventLogger.LogDebug("CodeMirror(): this.EnableSearchTools → {Arg0}", this.EnableSearchTools);
+			eventLogger.LogDebug("CodeMirror(): this.EnableCodeFolding → {Arg0}", this.EnableCodeFolding);
+			eventLogger.LogDebug("CodeMirror(): this.EnableCodeFormatting → {Arg0}", this.EnableCodeFormatting);
             this.HighlightMatches = true;
             this.ShowTabs = false;
             this.ShowFormatButton = true;
             this.ShowCommentButton = true;
             this.ShowUncommentButton = true;
+			eventLogger.LogDebug("<<< Exiting CodeMirror()");
         }
 
         /// <summary>Gets or sets the theme.</summary>

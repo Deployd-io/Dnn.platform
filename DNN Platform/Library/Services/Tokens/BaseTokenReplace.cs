@@ -19,6 +19,7 @@ namespace DotNetNuke.Services.Tokens
     /// </summary>
     public abstract class BaseTokenReplace
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(BaseTokenReplace));
         protected const string ObjectLessToken = "no_object";
         private const string ExpressionDefault =
             "(?:(?<text>\\[\\])|\\[(?:(?<object>[^{}\\]\\[:]+):(?<property>[^\\]\\[\\|]+))(?:\\|(?:(?<format>[^\\]\\[]+)\\|(?<ifEmpty>[^\\]\\[]+))|\\|(?:(?<format>[^\\|\\]\\[]+)))?\\])|(?<text>\\[[^\\]\\[]+\\])|(?<text>[^\\]\\[]+)";
@@ -84,15 +85,18 @@ namespace DotNetNuke.Services.Tokens
 
         protected virtual string ReplaceTokens(string sourceText)
         {
+			Logger.LogDebug(">>> Entering ReplaceTokens(sourceText={SourceText})", sourceText);
             if (sourceText == null)
             {
                 return string.Empty;
             }
 
             var result = new StringBuilder();
+			Logger.LogDebug("ReplaceTokens(sourceText={SourceText}): result → {Result}", sourceText, result);
             foreach (Match currentMatch in this.TokenizerRegex.Matches(sourceText))
             {
                 string objectName = currentMatch.Result("${object}");
+				Logger.LogDebug("ReplaceTokens(sourceText={SourceText}): objectName → {ObjectName}", sourceText, objectName);
                 if (!string.IsNullOrEmpty(objectName))
                 {
                     if (objectName == "[")
@@ -104,6 +108,7 @@ namespace DotNetNuke.Services.Tokens
                     string format = currentMatch.Result("${format}");
                     string ifEmptyReplacement = currentMatch.Result("${ifEmpty}");
                     string conversion = this.replacedTokenValue(objectName, propertyName, format);
+					Logger.LogDebug("ReplaceTokens(sourceText={SourceText}): conversion → {Conversion}", sourceText, conversion);
                     if (!string.IsNullOrEmpty(ifEmptyReplacement) && string.IsNullOrEmpty(conversion))
                     {
                         conversion = ifEmptyReplacement;
@@ -117,6 +122,7 @@ namespace DotNetNuke.Services.Tokens
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ReplaceTokens(sourceText={SourceText})", sourceText);
             return result.ToString();
         }
     }

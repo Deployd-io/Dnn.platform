@@ -26,6 +26,7 @@ namespace DotNetNuke.Security.Roles
     [Serializable]
     public class RoleInfo : BaseEntityInfo, IHydratable, IXmlSerializable, IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RoleInfo));
         private RoleType roleType = RoleType.None;
         private bool roleTypeSet = Null.NullBoolean;
         private Dictionary<string, string> settings;
@@ -33,10 +34,14 @@ namespace DotNetNuke.Security.Roles
         /// <summary>Initializes a new instance of the <see cref="RoleInfo"/> class.</summary>
         public RoleInfo()
         {
+			Logger.LogDebug(">>> Entering RoleInfo()");
             this.TrialFrequency = "N";
             this.BillingFrequency = "N";
+			Logger.LogDebug("RoleInfo(): this.TrialFrequency → {Arg0}", this.TrialFrequency);
+			Logger.LogDebug("RoleInfo(): this.BillingFrequency → {Arg0}", this.BillingFrequency);
             this.RoleID = Null.NullInteger;
             this.IsSystemRole = false;
+			Logger.LogDebug("<<< Exiting RoleInfo()");
         }
 
         /// <summary>Gets the Role Type.</summary>
@@ -194,6 +199,7 @@ namespace DotNetNuke.Security.Roles
         /// <param name="dr">The Data Reader to use.</param>
         public virtual void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.RoleID = Null.SetNullInteger(dr["RoleId"]);
             this.PortalID = Null.SetNullInteger(dr["PortalID"]);
             this.RoleGroupID = Null.SetNullInteger(dr["RoleGroupId"]);
@@ -214,10 +220,12 @@ namespace DotNetNuke.Security.Roles
             try
             {
                 int mode = Null.SetNullInteger(dr["SecurityMode"]);
+				Logger.LogDebug("Fill(dr={Dr}): mode → {Mode}", dr, mode);
                 switch (mode)
                 {
                     case 0:
                         this.SecurityMode = SecurityMode.SecurityRole;
+						Logger.LogDebug("Fill(dr={Dr}): this.SecurityMode → {Arg1}", dr, this.SecurityMode);
                         break;
                     case 1:
                         this.SecurityMode = SecurityMode.SocialGroup;
@@ -228,10 +236,12 @@ namespace DotNetNuke.Security.Roles
                 }
 
                 int status = Null.SetNullInteger(dr["Status"]);
+				Logger.LogDebug("Fill(dr={Dr}): status → {Status}", dr, status);
                 switch (status)
                 {
                     case -1:
                         this.Status = RoleStatus.Pending;
+						Logger.LogDebug("Fill(dr={Dr}): this.Status → {Arg1}", dr, this.Status);
                         break;
                     case 0:
                         this.Status = RoleStatus.Disabled;
@@ -243,6 +253,7 @@ namespace DotNetNuke.Security.Roles
 
                 // check for values only relevant to UserRoles
                 var schema = dr.GetSchemaTable();
+				Logger.LogDebug("Fill(dr={Dr}): schema → {Schema}", dr, schema);
                 if (schema != null)
                 {
                     if (schema.Select("ColumnName = 'UserCount'").Length > 0)
@@ -258,16 +269,19 @@ namespace DotNetNuke.Security.Roles
             }
             catch (IndexOutOfRangeException)
             {
+				Logger.LogError("Exception in Fill(dr={Dr}): {Arg1}", dr, IndexOutOfRangeException.getMessage());
                 // do nothing
             }
 
             // Fill base class fields
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             string outputFormat = string.Empty;
             if (format == string.Empty)
             {
@@ -334,6 +348,7 @@ namespace DotNetNuke.Security.Roles
                     }
 
                     propertyNotFound = true;
+					Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
                     return string.Empty;
             }
         }
@@ -341,6 +356,8 @@ namespace DotNetNuke.Security.Roles
         /// <inheritdoc />
         public XmlSchema GetSchema()
         {
+			Logger.LogDebug(">>> Entering GetSchema()");
+			Logger.LogDebug("<<< Exiting GetSchema()");
             return null;
         }
 
@@ -348,8 +365,10 @@ namespace DotNetNuke.Security.Roles
         /// <inheritdoc />
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadXml(reader={Reader})", reader);
             // Set status to approved by default
             this.Status = RoleStatus.Approved;
+			Logger.LogDebug("ReadXml(reader={Reader}): this.Status → {Arg1}", reader, this.Status);
 
             while (reader.Read())
             {
@@ -381,6 +400,7 @@ namespace DotNetNuke.Security.Roles
                             {
                                 this.BillingFrequency = "N";
                             }
+							Logger.LogDebug("ReadXml(reader={Reader}): this.BillingFrequency → {Arg1}", reader, this.BillingFrequency);
 
                             break;
                         case "billingperiod":
@@ -392,6 +412,7 @@ namespace DotNetNuke.Security.Roles
                             {
                                 this.ServiceFee = 0;
                             }
+							Logger.LogDebug("ReadXml(reader={Reader}): this.ServiceFee → {Arg1}", reader, this.ServiceFee);
 
                             break;
                         case "trialfrequency":
@@ -400,6 +421,7 @@ namespace DotNetNuke.Security.Roles
                             {
                                 this.TrialFrequency = "N";
                             }
+							Logger.LogDebug("ReadXml(reader={Reader}): this.TrialFrequency → {Arg1}", reader, this.TrialFrequency);
 
                             break;
                         case "trialperiod":
@@ -411,6 +433,7 @@ namespace DotNetNuke.Security.Roles
                             {
                                 this.TrialFee = 0;
                             }
+							Logger.LogDebug("ReadXml(reader={Reader}): this.TrialFee → {Arg1}", reader, this.TrialFee);
 
                             break;
                         case "ispublic":
@@ -433,6 +456,8 @@ namespace DotNetNuke.Security.Roles
                             {
                                 case "adminrole":
                                     this.roleType = RoleType.Administrator;
+									Logger.LogDebug("ReadXml(reader={Reader}): roleType → {RoleType}", reader, roleType);
+									Logger.LogDebug("ReadXml(reader={Reader}): this.roleType → {Arg1}", reader, this.roleType);
                                     break;
                                 case "registeredrole":
                                     this.roleType = RoleType.RegisteredUser;
@@ -449,12 +474,14 @@ namespace DotNetNuke.Security.Roles
                             }
 
                             this.roleTypeSet = true;
+							Logger.LogDebug("ReadXml(reader={Reader}): this.roleTypeSet → {Arg1}", reader, this.roleTypeSet);
                             break;
                         case "securitymode":
                             switch (reader.ReadElementContentAsString())
                             {
                                 case "securityrole":
                                     this.SecurityMode = SecurityMode.SecurityRole;
+									Logger.LogDebug("ReadXml(reader={Reader}): this.SecurityMode → {Arg1}", reader, this.SecurityMode);
                                     break;
                                 case "socialgroup":
                                     this.SecurityMode = SecurityMode.SocialGroup;
@@ -490,12 +517,14 @@ namespace DotNetNuke.Security.Roles
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting ReadXml(reader={Reader})", reader);
         }
 
         /// <summary>Writes a RoleInfo to an XmlWriter.</summary>
         /// <inheritdoc />
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteXml(writer={Writer})", writer);
             // Write start of main elements
             writer.WriteStartElement("role");
 
@@ -560,13 +589,16 @@ namespace DotNetNuke.Security.Roles
 
             // Write end of main element
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteXml(writer={Writer})", writer);
         }
 
         private static string FormatUrl(string url)
         {
+			Logger.LogDebug(">>> Entering FormatUrl(url={Url})", url);
             if (url.StartsWith("/", StringComparison.Ordinal) && HttpContext.Current != null)
             {
                 // server absolute path
+			Logger.LogDebug("<<< Exiting FormatUrl(url={Url})", url);
                 return Globals.AddHTTP(HttpContext.Current.Request.Url.Host) + url;
             }
 
@@ -575,10 +607,13 @@ namespace DotNetNuke.Security.Roles
 
         private void GetRoleType()
         {
+			Logger.LogDebug(">>> Entering GetRoleType()");
             var portal = PortalController.Instance.GetPortal(this.PortalID);
             if (this.RoleID == portal.AdministratorRoleId)
             {
                 this.roleType = RoleType.Administrator;
+				Logger.LogDebug("GetRoleType(): roleType → {RoleType}", roleType);
+				Logger.LogDebug("GetRoleType(): this.roleType → {Arg0}", this.roleType);
             }
             else if (this.RoleID == portal.RegisteredRoleId)
             {
@@ -592,10 +627,12 @@ namespace DotNetNuke.Security.Roles
             {
                 this.roleType = RoleType.UnverifiedUser;
             }
+			Logger.LogDebug("<<< Exiting GetRoleType()");
         }
 
         private string GetString(string keyName, string defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetString(keyName={KeyName},defaultValue={DefaultValue})", keyName, defaultValue);
             if (this.Settings == null)
             {
                 return defaultValue;
@@ -603,6 +640,7 @@ namespace DotNetNuke.Security.Roles
 
             if (this.Settings.TryGetValue(keyName, out var settingValue))
             {
+			Logger.LogDebug("<<< Exiting GetString(keyName={KeyName},defaultValue={DefaultValue})", keyName, defaultValue);
                 return settingValue;
             }
 

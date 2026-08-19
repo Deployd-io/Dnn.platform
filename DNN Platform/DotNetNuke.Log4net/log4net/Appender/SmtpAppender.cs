@@ -78,6 +78,8 @@ namespace log4net.Appender
         /// </remarks>
         public SmtpAppender()
         {	
+		value.LogDebug(">>> Entering SmtpAppender()");
+		value.LogDebug("<<< Exiting SmtpAppender()");
         }
 
         /// <summary>Gets or sets a comma- or semicolon-delimited list of recipient e-mail addresses (use semicolon on .NET 1.1 and comma for later versions).</summary>
@@ -343,6 +345,7 @@ namespace log4net.Appender
         /// <param name="events">The logging events to send.</param>
         protected override void SendBuffer(LoggingEvent[] events) 
         {
+			value.LogDebug(">>> Entering SendBuffer(events={Events})", events);
             // Note: this code already owns the monitor for this
             // appender. This frees us from needing to synchronize again.
             try 
@@ -372,8 +375,10 @@ namespace log4net.Appender
             } 
             catch(Exception e) 
             {
+				value.LogError("Exception in SendBuffer(events={Events}): {Arg1}", events, e.Message);
                 this.ErrorHandler.Error("Error occurred while sending e-mail notification.", e);
             }
+			value.LogDebug("<<< Exiting SendBuffer(events={Events})", events);
         }
 
         /// <summary>This appender requires a <see cref="Layout"/> to be set.</summary>
@@ -392,6 +397,10 @@ namespace log4net.Appender
         /// <param name="messageBody">the body text to include in the mail</param>
         protected virtual void SendEmail(string messageBody)
         {
+		value.LogDebug(">>> Entering SendEmail(messageBody={MessageBody})", messageBody);
+		value.LogError("Exception in SendEmail(messageBody={MessageBody}): {Arg1}", messageBody, missingMethodException.getMessage());
+		value.LogInformation("SendEmail(messageBody)={MessageBody}: external service call took {Arg1} ms", messageBody, __logStart.ElapsedMilliseconds);
+		value.LogDebug("<<< Exiting SendEmail(messageBody={MessageBody})", messageBody);
 #if NET_2_0 || MONO_2_0 || NETSTANDARD2_0
             // .NET 2.0 has a new API for SMTP email System.Net.Mail
             // This API supports credentials and multiple hosts correctly.
@@ -593,7 +602,9 @@ namespace log4net.Appender
             
             /// <summary>  trims leading and trailing commas or semicolons</summary>
             private static string MaybeTrimSeparators(string s) {
+			value.LogDebug(">>> Entering MaybeTrimSeparators(s={S})", s);
 #if NET_2_0 || MONO_2_0 || NETSTANDARD2_0
+				value.LogDebug("<<< Exiting MaybeTrimSeparators(s={S})", s);
                 return string.IsNullOrEmpty(s) ? s : s.Trim(ADDRESS_DELIMITERS);
 #else
                 return s != null && s.Length > 0 ? s : s.Trim(ADDRESS_DELIMITERS);

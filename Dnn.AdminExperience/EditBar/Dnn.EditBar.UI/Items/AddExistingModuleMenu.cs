@@ -43,9 +43,11 @@ namespace Dnn.EditBar.UI.Items
         /// <inheritdoc />
         public override bool Visible()
         {
+			eventLogger.LogDebug(">>> Entering Visible()");
             var portalSettings = PortalSettings.Current;
             if (portalSettings == null)
             {
+			eventLogger.LogDebug("<<< Exiting Visible()");
                 return false;
             }
 

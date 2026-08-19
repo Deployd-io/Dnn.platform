@@ -20,6 +20,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
     /// <summary>FileProvider implements the OutputCachingProvider for file storage.</summary>
     public class FileProvider : OutputCachingProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FileProvider));
         public const string DataFileExtension = ".data.resources";
         public const string AttribFileExtension = ".attrib.resources";
         public const string TempFileExtension = ".temp.resources";
@@ -29,12 +30,15 @@ namespace DotNetNuke.Services.OutputCache.Providers
         /// <inheritdoc />
         public override int GetItemCount(int tabId)
         {
+			Logger.LogDebug(">>> Entering GetItemCount(tabId={TabId})", tabId);
+			Logger.LogDebug("<<< Exiting GetItemCount(tabId={TabId})", tabId);
             return GetCachedItemCount(tabId);
         }
 
         /// <inheritdoc />
         public override byte[] GetOutput(int tabId, string cacheKey)
         {
+			Logger.LogDebug(">>> Entering GetOutput(tabId={TabId},cacheKey={CacheKey})", tabId, cacheKey);
             string cachedOutput = GetCachedOutputFileName(tabId, cacheKey);
             if (!File.Exists(cachedOutput))
             {
@@ -42,10 +46,12 @@ namespace DotNetNuke.Services.OutputCache.Providers
             }
 
             var fInfo = new FileInfo(cachedOutput);
+			Logger.LogDebug("GetOutput(tabId={TabId},cacheKey={CacheKey}): fInfo → {FInfo}", tabId, cacheKey, fInfo);
             long numBytes = fInfo.Length;
             using (var fStream = new FileStream(cachedOutput, FileMode.Open, FileAccess.Read))
             using (var br = new BinaryReader(fStream))
             {
+				Logger.LogDebug("<<< Exiting GetOutput(tabId={TabId},cacheKey={CacheKey})", tabId, cacheKey);
                 return br.ReadBytes(Convert.ToInt32(numBytes));
             }
         }
@@ -53,25 +59,32 @@ namespace DotNetNuke.Services.OutputCache.Providers
         /// <inheritdoc />
         public override OutputCacheResponseFilter GetResponseFilter(int tabId, int maxVaryByCount, Stream responseFilter, string cacheKey, TimeSpan cacheDuration)
         {
+			Logger.LogDebug(">>> Entering GetResponseFilter(tabId={TabId},maxVaryByCount={MaxVaryByCount},responseFilter={ResponseFilter},cacheKey={CacheKey},cacheDuration={CacheDuration})", tabId, maxVaryByCount, responseFilter, cacheKey, cacheDuration);
+			Logger.LogDebug("<<< Exiting GetResponseFilter(tabId={TabId},maxVaryByCount={MaxVaryByCount},responseFilter={ResponseFilter},cacheKey={CacheKey},cacheDuration={CacheDuration})", tabId, maxVaryByCount, responseFilter, cacheKey, cacheDuration);
             return new FileResponseFilter(tabId, maxVaryByCount, responseFilter, cacheKey, cacheDuration);
         }
 
         /// <inheritdoc />
         public override void PurgeCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering PurgeCache(portalId={PortalId})", portalId);
             string cacheFolder = GetCacheFolder(portalId);
             if (!string.IsNullOrEmpty(cacheFolder))
             {
                 PurgeCache(cacheFolder);
             }
+			Logger.LogDebug("<<< Exiting PurgeCache(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public override void PurgeExpiredItems(int portalId)
         {
+			Logger.LogDebug(">>> Entering PurgeExpiredItems(portalId={PortalId})", portalId);
             var filesNotDeleted = new StringBuilder();
             int i = 0;
+			Logger.LogDebug("PurgeExpiredItems(portalId={PortalId}): filesNotDeleted → {FilesNotDeleted}", portalId, filesNotDeleted);
             string cacheFolder = GetCacheFolder(portalId);
+			Logger.LogDebug("PurgeExpiredItems(portalId={PortalId}): cacheFolder → {CacheFolder}", portalId, cacheFolder);
 
             if (!string.IsNullOrEmpty(cacheFolder))
             {
@@ -93,22 +106,28 @@ namespace DotNetNuke.Services.OutputCache.Providers
 
                 if (filesNotDeleted.Length > 0)
                 {
+					Logger.LogWarning("Throwing IOException from PurgeExpiredItems(portalId={PortalId})", portalId);
                     throw new IOException("Deleted " + i + " files, however, some files are locked.  Could not delete the following files: " + filesNotDeleted);
                 }
             }
+			Logger.LogDebug("<<< Exiting PurgeExpiredItems(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public override void Remove(int tabId)
         {
+			Logger.LogDebug(">>> Entering Remove(tabId={TabId})", tabId);
             try
             {
                 var portals = PortalController.GetPortalDictionary();
+				Logger.LogDebug("Remove(tabId={TabId}): portals → {Portals}", tabId, portals);
                 if (portals.TryGetValue(tabId, out var portalId) && portalId > Null.NullInteger)
                 {
                     var filesNotDeleted = new StringBuilder();
+					Logger.LogDebug("Remove(tabId={TabId}): filesNotDeleted → {FilesNotDeleted}", tabId, filesNotDeleted);
                     int i = 0;
                     string cacheFolder = GetCacheFolder(portalId);
+					Logger.LogDebug("Remove(tabId={TabId}): cacheFolder → {CacheFolder}", tabId, cacheFolder);
 
                     if (!string.IsNullOrEmpty(cacheFolder))
                     {
@@ -127,6 +146,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
                         if (filesNotDeleted.Length > 0)
                         {
                             var log = new LogInfo { LogTypeKey = nameof(EventLogType.HOST_ALERT), };
+							Logger.LogDebug("Remove(tabId={TabId}): log → {Log}", tabId, log);
 
                             var logDetail = new LogDetailInfo
                             {
@@ -135,6 +155,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
                             };
                             var properties = new LogProperties { logDetail, };
                             log.LogProperties = properties;
+							Logger.LogDebug("Remove(tabId={TabId}): log.LogProperties → {Arg1}", tabId, log.LogProperties);
 
                             LogController.Instance.AddLog(log);
                         }
@@ -143,13 +164,16 @@ namespace DotNetNuke.Services.OutputCache.Providers
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in Remove(tabId={TabId}): {Arg1}", tabId, ex.getMessage());
                 Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting Remove(tabId={TabId})", tabId);
         }
 
         /// <inheritdoc />
         public override void SetOutput(int tabId, string cacheKey, TimeSpan duration, byte[] output)
         {
+			Logger.LogDebug(">>> Entering SetOutput(tabId={TabId},cacheKey={CacheKey},duration={Duration},output={Output})", tabId, cacheKey, duration, output);
             string attribFile = GetAttribFileName(tabId, cacheKey);
             string cachedOutputFile = GetCachedOutputFileName(tabId, cacheKey);
 
@@ -174,6 +198,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in SetOutput(tabId={TabId},cacheKey={CacheKey},duration={Duration},output={Output}): {Arg4}", tabId, cacheKey, duration, output, ex.getMessage());
                 // TODO: Need to implement multi-threading.
                 // The current code is not thread safe and threw error if two threads tried creating cache file
                 // A thread could create a file between the time another thread deleted it and tried to create new cache file.
@@ -181,13 +206,16 @@ namespace DotNetNuke.Services.OutputCache.Providers
                 // Error would bubble up to the user and provide details on the file structure of the site.
                 Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting SetOutput(tabId={TabId},cacheKey={CacheKey},duration={Duration},output={Output})", tabId, cacheKey, duration, output);
         }
 
         /// <inheritdoc />
         public override bool StreamOutput(int tabId, string cacheKey, HttpContext context)
         {
+			Logger.LogDebug(">>> Entering StreamOutput(tabId={TabId},cacheKey={CacheKey},context={Context})", tabId, cacheKey, context);
             bool foundFile = false;
             try
+			Logger.LogDebug("StreamOutput(tabId={TabId},cacheKey={CacheKey},context={Context}): foundFile → {FoundFile}", tabId, cacheKey, context, foundFile);
             {
                 string attribFile = GetAttribFileName(tabId, cacheKey);
                 if (!File.Exists(attribFile))
@@ -197,7 +225,9 @@ namespace DotNetNuke.Services.OutputCache.Providers
 
                 string captureFile = GetCachedOutputFileName(tabId, cacheKey);
                 StreamReader oRead = File.OpenText(attribFile);
+				Logger.LogDebug("StreamOutput(tabId={TabId},cacheKey={CacheKey},context={Context}): oRead → {ORead}", tabId, cacheKey, context, oRead);
                 DateTime expires = Convert.ToDateTime(oRead.ReadLine(), CultureInfo.InvariantCulture);
+				Logger.LogDebug("StreamOutput(tabId={TabId},cacheKey={CacheKey},context={Context}): expires → {Expires}", tabId, cacheKey, context, expires);
                 oRead.Close();
                 if (expires < DateTime.UtcNow)
                 {
@@ -212,35 +242,48 @@ namespace DotNetNuke.Services.OutputCache.Providers
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in StreamOutput(tabId={TabId},cacheKey={CacheKey},context={Context}): {Arg3}", tabId, cacheKey, context, ex.getMessage());
                 Exceptions.Exceptions.LogException(ex);
             }
 
+			Logger.LogDebug("<<< Exiting StreamOutput(tabId={TabId},cacheKey={CacheKey},context={Context})", tabId, cacheKey, context);
             return foundFile;
         }
 
         internal static string GetAttribFileName(int tabId, string cacheKey)
         {
+			Logger.LogDebug(">>> Entering GetAttribFileName(tabId={TabId},cacheKey={CacheKey})", tabId, cacheKey);
+			Logger.LogDebug("<<< Exiting GetAttribFileName(tabId={TabId},cacheKey={CacheKey})", tabId, cacheKey);
             return string.Concat(GetCacheFolder(), cacheKey, AttribFileExtension);
         }
 
         internal static int GetCachedItemCount(int tabId)
         {
+			Logger.LogDebug(">>> Entering GetCachedItemCount(tabId={TabId})", tabId);
+			Logger.LogDebug("<<< Exiting GetCachedItemCount(tabId={TabId})", tabId);
             return Directory.GetFiles(GetCacheFolder(), $"{tabId}_*{DataFileExtension}").Length;
         }
 
         internal static string GetCachedOutputFileName(int tabId, string cacheKey)
         {
+			Logger.LogDebug(">>> Entering GetCachedOutputFileName(tabId={TabId},cacheKey={CacheKey})", tabId, cacheKey);
+			Logger.LogDebug("<<< Exiting GetCachedOutputFileName(tabId={TabId},cacheKey={CacheKey})", tabId, cacheKey);
             return string.Concat(GetCacheFolder(), cacheKey, DataFileExtension);
         }
 
         internal static string GetTempFileName(int tabId, string cacheKey)
         {
+			Logger.LogDebug(">>> Entering GetTempFileName(tabId={TabId},cacheKey={CacheKey})", tabId, cacheKey);
+			Logger.LogDebug("<<< Exiting GetTempFileName(tabId={TabId},cacheKey={CacheKey})", tabId, cacheKey);
             return string.Concat(GetCacheFolder(), cacheKey, TempFileExtension);
         }
 
         private static string GetCacheFolder()
         {
+			Logger.LogDebug(">>> Entering GetCacheFolder()");
             int portalId = PortalController.Instance.GetCurrentSettings().PortalId;
+			Logger.LogDebug("GetCacheFolder(): portalId → {PortalId}", portalId);
+			Logger.LogDebug("<<< Exiting GetCacheFolder()");
             return GetCacheFolder(portalId);
         }
 
@@ -279,17 +322,21 @@ namespace DotNetNuke.Services.OutputCache.Providers
 
         private static bool IsFileExpired(string file)
         {
+			Logger.LogDebug(">>> Entering IsFileExpired(file={File})", file);
             StreamReader oRead = null;
             try
+			Logger.LogDebug("IsFileExpired(file={File}): oRead → {ORead}", file, oRead);
             {
                 oRead = File.OpenText(file);
                 var expires = Convert.ToDateTime(oRead.ReadLine(), CultureInfo.InvariantCulture);
+				Logger.LogDebug("IsFileExpired(file={File}): expires → {Expires}", file, expires);
                 if (expires < DateTime.UtcNow)
                 {
                     return true;
                 }
                 else
                 {
+					Logger.LogDebug("<<< Exiting IsFileExpired(file={File})", file);
                     return false;
                 }
             }
@@ -301,9 +348,11 @@ namespace DotNetNuke.Services.OutputCache.Providers
 
         private static void PurgeCache(string folder)
         {
+			Logger.LogDebug(">>> Entering PurgeCache(folder={Folder})", folder);
             try
             {
                 var filesNotDeleted = new StringBuilder();
+				Logger.LogDebug("PurgeCache(folder={Folder}): filesNotDeleted → {FilesNotDeleted}", folder, filesNotDeleted);
                 int i = 0;
                 foreach (string file in Directory.GetFiles(folder, "*.resources"))
                 {
@@ -319,13 +368,16 @@ namespace DotNetNuke.Services.OutputCache.Providers
 
                 if (filesNotDeleted.Length > 0)
                 {
+					Logger.LogWarning("Throwing IOException from PurgeCache(folder={Folder})", folder);
                     throw new IOException("Deleted " + i + " files, however, some files are locked.  Could not delete the following files: " + filesNotDeleted);
                 }
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in PurgeCache(folder={Folder}): {Arg1}", folder, ex.getMessage());
                 Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting PurgeCache(folder={Folder})", folder);
         }
     }
 }

@@ -51,7 +51,9 @@ namespace Dnn.EditBar.UI.Controllers
         public EditBarController()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering EditBarController()");
         }
+		Logger.LogDebug("<<< Exiting EditBarController()");
 
         /// <inheritdoc />
         public IDictionary<string, object> GetConfigurations(int portalId)
@@ -79,6 +81,8 @@ namespace Dnn.EditBar.UI.Controllers
         /// <inheritdoc />
         public IList<BaseMenuItem> GetMenuItems()
         {
+			Logger.LogDebug(">>> Entering GetMenuItems()");
+			Logger.LogDebug("<<< Exiting GetMenuItems()");
             return this.menuItems
                     .Where(m => m.Visible())
                     .OrderBy(m => m.Parent)
@@ -89,15 +93,19 @@ namespace Dnn.EditBar.UI.Controllers
         /// <inheritdoc />
         protected override Func<IEditBarController> GetFactory()
         {
+		Logger.LogDebug(">>> Entering GetFactory()");
 #pragma warning disable CS0618 // Type or member is obsolete
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new EditBarController();
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
         private static IEnumerable<BaseMenuItem> GetMenuItemInstances()
         {
+			Logger.LogDebug(">>> Entering GetMenuItemInstances()");
             var types = GetAllMenuItemTypes();
 
+			Logger.LogDebug("GetMenuItemInstances(): types → {Types}", types);
             foreach (var type in types)
             {
                 BaseMenuItem menuItem;
@@ -120,11 +128,15 @@ namespace Dnn.EditBar.UI.Controllers
                     yield return menuItem;
                 }
             }
+			Logger.LogDebug("<<< Exiting GetMenuItemInstances()");
         }
 
         private static IEnumerable<Type> GetAllMenuItemTypes()
         {
+			Logger.LogDebug(">>> Entering GetAllMenuItemTypes()");
             var typeLocator = new TypeLocator();
+			Logger.LogDebug("GetAllMenuItemTypes(): typeLocator → {TypeLocator}", typeLocator);
+			Logger.LogDebug("<<< Exiting GetAllMenuItemTypes()");
             return typeLocator.GetAllMatchingTypes(
                 t => t is { IsClass: true, IsAbstract: false, } && typeof(BaseMenuItem).IsAssignableFrom(t));
         }

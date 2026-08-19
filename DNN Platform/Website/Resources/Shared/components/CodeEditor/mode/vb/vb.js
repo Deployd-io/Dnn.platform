@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,10 +13,16 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("vb", function(conf, parserConf) {
+	logger.debug('>>> Entering defineMode()');
     var ERRORCLASS = 'error';
+	logger.debug('<<< Exiting defineMode()');
+	logger.debug(`defineMode(): ERRORCLASS → ${ERRORCLASS}`);
 
     function wordRegexp(words) {
+		logger.debug(`>>> Entering wordRegexp(words=${words})`);
+		logger.debug(`<<< Exiting wordRegexp(words=${words})`);
         return new RegExp("^((" + words.join(")|(") + "))\\b", "i");
     }
 

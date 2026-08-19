@@ -15,6 +15,7 @@ namespace DotNetNuke.UI.WebControls
     /// </summary>
     public class DNNDataGridCheckChangedEventArgs : DataGridItemEventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DNNDataGridCheckChangedEventArgs));
         /// <summary>Initializes a new instance of the <see cref="DNNDataGridCheckChangedEventArgs"/> class.</summary>
         /// <param name="item">The data grid item.</param>
         /// <param name="isChecked">Whether it's checked.</param>
@@ -22,8 +23,10 @@ namespace DotNetNuke.UI.WebControls
         public DNNDataGridCheckChangedEventArgs(DataGridItem item, bool isChecked, string field)
             : this(item, isChecked, field, false)
         {
+		Logger.LogDebug(">>> Entering DNNDataGridCheckChangedEventArgs(item={Item},isChecked={IsChecked},field={Field})", item, isChecked, field);
         }
 
+		Logger.LogDebug("<<< Exiting DNNDataGridCheckChangedEventArgs(item={Item},isChecked={IsChecked},field={Field})", item, isChecked, field);
         /// <summary>Initializes a new instance of the <see cref="DNNDataGridCheckChangedEventArgs"/> class.</summary>
         /// <param name="item">The data grid item.</param>
         /// <param name="isChecked">Whether it's checked.</param>
@@ -34,6 +37,7 @@ namespace DotNetNuke.UI.WebControls
         {
             this.Checked = isChecked;
             this.IsAll = isAll;
+			Logger.LogDebug("DNNDataGridCheckChangedEventArgs(item={Item},isChecked={IsChecked},field={Field},isAll={IsAll}): this.Checked → {Arg4}", item, isChecked, field, isAll, this.Checked);
             this.Field = field;
         }
 

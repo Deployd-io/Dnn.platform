@@ -2,6 +2,7 @@ import { Component, Host, h, Event, EventEmitter, Prop, State, Element, Listen }
 import { InternalServicesClient, FolderTreeItem } from '../../services/InternalServicesClient';
 import { Item, ItemsClient } from "../../services/ItemsClient";
 import state from "../../store/store";
+const logger = console;
 
 @Component({
   tag: 'dnn-rm-folder-list-item',
@@ -25,10 +26,12 @@ export class DnnRmFolderListItem {
 
   @Listen("dnnRmFolderDoubleClicked", {target: "document"})
   handleFolderDoubleClicked(e: CustomEvent<number>) {
+	logger.debug(`>>> Entering handleFolderDoubleClicked(e=${e})`);
     if (e.detail == Number.parseInt(this.folder.data.key)) {
       this.dnnRmFolderListItemClicked.emit(this.folder);
       void this.handleUserExpanded();
       this.expanded = true;
+	logger.debug(`<<< Exiting handleFolderDoubleClicked(e=${e})`);
     }
   }
 
@@ -44,20 +47,25 @@ export class DnnRmFolderListItem {
   private itemContextMenu: HTMLDnnContextMenuElement;
 
   constructor(){
+	logger.debug('>>> Entering constructor()');
     this.itemsClient = new ItemsClient(state.moduleId);
     this.internalServicesClient = new InternalServicesClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   async componentWillLoad() {
+	logger.debug('>>> Entering componentWillLoad()');
     try {
       this.item = await this.itemsClient.getFolderItem(Number.parseInt(this.folder.data.key));
       this.item.iconUrl = await this.itemsClient.getFolderIconUrl(Number.parseInt(this.folder.data.key));
     } catch (error) {
       console.error(error);
+	logger.debug('<<< Exiting componentWillLoad()');
     }
   }
 
   private async handleUserExpanded() {
+	logger.debug('>>> Entering handleUserExpanded()');
     const children = Array.from(this.el.shadowRoot.querySelectorAll('dnn-rm-folder-list-item'));
     children.forEach(element => {
       element.shadowRoot.querySelectorAll("dnn-treeview-item")
@@ -65,6 +73,7 @@ export class DnnRmFolderListItem {
     });
     try {
       const data = await this.internalServicesClient.getFolderDescendants(this.folder.data.key);
+	logger.debug(`handleUserExpanded(): data → ${data}`);
       this.folder = {
         ...this.folder,
         children: data.Items.map(item => {
@@ -80,11 +89,14 @@ export class DnnRmFolderListItem {
       };
     } catch (error) {
       alert(error);
+	logger.debug('<<< Exiting handleUserExpanded()');
     }
   };
 
   private getItemClasses(): string {
     if (this.selectedFolder?.data?.key == this.folder.data.key) {
+	logger.debug('>>> Entering getItemClasses()');
+	logger.debug('<<< Exiting getItemClasses()');
       return "selected";
     }
 
@@ -92,6 +104,8 @@ export class DnnRmFolderListItem {
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host class={this.getItemClasses()}>
         <dnn-treeview-item

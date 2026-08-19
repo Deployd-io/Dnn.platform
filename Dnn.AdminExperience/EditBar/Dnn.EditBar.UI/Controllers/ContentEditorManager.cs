@@ -70,8 +70,10 @@ namespace Dnn.EditBar.UI.Controllers
         public ContentEditorManager()
             : this(null, null, null, null, null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering ContentEditorManager()");
         }
 
+		eventLogger.LogDebug("<<< Exiting ContentEditorManager()");
         /// <summary>Initializes a new instance of the <see cref="ContentEditorManager"/> class.</summary>
         /// <param name="clientResourceController">The client resource controller.</param>
         /// <param name="appStatus">The application status.</param>
@@ -85,7 +87,14 @@ namespace Dnn.EditBar.UI.Controllers
         {
             this.clientResourceController = clientResourceController ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IClientResourceController>();
             this.appStatus = appStatus ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IApplicationStatusInfo>();
+			eventLogger.LogDebug("ContentEditorManager(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},hostSettings={HostSettings},userController={UserController},hostSettingsService={HostSettingsService},servicesFramework={ServicesFramework}): appStatus → {AppStatus1}", clientResourceController, appStatus, eventLogger, portalController, hostSettings, userController, hostSettingsService, servicesFramework, appStatus);
+			eventLogger.LogDebug("ContentEditorManager(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},hostSettings={HostSettings},userController={UserController},hostSettingsService={HostSettingsService},servicesFramework={ServicesFramework}): portalController → {PortalController1}", clientResourceController, appStatus, eventLogger, portalController, hostSettings, userController, hostSettingsService, servicesFramework, portalController);
+			eventLogger.LogDebug("ContentEditorManager(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},hostSettings={HostSettings},userController={UserController},hostSettingsService={HostSettingsService},servicesFramework={ServicesFramework}): hostSettings → {HostSettings1}", clientResourceController, appStatus, eventLogger, portalController, hostSettings, userController, hostSettingsService, servicesFramework, hostSettings);
+			eventLogger.LogDebug("ContentEditorManager(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},hostSettings={HostSettings},userController={UserController},hostSettingsService={HostSettingsService},servicesFramework={ServicesFramework}): userController → {UserController1}", clientResourceController, appStatus, eventLogger, portalController, hostSettings, userController, hostSettingsService, servicesFramework, userController);
+			eventLogger.LogDebug("ContentEditorManager(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},hostSettings={HostSettings},userController={UserController},hostSettingsService={HostSettingsService},servicesFramework={ServicesFramework}): hostSettingsService → {HostSettingsService1}", clientResourceController, appStatus, eventLogger, portalController, hostSettings, userController, hostSettingsService, servicesFramework, hostSettingsService);
+			eventLogger.LogDebug("ContentEditorManager(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},hostSettings={HostSettings},userController={UserController},hostSettingsService={HostSettingsService},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", clientResourceController, appStatus, eventLogger, portalController, hostSettings, userController, hostSettingsService, servicesFramework, servicesFramework);
             this.eventLogger = eventLogger ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("ContentEditorManager(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},hostSettings={HostSettings},userController={UserController},hostSettingsService={HostSettingsService},servicesFramework={ServicesFramework}): eventLogger → {EventLogger1}", clientResourceController, appStatus, eventLogger, portalController, hostSettings, userController, hostSettingsService, servicesFramework, eventLogger);
             this.portalController = portalController ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IPortalController>();
             this.hostSettings = hostSettings ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IHostSettings>();
             this.userController = userController ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IUserController>();
@@ -109,6 +118,7 @@ namespace Dnn.EditBar.UI.Controllers
         /// <returns>A value indicating whether the user has the specified permission for the tab.</returns>
         public static bool HasTabPermission(string permissionKey)
         {
+			eventLogger.LogDebug(">>> Entering HasTabPermission(permissionKey={PermissionKey})", permissionKey);
             var principal = Thread.CurrentPrincipal;
             if (!principal.Identity.IsAuthenticated)
             {
@@ -116,10 +126,13 @@ namespace Dnn.EditBar.UI.Controllers
             }
 
             var currentPortal = PortalController.Instance.GetCurrentSettings();
+			eventLogger.LogDebug("HasTabPermission(permissionKey={PermissionKey}): currentPortal → {CurrentPortal}", permissionKey, currentPortal);
             var currentUser = UserController.Instance.GetCurrentUserInfo();
+			eventLogger.LogDebug("HasTabPermission(permissionKey={PermissionKey}): currentUser → {CurrentUser}", permissionKey, currentUser);
             bool isAdminUser = currentUser.IsSuperUser || PortalSecurity.IsInRole(currentPortal.AdministratorRoleName);
             if (isAdminUser)
             {
+			eventLogger.LogDebug("<<< Exiting HasTabPermission(permissionKey={PermissionKey})", permissionKey);
                 return true;
             }
 
@@ -133,8 +146,10 @@ namespace Dnn.EditBar.UI.Controllers
         /// <returns><see cref="ContentEditorManager"/>.</returns>
         internal static ContentEditorManager GetCurrent(Page page)
         {
+			eventLogger.LogDebug(">>> Entering GetCurrent(page={Page})", page);
             if (page.Items.Contains("ContentEditorManager"))
             {
+			eventLogger.LogDebug("<<< Exiting GetCurrent(page={Page})", page);
                 return page.Items["ContentEditorManager"] as ContentEditorManager;
             }
 
@@ -144,10 +159,12 @@ namespace Dnn.EditBar.UI.Controllers
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (GetCurrent(this.Page) != null)
             {
+				eventLogger.LogWarning("Throwing InvalidOperationException from OnInit(e={E})", e);
                 throw new InvalidOperationException("Instance has already initialized");
             }
 
@@ -161,7 +178,9 @@ namespace Dnn.EditBar.UI.Controllers
             }
 
             var isInViewMode = Personalization.GetUserMode() != PortalSettings.Mode.Edit;
+			eventLogger.LogDebug("OnInit(e={E}): isInViewMode → {IsInViewMode}", e, isInViewMode);
             var menuItemsCount = EditBarController.Instance.GetMenuItems().Count;
+			eventLogger.LogDebug("OnInit(e={E}): menuItemsCount → {MenuItemsCount}", e, menuItemsCount);
             if (isInViewMode || menuItemsCount == 0)
             {
                 this.Parent.Controls.Remove(this);
@@ -181,25 +200,30 @@ namespace Dnn.EditBar.UI.Controllers
             this.CheckCallbackData();
 
             this.EnsureChildControls();
+			eventLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             this.RemoveEmptyPaneClass();
             this.RegisterInitScripts();
+			eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			eventLogger.LogDebug(">>> Entering CreateChildControls()");
             base.CreateChildControls();
 
             foreach (string paneId in this.PortalSettings.ActiveTab.Panes)
             {
                 var pane = this.Skin.FindControl(paneId) as HtmlContainerControl;
+				eventLogger.LogDebug("CreateChildControls(): pane → {Pane}", pane);
                 if (pane == null)
                 {
                     continue;
@@ -217,10 +241,12 @@ namespace Dnn.EditBar.UI.Controllers
                 {
                     // find update panels in pane and fire the unload event for a known issue: CONTENT-4039
                     var updatePanels = GetUpdatePanelsInPane(pane);
+					eventLogger.LogDebug("CreateChildControls(): updatePanels → {UpdatePanels}", updatePanels);
                     updatePanels.ForEach(p => p.Unload += this.UpdatePanelUnloadEvent);
                     updatePanel.Unload += this.UpdatePanelUnloadEvent;
 
                     var paneIndex = pane.Parent.Controls.IndexOf(pane);
+					eventLogger.LogDebug("CreateChildControls(): paneIndex → {PaneIndex}", paneIndex);
                     pane.Parent.Controls.AddAt(paneIndex, updatePanel);
 
                     var templateContainer = updatePanel.ContentTemplateContainer;
@@ -228,7 +254,9 @@ namespace Dnn.EditBar.UI.Controllers
                 }
                 catch (Exception)
                 {
+					eventLogger.LogError("Exception in CreateChildControls(): {Arg0}", Exception.Message);
                     this.SupportAjax = false;
+					eventLogger.LogDebug("CreateChildControls(): this.SupportAjax → {Arg0}", this.SupportAjax);
                     return;
                 }
 
@@ -236,6 +264,7 @@ namespace Dnn.EditBar.UI.Controllers
                 pane.Attributes["class"] = string.Empty;
 
                 var scriptManager = ScriptManager.GetCurrent(this.Page);
+				eventLogger.LogDebug("CreateChildControls(): scriptManager → {ScriptManager}", scriptManager);
                 if (scriptManager is { IsInAsyncPostBack: true }
                     && updatePanel.ClientID == this.Request.Form["__EVENTTARGET"]
                     && !string.IsNullOrEmpty(this.Request.Form["__EVENTARGUMENT"])
@@ -243,12 +272,16 @@ namespace Dnn.EditBar.UI.Controllers
                     && this.Request.Form["__EVENTARGUMENT"].StartsWith("module-", StringComparison.OrdinalIgnoreCase))
                 {
                     var moduleId = Convert.ToInt32(this.Request.Form["__EVENTARGUMENT"].Substring(7), CultureInfo.InvariantCulture);
+					eventLogger.LogDebug("CreateChildControls(): moduleId → {ModuleId}", moduleId);
 
                     var moduleContainer = this.FindModuleContainer(moduleId);
+					eventLogger.LogDebug("CreateChildControls(): moduleContainer → {ModuleContainer}", moduleContainer);
                     if (moduleContainer != null)
                     {
                         var moduleControl = this.FindModuleControl(moduleId);
+						eventLogger.LogDebug("CreateChildControls(): moduleControl → {ModuleControl}", moduleControl);
                         var moduleInfo = this.FindModuleInfo(moduleId);
+						eventLogger.LogDebug("CreateChildControls(): moduleInfo → {ModuleInfo}", moduleInfo);
 
                         if (moduleControl != null && moduleInfo != null && moduleContainer.Parent is HtmlContainerControl control)
                         {
@@ -268,11 +301,13 @@ namespace Dnn.EditBar.UI.Controllers
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			eventLogger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             var scripts = ScriptManager.GetCurrent(this.Page).GetRegisteredStartupScripts()
                 .Where(s => s.Control is ProxyPage).ToList();
             foreach (var script in scripts)
@@ -281,10 +316,12 @@ namespace Dnn.EditBar.UI.Controllers
             }
 
             base.Render(writer);
+			eventLogger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
 
         private static void FindControlRecursive(Control rootControl, string controlId, ICollection<Control> foundControls)
         {
+			eventLogger.LogDebug(">>> Entering FindControlRecursive(rootControl={RootControl},controlId={ControlId},foundControls={FoundControls})", rootControl, controlId, foundControls);
             if (rootControl.ID == controlId)
             {
                 foundControls.Add(rootControl);
@@ -294,15 +331,19 @@ namespace Dnn.EditBar.UI.Controllers
             {
                 FindControlRecursive(subControl, controlId, foundControls);
             }
+			eventLogger.LogDebug("<<< Exiting FindControlRecursive(rootControl={RootControl},controlId={ControlId},foundControls={FoundControls})", rootControl, controlId, foundControls);
         }
 
         private static string GetPanesClientIds(IEnumerable<IEnumerable<string>> panelClientIdCollection)
         {
+			eventLogger.LogDebug(">>> Entering GetPanesClientIds(panelClientIdCollection={PanelClientIdCollection})", panelClientIdCollection);
+			eventLogger.LogDebug("<<< Exiting GetPanesClientIds(panelClientIdCollection={PanelClientIdCollection})", panelClientIdCollection);
             return string.Join(";", panelClientIdCollection.Select(x => string.Join(",", x)));
         }
 
         private static List<UpdatePanel> GetUpdatePanelsInPane(Control parent)
         {
+			eventLogger.LogDebug(">>> Entering GetUpdatePanelsInPane(parent={Parent})", parent);
             var panels = new List<UpdatePanel>();
             if (parent is UpdatePanel panel)
             {
@@ -316,16 +357,20 @@ namespace Dnn.EditBar.UI.Controllers
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetUpdatePanelsInPane(parent={Parent})", parent);
             return panels;
         }
 
         private static bool IsListControl(Control control)
         {
+			eventLogger.LogDebug(">>> Entering IsListControl(control={Control})", control);
+			eventLogger.LogDebug("<<< Exiting IsListControl(control={Control})", control);
             return control is DataBoundControl or Repeater or DataGrid;
         }
 
         private void RegisterClientResources()
         {
+		eventLogger.LogDebug(">>> Entering RegisterClientResources()");
 #pragma warning disable CS0618 // Type or member is obsolete
             ClientResourceManager.EnableAsyncPostBackHandler();
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -358,44 +403,55 @@ namespace Dnn.EditBar.UI.Controllers
 
             this.clientResourceController.RegisterScript("~/Resources/Shared/Components/Tokeninput/jquery.tokeninput.js");
             this.clientResourceController.RegisterStylesheet("~/Resources/Shared/Components/Tokeninput/Themes/token-input-facebook.css");
+			eventLogger.LogDebug("<<< Exiting RegisterClientResources()");
         }
 
         private void RegisterEditBarResources()
         {
+			eventLogger.LogDebug(">>> Entering RegisterEditBarResources()");
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.PortalSettings, CommonJs.jQuery);
             this.servicesFramework.RequestAjaxAntiForgerySupport();
 
             ClientAPI.RegisterClientVariable(this.Page, "editbar_isAdmin", this.IsAdmin().ToString(), true);
 
             var settings = EditBarController.Instance.GetConfigurations(this.PortalSettings.PortalId);
+			eventLogger.LogDebug("RegisterEditBarResources(): settings → {Settings}", settings);
             var settingsScript = "window.editBarSettings = " + JsonConvert.SerializeObject(settings) + ";";
+			eventLogger.LogDebug("RegisterEditBarResources(): settingsScript → {SettingsScript}", settingsScript);
             this.Page.ClientScript.RegisterClientScriptBlock(this.Page.GetType(), "EditBarSettings", settingsScript, true);
 
             this.clientResourceController.RegisterScript("~/DesktopModules/admin/Dnn.EditBar/scripts/editBarContainer.js");
 
             this.clientResourceController.RegisterStylesheet("~/DesktopModules/admin/Dnn.EditBar/css/editBarContainer.css");
+			eventLogger.LogDebug("<<< Exiting RegisterEditBarResources()");
         }
 
         private List<List<string>> GetPaneClientIdCollection()
         {
+			eventLogger.LogDebug(">>> Entering GetPaneClientIdCollection()");
             var panelClientIds = new List<List<string>>(this.PortalSettings.ActiveTab.Panes.Count);
 
+			eventLogger.LogDebug("GetPaneClientIdCollection(): panelClientIds → {PanelClientIds}", panelClientIds);
             try
             {
                 var skinControl = this.Page.FindControl("SkinPlaceHolder").Controls[0];
+				eventLogger.LogDebug("GetPaneClientIdCollection(): skinControl → {SkinControl}", skinControl);
 
                 foreach (var pane in this.PortalSettings.ActiveTab.Panes.Cast<string>())
                 {
                     var foundControls = new List<Control>();
+					eventLogger.LogDebug("GetPaneClientIdCollection(): foundControls → {FoundControls}", foundControls);
                     FindControlRecursive(skinControl, pane, foundControls);
                     panelClientIds.Add((from control in foundControls select control.ClientID).ToList());
                 }
             }
             catch (Exception ex)
             {
+				eventLogger.LogError("Exception in GetPaneClientIdCollection(): {Arg0}", ex.getMessage());
                 Exceptions.LogException(ex);
             }
 
+			eventLogger.LogDebug("<<< Exiting GetPaneClientIdCollection()");
             return panelClientIds;
         }
 
@@ -406,9 +462,11 @@ namespace Dnn.EditBar.UI.Controllers
         /// </summary>
         private void RemoveEmptyPaneClass()
         {
+			eventLogger.LogDebug(">>> Entering RemoveEmptyPaneClass()");
             foreach (string paneId in this.PortalSettings.ActiveTab.Panes)
             {
                 var paneControl = this.Skin.FindControl(paneId) as HtmlContainerControl;
+				eventLogger.LogDebug("RemoveEmptyPaneClass(): paneControl → {PaneControl}", paneControl);
                 if (paneControl != null
                         && !string.IsNullOrEmpty(paneControl.Attributes["class"])
                         && paneControl.Attributes["class"].Contains("DNNEmptyPane"))
@@ -416,16 +474,20 @@ namespace Dnn.EditBar.UI.Controllers
                     paneControl.Attributes["class"] = $"{paneControl.Attributes["class"]} EditBarEmptyPane";
                 }
             }
+			eventLogger.LogDebug("<<< Exiting RemoveEmptyPaneClass()");
         }
 
         private void RegisterInitScripts()
         {
+			eventLogger.LogDebug(">>> Entering RegisterInitScripts()");
             this.RegisterLocalResources();
 
             ClientAPI.RegisterClientVariable(this.Page, "cem_loginurl", Globals.LoginURL(HttpContext.Current.Request.RawUrl, false), true);
 
             var panes = string.Join(",", this.PortalSettings.ActiveTab.Panes.Cast<string>());
+			eventLogger.LogDebug("RegisterInitScripts(): panes → {Panes}", panes);
             var panesClientIds = GetPanesClientIds(this.GetPaneClientIdCollection());
+			eventLogger.LogDebug("RegisterInitScripts(): panesClientIds → {PanesClientIds}", panesClientIds);
             var script = string.Format(
                 CultureInfo.InvariantCulture,
                 "dnn.ContentEditorManager.init({{type: 'moduleManager', panes: '{0}', panesClientIds: '{2}', supportAjax: {1}}});",
@@ -442,10 +504,12 @@ namespace Dnn.EditBar.UI.Controllers
             {
                 this.Page.ClientScript.RegisterStartupScript(this.GetType(), "ContentEditorManager", script, true);
             }
+			eventLogger.LogDebug("<<< Exiting RegisterInitScripts()");
         }
 
         private void RegisterLocalResources()
         {
+			eventLogger.LogDebug(">>> Entering RegisterLocalResources()");
             var script = $$"""
                            dnn.ContentEditorManagerResources = {
                                title: '{{Localization.GetSafeJSString("AddModule.Text", LocalResourcesFile)}}',
@@ -479,6 +543,7 @@ namespace Dnn.EditBar.UI.Controllers
                                makeCopy: '{{Localization.GetSafeJSString("MakeCopy.Text", LocalResourcesFile)}}'
                            };
                            """;
+						eventLogger.LogDebug("RegisterLocalResources(): dnn.ContentEditorManagerResources → {Arg0}", dnn.ContentEditorManagerResources);
 
             if (ScriptManager.GetCurrent(this.Page) != null)
             {
@@ -489,13 +554,16 @@ namespace Dnn.EditBar.UI.Controllers
             {
                 this.Page.ClientScript.RegisterStartupScript(this.GetType(), "ContentEditorManagerResources", script, true);
             }
+			eventLogger.LogDebug("<<< Exiting RegisterLocalResources()");
         }
 
         private void CheckPendingData()
         {
+			eventLogger.LogDebug(">>> Entering CheckPendingData()");
             if (this.Request.Cookies["cem_pending"] != null)
             {
                 var cookie = this.Request.Cookies["cem_pending"];
+				eventLogger.LogDebug("CheckPendingData(): cookie → {Cookie}", cookie);
                 var pendingData = cookie.Value;
                 if (!string.IsNullOrEmpty(pendingData))
                 {
@@ -504,6 +572,7 @@ namespace Dnn.EditBar.UI.Controllers
                         && int.TryParse(pendingData.Substring(7), out var moduleId))
                     {
                         var module = ModuleController.Instance.GetModule(moduleId, tabId, false);
+						eventLogger.LogDebug("CheckPendingData(): module → {Module}", module);
                         if (module != null)
                         {
                             this.RemoveTabModule(tabId, moduleId);
@@ -522,10 +591,12 @@ namespace Dnn.EditBar.UI.Controllers
                 cookie.Expires = DateTime.Now.AddDays(-1);
                 this.Response.Cookies.Add(cookie);
             }
+			eventLogger.LogDebug("<<< Exiting CheckPendingData()");
         }
 
         private void RemoveTabModule(int tabId, int moduleId)
         {
+			eventLogger.LogDebug(">>> Entering RemoveTabModule(tabId={TabId},moduleId={ModuleId})", tabId, moduleId);
             ModuleController.Instance.DeleteTabModule(tabId, moduleId, false);
 
             // remove that module control
@@ -537,20 +608,26 @@ namespace Dnn.EditBar.UI.Controllers
             {
                 moduleControl.Parent.Parent.Controls.Remove(moduleControl.Parent);
             }
+			eventLogger.LogDebug("<<< Exiting RemoveTabModule(tabId={TabId},moduleId={ModuleId})", tabId, moduleId);
         }
 
         private void CheckCallbackData()
         {
+			eventLogger.LogDebug(">>> Entering CheckCallbackData()");
             if (this.Request.Cookies["CEM_CallbackData"] != null)
             {
                 var cookie = this.Request.Cookies["CEM_CallbackData"];
+				eventLogger.LogDebug("CheckCallbackData(): cookie → {Cookie}", cookie);
                 var callbackData = cookie.Value;
                 if (!string.IsNullOrEmpty(callbackData) && callbackData.StartsWith("module-", StringComparison.OrdinalIgnoreCase))
                 {
                     var moduleId = Convert.ToInt32(callbackData.Substring(7), CultureInfo.InvariantCulture);
+					eventLogger.LogDebug("CheckCallbackData(): moduleId → {ModuleId}", moduleId);
 
                     var moduleContainer = this.FindModuleContainer(moduleId);
+					eventLogger.LogDebug("CheckCallbackData(): moduleContainer → {ModuleContainer}", moduleContainer);
                     var moduleInfo = this.FindModuleInfo(moduleId);
+					eventLogger.LogDebug("CheckCallbackData(): moduleInfo → {ModuleInfo}", moduleInfo);
                     if (moduleContainer != null && moduleInfo != null && moduleContainer.Parent is HtmlContainerControl parent)
                     {
                         parent.Attributes["data-module-title"] = moduleInfo.ModuleTitle;
@@ -558,47 +635,59 @@ namespace Dnn.EditBar.UI.Controllers
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting CheckCallbackData()");
         }
 
         private void ProcessDragTipShown(Container moduleContainer)
         {
+			eventLogger.LogDebug(">>> Entering ProcessDragTipShown(moduleContainer={ModuleContainer})", moduleContainer);
             var dragTipShown = Convert.ToString(Personalization.GetProfile("Usability", "DragTipShown" + this.PortalSettings.PortalId), CultureInfo.InvariantCulture);
             if (string.IsNullOrEmpty(dragTipShown) && moduleContainer.Parent is HtmlContainerControl parent && this.Request.Cookies["noFloat"] == null)
             {
                 Personalization.SetProfile("Usability", "DragTipShown" + this.PortalSettings.PortalId, "true");
                 parent.Attributes["class"] += " dragtip";
             }
+			eventLogger.LogDebug("<<< Exiting ProcessDragTipShown(moduleContainer={ModuleContainer})", moduleContainer);
         }
 
         private Container FindModuleContainer(int moduleId)
         {
+			eventLogger.LogDebug(">>> Entering FindModuleContainer(moduleId={ModuleId})", moduleId);
+			eventLogger.LogDebug("<<< Exiting FindModuleContainer(moduleId={ModuleId})", moduleId);
             return ControlUtilities.FindFirstDescendent<Container>(this.Skin, c => c.ID == "ctr" + moduleId);
         }
 
         private Control FindModuleControl(int moduleId)
         {
+			eventLogger.LogDebug(">>> Entering FindModuleControl(moduleId={ModuleId})", moduleId);
             var moduleContainer = this.FindModuleContainer(moduleId);
             if (moduleContainer != null)
             {
                 var moduleInfo = this.FindModuleInfo(moduleId);
+				eventLogger.LogDebug("FindModuleControl(moduleId={ModuleId}): moduleInfo → {ModuleInfo}", moduleId, moduleInfo);
                 if (moduleInfo != null)
                 {
                     var controlId = Path.GetFileNameWithoutExtension(moduleInfo.ModuleControl.ControlSrc);
+					eventLogger.LogDebug("FindModuleControl(moduleId={ModuleId}): controlId → {ControlId}", moduleId, controlId);
                     return ControlUtilities.FindFirstDescendent<Control>(moduleContainer, c => c.ID == controlId);
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting FindModuleControl(moduleId={ModuleId})", moduleId);
             return null;
         }
 
         private ModuleInfo FindModuleInfo(int moduleId)
         {
+			eventLogger.LogDebug(">>> Entering FindModuleInfo(moduleId={ModuleId})", moduleId);
+			eventLogger.LogDebug("<<< Exiting FindModuleInfo(moduleId={ModuleId})", moduleId);
             return this.PortalSettings.ActiveTab.Modules.Cast<ModuleInfo>()
                         .FirstOrDefault(m => m.ModuleID == moduleId);
         }
 
         private void UpdatePanelUnloadEvent(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering UpdatePanelUnloadEvent(sender={Sender},e={E})", sender, e);
             try
             {
                 var methodInfo = typeof(ScriptManager).GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
@@ -607,17 +696,21 @@ namespace Dnn.EditBar.UI.Controllers
             }
             catch (Exception ex)
             {
+				eventLogger.LogError("Exception in UpdatePanelUnloadEvent(sender={Sender},e={E}): {Arg2}", sender, e, ex.getMessage());
                 Exceptions.LogException(ex);
             }
+			eventLogger.LogDebug("<<< Exiting UpdatePanelUnloadEvent(sender={Sender},e={E})", sender, e);
         }
 
         private bool HaveContentLayoutModuleOnPage()
         {
+			eventLogger.LogDebug(">>> Entering HaveContentLayoutModuleOnPage()");
             var moduleDefinition =
                 ModuleDefinitionController.GetModuleDefinitions(this.hostSettings).Values
                     .FirstOrDefault(m => m.DefinitionName == "Content Layout");
             if (moduleDefinition != null)
             {
+			eventLogger.LogDebug("<<< Exiting HaveContentLayoutModuleOnPage()");
                 return this.PortalSettings.ActiveTab.Modules.Cast<ModuleInfo>().Any(m => m.ModuleDefID == moduleDefinition.ModuleDefID);
             }
 
@@ -626,14 +719,18 @@ namespace Dnn.EditBar.UI.Controllers
 
         private void SetLastPageHistory(string pageId)
         {
+			eventLogger.LogDebug(">>> Entering SetLastPageHistory(pageId={PageId})", pageId);
             this.Response.Cookies.Add(new HttpCookie("LastPageId", pageId) { Path = !string.IsNullOrEmpty(Globals.ApplicationPath) ? Globals.ApplicationPath : "/" });
+			eventLogger.LogDebug("<<< Exiting SetLastPageHistory(pageId={PageId})", pageId);
         }
 
         private string GetLastPageHistory()
         {
+			eventLogger.LogDebug(">>> Entering GetLastPageHistory()");
             var cookie = this.Request.Cookies["LastPageId"];
             if (cookie != null)
             {
+			eventLogger.LogDebug("<<< Exiting GetLastPageHistory()");
                 return cookie.Value;
             }
 
@@ -642,16 +739,21 @@ namespace Dnn.EditBar.UI.Controllers
 
         private void SetUserMode(string userMode)
         {
+			eventLogger.LogDebug(">>> Entering SetUserMode(userMode={UserMode})", userMode);
             Personalization.SetProfile("Usability", "UserMode" + this.PortalSettings.PortalId, userMode.ToUpperInvariant());
+			eventLogger.LogDebug("<<< Exiting SetUserMode(userMode={UserMode})", userMode);
         }
 
         private void AutoSetUserMode()
         {
+			eventLogger.LogDebug(">>> Entering AutoSetUserMode()");
             int tabId = this.PortalSettings.ActiveTab.TabID;
             int portalId = PortalSettings.Current.PortalId;
             string pageId = $"{portalId}:{tabId}";
+			eventLogger.LogDebug("AutoSetUserMode(): pageId → {PageId}", pageId);
 
             HttpCookie cookie = this.Request.Cookies["StayInEditMode"];
+			eventLogger.LogDebug("AutoSetUserMode(): cookie → {Cookie}", cookie);
             if (cookie is { Value: "YES", })
             {
                 if (Personalization.GetUserMode() != PortalSettings.Mode.Edit)
@@ -666,6 +768,7 @@ namespace Dnn.EditBar.UI.Controllers
 
             string lastPageId = this.GetLastPageHistory();
             var isShowAsCustomError = this.Request.QueryString.AllKeys.Contains("aspxerrorpath");
+			eventLogger.LogDebug("AutoSetUserMode(): isShowAsCustomError → {IsShowAsCustomError}", isShowAsCustomError);
 
             if (lastPageId != pageId && !isShowAsCustomError)
             {
@@ -682,11 +785,14 @@ namespace Dnn.EditBar.UI.Controllers
             {
                 this.SetLastPageHistory(pageId);
             }
+			eventLogger.LogDebug("<<< Exiting AutoSetUserMode()");
         }
 
         private bool IsAdmin()
         {
+			eventLogger.LogDebug(">>> Entering IsAdmin()");
             var user = this.PortalSettings.UserInfo;
+			eventLogger.LogDebug("<<< Exiting IsAdmin()");
             return user.IsSuperUser || PortalSecurity.IsInRole(this.PortalSettings.AdministratorRoleName);
         }
 
@@ -698,6 +804,9 @@ namespace Dnn.EditBar.UI.Controllers
             public ProxyPage(Page originalPage)
                 : this(null, null, null, null, null, originalPage)
             {
+			eventLogger.LogDebug(">>> Entering ProxyPage(originalPage={OriginalPage})", originalPage);
+			eventLogger.LogDebug("ProxyPage(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},userController={UserController},hostSettingsService={HostSettingsService},originalPage={OriginalPage}): originalPage → {OriginalPage1}", portalController, appStatus, hostSettings, userController, hostSettingsService, originalPage, originalPage);
+			eventLogger.LogDebug("<<< Exiting ProxyPage(originalPage={OriginalPage})", originalPage);
             }
 
             public ProxyPage(IPortalController portalController, IApplicationStatusInfo appStatus, IHostSettings hostSettings, IUserController userController, IHostSettingsService hostSettingsService, Page originalPage)
@@ -705,6 +814,7 @@ namespace Dnn.EditBar.UI.Controllers
             {
                 this.originalPage = originalPage;
 
+				eventLogger.LogDebug("ProxyPage(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},userController={UserController},hostSettingsService={HostSettingsService},originalPage={OriginalPage}): this.originalPage → {Arg6}", portalController, appStatus, hostSettings, userController, hostSettingsService, originalPage, this.originalPage);
                 this.SetField("_header", originalPage.Header);
                 this.SetField("_request", originalPage.Request);
                 this.SetField("_response", originalPage.Response);
@@ -723,27 +833,34 @@ namespace Dnn.EditBar.UI.Controllers
             /// <inheritdoc />
             public override Control FindControl(string id)
             {
+				eventLogger.LogDebug(">>> Entering FindControl(id={Id})", id);
+				eventLogger.LogDebug("<<< Exiting FindControl(id={Id})", id);
                 return this.originalPage.FindControl(id);
             }
 
             private void SetField(string name, object value)
             {
+				eventLogger.LogDebug(">>> Entering SetField(name={Name},value={Value})", name, value);
                 var field = typeof(Page).GetField(name, BindingFlags.NonPublic | BindingFlags.Instance);
                 if (field != null)
                 {
                     field.SetValue(this, value);
                 }
+				eventLogger.LogDebug("<<< Exiting SetField(name={Name},value={Value})", name, value);
             }
 
             private void CopyProperty(Page original, string propertyName)
             {
+				eventLogger.LogDebug(">>> Entering CopyProperty(original={Original},propertyName={PropertyName})", original, propertyName);
                 var property = typeof(Page).GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Instance);
                 if (property != null)
                 {
                     var value = property.GetValue(original, []);
+					eventLogger.LogDebug("CopyProperty(original={Original},propertyName={PropertyName}): value → {Value}", original, propertyName, value);
 
                     property.SetValue(this, value, []);
                 }
+				eventLogger.LogDebug("<<< Exiting CopyProperty(original={Original},propertyName={PropertyName})", original, propertyName);
             }
         }
     }

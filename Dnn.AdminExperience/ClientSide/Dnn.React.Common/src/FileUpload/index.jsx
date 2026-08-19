@@ -6,6 +6,7 @@ import BrowseIcon from "./img/browse.svg";
 import UploadIcon from "./img/upload.svg";
 
 import "./style.less";
+const logger = console;
 
 const Buttons = [
     { name: "browse", icon: BrowseIcon, },
@@ -15,6 +16,7 @@ const Buttons = [
 export default class FileUpload extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         let fileExist = false;
         let selectedFile = null;
         let selectedFolder = null;
@@ -44,9 +46,12 @@ export default class FileUpload extends Component {
             errorText: ""
         };
         this.compareTimeout = setTimeout(this.compareDimensions.bind(this), 2000);
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     updateStateAndReloadImage(file) {
+		logger.debug(`>>> Entering updateStateAndReloadImage(file=${file})`);
         const selectedFolder = { value: file.folderPath, key: file.folderId };
         const selectedFile = { value: file.fileName, key: file.fileId };
         const fileExist = true;
@@ -54,18 +59,22 @@ export default class FileUpload extends Component {
         this.setState({fileExist, selectedFile, selectedFolder}, () => {
             this.getPreviewUrl(file.fileId);
         });
+		logger.debug(`<<< Exiting updateStateAndReloadImage(file=${file})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const file = this.props.selectedFile;
         if (file) {
             this.updateStateAndReloadImage(file);
         }
         window.addEventListener("dragover", this.prevent);
         window.addEventListener("drop", this.prevent);
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const { props } = this;
         if (!props.selectedFile && props.selectedFile !== prevProps.selectedFile) {
             this.setState({ fileExist: null, selectedFile: null, selectedFolder: null }, () => {});
@@ -81,79 +90,104 @@ export default class FileUpload extends Component {
         if (props.portalId !== prevProps.portalId) {         
             this.setState({ showFolderPicker: false });
         }
+		logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
     }
 
     prevent(e) {
+		logger.debug(`>>> Entering prevent(e=${e})`);
         e.preventDefault();
+		logger.debug(`<<< Exiting prevent(e=${e})`);
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         window.removeEventListener("dragover", this.prevent);
         window.removeEventListener("drop", this.prevent);
 
         this._unmounted = true;
         if (this.compareTimeout) {
+			logger.debug(`componentWillUnmount(): this._unmounted → ${this._unmounted}`);
             clearTimeout(this.compareTimeout);
             this.compareTimeout = null;
+			logger.debug('<<< Exiting componentWillUnmount()');
         }
     }
 
     onBrowse() {
+		logger.debug('>>> Entering onBrowse()');
         if (window.dnn !== undefined) {
             window.dnn.stopEscapeFromClosingPB = true;
         }
         this.setState({ showFolderPicker: true });
+		logger.debug('<<< Exiting onBrowse()');
     }
 
     onButtonClick(action) {
+		logger.debug(`>>> Entering onButtonClick(action=${action})`);
         switch (action) {
             case "browse":
+				logger.debug(`<<< Exiting onButtonClick(action=${action})`);
                 return this.onBrowse();
         }
     }
 
     hideFields() {
+		logger.debug('>>> Entering hideFields()');
         if (window.dnn !== undefined) {
             window.dnn.stopEscapeFromClosingPB = false;
         }
         this.setState({ showFolderPicker: false });
+		logger.debug('<<< Exiting hideFields()');
     }
 
     onMouseEnter(text) {
+		logger.debug(`>>> Entering onMouseEnter(text=${text})`);
         this.setState({ text });
+		logger.debug(`<<< Exiting onMouseEnter(text=${text})`);
     }
 
     onMouseLeave() {
+		logger.debug('>>> Entering onMouseLeave()');
         this.setState({ text: this.props.defaultText });
+		logger.debug('<<< Exiting onMouseLeave()');
     }
 
     onFileSelect(selectedFolder, selectedFile) {
+		logger.debug(`>>> Entering onFileSelect(selectedFolder=${selectedFolder},selectedFile=${selectedFile})`);
         this.setState({ selectedFolder, selectedFile }, () => {
             this.getPreviewUrl();
             this.sendResult();
         });
         this.hideFields();
+		logger.debug(`<<< Exiting onFileSelect(selectedFolder=${selectedFolder},selectedFile=${selectedFile})`);
     }
 
 
     handleImageError() {
+		logger.debug('>>> Entering handleImageError()');
         this.setState({ fileExist: false });
+		logger.debug('<<< Exiting handleImageError()');
     }
 
     onFileUpload(e) {
+		logger.debug(`>>> Entering onFileUpload(e=${e})`);
         this.uploadFile(e.target.files[0]);
+		logger.debug(`<<< Exiting onFileUpload(e=${e})`);
     }
 
     handleError(error) {
+		logger.debug(`>>> Entering handleError(error=${error})`);
         const errorText = error && typeof error === "string" ? error : this.props.uploadFailedText;
         this.setState({ uploading: true, errorText }, () => {
             setTimeout(() => {
                 this.setState({ uploading: false, errorText: "" });
             }, 2000);
         });
+		logger.debug(`<<< Exiting handleError(error=${error})`);
     }
 
     uploadFile(file) {
+		logger.debug(`>>> Entering uploadFile(file=${file})`);
         if (!file) {
             return;
         }
@@ -162,7 +196,9 @@ export default class FileUpload extends Component {
         if (fileFormats.length > 0) {
             let format = file.type;
             const isAcceptFormat = fileFormats.some(f => format === f);
+			logger.debug(`uploadFile(file=${file}): isAcceptFormat → ${isAcceptFormat}`);
             if (!isAcceptFormat) {
+				logger.debug(`<<< Exiting uploadFile(file=${file})`);
                 return this.handleError(this.props.wrongFormatText);
             }
         }
@@ -171,13 +207,18 @@ export default class FileUpload extends Component {
     }
 
     getServiceFramework() {
+		logger.debug('>>> Entering getServiceFramework()');
         let sf = this.props.utils.utilities.sf;
         sf.controller = "FileUpload";
+		logger.debug(`getServiceFramework(): sf.controller → ${sf.controller}`);
         sf.moduleRoot = "InternalServices";
+		logger.debug(`getServiceFramework(): sf.moduleRoot → ${sf.moduleRoot}`);
+		logger.debug('<<< Exiting getServiceFramework()');
         return sf;
     }
 
     showPreview(fileUrl) {
+		logger.debug(`>>> Entering showPreview(fileUrl=${fileUrl})`);
         if (this._unmounted) {
             return;
         }
@@ -188,13 +229,16 @@ export default class FileUpload extends Component {
         }
         this.getImageDimensions(fileUrl);
         this.setState({ fileUrl, fileExist: true });
+		logger.debug(`<<< Exiting showPreview(fileUrl=${fileUrl})`);
     }
 
     sendResult() {
+		logger.debug('>>> Entering sendResult()');
         const selectedFile = this.state.selectedFile;
         const selectedFolder = this.state.selectedFolder;
         const fileId = selectedFile ? selectedFile.fileId || +selectedFile.key : null;
         const folderPath = selectedFolder ? selectedFolder.value : null;
+		logger.debug('<<< Exiting sendResult()');
         const fileName = selectedFile ? selectedFile.value : null;
         this.props.onSelectFile({
             folderPath,
@@ -204,38 +248,50 @@ export default class FileUpload extends Component {
     }
 
     getPreviewUrl() {
+		logger.debug('>>> Entering getPreviewUrl()');
         const fileId = this.state.selectedFile ? this.state.selectedFile.fileId || +this.state.selectedFile.key : "";
         if (!fileId) {
             this.setState({ fileUrl: "", fileExist: false }, this.sendResult.bind(this));
         } else {
             const sf = this.getServiceFramework();
             sf.get("loadimage", { fileId }, this.showPreview.bind(this), this.callback);
+			logger.debug(`getPreviewUrl(): sf → ${sf}`);
         }
+		logger.debug('<<< Exiting getPreviewUrl()');
     }
 
     getImageDimensions(src) {
+		logger.debug(`>>> Entering getImageDimensions(src=${src})`);
         let tempImage = new Image();
         tempImage.src = src;
+		logger.debug(`getImageDimensions(src=${src}): tempImage → ${tempImage}`);
         tempImage.onload = this.compareDimensions.bind(this, tempImage);
+		logger.debug(`<<< Exiting getImageDimensions(src=${src})`);
     }
 
     compareDimensions(image) {
+		logger.debug(`>>> Entering compareDimensions(image=${image})`);
         if (!image) {
             return;
         }
         const componentDimension = this.node.getBoundingClientRect();
+		logger.debug(`compareDimensions(image=${image}): componentDimension → ${componentDimension}`);
 
         if (image.height && image.width / image.height > componentDimension.width / componentDimension.height) {
             this.setState({ horizontalOrientation: true });
         } else {
             this.setState({ horizontalOrientation: false });
         }
+		logger.debug(`<<< Exiting compareDimensions(image=${image})`);
     }
 
     postFile(file) {
+		logger.debug(`>>> Entering postFile(file=${file})`);
         const formData = new FormData();
         formData.append("postfile", file);
+		logger.debug(`postFile(file=${file}): formData → ${formData}`);
         const sf = this.getServiceFramework();
+		logger.debug(`postFile(file=${file}): sf → ${sf}`);
         if (this.props.folderName && typeof this.props.folderName === "string") {
             formData.append("folder", this.props.folderName);
         }
@@ -247,21 +303,26 @@ export default class FileUpload extends Component {
 
         this.clearFileUploaderValue(this.fileInput1Ref);
         this.clearFileUploaderValue(this.fileInput2Ref);
+		logger.debug(`<<< Exiting postFile(file=${file})`);
     }
 
     clearFileUploaderValue(fileInput) {
+		logger.debug(`>>> Entering clearFileUploaderValue(fileInput=${fileInput})`);
         if (fileInput) {
             fileInput.value = "";
+			logger.debug(`<<< Exiting clearFileUploaderValue(fileInput=${fileInput})`);
         }
     }
 
     uploadComplete(res) {
+		logger.debug(`>>> Entering uploadComplete(res=${res})`);
         this.setState({ uploadComplete: true }, () => {
             setTimeout(() => {
                 this.setState({ uploading: false });
             }, 1000);
         });
         const response = typeof res === "string" ? JSON.parse(res) : res;
+		logger.debug(`uploadComplete(res=${res}): response → ${response}`);
         if (!response.path) {
             return;
         }
@@ -270,26 +331,35 @@ export default class FileUpload extends Component {
             this.getPreviewUrl();
             this.sendResult();
         });
+		logger.debug(`<<< Exiting uploadComplete(res=${res})`);
     }
 
     callback(result) {
+	logger.debug(`>>> Entering callback(result=${result})`);
     }
 
     onDragOver() {
+		logger.debug('>>> Entering onDragOver()');
         this.setState({ draggedOver: true, text: this.props.onDragOverText });
+		logger.debug('<<< Exiting onDragOver()');
     }
 
     onDragLeave() {
+		logger.debug('>>> Entering onDragLeave()');
         this.setState({ draggedOver: false, text: this.props.defaultText });
+		logger.debug('<<< Exiting onDragLeave()');
     }
 
     onDrop(e) {
+		logger.debug(`>>> Entering onDrop(e=${e})`);
         e.preventDefault();
         this.uploadFile(e.dataTransfer.files[0]);
         this.onDragLeave();
+		logger.debug(`<<< Exiting onDrop(e=${e})`);
     }
 
     getImageStyle() {
+		logger.debug('>>> Entering getImageStyle()');
         const {cropImagePreview} = this.props;
         const {horizontalOrientation} = this.state;
         let style = { width: "100%", height: "auto" };
@@ -300,15 +370,20 @@ export default class FileUpload extends Component {
         if (!horizontalOrientation && !cropImagePreview) {
             style = { height: "100%", width: "auto" };
         }
+		logger.debug(`getImageStyle(): style → ${style}`);
+		logger.debug('<<< Exiting getImageStyle()');
         return style;
     }
 
     onChangeUrl(url) {
+		logger.debug(`>>> Entering onChangeUrl(url=${url})`);
         const {props, state} = this;
         this.setState({fileUrl: url});
+		logger.debug(`<<< Exiting onChangeUrl(url=${url})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
 
         let buttons = Buttons;
@@ -323,6 +398,7 @@ export default class FileUpload extends Component {
         buttons = buttons.map((button) => {
             const ButtonIcon = button.icon;
             const isUpload = button.name === "upload";
+			logger.debug(`render(): isUpload → ${isUpload}`);
              
             const accept = props.fileFormats.join(",");
             return <div
@@ -339,9 +415,11 @@ export default class FileUpload extends Component {
 
         const buttonsStyle = { width: buttons.length * 67 };
         const src = state.fileUrl || "";
+		logger.debug(`render(): src → ${src}`);
         const showImage = src && state.fileExist && !state.showFolderPicker;
         const className = "overlay" + (src && state.fileExist ? " has-image" : "") + (state.draggedOver ? " hover" : "");
 
+		logger.debug('<<< Exiting render()');
         return <div className="dnn-file-upload" ref={node => this.node = node}>
             <div>
                 <div

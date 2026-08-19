@@ -76,19 +76,23 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>An XML document.</returns>
         public static XmlDocument AddAppSetting(XmlDocument xmlDoc, string key, string value, bool update)
         {
+			Logger.LogDebug(">>> Entering AddAppSetting(xmlDoc={XmlDoc},key={Key},value={Value},update={Update})", xmlDoc, key, value, update);
             // retrieve the appSettings node
             var xmlAppSettings = xmlDoc.SelectSingleNode("//appSettings");
+			Logger.LogDebug("AddAppSetting(xmlDoc={XmlDoc},key={Key},value={Value},update={Update}): xmlAppSettings → {XmlAppSettings}", xmlDoc, key, value, update, xmlAppSettings);
             if (xmlAppSettings != null)
             {
                 XmlElement xmlElement;
 
                 // get the node based on key
                 var xmlNode = xmlAppSettings.SelectSingleNode("//add[@key='" + key + "']");
+				Logger.LogDebug("AddAppSetting(xmlDoc={XmlDoc},key={Key},value={Value},update={Update}): xmlNode → {XmlNode}", xmlDoc, key, value, update, xmlNode);
                 if (update && xmlNode != null)
                 {
                     // update the existing element
                     xmlElement = (XmlElement)xmlNode;
                     xmlElement.SetAttribute("value", value);
+					Logger.LogDebug("AddAppSetting(xmlDoc={XmlDoc},key={Key},value={Value},update={Update}): xmlElement → {XmlElement}", xmlDoc, key, value, update, xmlElement);
                 }
                 else
                 {
@@ -101,6 +105,8 @@ namespace DotNetNuke.Common.Utilities
             }
 
             // return the xml doc
+			Logger.LogDebug("<<< Exiting AddAppSetting(xmlDoc={XmlDoc},key={Key},value={Value},update={Update})", xmlDoc, key, value, update);
+			Logger.LogDebug("<<< Exiting AddAppSetting(xmlDoc={XmlDoc},key={Key},value={Value})", xmlDoc, key, value);
             return xmlDoc;
         }
 
@@ -119,9 +125,11 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial void AddCodeSubDirectory(string name)
         {
+			Logger.LogDebug(">>> Entering AddCodeSubDirectory(name={Name})", name);
             AddCodeSubDirectory(
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()),
                 name);
+				Logger.LogDebug("<<< Exiting AddCodeSubDirectory(name={Name})", name);
         }
 
         /// <summary>Adds a code subdirectory to the configuration.</summary>
@@ -129,9 +137,12 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="name">The name of the code subdirectory.</param>
         public static void AddCodeSubDirectory(IApplicationStatusInfo appStatus, string name)
         {
+			Logger.LogDebug(">>> Entering AddCodeSubDirectory(appStatus={AppStatus},name={Name})", appStatus, name);
             var xmlConfig = Load(appStatus);
 
+			Logger.LogDebug("AddCodeSubDirectory(appStatus={AppStatus},name={Name}): xmlConfig → {XmlConfig}", appStatus, name, xmlConfig);
             // Try location node
+			Logger.LogDebug("<<< Exiting AddCodeSubDirectory(name={Name})", name);
             var xmlCompilation = xmlConfig.SelectSingleNode("configuration/system.web/compilation") ??
                                  xmlConfig.SelectSingleNode("configuration/location/system.web/compilation");
 
@@ -139,6 +150,7 @@ namespace DotNetNuke.Common.Utilities
             if (xmlCompilation != null)
             {
                 var xmlSubDirectories = xmlCompilation.SelectSingleNode("codeSubDirectories");
+				Logger.LogDebug("AddCodeSubDirectory(appStatus={AppStatus},name={Name}): xmlSubDirectories → {XmlSubDirectories}", appStatus, name, xmlSubDirectories);
                 if (xmlSubDirectories == null)
                 {
                     // Add Node
@@ -147,7 +159,9 @@ namespace DotNetNuke.Common.Utilities
                 }
 
                 var length = name.IndexOf("/", StringComparison.Ordinal);
+				Logger.LogDebug("AddCodeSubDirectory(appStatus={AppStatus},name={Name}): length → {Length}", appStatus, name, length);
                 var codeSubDirectoryName = name;
+				Logger.LogDebug("AddCodeSubDirectory(appStatus={AppStatus},name={Name}): codeSubDirectoryName → {CodeSubDirectoryName}", appStatus, name, codeSubDirectoryName);
                 if (length > 0)
                 {
                     codeSubDirectoryName = name.Substring(0, length);
@@ -155,6 +169,7 @@ namespace DotNetNuke.Common.Utilities
 
                 // Check if the node is already present
                 var xmlSubDirectory = xmlSubDirectories.SelectSingleNode($"add[@directoryName='{codeSubDirectoryName}']");
+				Logger.LogDebug("AddCodeSubDirectory(appStatus={AppStatus},name={Name}): xmlSubDirectory → {XmlSubDirectory}", appStatus, name, xmlSubDirectory);
                 if (xmlSubDirectory == null)
                 {
                     // Add Node
@@ -171,16 +186,22 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial void BackupConfig()
         {
+			Logger.LogDebug(">>> Entering BackupConfig()");
             BackupConfig(Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()));
+			Logger.LogDebug("<<< Exiting BackupConfig()");
         }
 
         /// <summary>Creates a backup of the web.config file.</summary>
         /// <param name="statusInfo">The application status info.</param>
         public static void BackupConfig(IApplicationStatusInfo statusInfo)
         {
+			Logger.LogDebug(">>> Entering BackupConfig(statusInfo={StatusInfo})", statusInfo);
             var webConfigPath = Path.Combine(statusInfo.ApplicationMapPath, "web.config");
             var backupWebConfigPath = GetTimestampedBackupPath(statusInfo, "web_old.config");
+			Logger.LogDebug("BackupConfig(statusInfo={StatusInfo}): backupWebConfigPath → {BackupWebConfigPath}", statusInfo, backupWebConfigPath);
             var backupFolderPath = Path.GetDirectoryName(backupWebConfigPath);
+			Logger.LogDebug("BackupConfig(statusInfo={StatusInfo}): backupFolderPath → {BackupFolderPath}", statusInfo, backupFolderPath);
+			Logger.LogDebug("BackupConfig(statusInfo={StatusInfo}): webConfigPath → {WebConfigPath}", statusInfo, webConfigPath);
 
             // save the current config files
             try
@@ -197,14 +218,19 @@ namespace DotNetNuke.Common.Utilities
             }
             catch (Exception e)
             {
+				Logger.LogError("Exception in BackupConfig(statusInfo={StatusInfo}): {Arg1}", statusInfo, e.Message);
                 Exceptions.LogException(e);
             }
+			Logger.LogDebug("<<< Exiting BackupConfig(statusInfo={StatusInfo})", statusInfo);
         }
 
         /// <summary>Gets the default connection String as specified in the provider.</summary>
         /// <returns>The connection String.</returns>
         public static string GetConnectionString()
         {
+			Logger.LogDebug(">>> Entering GetConnectionString()");
+			Logger.LogDebug("<<< Exiting GetConnectionString()");
+			Logger.LogDebug("<<< Exiting GetConnectionString(name={Name})", name);
             return GetConnectionString(GetDefaultProvider("data").Attributes["connectionStringName"]);
         }
 
@@ -240,7 +266,10 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>decryption key.</returns>
         public static string GetDecryptionkey()
         {
+			Logger.LogDebug(">>> Entering GetDecryptionkey()");
             var key = System.Configuration.ConfigurationManager.GetSection("system.web/machineKey") as MachineKeySection;
+			Logger.LogWarning("GetDecryptionkey(): key → {Key}", key);
+			Logger.LogDebug("<<< Exiting GetDecryptionkey()");
             return key?.DecryptionKey.ToString() ?? string.Empty;
         }
 
@@ -248,8 +277,11 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>FCN mode.</returns>
         public static string GetFcnMode()
         {
+			Logger.LogDebug(">>> Entering GetFcnMode()");
             var section = System.Configuration.ConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection;
             var mode = section?.FcnMode;
+			Logger.LogDebug("GetFcnMode(): section → {Section}", section);
+			Logger.LogDebug("<<< Exiting GetFcnMode()");
             return ((ValueType)mode ?? FcnMode.NotSet).ToString();
         }
 
@@ -258,7 +290,10 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial long GetMaxUploadSize()
         {
+			Logger.LogDebug(">>> Entering GetMaxUploadSize()");
+			Logger.LogDebug("<<< Exiting GetMaxUploadSize()");
             return GetMaxUploadSize(
+			Logger.LogDebug("<<< Exiting GetMaxUploadSize(appStatus={AppStatus})", appStatus);
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()));
         }
 
@@ -283,6 +318,7 @@ namespace DotNetNuke.Common.Utilities
             if (httpNode == null && Iis7AndAbove())
             {
                 const int DefaultMaxAllowedContentLength = 30000000;
+				Logger.LogDebug("<<< Exiting Iis7AndAbove()");
                 return Math.Min(maxRequestLength, DefaultMaxAllowedContentLength);
             }
 
@@ -300,7 +336,10 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial long GetRequestFilterSize()
         {
+			Logger.LogDebug(">>> Entering GetRequestFilterSize()");
+			Logger.LogDebug("<<< Exiting GetRequestFilterSize()");
             return GetRequestFilterSize(
+			Logger.LogDebug("<<< Exiting GetRequestFilterSize(appStatus={AppStatus})", appStatus);
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()));
         }
 
@@ -315,6 +354,7 @@ namespace DotNetNuke.Common.Utilities
                        configNav.SelectSingleNode("configuration//location//system.webServer//security//requestFiltering//requestLimits");
             if (httpNode == null && Iis7AndAbove())
             {
+				Logger.LogDebug(">>> Entering Iis7AndAbove()");
                 return DefaultRequestFilter;
             }
 
@@ -332,9 +372,11 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial void SetMaxUploadSize(long newSize)
         {
+			Logger.LogDebug(">>> Entering SetMaxUploadSize(newSize={NewSize})", newSize);
             SetMaxUploadSize(
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()),
                 newSize);
+				Logger.LogDebug("<<< Exiting SetMaxUploadSize(newSize={NewSize})", newSize);
         }
 
         /// <summary>Sets the maximum file size allowed to be uploaded to the application in bytes.</summary>
@@ -342,12 +384,14 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="newSize">The new max upload size in bytes.</param>
         public static void SetMaxUploadSize(IApplicationStatusInfo appStatus, long newSize)
         {
+			Logger.LogDebug(">>> Entering SetMaxUploadSize(appStatus={AppStatus},newSize={NewSize})", appStatus, newSize);
             if (newSize < 12582912)
             {
                 newSize = 12582912;
             } // 12 Mb minimum
 
             var configNav = Load(appStatus);
+			Logger.LogDebug("SetMaxUploadSize(appStatus={AppStatus},newSize={NewSize}): configNav → {ConfigNav}", appStatus, newSize, configNav);
 
             var httpNode = configNav.SelectSingleNode("configuration//system.web//httpRuntime") ??
                             configNav.SelectSingleNode("configuration//location//system.web//httpRuntime");
@@ -376,6 +420,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The connection String.</returns>
         public static string GetUpgradeConnectionString()
         {
+			Logger.LogDebug(">>> Entering GetUpgradeConnectionString()");
+			Logger.LogDebug("<<< Exiting GetUpgradeConnectionString()");
             return GetDefaultProvider("data").Attributes["upgradeConnectionString"];
         }
 
@@ -383,12 +429,14 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The database owner.</returns>
         public static string GetDataBaseOwner()
         {
+			Logger.LogDebug(">>> Entering GetDataBaseOwner()");
             var databaseOwner = GetDefaultProvider("data").Attributes["databaseOwner"];
             if (!string.IsNullOrEmpty(databaseOwner) && !databaseOwner.EndsWith(".", StringComparison.Ordinal))
             {
                 databaseOwner += ".";
             }
 
+			Logger.LogDebug("<<< Exiting GetDataBaseOwner()");
             return databaseOwner;
         }
 
@@ -397,9 +445,12 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The default provider, <see cref="Provider"/>.</returns>
         public static Provider GetDefaultProvider(string type)
         {
+			Logger.LogDebug(">>> Entering GetDefaultProvider(type={Type})", type);
             var providerConfiguration = ProviderConfiguration.GetProviderConfiguration(type);
 
+			Logger.LogDebug("GetDefaultProvider(type={Type}): providerConfiguration → {ProviderConfiguration}", type, providerConfiguration);
             // Read the configuration specific information for this provider
+			Logger.LogDebug("<<< Exiting GetDefaultProvider(type={Type})", type);
             return (Provider)providerConfiguration.Providers[providerConfiguration.DefaultProvider];
         }
 
@@ -407,13 +458,17 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The name of the friendly url provider.</returns>
         public static string GetFriendlyUrlProvider()
         {
+			Logger.LogDebug(">>> Entering GetFriendlyUrlProvider()");
             string providerToUse;
             var fupConfig = ProviderConfiguration.GetProviderConfiguration("friendlyUrl");
+			Logger.LogDebug("GetFriendlyUrlProvider(): fupConfig → {FupConfig}", fupConfig);
             if (fupConfig != null)
             {
                 var defaultFriendlyUrlProvider = fupConfig.DefaultProvider;
                 var provider = (Provider)fupConfig.Providers[defaultFriendlyUrlProvider];
+				Logger.LogDebug("GetFriendlyUrlProvider(): provider → {Provider}", provider);
                 var urlFormat = provider.Attributes["urlFormat"];
+				Logger.LogDebug("GetFriendlyUrlProvider(): urlFormat → {UrlFormat}", urlFormat);
                 if (string.IsNullOrEmpty(urlFormat) == false)
                 {
                     switch (urlFormat.ToLowerInvariant())
@@ -421,6 +476,7 @@ namespace DotNetNuke.Common.Utilities
                         case "advanced":
                         case "customonly":
                             providerToUse = "advanced";
+							Logger.LogDebug("GetFriendlyUrlProvider(): providerToUse → {ProviderToUse}", providerToUse);
                             break;
                         default:
                             providerToUse = "standard";
@@ -437,6 +493,7 @@ namespace DotNetNuke.Common.Utilities
                 providerToUse = "standard";
             }
 
+			Logger.LogDebug("<<< Exiting GetFriendlyUrlProvider()");
             return providerToUse;
         }
 
@@ -444,13 +501,17 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The object qualifier.</returns>
         public static string GetObjectQualifer()
         {
+			Logger.LogDebug(">>> Entering GetObjectQualifer()");
             var provider = GetDefaultProvider("data");
             var objectQualifier = provider.Attributes["objectQualifier"];
+			Logger.LogDebug("GetObjectQualifer(): objectQualifier → {ObjectQualifier}", objectQualifier);
+			Logger.LogDebug("GetObjectQualifer(): provider → {Provider}", provider);
             if (!string.IsNullOrEmpty(objectQualifier) && !objectQualifier.EndsWith("_", StringComparison.Ordinal))
             {
                 objectQualifier += "_";
             }
 
+			Logger.LogDebug("<<< Exiting GetObjectQualifer()");
             return objectQualifier;
         }
 
@@ -459,7 +520,10 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial int GetAuthCookieTimeout()
         {
+			Logger.LogDebug(">>> Entering GetAuthCookieTimeout()");
+			Logger.LogDebug("<<< Exiting GetAuthCookieTimeout()");
             return GetAuthCookieTimeout(
+			Logger.LogDebug("<<< Exiting GetAuthCookieTimeout(appStatus={AppStatus})", appStatus);
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()));
         }
 
@@ -488,7 +552,10 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial int GetPersistentCookieTimeout()
         {
+			Logger.LogDebug(">>> Entering GetPersistentCookieTimeout()");
+			Logger.LogDebug("<<< Exiting GetPersistentCookieTimeout()");
             return GetPersistentCookieTimeout(
+			Logger.LogDebug("<<< Exiting GetPersistentCookieTimeout(appStatus={AppStatus})", appStatus);
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()));
         }
 
@@ -513,9 +580,12 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The found provider, <see cref="Provider"/>.</returns>
         public static Provider GetProvider(string type, string name)
         {
+			Logger.LogDebug(">>> Entering GetProvider(type={Type},name={Name})", type, name);
             var providerConfiguration = ProviderConfiguration.GetProviderConfiguration(type);
 
+			Logger.LogDebug("GetProvider(type={Type},name={Name}): providerConfiguration → {ProviderConfiguration}", type, name, providerConfiguration);
             // Read the configuration specific information for this provider
+			Logger.LogDebug("<<< Exiting GetProvider(type={Type},name={Name})", type, name);
             return (Provider)providerConfiguration.Providers[name];
         }
 
@@ -524,7 +594,10 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The provider path.</returns>
         public static string GetProviderPath(string type)
         {
+			Logger.LogDebug(">>> Entering GetProviderPath(type={Type})", type);
             var objProvider = GetDefaultProvider(type);
+			Logger.LogDebug("GetProviderPath(type={Type}): objProvider → {ObjProvider}", type, objProvider);
+			Logger.LogDebug("<<< Exiting GetProviderPath(type={Type})", type);
             return objProvider.Attributes["providerPath"];
         }
 
@@ -533,6 +606,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A string representing the application setting.</returns>
         public static string GetSetting(string setting)
         {
+			Logger.LogDebug(">>> Entering GetSetting(setting={Setting})", setting);
+			Logger.LogDebug("<<< Exiting GetSetting(setting={Setting})", setting);
             return System.Configuration.ConfigurationManager.AppSettings[setting];
         }
 
@@ -541,6 +616,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>An object representing the application section.</returns>
         public static object GetSection(string section)
         {
+			Logger.LogDebug(">>> Entering GetSection(section={Section})", section);
+			Logger.LogDebug("<<< Exiting GetSection(section={Section})", section);
             return WebConfigurationManager.GetWebApplicationSection(section);
         }
 
@@ -549,6 +626,11 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The configuration XML document.</returns>
         public static XmlDocument Load(IApplicationStatusInfo appStatus)
         {
+			Logger.LogDebug(">>> Entering Load(appStatus={AppStatus})", appStatus);
+			Logger.LogDebug("<<< Exiting Load(appStatus={AppStatus})", appStatus);
+			Logger.LogDebug("<<< Exiting Load()");
+			Logger.LogDebug("<<< Exiting Load(filename={Filename})", filename);
+			Logger.LogDebug("<<< Exiting Load(appStatus={AppStatus},filename={Filename})", appStatus, filename);
             return Load(appStatus, "web.config");
         }
 
@@ -565,7 +647,10 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial string GetCustomErrorMode()
         {
+			Logger.LogDebug(">>> Entering GetCustomErrorMode()");
+			Logger.LogDebug("<<< Exiting GetCustomErrorMode()");
             return GetCustomErrorMode(
+			Logger.LogDebug("<<< Exiting GetCustomErrorMode(appStatus={AppStatus})", appStatus);
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()));
         }
 
@@ -635,9 +720,11 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial void RemoveCodeSubDirectory(string name)
         {
+			Logger.LogDebug(">>> Entering RemoveCodeSubDirectory(name={Name})", name);
             RemoveCodeSubDirectory(
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()),
                 name);
+				Logger.LogDebug("<<< Exiting RemoveCodeSubDirectory(name={Name})", name);
         }
 
         /// <summary>Removes a code subdirectory for the web.config file.</summary>
@@ -645,10 +732,14 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="name">The name of the code subdirectory.</param>
         public static void RemoveCodeSubDirectory(IApplicationStatusInfo appStatus, string name)
         {
+			Logger.LogDebug(">>> Entering RemoveCodeSubDirectory(appStatus={AppStatus},name={Name})", appStatus, name);
             var xmlConfig = Load(appStatus);
 
+			Logger.LogDebug("RemoveCodeSubDirectory(appStatus={AppStatus},name={Name}): xmlConfig → {XmlConfig}", appStatus, name, xmlConfig);
             // Select the location node
+			Logger.LogDebug("<<< Exiting RemoveCodeSubDirectory(name={Name})", name);
             var xmlCompilation = xmlConfig.SelectSingleNode("configuration/system.web/compilation");
+			Logger.LogDebug("RemoveCodeSubDirectory(appStatus={AppStatus},name={Name}): xmlCompilation → {XmlCompilation}", appStatus, name, xmlCompilation);
             if (xmlCompilation == null)
             {
                 // Try location node
@@ -657,6 +748,7 @@ namespace DotNetNuke.Common.Utilities
 
             // Get the CodeSubDirectories Node
             var xmlSubDirectories = xmlCompilation.SelectSingleNode("codeSubDirectories");
+			Logger.LogDebug("RemoveCodeSubDirectory(appStatus={AppStatus},name={Name}): xmlSubDirectories → {XmlSubDirectories}", appStatus, name, xmlSubDirectories);
             if (xmlSubDirectories == null)
             {
                 // Parent doesn't exist so subDirectory node can't exist
@@ -664,7 +756,9 @@ namespace DotNetNuke.Common.Utilities
             }
 
             var length = name.IndexOf("/", StringComparison.Ordinal);
+			Logger.LogDebug("RemoveCodeSubDirectory(appStatus={AppStatus},name={Name}): length → {Length}", appStatus, name, length);
             var codeSubDirectoryName = name;
+			Logger.LogDebug("RemoveCodeSubDirectory(appStatus={AppStatus},name={Name}): codeSubDirectoryName → {CodeSubDirectoryName}", appStatus, name, codeSubDirectoryName);
             if (length > 0)
             {
                 codeSubDirectoryName = name.Substring(0, length);
@@ -672,6 +766,7 @@ namespace DotNetNuke.Common.Utilities
 
             // Check if the node is present
             var xmlSubDirectory = xmlSubDirectories.SelectSingleNode($"add[@directoryName='{codeSubDirectoryName}']");
+			Logger.LogDebug("RemoveCodeSubDirectory(appStatus={AppStatus},name={Name}): xmlSubDirectory → {XmlSubDirectory}", appStatus, name, xmlSubDirectory);
             if (xmlSubDirectory != null)
             {
                 // Remove Node
@@ -687,6 +782,11 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>An empty string upon success or the error message upon failure.</returns>
         public static string Save(IApplicationStatusInfo appStatus, XmlDocument xmlDoc)
         {
+			Logger.LogDebug(">>> Entering Save(appStatus={AppStatus},xmlDoc={XmlDoc})", appStatus, xmlDoc);
+			Logger.LogDebug("<<< Exiting Save(appStatus={AppStatus},xmlDoc={XmlDoc})", appStatus, xmlDoc);
+			Logger.LogDebug("<<< Exiting Save(xmlDoc={XmlDoc})", xmlDoc);
+			Logger.LogDebug("<<< Exiting Save(xmlDoc={XmlDoc},filename={Filename})", xmlDoc, filename);
+			Logger.LogDebug("<<< Exiting Save(appStatus={AppStatus},xmlDoc={XmlDoc},filename={Filename})", appStatus, xmlDoc, filename);
             return Save(appStatus, xmlDoc, "web.config");
         }
 
@@ -781,7 +881,10 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial bool Touch()
         {
+			Logger.LogDebug(">>> Entering Touch()");
+			Logger.LogDebug("<<< Exiting Touch()");
             return Touch(
+			Logger.LogDebug("<<< Exiting Touch(appStatus={AppStatus})", appStatus);
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()));
         }
 
@@ -809,9 +912,11 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial void UpdateConnectionString(string conn)
         {
+			Logger.LogDebug(">>> Entering UpdateConnectionString(conn={Conn})", conn);
             UpdateConnectionString(
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()),
                 conn);
+				Logger.LogDebug("<<< Exiting UpdateConnectionString(conn={Conn})", conn);
         }
 
         /// <summary>Updates the database connection string.</summary>
@@ -819,15 +924,21 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="conn">The connection string value.</param>
         public static void UpdateConnectionString(IApplicationStatusInfo appStatus, string conn)
         {
+			Logger.LogDebug(">>> Entering UpdateConnectionString(appStatus={AppStatus},conn={Conn})", appStatus, conn);
             var xmlConfig = Load(appStatus);
             var name = GetDefaultProvider("data").Attributes["connectionStringName"];
+			Logger.LogDebug("UpdateConnectionString(appStatus={AppStatus},conn={Conn}): name → {Name}", appStatus, conn, name);
+			Logger.LogDebug("UpdateConnectionString(appStatus={AppStatus},conn={Conn}): xmlConfig → {XmlConfig}", appStatus, conn, xmlConfig);
 
             // Update ConnectionStrings
+			Logger.LogDebug("<<< Exiting UpdateConnectionString(conn={Conn})", conn);
             var xmlConnection = xmlConfig.SelectSingleNode("configuration/connectionStrings/add[@name='" + name + "']");
             XmlUtils.UpdateAttribute(xmlConnection, "connectionString", conn);
+			Logger.LogDebug("UpdateConnectionString(appStatus={AppStatus},conn={Conn}): xmlConnection → {XmlConnection}", appStatus, conn, xmlConnection);
 
             // Update AppSetting
             var xmlAppSetting = xmlConfig.SelectSingleNode("configuration/appSettings/add[@key='" + name + "']");
+			Logger.LogDebug("UpdateConnectionString(appStatus={AppStatus},conn={Conn}): xmlAppSetting → {XmlAppSetting}", appStatus, conn, xmlAppSetting);
             XmlUtils.UpdateAttribute(xmlAppSetting, "value", conn);
 
             // Save changes
@@ -841,11 +952,13 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial void UpdateDataProvider(string name, string databaseOwner, string objectQualifier)
         {
+			Logger.LogDebug(">>> Entering UpdateDataProvider(name={Name},databaseOwner={DatabaseOwner},objectQualifier={ObjectQualifier})", name, databaseOwner, objectQualifier);
             UpdateDataProvider(
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()),
                 name,
                 databaseOwner,
                 objectQualifier);
+				Logger.LogDebug("<<< Exiting UpdateDataProvider(name={Name},databaseOwner={DatabaseOwner},objectQualifier={ObjectQualifier})", name, databaseOwner, objectQualifier);
         }
 
         /// <summary>Updates the data provider configuration.</summary>
@@ -855,10 +968,14 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="objectQualifier">The object qualifier if multiple Dnn instance run under the same database (not recommended).</param>
         public static void UpdateDataProvider(IApplicationStatusInfo appStatus, string name, string databaseOwner, string objectQualifier)
         {
+			Logger.LogDebug(">>> Entering UpdateDataProvider(appStatus={AppStatus},name={Name},databaseOwner={DatabaseOwner},objectQualifier={ObjectQualifier})", appStatus, name, databaseOwner, objectQualifier);
             var xmlConfig = Load(appStatus);
 
+			Logger.LogDebug("UpdateDataProvider(appStatus={AppStatus},name={Name},databaseOwner={DatabaseOwner},objectQualifier={ObjectQualifier}): xmlConfig → {XmlConfig}", appStatus, name, databaseOwner, objectQualifier, xmlConfig);
             // Update provider
+			Logger.LogDebug("<<< Exiting UpdateDataProvider(name={Name},databaseOwner={DatabaseOwner},objectQualifier={ObjectQualifier})", name, databaseOwner, objectQualifier);
             var xmlProvider = xmlConfig.SelectSingleNode($"configuration/dotnetnuke/data/providers/add[@name='{name}']");
+			Logger.LogDebug("UpdateDataProvider(appStatus={AppStatus},name={Name},databaseOwner={DatabaseOwner},objectQualifier={ObjectQualifier}): xmlProvider → {XmlProvider}", appStatus, name, databaseOwner, objectQualifier, xmlProvider);
             XmlUtils.UpdateAttribute(xmlProvider, "databaseOwner", databaseOwner);
             XmlUtils.UpdateAttribute(xmlProvider, "objectQualifier", objectQualifier);
 
@@ -872,10 +989,12 @@ namespace DotNetNuke.Common.Utilities
         [DotNetNuke.Internal.SourceGenerators.DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial void UpdateUpgradeConnectionString(string name, string upgradeConnectionString)
         {
+			Logger.LogDebug(">>> Entering UpdateUpgradeConnectionString(name={Name},upgradeConnectionString={UpgradeConnectionString})", name, upgradeConnectionString);
             UpdateUpgradeConnectionString(
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()),
                 name,
                 upgradeConnectionString);
+				Logger.LogDebug("<<< Exiting UpdateUpgradeConnectionString(name={Name},upgradeConnectionString={UpgradeConnectionString})", name, upgradeConnectionString);
         }
 
         /// <summary>Updates the specified upgrade connection string.</summary>
@@ -884,10 +1003,14 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="upgradeConnectionString">The new value for the connection string.</param>
         public static void UpdateUpgradeConnectionString(IApplicationStatusInfo appStatus, string name, string upgradeConnectionString)
         {
+			Logger.LogDebug(">>> Entering UpdateUpgradeConnectionString(appStatus={AppStatus},name={Name},upgradeConnectionString={UpgradeConnectionString})", appStatus, name, upgradeConnectionString);
             var xmlConfig = Load(appStatus);
 
+			Logger.LogDebug("UpdateUpgradeConnectionString(appStatus={AppStatus},name={Name},upgradeConnectionString={UpgradeConnectionString}): xmlConfig → {XmlConfig}", appStatus, name, upgradeConnectionString, xmlConfig);
             // Update provider
+			Logger.LogDebug("<<< Exiting UpdateUpgradeConnectionString(name={Name},upgradeConnectionString={UpgradeConnectionString})", name, upgradeConnectionString);
             var xmlProvider = xmlConfig.SelectSingleNode($"configuration/dotnetnuke/data/providers/add[@name='{name}']");
+			Logger.LogDebug("UpdateUpgradeConnectionString(appStatus={AppStatus},name={Name},upgradeConnectionString={UpgradeConnectionString}): xmlProvider → {XmlProvider}", appStatus, name, upgradeConnectionString, xmlProvider);
             XmlUtils.UpdateAttribute(xmlProvider, "upgradeConnectionString", upgradeConnectionString);
 
             // Save changes
@@ -899,7 +1022,11 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial string UpdateMachineKey()
         {
+			Logger.LogDebug(">>> Entering UpdateMachineKey()");
+			Logger.LogDebug("<<< Exiting UpdateMachineKey()");
             return UpdateMachineKey(
+			Logger.LogDebug("<<< Exiting UpdateMachineKey(appStatus={AppStatus})", appStatus);
+			Logger.LogDebug("<<< Exiting UpdateMachineKey(xmlConfig={XmlConfig})", xmlConfig);
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()));
         }
 
@@ -957,7 +1084,11 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial string UpdateValidationKey()
         {
+			Logger.LogDebug(">>> Entering UpdateValidationKey()");
+			Logger.LogDebug("<<< Exiting UpdateValidationKey()");
             return UpdateValidationKey(
+			Logger.LogDebug("<<< Exiting UpdateValidationKey(appStatus={AppStatus})", appStatus);
+			Logger.LogDebug("<<< Exiting UpdateValidationKey(xmlConfig={XmlConfig})", xmlConfig);
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()));
         }
 
@@ -1016,6 +1147,10 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial string GetPathToFile(ConfigFileType file)
         {
+			Logger.LogDebug(">>> Entering GetPathToFile(file={File})", file);
+			Logger.LogDebug("<<< Exiting GetPathToFile(file={File})", file);
+			Logger.LogDebug("<<< Exiting GetPathToFile(appStatus={AppStatus},file={File})", appStatus, file);
+			Logger.LogDebug("<<< Exiting GetPathToFile(file={File},overwrite={Overwrite})", file, overwrite);
             return GetPathToFile(file, false);
         }
 
@@ -1073,8 +1208,12 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial string UpdateInstallVersion(Version version)
         {
+			Logger.LogDebug(">>> Entering UpdateInstallVersion(version={Version})", version);
+			Logger.LogDebug("<<< Exiting UpdateInstallVersion(version={Version})", version);
             return UpdateInstallVersion(
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()),
+			Logger.LogDebug("<<< Exiting UpdateInstallVersion(appStatus={AppStatus},version={Version})", appStatus, version);
+			Logger.LogDebug("<<< Exiting UpdateInstallVersion(xmlConfig={XmlConfig},version={Version})", xmlConfig, version);
                 version);
         }
 
@@ -1122,7 +1261,9 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A value indicating whether .Net Framework 4.5 or above is in use.</returns>
         public static bool IsNet45OrNewer()
         {
+			Logger.LogDebug(">>> Entering IsNet45OrNewer()");
             // Class "ReflectionContext" exists from .NET 4.5 onwards.
+			Logger.LogDebug("<<< Exiting IsNet45OrNewer()");
             return Type.GetType("System.Reflection.ReflectionContext", false) != null;
         }
 
@@ -1132,8 +1273,11 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial string AddFCNMode(FcnMode fcnMode)
         {
+			Logger.LogDebug(">>> Entering AddFCNMode(fcnMode={FcnMode})", fcnMode);
+			Logger.LogDebug("<<< Exiting AddFCNMode(fcnMode={FcnMode})", fcnMode);
             return AddFCNMode(
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()),
+			Logger.LogDebug("<<< Exiting AddFCNMode(appStatus={AppStatus},fcnMode={FcnMode})", appStatus, fcnMode);
                 fcnMode);
         }
 
@@ -1170,16 +1314,20 @@ namespace DotNetNuke.Common.Utilities
 
         private static bool Iis7AndAbove()
         {
+			Logger.LogDebug(">>> Entering Iis7AndAbove()");
+			Logger.LogDebug("<<< Exiting Iis7AndAbove()");
             return Environment.OSVersion.Version.Major >= 6;
         }
 
         private static string EnumToFileName(ConfigFileType file)
         {
+			Logger.LogDebug(">>> Entering EnumToFileName(file={File})", file);
             switch (file)
             {
                 case ConfigFileType.SolutionsExplorer:
                     return "SolutionsExplorer.opml.config";
                 default:
+					Logger.LogDebug("<<< Exiting EnumToFileName(file={File})", file);
                     return file + ".config";
             }
         }
@@ -1194,6 +1342,8 @@ namespace DotNetNuke.Common.Utilities
 
         private static string GetTimestampedBackupPath(IApplicationStatusInfo appStatus, string fileName)
         {
+			Logger.LogDebug(">>> Entering GetTimestampedBackupPath(appStatus={AppStatus},fileName={FileName})", appStatus, fileName);
+			Logger.LogDebug("<<< Exiting GetTimestampedBackupPath(appStatus={AppStatus},fileName={FileName})", appStatus, fileName);
             return Path.Combine(
                 appStatus.ApplicationMapPath,
                 Globals.glbConfigFolder.TrimStart('\\'),

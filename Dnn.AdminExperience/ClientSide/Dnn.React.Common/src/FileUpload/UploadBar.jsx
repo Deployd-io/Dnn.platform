@@ -4,31 +4,42 @@ import PropTypes from "prop-types";
 import Upload from "./img/upload.svg";
 import Checkmark from "./img/checkmark.svg";
 import ErrorIcon from "./img/x.svg";
+const logger = console;
 
 export default class UploadBar extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             percent: 0
         };
         this.timeout = 20;
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug(`constructor(): this.timeout → ${this.timeout}`);
+		logger.debug(`constructor(): this.setTimeout → ${this.setTimeout}`);
         this.delta = 1.01;
         this.setTimeout = null;
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         setTimeout(this.increase.bind(this), 100);
+		logger.debug('<<< Exiting componentDidMount()');
     }
     
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const { props } = this;
         if (props.uploadComplete && props.uploadComplete !== prevProps.uploadComplete) {
             clearTimeout(this.setTimeout);
             this.setState({percent: 100});
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
         }
     }
 
     increase() {
+		logger.debug('>>> Entering increase()');
         let {percent} = this.state;
         percent++;
         this.timeout *= this.delta;
@@ -36,10 +47,12 @@ export default class UploadBar extends Component {
         this.setState({percent});
         if (percent < 99) {
             this.setTimeout = setTimeout(this.increase.bind(this), this.timeout);
+			logger.debug('<<< Exiting increase()');
         }
     }
 
     render() {
+		logger.debug('>>> Entering render()');
          
         let percent = this.props.errorText ? 0 : this.state.percent;
         let text = this.props.uploadComplete ? this.props.uploadCompleteText : this.props.uploadingText;
@@ -48,6 +61,7 @@ export default class UploadBar extends Component {
         Svg = this.props.errorText ? ErrorIcon : Svg;
         const className = "file-upload-container dnn-upload-bar" + (!this.props.errorText && this.props.uploadComplete ? " complete" : "") + (this.props.errorText ? " upload-error" : "");
 
+		logger.debug('<<< Exiting render()');
         return <div className={className}>
             <div className="upload-bar-container">
                 <div className="upload-file-name">{this.props.fileName || this.props.uploadDefaultText}</div>

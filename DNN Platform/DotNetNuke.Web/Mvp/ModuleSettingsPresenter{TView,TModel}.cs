@@ -20,18 +20,22 @@ namespace DotNetNuke.Web.Mvp
         where TView : class, ISettingsView<TModel>
         where TModel : SettingsModel, new()
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleSettingsPresenter{TView,TModel}));
         /// <summary>Initializes a new instance of the <see cref="ModuleSettingsPresenter{TView, TModel}"/> class.</summary>
         /// <param name="view">The view.</param>
         protected ModuleSettingsPresenter(TView view)
             : base(view)
         {
+			Logger.LogDebug(">>> Entering ModuleSettingsPresenter(view={View})", view);
             view.OnLoadSettings += this.OnLoadSettingsInternal;
             view.OnSaveSettings += this.OnSaveSettingsInternal;
+			Logger.LogDebug("<<< Exiting ModuleSettingsPresenter(view={View})", view);
         }
 
         /// <inheritdoc />
         protected override void OnLoad()
         {
+			Logger.LogDebug(">>> Entering OnLoad()");
             base.OnLoad();
 
             if (this.IsPostBack)
@@ -40,11 +44,13 @@ namespace DotNetNuke.Web.Mvp
                 this.View.Model.ModuleSettings = new Dictionary<string, string>();
                 this.View.Model.TabModuleSettings = new Dictionary<string, string>();
             }
+			Logger.LogDebug("<<< Exiting OnLoad()");
         }
 
         /// <summary>Loads the module settings.</summary>
         protected virtual void LoadSettings()
         {
+			Logger.LogDebug(">>> Entering LoadSettings()");
             this.View.Model.ModuleSettings = new Dictionary<string, string>(
                                             this.ModuleContext.Configuration.ModuleSettings
                                             .Cast<DictionaryEntry>()
@@ -54,11 +60,13 @@ namespace DotNetNuke.Web.Mvp
                                             this.ModuleContext.Configuration.TabModuleSettings
                                             .Cast<DictionaryEntry>()
                                             .ToDictionary(kvp => (string)kvp.Key, kvp => (string)kvp.Value));
+											Logger.LogDebug("<<< Exiting LoadSettings()");
         }
 
         /// <summary>Updates the module settings.</summary>
         protected virtual void SaveSettings()
         {
+			Logger.LogDebug(">>> Entering SaveSettings()");
             foreach (var setting in this.View.Model.ModuleSettings)
             {
                 ModuleController.Instance.UpdateModuleSetting(this.ModuleId, setting.Key, setting.Value);
@@ -68,16 +76,21 @@ namespace DotNetNuke.Web.Mvp
             {
                 ModuleController.Instance.UpdateTabModuleSetting(this.ModuleContext.TabModuleId, setting.Key, setting.Value);
             }
+			Logger.LogDebug("<<< Exiting SaveSettings()");
         }
 
         private void OnLoadSettingsInternal(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoadSettingsInternal(sender={Sender},e={E})", sender, e);
             this.LoadSettings();
+			Logger.LogDebug("<<< Exiting OnLoadSettingsInternal(sender={Sender},e={E})", sender, e);
         }
 
         private void OnSaveSettingsInternal(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnSaveSettingsInternal(sender={Sender},e={E})", sender, e);
             this.SaveSettings();
+			Logger.LogDebug("<<< Exiting OnSaveSettingsInternal(sender={Sender},e={E})", sender, e);
         }
     }
 }

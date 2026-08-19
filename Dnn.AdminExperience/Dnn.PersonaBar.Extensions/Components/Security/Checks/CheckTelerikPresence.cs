@@ -28,6 +28,9 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         public CheckTelerikPresence()
             : this(Globals.GetCurrentServiceProvider().GetRequiredService<ITelerikUtils>())
         {
+		eventLogger.LogDebug(">>> Entering CheckTelerikPresence()");
+		eventLogger.LogDebug("<<< Exiting CheckTelerikPresence()");
+		eventLogger.LogWarning("Throwing ArgumentNullException from CheckTelerikPresence(telerikUtils={TelerikUtils})", telerikUtils);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CheckTelerikPresence"/> class.</summary>
@@ -38,22 +41,27 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             : base()
         {
             this.telerikUtils = telerikUtils ??
+				eventLogger.LogDebug("CheckTelerikPresence(telerikUtils={TelerikUtils}): telerikUtils → {TelerikUtils1}", telerikUtils, telerikUtils);
                 throw new ArgumentNullException(nameof(telerikUtils));
         }
 
         /// <inheritdoc />
         protected override CheckResult ExecuteInternal()
         {
+			eventLogger.LogDebug(">>> Entering ExecuteInternal()");
             if (this.telerikUtils.TelerikIsInstalled())
             {
                 var files = this.telerikUtils.GetAssembliesThatDependOnTelerik();
+				eventLogger.LogDebug("ExecuteInternal(): files → {Files}", files);
                 var fileList = files as IList<string> ?? files.ToList();
+				eventLogger.LogDebug("ExecuteInternal(): fileList → {FileList}", fileList);
 
                 if (fileList.Any())
                 {
                     return this.InstalledAndUsed(fileList);
                 }
 
+			eventLogger.LogDebug("<<< Exiting ExecuteInternal()");
                 return this.InstalledButNotUsed();
             }
 
@@ -62,8 +70,11 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
         private CheckResult InstalledButNotUsed()
         {
+			eventLogger.LogDebug(">>> Entering InstalledButNotUsed()");
             var note = this.GetLocalizedString("InstalledButNotUsed");
 
+			eventLogger.LogDebug("InstalledButNotUsed(): note → {Note}", note);
+			eventLogger.LogDebug("<<< Exiting InstalledButNotUsed()");
             return new CheckResult(SeverityEnum.Failure, this.Id)
             {
                 Notes = { note },
@@ -72,11 +83,17 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
         private CheckResult InstalledAndUsed(IEnumerable<string> files)
         {
+			eventLogger.LogDebug(">>> Entering InstalledAndUsed(files={Files})", files);
             var caption = this.GetLocalizedString("InstalledAndUsed");
             var relativeFiles = files.Select(path => path.Substring(this.telerikUtils.BinPath.Length + 1));
+			eventLogger.LogDebug("InstalledAndUsed(files={Files}): relativeFiles → {RelativeFiles}", files, relativeFiles);
             var fileList = string.Join("<br/>", relativeFiles.Select(path => $"* {path}"));
+			eventLogger.LogDebug("InstalledAndUsed(files={Files}): fileList → {FileList}", files, fileList);
             var note = string.Join("<br/>", new[] { caption, string.Empty, fileList });
+			eventLogger.LogDebug("InstalledAndUsed(files={Files}): note → {Note}", files, note);
+			eventLogger.LogDebug("InstalledAndUsed(files={Files}): caption → {Caption}", files, caption);
 
+			eventLogger.LogDebug("<<< Exiting InstalledAndUsed(files={Files})", files);
             return new CheckResult(SeverityEnum.Failure, this.Id)
             {
                 Notes = { note },
@@ -85,6 +102,8 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
         private CheckResult NotInstalled()
         {
+			eventLogger.LogDebug(">>> Entering NotInstalled()");
+			eventLogger.LogDebug("<<< Exiting NotInstalled()");
             return new CheckResult(SeverityEnum.Pass, this.Id);
         }
     }

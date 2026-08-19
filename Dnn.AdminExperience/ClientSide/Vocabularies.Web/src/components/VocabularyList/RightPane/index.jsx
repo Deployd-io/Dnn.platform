@@ -6,9 +6,11 @@ import Term from "./Term";
 import util from "../../../utils";
 import LocalizedResources from "../../../resources";
 import styles from "./style.module.less";
+const logger = console;
 import { GridCell, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 function findInChildren(list, parentTermId) {
+	logger.debug(`>>> Entering findInChildren(list=${list},parentTermId=${parentTermId})`);
     if (!list) {
         return null;
     }
@@ -19,10 +21,12 @@ function findInChildren(list, parentTermId) {
             ? term
             : findInChildren(term.ChildTerms, parentTermId);
     }
+	logger.debug(`<<< Exiting findInChildren(list=${list},parentTermId=${parentTermId})`);
     return parentTerm;
 }
 
 function getVocabularyTermList(terms, type) {
+	logger.debug(`>>> Entering getVocabularyTermList(terms=${terms},type=${type})`);
     if (type === "Simple") {
         return terms;
     }
@@ -46,10 +50,13 @@ function getVocabularyTermList(terms, type) {
             }
         }
     });
+	logger.debug(`<<< Exiting getVocabularyTermList(terms=${terms},type=${type})`);
     return _terms;
 }
 
 function removeChildTerms(terms) {
+	logger.debug(`>>> Entering removeChildTerms(terms=${terms})`);
+	logger.debug(`<<< Exiting removeChildTerms(terms=${terms})`);
     return terms.map((term) => {
         delete term.ChildTerms;
         return term;
@@ -59,6 +66,7 @@ function removeChildTerms(terms) {
 class RightPane extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             editBoxOpened: false,
             _editBoxOpened: false,
@@ -75,22 +83,28 @@ class RightPane extends Component {
             nameError: true,
             triedToSubmitTerm: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {termBeingEdited} = this.state;
         const {props} = this;
 
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
         termBeingEdited.VocabularyId = props.vocabularyId;
         this.setState({
             termBeingEdited
         });
     }
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {props} = this;
         props.getVocabularyTerms(props.vocabularyId, props.index);
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     openAddTerm(editMode, type, event) {
+	logger.debug(`>>> Entering openAddTerm(editMode=${editMode},type=${type},event=${event})`);
 
         if (event) {
             event.preventDefault();
@@ -125,12 +139,15 @@ class RightPane extends Component {
         if (parentTerm) {
             parentTerm.selected = true;
             props.selectParentTerm(parentTerm);
+			logger.debug(`<<< Exiting openAddTerm(editMode=${editMode},type=${type},event=${event})`);
         }
     }
 
     closeAddTerm() {
+		logger.debug('>>> Entering closeAddTerm()');
         const {props} = this;
         setTimeout(() => {
+			logger.debug('<<< Exiting closeAddTerm()');
             this.setState({
                 termBeingEdited: {
                     TermId: -1,
@@ -148,8 +165,10 @@ class RightPane extends Component {
     }
 
     toggleParentTree(event) {
+		logger.debug(`>>> Entering toggleParentTree(event=${event})`);
         if (event) {
             event.preventDefault();
+			logger.debug(`<<< Exiting toggleParentTree(event=${event})`);
         }
         const {state} = this;
         this.setState({
@@ -158,17 +177,20 @@ class RightPane extends Component {
     }
 
     onTermValueChange(key, event) {
+		logger.debug(`>>> Entering onTermValueChange(key=${key},event=${event})`);
         const value = event.target.value;
 
         const { state } = this;
 
         state.termBeingEdited[key] = value;
         state.triedToSubmitTerm = false;
+		logger.debug(`onTermValueChange(key=${key},event=${event}): state.triedToSubmitTerm → ${state.triedToSubmitTerm}`);
 
         if (key === "Name" && value === "") {
             state.nameError = true;
         } else {
             state.nameError = false;
+			logger.debug(`<<< Exiting onTermValueChange(key=${key},event=${event})`);
         }
 
         this.setState({
@@ -177,6 +199,7 @@ class RightPane extends Component {
     }
 
     onUpdateTerm(event) {
+		logger.debug(`>>> Entering onUpdateTerm(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
         if (props.type === "Simple") {
@@ -191,9 +214,11 @@ class RightPane extends Component {
         props.onUpdateTerm(state.termBeingEdited, state.editMode, () => {
             this.closeAddTerm();
         });
+		logger.debug(`<<< Exiting onUpdateTerm(event=${event})`);
     }
 
     onEditTerm(term) {
+		logger.debug(`>>> Entering onEditTerm(term=${term})`);
         const {props} = this;
 
         if (!this.canEdit()) {
@@ -215,9 +240,11 @@ class RightPane extends Component {
             parentTerm.selected = true;
             props.selectParentTerm(parentTerm);
         }
+		logger.debug(`<<< Exiting onEditTerm(term=${term})`);
     }
 
     getChildTerms(term, clickFunction, isEditable) {
+		logger.debug(`>>> Entering getChildTerms(term=${term},clickFunction=${clickFunction},isEditable=${isEditable})`);
         let children = [];
         if (term.ChildTerms) {
             children = term.ChildTerms.map((child) => {
@@ -233,10 +260,12 @@ class RightPane extends Component {
                 </ul>;
             });
         }
+		logger.debug(`<<< Exiting getChildTerms(term=${term},clickFunction=${clickFunction},isEditable=${isEditable})`);
         return children;
     }
 
     onSelectParent(term) {
+		logger.debug(`>>> Entering onSelectParent(term=${term})`);
         let {termBeingEdited} = this.state;
         const {props} = this;
         termBeingEdited.ParentTermId = term.TermId;
@@ -244,11 +273,14 @@ class RightPane extends Component {
             termBeingEdited
         }, () => {
             this.toggleParentTree();
+			logger.debug(`onSelectParent(term=${term}): termBeingEdited.ParentTermId → ${termBeingEdited.ParentTermId}`);
             props.selectParentTerm(term);
         });
+		logger.debug(`<<< Exiting onSelectParent(term=${term})`);
     }
 
     deleteTerm() {
+		logger.debug('>>> Entering deleteTerm()');
         const {props, state} = this;
         util.utilities.confirm(
             LocalizedResources.get("ConfirmDeletion_Term").replace("{0}", state.termBeingEdited.Name), //confirm message
@@ -258,20 +290,26 @@ class RightPane extends Component {
                 props.onDeleteTerm(state.termBeingEdited.TermId);
                 this.closeAddTerm();
             });
+			logger.debug('<<< Exiting deleteTerm()');
     }
 
     toggle() {
+		logger.debug('>>> Entering toggle()');
         this.setState({
             open: !this.state.open
         });
+		logger.debug('<<< Exiting toggle()');
     }
 
     canEdit() {
+		logger.debug('>>> Entering canEdit()');
         const {props} = this;
+		logger.debug('<<< Exiting canEdit()');
         return util.isHost() || (props.scopeType === "Portal" && util.canEdit());
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
 
         if (!props.vocabularyTerms) {
@@ -281,6 +319,7 @@ class RightPane extends Component {
         }
         let _vocabularyTerms = JSON.parse(JSON.stringify(props.vocabularyTerms));
         const vocabularyTerms = getVocabularyTermList(_vocabularyTerms, props.type);
+		logger.debug(`render(): vocabularyTerms → ${vocabularyTerms}`);
         const terms = vocabularyTerms.map((term) => {
             let children = this.getChildTerms(term, this.onEditTerm.bind(this), true);
             return <Term
@@ -308,6 +347,7 @@ class RightPane extends Component {
         });
 
         const parentDisplay = props.vocabularyTerms.find((term) => {
+		logger.debug('<<< Exiting render()');
             return term.TermId === state.termBeingEdited.ParentTermId;
         });
          

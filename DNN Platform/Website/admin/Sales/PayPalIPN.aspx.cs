@@ -34,6 +34,8 @@ namespace DotNetNuke.Modules.Admin.Sales
         public PayPalIPN()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering PayPalIPN()");
+		Logger.LogDebug("<<< Exiting PayPalIPN()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PayPalIPN"/> class.</summary>
@@ -45,35 +47,46 @@ namespace DotNetNuke.Modules.Admin.Sales
             : base(portalController, appStatus, hostSettings)
         {
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+			Logger.LogDebug("PayPalIPN(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): hostSettingsService → {HostSettingsService1}", portalController, appStatus, hostSettings, hostSettingsService, hostSettingsService);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.InitializeComponent();
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             base.OnLoad(e);
             try
             {
                 bool blnValid = true;
+				Logger.LogDebug("OnLoad(e={E}): blnValid → {BlnValid}", e, blnValid);
 
                 // string strTransactionID;
                 int intRoleID = 0;
+				Logger.LogDebug("OnLoad(e={E}): intRoleID → {IntRoleID}", e, intRoleID);
                 int intPortalID = this.PortalSettings.PortalId;
                 int intUserID = 0;
+				Logger.LogDebug("OnLoad(e={E}): intUserID → {IntUserID}", e, intUserID);
 
                 // string strDescription;
                 double dblAmount = 0;
+				Logger.LogDebug("OnLoad(e={E}): dblAmount → {DblAmount}", e, dblAmount);
 
                 // string strEmail;
                 bool blnCancel = false;
+				Logger.LogDebug("OnLoad(e={E}): blnCancel → {BlnCancel}", e, blnCancel);
                 string strPayPalID = Null.NullString;
+				Logger.LogDebug("OnLoad(e={E}): strPayPalID → {StrPayPalID}", e, strPayPalID);
                 string strPost = "cmd=_notify-validate";
                 foreach (string strName in this.Request.Form)
                 {
@@ -150,6 +163,10 @@ namespace DotNetNuke.Modules.Admin.Sales
                     }
 
                     var objRequest = Globals.GetExternalRequest(strPayPalURL);
+					Logger.LogDebug("OnLoad(e={E}): objRequest → {ObjRequest}", e, objRequest);
+					Logger.LogDebug("OnLoad(e={E}): objRequest.Method → {Arg1}", e, objRequest.Method);
+					Logger.LogDebug("OnLoad(e={E}): objRequest.ContentLength → {Arg1}", e, objRequest.ContentLength);
+					Logger.LogDebug("OnLoad(e={E}): objRequest.ContentType → {Arg1}", e, objRequest.ContentType);
                     objRequest.Method = "POST";
                     objRequest.ContentLength = strPost.Length;
                     objRequest.ContentType = "application/x-www-form-urlencoded";
@@ -169,6 +186,7 @@ namespace DotNetNuke.Modules.Admin.Sales
 
                     switch (strResponse)
                     {
+						private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PayPalIPN.aspx));
                         case "VERIFIED":
                             break;
                         default:
@@ -181,8 +199,11 @@ namespace DotNetNuke.Modules.Admin.Sales
                 if (blnValid)
                 {
                     int intAdministratorRoleId = 0;
+					Logger.LogDebug("OnLoad(e={E}): intAdministratorRoleId → {IntAdministratorRoleId}", e, intAdministratorRoleId);
                     string strProcessorID = Null.NullString;
+					Logger.LogDebug("OnLoad(e={E}): strProcessorID → {StrProcessorID}", e, strProcessorID);
                     PortalInfo objPortalInfo = this.PortalController.GetPortal(intPortalID);
+					Logger.LogDebug("OnLoad(e={E}): objPortalInfo → {ObjPortalInfo}", e, objPortalInfo);
                     if (objPortalInfo != null)
                     {
                         intAdministratorRoleId = objPortalInfo.AdministratorRoleId;
@@ -214,7 +235,9 @@ namespace DotNetNuke.Modules.Admin.Sales
                     {
                         // user subscription
                         RoleInfo objRoleInfo = RoleController.Instance.GetRole(intPortalID, r => r.RoleID == intRoleID);
+						Logger.LogDebug("OnLoad(e={E}): objRoleInfo → {ObjRoleInfo}", e, objRoleInfo);
                         float rolePrice = objRoleInfo.ServiceFee;
+						Logger.LogDebug("OnLoad(e={E}): rolePrice → {RolePrice}", e, rolePrice);
                         float trialPrice = objRoleInfo.TrialFee;
                         if ((rolePrice.ToString() == dblAmount.ToString() || trialPrice.ToString() == dblAmount.ToString()) && (HttpUtility.UrlDecode(strPayPalID.ToLowerInvariant()) == strProcessorID))
                         {
@@ -236,12 +259,17 @@ namespace DotNetNuke.Modules.Admin.Sales
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessPageLoadException(exc);
             }
+			Logger.LogInformation("OnLoad(e)={E}: external service call took {Arg1} ms", e, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private void InitializeComponent()
         {
+		Logger.LogDebug(">>> Entering InitializeComponent()");
+		Logger.LogDebug("<<< Exiting InitializeComponent()");
         }
     }
 }

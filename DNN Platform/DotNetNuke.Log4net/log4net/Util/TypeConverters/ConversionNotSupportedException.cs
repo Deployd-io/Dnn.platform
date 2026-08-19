@@ -56,6 +56,8 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public ConversionNotSupportedException()
         {
+		value.LogDebug(">>> Entering ConversionNotSupportedException()");
+		value.LogDebug("<<< Exiting ConversionNotSupportedException()");
         }
 
         /// <summary>
@@ -70,6 +72,7 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public ConversionNotSupportedException(String message) : base(message) 
         {
+		value.LogDebug(">>> Entering ConversionNotSupportedException(message={Message})", message);
         }
         
         /// <summary>
@@ -85,6 +88,7 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public ConversionNotSupportedException(String message, Exception innerException) : base(message, innerException) 
         {
+		value.LogDebug(">>> Entering ConversionNotSupportedException(message={Message},innerException={InnerException})", message, innerException);
         }
 
 #if !NETCF && !NETSTANDARD1_3
@@ -101,6 +105,7 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         protected ConversionNotSupportedException(SerializationInfo info, StreamingContext context) : base(info, context) 
         {
+		value.LogDebug(">>> Entering ConversionNotSupportedException(info={Info},context={Context})", info, context);
         }
 #endif
 
@@ -117,6 +122,9 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public static ConversionNotSupportedException Create(Type destinationType, object sourceValue)
         {
+			value.LogDebug(">>> Entering Create(destinationType={DestinationType},sourceValue={SourceValue})", destinationType, sourceValue);
+			value.LogDebug("<<< Exiting Create(destinationType={DestinationType},sourceValue={SourceValue})", destinationType, sourceValue);
+			value.LogDebug("<<< Exiting Create(destinationType={DestinationType},sourceValue={SourceValue},innerException={InnerException})", destinationType, sourceValue, innerException);
             return Create(destinationType, sourceValue, null);
         }
 

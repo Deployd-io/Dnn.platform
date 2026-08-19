@@ -15,6 +15,7 @@ namespace DotNetNuke.Web.Mvp
     public abstract partial class ModuleView<TModel> : ModuleViewBase, IView<TModel>
         where TModel : class, new()
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleView{TModel}));
         private TModel model;
 
         /// <inheritdoc />
@@ -40,17 +41,21 @@ namespace DotNetNuke.Web.Mvp
         /// <inheritdoc />
         protected override void LoadViewState(object savedState)
         {
+			Logger.LogDebug(">>> Entering LoadViewState(savedState={SavedState})", savedState);
             // Call the base class to load any View State
             base.LoadViewState(savedState);
             AttributeBasedViewStateSerializer.DeSerialize(this.Model, this.ViewState);
+			Logger.LogDebug("<<< Exiting LoadViewState(savedState={SavedState})", savedState);
         }
 
         /// <inheritdoc />
         protected override object SaveViewState()
         {
+			Logger.LogDebug(">>> Entering SaveViewState()");
             AttributeBasedViewStateSerializer.Serialize(this.Model, this.ViewState);
 
             // Call the base class to save the View State
+			Logger.LogDebug("<<< Exiting SaveViewState()");
             return base.SaveViewState();
         }
     }

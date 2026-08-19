@@ -22,6 +22,7 @@ namespace DotNetNuke.Web.Mvc.Common
     public class ModuleControlControllerAdapter(IHostSettings hostSettings)
         : ServiceLocator<IModuleControlController, ModuleControlControllerAdapter>, IModuleControlController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleControlControllerAdapter));
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
 
         /// <summary>Initializes a new instance of the <see cref="ModuleControlControllerAdapter"/> class.</summary>
@@ -29,17 +30,23 @@ namespace DotNetNuke.Web.Mvc.Common
         public ModuleControlControllerAdapter()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering ModuleControlControllerAdapter()");
         }
+		Logger.LogDebug("<<< Exiting ModuleControlControllerAdapter()");
 
         /// <inheritdoc />
         public ModuleControlInfo GetModuleControlByControlKey(string controlKey, int moduleDefID)
         {
+			Logger.LogDebug(">>> Entering GetModuleControlByControlKey(controlKey={ControlKey},moduleDefID={ModuleDefID})", controlKey, moduleDefID);
+			Logger.LogDebug("<<< Exiting GetModuleControlByControlKey(controlKey={ControlKey},moduleDefID={ModuleDefID})", controlKey, moduleDefID);
             return ModuleControlController.GetModuleControlByControlKey(this.hostSettings, controlKey, moduleDefID);
         }
 
         /// <inheritdoc />
         protected override Func<IModuleControlController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.GetCurrentServiceProvider().GetRequiredService<IModuleControlController>();
         }
     }

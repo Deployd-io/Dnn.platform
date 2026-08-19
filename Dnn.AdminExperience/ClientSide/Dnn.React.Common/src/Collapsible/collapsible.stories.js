@@ -5,14 +5,20 @@ import InputGroup from "../InputGroup";
 import SingleLineInputWithError from "../SingleLineInputWithError";
 import MultiLineInputWithError from "../MultiLineInputWithError";
 import Button from "../Button";
+const logger = console;
 
 class MyCollapsible extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = { opened: true };
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <Collapsible isOpened={this.state.opened} autoScroll={true} scrollDelay={10}>

@@ -20,6 +20,7 @@ namespace DotNetNuke.Common.Utilities
     /// <summary>HtmlUtils is a Utility class that provides HTML Utility methods.</summary>
     public partial class HtmlUtils
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlUtils));
         // Create Regular Expression objects
         private const string PunctuationMatch = "[~!#\\$%\\^&*\\(\\)-+=\\{\\[\\}\\]\\|;:\\x22'<,>\\.\\?\\\\\\t\\r\\v\\f\\n]";
 
@@ -48,6 +49,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The cleaned up string.</returns>
         public static string Clean(string html, bool removePunctuation)
         {
+			Logger.LogDebug(">>> Entering Clean(html={Html},removePunctuation={RemovePunctuation})", html, removePunctuation);
             if (string.IsNullOrWhiteSpace(html))
             {
                 return string.Empty;
@@ -57,6 +59,7 @@ namespace DotNetNuke.Common.Utilities
             {
                 // Fix when it is a double-encoded document
                 html = HttpUtility.HtmlDecode(html);
+				Logger.LogDebug("Clean(html={Html},removePunctuation={RemovePunctuation}): html → {Html1}", html, removePunctuation, html);
             }
 
             // First remove any HTML Tags ("<....>")
@@ -75,6 +78,7 @@ namespace DotNetNuke.Common.Utilities
                 html = StripWhiteSpace(html, true);
             }
 
+			Logger.LogDebug("<<< Exiting Clean(html={Html},removePunctuation={RemovePunctuation})", html, removePunctuation);
             return html;
         }
 
@@ -85,6 +89,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The cleaned up string.</returns>
         public static string CleanWithTagInfo(string html, string tagsFilter, bool removePunctuation)
         {
+			Logger.LogDebug(">>> Entering CleanWithTagInfo(html={Html},tagsFilter={TagsFilter},removePunctuation={RemovePunctuation})", html, tagsFilter, removePunctuation);
             if (string.IsNullOrWhiteSpace(html))
             {
                 return string.Empty;
@@ -92,6 +97,7 @@ namespace DotNetNuke.Common.Utilities
 
             // First remove unspecified HTML Tags ("<....>")
             html = StripUnspecifiedTags(html, tagsFilter, true);
+			Logger.LogDebug("CleanWithTagInfo(html={Html},tagsFilter={TagsFilter},removePunctuation={RemovePunctuation}): html → {Html1}", html, tagsFilter, removePunctuation, html);
 
             // Second replace any HTML entities (&nbsp; &lt; etc.) through their char symbol
             html = HttpUtility.HtmlDecode(html);
@@ -105,6 +111,7 @@ namespace DotNetNuke.Common.Utilities
             // Finally remove extra whitespace
             html = StripWhiteSpace(html, true);
 
+			Logger.LogDebug("<<< Exiting CleanWithTagInfo(html={Html},tagsFilter={TagsFilter},removePunctuation={RemovePunctuation})", html, tagsFilter, removePunctuation);
             return html;
         }
 
@@ -113,6 +120,9 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The email address as a cloaked html link.</returns>
         public static string FormatEmail(string email)
         {
+			Logger.LogDebug(">>> Entering FormatEmail(email={Email})", email);
+			Logger.LogDebug("<<< Exiting FormatEmail(email={Email})", email);
+			Logger.LogDebug("<<< Exiting FormatEmail(email={Email},cloak={Cloak})", email, cloak);
             return FormatEmail(email, true);
         }
 
@@ -149,6 +159,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The cleaned up string.</returns>
         public static string FormatText(string html, bool retainSpace)
         {
+			Logger.LogDebug(">>> Entering FormatText(html={Html},retainSpace={RetainSpace})", html, retainSpace);
+			Logger.LogDebug("<<< Exiting FormatText(html={Html},retainSpace={RetainSpace})", html, retainSpace);
             return ReplaceHtmlNewLinesRegex.Replace(html, Environment.NewLine);
         }
 
@@ -157,12 +169,15 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The formatted HTML.</returns>
         public static string ConvertToHtml(string strText)
         {
+			Logger.LogDebug(">>> Entering ConvertToHtml(strText={StrText})", strText);
             if (!string.IsNullOrEmpty(strText))
             {
                 var htmlBuilder = new StringBuilder(strText);
+				Logger.LogDebug("ConvertToHtml(strText={StrText}): htmlBuilder → {HtmlBuilder}", strText, htmlBuilder);
                 htmlBuilder.Replace("\r\n", "<br />");
                 htmlBuilder.Replace("\n", "<br />");
                 htmlBuilder.Replace("\r", "<br />");
+			Logger.LogDebug("<<< Exiting ConvertToHtml(strText={StrText})", strText);
                 return htmlBuilder.ToString();
             }
 
@@ -174,8 +189,10 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The formatted text.</returns>
         public static string ConvertToText(string strHtml)
         {
+			Logger.LogDebug(">>> Entering ConvertToText(strHtml={StrHtml})", strHtml);
             string strText = strHtml;
 
+			Logger.LogDebug("ConvertToText(strHtml={StrHtml}): strText → {StrText}", strHtml, strText);
             if (!string.IsNullOrEmpty(strText))
             {
                 // First remove white space (html does not render white space anyway and it screws up the conversion to text)
@@ -186,6 +203,7 @@ namespace DotNetNuke.Common.Utilities
                 strText = FormatText(strText, false);
             }
 
+			Logger.LogDebug("<<< Exiting ConvertToText(strHtml={StrHtml})", strHtml);
             return strText;
         }
 
@@ -194,6 +212,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The formatted domain name.</returns>
         public static string FormatWebsite(object website)
         {
+			Logger.LogDebug(">>> Entering FormatWebsite(website={Website})", website);
             string formatWebsite = string.Empty;
             if (website != DBNull.Value)
             {
@@ -202,6 +221,7 @@ namespace DotNetNuke.Common.Utilities
                     if (website.ToString().IndexOf(".", StringComparison.Ordinal) > -1)
                     {
                         var prefix = website.ToString().IndexOf("://", StringComparison.Ordinal) > -1 ? string.Empty : "http://";
+						Logger.LogDebug("FormatWebsite(website={Website}): prefix → {Prefix}", website, prefix);
                         formatWebsite = $"<a href=\"{prefix}{website}\">{website}</a>";
                     }
                     else
@@ -211,6 +231,7 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FormatWebsite(website={Website})", website);
             return formatWebsite;
         }
 
@@ -221,11 +242,14 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The shortened string.</returns>
         public static string Shorten(string txt, int length, string suffix)
         {
+			Logger.LogDebug(">>> Entering Shorten(txt={Txt},length={Length},suffix={Suffix})", txt, length, suffix);
             if (!string.IsNullOrEmpty(txt) && txt.Length > length)
             {
                 txt = txt.Substring(0, length) + suffix;
+				Logger.LogDebug("Shorten(txt={Txt},length={Length},suffix={Suffix}): txt → {Txt1}", txt, length, suffix, txt);
             }
 
+			Logger.LogDebug("<<< Exiting Shorten(txt={Txt},length={Length},suffix={Suffix})", txt, length, suffix);
             return txt;
         }
 
@@ -236,9 +260,12 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(7, 0, 0, "Please use System.Web.HtmlUtility.HtmlDecode", RemovalVersion = 11)]
         public static partial string StripEntities(string html, bool retainSpace)
         {
+			Logger.LogDebug(">>> Entering StripEntities(html={Html},retainSpace={RetainSpace})", html, retainSpace);
             var repString = retainSpace ? " " : string.Empty;
 
+			Logger.LogDebug("StripEntities(html={Html},retainSpace={RetainSpace}): repString → {RepString}", html, retainSpace, repString);
             // Replace Entities by replacement String and return modified string
+			Logger.LogDebug("<<< Exiting StripEntities(html={Html},retainSpace={RetainSpace})", html, retainSpace);
             return EntityRegEx.Replace(html, repString);
         }
 
@@ -247,6 +274,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>True if the string contains any entity.</returns>
         public static bool ContainsEntity(string html)
         {
+			Logger.LogDebug(">>> Entering ContainsEntity(html={Html})", html);
+			Logger.LogDebug("<<< Exiting ContainsEntity(html={Html})", html);
             return !string.IsNullOrEmpty(html) && EntityRegEx.IsMatch(html);
         }
 
@@ -255,6 +284,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>True if the string contains any URL encoded entity.</returns>
         public static bool IsUrlEncoded(string text)
         {
+			Logger.LogDebug(">>> Entering IsUrlEncoded(text={Text})", text);
+			Logger.LogDebug("<<< Exiting IsUrlEncoded(text={Text})", text);
             return !string.IsNullOrEmpty(text) && UrlEncodedRegEx.IsMatch(text);
         }
 
@@ -263,6 +294,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The cleaned up string.</returns>
         public static string RemoveInlineStyle(string html)
         {
+			Logger.LogDebug(">>> Entering RemoveInlineStyle(html={Html})", html);
+			Logger.LogDebug("<<< Exiting RemoveInlineStyle(html={Html})", html);
             return RemoveInlineStylesRegEx.Replace(html, string.Empty);
         }
 
@@ -272,6 +305,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The cleaned up string.</returns>
         public static string StripTags(string html, bool retainSpace)
         {
+			Logger.LogDebug(">>> Entering StripTags(html={Html},retainSpace={RetainSpace})", html, retainSpace);
+			Logger.LogDebug("<<< Exiting StripTags(html={Html},retainSpace={RetainSpace})", html, retainSpace);
             return StripTagsRegex.Replace(html, retainSpace ? " " : string.Empty);
         }
 
@@ -282,15 +317,18 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The cleaned up string.</returns>
         public static string StripUnspecifiedTags(string html, string specifiedTags, bool retainSpace)
         {
+			Logger.LogDebug(">>> Entering StripUnspecifiedTags(html={Html},specifiedTags={SpecifiedTags},retainSpace={RetainSpace})", html, specifiedTags, retainSpace);
             if (string.IsNullOrWhiteSpace(html))
             {
                 return string.Empty;
             }
 
             var result = new StringBuilder();
+			Logger.LogDebug("StripUnspecifiedTags(html={Html},specifiedTags={SpecifiedTags},retainSpace={RetainSpace}): result → {Result}", html, specifiedTags, retainSpace, result);
 
             // Set up Replacement String
             var repString = retainSpace ? " " : string.Empty;
+			Logger.LogDebug("StripUnspecifiedTags(html={Html},specifiedTags={SpecifiedTags},retainSpace={RetainSpace}): repString → {RepString}", html, specifiedTags, retainSpace, repString);
 
             // Stripped HTML
             result.Append(StripTagsRegex.Replace(html, repString));
@@ -304,6 +342,7 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting StripUnspecifiedTags(html={Html},specifiedTags={SpecifiedTags},retainSpace={RetainSpace})", html, specifiedTags, retainSpace);
             return result.ToString();
         }
 
@@ -313,6 +352,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The cleaned up string.</returns>
         public static string StripPunctuation(string html, bool retainSpace)
         {
+			Logger.LogDebug(">>> Entering StripPunctuation(html={Html},retainSpace={RetainSpace})", html, retainSpace);
             if (string.IsNullOrWhiteSpace(html))
             {
                 return string.Empty;
@@ -320,9 +360,11 @@ namespace DotNetNuke.Common.Utilities
 
             // Define return string
             string retHTML = html + " "; // Make sure any punctuation at the end of the String is removed
+			Logger.LogDebug("StripPunctuation(html={Html},retainSpace={RetainSpace}): retHTML → {RetHTML}", html, retainSpace, retHTML);
 
             // Set up Replacement String
             var repString = retainSpace ? " " : string.Empty;
+			Logger.LogDebug("StripPunctuation(html={Html},retainSpace={RetainSpace}): repString → {RepString}", html, retainSpace, repString);
             while (BeforeRegEx.IsMatch(retHTML))
             {
                 retHTML = BeforeRegEx.Replace(retHTML, repString);
@@ -334,6 +376,7 @@ namespace DotNetNuke.Common.Utilities
             }
 
             // Return modified string after trimming leading and ending quotation marks
+			Logger.LogDebug("<<< Exiting StripPunctuation(html={Html},retainSpace={RetainSpace})", html, retainSpace);
             return retHTML.Trim('"');
         }
 
@@ -343,8 +386,10 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The cleaned up string.</returns>
         public static string StripWhiteSpace(string html, bool retainSpace)
         {
+			Logger.LogDebug(">>> Entering StripWhiteSpace(html={Html},retainSpace={RetainSpace})", html, retainSpace);
             if (string.IsNullOrWhiteSpace(html))
             {
+			Logger.LogDebug("<<< Exiting StripWhiteSpace(html={Html},retainSpace={RetainSpace})", html, retainSpace);
                 return Null.NullString;
             }
 
@@ -357,12 +402,15 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The cleaned up string.</returns>
         public static string StripNonWord(string html, bool retainSpace)
         {
+			Logger.LogDebug(">>> Entering StripNonWord(html={Html},retainSpace={RetainSpace})", html, retainSpace);
             if (string.IsNullOrWhiteSpace(html))
             {
                 return html;
             }
 
             string repString = retainSpace ? " " : string.Empty;
+			Logger.LogDebug("StripNonWord(html={Html},retainSpace={RetainSpace}): repString → {RepString}", html, retainSpace, repString);
+			Logger.LogDebug("<<< Exiting StripNonWord(html={Html},retainSpace={RetainSpace})", html, retainSpace);
             return StripNonWordRegex.Replace(html, repString);
         }
 
@@ -371,8 +419,10 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>True for HTML and False for plain text.</returns>
         public static bool IsHtml(string text)
         {
+			Logger.LogDebug(">>> Entering IsHtml(text={Text})", text);
             if (string.IsNullOrEmpty(text))
             {
+			Logger.LogDebug("<<< Exiting IsHtml(text={Text})", text);
                 return false;
             }
 
@@ -385,6 +435,7 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="message">The error message.</param>
         public static void WriteError(HttpResponse response, string file, string message)
         {
+			Logger.LogDebug(">>> Entering WriteError(response={Response},file={File},message={Message})", response, file, message);
             response.Write("<h2>Error Details</h2>");
             response.Write("<table cellspacing=0 cellpadding=0 border=0>");
             response.Write("<tr><td><b>File</b></td><td><b>" + file + "</b></td></tr>");
@@ -392,6 +443,7 @@ namespace DotNetNuke.Common.Utilities
             response.Write("</table>");
             response.Write("<br><br>");
             response.Flush();
+			Logger.LogDebug("<<< Exiting WriteError(response={Response},file={File},message={Message})", response, file, message);
         }
 
         /// <summary>WriteFeedback outputs a Feedback Line during Install/Upgrade etc.</summary>
@@ -400,7 +452,9 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="message">The feedback message.</param>
         public static void WriteFeedback(HttpResponse response, int indent, string message)
         {
+			Logger.LogDebug(">>> Entering WriteFeedback(response={Response},indent={Indent},message={Message})", response, indent, message);
             WriteFeedback(response, indent, message, true);
+			Logger.LogDebug("<<< Exiting WriteFeedback(response={Response},indent={Indent},message={Message})", response, indent, message);
         }
 
         /// <summary>WriteFeedback outputs a Feedback Line during Install/Upgrade etc.</summary>
@@ -410,6 +464,7 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="showtime">Show the timespan before the message.</param>
         public static void WriteFeedback(HttpResponse response, int indent, string message, bool showtime)
         {
+			Logger.LogDebug(">>> Entering WriteFeedback(response={Response},indent={Indent},message={Message},showtime={Showtime})", response, indent, message, showtime);
             try
             {
                 bool showInstallationMessages;
@@ -439,11 +494,13 @@ namespace DotNetNuke.Common.Utilities
                 // Swallowing this for when requests have timed out. Log in case a listener is implemented
                 System.Diagnostics.Trace.TraceError(ex.ToString());
             }
+			Logger.LogDebug("<<< Exiting WriteFeedback(response={Response},indent={Indent},message={Message},showtime={Showtime})", response, indent, message, showtime);
         }
 
         /// <summary>This method adds an empty char to the response stream to avoid closing http connection on long-running tasks.</summary>
         public static void WriteKeepAlive()
         {
+			Logger.LogDebug(">>> Entering WriteKeepAlive()");
             if (HttpContext.Current == null)
             {
                 return;
@@ -455,17 +512,21 @@ namespace DotNetNuke.Common.Utilities
             }
 
             var response = HttpContext.Current.Response;
+			Logger.LogDebug("WriteKeepAlive(): response → {Response}", response);
             response.Write(" ");
             response.Flush();
+			Logger.LogDebug("<<< Exiting WriteKeepAlive()");
         }
 
         /// <summary>WriteFooter outputs the Footer during Install/Upgrade etc.</summary>
         /// <param name="response">The ASP.Net Response object.</param>
         public static void WriteFooter(HttpResponse response)
         {
+			Logger.LogDebug(">>> Entering WriteFooter(response={Response})", response);
             response.Write("</body>");
             response.Write("</html>");
             response.Flush();
+			Logger.LogDebug("<<< Exiting WriteFooter(response={Response})", response);
         }
 
         /// <summary>WriteHeader outputs the Header during Install/Upgrade etc.</summary>
@@ -473,8 +534,10 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="mode">The mode Install/Upgrade etc.</param>
         public static void WriteHeader(HttpResponse response, string mode)
         {
+			Logger.LogDebug(">>> Entering WriteHeader(response={Response},mode={Mode})", response, mode);
             // Set Response buffer to False
             response.Buffer = false;
+			Logger.LogDebug("WriteHeader(response={Response},mode={Mode}): response.Buffer → {Arg2}", response, mode, response.Buffer);
 
             // create an install page if it does not exist already
             if (!File.Exists(HttpContext.Current.Server.MapPath("~/Install/Install.htm")))
@@ -523,15 +586,19 @@ namespace DotNetNuke.Common.Utilities
             }
 
             response.Flush();
+			Logger.LogDebug("<<< Exiting WriteHeader(response={Response},mode={Mode})", response, mode);
         }
 
         public static void WriteSuccessError(HttpResponse response, bool bSuccess)
         {
+			Logger.LogDebug(">>> Entering WriteSuccessError(response={Response},bSuccess={BSuccess})", response, bSuccess);
             WriteFeedback(response, 0, bSuccess ? "<font color='green'>Success</font><br>" : "<font color='red'>Error!</font><br>", false);
+			Logger.LogDebug("<<< Exiting WriteSuccessError(response={Response},bSuccess={BSuccess})", response, bSuccess);
         }
 
         public static void WriteScriptSuccessError(HttpResponse response, bool bSuccess, string strLogFile)
         {
+			Logger.LogDebug(">>> Entering WriteScriptSuccessError(response={Response},bSuccess={BSuccess},strLogFile={StrLogFile})", response, bSuccess, strLogFile);
             if (bSuccess)
             {
                 WriteFeedback(response, 0, "<font color='green'>Success</font><br>", false);
@@ -540,6 +607,7 @@ namespace DotNetNuke.Common.Utilities
             {
                 WriteFeedback(response, 0, "<font color='red'>Error!</font> (see " + strLogFile + " for more information)<br>", false);
             }
+			Logger.LogDebug("<<< Exiting WriteScriptSuccessError(response={Response},bSuccess={BSuccess},strLogFile={StrLogFile})", response, bSuccess, strLogFile);
         }
 
         /// <summary>Searches the provided html for absolute hrefs that match the provided aliases and converts them to relative urls.</summary>
@@ -548,6 +616,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>html string.</returns>
         public static string AbsoluteToRelativeUrls(string html, IEnumerable<string> aliases)
         {
+			Logger.LogDebug(">>> Entering AbsoluteToRelativeUrls(html={Html},aliases={Aliases})", html, aliases);
             if (string.IsNullOrWhiteSpace(html))
             {
                 return string.Empty;
@@ -556,16 +625,19 @@ namespace DotNetNuke.Common.Utilities
             foreach (string portalAlias in aliases)
             {
                 string searchAlias = portalAlias;
+				Logger.LogDebug("AbsoluteToRelativeUrls(html={Html},aliases={Aliases}): searchAlias → {SearchAlias}", html, aliases, searchAlias);
                 if (!portalAlias.EndsWith("/", StringComparison.Ordinal))
                 {
                     searchAlias = $"{portalAlias}/";
                 }
 
                 var exp = new Regex("((?:href|src)=&quot;)https?://" + searchAlias + "(.*?&quot;)", RegexOptions.IgnoreCase);
+				Logger.LogDebug("AbsoluteToRelativeUrls(html={Html},aliases={Aliases}): exp → {Exp}", html, aliases, exp);
 
                 if (portalAlias.Contains("/", StringComparison.Ordinal))
                 {
                     html = exp.Replace(html, "$1" + portalAlias.Substring(portalAlias.IndexOf("/", StringComparison.Ordinal)) + "/$2");
+					Logger.LogDebug("AbsoluteToRelativeUrls(html={Html},aliases={Aliases}): html → {Html1}", html, aliases, html);
                 }
                 else
                 {
@@ -573,6 +645,7 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting AbsoluteToRelativeUrls(html={Html},aliases={Aliases})", html, aliases);
             return html;
         }
 
@@ -589,8 +662,11 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The sanitized HTML.</returns>
         public static string CleanOutOfJavascript(string htmlInput)
         {
+			Logger.LogDebug(">>> Entering JavaScriptStringEncode(value={Value},addDoubleQuotes={AddDoubleQuotes})", value, addDoubleQuotes);
             if (string.IsNullOrEmpty(htmlInput))
             {
+				Logger.LogDebug("<<< Exiting JavaScriptStringEncode(value={Value},addDoubleQuotes={AddDoubleQuotes})", value, addDoubleQuotes);
+			Logger.LogDebug("<<< Exiting CleanOutOfJavascript(htmlInput={HtmlInput})", htmlInput);
                 return string.Empty;
             }
 
@@ -602,6 +678,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns><see langword="true"/> if <paramref name="htmlInput"/> contains JavaScript, otherwise <see langword="false"/>.</returns>
         public static bool ContainsJavaScript(string htmlInput)
         {
+			Logger.LogDebug(">>> Entering ContainsJavaScript(htmlInput={HtmlInput})", htmlInput);
             if (string.IsNullOrEmpty(htmlInput))
             {
                 return false;
@@ -614,6 +691,7 @@ namespace DotNetNuke.Common.Utilities
             string strippedCleaned = StripHtmlSyntax(cleaned);
 
             // If the stripped versions are different, JavaScript was likely removed
+			Logger.LogDebug("<<< Exiting ContainsJavaScript(htmlInput={HtmlInput})", htmlInput);
             return !string.Equals(strippedOriginal, strippedCleaned, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -623,6 +701,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The HTML, potentially sanitized.</returns>
         public static string SanitizeHtmlIfNeeded(string rawHtmlInput, bool allowJavaScript)
         {
+			Logger.LogDebug(">>> Entering SanitizeHtmlIfNeeded(rawHtmlInput={RawHtmlInput},allowJavaScript={AllowJavaScript})", rawHtmlInput, allowJavaScript);
             // If input is null or empty: nothing to do
             if (string.IsNullOrEmpty(rawHtmlInput))
             {
@@ -632,6 +711,7 @@ namespace DotNetNuke.Common.Utilities
             // If JavaScript is not allowed: HTML must be sanitized
             if (!allowJavaScript)
             {
+			Logger.LogDebug("<<< Exiting SanitizeHtmlIfNeeded(rawHtmlInput={RawHtmlInput},allowJavaScript={AllowJavaScript})", rawHtmlInput, allowJavaScript);
                 return CleanOutOfJavascript(rawHtmlInput);
             }
 
@@ -640,6 +720,7 @@ namespace DotNetNuke.Common.Utilities
 
         private static HtmlSanitizer CreateJavaScriptOnlySanitizer(string htmlInput)
         {
+			Logger.LogDebug(">>> Entering CreateJavaScriptOnlySanitizer(htmlInput={HtmlInput})", htmlInput);
             var sanitizer = new HtmlSanitizer
             {
                 KeepChildNodes = true,
@@ -650,11 +731,14 @@ namespace DotNetNuke.Common.Utilities
             sanitizer.AllowedSchemes.Clear();
 
             var parser = new HtmlParser();
+			Logger.LogDebug("CreateJavaScriptOnlySanitizer(htmlInput={HtmlInput}): parser → {Parser}", htmlInput, parser);
             var document = parser.ParseDocument(htmlInput);
+			Logger.LogDebug("CreateJavaScriptOnlySanitizer(htmlInput={HtmlInput}): document → {Document}", htmlInput, document);
 
             foreach (var element in document.All)
             {
                 var tagName = element.TagName.ToLowerInvariant();
+				Logger.LogDebug("CreateJavaScriptOnlySanitizer(htmlInput={HtmlInput}): tagName → {TagName}", htmlInput, tagName);
                 if (!tagName.Equals("script", StringComparison.Ordinal))
                 {
                     sanitizer.AllowedTags.Add(tagName);
@@ -677,13 +761,16 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CreateJavaScriptOnlySanitizer(htmlInput={HtmlInput})", htmlInput);
             return sanitizer;
         }
 
         private static string StripHtmlSyntax(string html)
         {
+			Logger.LogDebug(">>> Entering StripHtmlSyntax(html={Html})", html);
             if (string.IsNullOrEmpty(html))
             {
+			Logger.LogDebug("<<< Exiting StripHtmlSyntax(html={Html})", html);
                 return string.Empty;
             }
 

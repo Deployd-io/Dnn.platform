@@ -2,17 +2,24 @@ import React, {Component } from "react";
 import PropTypes from "prop-types";
 import styles from "./style.module.less";
 import resx from "../../../resources";
+const logger = console;
 
 class RightPane extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
     onEnter(key, value) {
+		logger.debug(`>>> Entering onEnter(key=${key},value=${value})`);
         const {props} = this;
         props.onEnter(key, value, props.index);
+		logger.debug(`<<< Exiting onEnter(key=${key},value=${value})`);
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.taskStatusItemRightPane}>
                 <div className="taskDetailRight">

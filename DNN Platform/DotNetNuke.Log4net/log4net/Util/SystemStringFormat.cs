@@ -44,15 +44,21 @@ namespace log4net.Util
         /// <param name="args">An <see cref="System.Object"/> array containing zero or more objects to format.</param>
         public SystemStringFormat(IFormatProvider provider, string format, params object[] args)
         {
+			value.LogDebug(">>> Entering SystemStringFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
             this.m_provider = provider;
             this.m_format = format;
+			value.LogDebug("SystemStringFormat(provider={Provider},format={Format},args={Args}): this.m_provider → {Arg3}", provider, format, args, this.m_provider);
+			value.LogDebug("SystemStringFormat(provider={Provider},format={Format},args={Args}): this.m_format → {Arg3}", provider, format, args, this.m_format);
             this.m_args = args;
+			value.LogDebug("<<< Exiting SystemStringFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
         }
 
         /// <summary>Format the string and arguments</summary>
         /// <returns>the formatted string</returns>
         public override string ToString()
         {
+			value.LogDebug(">>> Entering ToString()");
+			value.LogDebug("<<< Exiting ToString()");
             return StringFormat(this.m_provider, this.m_format, this.m_args);
         }
 
@@ -76,6 +82,7 @@ namespace log4net.Util
         /// </remarks>
         private static string StringFormat(IFormatProvider provider, string format, params object[] args)
         {
+			value.LogDebug(">>> Entering StringFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
             try
             {
                 // The format is missing, log null value
@@ -97,6 +104,7 @@ namespace log4net.Util
             {
                 LogLog.Warn(declaringType, "Exception while rendering format [" + format + "]", ex);
                 return StringFormatError(ex, format, args);
+			value.LogDebug("<<< Exiting StringFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
             }
 #if !NET_2_0 && !MONO_2_0 && !MONO_3_5 && !MONO_4_0 && !NETSTANDARD
             catch
@@ -110,9 +118,11 @@ namespace log4net.Util
         /// <summary>Process an error during StringFormat</summary>
         private static string StringFormatError(Exception formatException, string format, object[] args)
         {
+			value.LogDebug(">>> Entering StringFormatError(formatException={FormatException},format={Format},args={Args})", formatException, format, args);
             try
             {
                 StringBuilder buf = new StringBuilder("<log4net.Error>");
+				value.LogDebug("StringFormatError(formatException={FormatException},format={Format},args={Args}): buf → {Buf}", formatException, format, args, buf);
 
                 if (formatException != null)
                 {
@@ -134,6 +144,7 @@ namespace log4net.Util
             {
                 LogLog.Error(declaringType, "INTERNAL ERROR during StringFormat error handling", ex);
                 return "<log4net.Error>Exception during StringFormat. See Internal Log.</log4net.Error>";
+			value.LogDebug("<<< Exiting StringFormatError(formatException={FormatException},format={Format},args={Args})", formatException, format, args);
             }
 #if !NET_2_0 && !MONO_2_0 && !MONO_3_5 && !MONO_4_0 && !NETSTANDARD
             catch
@@ -147,6 +158,7 @@ namespace log4net.Util
         /// <summary>Dump the contents of an array into a string builder</summary>
         private static void RenderArray(Array array, StringBuilder buffer)
         {
+			value.LogDebug(">>> Entering RenderArray(array={Array},buffer={Buffer})", array, buffer);
             if (array == null)
             {
                 buffer.Append(SystemInfo.NullText);
@@ -174,11 +186,13 @@ namespace log4net.Util
                     buffer.Append("}");
                 }
             }
+			value.LogDebug("<<< Exiting RenderArray(array={Array},buffer={Buffer})", array, buffer);
         }
 
         /// <summary>Dump an object to a string</summary>
         private static void RenderObject(Object obj, StringBuilder buffer)
         {
+			value.LogDebug(">>> Entering RenderObject(obj={Obj},buffer={Buffer})", obj, buffer);
             if (obj == null)
             {
                 buffer.Append(SystemInfo.NullText);
@@ -191,7 +205,10 @@ namespace log4net.Util
                 }
                 catch(Exception ex)
                 {
+					value.LogError("Exception in RenderObject(obj={Obj},buffer={Buffer}): {Arg2}", obj, buffer, ex.getMessage());
                     buffer.Append("<Exception: ").Append(ex.Message).Append(">");
+			value.LogError("Exception in RenderObject(obj={Obj},buffer={Buffer}): {Arg2}", obj, buffer, ex.Message);
+			value.LogDebug("<<< Exiting RenderObject(obj={Obj},buffer={Buffer})", obj, buffer);
                 }
 #if !NET_2_0 && !MONO_2_0 && !MONO_3_5 && !MONO_4_0 && !NETSTANDARD
                 catch

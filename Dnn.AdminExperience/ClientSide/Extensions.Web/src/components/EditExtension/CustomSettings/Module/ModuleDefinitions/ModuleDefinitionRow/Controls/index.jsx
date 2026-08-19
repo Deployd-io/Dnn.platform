@@ -9,16 +9,22 @@ import { ModuleDefinitionActions, ExtensionActions } from "actions";
 import ControlFields from "./ControlFields";
 import utils from "utils";
 import "./style.less";
+const logger = console;
 
 function getSourceFolder(str) {
+	logger.debug(`>>> Entering getSourceFolder(str=${str})`);
+	logger.debug(`<<< Exiting getSourceFolder(str=${str})`);
     return str.substr(0, str.lastIndexOf("/"));
 }
 function getFileName(str) {
+	logger.debug(`>>> Entering getFileName(str=${str})`);
+	logger.debug(`<<< Exiting getFileName(str=${str})`);
     return str.substr(str.lastIndexOf("/") + 1, str.length - 1);
 }
 class Controls extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             editMode: false,
             controlBeingEdited: {},
@@ -28,9 +34,12 @@ class Controls extends Component {
             },
             selectedSourceFolder: "Admin/Skins/"
         };
+		logger.debug('<<< Exiting constructor()');
     }
     getNewControlKeys() {
+		logger.debug('>>> Entering getNewControlKeys()');
         const { props } = this;
+		logger.debug('<<< Exiting getNewControlKeys()');
         return {
             id: -1,
             definitionId: props.moduleDefinitionId,
@@ -46,6 +55,7 @@ class Controls extends Component {
         };
     }
     confirmAction(callback) {
+		logger.debug(`>>> Entering confirmAction(callback=${callback})`);
         const { props } = this;
         if (props.controlFormIsDirty) {
             utilities.utilities.confirm(Localization.get("UnsavedChanges.HelpText"), Localization.get("UnsavedChanges.Confirm"), Localization.get("UnsavedChanges.Cancel"), () => {
@@ -54,6 +64,7 @@ class Controls extends Component {
             });
         } else {
             callback();
+			logger.debug(`<<< Exiting confirmAction(callback=${callback})`);
         }
     }
     onChange(key, event) {
@@ -248,6 +259,8 @@ Controls.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         sourceFolders: state.moduleDefinition.sourceFolders,
         sourceFiles: state.moduleDefinition.sourceFiles,

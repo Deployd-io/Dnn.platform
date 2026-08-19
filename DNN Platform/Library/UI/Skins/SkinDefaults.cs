@@ -16,6 +16,7 @@ namespace DotNetNuke.UI.Skins
 
     public enum SkinDefaultType
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinDefaults));
         /// <summary>Skin.</summary>
         SkinInfo = 0,
 
@@ -33,6 +34,7 @@ namespace DotNetNuke.UI.Skins
 
         private SkinDefaults(SkinDefaultType defaultType)
         {
+			Logger.LogDebug(">>> Entering SkinDefaults(defaultType={DefaultType})", defaultType);
             string nodename = Enum.GetName(defaultType.GetType(), defaultType).ToLowerInvariant();
             string filePath = Config.GetPathToFile(Config.ConfigFileType.DotNetNuke);
             var dnndoc = new XmlDocument { XmlResolver = null, };
@@ -42,9 +44,13 @@ namespace DotNetNuke.UI.Skins
             }
 
             XmlNode defaultElement = dnndoc.SelectSingleNode("/configuration/skinningdefaults/" + nodename);
+			Logger.LogDebug("SkinDefaults(defaultType={DefaultType}): defaultElement → {DefaultElement}", defaultType, defaultElement);
             this.folder = defaultElement.Attributes["folder"].Value;
+			Logger.LogDebug("SkinDefaults(defaultType={DefaultType}): this.folder → {Arg1}", defaultType, this.folder);
             this.defaultName = defaultElement.Attributes["default"].Value;
             this.adminDefaultName = defaultElement.Attributes["admindefault"].Value;
+			Logger.LogDebug("SkinDefaults(defaultType={DefaultType}): this.defaultName → {Arg1}", defaultType, this.defaultName);
+			Logger.LogDebug("<<< Exiting SkinDefaults(defaultType={DefaultType})", defaultType);
         }
 
         public string AdminDefaultName
@@ -78,6 +84,8 @@ namespace DotNetNuke.UI.Skins
         /// <returns>A <see cref="SkinDefaults"/> instance.</returns>
         public static SkinDefaults GetSkinDefaults(IHostSettings hostSettings, SkinDefaultType defaultType)
         {
+			Logger.LogDebug(">>> Entering GetSkinDefaults(hostSettings={HostSettings},defaultType={DefaultType})", hostSettings, defaultType);
+				Logger.LogDebug("<<< Exiting GetSkinDefaults(hostSettings={HostSettings},defaultType={DefaultType})", hostSettings, defaultType);
             return
                 CBO.GetCachedObject<SkinDefaults>(
                     hostSettings,
@@ -87,7 +95,10 @@ namespace DotNetNuke.UI.Skins
 
         private static object GetSkinDefaultsCallback(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetSkinDefaultsCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var defaultType = (SkinDefaultType)cacheItemArgs.ParamList[0];
+			Logger.LogDebug("GetSkinDefaultsCallback(cacheItemArgs={CacheItemArgs}): defaultType → {DefaultType}", cacheItemArgs, defaultType);
+			Logger.LogDebug("<<< Exiting GetSkinDefaultsCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return new SkinDefaults(defaultType);
         }
     }

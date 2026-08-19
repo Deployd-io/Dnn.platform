@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.EventQueue
 
     public enum MessagePriority
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EventMessage));
         /// <summary>High priority.</summary>
         High = 0,
 
@@ -42,7 +43,10 @@ namespace DotNetNuke.Services.EventQueue
         /// <summary>Initializes a new instance of the <see cref="EventMessage"/> class.</summary>
         public EventMessage()
         {
+			Logger.LogDebug(">>> Entering EventMessage()");
             this.attributes = new NameValueCollection();
+			Logger.LogDebug("EventMessage(): attributes → {Attributes}", attributes);
+			Logger.LogDebug("<<< Exiting EventMessage()");
         }
 
         public int EventMessageID
@@ -252,11 +256,17 @@ namespace DotNetNuke.Services.EventQueue
 
         public void DeserializeAttributes(string configXml)
         {
+			Logger.LogDebug(">>> Entering DeserializeAttributes(configXml={ConfigXml})", configXml);
             string attName = Null.NullString;
             string attValue = Null.NullString;
+			Logger.LogDebug("DeserializeAttributes(configXml={ConfigXml}): attValue → {AttValue}", configXml, attValue);
             var settings = new XmlReaderSettings();
+			Logger.LogDebug("DeserializeAttributes(configXml={ConfigXml}): settings → {Settings}", configXml, settings);
+			Logger.LogDebug("DeserializeAttributes(configXml={ConfigXml}): settings.ConformanceLevel → {Arg1}", configXml, settings.ConformanceLevel);
             settings.ConformanceLevel = ConformanceLevel.Fragment;
             using var reader = XmlReader.Create(new StringReader(configXml));
+			Logger.LogDebug("DeserializeAttributes(configXml={ConfigXml}): reader → {Reader}", configXml, reader);
+			Logger.LogDebug("DeserializeAttributes(configXml={ConfigXml}): attName → {AttName}", configXml, attName);
             reader.ReadStartElement("Attributes");
             if (!reader.IsEmptyElement)
             {
@@ -285,15 +295,21 @@ namespace DotNetNuke.Services.EventQueue
                 }
                 while (reader.ReadToNextSibling("Attribute"));
             }
+			Logger.LogDebug("<<< Exiting DeserializeAttributes(configXml={ConfigXml})", configXml);
         }
 
         public string SerializeAttributes()
         {
+			Logger.LogDebug(">>> Entering SerializeAttributes()");
             var settings = new XmlWriterSettings();
             settings.ConformanceLevel = ConformanceLevel.Fragment;
+			Logger.LogDebug("SerializeAttributes(): settings.ConformanceLevel → {Arg0}", settings.ConformanceLevel);
+			Logger.LogDebug("SerializeAttributes(): settings.OmitXmlDeclaration → {Arg0}", settings.OmitXmlDeclaration);
+			Logger.LogDebug("SerializeAttributes(): settings → {Settings}", settings);
             settings.OmitXmlDeclaration = true;
 
             var sb = new StringBuilder();
+			Logger.LogDebug("SerializeAttributes(): sb → {Sb}", sb);
 
             using (XmlWriter writer = XmlWriter.Create(sb, settings))
             {
@@ -329,6 +345,7 @@ namespace DotNetNuke.Services.EventQueue
                 // Close Writer
                 writer.Close();
 
+				Logger.LogDebug("<<< Exiting SerializeAttributes()");
                 return sb.ToString();
             }
         }

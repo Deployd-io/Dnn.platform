@@ -22,8 +22,12 @@ public class ContainerWithServiceProviderFallback : IContainer
     /// <param name="serviceProvider">The service provider.</param>
     public ContainerWithServiceProviderFallback(IContainer container, IServiceProvider serviceProvider)
     {
+		Logger.LogDebug(">>> Entering ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider})", container, serviceProvider);
         this.container = container;
         this.serviceProvider = serviceProvider;
+		Logger.LogDebug("ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider}): this.container → {Arg2}", container, serviceProvider, this.container);
+		Logger.LogDebug("ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", container, serviceProvider, serviceProvider);
+		Logger.LogDebug("<<< Exiting ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider})", container, serviceProvider);
     }
 
     /// <inheritdoc />
@@ -33,6 +37,8 @@ public class ContainerWithServiceProviderFallback : IContainer
     /// <inheritdoc />
     public void RegisterComponent<TComponent>()
         where TComponent : class
+		Logger.LogDebug(">>> Entering RegisterComponent()");
+		Logger.LogDebug("<<< Exiting RegisterComponent(name={Name})", name);
         => this.container.RegisterComponent<TComponent>();
 
     /// <inheritdoc />
@@ -119,8 +125,10 @@ public class ContainerWithServiceProviderFallback : IContainer
     /// <inheritdoc />
     public TContract GetComponent<TContract>()
     {
+		Logger.LogDebug(">>> Entering GetComponent()");
         Logger.Trace($"Getting component for {typeof(TContract).FullName}");
         var service = this.container.GetComponent<TContract>();
+		Logger.LogDebug("GetComponent(): service → {Service}", service);
         if (service is not null)
         {
             Logger.Trace($"Got component for {typeof(TContract).FullName} from container");
@@ -128,6 +136,7 @@ public class ContainerWithServiceProviderFallback : IContainer
         }
 
         Logger.Trace($"Getting component for {typeof(TContract).FullName} from service provider");
+		Logger.LogDebug("<<< Exiting GetComponent()");
         return this.serviceProvider.GetService<TContract>();
     }
 

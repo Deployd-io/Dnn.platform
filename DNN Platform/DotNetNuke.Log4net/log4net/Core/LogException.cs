@@ -52,6 +52,8 @@ namespace log4net.Core
         /// </remarks>
         public LogException()
         {
+		value.LogDebug(">>> Entering LogException()");
+		value.LogDebug("<<< Exiting LogException()");
         }
 
         /// <summary>Constructor</summary>
@@ -64,6 +66,7 @@ namespace log4net.Core
         /// </remarks>
         public LogException(String message) : base(message) 
         {
+		value.LogDebug(">>> Entering LogException(message={Message})", message);
         }
         
         /// <summary>Constructor</summary>
@@ -77,6 +80,7 @@ namespace log4net.Core
         /// </remarks>
         public LogException(String message, Exception innerException) : base(message, innerException) 
         {
+		value.LogDebug(">>> Entering LogException(message={Message},innerException={InnerException})", message, innerException);
         }
 
 #if !NETCF && !NETSTANDARD1_3
@@ -91,6 +95,7 @@ namespace log4net.Core
         /// </remarks>
         protected LogException(SerializationInfo info, StreamingContext context) : base(info, context) 
         {
+		value.LogDebug(">>> Entering LogException(info={Info},context={Context})", info, context);
         }
 #endif
     }

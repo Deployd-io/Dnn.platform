@@ -1,3 +1,4 @@
+const logger = console;
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
@@ -11,6 +12,7 @@ dnn.ContentEditorManager = $.extend({}, dnn.ContentEditorManager, {
             var panes = options.panes.split(',');
             for (var i = 0; i < panes.length; i++) {
                 (function (paneName, paneClientIds) {
+					logger.debug('>>> Entering function()');
                     var parentPaneClientIds = paneClientIds.split(',');
                     for (var j = 0; j < parentPaneClientIds.length; j++) {
                         (function (paneClientId) {
@@ -23,6 +25,7 @@ dnn.ContentEditorManager = $.extend({}, dnn.ContentEditorManager, {
                                 });
                             }
                         })(parentPaneClientIds[j]);
+					logger.debug('<<< Exiting function()');
                     }
                 })(panes[i], panesClientIds[i]);
             }
@@ -36,22 +39,28 @@ dnn.ContentEditorManager = $.extend({}, dnn.ContentEditorManager, {
 	var readyFunctionsInAjaxMode;
 
 	var runReadyFunctionsInAjaxMode = function() {
+		logger.debug('>>> Entering runReadyFunctionsInAjaxMode()');
 		setTimeout(function () {
+			logger.debug(`>>> Entering setTimeout($this=${$this})`);
 			var $this = $(document);
 			for (var i = 0; i < readyFunctionsInAjaxMode.length; i++) {
 			    (function(readyFunction) {
 			        originaljQueryReady.call($this, function () {
+						logger.debug(`>>> Entering call($this=${$this})`);
 			            try {
 			                readyFunction.call($this);
 			            } catch (ex) {
 			                console.log('function execute failed: "' + ex.message + '" on: ' + readyFunction);
+							logger.debug(`<<< Exiting call($this=${$this})`);
 			            };
 			        });
 			    })(readyFunctionsInAjaxMode[i]);
 			}
 
+			logger.debug(`<<< Exiting setTimeout($this=${$this})`);
 			readyFunctionsInAjaxMode = undefined;
 		}, 100);
+		logger.debug('<<< Exiting runReadyFunctionsInAjaxMode()');
 	}
 	$.fn.ready = function(fn) {
 		var $this = this;
@@ -64,6 +73,8 @@ dnn.ContentEditorManager = $.extend({}, dnn.ContentEditorManager, {
 					runReadyFunctionsInAjaxMode();
 				} else {
 					$(window).one('dnnScriptLoadComplete', function() {
+						logger.debug(`>>> Entering one(window=${window})`);
+						logger.debug(`<<< Exiting one(window=${window})`);
 						runReadyFunctionsInAjaxMode();
 					});
 				}
@@ -157,6 +168,7 @@ dnn.ContentEditorManager = $.extend({}, dnn.ContentEditorManager, {
 				if (catchedPanes === allPanesCount && typeof callback == "function") {
 					callback();
 				}
+				logger.debug('<<< Exiting catchSortEvents()');
 	        };
 
 	        catchSortEvents();
@@ -178,6 +190,7 @@ dnn.ContentEditorManager = $.extend({}, dnn.ContentEditorManager, {
 						newModule.trigger('editmodule');
 					}
 				}
+				logger.debug(`<<< Exiting setTimeout(moduleDialog=${moduleDialog})`);
             });
         }, 100);
     };
@@ -204,6 +217,7 @@ dnn.ContentEditorManager = $.extend({}, dnn.ContentEditorManager, {
             $item.addClass('animate');
         }, 1000);
         setTimeout(function() {
+			logger.debug('>>> Entering setTimeout()');
             $item.removeClass('highlight animate');
         }, 1500);
 
@@ -258,14 +272,18 @@ dnn.ContentEditorManager = $.extend({}, dnn.ContentEditorManager, {
 		}
 
 		var refreshPane = function () {
+			logger.debug('>>> Entering refreshPane()');
 			var panesId = getPanesId();
             moduleDialog.refreshPane(panesId[0], '', function() {
                 dnn.ContentEditorManager.refreshContent(this);
 
                 if (panesId.length > 1) {
+					logger.debug('<<< Exiting refreshPane()');
 	                setTimeout(function() {
+						logger.debug('>>> Entering setTimeout()');
 		                moduleDialog.refreshPane(panesId[1], '', function() {
 			                dnn.ContentEditorManager.refreshContent(this);
+							logger.debug('<<< Exiting setTimeout()');
 		                });
 	                }, 100);
                 }

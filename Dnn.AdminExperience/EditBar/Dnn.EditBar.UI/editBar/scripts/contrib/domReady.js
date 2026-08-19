@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * @license RequireJS domReady 2.0.1 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
@@ -10,6 +11,7 @@
 
 
 define(function () {
+	logger.debug('>>> Entering define()');
     'use strict';
 
     var isTop, testDiv, scrollIntervalId,
@@ -17,15 +19,19 @@ define(function () {
         isPageLoaded = !isBrowser,
         doc = isBrowser ? document : null,
         readyCalls = [];
+		logger.debug('<<< Exiting define()');
 
     function runCallbacks(callbacks) {
+		logger.debug(`>>> Entering runCallbacks(callbacks=${callbacks})`);
         var i;
         for (i = 0; i < callbacks.length; i += 1) {
             callbacks[i](doc);
+			logger.debug(`<<< Exiting runCallbacks(callbacks=${callbacks})`);
         }
     }
 
     function callReady() {
+		logger.debug('>>> Entering callReady()');
         var callbacks = readyCalls;
 
         if (isPageLoaded) {
@@ -33,7 +39,9 @@ define(function () {
             if (callbacks.length) {
                 readyCalls = [];
                 runCallbacks(callbacks);
+				logger.debug(`callReady(): readyCalls → ${readyCalls}`);
             }
+			logger.debug('<<< Exiting callReady()');
         }
     }
 
@@ -41,6 +49,7 @@ define(function () {
      * Sets the page as loaded.
      */
     function pageLoaded() {
+		logger.debug('>>> Entering pageLoaded()');
         if (!isPageLoaded) {
             isPageLoaded = true;
             if (scrollIntervalId) {
@@ -48,6 +57,7 @@ define(function () {
             }
 
             callReady();
+			logger.debug('<<< Exiting pageLoaded()');
         }
     }
 
@@ -70,10 +80,13 @@ define(function () {
             //but modified by other contributors, including jdalton
             if (testDiv.doScroll && isTop && window.external) {
                 scrollIntervalId = setInterval(function () {
+					logger.debug('>>> Entering setInterval()');
                     try {
                         testDiv.doScroll();
                         pageLoaded();
                     } catch (e) {}
+					logger.debug('<<< Exiting setInterval()');
+					logger.error('Exception in setInterval():', e.message, e);
                 }, 30);
             }
         }
@@ -102,11 +115,13 @@ define(function () {
      * @param {Function} callback
      */
     function domReady(callback) {
+		logger.debug(`>>> Entering domReady(callback=${callback})`);
         if (isPageLoaded) {
             callback(doc);
         } else {
             readyCalls.push(callback);
         }
+		logger.debug(`<<< Exiting domReady(callback=${callback})`);
         return domReady;
     }
 
@@ -116,10 +131,12 @@ define(function () {
      * Loader Plugin API method
      */
     domReady.load = function (name, req, onLoad, config) {
+		logger.debug(`>>> Entering function(name=${name},req=${req},onLoad=${onLoad},config=${config})`);
         if (config.isBuild) {
             onLoad(null);
         } else {
             domReady(onLoad);
+			logger.debug(`<<< Exiting function(name=${name},req=${req},onLoad=${onLoad},config=${config})`);
         }
     };
 

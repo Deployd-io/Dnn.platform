@@ -16,10 +16,12 @@ namespace DotNetNuke.Entities.Content.Common
     [DnnDeprecated(10, 2, 4, "Resolve types via Dependency Injection")]
     public static partial class Util
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Util));
         /// <summary>Gets the data service.</summary>
         /// <returns>data service instance from ComponentFactory.</returns>
         public static IDataService GetDataService()
         {
+			Logger.LogDebug(">>> Entering GetDataService()");
             var ds = ComponentFactory.GetComponent<IDataService>();
             if (ds == null)
             {
@@ -27,6 +29,7 @@ namespace DotNetNuke.Entities.Content.Common
                 ComponentFactory.RegisterComponentInstance<IDataService>(ds);
             }
 
+			Logger.LogDebug("<<< Exiting GetDataService()");
             return ds;
         }
 
@@ -42,6 +45,7 @@ namespace DotNetNuke.Entities.Content.Common
         /// <returns>ContentController from ComponentFactory.</returns>
         public static IContentController GetContentController(IDataService dataService, IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering GetContentController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
             var ctl = ComponentFactory.GetComponent<IContentController>();
             if (ctl == null)
             {
@@ -51,6 +55,7 @@ namespace DotNetNuke.Entities.Content.Common
                 ComponentFactory.RegisterComponentInstance<IContentController>(ctl);
             }
 
+			Logger.LogDebug("<<< Exiting GetContentController()");
             return ctl;
         }
 
@@ -66,6 +71,7 @@ namespace DotNetNuke.Entities.Content.Common
         /// <returns>ScopeTypeController from ComponentFactory.</returns>
         public static IScopeTypeController GetScopeTypeController(IDataService dataService, IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering GetScopeTypeController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
             var ctl = ComponentFactory.GetComponent<IScopeTypeController>();
             if (ctl == null)
             {
@@ -75,6 +81,7 @@ namespace DotNetNuke.Entities.Content.Common
                 ComponentFactory.RegisterComponentInstance<IScopeTypeController>(ctl);
             }
 
+			Logger.LogDebug("<<< Exiting GetScopeTypeController()");
             return ctl;
         }
 
@@ -90,6 +97,7 @@ namespace DotNetNuke.Entities.Content.Common
         /// <returns>TermController from ComponentFactory.</returns>
         public static ITermController GetTermController(IDataService dataService, IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering GetTermController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
             var ctl = ComponentFactory.GetComponent<ITermController>();
             if (ctl == null)
             {
@@ -99,6 +107,7 @@ namespace DotNetNuke.Entities.Content.Common
                 ComponentFactory.RegisterComponentInstance<ITermController>(ctl);
             }
 
+			Logger.LogDebug("<<< Exiting GetTermController()");
             return ctl;
         }
 
@@ -114,6 +123,7 @@ namespace DotNetNuke.Entities.Content.Common
         /// <returns>VocabularyController from ComponentFactory.</returns>
         public static IVocabularyController GetVocabularyController(IDataService dataService, IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering GetVocabularyController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
             var ctl = ComponentFactory.GetComponent<IVocabularyController>();
             if (ctl == null)
             {
@@ -123,6 +133,7 @@ namespace DotNetNuke.Entities.Content.Common
                 ComponentFactory.RegisterComponentInstance<IVocabularyController>(ctl);
             }
 
+			Logger.LogDebug("<<< Exiting GetVocabularyController()");
             return ctl;
         }
     }

@@ -12,6 +12,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
     public class DnnHtmlHelper<TModel> : DnnHtmlHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnHtmlHelper{TModel}));
         /// <summary>Initializes a new instance of the <see cref="DnnHtmlHelper{TModel}"/> class.</summary>
         /// <param name="viewContext">The view context.</param>
         /// <param name="viewDataContainer">The ViewData container.</param>
@@ -19,6 +20,10 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public DnnHtmlHelper(ViewContext viewContext, IViewDataContainer viewDataContainer)
             : this(viewContext, viewDataContainer, (IServicesFramework)null)
         {
+		Logger.LogDebug(">>> Entering DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer})", viewContext, viewDataContainer);
+		Logger.LogDebug("<<< Exiting DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer})", viewContext, viewDataContainer);
+		Logger.LogDebug(">>> Entering DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},servicesFramework={ServicesFramework})", viewContext, viewDataContainer, servicesFramework);
+		Logger.LogDebug("<<< Exiting DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},servicesFramework={ServicesFramework})", viewContext, viewDataContainer, servicesFramework);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnHtmlHelper{TModel}"/> class.</summary>

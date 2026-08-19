@@ -17,7 +17,10 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <summary>Initializes a new instance of the <see cref="BaseCheck"/> class.</summary>
         public BaseCheck()
         {
+			logger.LogDebug(">>> Entering BaseCheck()");
             this.logger = new Lazy<ILog>(() => LoggerSource.Instance.GetLogger(this.GetType()));
+			logger.LogDebug("BaseCheck(): logger → {Logger}", logger);
+			logger.LogDebug("<<< Exiting BaseCheck()");
         }
 
         /// <inheritdoc cref="IAuditCheck.Id" />
@@ -36,6 +39,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc cref="IAuditCheck.Execute" />
         public virtual CheckResult Execute()
         {
+			logger.LogDebug(">>> Entering Execute()");
             try
             {
                 return this.ExecuteInternal();
@@ -43,6 +47,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             catch (Exception ex)
             {
                 this.Logger.Error($"{this.Id} failed.", ex);
+				logger.LogDebug("<<< Exiting Execute()");
                 return this.Unverified("An internal error occurred. See logs for details.");
             }
         }
@@ -54,6 +59,8 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc cref="Localization.GetString(string, string)" />
         protected virtual string GetLocalizedString(string key)
         {
+			logger.LogDebug(">>> Entering GetLocalizedString(key={Key})", key);
+			logger.LogDebug("<<< Exiting GetLocalizedString(key={Key})", key);
             return Localization.GetString(this.Id + key, this.LocalResourceFile);
         }
 
@@ -64,6 +71,8 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// of <see cref="SeverityEnum.Unverified"/>.</returns>
         protected virtual CheckResult Unverified(string reason)
         {
+			logger.LogDebug(">>> Entering Unverified(reason={Reason})", reason);
+			logger.LogDebug("<<< Exiting Unverified(reason={Reason})", reason);
             return new CheckResult(SeverityEnum.Unverified, this.Id)
             {
                 Notes = { reason },

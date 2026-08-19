@@ -10,6 +10,7 @@ namespace DotNetNuke.Common.Utilities
     /// <summary>Extension methods for <see cref="string"/>.</summary>
     public static class StringExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(StringExtensions));
         private static readonly Encoding Iso8859Encoding = Encoding.GetEncoding("iso-8859-8");
 
         /// <summary>Returns a value indicating whether the specified <paramref name="value"/> occurs within the <paramref name="source"/>, using the specified comparison rules.</summary>
@@ -19,8 +20,11 @@ namespace DotNetNuke.Common.Utilities
         /// <returns><see langword="true"/> if the <paramref name="value"/> parameter occurs within this string, or if <paramref name="value"/> is the empty string (<c>""</c>); otherwise, <see langword="false"/>.</returns>
         public static bool Contains(this string source, string value, StringComparison comparisonType)
         {
+			Logger.LogDebug(">>> Entering Contains(source={Source},value={Value},comparisonType={ComparisonType})", source, value, comparisonType);
             if (source is null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from Contains(source={Source},value={Value},comparisonType={ComparisonType})", source, value, comparisonType);
+			Logger.LogDebug("<<< Exiting Contains(source={Source},value={Value},comparisonType={ComparisonType})", source, value, comparisonType);
                 throw new ArgumentNullException(nameof(source));
             }
 
@@ -33,6 +37,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The trimmed value.</returns>
         public static string TrimToLength(this string source, int maxLength)
         {
+			Logger.LogDebug(">>> Entering TrimToLength(source={Source},maxLength={MaxLength})", source, maxLength);
+			Logger.LogDebug("<<< Exiting TrimToLength(source={Source},maxLength={MaxLength})", source, maxLength);
             return source == null || source.Length <= maxLength
                 ? source :
                 source.Substring(0, maxLength);
@@ -45,6 +51,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The combined <see cref="string"/>.</returns>
         public static string Append(this string stringValue, string stringToLink, string delimiter)
         {
+			Logger.LogDebug(">>> Entering Append(stringValue={StringValue},stringToLink={StringToLink},delimiter={Delimiter})", stringValue, stringToLink, delimiter);
             if (string.IsNullOrEmpty(stringValue))
             {
                 return stringToLink;
@@ -52,6 +59,7 @@ namespace DotNetNuke.Common.Utilities
 
             if (string.IsNullOrEmpty(stringToLink))
             {
+			Logger.LogDebug("<<< Exiting Append(stringValue={StringValue},stringToLink={StringToLink},delimiter={Delimiter})", stringValue, stringToLink, delimiter);
                 return stringValue;
             }
 
@@ -63,6 +71,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A <see cref="string"/> value that is not <see langword="null"/>.</returns>
         public static string ValueOrEmpty(this string stringValue)
         {
+			Logger.LogDebug(">>> Entering ValueOrEmpty(stringValue={StringValue})", stringValue);
+			Logger.LogDebug("<<< Exiting ValueOrEmpty(stringValue={StringValue})", stringValue);
             return stringValue ?? string.Empty;
         }
 
@@ -71,6 +81,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>String without diacritics.</returns>
         public static string NormalizeString(this string input)
         {
+			Logger.LogDebug(">>> Entering NormalizeString(input={Input})", input);
+			Logger.LogDebug("<<< Exiting NormalizeString(input={Input})", input);
             return string.IsNullOrEmpty(input)
                 ? input
                 : Iso8859Encoding.GetString(Encoding.Convert(Encoding.UTF8, Iso8859Encoding, Encoding.UTF8.GetBytes(input))).ToLowerInvariant();
@@ -83,8 +95,10 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The <paramref name="source"/> with <paramref name="oldValue"/> replaced by <paramref name="newValue"/>.</returns>
         public static string ReplaceIgnoreCase(this string source, string oldValue, string newValue)
         {
+			Logger.LogDebug(">>> Entering ReplaceIgnoreCase(source={Source},oldValue={OldValue},newValue={NewValue})", source, oldValue, newValue);
             if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(oldValue) || oldValue.Equals(newValue, StringComparison.OrdinalIgnoreCase))
             {
+			Logger.LogDebug("<<< Exiting ReplaceIgnoreCase(source={Source},oldValue={OldValue},newValue={NewValue})", source, oldValue, newValue);
                 return source;
             }
 

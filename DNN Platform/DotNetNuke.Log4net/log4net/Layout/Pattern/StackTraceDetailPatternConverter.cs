@@ -40,13 +40,17 @@ namespace log4net.Layout.Pattern
     {
         internal override string GetMethodInformation(MethodItem method)
         {
+			value.LogDebug(">>> Entering GetMethodInformation(method={Method})", method);
             string returnValue = string.Empty;
 
+			value.LogDebug("GetMethodInformation(method={Method}): returnValue → {ReturnValue}", method, returnValue);
             try
             {
                 string param = string.Empty;
+				value.LogDebug("GetMethodInformation(method={Method}): param → {Param}", method, param);
                 string[] names = method.Parameters;
                 StringBuilder sb = new StringBuilder();
+				value.LogDebug("GetMethodInformation(method={Method}): sb → {Sb}", method, sb);
                 if (names != null && names.GetUpperBound(0) > 0)
                 {
                     for (int i = 0; i <= names.GetUpperBound(0); i++)
@@ -68,6 +72,7 @@ namespace log4net.Layout.Pattern
                 LogLog.Error(declaringType, "An exception ocurred while retreiving method information.", ex);
             }
 
+			value.LogDebug("<<< Exiting GetMethodInformation(method={Method})", method);
             return returnValue;
         }
 

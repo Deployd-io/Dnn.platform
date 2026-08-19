@@ -12,15 +12,19 @@ namespace Dnn.PersonaBar.Prompt.Common
     {
         internal static bool IsRequestForSiteGroup(int portalId, int portalIdSiteGroup)
         {
+			eventLogger.LogDebug(">>> Entering IsRequestForSiteGroup(portalId={PortalId},portalIdSiteGroup={PortalIdSiteGroup})", portalId, portalIdSiteGroup);
             const int NO_SITE_GROUPID = -1;
             var isSiteGroupPage = false;
+			eventLogger.LogDebug("IsRequestForSiteGroup(portalId={PortalId},portalIdSiteGroup={PortalIdSiteGroup}): isSiteGroupPage → {IsSiteGroupPage}", portalId, portalIdSiteGroup, isSiteGroupPage);
             var portal = PortalController.Instance.GetPortal(portalIdSiteGroup);
+			eventLogger.LogDebug("IsRequestForSiteGroup(portalId={PortalId},portalIdSiteGroup={PortalIdSiteGroup}): portal → {Portal}", portalId, portalIdSiteGroup, portal);
 
             if (portal.PortalGroupID != NO_SITE_GROUPID)
             {
                 isSiteGroupPage = PortalGroupController.Instance.GetPortalsByGroup(portal.PortalGroupID).Any(p => p.PortalID == portalId);
             }
 
+			eventLogger.LogDebug("<<< Exiting IsRequestForSiteGroup(portalId={PortalId},portalIdSiteGroup={PortalIdSiteGroup})", portalId, portalIdSiteGroup);
             return isSiteGroupPage;
         }
     }

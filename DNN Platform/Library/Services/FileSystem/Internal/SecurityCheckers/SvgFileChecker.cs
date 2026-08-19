@@ -14,6 +14,7 @@ using System.Xml.Linq;
 /// <summary>An <see cref="IFileSecurityChecker"/> for SVG files.</summary>
 public class SvgFileChecker : IFileSecurityChecker
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SvgFileChecker));
     private static readonly XNamespace XlinkNamespace = "http://www.w3.org/1999/xlink";
 
     /// <seealso href="https://github.com/cure53/DOMPurify/blob/55970a919f65c24f2d5a18f07ab8b36f50a9bf2b/src/regexp.ts#L9-L11" />
@@ -346,6 +347,7 @@ public class SvgFileChecker : IFileSecurityChecker
     /// <inheritdoc />
     public bool Validate(Stream fileContent)
     {
+		Logger.LogDebug(">>> Entering Validate(fileContent={FileContent})", fileContent);
         try
         {
             return XDocument.Load(fileContent)
@@ -354,13 +356,16 @@ public class SvgFileChecker : IFileSecurityChecker
         }
         catch (Exception)
         {
+			Logger.LogError("Exception in Validate(fileContent={FileContent}): {Arg1}", fileContent, Exception.Message);
             // when an exception occurs, just return false as not validated, no need log the error.
+			Logger.LogDebug("<<< Exiting Validate(fileContent={FileContent})", fileContent);
             return false;
         }
     }
 
     private static bool IsValidSvgElement(XElement e)
     {
+		Logger.LogDebug(">>> Entering IsValidSvgElement(e={E})", e);
         return AllowedSvgElements.Contains(e.Name.LocalName)
             && e.Attributes().All(IsValidSvgAttribute);
 
@@ -387,6 +392,7 @@ public class SvgFileChecker : IFileSecurityChecker
                 && a.Value.StartsWith("data:", StringComparison.Ordinal)
                 && AllowedDataUriElements.Contains(e.Name.LocalName))
             {
+			Logger.LogDebug("<<< Exiting IsValidSvgElement(e={E})", e);
                 return true;
             }
 
@@ -396,6 +402,8 @@ public class SvgFileChecker : IFileSecurityChecker
 
     private static string TrimAttributeValue(string value)
     {
+		Logger.LogDebug(">>> Entering TrimAttributeValue(value={Value})", value);
+		Logger.LogDebug("<<< Exiting TrimAttributeValue(value={Value})", value);
         return AttributeWhitespaceRegex.Replace(value, string.Empty);
     }
 }

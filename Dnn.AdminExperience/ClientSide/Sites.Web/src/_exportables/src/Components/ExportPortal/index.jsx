@@ -21,6 +21,7 @@ import utilities from "utils";
 import stringUtils from "utils/string";
 import Localization from "localization";
 import "./style.less";
+const logger = console;
 
 const emptyExport = {
     fileName: "",
@@ -48,6 +49,7 @@ const keysToValidate = ["fileName", "description"];
 class ExportPortal extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             localData: {
                 locales: [],
@@ -59,9 +61,11 @@ class ExportPortal extends Component {
             portalBeingExported: emptyExport,
             reloadPages: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const { props } = this;
         props.dispatch(
             CommonExportPortalActions.getPortalLocales(
@@ -79,6 +83,7 @@ class ExportPortal extends Component {
             props.portalBeingExported.contentLocalizable;
                     portalBeingExported.localizationCulture =
             props.portalBeingExported.DefaultLanguage;
+					logger.debug('<<< Exiting UNSAFE_componentWillMount()');
                     this.setState({
                         portalBeingExported,
                         localData
@@ -109,6 +114,7 @@ class ExportPortal extends Component {
     }
 
     onExportPortal() {
+		logger.debug('>>> Entering onExportPortal()');
         const { props, state } = this;
         if (this.Validate()) {
             props.dispatch(
@@ -122,6 +128,7 @@ class ExportPortal extends Component {
                         this.setState({ portalBeingExported }, () => {
                             props.onCancel();
                         });
+						logger.debug('<<< Exiting onExportPortal()');
                     }
                 )
             );
@@ -137,6 +144,7 @@ class ExportPortal extends Component {
         return success;
     }
     ValidateTexts(key) {
+		logger.debug(`>>> Entering ValidateTexts(key=${key})`);
         let success = true;
         const { portalBeingExported } = this.state;
         const { localData } = this.state;
@@ -152,19 +160,25 @@ class ExportPortal extends Component {
             this.setState({});
         });
 
+		logger.debug(`<<< Exiting ValidateTexts(key=${key})`);
         return success;
     }
     onLanguageSelectionChange(option) {
+		logger.debug(`>>> Entering onLanguageSelectionChange(option=${option})`);
         let { portalBeingExported } = this.state;
         const reloadPages = true;
         portalBeingExported.localizationCulture = option.value;
+		logger.debug(`onLanguageSelectionChange(option=${option}): portalBeingExported.localizationCulture → ${portalBeingExported.localizationCulture}`);
         this.setState({ portalBeingExported, reloadPages }, () => {
+			logger.debug(`<<< Exiting onLanguageSelectionChange(option=${option})`);
             this.setState({
                 reloadPages: false
             });
         });
     }
     createLocaleOptions(native) {
+		logger.debug(`>>> Entering createLocaleOptions(native=${native})`);
+		logger.debug(`<<< Exiting createLocaleOptions(native=${native})`);
         return this.state.localData.locales.map(locale => {
             if (native)
             //There is need of mechanism to get native name
@@ -173,6 +187,7 @@ class ExportPortal extends Component {
         });
     }
     onLanguageCheckBoxChange(Code, event) {
+		logger.debug(`>>> Entering onLanguageCheckBoxChange(Code=${Code},event=${event})`);
         let { portalBeingExported } = this.state;
         if (event && !portalBeingExported.locales.some(sl => sl === Code)) {
             portalBeingExported.locales = portalBeingExported.locales.concat([Code]);
@@ -182,9 +197,12 @@ class ExportPortal extends Component {
             );
         }
         this.setState({ portalBeingExported });
+		logger.debug(`<<< Exiting onLanguageCheckBoxChange(Code=${Code},event=${event})`);
     }
     createLanguageDropDownOptions() {
+		logger.debug('>>> Entering createLanguageDropDownOptions()');
         let { state } = this;
+		logger.debug('<<< Exiting createLanguageDropDownOptions()');
         return state.localData.locales.map(locale => {
             return {
                 label: (
@@ -216,14 +234,19 @@ class ExportPortal extends Component {
         });
     }
     updatePagesToExport(selectedPages) {
+		logger.debug(`>>> Entering updatePagesToExport(selectedPages=${selectedPages})`);
         let { portalBeingExported } = this.state;
         portalBeingExported.pages = selectedPages;
+		logger.debug(`updatePagesToExport(selectedPages=${selectedPages}): portalBeingExported.pages → ${portalBeingExported.pages}`);
         this.setState({ portalBeingExported });
+		logger.debug(`<<< Exiting updatePagesToExport(selectedPages=${selectedPages})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props, state } = this;
         const localeOptions = this.createLocaleOptions();
+		logger.debug(`render(): localeOptions → ${localeOptions}`);
         const dropdownOptions = this.createLanguageDropDownOptions();
         const PortalTabsParameters = {
             portalId: props.portalBeingExported.PortalID,
@@ -234,6 +257,7 @@ class ExportPortal extends Component {
             roles: "",
             sortOrder: 0
         };
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className="export-portal-container">
                 <PersonaBarPageHeader
@@ -402,6 +426,8 @@ ExportPortal.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         portalBeingExported: state.exportPortal.portalBeingExported
     };

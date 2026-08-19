@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class CorruptMetadataException : ApplicationException
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CorruptMetadataException));
     /// <inheritdoc />
     public CorruptMetadataException()
     {
+	Logger.LogDebug(">>> Entering CorruptMetadataException()");
+	Logger.LogDebug("<<< Exiting CorruptMetadataException()");
     }
 
     /// <inheritdoc />
     public CorruptMetadataException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering CorruptMetadataException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting CorruptMetadataException(message={Message})", message);
 
     /// <inheritdoc />
     public CorruptMetadataException(string message, Exception innerException)

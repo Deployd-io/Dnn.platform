@@ -1,3 +1,4 @@
+const logger = console;
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Contact } from '../types/Contact';
@@ -18,6 +19,7 @@ interface FormErrors {
 }
 
 export default function ContactForm({ moduleContext }: ContactFormProps) {
+logger.debug(`>>> Entering ContactForm(moduleContext=${moduleContext})`);
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEditMode = id !== undefined;
@@ -53,9 +55,11 @@ export default function ContactForm({ moduleContext }: ContactFormProps) {
   }, [id]);
 
   const loadContact = async (contactId: number) => {
+	logger.debug(`>>> Entering loadContact(contactId=${contactId})`);
     try {
       setLoading(true);
       const response = await getContact(moduleContext, contactId);
+	logger.debug(`loadContact(contactId=${contactId}): response → ${response}`);
       setContact(response);
     } catch (err) {
       console.error('Error loading contact:', err);
@@ -63,6 +67,7 @@ export default function ContactForm({ moduleContext }: ContactFormProps) {
       navigate('/');
     } finally {
       setLoading(false);
+	logger.debug(`<<< Exiting loadContact(contactId=${contactId})`);
     }
   };
 
@@ -121,6 +126,7 @@ export default function ContactForm({ moduleContext }: ContactFormProps) {
   };
 
   const handleSave = async () => {
+	logger.debug('>>> Entering handleSave()');
     if (!validateForm()) {
       return;
     }
@@ -128,6 +134,7 @@ export default function ContactForm({ moduleContext }: ContactFormProps) {
     try {
       setLoading(true);
       const response = await saveContact(moduleContext, contact);
+	logger.debug(`handleSave(): response → ${response}`);
 
       setContact(response);
       navigate('/');
@@ -137,12 +144,16 @@ export default function ContactForm({ moduleContext }: ContactFormProps) {
     } finally {
       setLoading(false);
     }
+	logger.debug('<<< Exiting handleSave()');
   };
 
   const handleCancel = () => {
+	logger.debug('>>> Entering handleCancel()');
     navigate('/');
+	logger.debug('<<< Exiting handleCancel()');
   };
 
+logger.debug(`<<< Exiting ContactForm(moduleContext=${moduleContext})`);
   return (
     <div className="contactList-container">
       <div className="editContact">

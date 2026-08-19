@@ -2,12 +2,15 @@ import React, {Component } from "react";
 import PropTypes from "prop-types";
 import { Label, InputGroup, Dropdown } from "@dnnsoftware/dnn-react-common";
 import GlobalIcon from "./GlobalIcon";
+const logger = console;
 
 export default class DropdownBlock extends Component {
     
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
 
+		logger.debug('<<< Exiting render()');
         return <InputGroup>
             <Label className="title"
                 tooltipMessage={props.tooltip}

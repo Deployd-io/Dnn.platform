@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.Installer.Installers
 
     public class JavaScriptFileInstaller : FileInstaller
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JavaScriptFileInstaller));
         /// <summary>Gets a list of allowable file extensions (in addition to the Host's List).</summary>
         /// <value>A String.</value>
         public override string AllowableFiles
@@ -47,12 +48,16 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <param name="nav">The XPathNavigator representing the node.</param>
         protected override void ReadCustomManifest(XPathNavigator nav)
         {
+			Logger.LogDebug(">>> Entering ReadCustomManifest(nav={Nav})", nav);
             var libraryNav = nav.SelectSingleNode("libraryFolderName");
             if (libraryNav != null)
             {
                 var version = Globals.FormatVersion(this.Package.Version, "00", 3, "_");
+				Logger.LogDebug("ReadCustomManifest(nav={Nav}): version → {Version}", nav, version);
                 this.BasePath = $@"Resources\Libraries\{libraryNav.Value}\{version}";
+				Logger.LogDebug("ReadCustomManifest(nav={Nav}): this.BasePath → {Arg1}", nav, this.BasePath);
             }
+			Logger.LogDebug("<<< Exiting ReadCustomManifest(nav={Nav})", nav);
         }
     }
 }

@@ -1,8 +1,11 @@
 import { task as ActionTypes } from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
+const logger = console;
 
 const taskActions = {
     getTaskStatusList(searchParameters, callback) {
+		logger.debug(`>>> Entering getTaskStatusList(searchParameters=${searchParameters},callback=${callback})`);
+		logger.debug(`<<< Exiting getTaskStatusList(searchParameters=${searchParameters},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getTaskStatusList(searchParameters, data => {
                 dispatch({
@@ -26,6 +29,8 @@ const taskActions = {
         };
     },
     startSchedule(callback) {
+		logger.debug(`>>> Entering startSchedule(callback=${callback})`);
+		logger.debug(`<<< Exiting startSchedule(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.startSchedule(data => {
                 dispatch({
@@ -41,6 +46,8 @@ const taskActions = {
         };
     },
     stopSchedule(callback) {
+		logger.debug(`>>> Entering stopSchedule(callback=${callback})`);
+		logger.debug(`<<< Exiting stopSchedule(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.stopSchedule(data => {
                 dispatch({
@@ -56,6 +63,8 @@ const taskActions = {
         };
     },
     getSchedulerSettings(callback) {
+		logger.debug(`>>> Entering getSchedulerSettings(callback=${callback})`);
+		logger.debug(`<<< Exiting getSchedulerSettings(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getSchedulerSettings(data => {
                 dispatch({
@@ -73,6 +82,8 @@ const taskActions = {
         };
     },
     updateSchedulerSettings(payload, callback) {
+		logger.debug(`>>> Entering updateSchedulerSettings(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting updateSchedulerSettings(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.updateSchedulerSettings(payload, data => {
                 dispatch({
@@ -90,6 +101,8 @@ const taskActions = {
         };
     },
     updateSchedulerStatusOnProgress(callback) {
+		logger.debug(`>>> Entering updateSchedulerStatusOnProgress(callback=${callback})`);
+		logger.debug(`<<< Exiting updateSchedulerStatusOnProgress(callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.UPDATED_SCHEDULE_SETTINGS_PENDING,
@@ -103,6 +116,8 @@ const taskActions = {
         };
     },
     getScheduleItemHistory(searchParameters, callback) {
+		logger.debug(`>>> Entering getScheduleItemHistory(searchParameters=${searchParameters},callback=${callback})`);
+		logger.debug(`<<< Exiting getScheduleItemHistory(searchParameters=${searchParameters},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getScheduleItemHistory(searchParameters, data => {
                 dispatch({
@@ -119,6 +134,8 @@ const taskActions = {
         };
     },
     getSchedulerItemList(searchParameters, callback) {
+		logger.debug(`>>> Entering getSchedulerItemList(searchParameters=${searchParameters},callback=${callback})`);
+		logger.debug(`<<< Exiting getSchedulerItemList(searchParameters=${searchParameters},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getScheduleItems(searchParameters, data => {
                 dispatch({
@@ -135,6 +152,8 @@ const taskActions = {
         };
     },
     getServerList(callback) {
+		logger.debug(`>>> Entering getServerList(callback=${callback})`);
+		logger.debug(`<<< Exiting getServerList(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getServerList(data => {
                 dispatch({
@@ -151,6 +170,8 @@ const taskActions = {
         };
     },
     getGetScheduleItem(searchParameters, callback) {
+		logger.debug(`>>> Entering getGetScheduleItem(searchParameters=${searchParameters},callback=${callback})`);
+		logger.debug(`<<< Exiting getGetScheduleItem(searchParameters=${searchParameters},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getGetScheduleItem(searchParameters, data => {
                 dispatch({
@@ -168,6 +189,8 @@ const taskActions = {
         };
     },
     deleteSchedule(payload, schedulerItemList, callback) {
+		logger.debug(`>>> Entering deleteSchedule(payload=${payload},schedulerItemList=${schedulerItemList},callback=${callback})`);
+		logger.debug(`<<< Exiting deleteSchedule(payload=${payload},schedulerItemList=${schedulerItemList},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.deleteScheduleItem(payload, data => {
                 dispatch({
@@ -184,6 +207,8 @@ const taskActions = {
         };
     },
     createScheduleItem(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering createScheduleItem(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting createScheduleItem(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.createScheduleItem(payload, data => {
                 dispatch({
@@ -204,6 +229,8 @@ const taskActions = {
         };
     },
     updateScheduleItem(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updateScheduleItem(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateScheduleItem(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateScheduleItem(payload, data => {
                 dispatch({
@@ -224,6 +251,8 @@ const taskActions = {
         };
     },
     runScheduleItem(payload, callback) {
+		logger.debug(`>>> Entering runScheduleItem(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting runScheduleItem(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.runScheduleItem(payload, data => {
                 dispatch({
@@ -239,6 +268,8 @@ const taskActions = {
         };
     },
     settingsClientModified(parameter) {
+		logger.debug(`>>> Entering settingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting settingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SCHEDULE_ITEM_SETTINS_CLIENT_MODIFIED,
@@ -250,6 +281,8 @@ const taskActions = {
         };
     },
     cancelSettingsClientModified() {
+		logger.debug('>>> Entering cancelSettingsClientModified()');
+		logger.debug('<<< Exiting cancelSettingsClientModified()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CANCELED_SCHEDULE_ITEM_SETTINS_CLIENT_MODIFIED,

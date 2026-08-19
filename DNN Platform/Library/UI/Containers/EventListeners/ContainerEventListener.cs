@@ -6,6 +6,7 @@ namespace DotNetNuke.UI.Containers.EventListeners
 {
     public class ContainerEventListener
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ContainerEventListener));
         private readonly ContainerEventHandler containerEvent;
         private readonly ContainerEventType type;
 
@@ -14,8 +15,12 @@ namespace DotNetNuke.UI.Containers.EventListeners
         /// <param name="e">The event handler.</param>
         public ContainerEventListener(ContainerEventType type, ContainerEventHandler e)
         {
+			Logger.LogDebug(">>> Entering ContainerEventListener(type={Type},e={E})", type, e);
             this.type = type;
             this.containerEvent = e;
+			Logger.LogDebug("ContainerEventListener(type={Type},e={E}): containerEvent → {ContainerEvent}", type, e, containerEvent);
+			Logger.LogDebug("ContainerEventListener(type={Type},e={E}): this.type → {Arg2}", type, e, this.type);
+			Logger.LogDebug("<<< Exiting ContainerEventListener(type={Type},e={E})", type, e);
         }
 
         public ContainerEventType EventType

@@ -15,11 +15,14 @@ namespace DotNetNuke.Services.Exceptions
 
     public class ErrorContainer : Control
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ErrorContainer));
         /// <summary>Initializes a new instance of the <see cref="ErrorContainer"/> class.</summary>
         /// <param name="strError">The error message.</param>
         public ErrorContainer(string strError)
         {
+			Logger.LogDebug(">>> Entering ErrorContainer(strError={StrError})", strError);
             this.Container = FormatException(strError);
+			Logger.LogDebug("<<< Exiting ErrorContainer(strError={StrError})", strError);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ErrorContainer"/> class.</summary>
@@ -27,9 +30,11 @@ namespace DotNetNuke.Services.Exceptions
         /// <param name="exc">The exception.</param>
         public ErrorContainer(string strError, Exception exc)
         {
+			Logger.LogDebug(">>> Entering ErrorContainer(strError={StrError},exc={Exc})", strError, exc);
             UserInfo objUserInfo = UserController.Instance.GetCurrentUserInfo();
             if (objUserInfo.IsSuperUser)
             {
+				Logger.LogDebug("<<< Exiting ErrorContainer(strError={StrError})", strError);
                 this.Container = FormatException(strError, exc);
             }
             else
@@ -51,8 +56,12 @@ namespace DotNetNuke.Services.Exceptions
 
         private static ModuleMessage FormatException(string strError)
         {
+			Logger.LogDebug(">>> Entering FormatException(strError={StrError})", strError);
             ModuleMessage m;
             m = UI.Skins.Skin.GetModuleMessageControl(Localization.GetString("ErrorOccurred"), strError, ModuleMessage.ModuleMessageType.RedError);
+			Logger.LogDebug("FormatException(strError={StrError}): m → {M}", strError, m);
+			Logger.LogDebug("<<< Exiting FormatException(strError={StrError})", strError);
+			Logger.LogDebug("<<< Exiting FormatException(strError={StrError},exc={Exc})", strError, exc);
             return m;
         }
 

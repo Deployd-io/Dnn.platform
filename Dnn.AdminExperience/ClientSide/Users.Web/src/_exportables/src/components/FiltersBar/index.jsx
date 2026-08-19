@@ -2,11 +2,13 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import "./style.less";
 import Localization from "localization";
+const logger = console;
 import { Dropdown, SearchBox, GridCell } from "@dnnsoftware/dnn-react-common";
 
 class FiltersBar extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             selectedUserFilter: {
                 label: Localization.get("Authorized"),
@@ -14,6 +16,7 @@ class FiltersBar extends Component {
             },
             searchText: ""
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
     onSelect(option) {
         let { label} = option;
@@ -44,24 +47,30 @@ class FiltersBar extends Component {
     }
 
     onKeywordChanged(text) {
+		logger.debug(`>>> Entering onKeywordChanged(text=${text})`);
         this.setState({
             searchText: text
         }, () => {
             this.props.onChange(this.state.selectedUserFilter, text);
         });
+		logger.debug(`<<< Exiting onKeywordChanged(text=${text})`);
     }
 
     BuildUserFiltersOptions() {
+		logger.debug('>>> Entering BuildUserFiltersOptions()');
         let {userFilters} = this.props;
         let userFiltersOptions = [];
         userFiltersOptions = userFilters.map((userFilter) => {
+		logger.debug('<<< Exiting BuildUserFiltersOptions()');
             return { label: userFilter.Key, value: userFilter.Value };
         });
         return userFiltersOptions;
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let userFiltersOptions = this.BuildUserFiltersOptions();
+		logger.debug('<<< Exiting render()');
         return (<div className="users-filter-container">
             <GridCell columnSize={35} >
                 {userFiltersOptions &&

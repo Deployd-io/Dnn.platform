@@ -1,6 +1,7 @@
 import { Component, Host, h, Element, State, Event, EventEmitter } from '@stencil/core';
 import { CreateNewFolderRequest, FolderMappingInfo, ItemsClient } from '../../services/ItemsClient';
 import state from '../../store/store';
+const logger = console;
 
 @Component({
   tag: 'dnn-rm-create-folder',
@@ -29,12 +30,16 @@ export class DnnRmCreateFolder {
   private nameField: HTMLDnnInputElement;
 
   constructor(){
+	logger.debug('>>> Entering constructor()');
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   async componentWillLoad() {
+	logger.debug('>>> Entering componentWillLoad()');
     try {
       const data = await this.itemsClient.getFolderMappings();
+	logger.debug(`componentWillLoad(): data → ${data}`);
       this.folderMappings = data.sort((a, b) => a.FolderMappingID - b.FolderMappingID);
       this.newFolderRequest = {
         ...this.newFolderRequest,
@@ -43,24 +48,30 @@ export class DnnRmCreateFolder {
       };
     } catch (error) {
       alert(error);
+	logger.debug('<<< Exiting componentWillLoad()');
     }
   }
 
   componentDidLoad() {
+	logger.debug('>>> Entering componentDidLoad()');
     setTimeout(() => {
       this.nameField.focus();
     }, 350);
+	logger.debug('<<< Exiting componentDidLoad()');
   }
 
   private async handleCancel() {
+	logger.debug('>>> Entering handleCancel()');
     const modal = this.el.parentElement as HTMLDnnModalElement;
     await modal.hide();
     setTimeout(() => {
       document.body.removeChild(modal);
     }, 300);
+	logger.debug('<<< Exiting handleCancel()');
   }
 
   private async handleSave(e: Event) {
+	logger.debug(`>>> Entering handleSave(e=${e})`);
     e.preventDefault();
     try {
       await this.itemsClient.createNewFolder(this.newFolderRequest)
@@ -76,15 +87,20 @@ export class DnnRmCreateFolder {
         }, 300);
     } catch (error) {
       alert(error);
+	logger.debug(`<<< Exiting handleSave(e=${e})`);
     }
   }
 
   private canChooseFolderProvider() {
+	logger.debug('>>> Entering canChooseFolderProvider()');
+	logger.debug('<<< Exiting canChooseFolderProvider()');
     return this.folderMappings &&
       this.folderMappings.find(f => f.FolderMappingID == state.currentItems.folder.folderMappingId).IsDefault;
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <h2>{state.localization.AddFolder}</h2>

@@ -1,9 +1,11 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 // declare global: diff_match_patch, DIFF_INSERT, DIFF_DELETE, DIFF_EQUAL
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("diff_match_patch"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -14,10 +16,14 @@
   "use strict";
   var Pos = CodeMirror.Pos;
   var svgNS = "http://www.w3.org/2000/svg";
+logger.debug(`<<< Exiting function(exports=${exports})`);
+logger.debug(`function(exports=${exports}): svgNS → ${svgNS}`);
 
   function DiffView(mv, type) {
+	logger.debug(`>>> Entering DiffView(mv=${mv},type=${type})`);
     this.mv = mv;
     this.type = type;
+	logger.debug(`DiffView(mv=${mv},type=${type}): mv → ${mv}`);
     this.classes = type == "left"
       ? {chunk: "CodeMirror-merge-l-chunk",
          start: "CodeMirror-merge-l-chunk-start",
@@ -31,6 +37,10 @@
          insert: "CodeMirror-merge-r-inserted",
          del: "CodeMirror-merge-r-deleted",
          connect: "CodeMirror-merge-r-connect"};
+		logger.debug(`DiffView(mv=${mv},type=${type}): type → ${type}`);
+		logger.debug(`DiffView(mv=${mv},type=${type}): this.mv → ${this.mv}`);
+		logger.debug(`DiffView(mv=${mv},type=${type}): this.type → ${this.type}`);
+		logger.debug(`<<< Exiting DiffView(mv=${mv},type=${type})`);
   }
 
   DiffView.prototype = {
@@ -39,41 +49,52 @@
       this.edit = this.mv.edit;
       (this.edit.state.diffViews || (this.edit.state.diffViews = [])).push(this);
       this.orig = CodeMirror(pane, copyObj({value: orig, readOnly: !this.mv.options.allowEditingOriginals}, copyObj(options)));
+	logger.debug(`init(pane=${pane},orig=${orig},options=${options}): this.edit → ${this.edit}`);
       this.orig.state.diffViews = [this];
 
+	logger.debug(`init(pane=${pane},orig=${orig},options=${options}): orig → ${orig}`);
       this.diff = getDiff(asString(orig), asString(options.value));
       this.chunks = getChunks(this.diff);
       this.diffOutOfDate = this.dealigned = false;
 
       this.showDifferences = options.showDifferences !== false;
       this.forceUpdate = registerUpdate(this);
+	logger.debug(`init(pane=${pane},orig=${orig},options=${options}): this.diffOutOfDate → ${this.diffOutOfDate}`);
       setScrollLock(this, true, false);
       registerScroll(this);
+	logger.debug(`<<< Exiting init(pane=${pane},orig=${orig},options=${options})`);
     },
     setShowDifferences: function(val) {
+	logger.debug(`>>> Entering setShowDifferences(val=${val})`);
       val = val !== false;
       if (val != this.showDifferences) {
         this.showDifferences = val;
         this.forceUpdate("full");
+		logger.debug(`<<< Exiting setShowDifferences(val=${val})`);
       }
     }
   };
 
   function ensureDiff(dv) {
+	logger.debug(`>>> Entering ensureDiff(dv=${dv})`);
     if (dv.diffOutOfDate) {
       dv.diff = getDiff(dv.orig.getValue(), dv.edit.getValue());
       dv.chunks = getChunks(dv.diff);
       dv.diffOutOfDate = false;
+	logger.debug(`ensureDiff(dv=${dv}): dv.diffOutOfDate → ${dv.diffOutOfDate}`);
       CodeMirror.signal(dv.edit, "updateDiff", dv.diff);
+	logger.debug(`<<< Exiting ensureDiff(dv=${dv})`);
     }
   }
 
   var updating = false;
   function registerUpdate(dv) {
+	logger.debug(`>>> Entering registerUpdate(dv=${dv})`);
     var edit = {from: 0, to: 0, marked: []};
     var orig = {from: 0, to: 0, marked: []};
     var debounceChange, updatingFast = false;
     function update(mode) {
+	logger.debug(`>>> Entering update(mode=${mode})`);
       updating = true;
       updatingFast = false;
       if (mode == "full") {
@@ -93,25 +114,32 @@
       if (dv.mv.options.connect == "align")
         alignChunks(dv);
       updating = false;
+	logger.debug(`<<< Exiting update(mode=${mode})`);
     }
     function setDealign(fast) {
+	logger.debug(`>>> Entering setDealign(fast=${fast})`);
       if (updating) return;
       dv.dealigned = true;
       set(fast);
+	logger.debug(`<<< Exiting setDealign(fast=${fast})`);
     }
     function set(fast) {
+	logger.debug(`>>> Entering set(fast=${fast})`);
       if (updating || updatingFast) return;
       clearTimeout(debounceChange);
       if (fast === true) updatingFast = true;
       debounceChange = setTimeout(update, fast === true ? 20 : 250);
+	logger.debug(`<<< Exiting set(fast=${fast})`);
     }
     function change(_cm, change) {
+	logger.debug(`>>> Entering change(_cm=${_cm},change=${change})`);
       if (!dv.diffOutOfDate) {
         dv.diffOutOfDate = true;
         edit.from = edit.to = orig.from = orig.to = 0;
       }
       // Update faster when a line was added/removed
       setDealign(change.text.length - 1 != change.to.line - change.from.line);
+	logger.debug(`<<< Exiting change(_cm=${_cm},change=${change})`);
     }
     dv.edit.on("change", change);
     dv.orig.on("change", change);
@@ -122,16 +150,23 @@
     dv.edit.on("viewportChange", function() { set(false); });
     dv.orig.on("viewportChange", function() { set(false); });
     update();
+	logger.debug(`<<< Exiting registerUpdate(dv=${dv})`);
     return update;
   }
 
   function registerScroll(dv) {
+	logger.debug(`>>> Entering registerScroll(dv=${dv})`);
     dv.edit.on("scroll", function() {
+	logger.debug('>>> Entering on()');
       syncScroll(dv, DIFF_INSERT) && makeConnections(dv);
     });
     dv.orig.on("scroll", function() {
       syncScroll(dv, DIFF_DELETE) && makeConnections(dv);
     });
+	logger.debug(`>>> Entering makeConnections(dv=${dv})`);
+	logger.debug('<<< Exiting on()');
+	logger.debug(`<<< Exiting registerScroll(dv=${dv})`);
+	logger.debug(`<<< Exiting makeConnections(dv=${dv})`);
   }
 
   function syncScroll(dv, type) {
@@ -139,6 +174,7 @@
     if (dv.diffOutOfDate) return false;
     if (!dv.lockScroll) return true;
     var editor, other, now = +new Date;
+	logger.debug(`>>> Entering syncScroll(dv=${dv},type=${type})`);
     if (type == DIFF_INSERT) { editor = dv.edit; other = dv.orig; }
     else { editor = dv.orig; other = dv.edit; }
     // Don't take action if the position of this editor was recently set
@@ -147,24 +183,32 @@
 
     var sInfo = editor.getScrollInfo();
     if (dv.mv.options.connect == "align") {
+	logger.debug(`syncScroll(dv=${dv},type=${type}): sInfo → ${sInfo}`);
       targetPos = sInfo.top;
     } else {
       var halfScreen = .5 * sInfo.clientHeight, midY = sInfo.top + halfScreen;
       var mid = editor.lineAtHeight(midY, "local");
       var around = chunkBoundariesAround(dv.chunks, mid, type == DIFF_INSERT);
+	logger.debug(`syncScroll(dv=${dv},type=${type}): mid → ${mid}`);
       var off = getOffsets(editor, type == DIFF_INSERT ? around.edit : around.orig);
       var offOther = getOffsets(other, type == DIFF_INSERT ? around.orig : around.edit);
+	logger.debug(`syncScroll(dv=${dv},type=${type}): around → ${around}`);
       var ratio = (midY - off.top) / (off.bot - off.top);
       var targetPos = (offOther.top - halfScreen) + ratio * (offOther.bot - offOther.top);
+	logger.debug(`syncScroll(dv=${dv},type=${type}): targetPos → ${targetPos}`);
+	logger.debug(`syncScroll(dv=${dv},type=${type}): off → ${off}`);
 
       var botDist, mix;
       // Some careful tweaking to make sure no space is left out of view
       // when scrolling to top or bottom.
       if (targetPos > sInfo.top && (mix = sInfo.top / halfScreen) < 1) {
+		logger.debug(`syncScroll(dv=${dv},type=${type}): offOther → ${offOther}`);
         targetPos = targetPos * mix + sInfo.top * (1 - mix);
       } else if ((botDist = sInfo.height - sInfo.clientHeight - sInfo.top) < halfScreen) {
+		logger.debug(`syncScroll(dv=${dv},type=${type}): ratio → ${ratio}`);
         var otherInfo = other.getScrollInfo();
         var botDistOther = otherInfo.height - otherInfo.clientHeight - targetPos;
+		logger.debug(`syncScroll(dv=${dv},type=${type}): otherInfo → ${otherInfo}`);
         if (botDistOther > botDist && (mix = botDist / halfScreen) < 1)
           targetPos = targetPos * mix + (otherInfo.height - otherInfo.clientHeight - botDist) * (1 - mix);
       }
@@ -173,25 +217,32 @@
     other.scrollTo(sInfo.left, targetPos);
     other.state.scrollSetAt = now;
     other.state.scrollSetBy = dv;
+	logger.debug(`<<< Exiting syncScroll(dv=${dv},type=${type})`);
     return true;
   }
 
   function getOffsets(editor, around) {
+	logger.debug(`>>> Entering getOffsets(editor=${editor},around=${around})`);
     var bot = around.after;
     if (bot == null) bot = editor.lastLine() + 1;
+	logger.debug(`<<< Exiting getOffsets(editor=${editor},around=${around})`);
     return {top: editor.heightAtLine(around.before || 0, "local"),
             bot: editor.heightAtLine(bot, "local")};
   }
 
   function setScrollLock(dv, val, action) {
+	logger.debug(`>>> Entering setScrollLock(dv=${dv},val=${val},action=${action})`);
     dv.lockScroll = val;
     if (val && action != false) syncScroll(dv, DIFF_INSERT) && makeConnections(dv);
+	logger.debug(`setScrollLock(dv=${dv},val=${val},action=${action}): dv.lockScroll → ${dv.lockScroll}`);
     dv.lockButton.innerHTML = val ? "\u21db\u21da" : "\u21db&nbsp;&nbsp;\u21da";
+	logger.debug(`<<< Exiting setScrollLock(dv=${dv},val=${val},action=${action})`);
   }
 
   // Updating the marks for editor content
 
   function clearMarks(editor, arr, classes) {
+	logger.debug(`>>> Entering clearMarks(editor=${editor},arr=${arr},classes=${classes})`);
     for (var i = 0; i < arr.length; ++i) {
       var mark = arr[i];
       if (mark instanceof CodeMirror.TextMarker) {
@@ -203,17 +254,22 @@
       }
     }
     arr.length = 0;
+	logger.debug(`clearMarks(editor=${editor},arr=${arr},classes=${classes}): arr.length → ${arr.length}`);
+	logger.debug(`<<< Exiting clearMarks(editor=${editor},arr=${arr},classes=${classes})`);
   }
 
   // FIXME maybe add a margin around viewport to prevent too many updates
   function updateMarks(editor, diff, state, type, classes) {
+	logger.debug(`>>> Entering updateMarks(editor=${editor},diff=${diff},state=${state},type=${type},classes=${classes})`);
     var vp = editor.getViewport();
     editor.operation(function() {
+	logger.debug('>>> Entering operation()');
       if (state.from == state.to || vp.from - state.to > 20 || state.from - vp.to > 20) {
         clearMarks(editor, state.marked, classes);
         markChanges(editor, diff, type, state.marked, vp.from, vp.to, classes);
         state.from = vp.from; state.to = vp.to;
       } else {
+		logger.debug(`operation(): state.from → ${state.from}`);
         if (vp.from < state.from) {
           markChanges(editor, diff, type, state.marked, vp.from, state.from, classes);
           state.from = vp.from;
@@ -221,19 +277,28 @@
         if (vp.to > state.to) {
           markChanges(editor, diff, type, state.marked, state.to, vp.to, classes);
           state.to = vp.to;
+		logger.debug('<<< Exiting operation()');
         }
       }
     });
+	logger.debug(`updateMarks(editor=${editor},diff=${diff},state=${state},type=${type},classes=${classes}): state.to → ${state.to}`);
+	logger.debug(`<<< Exiting updateMarks(editor=${editor},diff=${diff},state=${state},type=${type},classes=${classes})`);
   }
 
   function markChanges(editor, diff, type, marks, from, to, classes) {
+	logger.debug(`>>> Entering markChanges(editor=${editor},diff=${diff},type=${type},marks=${marks},from=${from},to=${to},classes=${classes})`);
     var pos = Pos(0, 0);
     var top = Pos(from, 0), bot = editor.clipPos(Pos(to - 1));
+	logger.debug(`markChanges(editor=${editor},diff=${diff},type=${type},marks=${marks},from=${from},to=${to},classes=${classes}): pos → ${pos}`);
+	logger.debug(`markChanges(editor=${editor},diff=${diff},type=${type},marks=${marks},from=${from},to=${to},classes=${classes}): top → ${top}`);
     var cls = type == DIFF_DELETE ? classes.del : classes.insert;
+	logger.debug(`<<< Exiting markChanges(editor=${editor},diff=${diff},type=${type},marks=${marks},from=${from},to=${to},classes=${classes})`);
     function markChunk(start, end) {
       var bfrom = Math.max(from, start), bto = Math.min(to, end);
+	logger.debug(`>>> Entering markChunk(start=${start},end=${end})`);
       for (var i = bfrom; i < bto; ++i) {
         var line = editor.addLineClass(i, "background", classes.chunk);
+		logger.debug(`markChunk(start=${start},end=${end}): line → ${line}`);
         if (i == start) editor.addLineClass(line, "background", classes.start);
         if (i == end - 1) editor.addLineClass(line, "background", classes.end);
         marks.push(line);
@@ -284,7 +349,9 @@
     if (dv.copyButtons) clear(dv.copyButtons);
 
     var vpEdit = dv.edit.getViewport(), vpOrig = dv.orig.getViewport();
+	logger.debug(`makeConnections(dv=${dv}): vpEdit → ${vpEdit}`);
     var sTopEdit = dv.edit.getScrollInfo().top, sTopOrig = dv.orig.getScrollInfo().top;
+	logger.debug(`makeConnections(dv=${dv}): sTopEdit → ${sTopEdit}`);
     for (var i = 0; i < dv.chunks.length; i++) {
       var ch = dv.chunks[i];
       if (ch.editFrom <= vpEdit.to && ch.editTo >= vpEdit.from &&
@@ -294,6 +361,7 @@
   }
 
   function getMatchingOrigLine(editLine, chunks) {
+	logger.debug(`>>> Entering getMatchingOrigLine(editLine=${editLine},chunks=${chunks})`);
     var editStart = 0, origStart = 0;
     for (var i = 0; i < chunks.length; i++) {
       var chunk = chunks[i];
@@ -302,10 +370,13 @@
       editStart = chunk.editTo;
       origStart = chunk.origTo;
     }
+	logger.debug(`getMatchingOrigLine(editLine=${editLine},chunks=${chunks}): origStart → ${origStart}`);
+	logger.debug(`<<< Exiting getMatchingOrigLine(editLine=${editLine},chunks=${chunks})`);
     return origStart + (editLine - editStart);
   }
 
   function findAlignedLines(dv, other) {
+	logger.debug(`>>> Entering findAlignedLines(dv=${dv},other=${other})`);
     var linesToAlign = [];
     for (var i = 0; i < dv.chunks.length; i++) {
       var chunk = dv.chunks[i];
@@ -327,28 +398,35 @@
           linesToAlign.splice(j - 1, 0, [getMatchingOrigLine(chunk.editTo, dv.chunks), chunk.editTo, chunk.origTo]);
       }
     }
+	logger.debug(`<<< Exiting findAlignedLines(dv=${dv},other=${other})`);
     return linesToAlign;
   }
 
   function alignChunks(dv, force) {
+	logger.debug(`>>> Entering alignChunks(dv=${dv},force=${force})`);
     if (!dv.dealigned && !force) return;
     if (!dv.orig.curOp) return dv.orig.operation(function() {
+	logger.debug(`<<< Exiting alignChunks(dv=${dv},force=${force})`);
       alignChunks(dv, force);
     });
 
     dv.dealigned = false;
+	logger.debug(`alignChunks(dv=${dv},force=${force}): dv.dealigned → ${dv.dealigned}`);
     var other = dv.mv.left == dv ? dv.mv.right : dv.mv.left;
     if (other) {
       ensureDiff(other);
       other.dealigned = false;
+	logger.debug(`alignChunks(dv=${dv},force=${force}): other.dealigned → ${other.dealigned}`);
     }
     var linesToAlign = findAlignedLines(dv, other);
+	logger.debug(`alignChunks(dv=${dv},force=${force}): linesToAlign → ${linesToAlign}`);
 
     // Clear old aligners
     var aligners = dv.mv.aligners;
     for (var i = 0; i < aligners.length; i++)
       aligners[i].clear();
     aligners.length = 0;
+	logger.debug(`alignChunks(dv=${dv},force=${force}): aligners.length → ${aligners.length}`);
 
     var cm = [dv.orig, dv.edit], scroll = [];
     if (other) cm.push(other.orig);
@@ -363,9 +441,12 @@
   }
 
   function alignLines(cm, lines, aligners) {
+	logger.debug(`>>> Entering alignLines(cm=${cm},lines=${lines},aligners=${aligners})`);
     var maxOffset = 0, offset = [];
     for (var i = 0; i < cm.length; i++) if (lines[i] != null) {
+	logger.debug(`alignLines(cm=${cm},lines=${lines},aligners=${aligners}): maxOffset → ${maxOffset}`);
       var off = cm[i].heightAtLine(lines[i], "local");
+	logger.debug(`alignLines(cm=${cm},lines=${lines},aligners=${aligners}): off → ${off}`);
       offset[i] = off;
       maxOffset = Math.max(maxOffset, off);
     }
@@ -377,6 +458,7 @@
   }
 
   function padAbove(cm, line, size) {
+	logger.debug(`>>> Entering padAbove(cm=${cm},line=${line},size=${size})`);
     var above = true;
     if (line > cm.lastLine()) {
       line--;
@@ -385,21 +467,30 @@
     var elt = document.createElement("div");
     elt.className = "CodeMirror-merge-spacer";
     elt.style.height = size + "px"; elt.style.minWidth = "1px";
+	logger.debug(`padAbove(cm=${cm},line=${line},size=${size}): elt.className → ${elt.className}`);
+	logger.debug(`<<< Exiting padAbove(cm=${cm},line=${line},size=${size})`);
     return cm.addLineWidget(line, elt, {height: size, above: above});
   }
 
   function drawConnectorsForChunk(dv, chunk, sTopOrig, sTopEdit, w) {
+	logger.debug(`>>> Entering drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w})`);
     var flip = dv.type == "left";
     var top = dv.orig.heightAtLine(chunk.origFrom, "local") - sTopOrig;
+	logger.debug(`drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w}): flip → ${flip}`);
     if (dv.svg) {
       var topLpx = top;
       var topRpx = dv.edit.heightAtLine(chunk.editFrom, "local") - sTopEdit;
+	logger.debug(`drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w}): topRpx → ${topRpx}`);
       if (flip) { var tmp = topLpx; topLpx = topRpx; topRpx = tmp; }
       var botLpx = dv.orig.heightAtLine(chunk.origTo, "local") - sTopOrig;
+	logger.debug(`drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w}): botLpx → ${botLpx}`);
       var botRpx = dv.edit.heightAtLine(chunk.editTo, "local") - sTopEdit;
+	logger.debug(`drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w}): botRpx → ${botRpx}`);
       if (flip) { var tmp = botLpx; botLpx = botRpx; botRpx = tmp; }
       var curveTop = " C " + w/2 + " " + topRpx + " " + w/2 + " " + topLpx + " " + (w + 2) + " " + topLpx;
+	logger.debug(`drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w}): curveTop → ${curveTop}`);
       var curveBot = " C " + w/2 + " " + botLpx + " " + w/2 + " " + botRpx + " -1 " + botRpx;
+	logger.debug(`drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w}): curveBot → ${curveBot}`);
       attrs(dv.svg.appendChild(document.createElementNS(svgNS, "path")),
             "d", "M -1 " + topRpx + curveTop + " L " + (w + 2) + " " + botLpx + curveBot + " z",
             "class", dv.classes.connect);
@@ -409,26 +500,35 @@
                                                 "CodeMirror-merge-copy"));
       var editOriginals = dv.mv.options.allowEditingOriginals;
       copy.title = editOriginals ? "Push to left" : "Revert chunk";
+	logger.debug(`drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w}): copy.title → ${copy.title}`);
       copy.chunk = chunk;
+	logger.debug(`drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w}): copy.chunk → ${copy.chunk}`);
       copy.style.top = top + "px";
 
       if (editOriginals) {
         var topReverse = dv.orig.heightAtLine(chunk.editFrom, "local") - sTopEdit;
+		logger.debug(`drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w}): topReverse → ${topReverse}`);
         var copyReverse = dv.copyButtons.appendChild(elt("div", dv.type == "right" ? "\u21dd" : "\u21dc",
                                                          "CodeMirror-merge-copy-reverse"));
         copyReverse.title = "Push to right";
+		logger.debug(`drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w}): copyReverse.title → ${copyReverse.title}`);
         copyReverse.chunk = {editFrom: chunk.origFrom, editTo: chunk.origTo,
                              origFrom: chunk.editFrom, origTo: chunk.editTo};
+							logger.debug(`drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w}): copyReverse.chunk → ${copyReverse.chunk}`);
         copyReverse.style.top = topReverse + "px";
         dv.type == "right" ? copyReverse.style.left = "2px" : copyReverse.style.right = "2px";
+		logger.debug(`drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w}): top → ${top}`);
       }
+	logger.debug(`<<< Exiting drawConnectorsForChunk(dv=${dv},chunk=${chunk},sTopOrig=${sTopOrig},sTopEdit=${sTopEdit},w=${w})`);
     }
   }
 
   function copyChunk(dv, to, from, chunk) {
+	logger.debug(`>>> Entering copyChunk(dv=${dv},to=${to},from=${from},chunk=${chunk})`);
     if (dv.diffOutOfDate) return;
     to.replaceRange(from.getRange(Pos(chunk.origFrom, 0), Pos(chunk.origTo, 0)),
                          Pos(chunk.editFrom, 0), Pos(chunk.editTo, 0));
+						logger.debug(`<<< Exiting copyChunk(dv=${dv},to=${to},from=${from},chunk=${chunk})`);
   }
 
   // Merge view, containing 0, 1, or 2 diff views.
@@ -438,26 +538,32 @@
 
     this.options = options;
     var origLeft = options.origLeft, origRight = options.origRight == null ? options.orig : options.origRight;
+	logger.debug(`function(node=${node},options=${options}): this.options → ${this.options}`);
 
     var hasLeft = origLeft != null, hasRight = origRight != null;
     var panes = 1 + (hasLeft ? 1 : 0) + (hasRight ? 1 : 0);
+	logger.debug(`function(node=${node},options=${options}): panes → ${panes}`);
     var wrap = [], left = this.left = null, right = this.right = null;
+	logger.debug(`function(node=${node},options=${options}): wrap → ${wrap}`);
     var self = this;
 
     if (hasLeft) {
       left = this.left = new DiffView(this, "left");
       var leftPane = elt("div", null, "CodeMirror-merge-pane");
+	logger.debug(`function(node=${node},options=${options}): leftPane → ${leftPane}`);
       wrap.push(leftPane);
       wrap.push(buildGap(left));
     }
 
     var editPane = elt("div", null, "CodeMirror-merge-pane");
+	logger.debug(`function(node=${node},options=${options}): editPane → ${editPane}`);
     wrap.push(editPane);
 
     if (hasRight) {
       right = this.right = new DiffView(this, "right");
       wrap.push(buildGap(right));
       var rightPane = elt("div", null, "CodeMirror-merge-pane");
+	logger.debug(`function(node=${node},options=${options}): rightPane → ${rightPane}`);
       wrap.push(rightPane);
     }
 
@@ -466,6 +572,7 @@
     wrap.push(elt("div", null, null, "height: 0; clear: both;"));
 
     var wrapElt = this.wrap = node.appendChild(elt("div", wrap, "CodeMirror-merge CodeMirror-merge-" + panes + "pane"));
+	logger.debug(`function(node=${node},options=${options}): wrapElt → ${wrapElt}`);
     this.edit = CodeMirror(editPane, copyObj(options));
 
     if (left) left.init(leftPane, origLeft, options);
@@ -476,30 +583,41 @@
       this.editor().operation(function() {
         collapseIdenticalStretches(self, options.collapseIdentical);
       });
+	logger.debug(`operation(): MergeView.prototype → ${MergeView.prototype}`);
+	logger.debug(`operation(): this.aligners → ${this.aligners}`);
       updating = false;
     }
     if (options.connect == "align") {
       this.aligners = [];
       alignChunks(this.left || this.right, true);
+	logger.debug(`function(node=${node},options=${options}): this.aligners → ${this.aligners}`);
     }
 
     var onResize = function() {
+	logger.debug('>>> Entering onResize()');
       if (left) makeConnections(left);
       if (right) makeConnections(right);
+	logger.debug('<<< Exiting onResize()');
     };
     CodeMirror.on(window, "resize", onResize);
     var resizeInterval = setInterval(function() {
+	logger.debug(`>>> Entering setInterval(p=${p})`);
       for (var p = wrapElt.parentNode; p && p != document.body; p = p.parentNode) {}
       if (!p) { clearInterval(resizeInterval); CodeMirror.off(window, "resize", onResize); }
+	logger.debug(`<<< Exiting setInterval(p=${p})`);
     }, 5000);
   };
 
   function buildGap(dv) {
+	logger.debug(`>>> Entering buildGap(dv=${dv})`);
     var lock = dv.lockButton = elt("div", null, "CodeMirror-merge-scrolllock");
     lock.title = "Toggle locked scrolling";
+	logger.debug(`buildGap(dv=${dv}): lock → ${lock}`);
     var lockWrap = elt("div", [lock], "CodeMirror-merge-scrolllock-wrap");
+	logger.debug(`buildGap(dv=${dv}): lockWrap → ${lockWrap}`);
     CodeMirror.on(lock, "click", function() { setScrollLock(dv, !dv.lockScroll); });
     var gapElts = [lockWrap];
+	logger.debug(`buildGap(dv=${dv}): lock.title → ${lock.title}`);
     if (dv.mv.options.revertButtons !== false) {
       dv.copyButtons = elt("div", null, "CodeMirror-merge-copybuttons-" + dv.type);
       CodeMirror.on(dv.copyButtons, "click", function(e) {
@@ -515,11 +633,14 @@
     }
     if (dv.mv.options.connect != "align") {
       var svg = document.createElementNS && document.createElementNS(svgNS, "svg");
+	logger.debug(`buildGap(dv=${dv}): svg → ${svg}`);
       if (svg && !svg.createSVGRect) svg = null;
       dv.svg = svg;
       if (svg) gapElts.push(svg);
     }
 
+	logger.debug(`buildGap(dv=${dv}): dv.svg → ${dv.svg}`);
+	logger.debug(`<<< Exiting buildGap(dv=${dv})`);
     return dv.gap = elt("div", gapElts, "CodeMirror-merge-gap");
   }
 
@@ -533,24 +654,32 @@
       if (this.left) this.left.setShowDifferences(val);
     },
     rightChunks: function() {
+	logger.debug('>>> Entering rightChunks()');
       if (this.right) { ensureDiff(this.right); return this.right.chunks; }
+	logger.debug('<<< Exiting rightChunks()');
     },
     leftChunks: function() {
+	logger.debug('>>> Entering leftChunks()');
       if (this.left) { ensureDiff(this.left); return this.left.chunks; }
+	logger.debug('<<< Exiting leftChunks()');
     }
   };
 
   function asString(obj) {
+	logger.debug(`>>> Entering asString(obj=${obj})`);
     if (typeof obj == "string") return obj;
     else return obj.getValue();
+	logger.debug(`<<< Exiting asString(obj=${obj})`);
   }
 
   // Operations on diffs
 
   var dmp = new diff_match_patch();
   function getDiff(a, b) {
+	logger.debug(`>>> Entering getDiff(a=${a},b=${b})`);
     var diff = dmp.diff_main(a, b);
     dmp.diff_cleanupSemantic(diff);
+	logger.debug(`getDiff(a=${a},b=${b}): diff → ${diff}`);
     // The library sometimes leaves in empty parts, which confuse the algorithm
     for (var i = 0; i < diff.length; ++i) {
       var part = diff[i];
@@ -561,20 +690,25 @@
         diff[i][1] += part[1];
       }
     }
+	logger.debug(`<<< Exiting getDiff(a=${a},b=${b})`);
     return diff;
   }
 
   function getChunks(diff) {
+	logger.debug(`>>> Entering getChunks(diff=${diff})`);
     var chunks = [];
     var startEdit = 0, startOrig = 0;
     var edit = Pos(0, 0), orig = Pos(0, 0);
+	logger.debug(`getChunks(diff=${diff}): edit → ${edit}`);
     for (var i = 0; i < diff.length; ++i) {
       var part = diff[i], tp = part[0];
       if (tp == DIFF_EQUAL) {
         var startOff = startOfLineClean(diff, i) ? 0 : 1;
+		logger.debug(`getChunks(diff=${diff}): startOff → ${startOff}`);
         var cleanFromEdit = edit.line + startOff, cleanFromOrig = orig.line + startOff;
         moveOver(edit, part[1], null, orig);
         var endOff = endOfLineClean(diff, i) ? 1 : 0;
+		logger.debug(`getChunks(diff=${diff}): endOff → ${endOff}`);
         var cleanToEdit = edit.line + endOff, cleanToOrig = orig.line + endOff;
         if (cleanToEdit > cleanFromEdit) {
           if (i) chunks.push({origFrom: startOrig, origTo: cleanFromOrig,
@@ -588,28 +722,34 @@
     if (startEdit <= edit.line || startOrig <= orig.line)
       chunks.push({origFrom: startOrig, origTo: orig.line + 1,
                    editFrom: startEdit, editTo: edit.line + 1});
+	logger.debug(`<<< Exiting getChunks(diff=${diff})`);
     return chunks;
   }
 
   function endOfLineClean(diff, i) {
+	logger.debug(`>>> Entering endOfLineClean(diff=${diff},i=${i})`);
     if (i == diff.length - 1) return true;
     var next = diff[i + 1][1];
     if (next.length == 1 || next.charCodeAt(0) != 10) return false;
     if (i == diff.length - 2) return true;
     next = diff[i + 2][1];
+	logger.debug(`<<< Exiting endOfLineClean(diff=${diff},i=${i})`);
     return next.length > 1 && next.charCodeAt(0) == 10;
   }
 
   function startOfLineClean(diff, i) {
+	logger.debug(`>>> Entering startOfLineClean(diff=${diff},i=${i})`);
     if (i == 0) return true;
     var last = diff[i - 1][1];
     if (last.charCodeAt(last.length - 1) != 10) return false;
     if (i == 1) return true;
     last = diff[i - 2][1];
+	logger.debug(`<<< Exiting startOfLineClean(diff=${diff},i=${i})`);
     return last.charCodeAt(last.length - 1) == 10;
   }
 
   function chunkBoundariesAround(chunks, n, nInEdit) {
+	logger.debug(`>>> Entering chunkBoundariesAround(chunks=${chunks},n=${n},nInEdit=${nInEdit})`);
     var beforeE, afterE, beforeO, afterO;
     for (var i = 0; i < chunks.length; i++) {
       var chunk = chunks[i];
@@ -622,13 +762,16 @@
       if (toLocal <= n) { beforeE = chunk.editTo; beforeO = chunk.origTo; }
       else if (fromLocal <= n) { beforeE = chunk.editFrom; beforeO = chunk.origFrom; }
     }
+	logger.debug(`<<< Exiting chunkBoundariesAround(chunks=${chunks},n=${n},nInEdit=${nInEdit})`);
     return {edit: {before: beforeE, after: afterE}, orig: {before: beforeO, after: afterO}};
   }
 
   function collapseSingle(cm, from, to) {
+	logger.debug(`>>> Entering collapseSingle(cm=${cm},from=${from},to=${to})`);
     cm.addLineClass(from, "wrap", "CodeMirror-merge-collapsed-line");
     var widget = document.createElement("span");
     widget.className = "CodeMirror-merge-collapsed-widget";
+	logger.debug(`collapseSingle(cm=${cm},from=${from},to=${to}): widget → ${widget}`);
     widget.title = "Identical text collapsed. Click to expand.";
     var mark = cm.markText(Pos(from, 0), Pos(to - 1), {
       inclusiveLeft: true,
@@ -636,15 +779,20 @@
       replacedWith: widget,
       clearOnEnter: true
     });
+	logger.debug(`collapseSingle(cm=${cm},from=${from},to=${to}): widget.className → ${widget.className}`);
     function clear() {
+	logger.debug('>>> Entering clear()');
       mark.clear();
       cm.removeLineClass(from, "wrap", "CodeMirror-merge-collapsed-line");
+	logger.debug('<<< Exiting clear()');
     }
     widget.addEventListener("click", clear);
+	logger.debug(`<<< Exiting collapseSingle(cm=${cm},from=${from},to=${to})`);
     return {mark: mark, clear: clear};
   }
 
   function collapseStretch(size, editors) {
+	logger.debug(`>>> Entering collapseStretch(size=${size},editors=${editors})`);
     var marks = [];
     function clear() {
       for (var i = 0; i < marks.length; i++) marks[i].clear();
@@ -652,26 +800,32 @@
     for (var i = 0; i < editors.length; i++) {
       var editor = editors[i];
       var mark = collapseSingle(editor.cm, editor.line, editor.line + size);
+	logger.debug(`collapseStretch(size=${size},editors=${editors}): mark → ${mark}`);
       marks.push(mark);
       mark.mark.on("clear", clear);
     }
+	logger.debug(`<<< Exiting collapseStretch(size=${size},editors=${editors})`);
     return marks[0].mark;
   }
 
   function unclearNearChunks(dv, margin, off, clear) {
+	logger.debug(`>>> Entering unclearNearChunks(dv=${dv},margin=${margin},off=${off},clear=${clear})`);
     for (var i = 0; i < dv.chunks.length; i++) {
       var chunk = dv.chunks[i];
       for (var l = chunk.editFrom - margin; l < chunk.editTo + margin; l++) {
         var pos = l + off;
         if (pos >= 0 && pos < clear.length) clear[pos] = false;
+		logger.debug(`<<< Exiting unclearNearChunks(dv=${dv},margin=${margin},off=${off},clear=${clear})`);
       }
     }
   }
 
   function collapseIdenticalStretches(mv, margin) {
+	logger.debug(`>>> Entering collapseIdenticalStretches(mv=${mv},margin=${margin})`);
     if (typeof margin != "number") margin = 2;
     var clear = [], edit = mv.editor(), off = edit.firstLine();
     for (var l = off, e = edit.lastLine(); l <= e; l++) clear.push(true);
+	logger.debug(`collapseIdenticalStretches(mv=${mv},margin=${margin}): l → ${l}`);
     if (mv.left) unclearNearChunks(mv.left, margin, off, clear);
     if (mv.right) unclearNearChunks(mv.right, margin, off, clear);
 
@@ -685,7 +839,9 @@
           if (mv.right) editors.push({line: getMatchingOrigLine(line, mv.right.chunks), cm: mv.right.orig});
           var mark = collapseStretch(size, editors);
           if (mv.options.onCollapse) mv.options.onCollapse(mv, line, size, mark);
+		logger.debug(`collapseIdenticalStretches(mv=${mv},margin=${margin}): mark → ${mark}`);
         }
+		logger.debug(`<<< Exiting collapseIdenticalStretches(mv=${mv},margin=${margin})`);
       }
     }
   }
@@ -702,25 +858,34 @@
   }
 
   function clear(node) {
+	logger.debug(`>>> Entering clear(node=${node})`);
     for (var count = node.childNodes.length; count > 0; --count)
       node.removeChild(node.firstChild);
+	logger.debug(`<<< Exiting clear(node=${node})`);
   }
 
   function attrs(elt) {
+	logger.debug(`>>> Entering attrs(elt=${elt})`);
     for (var i = 1; i < arguments.length; i += 2)
       elt.setAttribute(arguments[i], arguments[i+1]);
+	logger.debug(`<<< Exiting attrs(elt=${elt})`);
   }
 
   function copyObj(obj, target) {
+	logger.debug(`>>> Entering copyObj(obj=${obj},target=${target})`);
     if (!target) target = {};
     for (var prop in obj) if (obj.hasOwnProperty(prop)) target[prop] = obj[prop];
+	logger.debug(`<<< Exiting copyObj(obj=${obj},target=${target})`);
     return target;
   }
 
   function moveOver(pos, str, copy, other) {
+	logger.debug(`>>> Entering moveOver(pos=${pos},str=${str},copy=${copy},other=${other})`);
     var out = copy ? Pos(pos.line, pos.ch) : pos, at = 0;
     for (;;) {
+	logger.debug(`moveOver(pos=${pos},str=${str},copy=${copy},other=${other}): out → ${out}`);
       var nl = str.indexOf("\n", at);
+	logger.debug(`moveOver(pos=${pos},str=${str},copy=${copy},other=${other}): nl → ${nl}`);
       if (nl == -1) break;
       ++out.line;
       if (other) ++other.line;
@@ -728,6 +893,7 @@
     }
     out.ch = (at ? 0 : out.ch) + (str.length - at);
     if (other) other.ch = (at ? 0 : other.ch) + (str.length - at);
+	logger.debug(`<<< Exiting moveOver(pos=${pos},str=${str},copy=${copy},other=${other})`);
     return out;
   }
 
@@ -736,27 +902,36 @@
   function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
 
   function findPrevDiff(chunks, start, isOrig) {
+	logger.debug(`>>> Entering findPrevDiff(chunks=${chunks},start=${start},isOrig=${isOrig})`);
     for (var i = chunks.length - 1; i >= 0; i--) {
       var chunk = chunks[i];
       var to = (isOrig ? chunk.origTo : chunk.editTo) - 1;
       if (to < start) return to;
+	logger.debug(`findPrevDiff(chunks=${chunks},start=${start},isOrig=${isOrig}): to → ${to}`);
     }
+	logger.debug(`<<< Exiting findPrevDiff(chunks=${chunks},start=${start},isOrig=${isOrig})`);
   }
 
   function findNextDiff(chunks, start, isOrig) {
+	logger.debug(`>>> Entering findNextDiff(chunks=${chunks},start=${start},isOrig=${isOrig})`);
     for (var i = 0; i < chunks.length; i++) {
       var chunk = chunks[i];
       var from = (isOrig ? chunk.origFrom : chunk.editFrom);
       if (from > start) return from;
+	logger.debug(`findNextDiff(chunks=${chunks},start=${start},isOrig=${isOrig}): from → ${from}`);
     }
+	logger.debug(`<<< Exiting findNextDiff(chunks=${chunks},start=${start},isOrig=${isOrig})`);
   }
 
   function goNearbyDiff(cm, dir) {
+	logger.debug(`>>> Entering goNearbyDiff(cm=${cm},dir=${dir})`);
     var found = null, views = cm.state.diffViews, line = cm.getCursor().line;
     if (views) for (var i = 0; i < views.length; i++) {
       var dv = views[i], isOrig = cm == dv.orig;
       ensureDiff(dv);
+	logger.debug(`goNearbyDiff(cm=${cm},dir=${dir}): cm → ${cm}`);
       var pos = dir < 0 ? findPrevDiff(dv.chunks, line, isOrig) : findNextDiff(dv.chunks, line, isOrig);
+	logger.debug(`goNearbyDiff(cm=${cm},dir=${dir}): pos → ${pos}`);
       if (pos != null && (found == null || (dir < 0 ? pos > found : pos < found)))
         found = pos;
     }
@@ -767,6 +942,7 @@
   }
 
   CodeMirror.commands.goNextDiff = function(cm) {
+	logger.debug(`<<< Exiting function(cm=${cm})`);
     return goNearbyDiff(cm, 1);
   };
   CodeMirror.commands.goPrevDiff = function(cm) {

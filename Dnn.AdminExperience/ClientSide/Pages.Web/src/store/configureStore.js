@@ -1,11 +1,14 @@
 import { createStore, applyMiddleware, compose } from "redux";
 import thunk from "redux-thunk";
 import rootReducer from "../reducers/rootReducer";
+const logger = console;
 
 export default function configureStore(initialState) {
+	logger.debug(`>>> Entering configureStore(initialState=${initialState})`);
     const middleware = process.env.NODE_ENV !== "production" ?
         // eslint-disable-next-line no-undef
         [require("redux-immutable-state-invariant")(), thunk] :
+		logger.debug(`configureStore(initialState=${initialState}): middleware → ${middleware}`);
         [thunk];
 
     const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -16,5 +19,6 @@ export default function configureStore(initialState) {
         composeEnhancers(applyMiddleware(...middleware))
     );
 
+	logger.debug(`<<< Exiting configureStore(initialState=${initialState})`);
     return store;
 }

@@ -2,16 +2,20 @@ import React, { Component } from "react";
 import { SvgIcons } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../localization";
 import PropTypes from "prop-types";
+const logger = console;
 
 class SearchPageInput extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             searchTerm : ""
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     onSearchFieldChange(e) {
+		logger.debug(`>>> Entering onSearchFieldChange(e=${e})`);
         const currentSearchTerm = this.state.searchTerm;
         const inSearch = this.state.inSearch;
         this.setState({ searchTerm: e.target.value, filtersUpdated: true }, () => {
@@ -22,13 +26,16 @@ class SearchPageInput extends Component {
                     return;
                 case currentSearchTerm.length > 0 && searchTerm.length === 0 && inSearch:
                     this.props.onSearch();
+					logger.debug(`<<< Exiting onSearchFieldChange(e=${e})`);
                     return;
             }
         });
     }
 
     render() {
+		logger.debug('>>> Entering render()');
          
+		logger.debug('<<< Exiting render()');
         return (
             <div className="search-container">
                 {this.props.inSearch ?

@@ -39,6 +39,8 @@ namespace log4net.Layout
         /// <summary>Constructs a RawTimeStampLayout</summary>
         public RawTimeStampLayout()
         {
+		value.LogDebug(">>> Entering RawTimeStampLayout()");
+		value.LogDebug("<<< Exiting RawTimeStampLayout()");
         }
 
         /// <summary>Gets the <see cref="LoggingEvent.TimeStamp"/> as a <see cref="DateTime"/>.</summary>
@@ -55,6 +57,8 @@ namespace log4net.Layout
         /// </remarks>
         public virtual object Format(LoggingEvent loggingEvent)
         {
+			value.LogDebug(">>> Entering Format(loggingEvent={LoggingEvent})", loggingEvent);
+			value.LogDebug("<<< Exiting Format(loggingEvent={LoggingEvent})", loggingEvent);
             return loggingEvent.TimeStamp;
         }
     }

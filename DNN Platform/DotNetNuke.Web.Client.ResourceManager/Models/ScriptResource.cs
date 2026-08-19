@@ -12,16 +12,21 @@ using DotNetNuke.Abstractions.ClientResources;
 /// <summary>Represents a script resource that can be registered and rendered in the client resources system.</summary>
 public class ScriptResource : ResourceBase, IScriptResource
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ScriptResource));
     private readonly IClientResourceController clientResourceController;
 
     /// <summary>Initializes a new instance of the <see cref="ScriptResource"/> class.</summary>
     /// <param name="clientResourceController">The client resources controller.</param>
     public ScriptResource(IClientResourceController clientResourceController)
     {
+		Logger.LogDebug(">>> Entering ScriptResource(clientResourceController={ClientResourceController})", clientResourceController);
         this.clientResourceController = clientResourceController;
         this.Provider = ClientResourceProviders.DefaultJsProvider;
+		Logger.LogDebug("ScriptResource(clientResourceController={ClientResourceController}): this.clientResourceController → {Arg1}", clientResourceController, this.clientResourceController);
+		Logger.LogDebug("ScriptResource(clientResourceController={ClientResourceController}): this.Provider → {Arg1}", clientResourceController, this.Provider);
         this.Priority = (int)FileOrder.Js.DefaultPriority;
         this.Type = "text/javascript";
+		Logger.LogDebug("<<< Exiting ScriptResource(clientResourceController={ClientResourceController})", clientResourceController);
     }
 
     /// <inheritdoc />
@@ -36,14 +41,18 @@ public class ScriptResource : ResourceBase, IScriptResource
     /// <inheritdoc />
     public override void Register()
     {
+		Logger.LogDebug(">>> Entering Register()");
         this.clientResourceController.AddScript(this);
+		Logger.LogDebug("<<< Exiting Register()");
     }
 
     /// <inheritdoc />
     public override string Render(int crmVersion, bool useCdn, string applicationPath)
     {
+		Logger.LogDebug(">>> Entering Render(crmVersion={CrmVersion},useCdn={UseCdn},applicationPath={ApplicationPath})", crmVersion, useCdn, applicationPath);
         var htmlString = new StringBuilder("<script");
         htmlString.Append($" src=\"{this.GetVersionedPath(crmVersion, useCdn, applicationPath)}\"");
+		Logger.LogDebug("Render(crmVersion={CrmVersion},useCdn={UseCdn},applicationPath={ApplicationPath}): htmlString → {HtmlString}", crmVersion, useCdn, applicationPath, htmlString);
         if (this.Async && !this.Attributes.ContainsKey("async"))
         {
             htmlString.Append(" async");
@@ -67,6 +76,7 @@ public class ScriptResource : ResourceBase, IScriptResource
         this.RenderReferrerPolicy(htmlString);
         this.RenderAttributes(htmlString);
         htmlString.Append("></script>");
+		Logger.LogDebug("<<< Exiting Render(crmVersion={CrmVersion},useCdn={UseCdn},applicationPath={ApplicationPath})", crmVersion, useCdn, applicationPath);
         return htmlString.ToString();
     }
 }

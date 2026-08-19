@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
     /// <summary>FileResponseFilter implements <see cref="OutputCacheResponseFilter"/> to capture the response into files.</summary>
     public class FileResponseFilter : OutputCacheResponseFilter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FileResponseFilter));
         ////Private _content As StringBuilder
         private DateTime cacheExpiration;
 
@@ -25,9 +26,11 @@ namespace DotNetNuke.Services.OutputCache.Providers
         internal FileResponseFilter(int itemId, int maxVaryByCount, Stream filterChain, string cacheKey, TimeSpan cacheDuration)
             : base(filterChain, cacheKey, cacheDuration, maxVaryByCount)
         {
+			Logger.LogDebug(">>> Entering FileResponseFilter(itemId={ItemId},maxVaryByCount={MaxVaryByCount},filterChain={FilterChain},cacheKey={CacheKey},cacheDuration={CacheDuration})", itemId, maxVaryByCount, filterChain, cacheKey, cacheDuration);
             if (maxVaryByCount > -1 && Services.OutputCache.Providers.FileProvider.GetCachedItemCount(itemId) >= maxVaryByCount)
             {
                 this.HasErrored = true;
+				Logger.LogDebug("FileResponseFilter(itemId={ItemId},maxVaryByCount={MaxVaryByCount},filterChain={FilterChain},cacheKey={CacheKey},cacheDuration={CacheDuration}): this.HasErrored → {Arg5}", itemId, maxVaryByCount, filterChain, cacheKey, cacheDuration, this.HasErrored);
                 return;
             }
 
@@ -51,13 +54,16 @@ namespace DotNetNuke.Services.OutputCache.Providers
                 }
                 catch (Exception)
                 {
+					Logger.LogError("Exception in FileResponseFilter(itemId={ItemId},maxVaryByCount={MaxVaryByCount},filterChain={FilterChain},cacheKey={CacheKey},cacheDuration={CacheDuration}): {Arg5}", itemId, maxVaryByCount, filterChain, cacheKey, cacheDuration, Exception.Message);
                     this.HasErrored = true;
                     throw;
                 }
 
                 this.cacheExpiration = DateTime.UtcNow.Add(cacheDuration);
+				Logger.LogDebug("FileResponseFilter(itemId={ItemId},maxVaryByCount={MaxVaryByCount},filterChain={FilterChain},cacheKey={CacheKey},cacheDuration={CacheDuration}): cacheExpiration → {CacheExpiration}", itemId, maxVaryByCount, filterChain, cacheKey, cacheDuration, cacheExpiration);
                 this.HasErrored = false;
             }
+			Logger.LogDebug("<<< Exiting FileResponseFilter(itemId={ItemId},maxVaryByCount={MaxVaryByCount},filterChain={FilterChain},cacheKey={CacheKey},cacheDuration={CacheDuration})", itemId, maxVaryByCount, filterChain, cacheKey, cacheDuration);
         }
 
         public string CachedOutputTempFileName { get; set; }
@@ -82,6 +88,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
         /// <inheritdoc />
         public override byte[] StopFiltering(int itemId, bool deleteData)
         {
+			Logger.LogDebug(">>> Entering StopFiltering(itemId={ItemId},deleteData={DeleteData})", itemId, deleteData);
             if (this.HasErrored)
             {
                 return null;
@@ -99,6 +106,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
                 File.Move(this.CachedOutputTempFileName, this.CachedOutputFileName);
 
                 StreamWriter oWrite = File.CreateText(this.CachedOutputAttribFileName);
+				Logger.LogDebug("StopFiltering(itemId={ItemId},deleteData={DeleteData}): oWrite → {OWrite}", itemId, deleteData, oWrite);
                 oWrite.WriteLine(this.cacheExpiration.ToString(CultureInfo.InvariantCulture));
                 oWrite.Close();
             }
@@ -109,6 +117,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
                 FileSystemUtils.DeleteFileWithWait(this.CachedOutputAttribFileName, 100, 200);
             }
 
+			Logger.LogDebug("<<< Exiting StopFiltering(itemId={ItemId},deleteData={DeleteData})", itemId, deleteData);
             return null;
         }
     }

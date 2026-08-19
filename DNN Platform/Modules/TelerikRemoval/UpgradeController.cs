@@ -26,8 +26,10 @@ namespace Dnn.Modules.TelerikRemoval
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			Logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             var option = this.GetHostSetting(DotNetNuke.Maintenance.Constants.TelerikUninstallOptionSettingKey);
 
+			Logger.LogDebug("UpgradeModule(version={Version}): option → {Option}", version, option);
             // we have read the value, and now we need to delete the setting
             // to prevent this process from getting triggered if the user
             // manually installs the extension.
@@ -40,17 +42,20 @@ namespace Dnn.Modules.TelerikRemoval
             if (!DotNetNuke.Maintenance.Constants.TelerikUninstallNoValue.Equals(option, StringComparison.OrdinalIgnoreCase))
             {
                 var uninstaller = this.GetService<ITelerikUninstaller>();
+				Logger.LogDebug("UpgradeModule(version={Version}): uninstaller → {Uninstaller}", version, uninstaller);
                 uninstaller.Execute();
                 return string.Join(
                     Environment.NewLine,
                     uninstaller.Progress.Select((step, i) =>
                     {
                         var status = "🔲";
+						Logger.LogDebug("UpgradeModule(version={Version}): status → {Status}", version, status);
                         if (step.Success.HasValue)
                         {
                             status = step.Success.Value ? "✅" : "🚨";
                         }
 
+			Logger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
                         return $"{i}. {step.StepName} {status} - {step.Notes}";
                     }));
             }
@@ -60,28 +65,36 @@ namespace Dnn.Modules.TelerikRemoval
 
         private static IServiceProvider GetServiceProvider()
         {
+			Logger.LogDebug(">>> Entering GetServiceProvider()");
+			Logger.LogDebug("<<< Exiting GetServiceProvider()");
             return HttpContextSource.Current?.GetScope()?.ServiceProvider ??
                 DependencyInjectionInitialize.BuildServiceProvider();
         }
 
         private string GetHostSetting(string key)
         {
+			Logger.LogDebug(">>> Entering GetHostSetting(key={Key})", key);
+			Logger.LogDebug("<<< Exiting GetHostSetting(key={Key})", key);
             return this.GetService<IHostSettingsService>().GetString(key);
         }
 
         private void DeleteHostSetting(string key, bool isSecure = false)
         {
+			Logger.LogDebug(">>> Entering DeleteHostSetting(key={Key},isSecure={IsSecure})", key, isSecure);
             this.GetService<IHostSettingsService>().Update(new ConfigurationSetting
             {
                 IsSecure = isSecure,
                 Key = key,
                 Value = null,
             });
+			Logger.LogDebug("<<< Exiting DeleteHostSetting(key={Key},isSecure={IsSecure})", key, isSecure);
         }
 
         private T GetService<T>()
             where T : class
         {
+			Logger.LogDebug(">>> Entering GetService()");
+			Logger.LogDebug("<<< Exiting GetService()");
             return (T)this.serviceProvider.GetService(typeof(T));
         }
     }

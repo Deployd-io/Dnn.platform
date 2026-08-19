@@ -9,11 +9,13 @@ import { GridCell, Button, RadioButtons, DropdownWithError, SingleLineInputWithE
 import Collapsible from "react-collapse";
 import utils from "utils";
 import "./style.less";
+const logger = console;
 
 /*eslint-disable eqeqeq*/
 class EditThemeAttributes extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             themeType: "layout",
             themeName: "",
@@ -29,25 +31,32 @@ class EditThemeAttributes extends Component {
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
 
         if (props.tokens.length === 0) {
             props.dispatch(ThemeActions.getEditableTokens());
+			logger.debug('<<< Exiting UNSAFE_componentWillMount()');
         }
     }
 
     getThemeType() {
+		logger.debug('>>> Entering getThemeType()');
         const {state} = this;
 
+		logger.debug('<<< Exiting getThemeType()');
         return state.themeType == "container" ? 1 : 0;
     }
 
     getThemeOptions() {
+		logger.debug('>>> Entering getThemeOptions()');
         const {props} = this;
 
         let type = this.getThemeType();
+		logger.debug(`getThemeOptions(): type → ${type}`);
         let source = type == 1 ? props.themes.containers : props.themes.layouts;
         let isHost = utils.params.settings.isHost;
+		logger.debug('<<< Exiting getThemeOptions()');
         return source.filter(l => {
             return isHost || l.level === 1 || l.level === 2;
         }).map(function (t) {
@@ -57,6 +66,7 @@ class EditThemeAttributes extends Component {
 
 
     getThemeFileOptions() {
+		logger.debug('>>> Entering getThemeFileOptions()');
         const {props, state} = this;
 
         if (!state.themeName) {
@@ -64,11 +74,14 @@ class EditThemeAttributes extends Component {
         }
 
         return props.themeFiles.map(function (f) {
+		logger.debug('>>> Entering map()');
+		logger.debug('<<< Exiting getThemeFileOptions()');
             return { value: f.path, label: f.name };
         });
     }
 
     getTokenOptions() {
+		logger.debug('>>> Entering getTokenOptions()');
         const {props, state} = this;
 
         if (!state.path) {
@@ -76,11 +89,13 @@ class EditThemeAttributes extends Component {
         }
 
         return props.tokens.map(function (t) {
+		logger.debug('<<< Exiting getTokenOptions()');
             return { value: t.value, label: t.text };
         });
     }
 
     getSettingOptions() {
+		logger.debug('>>> Entering getSettingOptions()');
         const {props, state} = this;
 
         if (!state.path || !state.token) {
@@ -88,6 +103,7 @@ class EditThemeAttributes extends Component {
         }
 
         return props.settings.map(function (t) {
+		logger.debug('<<< Exiting getSettingOptions()');
             return { value: t.value, label: t.text };
         });
     }
@@ -102,6 +118,7 @@ class EditThemeAttributes extends Component {
         this.setState({ themeName: themeName.value, level: themeName.level, path: "", token: "", setting: "", value: "" }, function () {
             let themeName = this.state.themeName;
             let type = this.getThemeType();
+			logger.debug(`setState(themeName=${themeName}): type → ${type}`);
             let level = this.state.level;
 
             props.dispatch(ThemeActions.getEditableThemeFiles(themeName, type, level));
@@ -159,10 +176,13 @@ class EditThemeAttributes extends Component {
     }
 
     renderValueField() {
+		logger.debug('>>> Entering renderValueField()');
         const {props, state} = this;
 
         let onFieldChange = function (value) {
+			logger.debug(`>>> Entering onFieldChange(value=${value})`);
             let editValue = value.value;
+			logger.debug(`<<< Exiting onFieldChange(value=${value})`);
             if (value.target) {
                 editValue = value.target.value;
             }
@@ -188,6 +208,7 @@ class EditThemeAttributes extends Component {
             }
         });
 
+		logger.debug('<<< Exiting renderValueField()');
         return <DropdownWithError
             options={options}
             value={state.value}
@@ -197,8 +218,10 @@ class EditThemeAttributes extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {state} = this;
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className="edit-theme-attributes">
                 <Button size="small" onClick={this.startEdit.bind(this)}>{Localization.get("EditThemeAttributes")}</Button>
@@ -280,6 +303,8 @@ EditThemeAttributes.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         themes: state.theme.themes,
         themeFiles: state.theme.editableThemeFiles,

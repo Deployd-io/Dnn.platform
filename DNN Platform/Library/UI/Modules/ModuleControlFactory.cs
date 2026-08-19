@@ -25,13 +25,16 @@ namespace DotNetNuke.UI.Modules
         [DnnDeprecated(9, 4, 0, "This implementation has moved to DotNetNuke.ModulePipeline.ModuleControlPipeline")]
         public static partial Control LoadModuleControl(TemplateControl containerControl, ModuleInfo moduleConfiguration, string controlKey, string controlSrc)
         {
+			TracelLogger.LogDebug(">>> Entering LoadModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlKey={ControlKey},controlSrc={ControlSrc})", containerControl, moduleConfiguration, controlKey, controlSrc);
             if (TracelLogger.IsDebugEnabled)
             {
                 TracelLogger.Debug($"ModuleControlFactory.LoadModuleControl Start (TabId:{moduleConfiguration.TabID},ModuleId:{moduleConfiguration.ModuleID}): ModuleControlSource:{moduleConfiguration.ModuleControl.ControlSrc}");
             }
 
             Control control = null;
+			TracelLogger.LogDebug("LoadModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlKey={ControlKey},controlSrc={ControlSrc}): control → {Control}", containerControl, moduleConfiguration, controlKey, controlSrc, control);
             IModuleControlFactory controlFactory = GetModuleControlFactory(controlSrc);
+			TracelLogger.LogDebug("LoadModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlKey={ControlKey},controlSrc={ControlSrc}): controlFactory → {ControlFactory}", containerControl, moduleConfiguration, controlKey, controlSrc, controlFactory);
 
             if (controlFactory != null)
             {
@@ -57,6 +60,8 @@ namespace DotNetNuke.UI.Modules
                 TracelLogger.Debug($"ModuleControlFactory.LoadModuleControl End (TabId:{moduleConfiguration.TabID},ModuleId:{moduleConfiguration.ModuleID}): ModuleControlSource:{moduleConfiguration.ModuleControl.ControlSrc}");
             }
 
+			TracelLogger.LogDebug("<<< Exiting LoadModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlKey={ControlKey},controlSrc={ControlSrc})", containerControl, moduleConfiguration, controlKey, controlSrc);
+			TracelLogger.LogDebug("<<< Exiting LoadModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration})", containerControl, moduleConfiguration);
             return control;
         }
 
@@ -103,13 +108,16 @@ namespace DotNetNuke.UI.Modules
         [DnnDeprecated(9, 4, 0, "This implementation has moved to DotNetNuke.ModulePipeline.ModuleControlPipeline")]
         public static partial Control LoadSettingsControl(TemplateControl containerControl, ModuleInfo moduleConfiguration, string controlSrc)
         {
+			TracelLogger.LogDebug(">>> Entering LoadSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", containerControl, moduleConfiguration, controlSrc);
             if (TracelLogger.IsDebugEnabled)
             {
                 TracelLogger.Debug($"ModuleControlFactory.LoadSettingsControl Start (TabId:{moduleConfiguration.TabID},ModuleId:{moduleConfiguration.ModuleID}): ModuleControlSource:{moduleConfiguration.ModuleControl.ControlSrc}");
             }
 
             Control control = null;
+			TracelLogger.LogDebug("LoadSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc}): control → {Control}", containerControl, moduleConfiguration, controlSrc, control);
             IModuleControlFactory controlFactory = GetModuleControlFactory(controlSrc);
+			TracelLogger.LogDebug("LoadSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc}): controlFactory → {ControlFactory}", containerControl, moduleConfiguration, controlSrc, controlFactory);
 
             if (controlFactory != null)
             {
@@ -121,6 +129,7 @@ namespace DotNetNuke.UI.Modules
             if (control != null)
             {
                 var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(controlSrc);
+				TracelLogger.LogDebug("LoadSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc}): fileNameWithoutExtension → {FileNameWithoutExtension}", containerControl, moduleConfiguration, controlSrc, fileNameWithoutExtension);
                 if (fileNameWithoutExtension != null)
                 {
                     control.ID = fileNameWithoutExtension.Replace('.', '-');
@@ -139,6 +148,7 @@ namespace DotNetNuke.UI.Modules
                 TracelLogger.Debug($"ModuleControlFactory.LoadSettingsControl End (TabId:{moduleConfiguration.TabID},ModuleId:{moduleConfiguration.ModuleID}): ModuleControlSource:{moduleConfiguration.ModuleControl.ControlSrc}");
             }
 
+			TracelLogger.LogDebug("<<< Exiting LoadSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", containerControl, moduleConfiguration, controlSrc);
             return control;
         }
 
@@ -146,8 +156,11 @@ namespace DotNetNuke.UI.Modules
         [DnnDeprecated(9, 4, 0, "This implementation has moved to DotNetNuke.ModulePipeline.ModuleControlPipeline")]
         public static partial Control CreateCachedControl(string cachedContent, ModuleInfo moduleConfiguration)
         {
+			TracelLogger.LogDebug(">>> Entering CreateCachedControl(cachedContent={CachedContent},moduleConfiguration={ModuleConfiguration})", cachedContent, moduleConfiguration);
             var moduleControl = new CachedModuleControl(cachedContent);
             moduleControl.ModuleContext.Configuration = moduleConfiguration;
+			TracelLogger.LogDebug("CreateCachedControl(cachedContent={CachedContent},moduleConfiguration={ModuleConfiguration}): moduleControl → {ModuleControl}", cachedContent, moduleConfiguration, moduleControl);
+			TracelLogger.LogDebug("<<< Exiting CreateCachedControl(cachedContent={CachedContent},moduleConfiguration={ModuleConfiguration})", cachedContent, moduleConfiguration);
             return moduleControl;
         }
 
@@ -155,16 +168,20 @@ namespace DotNetNuke.UI.Modules
         [DnnDeprecated(9, 4, 0, "This implementation has moved to DotNetNuke.ModulePipeline.ModuleControlPipeline")]
         public static partial Control CreateModuleControl(ModuleInfo moduleConfiguration)
         {
+			TracelLogger.LogDebug(">>> Entering CreateModuleControl(moduleConfiguration={ModuleConfiguration})", moduleConfiguration);
             string extension = Path.GetExtension(moduleConfiguration.ModuleControl.ControlSrc.ToLowerInvariant());
             var moduleControl = new ModuleControlBase();
+			TracelLogger.LogDebug("CreateModuleControl(moduleConfiguration={ModuleConfiguration}): moduleControl → {ModuleControl}", moduleConfiguration, moduleControl);
             moduleControl.ModuleContext.Configuration = moduleConfiguration;
 
             switch (extension)
             {
                 case ".mvc":
                     var segments = moduleConfiguration.ModuleControl.ControlSrc.Replace(".mvc", string.Empty).Split('/');
+					TracelLogger.LogDebug("CreateModuleControl(moduleConfiguration={ModuleConfiguration}): segments → {Segments}", moduleConfiguration, segments);
 
                     moduleControl.LocalResourceFile = $"~/DesktopModules/MVC/{moduleConfiguration.DesktopModule.FolderName}/{Localization.LocalResourceDirectory}/{segments[0]}.resx";
+					TracelLogger.LogDebug("CreateModuleControl(moduleConfiguration={ModuleConfiguration}): moduleControl.LocalResourceFile → {Arg1}", moduleConfiguration, moduleControl.LocalResourceFile);
                     break;
                 default:
                     moduleControl.LocalResourceFile = moduleConfiguration.ModuleControl.ControlSrc.Replace(Path.GetFileName(moduleConfiguration.ModuleControl.ControlSrc), string.Empty) +
@@ -173,15 +190,18 @@ namespace DotNetNuke.UI.Modules
                     break;
             }
 
+			TracelLogger.LogDebug("<<< Exiting CreateModuleControl(moduleConfiguration={ModuleConfiguration})", moduleConfiguration);
             return moduleControl;
         }
 
         [DnnDeprecated(9, 4, 0, "This implementation has moved to DotNetNuke.ModulePipeline.ModuleControlPipeline")]
         private static partial IModuleControlFactory GetModuleControlFactory(string controlSrc)
         {
+			TracelLogger.LogDebug(">>> Entering GetModuleControlFactory(controlSrc={ControlSrc})", controlSrc);
             string extension = Path.GetExtension(controlSrc.ToLowerInvariant());
 
             IModuleControlFactory controlFactory = null;
+			TracelLogger.LogDebug("GetModuleControlFactory(controlSrc={ControlSrc}): controlFactory → {ControlFactory}", controlSrc, controlFactory);
             Type factoryType;
             switch (extension)
             {
@@ -214,6 +234,7 @@ namespace DotNetNuke.UI.Modules
                     break;
             }
 
+			TracelLogger.LogDebug("<<< Exiting GetModuleControlFactory(controlSrc={ControlSrc})", controlSrc);
             return controlFactory;
         }
     }

@@ -1,5 +1,6 @@
 import { Component, Host, h, } from '@stencil/core';
 import state from '../../store/store';
+const logger = console;
 import { ItemsClient } from "../../services/ItemsClient";
 @Component({
   tag: 'dnn-rm-top-bar',
@@ -11,10 +12,13 @@ export class DnnRmTopBar {
   private itemsClient: ItemsClient;
 
   constructor(){
+	logger.debug('>>> Entering constructor()');
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   private async handleSearchChanged(e: CustomEvent<string>) {
+	logger.debug(`>>> Entering handleSearchChanged(e=${e})`);
     if (e.detail != ""){
       try {
         state.itemsSearchTerm = e.detail;
@@ -31,6 +35,7 @@ export class DnnRmTopBar {
         state.lastSearchRequestedPage = 1;
       } catch (error) {
         alert(error);
+		logger.debug(`handleSearchChanged(e=${e}): state.lastSearchRequestedPage → ${state.lastSearchRequestedPage}`);
       }
     }
     else
@@ -42,12 +47,17 @@ export class DnnRmTopBar {
         state.sortField,
         state.sortOrder);
       state.lastSearchRequestedPage = 1;
+	logger.error(`Exception in handleSearchChanged(e=${e}): ${(error as Error).message}`, error);
+	logger.debug(`handleSearchChanged(e=${e}): data → ${data}`);
       state.itemsSearchTerm = undefined;
       state.currentItems = data;
+	logger.debug(`<<< Exiting handleSearchChanged(e=${e})`);
     }
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <dnn-searchbox onQueryChanged={e => void this.handleSearchChanged(e)}></dnn-searchbox>

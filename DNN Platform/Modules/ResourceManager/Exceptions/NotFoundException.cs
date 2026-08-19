@@ -8,11 +8,14 @@ namespace Dnn.Modules.ResourceManager.Exceptions
     /// <summary>Thrown when a resource is not found.</summary>
     public class NotFoundException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NotFoundException));
         /// <summary>Initializes a new instance of the <see cref="NotFoundException"/> class.</summary>
         /// <param name="message">The exception message.</param>
         public NotFoundException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering NotFoundException(message={Message})", message);
+		Logger.LogDebug("<<< Exiting NotFoundException(message={Message})", message);
         }
     }
 }

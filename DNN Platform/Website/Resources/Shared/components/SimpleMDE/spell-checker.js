@@ -1,3 +1,4 @@
+const logger = console;
 // Initialize data globally to reduce memory consumption
 var num_loaded = 0;
 var aff_loading = false;
@@ -8,17 +9,20 @@ var typo;
 
 
 CodeMirror.defineMode("spell-checker", function(config, parserConfig) {
+	logger.debug('>>> Entering defineMode()'); const _start = Date.now();
 	// Load AFF/DIC data
 	if(!aff_loading){
 		aff_loading = true;
 		var xhr_aff = new XMLHttpRequest();
 		xhr_aff.open("GET", "https://cdn.jsdelivr.net/codemirror.spell-checker/latest/en_US.aff", true);
 		xhr_aff.onload = function (e) {
+			logger.debug(`>>> Entering function(e=${e})`);
 			if (xhr_aff.readyState === 4 && xhr_aff.status === 200) {
 				aff_data = xhr_aff.responseText;
 				num_loaded++;
 				
 				if(num_loaded == 2){
+					logger.debug(`<<< Exiting function(e=${e})`);
 					typo = new Typo("en_US", aff_data, dic_data, {
 						platform: 'any'
 					});

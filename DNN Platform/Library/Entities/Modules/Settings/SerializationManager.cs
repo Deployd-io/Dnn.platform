@@ -17,6 +17,7 @@ namespace DotNetNuke.Entities.Modules.Settings
     /// <inheritdoc />
     public class SerializationManager : ISerializationManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SerializationManager));
         /// <inheritdoc />
         string ISerializationManager.SerializeValue<T>(T value) =>
             this.SerializeValue(value, null, typeof(T));
@@ -42,6 +43,9 @@ namespace DotNetNuke.Entities.Modules.Settings
         /// <inheritdoc />
         public T DeserializeValue<T>(string value, string serializer)
         {
+			Logger.LogDebug(">>> Entering DeserializeValue(value={Value},serializer={Serializer})", value, serializer);
+			Logger.LogDebug("<<< Exiting DeserializeValue(value={Value},serializer={Serializer})", value, serializer);
+			Logger.LogError("Exception in DeserializeValue(propertyValue={PropertyValue},serializer={Serializer},destinationType={DestinationType}): {Arg3}", propertyValue, serializer, destinationType, exception.Message);
             return (T)this.DeserializeValue(value, serializer, typeof(T));
         }
 
@@ -73,6 +77,7 @@ namespace DotNetNuke.Entities.Modules.Settings
 
         private static string GetSettingValueAsString<T>(T settingValue)
         {
+			Logger.LogDebug(">>> Entering GetSettingValueAsString(settingValue={SettingValue})", settingValue);
             if (settingValue is DateTime dateTimeValue)
             {
                 return dateTimeValue.ToString("o", CultureInfo.InvariantCulture);
@@ -83,11 +88,13 @@ namespace DotNetNuke.Entities.Modules.Settings
                 return timeSpanValue.ToString("c", CultureInfo.InvariantCulture);
             }
 
+			Logger.LogDebug("<<< Exiting GetSettingValueAsString(settingValue={SettingValue})", settingValue);
             return Convert.ToString(settingValue, CultureInfo.InvariantCulture);
         }
 
         private static string ChangeFormatForBooleansIfNeeded(Type propertyType, string propertyValue)
         {
+			Logger.LogDebug(">>> Entering ChangeFormatForBooleansIfNeeded(propertyType={PropertyType},propertyValue={PropertyValue})", propertyType, propertyValue);
             if (!propertyType.Name.Equals("Boolean", StringComparison.Ordinal))
             {
                 return propertyValue;
@@ -105,6 +112,7 @@ namespace DotNetNuke.Entities.Modules.Settings
 
             if (propertyValue.Equals("0", StringComparison.Ordinal))
             {
+			Logger.LogDebug("<<< Exiting ChangeFormatForBooleansIfNeeded(propertyType={PropertyType},propertyValue={PropertyValue})", propertyType, propertyValue);
                 return bool.FalseString;
             }
 
@@ -113,6 +121,7 @@ namespace DotNetNuke.Entities.Modules.Settings
 
         private static object CallSerializerMethod(string serializerTypeName, Type typeArgument, object value, string methodName)
         {
+			Logger.LogDebug(">>> Entering CallSerializerMethod(serializerTypeName={SerializerTypeName},typeArgument={TypeArgument},value={Value},methodName={MethodName})", serializerTypeName, typeArgument, value, methodName);
             var serializerType = Framework.Reflection.CreateType(serializerTypeName, true);
             if (serializerType == null)
             {
@@ -120,18 +129,23 @@ namespace DotNetNuke.Entities.Modules.Settings
             }
 
             var serializer = Framework.Reflection.CreateInstance(serializerType);
+			Logger.LogDebug("CallSerializerMethod(serializerTypeName={SerializerTypeName},typeArgument={TypeArgument},value={Value},methodName={MethodName}): serializer → {Serializer}", serializerTypeName, typeArgument, value, methodName, serializer);
             if (serializer == null)
             {
                 return null;
             }
 
             var serializerInterfaceType = typeof(ISettingsSerializer<>).MakeGenericType(typeArgument);
+			Logger.LogDebug("CallSerializerMethod(serializerTypeName={SerializerTypeName},typeArgument={TypeArgument},value={Value},methodName={MethodName}): serializerInterfaceType → {SerializerInterfaceType}", serializerTypeName, typeArgument, value, methodName, serializerInterfaceType);
             var method = serializerInterfaceType.GetMethod(methodName);
+			Logger.LogDebug("CallSerializerMethod(serializerTypeName={SerializerTypeName},typeArgument={TypeArgument},value={Value},methodName={MethodName}): method → {Method}", serializerTypeName, typeArgument, value, methodName, method);
+			Logger.LogDebug("<<< Exiting CallSerializerMethod(serializerTypeName={SerializerTypeName},typeArgument={TypeArgument},value={Value},methodName={MethodName})", serializerTypeName, typeArgument, value, methodName);
             return method?.Invoke(serializer, new[] { value, });
         }
 
         private string SerializeValue<T>(T value, string serializer, Type valueType)
         {
+			Logger.LogDebug(">>> Entering SerializeValue(value={Value},serializer={Serializer},valueType={ValueType})", value, serializer, valueType);
             string settingValueAsString = null;
             if (!string.IsNullOrEmpty(serializer))
             {
@@ -143,6 +157,7 @@ namespace DotNetNuke.Entities.Modules.Settings
                 settingValueAsString = GetSettingValueAsString(value);
             }
 
+			Logger.LogDebug("<<< Exiting SerializeValue(value={Value},serializer={Serializer},valueType={ValueType})", value, serializer, valueType);
             return settingValueAsString;
         }
 
@@ -156,6 +171,7 @@ namespace DotNetNuke.Entities.Modules.Settings
             {
                 // Nullable type
                 destinationType = destinationType.GetGenericArguments()[0];
+				Logger.LogDebug("DeserializeValue(propertyValue={PropertyValue},serializer={Serializer},destinationType={DestinationType}): destinationType → {DestinationType1}", propertyValue, serializer, destinationType, destinationType);
                 if (string.IsNullOrEmpty(propertyValue))
                 {
                     return null;
@@ -218,12 +234,15 @@ namespace DotNetNuke.Entities.Modules.Settings
             if (destinationType.GetInterface(typeof(IConvertible).FullName) != null)
             {
                 propertyValue = ChangeFormatForBooleansIfNeeded(destinationType, propertyValue);
+				Logger.LogDebug("DeserializeValue(propertyValue={PropertyValue},serializer={Serializer},destinationType={DestinationType}): propertyValue → {PropertyValue1}", propertyValue, serializer, destinationType, propertyValue);
                 return Convert.ChangeType(propertyValue, destinationType, CultureInfo.InvariantCulture);
             }
 
             var converter = TypeDescriptor.GetConverter(destinationType);
+			Logger.LogDebug("DeserializeValue(propertyValue={PropertyValue},serializer={Serializer},destinationType={DestinationType}): converter → {Converter}", propertyValue, serializer, destinationType, converter);
             if (converter.IsValid(propertyValue))
             {
+			Logger.LogWarning("Throwing InvalidCastException from DeserializeValue(propertyValue={PropertyValue},serializer={Serializer},destinationType={DestinationType})", propertyValue, serializer, destinationType);
                 return converter.ConvertFromInvariantString(propertyValue);
             }
 

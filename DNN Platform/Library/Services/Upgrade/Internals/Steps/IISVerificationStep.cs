@@ -15,11 +15,14 @@ namespace DotNetNuke.Services.Upgrade.Internals.Steps
     /// <summary>Performs verifications about the IIS environment.</summary>
     public class IISVerificationStep : BaseInstallationStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(IISVerificationStep));
         /// <summary>Executes verifications on the IIS environment.</summary>
         public override void Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             this.Status = StepStatus.Running;
 
+			Logger.LogDebug("Execute(): this.Status → {Arg0}", this.Status);
             this.Details = Localization.GetString("CheckingIIS", this.LocalInstallResourceFile);
 
             // Checks for integrated pipeline mode.
@@ -39,16 +42,22 @@ namespace DotNetNuke.Services.Upgrade.Internals.Steps
             }
 
             this.Status = StepStatus.Done;
+			Logger.LogDebug("<<< Exiting Execute()");
         }
 
         private static bool IsDotNetVersionAtLeast(int version)
         {
+			Logger.LogDebug(">>> Entering IsDotNetVersionAtLeast(version={Version})", version);
+			Logger.LogDebug("<<< Exiting IsDotNetVersionAtLeast(version={Version})", version);
             return GetVersion() >= version;
         }
 
         private static int GetVersion()
         {
+			Logger.LogDebug(">>> Entering GetVersion()");
             using var key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\");
+			Logger.LogWarning("GetVersion(): key → {Key}", key);
+			Logger.LogDebug("<<< Exiting GetVersion()");
             return Convert.ToInt32(key.GetValue("Release"), CultureInfo.InvariantCulture);
         }
     }

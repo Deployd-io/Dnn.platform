@@ -8,30 +8,44 @@ Imports System.Collections
 Imports System.Collections.Generic
 Imports System.Reflection
 Imports System.Xml
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     <DefaultMember("Item")> _
     Public Class MenuNodeCollection
         Inherits DNNNodeCollection
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Public Sub New(ByVal JSONDict As Dictionary(Of String, Object), ByVal Menu As DNNMenu)
+			_logger.LogDebug(">>> Entering New(JSONDict={JSONDict},Object={Object})", JSONDict, Object)
             MyBase.New(Menu.ClientID, JSONDict)
             Me.m_objDNNMenu = Menu
+			_logger.LogDebug("New(JSONDict={JSONDict},Object={Object}): Me.m_objDNNMenu → {Arg2}", JSONDict, Object, Me.m_objDNNMenu)
+			_logger.LogDebug("<<< Exiting New(JSONDict={JSONDict},Object={Object})", JSONDict, Object)
+			_logger.LogDebug(">>> Entering New(strNamespace={StrNamespace},objControl={ObjControl})", strNamespace, objControl)
+			_logger.LogDebug("New(strNamespace={StrNamespace},objControl={ObjControl}): Me.m_objDNNMenu → {Arg2}", strNamespace, objControl, Me.m_objDNNMenu)
         End Sub
 
         Public Sub New(ByVal strNamespace As String, ByVal objControl As DNNMenu)
             MyBase.New(strNamespace)
             Me.m_objDNNMenu = objControl
+			_logger.LogDebug("<<< Exiting New(strNamespace={StrNamespace},objControl={ObjControl})", strNamespace, objControl)
+			_logger.LogDebug(">>> Entering New(objXmlNode={ObjXmlNode},objControl={ObjControl})", objXmlNode, objControl)
+			_logger.LogDebug("New(objXmlNode={ObjXmlNode},objControl={ObjControl}): Me.m_objDNNMenu → {Arg2}", objXmlNode, objControl, Me.m_objDNNMenu)
         End Sub
 
         Public Sub New(ByVal objXmlNode As XmlNode, ByVal objControl As DNNMenu)
             MyBase.New(objXmlNode)
             Me.m_objDNNMenu = objControl
+			_logger.LogDebug("<<< Exiting New(objXmlNode={ObjXmlNode},objControl={ObjControl})", objXmlNode, objControl)
+			_logger.LogDebug(">>> Entering New(strXML={StrXML},strXSLFile={StrXSLFile},objControl={ObjControl})", strXML, strXSLFile, objControl)
+			_logger.LogDebug("New(strXML={StrXML},strXSLFile={StrXSLFile},objControl={ObjControl}): Me.m_objDNNMenu → {Arg3}", strXML, strXSLFile, objControl, Me.m_objDNNMenu)
         End Sub
 
         Public Sub New(ByVal strXML As String, ByVal strXSLFile As String, ByVal objControl As DNNMenu)
             MyBase.New(strXML, strXSLFile)
             Me.m_objDNNMenu = objControl
+			_logger.LogDebug("<<< Exiting New(strXML={StrXML},strXSLFile={StrXSLFile},objControl={ObjControl})", strXML, strXSLFile, objControl)
         End Sub
 
         Public Shadows Function Add() As Integer
@@ -94,19 +108,24 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Overrides Function FindSelectedNodes() As Collection
+			_logger.LogDebug(">>> Entering FindSelectedNodes()")
             Dim collection As New Collection
             Dim flag As Boolean = Not Object.ReferenceEquals(Me.XMLNode, Nothing)
+			_logger.LogDebug("FindSelectedNodes(): flag → {Flag}", flag)
             If flag Then
                 Dim enumerator As IEnumerator = Nothing
                 Dim list As XmlNodeList = Me.XMLNode.SelectNodes("//n[@selected='1']")
+				_logger.LogDebug("FindSelectedNodes(): list → {List}", list)
                 Try 
                     enumerator = list.GetEnumerator
+					_logger.LogDebug("FindSelectedNodes(): enumerator → {Enumerator}", enumerator)
                     Do While True
                         flag = enumerator.MoveNext
                         If Not flag Then
                             Exit Do
                         End If
                         Dim current As XmlNode = DirectCast(enumerator.Current, XmlNode)
+						_logger.LogDebug("FindSelectedNodes(): current → {Current}", current)
                         collection.Add(New MenuNode(current, Me.m_objDNNMenu), Nothing, Nothing, Nothing)
                     Loop
                 Finally
@@ -115,6 +134,7 @@ Namespace DotNetNuke.UI.WebControls
                     End If
                 End Try
             End If
+			_logger.LogDebug("<<< Exiting FindSelectedNodes()")
             Return collection
         End Function
 
@@ -142,7 +162,9 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Sub Insert(ByVal index As Integer, ByVal value As MenuNode)
+			_logger.LogDebug(">>> Entering Insert(index={Index},value={Value})", index, value)
             Me.XMLNode.InsertAfter(Me.XMLNode.ChildNodes(index), value.XmlNode)
+			_logger.LogDebug("<<< Exiting Insert(index={Index},value={Value})", index, value)
         End Sub
 
         Public Shadows Sub Remove(ByVal value As MenuNode)

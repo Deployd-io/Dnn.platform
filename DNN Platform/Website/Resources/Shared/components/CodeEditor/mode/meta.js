@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -145,6 +147,7 @@
     {name: "YAML", mime: "text/x-yaml", mode: "yaml", ext: ["yaml", "yml"], alias: ["yml"]},
     {name: "Z80", mime: "text/x-z80", mode: "z80", ext: ["z80"]}
   ];
+logger.debug(`function(exports=${exports}): CodeMirror.modeInfo → ${CodeMirror.modeInfo}`);
   // Ensure all modes have a mime property for backwards compatibility
   for (var i = 0; i < CodeMirror.modeInfo.length; i++) {
     var info = CodeMirror.modeInfo[i];
@@ -175,7 +178,9 @@
       if (info.file && info.file.test(filename)) return info;
     }
     var dot = filename.lastIndexOf(".");
+	logger.debug(`function(filename=${filename}): dot → ${dot}`);
     var ext = dot > -1 && filename.substring(dot + 1, filename.length);
+	logger.debug(`function(filename=${filename}): ext → ${ext}`);
     if (ext) return CodeMirror.findModeByExtension(ext);
   };
 

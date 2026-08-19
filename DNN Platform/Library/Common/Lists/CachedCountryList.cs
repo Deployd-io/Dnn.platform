@@ -16,12 +16,14 @@ namespace DotNetNuke.Common.Lists
     [Serializable]
     public class CachedCountryList : Dictionary<string, CachedCountryList.Country>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CachedCountryList));
         /// <summary>Initializes a new instance of the <see cref="CachedCountryList"/> class.</summary>
         /// <param name="locale">This value is not currently used.</param>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with ListController. Scheduled removal in v12.0.0.")]
         public CachedCountryList(string locale)
             : this(Globals.GetCurrentServiceProvider().GetRequiredService<ListController>())
         {
+		Logger.LogDebug(">>> Entering CachedCountryList(locale={Locale})", locale);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CachedCountryList"/> class.</summary>
@@ -29,6 +31,7 @@ namespace DotNetNuke.Common.Lists
         public CachedCountryList(ListController listController)
         {
             // TODO: locale is unused here, this as it stands is not localizable. See https://www.dnnsoftware.com/community-blog/cid/155072/new-list-localization-in-dnn-733
+			Logger.LogDebug("<<< Exiting CachedCountryList(locale={Locale})", locale);
             foreach (ListEntryInfo li in listController.GetListEntryInfoItems("Country"))
             {
                 string text = li.Text;
@@ -56,14 +59,18 @@ namespace DotNetNuke.Common.Lists
         /// <returns>A cached list of countries.</returns>
         public static CachedCountryList GetCountryList(ListController listController)
         {
+			Logger.LogDebug(">>> Entering GetCountryList(listController={ListController})", listController);
             CachedCountryList res = null;
+			Logger.LogDebug("GetCountryList(listController={ListController}): res → {Res}", listController, res);
             try
             {
                 res = (CachedCountryList)DataCache.GetCache(CacheKey("none"));
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in GetCountryList(locale={Locale}): {Arg1}", locale, Exception.Message);
                 // do nothing here.
+				Logger.LogError("Exception in GetCountryList(listController={ListController}): {Arg1}", listController, Exception.Message);
             }
 
             if (res == null)
@@ -72,6 +79,7 @@ namespace DotNetNuke.Common.Lists
                 DataCache.SetCache(CacheKey("none"), res);
             }
 
+			Logger.LogDebug("<<< Exiting GetCountryList(locale={Locale})", locale);
             return res;
         }
 
@@ -80,6 +88,8 @@ namespace DotNetNuke.Common.Lists
         /// <returns>The cache key string.</returns>
         public static string CacheKey(string locale)
         {
+			Logger.LogDebug(">>> Entering CacheKey(locale={Locale})", locale);
+			Logger.LogDebug("<<< Exiting CacheKey(locale={Locale})", locale);
             return $"CountryList:{locale}";
         }
 
