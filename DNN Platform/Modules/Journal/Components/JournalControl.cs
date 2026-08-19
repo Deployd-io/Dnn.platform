@@ -13,6 +13,7 @@ namespace DotNetNuke.Modules.Journal.Components
 
     public class JournalControl : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JournalControl));
         /// <inheritdoc />
         public CacheLevel Cacheability
         {
@@ -35,8 +36,10 @@ namespace DotNetNuke.Modules.Journal.Components
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, System.Globalization.CultureInfo formatProvider, Entities.Users.UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             string outputFormat = string.Empty;
             if (format == string.Empty)
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): outputFormat → {OutputFormat}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, outputFormat);
             {
                 outputFormat = "g";
             }
@@ -46,6 +49,7 @@ namespace DotNetNuke.Modules.Journal.Components
             }
 
             propertyName = propertyName.ToLowerInvariant();
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): propertyName → {PropertyName1}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, propertyName);
             switch (propertyName)
             {
                 case "commentlink":
@@ -61,6 +65,7 @@ namespace DotNetNuke.Modules.Journal.Components
             }
 
             propertyNotFound = true;
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return string.Empty;
         }
     }

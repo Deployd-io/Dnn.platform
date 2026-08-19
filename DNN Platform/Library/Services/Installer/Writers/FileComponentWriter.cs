@@ -14,6 +14,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The FileComponentWriter class handles creating the manifest for File Component(s).</summary>
     public class FileComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FileComponentWriter));
         private readonly string basePath;
         private readonly Dictionary<string, InstallFile> files;
         private readonly PackageInfo package;
@@ -29,9 +30,13 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="package">Package Info.</param>
         public FileComponentWriter(string basePath, Dictionary<string, InstallFile> files, PackageInfo package)
         {
+			Logger.LogDebug(">>> Entering FileComponentWriter(basePath={BasePath},files={Files},package={Package})", basePath, files, package);
             this.files = files;
             this.basePath = basePath;
+			Logger.LogDebug("FileComponentWriter(basePath={BasePath},files={Files},package={Package}): this.files → {Arg3}", basePath, files, package, this.files);
+			Logger.LogDebug("FileComponentWriter(basePath={BasePath},files={Files},package={Package}): this.basePath → {Arg3}", basePath, files, package, this.basePath);
             this.package = package;
+			Logger.LogDebug("<<< Exiting FileComponentWriter(basePath={BasePath},files={Files},package={Package})", basePath, files, package);
         }
 
         public int InstallOrder
@@ -112,6 +117,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
         public virtual void WriteManifest(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteManifest(writer={Writer})", writer);
             // Start component Element
             writer.WriteStartElement("component");
             writer.WriteAttributeString("type", this.ComponentType);
@@ -147,6 +153,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
             // End component Element
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteManifest(writer={Writer})", writer);
         }
 
         /// <summary>
@@ -156,10 +163,13 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="writer">The XmlWriter to use.</param>
         protected virtual void WriteCustomManifest(XmlWriter writer)
         {
+		Logger.LogDebug(">>> Entering WriteCustomManifest(writer={Writer})", writer);
+		Logger.LogDebug("<<< Exiting WriteCustomManifest(writer={Writer})", writer);
         }
 
         protected virtual void WriteFileElement(XmlWriter writer, InstallFile file)
         {
+			Logger.LogDebug(">>> Entering WriteFileElement(writer={Writer},file={File})", writer, file);
             this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.WRITER_AddFileToManifest, file.Name));
 
             // Start file Element
@@ -169,6 +179,7 @@ namespace DotNetNuke.Services.Installer.Writers
             if (!string.IsNullOrEmpty(file.Path))
             {
                 string path = file.Path;
+				Logger.LogDebug("WriteFileElement(writer={Writer},file={File}): path → {Path}", writer, file, path);
                 if (!string.IsNullOrEmpty(this.basePath))
                 {
                     if (file.Path.ToLowerInvariant().Contains(this.basePath.ToLowerInvariant()))
@@ -191,6 +202,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
             // Close file Element
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteFileElement(writer={Writer},file={File})", writer, file);
         }
     }
 }

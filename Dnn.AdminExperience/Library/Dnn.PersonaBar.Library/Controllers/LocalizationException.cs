@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class LocalizationException : ApplicationException
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LocalizationException));
     /// <inheritdoc />
     public LocalizationException()
     {
+	Logger.LogDebug(">>> Entering LocalizationException()");
+	Logger.LogDebug("<<< Exiting LocalizationException()");
     }
 
     /// <inheritdoc />
     public LocalizationException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering LocalizationException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting LocalizationException(message={Message})", message);
 
     /// <inheritdoc />
     public LocalizationException(string message, Exception innerException)

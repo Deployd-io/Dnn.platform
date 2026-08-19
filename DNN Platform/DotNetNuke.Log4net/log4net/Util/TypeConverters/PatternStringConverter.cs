@@ -50,6 +50,10 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public bool CanConvertTo(Type targetType)
         {
+			value.LogDebug(">>> Entering CanConvertTo(targetType={TargetType})", targetType);
+			value.LogDebug(">>> Entering ConvertTo(source={Source},targetType={TargetType})", source, targetType);
+			value.LogDebug("<<< Exiting ConvertTo(source={Source},targetType={TargetType})", source, targetType);
+			value.LogDebug("<<< Exiting CanConvertTo(targetType={TargetType})", targetType);
             return (typeof(string).IsAssignableFrom(targetType));
         }
 
@@ -89,6 +93,10 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public bool CanConvertFrom(Type sourceType)
         {
+			value.LogDebug(">>> Entering CanConvertFrom(sourceType={SourceType})", sourceType);
+			value.LogDebug(">>> Entering ConvertFrom(source={Source})", source);
+			value.LogDebug("<<< Exiting ConvertFrom(source={Source})", source);
+			value.LogDebug("<<< Exiting CanConvertFrom(sourceType={SourceType})", sourceType);
             return (sourceType == typeof(string));
         }
 

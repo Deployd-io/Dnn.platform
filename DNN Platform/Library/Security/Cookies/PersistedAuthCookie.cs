@@ -17,6 +17,7 @@ namespace DotNetNuke.Security.Cookies
     [PrimaryKey("CookieId")]
     public class PersistedAuthCookie : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PersistedAuthCookie));
         public int CookieId { get; private set; }
 
         public string CookieValue { get; private set; }
@@ -33,6 +34,7 @@ namespace DotNetNuke.Security.Cookies
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.CookieId = Null.SetNullInteger(dr[nameof(this.CookieId)]);
             this.CookieValue = Null.SetNullString(dr[nameof(this.CookieValue)]);
             this.ExpiresOn = Null.SetNullDateTime(dr[nameof(this.ExpiresOn)]);
@@ -49,6 +51,7 @@ namespace DotNetNuke.Security.Cookies
                     this.ExpiresOn.Millisecond,
                     DateTimeKind.Utc);
             }
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

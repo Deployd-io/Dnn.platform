@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.Social.Notifications
     [Serializable]
     public class NotificationTypeAction : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NotificationTypeAction));
         private int notificationTypeActionId = -1;
 
         /// <summary>Gets or sets the notification type action identifier.</summary>
@@ -72,6 +73,7 @@ namespace DotNetNuke.Services.Social.Notifications
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.NotificationTypeActionId = Convert.ToInt32(dr["NotificationTypeActionID"], CultureInfo.InvariantCulture);
             this.NotificationTypeId = Convert.ToInt32(dr["NotificationTypeID"], CultureInfo.InvariantCulture);
             this.NameResourceKey = dr["NameResourceKey"].ToString();
@@ -82,6 +84,7 @@ namespace DotNetNuke.Services.Social.Notifications
 
             // add audit column data
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

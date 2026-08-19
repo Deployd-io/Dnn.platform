@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"))
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,12 +13,15 @@
 })(function(CodeMirror) {
   "use strict"
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
   CodeMirror.defineOption("autoRefresh", false, function(cm, val) {
+	logger.debug(`>>> Entering defineOption(false=${false})`);
     if (cm.state.autoRefresh) {
       stopListening(cm, cm.state.autoRefresh)
       cm.state.autoRefresh = null
     }
     if (val && cm.display.wrapper.offsetHeight == 0)
+	logger.debug(`<<< Exiting defineOption(false=${false})`);
       startListening(cm, cm.state.autoRefresh = {delay: val.delay || 250})
   })
 
@@ -40,8 +45,10 @@
   }
 
   function stopListening(_cm, state) {
+	logger.debug(`>>> Entering stopListening(_cm=${_cm},state=${state})`);
     clearTimeout(state.timeout)
     CodeMirror.off(window, "mouseup", state.hurry)
     CodeMirror.off(window, "keyup", state.hurry)
+	logger.debug(`<<< Exiting stopListening(_cm=${_cm},state=${state})`);
   }
 });

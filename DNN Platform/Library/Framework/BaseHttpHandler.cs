@@ -66,6 +66,7 @@ namespace DotNetNuke.Framework
         /// </value>
         public virtual bool RequiresAuthentication
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(BaseHttpHandler));
             get
             {
                 return true;
@@ -129,8 +130,11 @@ namespace DotNetNuke.Framework
         /// <param name="context">Context.</param>
         public void ProcessRequest(HttpContext context)
         {
+			Logger.LogDebug(">>> Entering ProcessRequest(context={Context})", context);
             this.context = context;
 
+			Logger.LogDebug("ProcessRequest(context={Context}): this.context → {Arg1}", context, this.context);
+			Logger.LogDebug("ProcessRequest(context={Context}): context → {Context1}", context, context);
             this.SetResponseCachePolicy(this.Response.Cache);
 
             if (!this.ValidateParameters())
@@ -149,6 +153,7 @@ namespace DotNetNuke.Framework
             this.Response.ContentEncoding = this.ContentEncoding;
 
             this.HandleRequest();
+			Logger.LogDebug("<<< Exiting ProcessRequest(context={Context})", context);
         }
 
         /// <summary>
@@ -196,9 +201,11 @@ namespace DotNetNuke.Framework
         /// <param name="cache">Cache.</param>
         public virtual void SetResponseCachePolicy(HttpCachePolicy cache)
         {
+			Logger.LogDebug(">>> Entering SetResponseCachePolicy(cache={Cache})", cache);
             cache.SetCacheability(HttpCacheability.NoCache);
             cache.SetNoStore();
             cache.SetExpires(DateTime.MinValue);
+			Logger.LogDebug("<<< Exiting SetResponseCachePolicy(cache={Cache})", cache);
         }
 
         /// <summary>
@@ -207,8 +214,10 @@ namespace DotNetNuke.Framework
         /// </summary>
         protected void RespondFileNotFound()
         {
+			Logger.LogDebug(">>> Entering RespondFileNotFound()");
             this.Response.StatusCode = (int)HttpStatusCode.NotFound;
             this.Response.End();
+			Logger.LogDebug("<<< Exiting RespondFileNotFound()");
         }
 
         /// <summary>
@@ -217,10 +226,12 @@ namespace DotNetNuke.Framework
         /// </summary>
         protected void RespondInternalError()
         {
+			Logger.LogDebug(">>> Entering RespondInternalError()");
             // It's really too bad that StatusCode property
             // is not of type HttpStatusCode.
             this.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             this.Response.End();
+			Logger.LogDebug("<<< Exiting RespondInternalError()");
         }
 
         /// <summary>
@@ -230,8 +241,10 @@ namespace DotNetNuke.Framework
         /// </summary>
         protected void RespondForbidden()
         {
+			Logger.LogDebug(">>> Entering RespondForbidden()");
             this.Response.StatusCode = (int)HttpStatusCode.Forbidden;
             this.Response.End();
+			Logger.LogDebug("<<< Exiting RespondForbidden()");
         }
     }
 }

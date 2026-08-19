@@ -4,6 +4,7 @@
 
 namespace DotNetNuke.Web.Mvc.Common
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AntiForgeryImpl));
     internal class AntiForgeryImpl : IAntiForgery
     {
         /// <inheritdoc />
@@ -15,7 +16,9 @@ namespace DotNetNuke.Web.Mvc.Common
         /// <inheritdoc />
         public void Validate(string cookieToken, string headerToken)
         {
+			Logger.LogDebug(">>> Entering Validate(cookieToken=<redacted>,headerToken=<redacted>)");
             System.Web.Helpers.AntiForgery.Validate(cookieToken, headerToken);
+			Logger.LogDebug("<<< Exiting Validate(cookieToken=<redacted>,headerToken=<redacted>)");
         }
     }
 }

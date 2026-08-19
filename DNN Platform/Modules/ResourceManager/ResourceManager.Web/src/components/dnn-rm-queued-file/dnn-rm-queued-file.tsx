@@ -1,5 +1,6 @@
 import { Component, Host, h, Prop, State, Element } from '@stencil/core';
 import state from '../../store/store';
+const logger = console;
 import { getFileSize } from '../../utilities/filesize-utilities';
 import { DnnServicesFramework } from '@dnncommunity/dnn-elements';
 import { UploadFromLocalResponse } from './UploadFromLocalResponse';
@@ -37,10 +38,13 @@ export class DnnRmQueuedFile {
     private xhr = new XMLHttpRequest();
 
     constructor() {
+		logger.debug('>>> Entering constructor()');
         this.servicesFramework = new DnnServicesFramework(state.moduleId);
+		logger.debug('<<< Exiting constructor()');
     }
 
     async componentDidLoad() {
+		logger.debug('>>> Entering componentDidLoad()');
         try {
             this.fileUploadResults = await this.uploadFile();
             if (this.fileUploadResults.message === null) {
@@ -48,6 +52,7 @@ export class DnnRmQueuedFile {
                 setTimeout(() => {
                     void this.dismiss();
                 }, 3000);
+				logger.debug('<<< Exiting componentDidLoad()');
                 return;
             }
         } catch (err) {
@@ -56,6 +61,8 @@ export class DnnRmQueuedFile {
     }
 
     private dismiss() {
+		logger.debug('>>> Entering dismiss()');
+		logger.debug('<<< Exiting dismiss()');
         return new Promise<void>((resolve, reject) => {
             try {
                 this.el.style.transition = 'all 1s ease-in-out';
@@ -78,8 +85,10 @@ export class DnnRmQueuedFile {
 
     private async uploadFile(): Promise<UploadFromLocalResponse> {
         return new Promise<UploadFromLocalResponse>((resolve, reject) => {
+		logger.debug('>>> Entering uploadFile()');
             const extension = this.file.name.split('.').pop().toLowerCase();
             if (this.filter.split(',').indexOf(extension) === -1) {
+				logger.debug(`uploadFile(): extension → ${extension}`);
                 const message = `'.${extension}' ${state.localization.InvalidExtensionMessage}`;
                 this.fileUploadResults = {
                     alreadyExists: false,
@@ -95,6 +104,7 @@ export class DnnRmQueuedFile {
 
             if (this.file.size > this.maxUploadFileSize) {
                 const message = `${this.file.name} ${state.localization.FileSizeErrorMessage} ${getFileSize(this.maxUploadFileSize)}`;
+				logger.debug(`uploadFile(): message → ${message}`);
                 this.fileUploadResults = {
                     alreadyExists: false,
                     message: message,
@@ -108,8 +118,10 @@ export class DnnRmQueuedFile {
             }
 
             const headers = this.servicesFramework.getModuleHeaders();
+			logger.debug(`uploadFile(): headers → ${headers}`);
 
             const formData = new FormData();
+			logger.debug(`uploadFile(): formData → ${formData}`);
             formData.append("folder", state.currentItems.folder.folderPath);
             formData.append("filter", this.filter);
             formData.append("extract", this.extract ? "true" : "false");
@@ -142,12 +154,14 @@ export class DnnRmQueuedFile {
             };
 
             const url = this.servicesFramework.getServiceRoot('InternalServices') + 'FileUpload/UploadFromLocal';
+			logger.debug(`uploadFile(): url → ${url}`);
             this.xhr.open("POST", url);
             headers.forEach((value, key) => {
                 this.xhr.setRequestHeader(key, value);
             });
             this.xhr.send(formData);
         });
+		logger.debug('<<< Exiting uploadFile()');
     }
 
     private async handleOvewrite(): Promise<void> {
@@ -156,12 +170,17 @@ export class DnnRmQueuedFile {
         try {
             this.fileUploadResults = await this.uploadFile();
             await this.dismiss();
+			logger.debug(`handleOvewrite(): this.fileUploadResults → ${this.fileUploadResults}`);
+			logger.debug('>>> Entering handleOvewrite()');
         } catch (err) {
             alert(err);
+			logger.debug('<<< Exiting handleOvewrite()');
         }
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <Host>
                 <div class="container">

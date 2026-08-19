@@ -8,17 +8,21 @@ import { Dropdown, InputGroup, GridSystem as Grid, Label, RadioButtons, Switch, 
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class GeneralSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             generalSettings: undefined,
             triedToSubmit: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         if (props.generalSettings) {
             this.setState({
@@ -31,18 +35,23 @@ class GeneralSettingsPanelBody extends Component {
                 generalSettings: Object.assign({}, data.Settings)
             });
         }));
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`);
         this.setState({
             generalSettings: Object.assign({}, props.generalSettings),
             triedToSubmit: false
         });
+		logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`);
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
         let generalSettings = Object.assign({}, state.generalSettings);
+		logger.debug(`onSettingChange(key=${key},event=${event}): generalSettings → ${generalSettings}`);
 
         if (key === "ReplaceSpaceWith") {
             generalSettings[key] = event.value;
@@ -57,12 +66,15 @@ class GeneralSettingsPanelBody extends Component {
         });
 
         props.dispatch(SeoActions.generalSettingsClientModified(generalSettings));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     keyValuePairsToOptions(keyValuePairs) {
+		logger.debug(`>>> Entering keyValuePairsToOptions(keyValuePairs=${keyValuePairs})`);
         let options = [];
         if (keyValuePairs !== undefined) {
             options = keyValuePairs.map((item) => {
+		logger.debug(`<<< Exiting keyValuePairsToOptions(keyValuePairs=${keyValuePairs})`);
                 return { label: item.Key, value: item.Value };
             });
         }
@@ -70,6 +82,7 @@ class GeneralSettingsPanelBody extends Component {
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -80,13 +93,16 @@ class GeneralSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.debug(`<<< Exiting onUpdate(event=${event})`);
         }));
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SeoActions.getGeneralSettings((data) => {
+				logger.debug('<<< Exiting onCancel()');
                 this.setState({
                     generalSettings: Object.assign({}, data.Settings)
                 });
@@ -96,6 +112,7 @@ class GeneralSettingsPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         if (state.generalSettings) {
             const columnOne = <div className="left-column" key="columnOne">
@@ -204,6 +221,7 @@ class GeneralSettingsPanelBody extends Component {
                 </InputGroup>
             </div>;
 
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.generalSettings}>
                     <Grid numberOfColumns={2}>{[columnOne, columnTwo]}</Grid>
@@ -238,6 +256,8 @@ GeneralSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         generalSettings: state.seo.generalSettings,

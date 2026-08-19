@@ -11,6 +11,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     {
         public SkinObjectPackageDetailDto()
         {
+		eventLogger.LogDebug(">>> Entering SkinObjectPackageDetailDto()");
+		eventLogger.LogDebug("<<< Exiting SkinObjectPackageDetailDto()");
         }
 
         public SkinObjectPackageDetailDto(int portalId, PackageInfo package)

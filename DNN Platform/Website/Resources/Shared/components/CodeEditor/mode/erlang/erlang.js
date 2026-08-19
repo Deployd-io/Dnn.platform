@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -16,6 +17,7 @@
 //   type/spec/opaque
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -27,6 +29,7 @@
 
 CodeMirror.defineMIME("text/x-erlang", "erlang");
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("erlang", function(cmCfg) {
   "use strict";
 
@@ -101,6 +104,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
 // tokenizer
 
   function tokenizer(stream,state) {
+	logger.debug(`>>> Entering tokenizer(stream=${stream},state=${state})`);
     // in multi-line string
     if (state.in_string) {
       state.in_string = (!doubleQuote(stream));
@@ -129,6 +133,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
     }
 
     var ch = stream.next();
+	logger.debug(`tokenizer(stream=${stream},state=${state}): ch → ${ch}`);
 
     // comment
     if (ch == '%') {
@@ -218,17 +223,23 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
         }else if (is_member(w,guardWords)) {
           return rval(state,stream,"guard");
         }else{
+		logger.debug(`>>> Entering peekToken(state=${state},depth=${depth})`);
+		logger.debug(`<<< Exiting peekToken(state=${state},depth=${depth})`);
           return rval(state,stream,"function");
         }
       }else if (lookahead(stream) == ":") {
         if (w == "erlang") {
           return rval(state,stream,"builtin");
         } else {
+		logger.debug(`>>> Entering d(stack=${stack},tt=${tt})`);
+		logger.debug(`<<< Exiting d(stack=${stack},tt=${tt})`);
           return rval(state,stream,"function");
         }
       }else if (is_member(w,["true","false"])) {
         return rval(state,stream,"boolean");
       }else{
+		logger.debug(`>>> Entering is_member(element=${element},list=${list})`);
+		logger.debug(`<<< Exiting is_member(element=${element},list=${list})`);
         return rval(state,stream,"atom");
       }
     }
@@ -279,6 +290,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
 
     // operators
     if (greedy(stream,operatorSymbolRE,operatorSymbolWords)) {
+	logger.debug(`<<< Exiting tokenizer(stream=${stream},state=${state})`);
       return rval(state,stream,"operator");
     }
 
@@ -288,6 +300,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
 /////////////////////////////////////////////////////////////////////////////
 // utilities
   function nongreedy(stream,re,words) {
+	logger.debug(`>>> Entering nongreedy(stream=${stream},re=${re},words=${words})`);
     if (stream.current().length == 1 && re.test(stream.current())) {
       stream.backUp(1);
       while (re.test(stream.peek())) {
@@ -298,6 +311,9 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
       }
       stream.backUp(stream.current().length-1);
     }
+	logger.debug(`>>> Entering greedy(stream=${stream},re=${re},words=${words})`);
+	logger.debug(`<<< Exiting greedy(stream=${stream},re=${re},words=${words})`);
+	logger.debug(`<<< Exiting nongreedy(stream=${stream},re=${re},words=${words})`);
     return false;
   }
 
@@ -319,14 +335,19 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function doubleQuote(stream) {
+	logger.debug(`>>> Entering doubleQuote(stream=${stream})`);
+	logger.debug(`<<< Exiting doubleQuote(stream=${stream})`);
     return quote(stream, '"', '\\');
   }
 
   function singleQuote(stream) {
+	logger.debug(`>>> Entering singleQuote(stream=${stream})`);
+	logger.debug(`<<< Exiting singleQuote(stream=${stream})`);
     return quote(stream,'\'','\\');
   }
 
   function quote(stream,quoteChar,escapeChar) {
+	logger.debug(`>>> Entering quote(stream=${stream},quoteChar=${quoteChar},escapeChar=${escapeChar})`);
     while (!stream.eol()) {
       var ch = stream.next();
       if (ch == quoteChar) {
@@ -335,11 +356,16 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
         stream.next();
       }
     }
+	logger.debug(`quote(stream=${stream},quoteChar=${quoteChar},escapeChar=${escapeChar}): ch → ${ch}`);
+	logger.debug(`<<< Exiting quote(stream=${stream},quoteChar=${quoteChar},escapeChar=${escapeChar})`);
     return false;
   }
 
   function lookahead(stream) {
+	logger.debug(`>>> Entering lookahead(stream=${stream})`);
     var m = stream.match(/([\n\s]+|%[^\n]*\n)*(.)/,false);
+	logger.debug(`lookahead(stream=${stream}): m → ${m}`);
+	logger.debug(`<<< Exiting lookahead(stream=${stream})`);
     return m ? m.pop() : "";
   }
 
@@ -348,6 +374,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function rval(state,stream,type) {
+logger.debug(`>>> Entering rval(state=${state},stream=${stream},type=${type})`);
 
     // parse stack
     pushToken(state,realToken(type,stream));
@@ -378,10 +405,13 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
       case "type":        return "def";
       case "variable":    return "variable";
       default:            return null;
+	logger.debug(`<<< Exiting rval(state=${state},stream=${stream},type=${type})`);
     }
   }
 
   function aToken(tok,col,ind,typ) {
+	logger.debug(`>>> Entering aToken(tok=${tok},col=${col},ind=${ind},typ=${typ})`);
+	logger.debug(`<<< Exiting aToken(tok=${tok},col=${col},ind=${ind},typ=${typ})`);
     return {token:  tok,
             column: col,
             indent: ind,
@@ -389,6 +419,8 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function realToken(type,stream) {
+	logger.debug(`>>> Entering realToken(type=${type},stream=${stream})`);
+	logger.debug(`<<< Exiting realToken(type=${type},stream=${stream})`);
     return aToken(stream.current(),
                  stream.column(),
                  stream.indentation(),
@@ -396,6 +428,8 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function fakeToken(type) {
+	logger.debug(`>>> Entering fakeToken(type=${type})`);
+	logger.debug(`<<< Exiting fakeToken(type=${type})`);
     return aToken(type,0,0,type);
   }
 
@@ -433,6 +467,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function maybe_drop_post(s) {
+	logger.debug(`>>> Entering maybe_drop_post(s=${s})`);
     var last = s.length-1;
 
     if (s[last].type === "dot") {
@@ -456,6 +491,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
       case "of":   return d(s,{e:["case"]});
       case "after":return d(s,{e:["receive","try"]});
       default:     return s;
+	logger.debug(`<<< Exiting maybe_drop_post(s=${s})`);
     }
   }
 
@@ -477,6 +513,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
     //  in which case it will return an empty stack.
 
     for (var type in tt) {
+	logger.debug(`>>> Entering returns(truncated=${truncated})`);
       var len = stack.length-1;
       var tokens = tt[type];
       for (var i = len-1; -1 < i ; i--) {
@@ -489,6 +526,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
               case "g": return ss.concat(fakeToken("group"));
               case "E": return ss.concat(stack[i]);
               case "e": return ss.concat(stack[i]);
+			logger.debug(`<<< Exiting returns(truncated=${truncated})`);
           }
         }
       }
@@ -500,11 +538,15 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
 // indenter
 
   function indenter(state,textAfter) {
+	logger.debug(`>>> Entering indenter(state=${state},textAfter=${textAfter})`);
     var t;
     var unit = cmCfg.indentUnit;
     var wordAfter = wordafter(textAfter);
+	logger.debug(`indenter(state=${state},textAfter=${textAfter}): wordAfter → ${wordAfter}`);
     var currT = peekToken(state,1);
+	logger.debug(`indenter(state=${state},textAfter=${textAfter}): currT → ${currT}`);
     var prevT = peekToken(state,2);
+	logger.debug(`indenter(state=${state},textAfter=${textAfter}): prevT → ${prevT}`);
 
     if (state.in_string || state.in_atom) {
       return CodeMirror.Pass;
@@ -538,33 +580,45 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
       return currT.column+currT.token.length;
     }else{
       t = defaultToken(state);
+	logger.debug(`<<< Exiting indenter(state=${state},textAfter=${textAfter})`);
       return truthy(t) ? t.column+unit : 0;
     }
   }
 
   function wordafter(str) {
+	logger.debug(`>>> Entering wordafter(str=${str})`);
     var m = str.match(/,|[a-z]+|\}|\]|\)|>>|\|+|\(/);
+	logger.debug(`wordafter(str=${str}): m → ${m}`);
 
+	logger.debug(`<<< Exiting wordafter(str=${str})`);
     return truthy(m) && (m.index === 0) ? m[0] : "";
   }
 
   function postcommaToken(state) {
+	logger.debug(`>>> Entering postcommaToken(state=${state})`);
     var objs = state.tokenStack.slice(0,-1);
     var i = getTokenIndex(objs,"type",["open_paren"]);
+	logger.debug(`postcommaToken(state=${state}): objs → ${objs}`);
 
+	logger.debug(`<<< Exiting postcommaToken(state=${state})`);
     return truthy(objs[i]) ? objs[i] : false;
   }
 
   function defaultToken(state) {
+	logger.debug(`>>> Entering defaultToken(state=${state})`);
     var objs = state.tokenStack;
     var stop = getTokenIndex(objs,"type",["open_paren","separator","keyword"]);
+	logger.debug(`defaultToken(state=${state}): stop → ${stop}`);
     var oper = getTokenIndex(objs,"type",["operator"]);
+	logger.debug(`defaultToken(state=${state}): oper → ${oper}`);
 
     if (truthy(stop) && truthy(oper) && stop < oper) {
       return objs[stop+1];
     } else if (truthy(stop)) {
       return objs[stop];
     } else {
+	logger.debug(`<<< Exiting truthy(x=${x})`);
+	logger.debug(`<<< Exiting defaultToken(state=${state})`);
       return false;
     }
   }
@@ -577,12 +631,14 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function getTokenIndex(objs,propname,propvals) {
+logger.debug(`>>> Entering getTokenIndex(objs=${objs},propname=${propname},propvals=${propvals})`);
 
     for (var i = objs.length-1; -1 < i ; i--) {
       if (is_member(objs[i][propname],propvals)) {
         return i;
       }
     }
+	logger.debug(`<<< Exiting getTokenIndex(objs=${objs},propname=${propname},propvals=${propvals})`);
     return false;
   }
 
@@ -596,6 +652,8 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   return {
     startState:
       function() {
+		logger.debug(`>>> Entering function(stream=${stream},state=${state})`);
+		logger.debug('>>> Entering function()');
         return {tokenStack: [],
                 in_string:  false,
                 in_atom:    false};

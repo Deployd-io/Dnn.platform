@@ -11,12 +11,17 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The ContainerPackageWriter class.</summary>
     public class ContainerPackageWriter : SkinPackageWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ContainerPackageWriter));
         /// <summary>Initializes a new instance of the <see cref="ContainerPackageWriter"/> class.</summary>
         /// <param name="package">The package info.</param>
         public ContainerPackageWriter(PackageInfo package)
             : base(package)
         {
+			Logger.LogDebug(">>> Entering ContainerPackageWriter(package={Package})", package);
             this.BasePath = "Portals\\_default\\Containers\\" + this.SkinPackage.SkinName;
+			Logger.LogDebug("ContainerPackageWriter(skinPackage={SkinPackage},package={Package}): this.BasePath → {Arg2}", skinPackage, package, this.BasePath);
+			Logger.LogDebug("<<< Exiting ContainerPackageWriter(package={Package})", package);
+			Logger.LogDebug("ContainerPackageWriter(package={Package}): this.BasePath → {Arg1}", package, this.BasePath);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ContainerPackageWriter"/> class.</summary>
@@ -31,8 +36,11 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <inheritdoc />
         protected override void WriteFilesToManifest(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteFilesToManifest(writer={Writer})", writer);
             var containerFileWriter = new ContainerComponentWriter(this.SkinPackage.SkinName, this.BasePath, this.Files, this.Package);
             containerFileWriter.WriteManifest(writer);
+			Logger.LogDebug("WriteFilesToManifest(writer={Writer}): containerFileWriter → {ContainerFileWriter}", writer, containerFileWriter);
+			Logger.LogDebug("<<< Exiting WriteFilesToManifest(writer={Writer})", writer);
         }
     }
 }

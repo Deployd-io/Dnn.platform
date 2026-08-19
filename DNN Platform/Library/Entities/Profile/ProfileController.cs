@@ -59,11 +59,16 @@ namespace DotNetNuke.Entities.Profile
         /// <param name="portalId">ID of the Portal.</param>
         public static void AddDefaultDefinitions(ListController listController, IEventLogger eventLogger, IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, int portalId)
         {
+			Logger.LogDebug(">>> Entering AddDefaultDefinitions(listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId})", listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, portalId);
             portalId = PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, portalId);
 
+			Logger.LogDebug("AddDefaultDefinitions(listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId}): portalId → {PortalId1}", listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, portalId, portalId);
             orderCounter = 1;
+			Logger.LogDebug("AddDefaultDefinitions(listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId}): orderCounter → {OrderCounter}", listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, portalId, orderCounter);
             var dataTypes = listController.GetListEntryInfoDictionary("DataType");
+			Logger.LogDebug("AddDefaultDefinitions(listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId}): dataTypes → {DataTypes}", listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, portalId, dataTypes);
 
+			Logger.LogDebug("<<< Exiting AddDefaultDefinitions(portalId={PortalId})", portalId);
             AddDefaultDefinition(eventLogger, portalController, appStatus, portalGroupController, portalId, "Name", "Prefix", "Text", 50, UserVisibilityMode.AllUsers, dataTypes);
             AddDefaultDefinition(eventLogger, portalController, appStatus, portalGroupController, portalId, "Name", "FirstName", "Text", 50, UserVisibilityMode.AllUsers, dataTypes);
             AddDefaultDefinition(eventLogger, portalController, appStatus, portalGroupController, portalId, "Name", "MiddleName", "Text", 50, UserVisibilityMode.AllUsers, dataTypes);
@@ -88,6 +93,7 @@ namespace DotNetNuke.Entities.Profile
 
             // 6.0 requires the old TimeZone property to be marked as Deleted
             var timeZoneProperty = GetPropertyDefinitionByName(hostSettings, portalController, appStatus, portalGroupController, portalId, "TimeZone");
+			Logger.LogDebug("AddDefaultDefinitions(listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId}): timeZoneProperty → {TimeZoneProperty}", listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, portalId, timeZoneProperty);
             if (timeZoneProperty != null)
             {
                 DeletePropertyDefinition(eventLogger, portalController, appStatus, portalGroupController, timeZoneProperty);
@@ -115,10 +121,13 @@ namespace DotNetNuke.Entities.Profile
         /// <returns>The ID of the definition (or if negative the errorcode of the error).</returns>
         public static int AddPropertyDefinition(IEventLogger eventLogger, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, ProfilePropertyDefinition definition)
         {
+			Logger.LogDebug(">>> Entering AddPropertyDefinition(eventLogger={EventLogger},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},definition={Definition})", eventLogger, portalController, appStatus, portalGroupController, definition);
             int portalId = PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, definition.PortalId);
             if (definition.Required)
+			Logger.LogDebug("AddPropertyDefinition(eventLogger={EventLogger},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},definition={Definition}): portalId → {PortalId}", eventLogger, portalController, appStatus, portalGroupController, definition, portalId);
             {
                 definition.Visible = true;
+				Logger.LogDebug("AddPropertyDefinition(eventLogger={EventLogger},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},definition={Definition}): definition.Visible → {Arg5}", eventLogger, portalController, appStatus, portalGroupController, definition, definition.Visible);
             }
 
             int intDefinition = DataProvider.AddPropertyDefinition(
@@ -139,6 +148,7 @@ namespace DotNetNuke.Entities.Profile
             eventLogger.AddLog(definition, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.PROFILEPROPERTY_CREATED);
             ClearProfileDefinitionCache(portalController, appStatus, portalGroupController, definition.PortalId);
             ClearAllUsersInfoProfileCacheByPortal(definition.PortalId);
+			Logger.LogDebug("<<< Exiting AddPropertyDefinition(definition={Definition})", definition);
             return intDefinition;
         }
 
@@ -159,7 +169,9 @@ namespace DotNetNuke.Entities.Profile
         /// <param name="portalId">ID of the Portal.</param>
         public static void ClearProfileDefinitionCache(IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearProfileDefinitionCache(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId})", portalController, appStatus, portalGroupController, portalId);
             DataCache.ClearDefinitionsCache(PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, portalId));
+			Logger.LogDebug("<<< Exiting ClearProfileDefinitionCache(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId})", portalController, appStatus, portalGroupController, portalId);
         }
 
         /// <summary>Deletes a Property Definition from the Data Store.</summary>
@@ -188,9 +200,11 @@ namespace DotNetNuke.Entities.Profile
         /// <param name="definition">The ProfilePropertyDefinition object to delete.</param>
         public static void DeletePropertyDefinition(IEventLogger eventLogger, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, ProfilePropertyDefinition definition)
         {
+			Logger.LogDebug(">>> Entering DeletePropertyDefinition(eventLogger={EventLogger},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},definition={Definition})", eventLogger, portalController, appStatus, portalGroupController, definition);
             DataProvider.DeletePropertyDefinition(definition.PropertyDefinitionId);
             eventLogger.AddLog(definition, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.PROFILEPROPERTY_DELETED);
             ClearProfileDefinitionCache(portalController, appStatus, portalGroupController, definition.PortalId);
+			Logger.LogDebug("<<< Exiting DeletePropertyDefinition(definition={Definition})", definition);
             ClearAllUsersInfoProfileCacheByPortal(definition.PortalId);
         }
 
@@ -198,8 +212,10 @@ namespace DotNetNuke.Entities.Profile
         /// <param name="portalId">The portal ID.</param>
         public static void ClearAllUsersInfoProfileCacheByPortal(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearAllUsersInfoProfileCacheByPortal(portalId={PortalId})", portalId);
             DataCache.ClearCache(string.Format(CultureInfo.InvariantCulture, DataCache.UserCacheKey, portalId, string.Empty));
             DataCache.ClearCache(string.Format(CultureInfo.InvariantCulture, DataCache.UserProfileCacheKey, portalId, string.Empty));
+			Logger.LogDebug("<<< Exiting ClearAllUsersInfoProfileCacheByPortal(portalId={PortalId})", portalId);
         }
 
         /// <summary>Gets a Property Definition from the Data Store by ID.</summary>
@@ -235,8 +251,11 @@ namespace DotNetNuke.Entities.Profile
         /// <returns>The ProfilePropertyDefinition object.</returns>
         public static ProfilePropertyDefinition GetPropertyDefinition(IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, int definitionId, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetPropertyDefinition(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},definitionId={DefinitionId},portalId={PortalId})", hostSettings, portalController, appStatus, portalGroupController, definitionId, portalId);
             bool bFound = Null.NullBoolean;
             ProfilePropertyDefinition definition = null;
+			Logger.LogDebug("GetPropertyDefinition(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},definitionId={DefinitionId},portalId={PortalId}): definition → {Definition}", hostSettings, portalController, appStatus, portalGroupController, definitionId, portalId, definition);
+			Logger.LogDebug("GetPropertyDefinition(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},definitionId={DefinitionId},portalId={PortalId}): bFound → {BFound}", hostSettings, portalController, appStatus, portalGroupController, definitionId, portalId, bFound);
             foreach (ProfilePropertyDefinition def in GetPropertyDefinitions(hostSettings, PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, portalId)))
             {
                 if (def.PropertyDefinitionId == definitionId)
@@ -245,6 +264,7 @@ namespace DotNetNuke.Entities.Profile
                     bFound = true;
                     break;
                 }
+				Logger.LogDebug("<<< Exiting GetPropertyDefinitions(hostSettings={HostSettings},portalId={PortalId})", hostSettings, portalId);
             }
 
             if (!bFound)
@@ -253,6 +273,8 @@ namespace DotNetNuke.Entities.Profile
                 definition = FillPropertyDefinitionInfo(DataProvider.GetPropertyDefinition(definitionId));
             }
 
+			Logger.LogDebug("<<< Exiting GetPropertyDefinition(definitionId={DefinitionId},portalId={PortalId})", definitionId, portalId);
+			Logger.LogDebug("<<< Exiting GetPropertyDefinition(hostSettings={HostSettings},definitionId={DefinitionId},portalId={PortalId})", hostSettings, definitionId, portalId);
             return definition;
         }
 
@@ -289,10 +311,14 @@ namespace DotNetNuke.Entities.Profile
         /// <returns>The ProfilePropertyDefinition object.</returns>
         public static ProfilePropertyDefinition GetPropertyDefinitionByName(IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, int portalId, string name)
         {
+			Logger.LogDebug(">>> Entering GetPropertyDefinitionByName(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},name={Name})", hostSettings, portalController, appStatus, portalGroupController, portalId, name);
             portalId = PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, portalId);
 
+			Logger.LogDebug("GetPropertyDefinitionByName(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},name={Name}): portalId → {PortalId1}", hostSettings, portalController, appStatus, portalGroupController, portalId, name, portalId);
             bool bFound = Null.NullBoolean;
+			Logger.LogDebug("GetPropertyDefinitionByName(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},name={Name}): bFound → {BFound}", hostSettings, portalController, appStatus, portalGroupController, portalId, name, bFound);
             ProfilePropertyDefinition definition = null;
+			Logger.LogDebug("GetPropertyDefinitionByName(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},name={Name}): definition → {Definition}", hostSettings, portalController, appStatus, portalGroupController, portalId, name, definition);
             foreach (ProfilePropertyDefinition def in GetPropertyDefinitions(hostSettings, portalId))
             {
                 if (def.PropertyName == name)
@@ -309,6 +335,7 @@ namespace DotNetNuke.Entities.Profile
                 definition = FillPropertyDefinitionInfo(DataProvider.GetPropertyDefinitionByName(portalId, name));
             }
 
+			Logger.LogDebug("<<< Exiting GetPropertyDefinitionByName(portalId={PortalId},name={Name})", portalId, name);
             return definition;
         }
 
@@ -345,9 +372,12 @@ namespace DotNetNuke.Entities.Profile
         /// <returns>A ProfilePropertyDefinitionCollection object.</returns>
         public static ProfilePropertyDefinitionCollection GetPropertyDefinitionsByCategory(IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, int portalId, string category)
         {
+			Logger.LogDebug(">>> Entering GetPropertyDefinitionsByCategory(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},category={Category})", hostSettings, portalController, appStatus, portalGroupController, portalId, category);
             portalId = PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, portalId);
 
+			Logger.LogDebug("GetPropertyDefinitionsByCategory(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},category={Category}): portalId → {PortalId1}", hostSettings, portalController, appStatus, portalGroupController, portalId, category, portalId);
             var definitions = new ProfilePropertyDefinitionCollection();
+			Logger.LogDebug("GetPropertyDefinitionsByCategory(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},category={Category}): definitions → {Definitions}", hostSettings, portalController, appStatus, portalGroupController, portalId, category, definitions);
             foreach (ProfilePropertyDefinition definition in GetPropertyDefinitions(hostSettings, portalId))
             {
                 if (definition.PropertyCategory == category)
@@ -356,6 +386,7 @@ namespace DotNetNuke.Entities.Profile
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetPropertyDefinitionsByCategory(portalId={PortalId},category={Category})", portalId, category);
             return definitions;
         }
 
@@ -443,17 +474,22 @@ namespace DotNetNuke.Entities.Profile
         /// <returns>A ProfilePropertyDefinitionCollection object.</returns>
         public static ProfilePropertyDefinitionCollection GetPropertyDefinitionsByPortal(IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, int portalId, bool clone, bool includeDeleted)
         {
+			Logger.LogDebug(">>> Entering GetPropertyDefinitionsByPortal(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},clone={Clone},includeDeleted={IncludeDeleted})", hostSettings, portalController, appStatus, portalGroupController, portalId, clone, includeDeleted);
             portalId = PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, portalId);
 
+			Logger.LogDebug("GetPropertyDefinitionsByPortal(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},clone={Clone},includeDeleted={IncludeDeleted}): portalId → {PortalId1}", hostSettings, portalController, appStatus, portalGroupController, portalId, clone, includeDeleted, portalId);
             var definitions = new ProfilePropertyDefinitionCollection();
+			Logger.LogDebug("GetPropertyDefinitionsByPortal(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},clone={Clone},includeDeleted={IncludeDeleted}): definitions → {Definitions}", hostSettings, portalController, appStatus, portalGroupController, portalId, clone, includeDeleted, definitions);
             foreach (ProfilePropertyDefinition definition in GetPropertyDefinitions(hostSettings, portalId))
             {
                 if (!definition.Deleted || includeDeleted)
                 {
                     definitions.Add(clone ? definition.Clone() : definition);
                 }
+				Logger.LogDebug(">>> Entering GetPropertyDefinitions(hostSettings={HostSettings},portalId={PortalId})", hostSettings, portalId);
             }
 
+			Logger.LogDebug("<<< Exiting GetPropertyDefinitionsByPortal(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId})", hostSettings, portalController, appStatus, portalGroupController, portalId);
             return definitions;
         }
 
@@ -474,11 +510,14 @@ namespace DotNetNuke.Entities.Profile
         /// <param name="user">The user whose Profile information we are retrieving.</param>
         public static void GetUserProfile(IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, ref UserInfo user)
         {
+			Logger.LogDebug(">>> Entering GetUserProfile(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},user={User})", portalController, appStatus, portalGroupController, user);
             int portalId = user.PortalID;
             user.PortalID = PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, portalId);
 
             ProfileProvider.GetUserProfile(ref user);
             user.PortalID = portalId;
+			Logger.LogDebug("GetUserProfile(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},user={User}): user.PortalID → {Arg4}", portalController, appStatus, portalGroupController, user, user.PortalID);
+			Logger.LogDebug("<<< Exiting GetUserProfile(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},user={User})", portalController, appStatus, portalGroupController, user);
         }
 
         /// <summary>Updates a Property Definition in the Data Store.</summary>
@@ -507,9 +546,11 @@ namespace DotNetNuke.Entities.Profile
         /// <param name="definition">The ProfilePropertyDefinition object to update.</param>
         public static void UpdatePropertyDefinition(IEventLogger eventLogger, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, ProfilePropertyDefinition definition)
         {
+			Logger.LogDebug(">>> Entering UpdatePropertyDefinition(eventLogger={EventLogger},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},definition={Definition})", eventLogger, portalController, appStatus, portalGroupController, definition);
             if (definition.Required)
             {
                 definition.Visible = true;
+				Logger.LogDebug("UpdatePropertyDefinition(eventLogger={EventLogger},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},definition={Definition}): definition.Visible → {Arg5}", eventLogger, portalController, appStatus, portalGroupController, definition, definition.Visible);
             }
 
             DataProvider.UpdatePropertyDefinition(
@@ -528,6 +569,7 @@ namespace DotNetNuke.Entities.Profile
                 UserController.Instance.GetCurrentUserInfo().UserID);
             eventLogger.AddLog(definition, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.PROFILEPROPERTY_UPDATED);
             ClearProfileDefinitionCache(portalController, appStatus, portalGroupController, definition.PortalId);
+			Logger.LogDebug("<<< Exiting UpdatePropertyDefinition(definition={Definition})", definition);
             ClearAllUsersInfoProfileCacheByPortal(definition.PortalId);
         }
 
@@ -548,12 +590,15 @@ namespace DotNetNuke.Entities.Profile
         /// <param name="user">The use to update.</param>
         public static void UpdateUserProfile(IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, UserInfo user)
         {
+			Logger.LogDebug(">>> Entering UpdateUserProfile(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},user={User})", portalController, appStatus, portalGroupController, user);
             if (!user.Profile.IsDirty)
             {
                 return;
             }
 
             var portalId = PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, user.PortalID);
+			Logger.LogDebug("UpdateUserProfile(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},user={User}): portalId → {PortalId}", portalController, appStatus, portalGroupController, user, portalId);
+			Logger.LogDebug("UpdateUserProfile(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},user={User}): user.PortalID → {Arg4}", portalController, appStatus, portalGroupController, user, user.PortalID);
             user.PortalID = portalId;
 
             var oldUser = new UserInfo { UserID = user.UserID, PortalID = user.PortalID, IsSuperUser = user.IsSuperUser };
@@ -566,6 +611,7 @@ namespace DotNetNuke.Entities.Profile
 
             // Raise Profile updated event
             EventManager.Instance.OnProfileUpdated(new ProfileEventArgs { User = user, OldProfile = oldUser.Profile });
+			Logger.LogDebug("<<< Exiting UpdateUserProfile(user={User})", user);
         }
 
         /// <summary>Updates a User's Profile.</summary>
@@ -592,10 +638,14 @@ namespace DotNetNuke.Entities.Profile
         /// <returns>The updated User.</returns>
         public static UserInfo UpdateUserProfile(IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, IEventLogger eventLogger, UserInfo user, ProfilePropertyDefinitionCollection profileProperties)
         {
+			Logger.LogDebug(">>> Entering UpdateUserProfile(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},user={User},profileProperties={ProfileProperties})", portalController, appStatus, portalGroupController, eventLogger, user, profileProperties);
             int portalId = PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, user.PortalID);
             user.PortalID = portalId;
+			Logger.LogDebug("UpdateUserProfile(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},user={User},profileProperties={ProfileProperties}): user.PortalID → {Arg6}", portalController, appStatus, portalGroupController, eventLogger, user, profileProperties, user.PortalID);
+			Logger.LogDebug("UpdateUserProfile(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},user={User},profileProperties={ProfileProperties}): portalId → {PortalId}", portalController, appStatus, portalGroupController, eventLogger, user, profileProperties, portalId);
 
             var photoChanged = Null.NullBoolean;
+			Logger.LogDebug("UpdateUserProfile(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},user={User},profileProperties={ProfileProperties}): photoChanged → {PhotoChanged}", portalController, appStatus, portalGroupController, eventLogger, user, profileProperties, photoChanged);
 
             // Iterate through the Definitions
             if (profileProperties is null)
@@ -654,8 +704,11 @@ namespace DotNetNuke.Entities.Profile
         /// <returns><see langword="true"/> if the profile is valid, otherwise <see langword="false"/>.</returns>
         public static bool ValidateProfile(ListController listController, int portalId, UserProfile profile)
         {
+			Logger.LogDebug(">>> Entering ValidateProfile(listController={ListController},portalId={PortalId},profile={Profile})", listController, portalId, profile);
             var isValid = true;
             var imageType = listController.GetListEntryInfo("DataType", "Image");
+			Logger.LogDebug("ValidateProfile(listController={ListController},portalId={PortalId},profile={Profile}): imageType → {ImageType}", listController, portalId, profile, imageType);
+			Logger.LogDebug("ValidateProfile(listController={ListController},portalId={PortalId},profile={Profile}): isValid → {IsValid}", listController, portalId, profile, isValid);
             foreach (ProfilePropertyDefinition propertyDefinition in profile.ProfileProperties)
             {
                 if (propertyDefinition.Required && string.IsNullOrEmpty(propertyDefinition.PropertyValue) && propertyDefinition.DataType != imageType.EntryID)
@@ -665,6 +718,7 @@ namespace DotNetNuke.Entities.Profile
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ValidateProfile(portalId={PortalId},objProfile={ObjProfile})", portalId, objProfile);
             return isValid;
         }
 
@@ -697,20 +751,25 @@ namespace DotNetNuke.Entities.Profile
         /// <returns>List of matching values.</returns>
         public static List<string> SearchProfilePropertyValues(ListController listController, IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, int portalId, string propertyName, string searchString)
         {
+			Logger.LogDebug(">>> Entering SearchProfilePropertyValues(listController={ListController},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},propertyName={PropertyName},searchString={SearchString})", listController, hostSettings, portalController, appStatus, portalGroupController, portalId, propertyName, searchString);
             var res = new List<string>();
             var autoCompleteType = listController.GetListEntryInfo("DataType", "AutoComplete");
+			Logger.LogDebug("SearchProfilePropertyValues(listController={ListController},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},propertyName={PropertyName},searchString={SearchString}): autoCompleteType → {AutoCompleteType}", listController, hostSettings, portalController, appStatus, portalGroupController, portalId, propertyName, searchString, autoCompleteType);
             var def = GetPropertyDefinitionByName(hostSettings, portalController, appStatus, portalGroupController, portalId, propertyName);
+			Logger.LogDebug("SearchProfilePropertyValues(listController={ListController},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},propertyName={PropertyName},searchString={SearchString}): res → {Res}", listController, hostSettings, portalController, appStatus, portalGroupController, portalId, propertyName, searchString, res);
             if (def.DataType != autoCompleteType.EntryID)
             {
                 return res;
             }
 
             using var reader = Data.DataProvider.Instance().SearchProfilePropertyValues(portalId, propertyName, searchString);
+			Logger.LogDebug("SearchProfilePropertyValues(listController={ListController},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},propertyName={PropertyName},searchString={SearchString}): reader → {Reader}", listController, hostSettings, portalController, appStatus, portalGroupController, portalId, propertyName, searchString, reader);
             while (reader.Read())
             {
                 res.Add(Convert.ToString(reader[0], CultureInfo.InvariantCulture));
             }
 
+			Logger.LogDebug("<<< Exiting SearchProfilePropertyValues(portalId={PortalId},propertyName={PropertyName},searchString={SearchString})", portalId, propertyName, searchString);
             return res;
         }
 
@@ -723,9 +782,11 @@ namespace DotNetNuke.Entities.Profile
 
         internal static void AddDefaultDefinition(IEventLogger eventLogger, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, int portalId, string category, string name, string type, int length, int viewOrder, UserVisibilityMode defaultVisibility, Dictionary<string, ListEntryInfo> types)
         {
+			Logger.LogDebug(">>> Entering AddDefaultDefinition(eventLogger={EventLogger},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},category={Category},name={Name},type={Type},length={Length},viewOrder={ViewOrder},defaultVisibility={DefaultVisibility},types={Types})", eventLogger, portalController, appStatus, portalGroupController, portalId, category, name, type, length, viewOrder, defaultVisibility, types);
             ListEntryInfo typeInfo = types[$"DataType:{type}"] ?? types["DataType:Unknown"];
             var propertyDefinition = new ProfilePropertyDefinition(portalId)
             {
+			Logger.LogDebug("AddDefaultDefinition(eventLogger={EventLogger},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},category={Category},name={Name},type={Type},length={Length},viewOrder={ViewOrder},defaultVisibility={DefaultVisibility},types={Types}): typeInfo → {TypeInfo}", eventLogger, portalController, appStatus, portalGroupController, portalId, category, name, type, length, viewOrder, defaultVisibility, types, typeInfo);
                 DataType = typeInfo.EntryID,
                 DefaultValue = string.Empty,
                 ModuleDefId = Null.NullInteger,
@@ -738,18 +799,23 @@ namespace DotNetNuke.Entities.Profile
                 DefaultVisibility = defaultVisibility,
             };
             AddPropertyDefinition(eventLogger, portalController, appStatus, portalGroupController, propertyDefinition);
+			Logger.LogDebug("<<< Exiting AddDefaultDefinition(eventLogger={EventLogger},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},category={Category},name={Name},type={Type},length={Length},viewOrder={ViewOrder},defaultVisibility={DefaultVisibility},types={Types})", eventLogger, portalController, appStatus, portalGroupController, portalId, category, name, type, length, viewOrder, defaultVisibility, types);
         }
 
         private static void AddDefaultDefinition(IEventLogger eventLogger, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, int portalId, string category, string name, string strType, int length, UserVisibilityMode defaultVisibility, Dictionary<string, ListEntryInfo> types)
         {
+			Logger.LogDebug(">>> Entering AddDefaultDefinition(eventLogger={EventLogger},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},category={Category},name={Name},strType={StrType},length={Length},defaultVisibility={DefaultVisibility},types={Types})", eventLogger, portalController, appStatus, portalGroupController, portalId, category, name, strType, length, defaultVisibility, types);
             orderCounter += 2;
             AddDefaultDefinition(eventLogger, portalController, appStatus, portalGroupController, portalId, category, name, strType, length, orderCounter, defaultVisibility, types);
+			Logger.LogDebug("<<< Exiting AddDefaultDefinition(eventLogger={EventLogger},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},category={Category},name={Name},strType={StrType},length={Length},defaultVisibility={DefaultVisibility},types={Types})", eventLogger, portalController, appStatus, portalGroupController, portalId, category, name, strType, length, defaultVisibility, types);
         }
 
         private static ProfilePropertyDefinition FillPropertyDefinitionInfo(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering FillPropertyDefinitionInfo(dr={Dr})", dr);
             ProfilePropertyDefinition definition = null;
             try
+			Logger.LogDebug("FillPropertyDefinitionInfo(dr={Dr}): definition → {Definition}", dr, definition);
             {
                 definition = FillPropertyDefinitionInfo(dr, true);
             }
@@ -762,6 +828,8 @@ namespace DotNetNuke.Entities.Profile
                 CBO.CloseDataReader(dr, true);
             }
 
+			Logger.LogDebug("<<< Exiting FillPropertyDefinitionInfo(dr={Dr})", dr);
+			Logger.LogDebug("<<< Exiting FillPropertyDefinitionInfo(dr={Dr},checkForOpenDataReader={CheckForOpenDataReader})", dr, checkForOpenDataReader);
             return definition;
         }
 
@@ -812,13 +880,16 @@ namespace DotNetNuke.Entities.Profile
 
         private static List<ProfilePropertyDefinition> FillPropertyDefinitionInfoCollection(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering FillPropertyDefinitionInfoCollection(dr={Dr})", dr);
             var arr = new List<ProfilePropertyDefinition>();
             try
+			Logger.LogDebug("FillPropertyDefinitionInfoCollection(dr={Dr}): arr → {Arr}", dr, arr);
             {
                 while (dr.Read())
                 {
                     // fill business object
                     ProfilePropertyDefinition definition = FillPropertyDefinitionInfo(dr, false);
+					Logger.LogDebug("FillPropertyDefinitionInfoCollection(dr={Dr}): definition → {Definition}", dr, definition);
 
                     // add to collection
                     arr.Add(definition);
@@ -826,6 +897,7 @@ namespace DotNetNuke.Entities.Profile
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in FillPropertyDefinitionInfoCollection(dr={Dr}): {Arg1}", dr, exc.getMessage());
                 Exceptions.LogException(exc);
             }
             finally
@@ -834,16 +906,19 @@ namespace DotNetNuke.Entities.Profile
                 CBO.CloseDataReader(dr, true);
             }
 
+			Logger.LogDebug("<<< Exiting FillPropertyDefinitionInfoCollection(dr={Dr})", dr);
             return arr;
         }
 
         private static List<ProfilePropertyDefinition> GetPropertyDefinitions(IHostSettings hostSettings, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetPropertyDefinitions(hostSettings={HostSettings},portalId={PortalId})", hostSettings, portalId);
             // Get the Cache Key
             string key = string.Format(CultureInfo.InvariantCulture, DataCache.ProfileDefinitionsCacheKey, portalId);
 
             // Try fetching the List from the Cache
             var definitions = (List<ProfilePropertyDefinition>)DataCache.GetCache(key);
+			Logger.LogDebug("GetPropertyDefinitions(hostSettings={HostSettings},portalId={PortalId}): definitions → {Definitions}", hostSettings, portalId, definitions);
             if (definitions is not null)
             {
                 return definitions;
@@ -851,6 +926,7 @@ namespace DotNetNuke.Entities.Profile
 
             // definitions caching settings
             int timeOut = DataCache.ProfileDefinitionsCacheTimeOut * (int)hostSettings.PerformanceSetting;
+			Logger.LogDebug("GetPropertyDefinitions(hostSettings={HostSettings},portalId={PortalId}): timeOut → {TimeOut}", hostSettings, portalId, timeOut);
 
             // Get the List from the database
             definitions = FillPropertyDefinitionInfoCollection(DataProvider.GetPropertyDefinitionsByPortal(portalId));
@@ -866,29 +942,38 @@ namespace DotNetNuke.Entities.Profile
 
         private static void CreateThumbnails(int fileId)
         {
+			Logger.LogDebug(">>> Entering CreateThumbnails(fileId={FileId})", fileId);
             CreateThumbnail(fileId, "l", 64, 64);
             CreateThumbnail(fileId, "s", 50, 50);
             CreateThumbnail(fileId, "xs", 32, 32);
+			Logger.LogDebug("<<< Exiting CreateThumbnails(fileId={FileId})", fileId);
         }
 
         private static void CreateThumbnail(int fileId, string type, int width, int height)
         {
+			Logger.LogDebug(">>> Entering CreateThumbnail(fileId={FileId},type={Type},width={Width},height={Height})", fileId, type, width, height);
             var file = FileManager.Instance.GetFile(fileId);
             if (file == null)
+			Logger.LogDebug("CreateThumbnail(fileId={FileId},type={Type},width={Width},height={Height}): file → {File}", fileId, type, width, height, file);
             {
                 return;
             }
 
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
+			Logger.LogDebug("CreateThumbnail(fileId={FileId},type={Type},width={Width},height={Height}): folder → {Folder}", fileId, type, width, height, folder);
             var extension = $".{file.Extension}";
+			Logger.LogDebug("CreateThumbnail(fileId={FileId},type={Type},width={Width},height={Height}): extension → {Extension}", fileId, type, width, height, extension);
             var sizedPhoto = file.FileName.Replace(extension, $"_{type}{extension}");
+			Logger.LogDebug("CreateThumbnail(fileId={FileId},type={Type},width={Width},height={Height}): sizedPhoto → {SizedPhoto}", fileId, type, width, height, sizedPhoto);
             if (FileManager.Instance.FileExists(folder, sizedPhoto))
             {
                 return;
             }
 
             using var content = FileManager.Instance.GetFileContent(file);
+			Logger.LogDebug("CreateThumbnail(fileId={FileId},type={Type},width={Width},height={Height}): content → {Content}", fileId, type, width, height, content);
             var sizedContent = ImageUtils.CreateImage(content, height, width, extension);
+			Logger.LogDebug("CreateThumbnail(fileId={FileId},type={Type},width={Width},height={Height}): sizedContent → {SizedContent}", fileId, type, width, height, sizedContent);
 
             const bool operationDoesNotRequirePermissionsCheck = true;
             FileManager.Instance.AddFile(folder, sizedPhoto, sizedContent, false, !operationDoesNotRequirePermissionsCheck, FileContentTypeManager.Instance.GetContentType(Path.GetExtension(sizedPhoto)));

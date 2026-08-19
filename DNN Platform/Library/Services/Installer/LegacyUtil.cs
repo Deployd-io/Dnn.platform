@@ -42,9 +42,12 @@ namespace DotNetNuke.Services.Installer
 
         public static string CreateSkinManifest(string skinFolder, string skinType, string tempInstallFolder)
         {
+			Logger.LogDebug(">>> Entering CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder=<redacted>)", skinFolder, skinType);
             // Test if there are Skins and Containers folders in TempInstallFolder (ie it is a legacy combi package)
             bool isCombi = false;
+			Logger.LogDebug("CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder=<redacted>): isCombi → {IsCombi}", skinFolder, skinType, isCombi);
             var installFolder = new DirectoryInfo(tempInstallFolder);
+			Logger.LogDebug("CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder=<redacted>): installFolder → {InstallFolder}", skinFolder, skinType, installFolder);
             DirectoryInfo[] subFolders = installFolder.GetDirectories();
             if (subFolders.Length > 0)
             {
@@ -56,6 +59,7 @@ namespace DotNetNuke.Services.Installer
 
             // Create a writer to create the processed manifest
             var sb = new StringBuilder();
+			Logger.LogDebug("CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder=<redacted>): sb → {Sb}", skinFolder, skinType, sb);
             using (XmlWriter writer = XmlWriter.Create(sb, XmlUtils.GetXmlWriterSettings(ConformanceLevel.Fragment)))
             {
                 PackageWriterBase.WriteManifestStartElement(writer);
@@ -85,12 +89,14 @@ namespace DotNetNuke.Services.Installer
                 writer.Close();
 
                 // Return new manifest
+				Logger.LogDebug("<<< Exiting CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder=<redacted>)", skinFolder, skinType);
                 return sb.ToString();
             }
         }
 
         public static void ParsePackageName(PackageInfo package)
         {
+			Logger.LogDebug(">>> Entering ParsePackageName(package={Package})", package);
             ParsePackageName(package, ".");
             if (string.IsNullOrEmpty(package.Owner))
             {
@@ -107,6 +113,8 @@ namespace DotNetNuke.Services.Installer
                 if (string.IsNullOrEmpty(package.Owner))
                 {
                     package.Owner = "DotNetNuke";
+					Logger.LogDebug("ParsePackageName(package={Package}): package.Owner → {Arg1}", package, package.Owner);
+					Logger.LogDebug("ParsePackageName(package={Package}): package.Name → {Arg1}", package, package.Name);
                     package.Name = "DotNetNuke." + package.Name;
                     switch (package.PackageType)
                     {
@@ -130,6 +138,10 @@ namespace DotNetNuke.Services.Installer
             {
                 package.License = Localization.GetString("License", Localization.GlobalResourceFile);
                 package.Organization = ".NET Foundation";
+				Logger.LogDebug("ParsePackageName(package={Package}): package.Organization → {Arg1}", package, package.Organization);
+				Logger.LogDebug("ParsePackageName(package={Package}): package.Url → {Arg1}", package, package.Url);
+				Logger.LogDebug("ParsePackageName(package={Package}): package.Email → {Arg1}", package, package.Email);
+				Logger.LogDebug("ParsePackageName(package={Package}): package.ReleaseNotes → {Arg1}", package, package.ReleaseNotes);
                 package.Url = "https://dnncommunity.org";
                 package.Email = "info@dnncommunity.org";
                 package.ReleaseNotes = "There are no release notes for this version.";
@@ -137,23 +149,33 @@ namespace DotNetNuke.Services.Installer
             else
             {
                 package.License = Util.PACKAGE_NoLicense;
+				Logger.LogDebug("ParsePackageName(package={Package}): package.License → {Arg1}", package, package.License);
             }
+			Logger.LogDebug("<<< Exiting ParsePackageName(package={Package})", package);
         }
 
         private static PackageInfo CreateSkinPackage(SkinPackageInfo skin)
         {
+			Logger.LogDebug(">>> Entering CreateSkinPackage(skin={Skin})", skin);
             // Create a Package
             var package = new PackageInfo(new InstallerInfo());
+			Logger.LogDebug("CreateSkinPackage(skin={Skin}): package → {Package}", skin, package);
+			Logger.LogDebug("CreateSkinPackage(skin={Skin}): package.Name → {Arg1}", skin, package.Name);
+			Logger.LogDebug("CreateSkinPackage(skin={Skin}): package.FriendlyName → {Arg1}", skin, package.FriendlyName);
+			Logger.LogDebug("CreateSkinPackage(skin={Skin}): package.Description → {Arg1}", skin, package.Description);
             package.Name = skin.SkinName;
             package.FriendlyName = skin.SkinName;
             package.Description = Null.NullString;
             package.Version = new Version(1, 0, 0);
             package.PackageType = skin.SkinType;
+			Logger.LogDebug("CreateSkinPackage(skin={Skin}): package.PackageType → {Arg1}", skin, package.PackageType);
+			Logger.LogDebug("CreateSkinPackage(skin={Skin}): package.License → {Arg1}", skin, package.License);
             package.License = Util.PACKAGE_NoLicense;
 
             // See if the Skin is using a Namespace (or is a known skin)
             ParsePackageName(package);
 
+			Logger.LogDebug("<<< Exiting CreateSkinPackage(skin={Skin})", skin);
             return package;
         }
 
@@ -180,12 +202,15 @@ namespace DotNetNuke.Services.Installer
 
         private static void ParsePackageName(PackageInfo package, string separator)
         {
+			Logger.LogDebug(">>> Entering ParsePackageName(package={Package},separator={Separator})", package, separator);
             // See if the Module is using a "Namespace" for its name
             int ownerIndex = package.Name.IndexOf(separator, StringComparison.Ordinal);
+			Logger.LogDebug("ParsePackageName(package={Package},separator={Separator}): ownerIndex → {OwnerIndex}", package, separator, ownerIndex);
             if (ownerIndex > 0)
             {
                 package.Owner = package.Name.Substring(0, ownerIndex);
             }
+			Logger.LogDebug("<<< Exiting ParsePackageName(package={Package},separator={Separator})", package, separator);
         }
     }
 }

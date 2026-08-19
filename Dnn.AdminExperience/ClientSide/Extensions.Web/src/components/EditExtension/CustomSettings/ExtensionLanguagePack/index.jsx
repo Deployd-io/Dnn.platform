@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { GridCell, DropdownWithError, Button } from "@dnnsoftware/dnn-react-common";
 import Localization from "localization";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 class ExtensionLanguagePack extends Component {
@@ -12,8 +13,10 @@ class ExtensionLanguagePack extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         let { extensionBeingEdited } = props;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.editExtensionLanguagePack + (props.className ? " " + props.className : "")}>
                 <GridCell>
@@ -62,6 +65,8 @@ ExtensionLanguagePack.propTypes = {
 
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         extensionBeingEdited: state.extension.extensionBeingEdited,
         extensionBeingEditedIndex: state.extension.extensionBeingEditedIndex

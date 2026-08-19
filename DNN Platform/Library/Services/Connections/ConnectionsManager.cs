@@ -15,15 +15,22 @@ namespace DotNetNuke.Services.Connections
 
     public sealed class ConnectionsManager : ServiceLocator<IConnectionsManager, ConnectionsManager>, IConnectionsManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConnectionsManager));
         /// <inheritdoc />
         public IList<IConnector> GetConnectors(IServiceProvider serviceProvider)
         {
+			Logger.LogDebug(">>> Entering GetConnectors(serviceProvider={ServiceProvider})", serviceProvider);
+			Logger.LogDebug("<<< Exiting GetConnectors(serviceProvider={ServiceProvider})", serviceProvider);
             return serviceProvider.GetServices<IConnector>().Where(x => IsPackageInstalled(x.GetType().Assembly)).ToList();
         }
 
         /// <inheritdoc />
         protected override Func<IConnectionsManager> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
+			Logger.LogDebug(">>> Entering IsPackageInstalled(assembly={Assembly})", assembly);
+			Logger.LogDebug("<<< Exiting IsPackageInstalled(assembly={Assembly})", assembly);
             return Globals.DependencyProvider.GetRequiredService<IConnectionsManager>;
         }
 

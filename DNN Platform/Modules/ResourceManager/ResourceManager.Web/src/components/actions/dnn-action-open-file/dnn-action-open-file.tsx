@@ -1,6 +1,7 @@
 import { Component, Host, h, Prop } from '@stencil/core';
 import { Item } from '../../../services/ItemsClient';
 import state from "../../../store/store";
+const logger = console;
 
 @Component({
   tag: 'dnn-action-open-file',
@@ -13,10 +14,14 @@ export class DnnActionOpenFile {
   @Prop() item!: Item;
 
   private handleClick(): void {
+	logger.debug('>>> Entering handleClick()');
     window.open(this.item.path, "_blank");
+	logger.debug('<<< Exiting handleClick()');
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <button onClick={() => this.handleClick()}>

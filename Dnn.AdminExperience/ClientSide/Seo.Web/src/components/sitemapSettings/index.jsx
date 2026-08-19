@@ -17,6 +17,7 @@ import ProviderEditor from "./providerEditor";
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let daysToCacheOptions = [];
 let priorityOptions = [];
@@ -27,6 +28,7 @@ const re = /[^].html$/;
 class SitemapSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             sitemapSettings: undefined,
             searchEngine: "Google",
@@ -38,9 +40,11 @@ class SitemapSettingsPanelBody extends Component {
                 verificationValidity: true
             }
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         if (props.sitemapSettings) {
             this.setState({
@@ -88,19 +92,24 @@ class SitemapSettingsPanelBody extends Component {
                 sitemapProviders: Object.assign({}, data.Providers)
             });
         }));
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`);
         this.setState({
             sitemapSettings: Object.assign({}, props.sitemapSettings),
             triedToSubmit: false,
             triedToCreate: false
         });
+		logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`);
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
         let sitemapSettings = Object.assign({}, state.sitemapSettings);
+		logger.debug(`onSettingChange(key=${key},event=${event}): sitemapSettings → ${sitemapSettings}`);
 
         if (key === "SitemapExcludePriority" || key === "SitemapCacheDays" || key === "SitemapMinPriority") {
             sitemapSettings[key] = event.value;
@@ -115,12 +124,15 @@ class SitemapSettingsPanelBody extends Component {
         });
 
         props.dispatch(SeoActions.sitemapSettingsClientModified(sitemapSettings));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     searchEngineListToOptions(list) {
+		logger.debug(`>>> Entering searchEngineListToOptions(list=${list})`);
         let options = [];
         if (list !== undefined) {
             options = list.map((item) => {
+		logger.debug(`<<< Exiting searchEngineListToOptions(list=${list})`);
                 return { label: item.Key, value: item.Key };
             });
         }
@@ -128,6 +140,7 @@ class SitemapSettingsPanelBody extends Component {
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -138,13 +151,16 @@ class SitemapSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.debug(`<<< Exiting onUpdate(event=${event})`);
         }));
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SeoActions.getSitemapSettings((data) => {
+				logger.debug('<<< Exiting onCancel()');
                 this.setState({
                     sitemapSettings: Object.assign({}, data.Settings)
                 });
@@ -153,11 +169,14 @@ class SitemapSettingsPanelBody extends Component {
     }
 
     onClearCache() {
+		logger.debug('>>> Entering onClearCache()');
         const {props} = this;
         props.dispatch(SeoActions.clearCache());
+		logger.debug('<<< Exiting onClearCache()');
     }
 
     onUpdateProvider(settings) {
+		logger.debug(`>>> Entering onUpdateProvider(settings=${settings})`);
         const {props} = this;
 
         props.dispatch(SeoActions.updateSitemapProvider(settings, () => {
@@ -170,43 +189,54 @@ class SitemapSettingsPanelBody extends Component {
             this.collapse();
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.debug(`<<< Exiting onUpdateProvider(settings=${settings})`);
         }));
     }
 
     uncollapse(id) {
+		logger.debug(`>>> Entering uncollapse(id=${id})`);
         setTimeout(() => {
             this.setState({
                 openId: id
             });
         }, this.timeout);
+		logger.debug(`<<< Exiting uncollapse(id=${id})`);
     }
     collapse() {
+		logger.debug('>>> Entering collapse()');
         if (this.state.openId !== "") {
             this.setState({
                 openId: ""
             });
+			logger.debug('<<< Exiting collapse()');
         }
     }
     toggle(openId) {
+		logger.debug(`>>> Entering toggle(openId=${openId})`);
         if (openId !== "") {
             this.uncollapse(openId);
         } else {
             this.collapse();
+			logger.debug(`<<< Exiting toggle(openId=${openId})`);
         }
     }
 
     renderProvidersHeader() {
+		logger.debug('>>> Entering renderProvidersHeader()');
         let tableHeaders = tableFields.map((field) => {
             let className = "provider-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}</span>
             </div>;
         });
+		logger.debug('<<< Exiting renderProvidersHeader()');
         return <div className="header-row">{tableHeaders}</div>;
     }
 
     renderedProviders() {
+		logger.debug('>>> Entering renderedProviders()');
         if (this.props.providers) {
+			logger.debug('<<< Exiting renderedProviders()');
             return this.props.providers.map((item, index) => {
                 return (
                     <ProviderRow
@@ -232,25 +262,33 @@ class SitemapSettingsPanelBody extends Component {
     }
 
     onSearchEngineChange(event) {
+		logger.debug(`>>> Entering onSearchEngineChange(event=${event})`);
         this.setState({
             searchEngine: event.value
         });
+		logger.debug(`<<< Exiting onSearchEngineChange(event=${event})`);
     }
 
     onSearchEngineSubmit() {
+		logger.debug('>>> Entering onSearchEngineSubmit()');
         let {state, props} = this;
         let url = props.searchEngineUrls.filter((item) => item.Key === state.searchEngine)[0].Value;
         window.open(url, "_blank");
+		logger.debug(`onSearchEngineSubmit(): url → ${url}`);
+		logger.debug('<<< Exiting onSearchEngineSubmit()');
     }
 
     onVerificationChange(event) {
+		logger.debug(`>>> Entering onVerificationChange(event=${event})`);
         let {state} = this;
         let verification = typeof (event) === "object" ? event.target.value : event;
+		logger.debug(`onVerificationChange(event=${event}): verification → ${verification}`);
         if (verification === "" || !re.test(verification)) {
             state.error["verificationValidity"] = true;
         }
         else if (verification !== "" && re.test(verification)) {
             state.error["verificationValidity"] = false;
+			logger.debug(`<<< Exiting onVerificationChange(event=${event})`);
         }
 
         this.setState({
@@ -261,6 +299,7 @@ class SitemapSettingsPanelBody extends Component {
     }
 
     onCreateVerification() {
+		logger.debug('>>> Entering onCreateVerification()');
         let {state, props} = this;
         this.setState({
             triedToCreate: true
@@ -271,10 +310,12 @@ class SitemapSettingsPanelBody extends Component {
         }
 
         props.dispatch(SeoActions.createVerification(state.verification));
+		logger.debug('<<< Exiting onCreateVerification()');
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         if (state.sitemapSettings) {
             const columnOne = <div className="left-column" key="columnOne">
@@ -399,6 +440,7 @@ class SitemapSettingsPanelBody extends Component {
                 </InputGroup>
             </div>;
 
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.sitemapSettings}>
                     <div className="columnTitle">{resx.get("SitemapSettings")}</div>
@@ -441,6 +483,8 @@ SitemapSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         sitemapSettings: state.seo.sitemapSettings,

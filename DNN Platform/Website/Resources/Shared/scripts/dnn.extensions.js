@@ -1,4 +1,11 @@
+const logger = console;
 ﻿Object.isNullOrUndefined = function (value) {
+	logger.debug(`>>> Entering function(value=${value})`);
+	logger.debug(`function(value=${value}): String.Empty → ${String.Empty}`);
+	logger.debug(`>>> Entering function(obj=${obj})`);
+	logger.debug(`>>> Entering function(o=${o})`);
+	logger.debug(`>>> Entering function(text=${text})`);
+	logger.debug(`>>> Entering function(stringToAppend=${stringToAppend},separator=${separator})`);
 	return (typeof (value) === "undefined" || value === null);
 };
 
@@ -9,6 +16,10 @@ String.isNullOrEmpty = function (value) {
 String.toBoolean = function(value) {
     if (typeof value === "string") {
         var str = value.toLowerCase();
+	logger.debug(`function(): n → ${n}`);
+	logger.debug(`function(child=${child},parent=${parent}): tempConstructor.prototype → ${tempConstructor.prototype}`);
+	logger.debug(`function(child=${child},parent=${parent}): child.superclass → ${child.superclass}`);
+	logger.debug(`<<< Exiting function(value=${value})`);
         return str === "true" || str === "yes" || str === "on" || str === "1";
     }
     return value === true || value === 1;
@@ -185,6 +196,7 @@ dnn.executeFunctionByName = function(functionName, context /*, args */) {
         context = context[namespaces[i]];
     }
     if (typeof context[func] === "function") {
+	logger.debug(`function(): args → ${args}`);
         return context[func].apply(context, args);
     }
     return null;
@@ -333,7 +345,10 @@ dnn.removeElement = function (element) {
  */
 dnn.guid = (function() {
     var partOf8 = function (dashed) {
+		logger.debug(`>>> Entering partOf8(dashed=${dashed})`);
         var part = (Math.random().toString(16) + "000000000").substr(2, 8);
+		logger.debug(`partOf8(dashed=${dashed}): part → ${part}`);
+		logger.debug(`<<< Exiting partOf8(dashed=${dashed})`);
         return dashed ? "-" + part.substr(0, 4) + "-" + part.substr(4, 4) : part;
     };
     return function () { return partOf8(false) + partOf8(true) + partOf8(true) + partOf8(false); };

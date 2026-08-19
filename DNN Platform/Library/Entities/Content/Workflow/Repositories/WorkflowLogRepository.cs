@@ -17,11 +17,15 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
         /// <inheritdoc />
         public IEnumerable<WorkflowLog> GetWorkflowLogs(int contentItemId, int workflowId)
         {
+			Logger.LogDebug(">>> Entering GetWorkflowLogs(contentItemId={ContentItemId},workflowId={WorkflowId})", contentItemId, workflowId);
             using (var context = DataContext.Instance())
             {
                 var rep = context.GetRepository<WorkflowLog>();
+				Logger.LogDebug("GetWorkflowLogs(contentItemId={ContentItemId},workflowId={WorkflowId}): rep → {Rep}", contentItemId, workflowId, rep);
                 var workflowLogs = rep.Find("WHERE (ContentItemID = @0 AND WorkflowID = @1)", contentItemId, workflowId).ToArray();
+				Logger.LogDebug("GetWorkflowLogs(contentItemId={ContentItemId},workflowId={WorkflowId}): workflowLogs → {WorkflowLogs}", contentItemId, workflowId, workflowLogs);
 
+				Logger.LogDebug("<<< Exiting GetWorkflowLogs(contentItemId={ContentItemId},workflowId={WorkflowId})", contentItemId, workflowId);
                 return workflowLogs;
             }
         }
@@ -29,27 +33,37 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
         /// <inheritdoc />
         public void DeleteWorkflowLogs(int contentItemId, int workflowId)
         {
+			Logger.LogDebug(">>> Entering DeleteWorkflowLogs(contentItemId={ContentItemId},workflowId={WorkflowId})", contentItemId, workflowId);
             using (var context = DataContext.Instance())
             {
                 var rep = context.GetRepository<WorkflowLog>();
+				Logger.LogDebug("DeleteWorkflowLogs(contentItemId={ContentItemId},workflowId={WorkflowId}): rep → {Rep}", contentItemId, workflowId, rep);
                 rep.Delete("WHERE (ContentItemID = @0 AND WorkflowID = @1)", contentItemId, workflowId);
+				Logger.LogDebug("DeleteWorkflowLogs(contentItemId={ContentItemId},workflowId={WorkflowId}): WorkflowID → {WorkflowID}", contentItemId, workflowId, WorkflowID);
             }
+			Logger.LogDebug("<<< Exiting DeleteWorkflowLogs(contentItemId={ContentItemId},workflowId={WorkflowId})", contentItemId, workflowId);
         }
 
         /// <inheritdoc />
         public void AddWorkflowLog(WorkflowLog workflowLog)
         {
+			Logger.LogDebug(">>> Entering AddWorkflowLog(workflowLog={WorkflowLog})", workflowLog);
             using (var context = DataContext.Instance())
             {
                 var rep = context.GetRepository<WorkflowLog>();
+				Logger.LogDebug("AddWorkflowLog(workflowLog={WorkflowLog}): rep → {Rep}", workflowLog, rep);
 
                 rep.Insert(workflowLog);
             }
+			Logger.LogDebug("<<< Exiting AddWorkflowLog(workflowLog={WorkflowLog})", workflowLog);
         }
 
         /// <inheritdoc />
         protected override Func<IWorkflowLogRepository> GetFactory()
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WorkflowLogRepository));
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new WorkflowLogRepository();
         }
     }

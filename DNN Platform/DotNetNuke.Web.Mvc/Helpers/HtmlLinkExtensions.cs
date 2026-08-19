@@ -17,8 +17,16 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
     public static class HtmlLinkExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlLinkExtensions));
         public static MvcHtmlString ActionLink(this DnnHtmlHelper htmlHelper, string linkText, string actionName)
         {
+			Logger.LogDebug(">>> Entering ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName})", htmlHelper, linkText, actionName);
+			Logger.LogDebug("<<< Exiting ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName})", htmlHelper, linkText, actionName);
+			Logger.LogDebug("<<< Exiting ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName},routeValues={RouteValues})", htmlHelper, linkText, actionName, routeValues);
+			Logger.LogDebug("<<< Exiting ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName},routeValues={RouteValues},htmlAttributes={HtmlAttributes})", htmlHelper, linkText, actionName, routeValues, htmlAttributes);
+			Logger.LogDebug("<<< Exiting ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName},controllerName={ControllerName})", htmlHelper, linkText, actionName, controllerName);
+			Logger.LogDebug("<<< Exiting ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues},htmlAttributes={HtmlAttributes})", htmlHelper, linkText, actionName, controllerName, routeValues, htmlAttributes);
+			Logger.LogDebug("<<< Exiting ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName},controllerName={ControllerName},protocol={Protocol},hostName={HostName},fragment={Fragment},routeValues={RouteValues},htmlAttributes={HtmlAttributes})", htmlHelper, linkText, actionName, controllerName, protocol, hostName, fragment, routeValues, htmlAttributes);
             return ActionLink(htmlHelper, linkText, actionName, null, new RouteValueDictionary(), new RouteValueDictionary());
         }
 
@@ -73,6 +81,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
         private static string GenerateLink(string linkText, string actionName, string controllerName, RouteValueDictionary routeValues, IDictionary<string, object> htmlAttributes, ModuleInstanceContext moduleContext)
         {
+			Logger.LogDebug(">>> Entering GenerateLink(linkText={LinkText},actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues},htmlAttributes={HtmlAttributes},moduleContext={ModuleContext})", linkText, actionName, controllerName, routeValues, htmlAttributes, moduleContext);
             routeValues["controller"] = controllerName;
             routeValues["action"] = actionName;
             string url = ModuleRoutingProvider.Instance().GenerateUrl(routeValues, moduleContext);
@@ -83,6 +92,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
             };
             tagBuilder.MergeAttributes(htmlAttributes);
             tagBuilder.MergeAttribute("href", url);
+			Logger.LogDebug("<<< Exiting GenerateLink(linkText={LinkText},actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues},htmlAttributes={HtmlAttributes},moduleContext={ModuleContext})", linkText, actionName, controllerName, routeValues, htmlAttributes, moduleContext);
             return tagBuilder.ToString(TagRenderMode.Normal);
         }
     }

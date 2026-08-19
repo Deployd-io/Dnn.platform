@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -8,6 +9,7 @@
  *  This implementation is adapted from PL/SQL mode in CodeMirror 2.
  */
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -17,33 +19,46 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("pig", function(_config, parserConfig) {
+logger.debug('>>> Entering defineMode()');
   var keywords = parserConfig.keywords,
   builtins = parserConfig.builtins,
   types = parserConfig.types,
   multiLineStrings = parserConfig.multiLineStrings;
 
   var isOperatorChar = /[*+\-%<>=&?:\/!|]/;
+logger.debug('<<< Exiting defineMode()');
 
   function chain(stream, state, f) {
+	logger.debug(`>>> Entering chain(stream=${stream},state=${state},f=${f})`);
     state.tokenize = f;
+	logger.debug(`chain(stream=${stream},state=${state},f=${f}): state.tokenize → ${state.tokenize}`);
+	logger.debug(`<<< Exiting chain(stream=${stream},state=${state},f=${f})`);
+	logger.debug(`>>> Entering keywords(str=${str})`);
+	logger.debug(`<<< Exiting keywords(str=${str})`);
     return f(stream, state);
   }
 
   function tokenComment(stream, state) {
+	logger.debug(`>>> Entering tokenComment(stream=${stream},state=${state})`);
     var isEnd = false;
     var ch;
     while(ch = stream.next()) {
       if(ch == "/" && isEnd) {
         state.tokenize = tokenBase;
+		logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         break;
       }
       isEnd = (ch == "*");
     }
+	logger.debug(`tokenComment(stream=${stream},state=${state}): isEnd → ${isEnd}`);
+	logger.debug(`<<< Exiting tokenComment(stream=${stream},state=${state})`);
     return "comment";
   }
 
   function tokenString(quote) {
+	logger.debug(`>>> Entering tokenString(quote=${quote})`);
     return function(stream, state) {
       var escaped = false, next, end = false;
       while((next = stream.next()) != null) {
@@ -54,14 +69,18 @@ CodeMirror.defineMode("pig", function(_config, parserConfig) {
       }
       if (end || !(escaped || multiLineStrings))
         state.tokenize = tokenBase;
+	logger.debug(`tokenString(quote=${quote}): state.tokenize → ${state.tokenize}`);
+	logger.debug(`<<< Exiting tokenString(quote=${quote})`);
       return "error";
     };
   }
 
 
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     var ch = stream.next();
 
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
     // is a start of string?
     if (ch == '"' || ch == "'")
       return chain(stream, state, tokenString(ch));
@@ -113,6 +132,7 @@ CodeMirror.defineMode("pig", function(_config, parserConfig) {
         return "variable-2";
       // is it one of the listed types?
       if (types && types.propertyIsEnumerable(stream.current().toUpperCase()))
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
         return "variable-3";
       // default is a 'variable'
       return "variable";
@@ -122,15 +142,20 @@ CodeMirror.defineMode("pig", function(_config, parserConfig) {
   // Interface
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {
         tokenize: tokenBase,
         startOfLine: true
       };
+	logger.debug('<<< Exiting startState()');
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if(stream.eatSpace()) return null;
       var style = state.tokenize(stream, state);
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
+	logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
       return style;
     }
   };
@@ -140,6 +165,7 @@ CodeMirror.defineMode("pig", function(_config, parserConfig) {
   function keywords(str) {
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.debug(`keywords(str=${str}): obj → ${obj}`);
     return obj;
   }
 

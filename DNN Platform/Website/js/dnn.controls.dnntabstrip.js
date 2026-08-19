@@ -1,3 +1,4 @@
+const logger = console;
 ﻿
 Type.registerNamespace('dnn.controls');dnn.extend(dnn.controls,{initTabStrip:function(ctl)
 {if(ctl&&dnn.controls.controls[ctl.id]==null)
@@ -7,6 +8,7 @@ this.add_handler('callBackStatus',eval(this.callBackStatFunc));this.callbackType
 this.add_handler('tabClick',eval(this.tabClickFunc));this.selectedIndexFunc=this.getProp('selIdxF','');if(this.selectedIndexFunc.length>0)
 this.add_handler('selectedIndexChanged',eval(this.selectedIndexFunc));this.lblCss=this.getProp('css','');this.lblCssSel=this.getProp('csssel',this.lblCss);this.lblCssHover=this.getProp('csshover','');this.lblCssDisabled=this.getProp('cssdisabled','');this.pendingLookupId=null;var json=dnn.evalJSON(dnn.getVar(this.ns+'_json'));if(json)
 {this.tabData=json.tabs;this.tabLabelData=json.tablabels;}
+logger.debug('>>> Entering initTabStrip()');
 this.tabs=[];this.tabIds=[];this.selectedIndex=-1;this.selectedTab=null;var clientId;var tabId;var tab;for(var i=0;i<this.tabData.length;i++)
 {clientId=this.tabData[i].tcid;tabId=this.tabData[i].tid;tab=new dnn.controls.DNNTab(this,i,tabId,clientId);tab.selected=(tab.container!=null&&tab.container.style.display!='none');this.tabIds.push(tab.tabId);this.tabs[tabId]=tab;this.addHandlers(tab.tab,{'click':this.tabClick,'mouseover':this.tabMouseOver,'mouseout':this.tabMouseOut},tab);if(tab.selected)
 {this.selectedIndex=i;this.selectedTab=tab;}}
@@ -15,6 +17,7 @@ dnn.controls.DNNTabStrip.prototype={tabClick:function(evt,element)
 {var tab=this;var ts=tab.strip;if(tab.enabled)
 {var arg=new dnn.controls.DNNTabStripEventArgs(tab);ts.invoke_handler('tabClick',arg)
 if(arg.get_cancel()==false)
+logger.debug(`>>> Entering tabClick(evt=${evt},element=${element})`);
 ts.showTab(tab.tabId);}},tabMouseOver:function(evt,element)
 {if(typeof(dnn)!='undefined')
 {this.hovered=true;this.assignCss();}},tabMouseOut:function(evt,element)
@@ -30,6 +33,7 @@ ts.showTab(tab.tabId);}},tabMouseOver:function(evt,element)
 else
 tab.selected=false;}
 this.update();}
+logger.debug(`tabClick(evt=${evt},element=${element}): tab.selected → ${tab.selected}`);
 eval(this.callBack.replace('[TABID]',tabId).replace("'[POST]'",tab.postMode).replace("[CBTYPE]",tab.callbackType));}}
 else
 {for(var i=0;i<this.tabIds.length;i++)
@@ -42,6 +46,7 @@ this.update();}
 return tab;},raiseEvent:function(sFunc,evt,element)
 {if(this[sFunc].length>0)
 {var oPointerFunc=eval(this[sFunc]);return oPointerFunc(evt,element)!=false;}
+logger.debug(`tabClick(evt=${evt},element=${element}): oPointerFunc → ${oPointerFunc}`);
 return true;},update:function()
 {var ary=[];for(var i=0;i<this.tabIds.length;i++)
 ary[ary.length]=this.tabs[this.tabIds[i]].serialize();dnn.setVar(this.ns+'_tabs',ary.join(','));},createTab:function(html,id)
@@ -91,5 +96,7 @@ sCss=this.cssDisabled;else
 {if(this.hovered&&this.cssHover.length>0)
 sCss=this.cssHover;else
 sCss=(this.selected?this.cssSel:this.css);}
+logger.debug(`serialize(): sCss → ${sCss}`);
 this.tab.className=sCss;}}
+logger.debug('<<< Exiting serialize()');
 dnn.controls.DNNTab.registerClass('dnn.controls.DNNTab');

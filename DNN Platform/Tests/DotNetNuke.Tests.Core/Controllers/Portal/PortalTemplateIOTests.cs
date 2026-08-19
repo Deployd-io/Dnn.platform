@@ -96,69 +96,85 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
         [SetUp]
         public void SetUp()
         {
+			mockEventLogger.LogDebug(">>> Entering SetUp()");
             this.mockPortalTemplateIO = new Mock<IPortalTemplateIO>();
             PortalTemplateIO.SetTestableInstance(this.mockPortalTemplateIO.Object);
+			mockEventLogger.LogDebug("SetUp(): mockPortalTemplateIO → {MockPortalTemplateIO}", mockPortalTemplateIO);
 
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+					mockEventLogger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
                     services.AddSingleton(this.mockPortalTemplateIO.Object);
                     services.AddSingleton(Mock.Of<IPortalController>());
                 });
+				mockEventLogger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			mockEventLogger.LogDebug(">>> Entering TearDown()");
             PortalTemplateIO.ClearInstance();
 
             // NOTE: not sure why, but disposing here causes other unrelated tests to fail
             ////this.serviceProvider.Dispose();
+			mockEventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void NoTemplatesReturnsEmptyList()
         {
+			mockEventLogger.LogDebug(">>> Entering NoTemplatesReturnsEmptyList()");
             // Arrange
 
             // Act
             var templates = CreateController().GetPortalTemplates();
+			mockEventLogger.LogDebug("NoTemplatesReturnsEmptyList(): templates → {Templates}", templates);
 
             // Assert
             Assert.That(templates, Is.Empty);
+			mockEventLogger.LogDebug("<<< Exiting NoTemplatesReturnsEmptyList()");
         }
 
         [Test]
         public void LanguageFileWithoutATemplateIsIgnored()
         {
+			mockEventLogger.LogDebug(">>> Entering LanguageFileWithoutATemplateIsIgnored()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateLanguageFiles()).Returns(this.ToEnumerable(DefaultDePath));
 
             // Act
             var templates = CreateController().GetPortalTemplates();
+			mockEventLogger.LogDebug("LanguageFileWithoutATemplateIsIgnored(): templates → {Templates}", templates);
 
             // Assert
             Assert.That(templates, Is.Empty);
+			mockEventLogger.LogDebug("<<< Exiting LanguageFileWithoutATemplateIsIgnored()");
         }
 
         [Test]
         public void TemplatesWithNoLanguageFilesAreLoaded()
         {
+			mockEventLogger.LogDebug(">>> Entering TemplatesWithNoLanguageFilesAreLoaded()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(StaticPath));
             this.mockPortalTemplateIO.Setup(x => x.OpenTextReader(StaticPath)).Returns(this.CreateTemplateFileReader(StaticDescription));
 
             // Act
             var templates = CreateController().GetPortalTemplates();
+			mockEventLogger.LogDebug("TemplatesWithNoLanguageFilesAreLoaded(): templates → {Templates}", templates);
 
             // Assert
             Assert.That(templates, Has.Count.EqualTo(1));
             AssertTemplateInfo(StaticExpectations, templates[0]);
+			mockEventLogger.LogDebug("<<< Exiting TemplatesWithNoLanguageFilesAreLoaded()");
         }
 
         [Test]
         public void TemplateWith2Languages()
         {
+			mockEventLogger.LogDebug(">>> Entering TemplateWith2Languages()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(DefaultPath));
             this.mockPortalTemplateIO.Setup(x => x.EnumerateLanguageFiles()).Returns(this.ToEnumerable(DefaultDePath, DefaultUsPath));
@@ -169,16 +185,19 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
 
             // Act
             var templates = CreateController().GetPortalTemplates();
+			mockEventLogger.LogDebug("TemplateWith2Languages(): templates → {Templates}", templates);
 
             // Assert
             Assert.That(templates, Has.Count.EqualTo(2));
             AssertTemplateInfo(DefaultExpectationsDe, templates[0]);
             AssertTemplateInfo(DefaultExpectationsUs, templates[1]);
+			mockEventLogger.LogDebug("<<< Exiting TemplateWith2Languages()");
         }
 
         [Test]
         public void TwoTemplatesAssortedLanguages()
         {
+			mockEventLogger.LogDebug(">>> Entering TwoTemplatesAssortedLanguages()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(DefaultPath, AlternatePath));
             this.mockPortalTemplateIO.Setup(x => x.EnumerateLanguageFiles()).Returns(this.ToEnumerable(DefaultDePath, DefaultUsPath, AlternateDePath));
@@ -191,32 +210,38 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
 
             // Act
             var templates = CreateController().GetPortalTemplates();
+			mockEventLogger.LogDebug("TwoTemplatesAssortedLanguages(): templates → {Templates}", templates);
 
             // Assert
             Assert.That(templates, Has.Count.EqualTo(3));
             AssertTemplateInfo(DefaultExpectationsDe, templates[0]);
             AssertTemplateInfo(DefaultExpectationsUs, templates[1]);
             AssertTemplateInfo(AlternateExpectationsDe, templates[2]);
+			mockEventLogger.LogDebug("<<< Exiting TwoTemplatesAssortedLanguages()");
         }
 
         [Test]
         public void ResourceFileIsLocatedWhenPresent()
         {
+			mockEventLogger.LogDebug(">>> Entering ResourceFileIsLocatedWhenPresent()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(ResourcePath));
             this.mockPortalTemplateIO.Setup(x => x.GetResourceFilePath(ResourcePath)).Returns(ResourceFilePath);
 
             // Act
             var templates = CreateController().GetPortalTemplates();
+			mockEventLogger.LogDebug("ResourceFileIsLocatedWhenPresent(): templates → {Templates}", templates);
 
             // Assert
             Assert.That(templates, Has.Count.EqualTo(1));
             AssertTemplateInfo(ResourceExpectations, templates[0]);
+			mockEventLogger.LogDebug("<<< Exiting ResourceFileIsLocatedWhenPresent()");
         }
 
         [Test]
         public void SingleTemplateAndLanguage()
         {
+			mockEventLogger.LogDebug(">>> Entering SingleTemplateAndLanguage()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(DefaultPath));
             this.mockPortalTemplateIO.Setup(x => x.EnumerateLanguageFiles()).Returns(this.ToEnumerable(DefaultDePath));
@@ -225,15 +250,18 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
 
             // Act
             var templates = CreateController().GetPortalTemplates();
+			mockEventLogger.LogDebug("SingleTemplateAndLanguage(): templates → {Templates}", templates);
 
             // Assert
             Assert.That(templates, Has.Count.EqualTo(1));
             AssertTemplateInfo(DefaultExpectationsDe, templates[0]);
+			mockEventLogger.LogDebug("<<< Exiting SingleTemplateAndLanguage()");
         }
 
         [Test]
         public void ATemplateCanBeLoadedDirectly()
         {
+			mockEventLogger.LogDebug(">>> Entering ATemplateCanBeLoadedDirectly()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(DefaultPath));
             this.mockPortalTemplateIO.Setup(x => x.EnumerateLanguageFiles()).Returns(this.ToEnumerable(DefaultDePath));
@@ -242,14 +270,17 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
 
             // Act
             var template = CreateController().GetPortalTemplate(DefaultPath, "de-DE");
+			mockEventLogger.LogDebug("ATemplateCanBeLoadedDirectly(): template → {Template}", template);
 
             // Assert
             AssertTemplateInfo(DefaultExpectationsDe, template);
+			mockEventLogger.LogDebug("<<< Exiting ATemplateCanBeLoadedDirectly()");
         }
 
         [Test]
         public void GetPortalTemplateReturnsNullIfCultureDoesNotMatch()
         {
+			mockEventLogger.LogDebug(">>> Entering GetPortalTemplateReturnsNullIfCultureDoesNotMatch()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(DefaultPath));
             this.mockPortalTemplateIO.Setup(x => x.EnumerateLanguageFiles()).Returns(this.ToEnumerable(DefaultDePath));
@@ -258,42 +289,52 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
 
             // Act
             var template = CreateController().GetPortalTemplate(DefaultPath, "de");
+			mockEventLogger.LogDebug("GetPortalTemplateReturnsNullIfCultureDoesNotMatch(): template → {Template}", template);
 
             // Assert
             Assert.That(template, Is.Null);
+			mockEventLogger.LogDebug("<<< Exiting GetPortalTemplateReturnsNullIfCultureDoesNotMatch()");
         }
 
         [Test]
         public void GetPortalTemplateCanReturnAStaticTemplate()
         {
+			mockEventLogger.LogDebug(">>> Entering GetPortalTemplateCanReturnAStaticTemplate()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(StaticPath));
             this.mockPortalTemplateIO.Setup(x => x.OpenTextReader(StaticPath)).Returns(this.CreateTemplateFileReader(StaticDescription));
 
             // Act
             var template = CreateController().GetPortalTemplate(StaticPath, "en-US");
+			mockEventLogger.LogDebug("GetPortalTemplateCanReturnAStaticTemplate(): template → {Template}", template);
 
             // Assert
             AssertTemplateInfo(StaticExpectations, template);
+			mockEventLogger.LogDebug("<<< Exiting GetPortalTemplateCanReturnAStaticTemplate()");
         }
 
         private static PortalTemplateController CreateController()
         {
+			mockEventLogger.LogDebug(">>> Entering CreateController()");
+			mockEventLogger.LogDebug("<<< Exiting CreateController()");
             return new PortalTemplateController(Mock.Of<IBusinessControllerProvider>());
         }
 
         private static void AssertTemplateInfo(Dictionary<string, string> expectations, IPortalTemplateInfo templateInfo)
         {
+			mockEventLogger.LogDebug(">>> Entering AssertTemplateInfo(expectations={Expectations},templateInfo={TemplateInfo})", expectations, templateInfo);
             AssertTemplateField(expectations, "Name", templateInfo.Name);
             AssertTemplateField(expectations, "TemplateFilePath", templateInfo.TemplateFilePath);
             AssertTemplateField(expectations, "CultureCode", templateInfo.CultureCode);
             AssertTemplateField(expectations, "LanguageFilePath", templateInfo.LanguageFilePath);
             AssertTemplateField(expectations, "ResourceFilePath", templateInfo.ResourceFilePath);
             AssertTemplateField(expectations, "Description", templateInfo.Description);
+			mockEventLogger.LogDebug("<<< Exiting AssertTemplateInfo(expectations={Expectations},templateInfo={TemplateInfo})", expectations, templateInfo);
         }
 
         private static void AssertTemplateField(Dictionary<string, string> expectations, string key, string value)
         {
+			mockEventLogger.LogDebug(">>> Entering AssertTemplateField(expectations={Expectations},key={Key},value={Value})", expectations, key, value);
             string expected;
             expectations.TryGetValue(key, out expected);
             if (string.IsNullOrEmpty(expected))
@@ -304,11 +345,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
             {
                 Assert.That(value, Is.EqualTo(expected), string.Format("Checking value of " + key));
             }
+			mockEventLogger.LogDebug("<<< Exiting AssertTemplateField(expectations={Expectations},key={Key},value={Value})", expectations, key, value);
         }
 
         private static string MakePath(string name)
         {
+			mockEventLogger.LogDebug(">>> Entering MakePath(name={Name})", name);
             var fileName = name + ".template";
+			mockEventLogger.LogDebug("MakePath(name={Name}): fileName → {FileName}", name, fileName);
+			mockEventLogger.LogDebug("<<< Exiting MakePath(name={Name})", name);
+			mockEventLogger.LogDebug("<<< Exiting MakePath(name={Name},culture={Culture})", name, culture);
             return Path.Combine(HostMapPath, fileName);
         }
 
@@ -319,6 +365,9 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
 
         private TextReader CreateLanguageFileReader(string name)
         {
+			mockEventLogger.LogDebug(">>> Entering CreateLanguageFileReader(name={Name})", name);
+			mockEventLogger.LogDebug("<<< Exiting CreateLanguageFileReader(name={Name})", name);
+			mockEventLogger.LogDebug("<<< Exiting CreateLanguageFileReader(name={Name},description={Description})", name, description);
             return this.CreateLanguageFileReader(name, null);
         }
 
@@ -330,17 +379,23 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
             }
 
             var xml = string.Format("<root><data name=\"LocalizedTemplateName.Text\" xml:space=\"preserve\"><value>{0}</value></data>{1}</root>", name, description);
+			mockEventLogger.LogDebug("CreateLanguageFileReader(name={Name},description={Description}): xml → {Xml}", name, description, xml);
             return new StringReader(xml);
         }
 
         private TextReader CreateTemplateFileReader(string description)
         {
+			mockEventLogger.LogDebug(">>> Entering CreateTemplateFileReader(description={Description})", description);
             var xml = string.Format("<portal><description>{0}</description></portal>", description);
+			mockEventLogger.LogDebug("CreateTemplateFileReader(description={Description}): xml → {Xml}", description, xml);
+			mockEventLogger.LogDebug("<<< Exiting CreateTemplateFileReader(description={Description})", description);
             return new StringReader(xml);
         }
 
         private IEnumerable<T> ToEnumerable<T>(params T[] input)
         {
+			mockEventLogger.LogDebug(">>> Entering ToEnumerable(input={Input})", input);
+			mockEventLogger.LogDebug("<<< Exiting ToEnumerable(input={Input})", input);
             return input;
         }
     }

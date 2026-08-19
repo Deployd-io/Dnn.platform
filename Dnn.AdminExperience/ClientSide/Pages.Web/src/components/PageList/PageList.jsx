@@ -6,10 +6,13 @@ import PageHierarchy from "../PageHierarchy/PageHierarchy";
 import {pageHierarchyActions as PageHierarchyActions} from "../../actions";
 import styles from "./PageList.module.less";
 import Localization from "../../localization";
+const logger = console;
 import { bindActionCreators } from "redux";
 
 class PageList extends Component {
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.pageListBody + " dnn-persona-bar-page-body"}>
                 <div className="search-container">      
@@ -51,6 +54,8 @@ PageList.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         searchKeyword: state.pageHierarchy.searchKeyword,
         itemTemplate: state.pageHierarchy.itemTemplate,
@@ -62,6 +67,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.debug(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`);
+	logger.debug(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`);
     return bindActionCreators({
         onSelectedPagePathChanged: PageHierarchyActions.changeSelectedPagePath,
         onSearchKeywordChanged: PageHierarchyActions.setSearchKeyword

@@ -49,7 +49,9 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			value.LogDebug(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             writer.Write(loggingEvent.Identity);
+			value.LogDebug("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
     }
 }

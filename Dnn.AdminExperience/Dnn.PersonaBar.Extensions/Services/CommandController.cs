@@ -54,9 +54,14 @@ namespace Dnn.PersonaBar.Prompt.Services
         /// <param name="oldCommandRepository">The obsolete command repository (to be removed in DNN 11).</param>
         public CommandController(IServiceProvider serviceProvider, ICommandRepository commandRepository, Components.Repositories.ICommandRepository oldCommandRepository)
         {
+			Logger.LogDebug(">>> Entering CommandController(serviceProvider={ServiceProvider},commandRepository={CommandRepository},oldCommandRepository={OldCommandRepository})", serviceProvider, commandRepository, oldCommandRepository);
             this.serviceProvider = serviceProvider;
             this.commandRepository = commandRepository;
+			Logger.LogDebug("CommandController(serviceProvider={ServiceProvider},commandRepository={CommandRepository},oldCommandRepository={OldCommandRepository}): this.serviceProvider → {Arg3}", serviceProvider, commandRepository, oldCommandRepository, this.serviceProvider);
+			Logger.LogDebug("CommandController(serviceProvider={ServiceProvider},commandRepository={CommandRepository},oldCommandRepository={OldCommandRepository}): commandRepository → {CommandRepository1}", serviceProvider, commandRepository, oldCommandRepository, commandRepository);
+			Logger.LogDebug("CommandController(serviceProvider={ServiceProvider},commandRepository={CommandRepository},oldCommandRepository={OldCommandRepository}): this.commandRepository → {Arg3}", serviceProvider, commandRepository, oldCommandRepository, this.commandRepository);
             this.oldCommandRepository = oldCommandRepository;
+			Logger.LogDebug("<<< Exiting CommandController(serviceProvider={ServiceProvider},commandRepository={CommandRepository},oldCommandRepository={OldCommandRepository})", serviceProvider, commandRepository, oldCommandRepository);
         }
 
         private new int PortalId
@@ -99,18 +104,24 @@ namespace Dnn.PersonaBar.Prompt.Services
         [HttpPost]
         public HttpResponseMessage Cmd(int portalId, [FromBody] CommandInputModel command)
         {
+			Logger.LogDebug(">>> Entering Cmd(portalId={PortalId},command={Command})", portalId, command);
             var portal = PortalController.Instance.GetPortal(portalId);
 
+			Logger.LogDebug("Cmd(portalId={PortalId},command={Command}): portal → {Portal}", portalId, command, portal);
             if (portal == null)
             {
                 var errorMessage = string.Format(CultureInfo.CurrentCulture, Localization.GetString("Prompt_GetPortal_NotFound", Constants.LocalResourcesFile), portalId);
+				Logger.LogDebug("Cmd(portalId={PortalId},command={Command}): errorMessage → {ErrorMessage}", portalId, command, errorMessage);
                 Logger.Error(errorMessage);
                 return this.AddLogAndReturnResponse(null, null, command, DateTime.Now, errorMessage);
             }
 
             this.PortalId = portalId;
+			Logger.LogDebug("Cmd(portalId={PortalId},command={Command}): this.PortalId → {Arg2}", portalId, command, this.PortalId);
             this.SetupPortalSettings(portalId);
 
+			Logger.LogDebug("<<< Exiting Cmd(portalId={PortalId},command={Command})", portalId, command);
+			Logger.LogDebug("<<< Exiting Cmd(command={Command})", command);
             return this.Cmd(command);
         }
 
@@ -190,45 +201,58 @@ namespace Dnn.PersonaBar.Prompt.Services
         /// <inheritdoc />
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			Logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute("PersonaBar", "promptwithportalid", "{controller}/{action}/{portalId}", null, new { portalId = "-?\\d+" }, Namespaces);
+			Logger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
 
         private static string FilterCommand(string command)
         {
+			Logger.LogDebug(">>> Entering FilterCommand(command={Command})", command);
             var blackList = DenyList;
             var promptDenyList = HostController.Instance.GetString("PromptBlackList", string.Empty)
                 .Split(Separators, StringSplitOptions.RemoveEmptyEntries);
+				Logger.LogDebug("FilterCommand(command={Command}): blackList → {BlackList}", command, blackList);
             if (promptDenyList.Length > 0)
             {
                 blackList = blackList.Concat(promptDenyList).Distinct().ToArray();
             }
 
             var args = command.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.ToLowerInvariant()).ToList();
+			Logger.LogDebug("FilterCommand(command={Command}): args → {Args}", command, args);
             foreach (var lowerKey in blackList.Select(key => key.ToLowerInvariant())
                         .Where(lowerKey => args.Any(arg => arg.Replace("-", string.Empty) == lowerKey)))
             {
                 args[args.TakeWhile(arg => arg.Replace("-", string.Empty) != lowerKey).Count() + 1] = "******";
             }
 
+			Logger.LogDebug("<<< Exiting FilterCommand(command={Command})", command);
             return string.Join(" ", args);
         }
 
         private void SetupPortalSettings(int portalId)
         {
+			Logger.LogDebug(">>> Entering SetupPortalSettings(portalId={PortalId})", portalId);
             this.PortalSettings = new PortalSettings(portalId);
             var portalAliases = PortalAliasController.Instance.GetPortalAliasesByPortalId(portalId);
+			Logger.LogDebug("SetupPortalSettings(portalId={PortalId}): portalAliases → {PortalAliases}", portalId, portalAliases);
             this.PortalSettings.PrimaryAlias = portalAliases.FirstOrDefault(a => a.IsPrimary);
             this.PortalSettings.PortalAlias = PortalAliasController.Instance.GetPortalAlias(this.PortalSettings.DefaultPortalAlias);
+			Logger.LogDebug("<<< Exiting SetupPortalSettings(portalId={PortalId})", portalId);
         }
 
         private HttpResponseMessage TryRunOldCommand(CommandInputModel command, Type cmdTypeToRun, string[] args, bool isHelpCmd, DateTime startTime)
         {
+			Logger.LogDebug(">>> Entering TryRunOldCommand(command={Command},cmdTypeToRun={CmdTypeToRun},args={Args},isHelpCmd={IsHelpCmd},startTime={StartTime})", command, cmdTypeToRun, args, isHelpCmd, startTime);
             // Instantiate and run the command
             try
             {
                 var cmdObj = (IOldConsoleCommand)ActivatorUtilities.GetServiceOrCreateInstance(this.serviceProvider, cmdTypeToRun);
+				Logger.LogDebug("TryRunOldCommand(command={Command},cmdTypeToRun={CmdTypeToRun},args={Args},isHelpCmd={IsHelpCmd},startTime={StartTime}): cmdObj → {CmdObj}", command, cmdTypeToRun, args, isHelpCmd, startTime, cmdObj);
                 if (isHelpCmd)
                 {
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
+					Logger.LogInformation("TryRunOldCommand(command,cmdTypeToRun,args,isHelpCmd,startTime)={Command},{CmdTypeToRun},{Args},{IsHelpCmd},{StartTime}: find query executed in {Arg5} ms", command, cmdTypeToRun, args, isHelpCmd, startTime, __logStart.ElapsedMilliseconds);
                     return this.Request.CreateResponse(HttpStatusCode.OK, this.oldCommandRepository.GetCommandHelp(command.Args, cmdObj));
                 }
 
@@ -239,17 +263,21 @@ namespace Dnn.PersonaBar.Prompt.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting TryRunOldCommand(command={Command},cmdTypeToRun={CmdTypeToRun},args={Args},isHelpCmd={IsHelpCmd},startTime={StartTime})", command, cmdTypeToRun, args, isHelpCmd, startTime);
                 return this.AddLogAndReturnResponse(null, null, command, startTime, ex.Message);
             }
         }
 
         private HttpResponseMessage TryRunNewCommand(CommandInputModel command, IConsoleCommand cmdObj, string[] args, bool isHelpCmd, DateTime startTime)
         {
+			Logger.LogDebug(">>> Entering TryRunNewCommand(command={Command},cmdObj={CmdObj},args={Args},isHelpCmd={IsHelpCmd},startTime={StartTime})", command, cmdObj, args, isHelpCmd, startTime);
             // Instantiate and run the command that uses the new interfaces and base class
             try
             {
                 if (isHelpCmd)
                 {
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
+					Logger.LogInformation("TryRunNewCommand(command,cmdObj,args,isHelpCmd,startTime)={Command},{CmdObj},{Args},{IsHelpCmd},{StartTime}: find query executed in {Arg5} ms", command, cmdObj, args, isHelpCmd, startTime, __logStart.ElapsedMilliseconds);
                     return this.Request.CreateResponse(HttpStatusCode.OK, this.commandRepository.GetCommandHelp(cmdObj));
                 }
 
@@ -260,14 +288,17 @@ namespace Dnn.PersonaBar.Prompt.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting TryRunNewCommand(command={Command},cmdObj={CmdObj},args={Args},isHelpCmd={IsHelpCmd},startTime={StartTime})", command, cmdObj, args, isHelpCmd, startTime);
                 return this.AddLogAndReturnResponse(null, null, command, startTime, ex.Message);
             }
         }
 
         private HttpResponseMessage AddLogAndReturnResponseNewCommands(IConsoleCommand consoleCommand, CommandInputModel command, DateTime startTime, string error = null)
         {
+			Logger.LogDebug(">>> Entering AddLogAndReturnResponseNewCommands(consoleCommand={ConsoleCommand},command={Command},startTime={StartTime},error={Error})", consoleCommand, command, startTime, error);
             HttpResponseMessage message;
             var isValid = consoleCommand?.IsValid() ?? false;
+			Logger.LogDebug("AddLogAndReturnResponseNewCommands(consoleCommand={ConsoleCommand},command={Command},startTime={StartTime},error={Error}): isValid → {IsValid}", consoleCommand, command, startTime, error, isValid);
             var logInfo = new LogInfo
             {
                 LogTypeKey = "PROMPT_ALERT",
@@ -281,6 +312,7 @@ namespace Dnn.PersonaBar.Prompt.Services
                 if (isValid)
                 {
                     var result = consoleCommand.Run();
+					Logger.LogDebug("AddLogAndReturnResponseNewCommands(consoleCommand={ConsoleCommand},command={Command},startTime={StartTime},error={Error}): result → {Result}", consoleCommand, command, startTime, error, result);
                     if (result.PagingInfo != null)
                     {
                         if (result.PagingInfo.PageNo < result.PagingInfo.TotalPages)
@@ -301,12 +333,14 @@ namespace Dnn.PersonaBar.Prompt.Services
                             }
 
                             var nextPageCommand = string.Join(" ", args);
+							Logger.LogDebug("AddLogAndReturnResponseNewCommands(consoleCommand={ConsoleCommand},command={Command},startTime={StartTime},error={Error}): nextPageCommand → {NextPageCommand}", consoleCommand, command, startTime, error, nextPageCommand);
                             if (indexOfPage == -1)
                             {
                                 nextPageCommand += " --page " + (result.PagingInfo.PageNo + 1);
                             }
 
                             result.NextPageCommand = nextPageCommand;
+							Logger.LogDebug("AddLogAndReturnResponseNewCommands(consoleCommand={ConsoleCommand},command={Command},startTime={StartTime},error={Error}): result.NextPageCommand → {Arg4}", consoleCommand, command, startTime, error, result.NextPageCommand);
                         }
                         else if (result.Records > 0)
                         {
@@ -320,6 +354,7 @@ namespace Dnn.PersonaBar.Prompt.Services
 
                     message = this.Request.CreateResponse(HttpStatusCode.OK, result);
                     logInfo.LogProperties.Add(new LogDetailInfo("RecordsAffected", result.Records.ToString(CultureInfo.InvariantCulture)));
+					Logger.LogDebug("AddLogAndReturnResponseNewCommands(consoleCommand={ConsoleCommand},command={Command},startTime={StartTime},error={Error}): message → {Message}", consoleCommand, command, startTime, error, message);
                     logInfo.LogProperties.Add(new LogDetailInfo("Output", result.Output));
                 }
                 else
@@ -336,6 +371,7 @@ namespace Dnn.PersonaBar.Prompt.Services
 
             logInfo.LogProperties.Add(new LogDetailInfo("ExecutionTime(hh:mm:ss)", TimeSpan.FromMilliseconds(DateTime.Now.Subtract(startTime).TotalMilliseconds).ToString(@"hh\:mm\:ss\.ffffff", CultureInfo.InvariantCulture)));
             LogController.Instance.AddLog(logInfo);
+			Logger.LogDebug("<<< Exiting AddLogAndReturnResponseNewCommands(consoleCommand={ConsoleCommand},command={Command},startTime={StartTime},error={Error})", consoleCommand, command, startTime, error);
             return message;
         }
 
@@ -348,8 +384,10 @@ namespace Dnn.PersonaBar.Prompt.Services
         /// <returns>A <see cref="ConsoleResultModel"/> response.</returns>
         private HttpResponseMessage AddLogAndReturnResponse(IOldConsoleCommand consoleCommand, Type cmdTypeToRun, CommandInputModel command, DateTime startTime, string error = null)
         {
+			Logger.LogDebug(">>> Entering AddLogAndReturnResponse(consoleCommand={ConsoleCommand},cmdTypeToRun={CmdTypeToRun},command={Command},startTime={StartTime},error={Error})", consoleCommand, cmdTypeToRun, command, startTime, error);
             HttpResponseMessage message;
             var isValid = consoleCommand?.IsValid() ?? false;
+			Logger.LogDebug("AddLogAndReturnResponse(consoleCommand={ConsoleCommand},cmdTypeToRun={CmdTypeToRun},command={Command},startTime={StartTime},error={Error}): isValid → {IsValid}", consoleCommand, cmdTypeToRun, command, startTime, error, isValid);
             var logInfo = new LogInfo
             {
                 LogTypeKey = "PROMPT_ALERT",
@@ -367,6 +405,7 @@ namespace Dnn.PersonaBar.Prompt.Services
                 if (isValid)
                 {
                     var result = consoleCommand.Run();
+					Logger.LogDebug("AddLogAndReturnResponse(consoleCommand={ConsoleCommand},cmdTypeToRun={CmdTypeToRun},command={Command},startTime={StartTime},error={Error}): result → {Result}", consoleCommand, cmdTypeToRun, command, startTime, error, result);
                     if (result.PagingInfo != null)
                     {
                         if (result.PagingInfo.PageNo < result.PagingInfo.TotalPages)
@@ -387,12 +426,14 @@ namespace Dnn.PersonaBar.Prompt.Services
                             }
 
                             var nextPageCommand = string.Join(" ", args);
+							Logger.LogDebug("AddLogAndReturnResponse(consoleCommand={ConsoleCommand},cmdTypeToRun={CmdTypeToRun},command={Command},startTime={StartTime},error={Error}): nextPageCommand → {NextPageCommand}", consoleCommand, cmdTypeToRun, command, startTime, error, nextPageCommand);
                             if (indexOfPage == -1)
                             {
                                 nextPageCommand += " --page " + (result.PagingInfo.PageNo + 1);
                             }
 
                             result.NextPageCommand = nextPageCommand;
+							Logger.LogDebug("AddLogAndReturnResponse(consoleCommand={ConsoleCommand},cmdTypeToRun={CmdTypeToRun},command={Command},startTime={StartTime},error={Error}): result.NextPageCommand → {Arg5}", consoleCommand, cmdTypeToRun, command, startTime, error, result.NextPageCommand);
                         }
                         else if (result.Records > 0)
                         {
@@ -406,6 +447,7 @@ namespace Dnn.PersonaBar.Prompt.Services
 
                     message = this.Request.CreateResponse(HttpStatusCode.OK, result);
                     logInfo.LogProperties.Add(new LogDetailInfo("RecordsAffected", result.Records.ToString(CultureInfo.InvariantCulture)));
+					Logger.LogDebug("AddLogAndReturnResponse(consoleCommand={ConsoleCommand},cmdTypeToRun={CmdTypeToRun},command={Command},startTime={StartTime},error={Error}): message → {Message}", consoleCommand, cmdTypeToRun, command, startTime, error, message);
                     logInfo.LogProperties.Add(new LogDetailInfo("Output", result.Output));
                 }
                 else
@@ -422,6 +464,7 @@ namespace Dnn.PersonaBar.Prompt.Services
 
             logInfo.LogProperties.Add(new LogDetailInfo("ExecutionTime(hh:mm:ss)", TimeSpan.FromMilliseconds(DateTime.Now.Subtract(startTime).TotalMilliseconds).ToString(@"hh\:mm\:ss\.ffffff", CultureInfo.InvariantCulture)));
             LogController.Instance.AddLog(logInfo);
+			Logger.LogDebug("<<< Exiting AddLogAndReturnResponse(consoleCommand={ConsoleCommand},cmdTypeToRun={CmdTypeToRun},command={Command},startTime={StartTime},error={Error})", consoleCommand, cmdTypeToRun, command, startTime, error);
             return message;
         }
     }

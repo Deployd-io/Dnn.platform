@@ -192,10 +192,13 @@ namespace log4net.Appender
         /// </remarks>
         public RemoteSyslogAppender()
         {
+			value.LogDebug(">>> Entering RemoteSyslogAppender()");
             // syslog udp defaults
             this.RemotePort = DefaultSyslogPort;
+			value.LogDebug("RemoteSyslogAppender(): this.RemotePort → {Arg0}", this.RemotePort);
             this.RemoteAddress = System.Net.IPAddress.Parse("127.0.0.1");
             this.Encoding = Encoding.ASCII;
+			value.LogDebug("<<< Exiting RemoteSyslogAppender()");
         }
 
         /// <summary>Message identity</summary>
@@ -234,7 +237,9 @@ namespace log4net.Appender
         /// </remarks>
         public void AddMapping(LevelSeverity mapping)
         {
+			value.LogDebug(">>> Entering AddMapping(mapping=<redacted>)");
             this.m_levelMapping.Add(mapping);
+			value.LogDebug("<<< Exiting AddMapping(mapping=<redacted>)");
         }
 
         /// <summary>This method is called by the <see cref="M:AppenderSkeleton.DoAppend(LoggingEvent)"/> method.</summary>
@@ -249,10 +254,13 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent)
         {
+			value.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 // Priority
                 int priority = GeneratePriority(this.m_facility, this.GetSeverity(loggingEvent.Level));
+				value.LogDebug("Append(loggingEvent={LoggingEvent}): priority → {Priority}", loggingEvent, priority);
 
                 // Identity
                 string identity;
@@ -274,11 +282,13 @@ namespace log4net.Appender
                 char c;
 
                 StringBuilder builder = new StringBuilder();
+				value.LogDebug("Append(loggingEvent={LoggingEvent}): builder → {Builder}", loggingEvent, builder);
 
                 while (i < message.Length)
                 {
                     // Clear StringBuilder
                     builder.Length = 0;
+					value.LogDebug("Append(loggingEvent={LoggingEvent}): builder.Length → {Arg1}", loggingEvent, builder.Length);
 
                     // Write priority
                     builder.Append('<');
@@ -312,8 +322,11 @@ namespace log4net.Appender
                     }
 
                     // Grab as a byte array
+			value.LogInformation("Append(loggingEvent)={LoggingEvent}: external service call took {Arg1} ms", loggingEvent, __logStart.ElapsedMilliseconds);
+			value.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
                     buffer = this.Encoding.GetBytes(builder.ToString());
 
+value.LogDebug("Append(loggingEvent={LoggingEvent}): buffer → {Buffer}", loggingEvent, buffer);
 #if NET_4_5 || NETSTANDARD
                     this.Client.SendAsync(buffer, buffer.Length, this.RemoteEndPoint).Wait();
 #else
@@ -323,6 +336,7 @@ namespace log4net.Appender
             }
             catch (Exception e)
             {
+				value.LogError("Exception in Append(loggingEvent={LoggingEvent}): {Arg1}", loggingEvent, e.Message);
                 this.ErrorHandler.Error(
                     "Unable to send logging event to remote syslog " +
                     this.RemoteAddress.ToString() +
@@ -341,8 +355,10 @@ namespace log4net.Appender
         /// </remarks>
         public override void ActivateOptions()
         {
+			value.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
             this.m_levelMapping.ActivateOptions();
+			value.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>Translates a log4net level to a syslog severity.</summary>
@@ -355,8 +371,10 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual SyslogSeverity GetSeverity(Level level)
         {
+			value.LogDebug(">>> Entering GetSeverity(level={Level})", level);
             LevelSeverity levelSeverity = this.m_levelMapping.Lookup(level) as LevelSeverity;
             if (levelSeverity != null)
+			value.LogDebug("GetSeverity(level={Level}): levelSeverity → {LevelSeverity}", level, levelSeverity);
             {
                 return levelSeverity.Severity;
             }
@@ -387,6 +405,7 @@ namespace log4net.Appender
             }
             else if (level >= Level.Info)
             {
+			value.LogDebug("<<< Exiting GetSeverity(level={Level})", level);
                 return SyslogSeverity.Informational;
             }
             // Default setting
@@ -404,8 +423,10 @@ namespace log4net.Appender
         /// </remarks>
         public static int GeneratePriority(SyslogFacility facility, SyslogSeverity severity)
         {
+			value.LogDebug(">>> Entering GeneratePriority(facility={Facility},severity={Severity})", facility, severity);
             if (facility < SyslogFacility.Kernel || facility > SyslogFacility.Local7)
             {
+				value.LogWarning("Throwing ArgumentException from GeneratePriority(facility={Facility},severity={Severity})", facility, severity);
                 throw new ArgumentException("SyslogFacility out of range", "facility");
             }
 
@@ -416,6 +437,7 @@ namespace log4net.Appender
 
             unchecked
             {
+				value.LogDebug("<<< Exiting GeneratePriority(facility={Facility},severity={Severity})", facility, severity);
                 return ((int)facility * 8) + (int)severity;
             }
         }

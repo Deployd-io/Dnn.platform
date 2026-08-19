@@ -9,6 +9,7 @@ import {
 import util from "../../../../utils";
 import resx from "../../../../resources";
 import ListEntries from "./listEntries";
+const logger = console;
 
 const re = /^([0-9]+|[1-9])$/;
 
@@ -16,6 +17,7 @@ const ADD_PROPERTY_FLAG = "add";
 class ProfilePropertyEditor extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
 
         this.state = {
             profileProperty: {
@@ -42,14 +44,18 @@ class ProfilePropertyEditor extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const { props } = this;
         props.dispatch(SiteBehaviorActions.getProfileProperty(props.propertyId, props.portalId));
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         let { state, props } = this;
 
         const error = Object.assign({}, state.error);
+		logger.debug(`componentDidUpdate(prevProps=${prevProps}): error → ${error}`);
 
         if (!props.profileProperty) {
             return;
@@ -92,6 +98,7 @@ class ProfilePropertyEditor extends Component {
             error["datatype"] = false;
         }
         let length = props.profileProperty["Length"];
+		logger.debug(`componentDidUpdate(prevProps=${prevProps}): length → ${length}`);
         if (this.isValidLength(length)) {
             error["length"] = false;
         }
@@ -116,6 +123,7 @@ class ProfilePropertyEditor extends Component {
                 error
             });
         }
+		logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
     }
 
     isValidName(name) {
@@ -125,7 +133,9 @@ class ProfilePropertyEditor extends Component {
     }
 
     _chooseNameError() {
+		logger.debug('>>> Entering _chooseNameError()');
         if (this.state.error.name.required) {
+		logger.debug('<<< Exiting _chooseNameError()');
             return resx.get("ProfilePropertyDefinition_PropertyName.Required"); 
         }
         return resx.get("ProfilePropertyDefinition_PropertyName.NoSpecialCharacters");
@@ -152,8 +162,10 @@ class ProfilePropertyEditor extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let { state, props } = this;
         let profileProperty = Object.assign({}, state.profileProperty);
+		logger.debug(`onSettingChange(key=${key},event=${event}): profileProperty → ${profileProperty}`);
 
         if (profileProperty[key] === "" && key === "PropertyName") {
             state.error.name["required"] = true;
@@ -203,13 +215,17 @@ class ProfilePropertyEditor extends Component {
         });
 
         props.dispatch(SiteBehaviorActions.profilePropertyClientModified(profileProperty));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     onLanguageChange(event) {
+		logger.debug(`>>> Entering onLanguageChange(event=${event})`);
         let { state, props } = this;
         let propertyLocalization = Object.assign({}, state.propertyLocalization);
+		logger.debug(`onLanguageChange(event=${event}): propertyLocalization → ${propertyLocalization}`);
 
         propertyLocalization["Language"] = event.value;
+		logger.debug(`<<< Exiting onLanguageChange(event=${event})`);
         props.dispatch(SiteBehaviorActions.getProfilePropertyLocalization(props.portalId, state.profileProperty.PropertyName, state.profileProperty.PropertyCategory, event.value));
 
         this.setState({
@@ -220,11 +236,14 @@ class ProfilePropertyEditor extends Component {
     }
 
     onLocaleSettingChange(key, event) {
+		logger.debug(`>>> Entering onLocaleSettingChange(key=${key},event=${event})`);
         let { state, props } = this;
         let propertyLocalization = Object.assign({}, state.propertyLocalization);
+		logger.debug(`onLocaleSettingChange(key=${key},event=${event}): propertyLocalization → ${propertyLocalization}`);
 
         if (propertyLocalization[key] === "" && key === "PropertyName") {
             state.error["localeName"] = true;
+			logger.debug(`<<< Exiting onLocaleSettingChange(key=${key},event=${event})`);
         }
         else if (propertyLocalization[key] !== "" && key === "PropertyName") {
             state.error["localeName"] = false;
@@ -242,9 +261,11 @@ class ProfilePropertyEditor extends Component {
     }
 
     getProfileVisibilityOptions() {
+		logger.debug('>>> Entering getProfileVisibilityOptions()');
         let options = [];
         if (this.props.userVisibilityOptions !== undefined) {
             options = this.props.userVisibilityOptions.map((item) => {
+		logger.debug('<<< Exiting getProfileVisibilityOptions()');
                 return { label: resx.get(item.label), value: item.value };
             });
         }
@@ -252,6 +273,7 @@ class ProfilePropertyEditor extends Component {
     }
 
     getProfileLanguageOptions() {
+		logger.debug('>>> Entering getProfileLanguageOptions()');
         let options = [];
         if (this.props.languageOptions !== undefined) {
             options = this.props.languageOptions.map((item) => {
@@ -265,10 +287,12 @@ class ProfilePropertyEditor extends Component {
                 };
             });
         }
+		logger.debug('<<< Exiting getProfileLanguageOptions()');
         return options;
     }
 
     getProfileDataTypeOptions() {
+		logger.debug('>>> Entering getProfileDataTypeOptions()');
         let options = [];
         const noneSpecifiedText = "<" + resx.get("NoneSpecified") + ">";
         if (this.props.dataTypeOptions !== undefined) {
@@ -277,10 +301,13 @@ class ProfilePropertyEditor extends Component {
             });
             options.unshift({ label: noneSpecifiedText, value: "" });
         }
+		logger.debug(`getProfileDataTypeOptions(): noneSpecifiedText → ${noneSpecifiedText}`);
+		logger.debug('<<< Exiting getProfileDataTypeOptions()');
         return options;
     }
 
     getDefaultVisibility() {
+		logger.debug('>>> Entering getDefaultVisibility()');
         const { props, state } = this;
         if (!state.profileProperty) {
             if (props.id === ADD_PROPERTY_FLAG) {
@@ -288,11 +315,13 @@ class ProfilePropertyEditor extends Component {
             }
         }
         else {
+			logger.debug('<<< Exiting getDefaultVisibility()');
             return state.profileProperty.DefaultVisibility;
         }
     }
 
     onNext() {
+	logger.debug('>>> Entering onNext()');
 
         const { props, state } = this;
         this.setState({
@@ -306,6 +335,7 @@ class ProfilePropertyEditor extends Component {
         if (props.profilePropertyClientModified) {
             if (props.id === ADD_PROPERTY_FLAG) {
                 const property = Object.assign({}, state.profileProperty);
+				logger.debug(`onNext(): property → ${property}`);
                 property["PortalId"] = props.portalId;
                 props.dispatch(SiteBehaviorActions.addProfileProperty(property, () => {
                     util.utilities.notify(resx.get("SettingsUpdateSuccess"));
@@ -345,12 +375,15 @@ class ProfilePropertyEditor extends Component {
                     });
                 }));
         }
+		logger.debug('<<< Exiting onNext()');
     }
 
     onListNext() {
+		logger.debug('>>> Entering onListNext()');
         const { props, state } = this;
         props.dispatch(SiteBehaviorActions.getProfilePropertyLocalization(props.portalId,
             state.profileProperty.PropertyName, state.profileProperty.PropertyCategory, props.cultureCode, (data) => {
+				logger.debug('<<< Exiting onListNext()');
                 this.setState({
                     propertyLocalization: data.PropertyLocalization,
                     showFirstPage: false,
@@ -360,6 +393,7 @@ class ProfilePropertyEditor extends Component {
     }
 
     onSave() {
+		logger.debug('>>> Entering onSave()');
         const { props, state } = this;
         this.setState({
             triedToSubmit: true
@@ -386,9 +420,11 @@ class ProfilePropertyEditor extends Component {
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
         }));
+		logger.debug('<<< Exiting onSave()');
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const { props } = this;
         if (props.profilePropertyClientModified) {
             util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
@@ -398,11 +434,13 @@ class ProfilePropertyEditor extends Component {
         }
         else {
             props.Collapse();
+			logger.debug('<<< Exiting onCancel()');
         }
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
          
         if (this.state.profileProperty !== undefined || this.props.id === ADD_PROPERTY_FLAG) {
             const { profileProperty, propertyLocalization } = this.state;
@@ -643,6 +681,7 @@ class ProfilePropertyEditor extends Component {
                 </InputGroup>
             </div>;
 
+			logger.debug('<<< Exiting render()');
             return (
                 <div className="property-editor" ref={node => this.node = node}>
                     <div className={this.state.showFirstPage ? "property-editor-page" : "property-editor-page-hidden"}>
@@ -734,6 +773,8 @@ ProfilePropertyEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         profileProperty: state.siteBehavior.profileProperty,
         propertyLocalization: state.siteBehavior.propertyLocalization,

@@ -10,11 +10,14 @@ namespace DotNetNuke.Web.UI
     /// <summary>An exception with a <see cref="DotNetNukeErrorCode"/>.</summary>
     public class DotNetNukeException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DotNetNukeException));
         private readonly DotNetNukeErrorCode errorCode = DotNetNukeErrorCode.NotSet;
 
         /// <summary>Initializes a new instance of the <see cref="DotNetNukeException"/> class.</summary>
         public DotNetNukeException()
         {
+		Logger.LogDebug(">>> Entering DotNetNukeException()");
+		Logger.LogDebug("<<< Exiting DotNetNukeException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DotNetNukeException"/> class.</summary>
@@ -22,7 +25,9 @@ namespace DotNetNuke.Web.UI
         public DotNetNukeException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering DotNetNukeException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting DotNetNukeException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="DotNetNukeException"/> class.</summary>
         /// <param name="message">The message.</param>
@@ -30,6 +35,7 @@ namespace DotNetNuke.Web.UI
         public DotNetNukeException(string message, Exception innerException)
             : base(message, innerException)
         {
+		Logger.LogDebug(">>> Entering DotNetNukeException(message={Message},innerException={InnerException})", message, innerException);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DotNetNukeException"/> class.</summary>
@@ -39,7 +45,9 @@ namespace DotNetNuke.Web.UI
             : base(message)
         {
             this.errorCode = errorCode;
+			Logger.LogDebug("DotNetNukeException(message={Message},errorCode={ErrorCode}): errorCode → {ErrorCode1}", message, errorCode, errorCode);
         }
+		Logger.LogDebug("<<< Exiting DotNetNukeException(message={Message},errorCode={ErrorCode})", message, errorCode);
 
         /// <summary>Initializes a new instance of the <see cref="DotNetNukeException"/> class.</summary>
         /// <param name="message">The message.</param>
@@ -49,6 +57,7 @@ namespace DotNetNuke.Web.UI
             : base(message, innerException)
         {
             this.errorCode = errorCode;
+			Logger.LogDebug("DotNetNukeException(message={Message},innerException={InnerException},errorCode={ErrorCode}): errorCode → {ErrorCode1}", message, innerException, errorCode, errorCode);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DotNetNukeException"/> class.</summary>

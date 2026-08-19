@@ -18,6 +18,7 @@ namespace Dnn.ExportImport.Components.Services
     /// <summary>An export service for profile properties.</summary>
     public class ProfilePropertiesService : BasePortableService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ProfilePropertiesService));
         /// <inheritdoc />
         public override string Category => Constants.Category_ProfileProps;
 
@@ -30,8 +31,11 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			Logger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
             var fromDate = (exportDto.FromDateUtc ?? Constants.MinDbTime).ToLocalTime();
             var toDate = exportDto.ToDateUtc.ToLocalTime();
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): toDate → {ToDate}", exportJob, exportDto, toDate);
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): fromDate → {FromDate}", exportJob, exportDto, fromDate);
             if (this.CheckCancelled(exportJob))
             {
                 return;
@@ -66,6 +70,8 @@ namespace Dnn.ExportImport.Components.Services
                 return;
             }
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			Logger.LogInformation("ExportData(exportJob,exportDto)={ExportJob},{ExportDto}: database query executed in {Arg2} ms", exportJob, exportDto, __logStart.ElapsedMilliseconds);
             this.Repository.CreateItems(profileProperties);
             this.Result.AddSummary("Exported Profile Properties", profileProperties.Count.ToString(CultureInfo.InvariantCulture));
             this.CheckPoint.Progress = 100;
@@ -73,17 +79,20 @@ namespace Dnn.ExportImport.Components.Services
             this.CheckPoint.Completed = true;
             this.CheckPoint.Stage++;
             this.CheckPointStageCallback(this);
+			Logger.LogDebug("<<< Exiting ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
         }
 
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
             if (this.CheckPoint.Stage > 0)
             {
                 return;
             }
 
             var profileProperties = this.Repository.GetAllItems<ExportProfileProperty>().ToList();
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): profileProperties → {ProfileProperties}", importJob, importDto, profileProperties);
 
             // Update the total items count in the check points. This should be updated only once.
             this.CheckPoint.TotalItems = this.CheckPoint.TotalItems <= 0 ? profileProperties.Count : this.CheckPoint.TotalItems;
@@ -105,11 +114,13 @@ namespace Dnn.ExportImport.Components.Services
                     {
                         case CollisionResolution.Overwrite:
                             var modifiedById = Util.GetUserIdByName(importJob, profileProperty.LastModifiedByUserId, profileProperty.LastModifiedByUserName);
+							Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): modifiedById → {ModifiedById}", importJob, importDto, modifiedById);
                             ProcessUpdateProfileProperty(profileProperty, existingProfileProperty, modifiedById);
                             break;
                         case CollisionResolution.Ignore:
                             break;
                         default:
+							Logger.LogWarning("Throwing ArgumentOutOfRangeException from ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
                             throw new ArgumentOutOfRangeException(importDto.CollisionResolution.ToString());
                     }
                 }
@@ -130,11 +141,14 @@ namespace Dnn.ExportImport.Components.Services
             this.CheckPoint.Progress = 100;
             this.CheckPoint.Stage++;
             this.CheckPointStageCallback(this);
+			Logger.LogDebug("<<< Exiting ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
         }
 
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			Logger.LogDebug(">>> Entering GetImportTotal()");
+			Logger.LogDebug("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<ExportProfileProperty>();
         }
 
@@ -143,6 +157,7 @@ namespace Dnn.ExportImport.Components.Services
             ExportProfileProperty profileProperty,
             int createdById)
         {
+			Logger.LogDebug(">>> Entering ProcessCreateProfileProperty(importJob={ImportJob},profileProperty={ProfileProperty},createdById={CreatedById})", importJob, profileProperty, createdById);
             DotNetNuke.Data.DataProvider.Instance()
                 .AddPropertyDefinition(
                     importJob.PortalId,
@@ -159,10 +174,12 @@ namespace Dnn.ExportImport.Components.Services
                     profileProperty.Length,
                     profileProperty.DefaultVisibility,
                     createdById);
+					Logger.LogDebug("<<< Exiting ProcessCreateProfileProperty(importJob={ImportJob},profileProperty={ProfileProperty},createdById={CreatedById})", importJob, profileProperty, createdById);
         }
 
         private static void ProcessUpdateProfileProperty(ExportProfileProperty profileProperty, ExportProfileProperty existingProfileProperty, int modifiedById)
         {
+			Logger.LogDebug(">>> Entering ProcessUpdateProfileProperty(profileProperty={ProfileProperty},existingProfileProperty={ExistingProfileProperty},modifiedById={ModifiedById})", profileProperty, existingProfileProperty, modifiedById);
             DotNetNuke.Data.DataProvider.Instance()
                 .UpdatePropertyDefinition(
                     existingProfileProperty.PropertyDefinitionId,
@@ -178,6 +195,7 @@ namespace Dnn.ExportImport.Components.Services
                     profileProperty.Length,
                     profileProperty.DefaultVisibility,
                     modifiedById);
+					Logger.LogDebug("<<< Exiting ProcessUpdateProfileProperty(profileProperty={ProfileProperty},existingProfileProperty={ExistingProfileProperty},modifiedById={ModifiedById})", profileProperty, existingProfileProperty, modifiedById);
         }
     }
 }

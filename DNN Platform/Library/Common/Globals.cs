@@ -496,6 +496,7 @@ namespace DotNetNuke.Common
         /// <param name="endResponse">if set to <see langword="true"/> [end response].</param>
         public static void Redirect(string url, bool endResponse)
         {
+			Logger.LogDebug(">>> Entering Redirect(url={Url},endResponse={EndResponse})", url, endResponse);
             try
             {
                 HttpContext.Current.Response.Redirect(url, endResponse);
@@ -509,6 +510,7 @@ namespace DotNetNuke.Common
             {
                 Logger.Error(ex);
             }
+			Logger.LogDebug("<<< Exiting Redirect(url={Url},endResponse={EndResponse})", url, endResponse);
         }
 
         /// <summary>Checks if incremental sqlDataProvider files exist.</summary>
@@ -541,6 +543,10 @@ namespace DotNetNuke.Common
             string stringValueColumn,
             string numericValueColumn)
         {
+			Logger.LogDebug(">>> Entering BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn})", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn);
+			Logger.LogDebug("<<< Exiting BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn})", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn);
+			Logger.LogDebug(">>> Entering BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture})", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture);
+			Logger.LogDebug("<<< Exiting BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture})", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture);
             return BuildCrossTabDataSet(dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, CultureInfo.CurrentCulture);
         }
 
@@ -578,19 +584,25 @@ namespace DotNetNuke.Common
 
             // create dataset
             var crosstab = new DataSet(dataSetName);
+			Logger.LogDebug("BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture}): crosstab → {Crosstab}", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture, crosstab);
+			Logger.LogDebug("BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture}): crosstab.Namespace → {Arg10}", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture, crosstab.Namespace);
             crosstab.Namespace = "NetFrameWork";
 
             // create table
             var tab = new DataTable(dataSetName);
+			Logger.LogDebug("BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture}): tab → {Tab}", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture, tab);
 
             // split fixed columns
             arrFixedColumns = fixedColumns.Split(',');
 
+			Logger.LogDebug("BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture}): arrFixedColumns → {ArrFixedColumns}", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture, arrFixedColumns);
             // add fixed columns to table
             for (intColumn = 0; intColumn < arrFixedColumns.Length; intColumn++)
             {
                 arrField = arrFixedColumns[intColumn].Split('|');
                 var col = new DataColumn(arrField[0], Type.GetType("System." + arrField[1]));
+				Logger.LogDebug("BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture}): col → {Col}", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture, col);
+				Logger.LogDebug("BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture}): arrField → {ArrField}", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture, arrField);
                 tab.Columns.Add(col);
             }
 
@@ -599,6 +611,7 @@ namespace DotNetNuke.Common
             {
                 arrVariableColumns = variableColumns.Split(',');
 
+				Logger.LogDebug("BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture}): arrVariableColumns → {ArrVariableColumns}", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture, arrVariableColumns);
                 // add varible columns to table
                 for (intColumn = 0; intColumn < arrVariableColumns.Length; intColumn++)
                 {
@@ -606,6 +619,7 @@ namespace DotNetNuke.Common
                     var col = new DataColumn(arrField[0], Type.GetType("System." + arrField[1]));
                     col.AllowDBNull = true;
                     tab.Columns.Add(col);
+					Logger.LogDebug("BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture}): col.AllowDBNull → {Arg10}", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture, col.AllowDBNull);
                 }
             }
 
@@ -615,6 +629,8 @@ namespace DotNetNuke.Common
             // add rows to table
             intKeyColumn = -1;
             DataRow row = null;
+			Logger.LogDebug("BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture}): row → {Row}", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture, row);
+			Logger.LogDebug("BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture}): intKeyColumn → {IntKeyColumn}", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture, intKeyColumn);
             while (result.Read())
             {
                 // loop using KeyColumn as control break
@@ -718,8 +734,10 @@ namespace DotNetNuke.Common
         /// <returns>the dataset instance.</returns>
         public static DataSet ConvertDataReaderToDataSet(IDataReader reader)
         {
+			Logger.LogDebug(">>> Entering ConvertDataReaderToDataSet(reader={Reader})", reader);
             // add datatable to dataset
             var objDataSet = new DataSet();
+			Logger.LogDebug("ConvertDataReaderToDataSet(reader={Reader}): objDataSet → {ObjDataSet}", reader, objDataSet);
 
             try
             {
@@ -734,6 +752,7 @@ namespace DotNetNuke.Common
                 reader.Close();
             }
 
+			Logger.LogDebug("<<< Exiting ConvertDataReaderToDataSet(reader={Reader})", reader);
             return objDataSet;
         }
 
@@ -742,6 +761,9 @@ namespace DotNetNuke.Common
         /// <returns>the datatable instance.</returns>
         public static DataTable ConvertDataReaderToDataTable(IDataReader reader)
         {
+			Logger.LogDebug(">>> Entering ConvertDataReaderToDataTable(reader={Reader})", reader);
+			Logger.LogDebug("<<< Exiting ConvertDataReaderToDataTable(reader={Reader})", reader);
+			Logger.LogDebug("<<< Exiting ConvertDataReaderToDataTable(reader={Reader},closeReader={CloseReader})", reader, closeReader);
             return ConvertDataReaderToDataTable(reader, true);
         }
 
@@ -788,9 +810,11 @@ namespace DotNetNuke.Common
         /// <returns>absolute server path.</returns>
         public static string GetAbsoluteServerPath(HttpRequest request)
         {
+			Logger.LogDebug(">>> Entering GetAbsoluteServerPath(request={Request})", request);
             var strServerPath = request.MapPath(request.ApplicationPath);
             if (!strServerPath.EndsWith(@"\", StringComparison.Ordinal))
             {
+				Logger.LogDebug("GetAbsoluteServerPath(request={Request}): strServerPath → {StrServerPath}", request, strServerPath);
                 strServerPath += @"\";
             }
 
@@ -807,10 +831,12 @@ namespace DotNetNuke.Common
         /// <returns>A string representing the application name.</returns>
         public static string GetApplicationName()
         {
+			Logger.LogDebug(">>> Entering GetApplicationName()");
             string appName;
             if (HttpContext.Current.Items["ApplicationName"] == null || string.IsNullOrEmpty(HttpContext.Current.Items["ApplicationName"].ToString()))
             {
                 var portalSettings = PortalController.Instance.GetCurrentSettings();
+				Logger.LogDebug("GetApplicationName(): portalSettings → {PortalSettings}", portalSettings);
                 if (portalSettings == null)
                 {
                     appName = "/";
@@ -825,6 +851,8 @@ namespace DotNetNuke.Common
                 appName = Convert.ToString(HttpContext.Current.Items["ApplicationName"], CultureInfo.InvariantCulture);
             }
 
+			Logger.LogDebug("<<< Exiting GetApplicationName()");
+			Logger.LogDebug("<<< Exiting GetApplicationName(portalID={PortalID})", portalID);
             return appName;
         }
 
@@ -859,8 +887,11 @@ namespace DotNetNuke.Common
         /// <returns>return <see langword="true"/> if can find the specific version, otherwise will return <see langword="false"/>.</returns>
         public static bool FindDatabaseVersion(int major, int minor, int build)
         {
+			Logger.LogDebug(">>> Entering FindDatabaseVersion(major={Major},minor={Minor},build={Build})", major, minor, build);
             bool version = false;
             IDataReader dr = null;
+			Logger.LogDebug("FindDatabaseVersion(major={Major},minor={Minor},build={Build}): dr → {Dr}", major, minor, build, dr);
+			Logger.LogDebug("FindDatabaseVersion(major={Major},minor={Minor},build={Build}): version → {Version}", major, minor, build, version);
             try
             {
                 dr = DataProvider.Instance().FindDatabaseVersion(major, minor, build);
@@ -871,6 +902,7 @@ namespace DotNetNuke.Common
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in FindDatabaseVersion(major={Major},minor={Minor},build={Build}): {Arg3}", major, minor, build, ex.getMessage());
                 Exceptions.LogException(ex);
             }
             finally
@@ -878,6 +910,7 @@ namespace DotNetNuke.Common
                 CBO.CloseDataReader(dr, true);
             }
 
+			Logger.LogDebug("<<< Exiting FindDatabaseVersion(major={Major},minor={Minor},build={Build})", major, minor, build);
             return version;
         }
 
@@ -906,14 +939,19 @@ namespace DotNetNuke.Common
         /// <returns>url with port if the post number is not 80.</returns>
         public static string AddPort(string httpAlias, string originalUrl)
         {
+			Logger.LogDebug(">>> Entering AddPort(httpAlias={HttpAlias},originalUrl={OriginalUrl})", httpAlias, originalUrl);
             var uri = new Uri(originalUrl);
             var aliasUri = new Uri(httpAlias);
+			Logger.LogDebug("AddPort(httpAlias={HttpAlias},originalUrl={OriginalUrl}): aliasUri → {AliasUri}", httpAlias, originalUrl, aliasUri);
+			Logger.LogDebug("AddPort(httpAlias={HttpAlias},originalUrl={OriginalUrl}): uri → {Uri}", httpAlias, originalUrl, uri);
 
             if (!uri.IsDefaultPort)
             {
                 httpAlias = AddHTTP(aliasUri.Host + ":" + uri.Port + aliasUri.LocalPath);
+				Logger.LogDebug("AddPort(httpAlias={HttpAlias},originalUrl={OriginalUrl}): httpAlias → {HttpAlias1}", httpAlias, originalUrl, httpAlias);
             }
 
+			Logger.LogDebug("<<< Exiting AddPort(httpAlias={HttpAlias},originalUrl={OriginalUrl})", httpAlias, originalUrl);
             return httpAlias;
         }
 
@@ -922,6 +960,9 @@ namespace DotNetNuke.Common
         /// <returns>domain name.</returns>
         public static string GetDomainName(HttpRequest request)
         {
+			Logger.LogDebug(">>> Entering GetDomainName(request={Request})", request);
+			Logger.LogDebug("<<< Exiting GetDomainName(request={Request})", request);
+			Logger.LogDebug("<<< Exiting GetDomainName(request={Request},parsePortNumber={ParsePortNumber})", request, parsePortNumber);
             return GetDomainName(new HttpRequestWrapper(request), false);
         }
 
@@ -957,12 +998,15 @@ namespace DotNetNuke.Common
         /// </returns>
         public static bool UsePortNumber()
         {
+			Logger.LogDebug(">>> Entering UsePortNumber()");
             bool usePort = true;
             if (Config.GetSetting("UsePortNumber") != null)
+			Logger.LogDebug("UsePortNumber(): usePort → {UsePort}", usePort);
             {
                 usePort = bool.Parse(Config.GetSetting("UsePortNumber"));
             }
 
+			Logger.LogDebug("<<< Exiting UsePortNumber()");
             return usePort;
         }
 
@@ -970,6 +1014,13 @@ namespace DotNetNuke.Common
         /// <returns>file list.</returns>
         public static ArrayList GetFileList()
         {
+			Logger.LogDebug(">>> Entering GetFileList()");
+			Logger.LogDebug("<<< Exiting GetFileList()");
+			Logger.LogDebug("<<< Exiting GetFileList(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetFileList(portalId={PortalId},strExtensions={StrExtensions})", portalId, strExtensions);
+			Logger.LogDebug("<<< Exiting GetFileList(portalId={PortalId},strExtensions={StrExtensions},noneSpecified={NoneSpecified})", portalId, strExtensions, noneSpecified);
+			Logger.LogDebug("<<< Exiting GetFileList(portalId={PortalId},strExtensions={StrExtensions},noneSpecified={NoneSpecified},folder={Folder})", portalId, strExtensions, noneSpecified, folder);
+			Logger.LogDebug("<<< Exiting GetFileList(portalId={PortalId},strExtensions={StrExtensions},noneSpecified={NoneSpecified},folder={Folder},includeHidden={IncludeHidden})", portalId, strExtensions, noneSpecified, folder, includeHidden);
             return GetFileList(-1, string.Empty, true, string.Empty, false);
         }
 
@@ -1102,9 +1153,12 @@ namespace DotNetNuke.Common
         /// <returns>Host portal settings.</returns>
         public static PortalSettings GetHostPortalSettings(IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering GetHostPortalSettings(hostSettings={HostSettings})", hostSettings);
             int tabId = -1;
             int portalId = -1;
             IPortalAliasInfo objPortalAliasInfo = null;
+			Logger.LogDebug("GetHostPortalSettings(hostSettings={HostSettings}): portalId → {PortalId}", hostSettings, portalId);
+			Logger.LogDebug("GetHostPortalSettings(hostSettings={HostSettings}): objPortalAliasInfo → {ObjPortalAliasInfo}", hostSettings, objPortalAliasInfo);
 
             // if the portal alias exists
             if (hostSettings.HostPortalId > Null.NullInteger)
@@ -1114,9 +1168,11 @@ namespace DotNetNuke.Common
                 // use the host portal
                 objPortalAliasInfo = new PortalAliasInfo();
                 objPortalAliasInfo.PortalId = portalId;
+				Logger.LogDebug("GetHostPortalSettings(hostSettings={HostSettings}): objPortalAliasInfo.PortalId → {Arg1}", hostSettings, objPortalAliasInfo.PortalId);
             }
 
             // load the PortalSettings into current context
+			Logger.LogDebug("<<< Exiting GetHostPortalSettings()");
             return new PortalSettings(tabId, objPortalAliasInfo as PortalAliasInfo);
         }
 
@@ -1127,8 +1183,11 @@ namespace DotNetNuke.Common
         /// <returns>domain name.</returns>
         public static string GetPortalDomainName(string strPortalAlias, HttpRequest request, bool blnAddHTTP)
         {
+			Logger.LogDebug(">>> Entering GetPortalDomainName(strPortalAlias={StrPortalAlias},request={Request},blnAddHTTP={BlnAddHTTP})", strPortalAlias, request, blnAddHTTP);
             string strDomainName = string.Empty;
             string strURL = string.Empty;
+			Logger.LogDebug("GetPortalDomainName(strPortalAlias={StrPortalAlias},request={Request},blnAddHTTP={BlnAddHTTP}): strURL → {StrURL}", strPortalAlias, request, blnAddHTTP, strURL);
+			Logger.LogDebug("GetPortalDomainName(strPortalAlias={StrPortalAlias},request={Request},blnAddHTTP={BlnAddHTTP}): strDomainName → {StrDomainName}", strPortalAlias, request, blnAddHTTP, strDomainName);
             int intAlias;
             if (request != null)
             {
@@ -1154,6 +1213,7 @@ namespace DotNetNuke.Common
                 strDomainName = AddHTTP(strDomainName);
             }
 
+			Logger.LogDebug("<<< Exiting GetPortalDomainName(strPortalAlias={StrPortalAlias},request={Request},blnAddHTTP={BlnAddHTTP})", strPortalAlias, request, blnAddHTTP);
             return strDomainName;
         }
 
@@ -1168,7 +1228,9 @@ namespace DotNetNuke.Common
         /// <returns>Portal settings.</returns>
         public static PortalSettings GetPortalSettings(IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering GetPortalSettings()");
             PortalSettings portalSettings = null;
+			Logger.LogDebug("GetPortalSettings(hostSettings={HostSettings}): portalSettings → {PortalSettings}", hostSettings, portalSettings);
 
             // Try getting the settings from the Context
             if (HttpContext.Current != null)
@@ -1182,6 +1244,7 @@ namespace DotNetNuke.Common
                 portalSettings = GetHostPortalSettings(hostSettings);
             }
 
+			Logger.LogDebug("<<< Exiting GetPortalSettings()");
             return portalSettings;
         }
 
@@ -1191,6 +1254,7 @@ namespace DotNetNuke.Common
         /// <returns>A string containing the subfolder path.</returns>
         public static string GetSubFolderPath(string strFileNamePath, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetSubFolderPath(strFileNamePath={StrFileNamePath},portalId={PortalId})", strFileNamePath, portalId);
             string parentFolderName;
             if (portalId == Null.NullInteger)
             {
@@ -1199,6 +1263,7 @@ namespace DotNetNuke.Common
             else
             {
                 PortalInfo objPortal = PortalController.Instance.GetPortal(portalId);
+				Logger.LogDebug("GetSubFolderPath(strFileNamePath={StrFileNamePath},portalId={PortalId}): objPortal → {ObjPortal}", strFileNamePath, portalId, objPortal);
                 parentFolderName = objPortal.HomeDirectoryMapPath.Replace("/", @"\");
             }
 
@@ -1211,8 +1276,10 @@ namespace DotNetNuke.Common
         /// <returns>The total number of records in the data reader.</returns>
         public static int GetTotalRecords(ref IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering GetTotalRecords(dr={Dr})", dr);
             int total = 0;
             if (dr.Read())
+			Logger.LogDebug("GetTotalRecords(dr={Dr}): total → {Total}", dr, total);
             {
                 try
                 {
@@ -1225,6 +1292,7 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetTotalRecords(dr={Dr})", dr);
             return total;
         }
 
@@ -1243,17 +1311,23 @@ namespace DotNetNuke.Common
         /// <returns>The file handler url for the file (FileID=xxxx).</returns>
         public static string ImportFile(int portalId, string url)
         {
+			Logger.LogDebug(">>> Entering ImportFile(portalId={PortalId},url={Url})", portalId, url);
             string strUrl = url;
             if (GetURLType(url) == TabType.File)
+			Logger.LogDebug("ImportFile(portalId={PortalId},url={Url}): strUrl → {StrUrl}", portalId, url, strUrl);
             {
                 var fileName = Path.GetFileName(url);
+				Logger.LogDebug("ImportFile(portalId={PortalId},url={Url}): fileName → {FileName}", portalId, url, fileName);
 
                 var folderPath = url.Substring(0, url.LastIndexOf(fileName, StringComparison.OrdinalIgnoreCase));
+				Logger.LogDebug("ImportFile(portalId={PortalId},url={Url}): folderPath → {FolderPath}", portalId, url, folderPath);
                 var folder = FolderManager.Instance.GetFolder(portalId, folderPath);
+				Logger.LogDebug("ImportFile(portalId={PortalId},url={Url}): folder → {Folder}", portalId, url, folder);
 
                 if (folder != null)
                 {
                     var file = FileManager.Instance.GetFile(folder, fileName);
+					Logger.LogDebug("ImportFile(portalId={PortalId},url={Url}): file → {File}", portalId, url, file);
                     if (file != null)
                     {
                         strUrl = "FileID=" + file.FileId;
@@ -1261,6 +1335,7 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ImportFile(portalId={PortalId},url={Url})", portalId, url);
             return strUrl;
         }
 
@@ -1269,9 +1344,12 @@ namespace DotNetNuke.Common
         /// <returns>encoded value.</returns>
         public static string HTTPPOSTEncode(string strPost)
         {
+			Logger.LogDebug(">>> Entering HTTPPOSTEncode(strPost={StrPost})", strPost);
             strPost = strPost.Replace(@"\", string.Empty);
             strPost = HttpUtility.UrlEncode(strPost);
             strPost = strPost.Replace("%2f", "/");
+			Logger.LogDebug("HTTPPOSTEncode(strPost={StrPost}): strPost → {StrPost1}", strPost, strPost);
+			Logger.LogDebug("<<< Exiting HTTPPOSTEncode(strPost={StrPost})", strPost);
             return strPost;
         }
 
@@ -1282,7 +1360,9 @@ namespace DotNetNuke.Common
         /// <param name="portalId">The Portal ID.</param>
         public static void SetApplicationName(int portalId)
         {
+			Logger.LogDebug(">>> Entering SetApplicationName(portalId={PortalId})", portalId);
             HttpContext.Current.Items["ApplicationName"] = GetApplicationName(portalId);
+			Logger.LogDebug("<<< Exiting SetApplicationName(portalId={PortalId})", portalId);
         }
 
         /// <summary>Sets the ApplicationName for the MemberRole API.</summary>
@@ -1292,7 +1372,9 @@ namespace DotNetNuke.Common
         /// <param name="applicationName">The Application Name to set.</param>
         public static void SetApplicationName(string applicationName)
         {
+			Logger.LogDebug(">>> Entering SetApplicationName(applicationName={ApplicationName})", applicationName);
             HttpContext.Current.Items["ApplicationName"] = applicationName;
+			Logger.LogDebug("<<< Exiting SetApplicationName(applicationName={ApplicationName})", applicationName);
         }
 
         /// <summary>Formats the address on a single line ( ie. Unit, Street, City, Region, Country, PostalCode ).</summary>
@@ -1305,8 +1387,10 @@ namespace DotNetNuke.Common
         /// <returns>A string containing the whole address on a single line.</returns>
         public static string FormatAddress(object unit, object street, object city, object region, object country, object postalCode)
         {
+			Logger.LogDebug(">>> Entering FormatAddress(unit={Unit},street={Street},city={City},region={Region},country={Country},postalCode={PostalCode})", unit, street, city, region, country, postalCode);
             string strAddress = string.Empty;
             if (unit != null)
+			Logger.LogDebug("FormatAddress(unit={Unit},street={Street},city={City},region={Region},country={Country},postalCode={PostalCode}): strAddress → {StrAddress}", unit, street, city, region, country, postalCode, strAddress);
             {
                 if (!string.IsNullOrEmpty(unit.ToString().Trim()))
                 {
@@ -1359,6 +1443,7 @@ namespace DotNetNuke.Common
                 strAddress = strAddress.Substring(2);
             }
 
+			Logger.LogDebug("<<< Exiting FormatAddress(unit={Unit},street={Street},city={City},region={Region},country={Country},postalCode={PostalCode})", unit, street, city, region, country, postalCode);
             return strAddress;
         }
 
@@ -1367,6 +1452,8 @@ namespace DotNetNuke.Common
         /// <returns>Formatted  version as string.</returns>
         public static string FormatVersion(Version version)
         {
+			Logger.LogDebug(">>> Entering FormatVersion(version={Version})", version);
+			Logger.LogDebug("<<< Exiting FormatVersion(version={Version})", version);
             return FormatVersion(version, false);
         }
 
@@ -1463,12 +1550,15 @@ namespace DotNetNuke.Common
         /// <returns>obfuscated sensitive data by hustling ASCII characters.</returns>
         public static string CloakText(string personalInfo)
         {
+			Logger.LogDebug(">>> Entering CloakText(personalInfo={PersonalInfo})", personalInfo);
             if (personalInfo == null)
             {
                 return Null.NullString;
             }
 
             var characterCodes = personalInfo.Select(ch => ((int)ch).ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("CloakText(personalInfo={PersonalInfo}): characterCodes → {CharacterCodes}", personalInfo, characterCodes);
+			Logger.LogDebug("<<< Exiting CloakText(personalInfo={PersonalInfo})", personalInfo);
             return $"""
                     <script type="text/javascript">
                         //<![CDATA[
@@ -1488,13 +1578,17 @@ namespace DotNetNuke.Common
         /// </example>
         public static string GetMediumDate(string strDate)
         {
+			Logger.LogDebug(">>> Entering GetMediumDate(strDate={StrDate})", strDate);
             if (!string.IsNullOrEmpty(strDate))
             {
                 DateTime datDate = Convert.ToDateTime(strDate, CultureInfo.CurrentCulture);
+				Logger.LogDebug("GetMediumDate(strDate={StrDate}): datDate → {DatDate}", strDate, datDate);
                 string strMonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(datDate.Month);
                 strDate = $"{datDate.Day}-{strMonth}-{datDate.Year}";
+				Logger.LogDebug("GetMediumDate(strDate={StrDate}): strDate → {StrDate1}", strDate, strDate);
             }
 
+			Logger.LogDebug("<<< Exiting GetMediumDate(strDate={StrDate})", strDate);
             return strDate;
         }
 
@@ -1503,12 +1597,16 @@ namespace DotNetNuke.Common
         /// <returns>short date content of the input.</returns>
         public static string GetShortDate(string strDate)
         {
+			Logger.LogDebug(">>> Entering GetShortDate(strDate={StrDate})", strDate);
             if (!string.IsNullOrEmpty(strDate))
             {
                 var datDate = Convert.ToDateTime(strDate, CultureInfo.CurrentCulture);
+				Logger.LogDebug("GetShortDate(strDate={StrDate}): datDate → {DatDate}", strDate, datDate);
                 strDate = $"{datDate.Month}/{datDate.Day}/{datDate.Year}";
+				Logger.LogDebug("GetShortDate(strDate={StrDate}): strDate → {StrDate1}", strDate, strDate);
             }
 
+			Logger.LogDebug("<<< Exiting GetShortDate(strDate={StrDate})", strDate);
             return strDate;
         }
 
@@ -1518,9 +1616,11 @@ namespace DotNetNuke.Common
         /// </returns>
         public static bool IsAdminControl()
         {
+			Logger.LogDebug(">>> Entering IsAdminControl()");
             // This is needed to avoid an exception if there is no Context.  This will occur if code is called from the Scheduler
             if (HttpContext.Current == null)
             {
+			Logger.LogDebug("<<< Exiting IsAdminControl()");
                 return false;
             }
 
@@ -1533,16 +1633,19 @@ namespace DotNetNuke.Common
         /// </returns>
         public static bool IsAdminSkin()
         {
+			Logger.LogDebug(">>> Entering IsAdminSkin()");
             bool isAdminSkin = Null.NullBoolean;
             if (HttpContext.Current != null)
             {
                 string controlKey = string.Empty;
+				Logger.LogDebug("IsAdminSkin(): controlKey → {ControlKey}", controlKey);
                 if (HttpContext.Current.Request.QueryString["ctl"] != null)
                 {
                     controlKey = HttpContext.Current.Request.QueryString["ctl"].ToLowerInvariant();
                 }
 
                 int moduleID = -1;
+				Logger.LogDebug("IsAdminSkin(): moduleID → {ModuleID}", moduleID);
                 if (HttpContext.Current.Request.QueryString["mid"] != null)
                 {
                     if (!int.TryParse(HttpContext.Current.Request.QueryString["mid"], out moduleID))
@@ -1555,6 +1658,7 @@ namespace DotNetNuke.Common
                                (!string.IsNullOrEmpty(controlKey) && AdminControlKeys.Contains(controlKey) && moduleID == -1);
             }
 
+			Logger.LogDebug("<<< Exiting IsAdminSkin()");
             return isAdminSkin;
         }
 
@@ -1562,6 +1666,8 @@ namespace DotNetNuke.Common
         /// <returns><see langword="true"/> if the tab is in Edit mode; otherwise <see langword="false"/>.</returns>
         public static bool IsEditMode()
         {
+			Logger.LogDebug(">>> Entering IsEditMode()");
+			Logger.LogDebug("<<< Exiting IsEditMode()");
             return Personalization.GetUserMode() == PortalSettings.Mode.Edit && TabPermissionController.CanAddContentToPage();
         }
 
@@ -1569,6 +1675,8 @@ namespace DotNetNuke.Common
         /// <returns><see langword="true"/> if the current tab is in layout mode; otherwise <see langword="false"/>.</returns>
         public static bool IsLayoutMode()
         {
+			Logger.LogDebug(">>> Entering IsLayoutMode()");
+			Logger.LogDebug("<<< Exiting IsLayoutMode()");
             return TabPermissionController.CanAddContentToPage() && Personalization.GetUserMode() == PortalSettings.Mode.Layout;
         }
 
@@ -1627,6 +1735,7 @@ namespace DotNetNuke.Common
 
                     strRSS.AppendLine("  <description>" + portalSettings.PortalName + " " + GetMediumDate(dr[createdDateField].ToString()) + "</description>");
                     strRSS.AppendLine(" </item>");
+					Logger.LogDebug("<<< Exiting CreateRSS(dr={Dr},titleField={TitleField},urlField={UrlField},createdDateField={CreatedDateField},syndicateField={SyndicateField},domainName={DomainName},fileName={FileName})", dr, titleField, urlField, createdDateField, syndicateField, domainName, fileName);
                 }
             }
             catch (Exception ex)
@@ -1694,7 +1803,10 @@ namespace DotNetNuke.Common
         /// <returns>HTML with paths for images and background corrected.</returns>
         public static string ManageUploadDirectory(string strHTML, string strUploadDirectory)
         {
+			Logger.LogDebug(">>> Entering ManageUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory})", strHTML, strUploadDirectory);
             strHTML = ManageTokenUploadDirectory(strHTML, strUploadDirectory, "src");
+			Logger.LogDebug("ManageUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory}): strHTML → {StrHTML1}", strHTML, strUploadDirectory, strHTML);
+			Logger.LogDebug("<<< Exiting ManageUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory})", strHTML, strUploadDirectory);
             return ManageTokenUploadDirectory(strHTML, strUploadDirectory, "background");
         }
 
@@ -1708,19 +1820,24 @@ namespace DotNetNuke.Common
         /// </remarks>
         public static string ManageTokenUploadDirectory(string strHTML, string strUploadDirectory, string strToken)
         {
+			Logger.LogDebug(">>> Entering ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>)", strHTML, strUploadDirectory);
             int urlStartPosition = 0;
             var sbBuff = new StringBuilder(string.Empty);
+			Logger.LogDebug("ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>): sbBuff → {SbBuff}", strHTML, strUploadDirectory, sbBuff);
+			Logger.LogDebug("ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>): urlStartPosition → {UrlStartPosition}", strHTML, strUploadDirectory, urlStartPosition);
             if (!string.IsNullOrEmpty(strHTML))
             {
                 var tokenLength = strToken.Length + 2;
                 string uploadDirectory = strUploadDirectory.ToLowerInvariant();
 
                 var tokenStartPosition = strHTML.IndexOf(strToken + "=\"", StringComparison.OrdinalIgnoreCase);
+				Logger.LogDebug("ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>): tokenStartPosition → {TokenStartPosition}", strHTML, strUploadDirectory, tokenStartPosition);
                 while (tokenStartPosition != -1)
                 {
                     sbBuff.Append(strHTML.Substring(urlStartPosition, tokenStartPosition - urlStartPosition + tokenLength)); // keep characters left of URL
                     urlStartPosition = tokenStartPosition + tokenLength;
                     var endOfUrl = strHTML.IndexOf("\"", urlStartPosition, StringComparison.Ordinal);
+					Logger.LogDebug("ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>): endOfUrl → {EndOfUrl}", strHTML, strUploadDirectory, endOfUrl);
                     string strUrl;
                     if (endOfUrl >= 0)
                     {
@@ -1747,6 +1864,7 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>)", strHTML, strUploadDirectory);
             return sbBuff.ToString();
         }
 
@@ -1756,6 +1874,7 @@ namespace DotNetNuke.Common
         /// <returns>control which'name is strControlName, or else return null if didn't match any control.</returns>
         public static Control FindControlRecursive(Control objControl, string strControlName)
         {
+			Logger.LogDebug(">>> Entering FindControlRecursive(objControl={ObjControl},strControlName={StrControlName})", objControl, strControlName);
             if (objControl.Parent == null)
             {
                 return null;
@@ -1768,6 +1887,7 @@ namespace DotNetNuke.Common
                 }
                 else
                 {
+					Logger.LogDebug("<<< Exiting FindControlRecursive(objControl={ObjControl},strControlName={StrControlName})", objControl, strControlName);
                     return FindControlRecursive(objControl.Parent, strControlName);
                 }
             }
@@ -1784,9 +1904,11 @@ namespace DotNetNuke.Common
         /// </remarks>
         public static Control FindControlRecursiveDown(Control objParent, string strControlName)
         {
+			Logger.LogDebug(">>> Entering FindControlRecursiveDown(objParent={ObjParent},strControlName={StrControlName})", objParent, strControlName);
             Control objCtl;
             objCtl = objParent.FindControl(strControlName);
             if (objCtl == null)
+			Logger.LogDebug("FindControlRecursiveDown(objParent={ObjParent},strControlName={StrControlName}): objCtl → {ObjCtl}", objParent, strControlName, objCtl);
             {
                 foreach (Control objChild in objParent.Controls)
                 {
@@ -1798,6 +1920,7 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FindControlRecursiveDown(objParent={ObjParent},strControlName={StrControlName})", objParent, strControlName);
             return objCtl;
         }
 
@@ -1805,6 +1928,7 @@ namespace DotNetNuke.Common
         /// <param name="control">The control.</param>
         public static void SetFormFocus(Control control)
         {
+			Logger.LogDebug(">>> Entering SetFormFocus(control={Control})", control);
             if (control.Page != null && control.Visible)
             {
                 if (control.Page.Request.Browser.EcmaScriptVersion.Major >= 1)
@@ -1819,6 +1943,7 @@ namespace DotNetNuke.Common
                     {
                         // Create JavaScript
                         var sb = new StringBuilder();
+						Logger.LogDebug("SetFormFocus(control={Control}): sb → {Sb}", control, sb);
                         sb.Append("<script type=\"text/javascript\">");
                         sb.Append("<!--");
                         sb.Append(Environment.NewLine);
@@ -1828,6 +1953,7 @@ namespace DotNetNuke.Common
 
                         // Find the Form
                         Control objParent = control.Parent;
+						Logger.LogDebug("SetFormFocus(control={Control}): objParent → {ObjParent}", control, objParent);
                         while (!(objParent is HtmlForm))
                         {
                             objParent = objParent.Parent;
@@ -1848,6 +1974,7 @@ namespace DotNetNuke.Common
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting SetFormFocus(control={Control})", control);
         }
 
         /// <summary>Gets the external request.</summary>
@@ -1856,6 +1983,7 @@ namespace DotNetNuke.Common
         [DnnDeprecated(10, 0, 2, "Use overload taking IHostSettings")]
         public static partial HttpWebRequest GetExternalRequest(string address)
             => GetExternalRequest(GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), address);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         /// <summary>Gets the external request.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -1863,14 +1991,17 @@ namespace DotNetNuke.Common
         /// <returns>Web request.</returns>
         public static HttpWebRequest GetExternalRequest(IHostSettings hostSettings, string address)
         {
+			Logger.LogDebug(">>> Entering GetExternalRequest(hostSettings={HostSettings},address={Address})", hostSettings, address);
             // Create the request object
             var objRequest = (HttpWebRequest)WebRequest.Create(address);
+			Logger.LogDebug("GetExternalRequest(hostSettings={HostSettings},address={Address}): objRequest → {ObjRequest}", hostSettings, address, objRequest);
 
             // Set a time-out to the request ... 10 seconds
             objRequest.Timeout = (int)hostSettings.WebRequestTimeout.TotalMilliseconds;
 
             // Attach a User Agent to the request
             objRequest.UserAgent = "DotNetNuke";
+			Logger.LogDebug("GetExternalRequest(hostSettings={HostSettings},address={Address}): objRequest.UserAgent → {Arg2}", hostSettings, address, objRequest.UserAgent);
 
             // If there is Proxy info, apply it to the request
             if (!string.IsNullOrEmpty(hostSettings.ProxyServer))
@@ -1884,18 +2015,26 @@ namespace DotNetNuke.Common
                 // Fill Proxy info from host settings
                 proxy = new WebProxy(hostSettings.ProxyServer, hostSettings.ProxyPort);
                 if (!string.IsNullOrEmpty(hostSettings.ProxyUsername))
+				Logger.LogDebug("GetExternalRequest(hostSettings={HostSettings},address={Address}): proxy → {Proxy}", hostSettings, address, proxy);
                 {
                     // Fill the credential info from host settings
                     proxyCredentials = new NetworkCredential(hostSettings.ProxyUsername, hostSettings.ProxyPassword);
 
+					Logger.LogDebug("GetExternalRequest(hostSettings={HostSettings},address={Address}): proxyCredentials → {ProxyCredentials}", hostSettings, address, proxyCredentials);
                     // Apply credentials to proxy
                     proxy.Credentials = proxyCredentials;
+					Logger.LogDebug("GetExternalRequest(hostSettings={HostSettings},address={Address}): proxy.Credentials → {Arg2}", hostSettings, address, proxy.Credentials);
                 }
 
                 // Apply Proxy to request
                 objRequest.Proxy = proxy;
+				Logger.LogDebug("GetExternalRequest(hostSettings={HostSettings},address={Address}): objRequest.Proxy → {Arg2}", hostSettings, address, objRequest.Proxy);
             }
 
+			Logger.LogInformation("GetExternalRequest(hostSettings,address)={HostSettings},{Address}: external service call {HostSettings1} took {Arg3} ms", hostSettings, address, hostSettings, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting GetExternalRequest(address={Address})", address);
+			Logger.LogInformation("GetExternalRequest(hostSettings,address,credentials)={HostSettings},{Address},{Credentials}: external service call {HostSettings1} took {Arg4} ms", hostSettings, address, credentials, hostSettings, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting GetExternalRequest(address={Address},credentials=<redacted>)", address);
             return objRequest;
         }
 
@@ -1986,6 +2125,11 @@ namespace DotNetNuke.Common
         /// <returns>clean name.</returns>
         public static string CleanFileName(string fileName)
         {
+			Logger.LogDebug(">>> Entering CleanFileName(fileName={FileName})", fileName);
+			Logger.LogDebug("<<< Exiting CleanFileName(fileName={FileName},badChars={BadChars})", fileName, badChars);
+			Logger.LogDebug("<<< Exiting CleanFileName(fileName={FileName},badChars={BadChars},replaceChar={ReplaceChar})", fileName, badChars, replaceChar);
+			Logger.LogDebug("<<< Exiting CleanFileName(fileName={FileName})", fileName);
+		Logger.LogDebug("<<< Exiting DeleteFilesRecursiveAsync(strRoot={StrRoot},filter={Filter},cancellationToken=<redacted>)", strRoot, filter);
             return CleanFileName(fileName, string.Empty, string.Empty);
         }
 
@@ -2033,6 +2177,7 @@ namespace DotNetNuke.Common
         /// <returns>A cleaned string.</returns>
         public static string CleanName(string name)
         {
+			Logger.LogDebug(">>> Entering CleanName(name={Name})", name);
             string strName = name;
             string strBadChars = ". ~`!@#$%^&*()-_+={[}]|\\:;<,>?/" + ((char)34) + ((char)39);
             int intCounter;

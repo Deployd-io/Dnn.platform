@@ -19,6 +19,7 @@ namespace Dnn.PersonaBar.Prompt.Components
 
         public static RoleInfo CreateRole(string roleName, int portalId, RoleStatus status, string description = "", bool isPublic = false, bool autoAssign = false, int roleGroupId = -1)
         {
+			Logger.LogDebug(">>> Entering CreateRole(roleName={RoleName},portalId={PortalId},status={Status},description={Description},isPublic={IsPublic},autoAssign={AutoAssign},roleGroupId={RoleGroupId})", roleName, portalId, status, description, isPublic, autoAssign, roleGroupId);
             var ri = new RoleInfo
             {
                 RoleName = roleName,
@@ -32,46 +33,60 @@ namespace Dnn.PersonaBar.Prompt.Components
             };
 
             var newRoleId = RoleController.Instance.AddRole(ri);
+			Logger.LogDebug("CreateRole(roleName={RoleName},portalId={PortalId},status={Status},description={Description},isPublic={IsPublic},autoAssign={AutoAssign},roleGroupId={RoleGroupId}): newRoleId → {NewRoleId}", roleName, portalId, status, description, isPublic, autoAssign, roleGroupId, newRoleId);
 
+			Logger.LogDebug("<<< Exiting CreateRole(roleName={RoleName},portalId={PortalId},status={Status},description={Description},isPublic={IsPublic},autoAssign={AutoAssign},roleGroupId={RoleGroupId})", roleName, portalId, status, description, isPublic, autoAssign, roleGroupId);
             return RoleController.Instance.GetRoleById(portalId, newRoleId);
         }
 
         public static RoleInfo UpdateRole(RoleInfo role)
         {
+			Logger.LogDebug(">>> Entering UpdateRole(role={Role})", role);
             RoleController.Instance.UpdateRole(role);
+			Logger.LogDebug("<<< Exiting UpdateRole(role={Role})", role);
             return GetRoleById(role.RoleID, role.PortalID);
         }
 
         public static RoleInfo GetRoleById(int roleId, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetRoleById(roleId={RoleId},portalId={PortalId})", roleId, portalId);
+			Logger.LogDebug("<<< Exiting GetRoleById(roleId={RoleId},portalId={PortalId})", roleId, portalId);
             return RoleController.Instance.GetRoleById(portalId, roleId);
         }
 
         public static bool RoleExists(string roleName, int portalId)
         {
+			Logger.LogDebug(">>> Entering RoleExists(roleName={RoleName},portalId={PortalId})", roleName, portalId);
             var ri = RoleController.Instance.GetRoleByName(portalId, roleName);
+			Logger.LogDebug("RoleExists(roleName={RoleName},portalId={PortalId}): ri → {Ri}", roleName, portalId, ri);
+			Logger.LogDebug("<<< Exiting RoleExists(roleName={RoleName},portalId={PortalId})", roleName, portalId);
             return ri != null;
         }
 
         public static IList<UserInfo> GetUsersInRole(string roleName, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetUsersInRole(roleName={RoleName},portalId={PortalId})", roleName, portalId);
+			Logger.LogDebug("<<< Exiting GetUsersInRole(roleName={RoleName},portalId={PortalId})", roleName, portalId);
             return RoleController.Instance.GetUsersByRole(portalId, roleName);
         }
 
         public static string FormatSkinName(string skin)
         {
+			Logger.LogDebug(">>> Entering FormatSkinName(skin={Skin})", skin);
             if (string.IsNullOrEmpty(skin))
             {
                 return skin;
             }
 
             var match = Regex.Match(skin, "skins\\/(\\w*)\\/(.*)\\.ascx", RegexOptions.IgnoreCase);
+			Logger.LogDebug("FormatSkinName(skin={Skin}): match → {Match}", skin, match);
             if (match.Success)
             {
                 return $"{match.Groups[1].Value} ({match.Groups[2].Value})";
             }
             else
             {
+				Logger.LogDebug("<<< Exiting FormatSkinName(skin={Skin})", skin);
                 return skin;
 
                 // unable to find a match
@@ -80,19 +95,23 @@ namespace Dnn.PersonaBar.Prompt.Components
 
         public static string FormatContainerName(string container)
         {
+			Logger.LogDebug(">>> Entering FormatContainerName(container={Container})", container);
             if (string.IsNullOrEmpty(container))
             {
                 return container;
             }
 
             var r = new Regex("containers\\/(\\w*)\\/(.*)\\.ascx", RegexOptions.IgnoreCase);
+			Logger.LogDebug("FormatContainerName(container={Container}): r → {R}", container, r);
             var match = r.Match(container);
+			Logger.LogDebug("FormatContainerName(container={Container}): match → {Match}", container, match);
             if (match.Success)
             {
                 return $"{match.Groups[1].Value} ({match.Groups[2].Value})";
             }
             else
             {
+				Logger.LogDebug("<<< Exiting FormatContainerName(container={Container})", container);
                 return container;
 
                 // unable to find a match
@@ -101,8 +120,10 @@ namespace Dnn.PersonaBar.Prompt.Components
 
         internal static string GetSuggestedCommand(string cmdName)
         {
+			Logger.LogDebug(">>> Entering GetSuggestedCommand(cmdName={CmdName})", cmdName);
             var match = Regex.Match(cmdName, "(\\w+)\\-(\\w+)");
             if (match.Success)
+			Logger.LogDebug("GetSuggestedCommand(cmdName={CmdName}): match → {Match}", cmdName, match);
             {
                 var verb = match.Groups[1].Value;
                 var component = match.Groups[2].Value;
@@ -205,11 +226,14 @@ namespace Dnn.PersonaBar.Prompt.Components
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetSuggestedCommand(cmdName={CmdName})", cmdName);
             return string.Empty;
         }
 
         private static string TranslateToCommandOptionText(string string1, string string2)
         {
+			Logger.LogDebug(">>> Entering TranslateToCommandOptionText(string1={String1},string2={String2})", string1, string2);
+			Logger.LogDebug("<<< Exiting TranslateToCommandOptionText(string1={String1},string2={String2})", string1, string2);
             return string.Format(CultureInfo.InvariantCulture, Localization.GetString("CommandOptionText", Constants.LocalResourcesFile), string1, string2);
         }
     }

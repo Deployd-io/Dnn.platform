@@ -7,12 +7,17 @@ namespace Dnn.PersonaBar.Library.Dto.Tabs
 
     public class TabDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabDto));
         /// <summary>Initializes a new instance of the <see cref="TabDto"/> class.</summary>
         public TabDto()
         {
+			Logger.LogDebug(">>> Entering TabDto()");
             this.CheckedState = NodeCheckedState.UnChecked;
             this.IsOpen = false;
+			Logger.LogDebug("TabDto(): this.CheckedState → {Arg0}", this.CheckedState);
+			Logger.LogDebug("TabDto(): this.IsOpen → {Arg0}", this.IsOpen);
             this.Selectable = true;
+			Logger.LogDebug("<<< Exiting TabDto()");
         }
 
         public string Name { get; set; }

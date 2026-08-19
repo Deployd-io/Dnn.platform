@@ -13,6 +13,7 @@ namespace Dnn.ExportImport.Components.Dto
     [JsonObject]
     public class SummaryItem : IDateTimeConverter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SummaryItem));
         /// <summary>Gets formatted total items.</summary>
         public string TotalItemsString => Util.FormatNumber(this.TotalItems);
 
@@ -40,7 +41,9 @@ namespace Dnn.ExportImport.Components.Dto
         /// <inheritdoc />
         public void ConvertToLocal(UserInfo userInfo)
         {
+			Logger.LogDebug(">>> Entering ConvertToLocal(userInfo={UserInfo})", userInfo);
             // Nothing to convert.
+			Logger.LogDebug("<<< Exiting ConvertToLocal(userInfo={UserInfo})", userInfo);
         }
     }
 }

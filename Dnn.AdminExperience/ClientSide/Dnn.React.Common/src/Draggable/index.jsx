@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import interact from "interact.js";
+const logger = console;
 
 //TODO: reconsider location of this general component
 export default (Component) => { 
@@ -9,25 +10,32 @@ export default (Component) => {
 
         constructor(props) {
             super(props);
+			logger.debug(`>>> Entering constructor(props=${props})`);
             this.collapsibleRef = React.createRef();
+			logger.debug(`<<< Exiting constructor(props=${props})`);
         }
             
         showGhostTargetOnClone(currentTarget) {            
+			logger.debug(`>>> Entering showGhostTargetOnClone(currentTarget=${currentTarget})`);
             this.originalTarget = currentTarget;
             this.originalTargetClassName = this.originalTarget.className;
             this.originalTarget.className += " ghost";            
+			logger.debug(`<<< Exiting showGhostTargetOnClone(currentTarget=${currentTarget})`);
         }
         
         setCloneInitialPositionAndWidth(clone, currentTarget) {            
+			logger.debug(`>>> Entering setCloneInitialPositionAndWidth(clone=${clone},currentTarget=${currentTarget})`);
             const rect = currentTarget.getBoundingClientRect();  
             Object.assign(clone.style, {
                 left: rect.left + "px",
                 top: rect.top + "px",
                 width: rect.width + "px"
             });  
+			logger.debug(`<<< Exiting setCloneInitialPositionAndWidth(clone=${clone},currentTarget=${currentTarget})`);
         }
         
         setPreviewInitialPosition(preview, event) {
+			logger.debug(`>>> Entering setPreviewInitialPosition(preview=${preview},event=${event})`);
             Object.assign(preview.style, {
                 display: "",
                 visibility: ""
@@ -37,40 +45,52 @@ export default (Component) => {
                 left: (event.clientX - rect.width / 2 ) + "px",
                 top: (event.clientY - rect.height / 2)  + "px"
             }); 
+			logger.debug(`<<< Exiting setPreviewInitialPosition(preview=${preview},event=${event})`);
         }
         
         cloneTarget(currentTarget) {
+			logger.debug(`>>> Entering cloneTarget(currentTarget=${currentTarget})`);
             let clone = currentTarget.cloneNode(true);                
             this.setDraggingStyle(clone);
+			logger.debug(`cloneTarget(currentTarget=${currentTarget}): clone → ${clone}`);
             this.setCloneInitialPositionAndWidth(clone, currentTarget);
             document.body.appendChild(clone);
+			logger.debug(`<<< Exiting cloneTarget(currentTarget=${currentTarget})`);
             return clone;
         }
         
         clonePreviewElement(previewElement, event) {            
+			logger.debug(`>>> Entering clonePreviewElement(previewElement=${previewElement},event=${event})`);
             let clone = previewElement.cloneNode(true);                 
             this.setDraggingStyle(clone);
+			logger.debug(`clonePreviewElement(previewElement=${previewElement},event=${event}): clone → ${clone}`);
             document.body.appendChild(clone);
             this.setPreviewInitialPosition(clone, event);
+			logger.debug(`<<< Exiting clonePreviewElement(previewElement=${previewElement},event=${event})`);
             return clone;
         }
 
         destroyClone(clone) {
+			logger.debug(`>>> Entering destroyClone(clone=${clone})`);
             if (clone.parentNode) {
                 clone.parentNode.removeChild(clone);
+				logger.debug(`<<< Exiting destroyClone(clone=${clone})`);
             }
         }
         
         setDraggingStyle(target) {
+			logger.debug(`>>> Entering setDraggingStyle(target=${target})`);
             this.previousPosition = target.style.position;
             Object.assign(target.style, {            
                 position: "fixed",
                 zIndex: 100000,
                 boxShadow: "20px 20px 20px 2px rgba(0,0,0,0.2)"
             });
+			logger.debug(`<<< Exiting setDraggingStyle(target=${target})`);
         }
         
         resetTarget(target) {   
+			logger.debug(`>>> Entering resetTarget(target=${target})`);
             Object.assign(target.style, {
                 position: this.previousPosition,
                 zIndex: "",
@@ -82,24 +102,31 @@ export default (Component) => {
             });
             target.setAttribute("data-x", "");
             target.setAttribute("data-y", "");
+			logger.debug(`<<< Exiting resetTarget(target=${target})`);
         }
         
         moveTarget(event) {
+			logger.debug(`>>> Entering moveTarget(event=${event})`);
             const target = event.target;
             const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
+			logger.debug(`moveTarget(event=${event}): target → ${target}`);
+			logger.debug(`moveTarget(event=${event}): x → ${x}`);
             const y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
             // translate the element
             target.style.webkitTransform = 
                 target.style.transform = 
                 target.style.mozTransform = 
                 target.style.msTransform = "translate(" + x + "px, " + y + "px)";
+				logger.debug(`moveTarget(event=${event}): y → ${y}`);
             
             // update the position attributes
             target.setAttribute("data-x", x);
             target.setAttribute("data-y", y);
+			logger.debug(`<<< Exiting moveTarget(event=${event})`);
         }
 
         componentDidMount() {
+			logger.debug('>>> Entering componentDidMount()');
             const self = this;
             const dragElement = this.node;   
             if (!dragElement) {
@@ -152,8 +179,10 @@ export default (Component) => {
                     }
                     
                     let clone = null;
+					logger.debug(`componentDidMount(): clone → ${clone}`);
                     if (typeof(getDragPreview) === "function") {
                         const dragPreviewComponent = getDragPreview(self);
+						logger.debug(`componentDidMount(): dragPreviewComponent → ${dragPreviewComponent}`);
                         const dragPreviewDOMElement = dragPreviewComponent.node;
                         clone = this.clonePreviewElement(dragPreviewDOMElement, event);
                     } else {                                    
@@ -170,6 +199,7 @@ export default (Component) => {
                     onDragStart(self, event);
                 }
             });
+			logger.debug('<<< Exiting componentDidMount()');
         }
 
         render() {

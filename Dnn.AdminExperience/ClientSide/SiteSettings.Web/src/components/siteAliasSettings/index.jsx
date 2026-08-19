@@ -9,32 +9,41 @@ import { InputGroup, Switch, RadioButtons, Label, Button } from "@dnnsoftware/dn
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class SiteAliasSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             urlMappingSettings: undefined
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.loadData();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentDidUpdate() {
+		logger.debug('>>> Entering componentDidUpdate()');
         const { props } = this;        
         if (props.urlMappingSettings) {
             let portalIdChanged = props.portalId !== undefined && props.urlMappingSettings.PortalId !== props.portalId;
             if (portalIdChanged) {
                 this.loadData();
+				logger.debug('<<< Exiting componentDidUpdate()');
             }
         }
     }
 
     loadData() {
+		logger.debug('>>> Entering loadData()');
         const {props} = this;
         props.dispatch(SiteBehaviorActions.getUrlMappingSettings(props.portalId, (data) => {
+			logger.debug('<<< Exiting loadData()');
             this.setState({
                 urlMappingSettings: Object.assign({}, data.Settings)
             });
@@ -42,9 +51,11 @@ class SiteAliasSettingsPanelBody extends Component {
     }
 
     getMappingModeOptions() {
+		logger.debug('>>> Entering getMappingModeOptions()');
         let options = [];
         if (this.props.portalAliasMappingModes !== undefined) {
             options = this.props.portalAliasMappingModes.map((item) => {
+		logger.debug('<<< Exiting getMappingModeOptions()');
                 return { label: item.Key, value: item.Value };
             });
         }
@@ -52,6 +63,7 @@ class SiteAliasSettingsPanelBody extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
 
         let urlMappingSettings = Object.assign({}, state.urlMappingSettings);
@@ -67,22 +79,27 @@ class SiteAliasSettingsPanelBody extends Component {
         });
 
         props.dispatch(SiteBehaviorActions.urlMappingSettingsClientModified(urlMappingSettings));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
         props.dispatch(SiteBehaviorActions.updateUrlMappingSettings(state.urlMappingSettings, () => {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.debug(`<<< Exiting onUpdate(event=${event})`);
         }));
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SiteBehaviorActions.getUrlMappingSettings(props.portalId, (data) => {
+				logger.debug('<<< Exiting onCancel()');
                 let urlMappingSettings = Object.assign({}, data.Settings);
                 this.setState({
                     urlMappingSettings
@@ -93,8 +110,10 @@ class SiteAliasSettingsPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         if (state.urlMappingSettings) {
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.siteAliasSettings}>
                     <SiteAliases portalId={props.portalId}/>
@@ -161,6 +180,8 @@ SiteAliasSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         urlMappingSettings: state.siteBehavior.urlMappingSettings,

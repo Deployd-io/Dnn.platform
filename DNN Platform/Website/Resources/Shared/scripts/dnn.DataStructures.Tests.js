@@ -1,3 +1,4 @@
+const logger = console;
 ﻿/// <reference path="dnn.DataStructures.js"/>
 /// <reference path="jquery/jquery.js"/>
 
@@ -6,6 +7,7 @@ test("AddFunction_ShouldAddTwoNumbers_WillPass", function () {
     var expected = 2;
     var actual = add(1, 1);
     equal(expected, actual, "Add function actual value did not match expected value");
+	logger.debug(`<<< Exiting test(expected=${expected})`);
 });
 
 // Second test
@@ -16,7 +18,9 @@ test("AddFunction_ShouldAddTwoNumbers_WillFail", function () {
 });
 
 function add(first, second) {
+	logger.debug(`>>> Entering add(first=${first},second=${second})`);
     //return first + second; -- deliberate mistake
+	logger.debug(`<<< Exiting add(first=${first},second=${second})`);
     return first + second;
 }
 

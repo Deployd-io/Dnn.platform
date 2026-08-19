@@ -10,9 +10,12 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class UserRelationshipBlockedException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserRelationshipBlockedException));
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipBlockedException"/> class.</summary>
         public UserRelationshipBlockedException()
         {
+		Logger.LogDebug(">>> Entering UserRelationshipBlockedException()");
+		Logger.LogDebug("<<< Exiting UserRelationshipBlockedException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipBlockedException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Entities.Users
         public UserRelationshipBlockedException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering UserRelationshipBlockedException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting UserRelationshipBlockedException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipBlockedException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

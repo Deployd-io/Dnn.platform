@@ -1,8 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
+const logger = console;
 import { SingleLineInputWithError, IconButton } from "@dnnsoftware/dnn-react-common";
 
 function TextEdit(props) {
+	logger.debug(`>>> Entering TextEdit(props=${props})`);
     if (props.inEdit) {
         return (
             <SingleLineInputWithError
@@ -14,6 +16,7 @@ function TextEdit(props) {
             />
         );
     } else {
+		logger.debug(`<<< Exiting TextEdit(props=${props})`);
         return (
             <div>
                 <span>{props.text}</span>

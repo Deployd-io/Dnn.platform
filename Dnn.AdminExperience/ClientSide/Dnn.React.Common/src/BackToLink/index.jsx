@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { ArrowBack } from "../SvgIcons";
 import "./style.less";
+const logger = console;
 
  
 const BackToLink = ({text, children, className, onClick, style, arrowStyle}) => { 

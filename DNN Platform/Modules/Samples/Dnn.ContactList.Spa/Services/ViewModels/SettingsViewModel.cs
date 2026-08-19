@@ -3,15 +3,19 @@
 // See the LICENSE file in the project root for more information
 
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Dnn.ContactList.Spa.Services.ViewModels
 {
     [JsonObject(MemberSerialization.OptIn)]
     public class SettingsViewModel
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public SettingsViewModel()
         {
+			_logger.LogDebug(">>> Entering SettingsViewModel()");
             
+			_logger.LogDebug("<<< Exiting SettingsViewModel()");
         }
 
         [JsonProperty("isFormEnabled")]

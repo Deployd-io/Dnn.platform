@@ -1,3 +1,4 @@
+const logger = console;
 ﻿(function ($) {
     if (typeof dnn === 'undefined') dnn = {};
     dnn.logViewer = dnn.logViewer || {};
@@ -22,12 +23,14 @@
         dnn.dom.deleteCookie('LogGUID');
         var servicePath = serviceFramework.getServiceRoot('InternalServices') + 'EventLogService/GetLogDetails';
         $('div[class*=dnnFormMessage][class*=dnnFormValidationSummary]').click(function() {
+			logger.debug('>>> Entering click()');
             $.ajax({
                 type: "GET",
                 url: servicePath,
                 data: { guid: guid },
                 beforeSend: serviceFramework.setModuleHeaders,
                 success: function (data) {
+					logger.debug(`>>> Entering success(data=${data})`);
                     var container = handler.getContainer();
                     container.html(data.Content).dialog({
                         modal: true,
@@ -40,11 +43,15 @@
                         resizable: false,
                         closeOnEscape: true
                     });
+					logger.debug(`<<< Exiting success(data=${data})`);
                 },
                 error: function (xhr, status, error) {
+					logger.debug(`>>> Entering error(xhr=${xhr},status=${status},error=${error})`);
                     alert(error);
+					logger.debug(`<<< Exiting error(xhr=${xhr},status=${status},error=${error})`);
                 }
             });
+			logger.debug('<<< Exiting click()');
         }).css('cursor', 'pointer');
     };
 

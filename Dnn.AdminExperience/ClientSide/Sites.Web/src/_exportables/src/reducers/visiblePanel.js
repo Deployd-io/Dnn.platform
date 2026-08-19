@@ -1,3 +1,4 @@
+const logger = console;
 import {
     visiblePanel as ActionTypes
 } from "actionTypes";
@@ -12,10 +13,12 @@ const switchCase = [{
     }
 }];
 export default function getReducer(initialState, additionalCases) {
+	logger.debug(`>>> Entering getReducer(initialState=${initialState},additionalCases=${additionalCases})`);
     return function common(state = Object.assign({
         selectedPage: 0
     }, initialState), action) {
         let _switchCase = getFinalSwitchCase(switchCase, additionalCases);
+		logger.debug(`getReducer(initialState=${initialState},additionalCases=${additionalCases}): _switchCase → ${_switchCase}`);
 
         let returnCase = { ...state };
 
@@ -26,6 +29,7 @@ export default function getReducer(initialState, additionalCases) {
             }
         });
 
+		logger.debug(`<<< Exiting getReducer(initialState=${initialState},additionalCases=${additionalCases})`);
         return returnCase;
     };
 }

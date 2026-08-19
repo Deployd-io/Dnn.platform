@@ -10,10 +10,12 @@ namespace DotNetNuke.Authentication.LiveConnect
     using DotNetNuke.Services.Authentication.OAuth;
     using DotNetNuke.Services.Localization;
     using DotNetNuke.UI.Skins.Controls;
+	using Microsoft.Extensions.Logging;
 
     /// <inheritdoc />
     public partial class Login : OAuthLoginBase
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <inheritdoc />
         public override bool SupportsRegistration
         {
@@ -29,12 +31,15 @@ namespace DotNetNuke.Authentication.LiveConnect
         /// <inheritdoc />
         protected override UserData GetCurrentUser()
         {
+			_logger.LogDebug(">>> Entering GetCurrentUser()");
+			_logger.LogDebug("<<< Exiting GetCurrentUser()");
             return this.OAuthClient.GetCurrentUser<LiveUserData>();
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			_logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.loginButton.Click += this.LoginButton_Click;
@@ -44,15 +49,19 @@ namespace DotNetNuke.Authentication.LiveConnect
 
             this.loginItem.Visible = this.Mode == AuthMode.Login;
             this.registerItem.Visible = this.Mode == AuthMode.Register;
+			_logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         private void LoginButton_Click(object sender, EventArgs e)
         {
+			_logger.LogDebug(">>> Entering LoginButton_Click(sender={Sender},e={E})", sender, e);
             AuthorisationResult result = this.OAuthClient.Authorize();
             if (result == AuthorisationResult.Denied)
+			_logger.LogDebug("LoginButton_Click(sender={Sender},e={E}): result → {Result}", sender, e, result);
             {
                 UI.Skins.Skin.AddModuleMessage(this, Localization.GetString("PrivateConfirmationMessage", Localization.SharedResourceFile), ModuleMessage.ModuleMessageType.YellowWarning);
             }
+			_logger.LogDebug("<<< Exiting LoginButton_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

@@ -15,6 +15,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The StandardEditorInfoAdapter control provides an Adapter for standard datasources.</summary>
     public class StandardEditorInfoAdapter : IEditorInfoAdapter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(StandardEditorInfoAdapter));
         private readonly object dataSource;
         private readonly string fieldName;
 
@@ -23,33 +24,43 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="fieldName">The field/property name.</param>
         public StandardEditorInfoAdapter(object dataSource, string fieldName)
         {
+			Logger.LogDebug(">>> Entering StandardEditorInfoAdapter(dataSource={DataSource},fieldName={FieldName})", dataSource, fieldName);
             this.dataSource = dataSource;
             this.fieldName = fieldName;
+			Logger.LogDebug("StandardEditorInfoAdapter(dataSource={DataSource},fieldName={FieldName}): this.dataSource → {Arg2}", dataSource, fieldName, this.dataSource);
+			Logger.LogDebug("<<< Exiting StandardEditorInfoAdapter(dataSource={DataSource},fieldName={FieldName})", dataSource, fieldName);
         }
 
         /// <inheritdoc />
         public EditorInfo CreateEditControl()
         {
+			Logger.LogDebug(">>> Entering CreateEditControl()");
             EditorInfo editInfo = null;
             PropertyInfo objProperty = GetProperty(this.dataSource, this.fieldName);
+			Logger.LogDebug("CreateEditControl(): objProperty → {ObjProperty}", objProperty);
+			Logger.LogDebug("CreateEditControl(): editInfo → {EditInfo}", editInfo);
             if (objProperty != null)
             {
                 editInfo = GetEditorInfo(this.dataSource, objProperty);
             }
 
+			Logger.LogDebug("<<< Exiting CreateEditControl()");
             return editInfo;
         }
 
         /// <inheritdoc />
         public bool UpdateValue(PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering UpdateValue(e={E})", e);
             bool changed = e.Changed;
             object oldValue = e.OldValue;
             object newValue = e.Value;
             bool isDirty = Null.NullBoolean;
+			Logger.LogDebug("UpdateValue(e={E}): isDirty → {IsDirty}", e, isDirty);
             if (this.dataSource != null)
             {
                 PropertyInfo objProperty = this.dataSource.GetType().GetProperty(e.Name);
+				Logger.LogDebug("UpdateValue(e={E}): objProperty → {ObjProperty}", e, objProperty);
                 if (objProperty != null)
                 {
                     if ((!ReferenceEquals(newValue, oldValue)) || changed)
@@ -60,38 +71,47 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting UpdateValue(e={E})", e);
             return isDirty;
         }
 
         /// <inheritdoc />
         public bool UpdateVisibility(PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering UpdateVisibility(e={E})", e);
+			Logger.LogDebug("<<< Exiting UpdateVisibility(e={E})", e);
             return false;
         }
 
         /// <summary>GetEditorInfo builds an EditorInfo object for a property.</summary>
         private static EditorInfo GetEditorInfo(object dataSource, PropertyInfo objProperty)
         {
+			Logger.LogDebug(">>> Entering GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty})", dataSource, objProperty);
             var editInfo = new EditorInfo();
 
+			Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): editInfo → {EditInfo}", dataSource, objProperty, editInfo);
             // Get the Name of the property
             editInfo.Name = objProperty.Name;
+			Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): editInfo.Name → {Arg2}", dataSource, objProperty, editInfo.Name);
 
             // Get the value of the property
             editInfo.Value = objProperty.GetValue(dataSource, null);
 
             // Get the type of the property
             editInfo.Type = objProperty.PropertyType.AssemblyQualifiedName;
+			Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): editInfo.Type → {Arg2}", dataSource, objProperty, editInfo.Type);
 
             // Get the Custom Attributes for the property
             editInfo.Attributes = objProperty.GetCustomAttributes(true);
 
             // Get Category Field
             editInfo.Category = string.Empty;
+			Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): editInfo.Category → {Arg2}", dataSource, objProperty, editInfo.Category);
             object[] categoryAttributes = objProperty.GetCustomAttributes(typeof(CategoryAttribute), true);
             if (categoryAttributes.Length > 0)
             {
                 var category = (CategoryAttribute)categoryAttributes[0];
+				Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): category → {Category}", dataSource, objProperty, category);
                 editInfo.Category = category.Category;
             }
 
@@ -99,6 +119,7 @@ namespace DotNetNuke.UI.WebControls
             if (!objProperty.CanWrite)
             {
                 editInfo.EditMode = PropertyEditorMode.View;
+				Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): editInfo.EditMode → {Arg2}", dataSource, objProperty, editInfo.EditMode);
             }
             else
             {
@@ -106,6 +127,7 @@ namespace DotNetNuke.UI.WebControls
                 if (readOnlyAttributes.Length > 0)
                 {
                     var readOnlyMode = (IsReadOnlyAttribute)readOnlyAttributes[0];
+					Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): readOnlyMode → {ReadOnlyMode}", dataSource, objProperty, readOnlyMode);
                     if (readOnlyMode.IsReadOnly)
                     {
                         editInfo.EditMode = PropertyEditorMode.View;
@@ -115,10 +137,12 @@ namespace DotNetNuke.UI.WebControls
 
             // Get Editor Field
             editInfo.Editor = "UseSystemType";
+			Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): editInfo.Editor → {Arg2}", dataSource, objProperty, editInfo.Editor);
             object[] editorAttributes = objProperty.GetCustomAttributes(typeof(EditorAttribute), true);
             if (editorAttributes.Length > 0)
             {
                 EditorAttribute editor = null;
+				Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): editor → {Editor}", dataSource, objProperty, editor);
                 for (int i = 0; i <= editorAttributes.Length - 1; i++)
                 {
                     if (((EditorAttribute)editorAttributes[i]).EditorBaseTypeName.Contains("DotNetNuke.UI.WebControls.EditControl", StringComparison.Ordinal))
@@ -136,11 +160,13 @@ namespace DotNetNuke.UI.WebControls
 
             // Get Required Field
             editInfo.Required = false;
+			Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): editInfo.Required → {Arg2}", dataSource, objProperty, editInfo.Required);
             object[] requiredAttributes = objProperty.GetCustomAttributes(typeof(RequiredAttribute), true);
             if (requiredAttributes.Length > 0)
             {
                 // The property may contain multiple edit mode types, so make sure we only use DotNetNuke editors.
                 var required = (RequiredAttribute)requiredAttributes[0];
+				Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): required → {Required}", dataSource, objProperty, required);
                 if (required.Required)
                 {
                     editInfo.Required = true;
@@ -153,6 +179,7 @@ namespace DotNetNuke.UI.WebControls
             if (styleAttributes.Length > 0)
             {
                 var attribute = (ControlStyleAttribute)styleAttributes[0];
+				Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): attribute → {Attribute}", dataSource, objProperty, attribute);
                 editInfo.ControlStyle.CssClass = attribute.CssClass;
                 editInfo.ControlStyle.Height = attribute.Height;
                 editInfo.ControlStyle.Width = attribute.Width;
@@ -160,10 +187,12 @@ namespace DotNetNuke.UI.WebControls
 
             // Get LabelMode Field
             editInfo.LabelMode = LabelMode.Left;
+			Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): editInfo.LabelMode → {Arg2}", dataSource, objProperty, editInfo.LabelMode);
             object[] labelModeAttributes = objProperty.GetCustomAttributes(typeof(LabelModeAttribute), true);
             if (labelModeAttributes.Length > 0)
             {
                 var mode = (LabelModeAttribute)labelModeAttributes[0];
+				Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): mode → {Mode}", dataSource, objProperty, mode);
                 editInfo.LabelMode = mode.Mode;
             }
 
@@ -172,33 +201,40 @@ namespace DotNetNuke.UI.WebControls
 
             // Get Validation Expression Field
             editInfo.ValidationExpression = string.Empty;
+			Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): editInfo.ValidationExpression → {Arg2}", dataSource, objProperty, editInfo.ValidationExpression);
             object[] regExAttributes = objProperty.GetCustomAttributes(typeof(RegularExpressionValidatorAttribute), true);
             if (regExAttributes.Length > 0)
             {
                 var regExAttribute = (RegularExpressionValidatorAttribute)regExAttributes[0];
+				Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): regExAttribute → {RegExAttribute}", dataSource, objProperty, regExAttribute);
                 editInfo.ValidationExpression = regExAttribute.Expression;
             }
 
             // Set Visibility
             editInfo.ProfileVisibility = new ProfileVisibility
+			Logger.LogDebug("GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty}): editInfo.ProfileVisibility → {Arg2}", dataSource, objProperty, editInfo.ProfileVisibility);
             {
                 VisibilityMode = UserVisibilityMode.AllUsers,
             };
 
+			Logger.LogDebug("<<< Exiting GetEditorInfo(dataSource={DataSource},objProperty={ObjProperty})", dataSource, objProperty);
             return editInfo;
         }
 
         /// <summary>GetProperty returns the property that is being "bound" to.</summary>
         private static PropertyInfo GetProperty(object dataSource, string fieldName)
         {
+			Logger.LogDebug(">>> Entering GetProperty(dataSource={DataSource},fieldName={FieldName})", dataSource, fieldName);
             if (dataSource != null)
             {
                 BindingFlags bindings = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
                 PropertyInfo objProperty = dataSource.GetType().GetProperty(fieldName, bindings);
+				Logger.LogDebug("GetProperty(dataSource={DataSource},fieldName={FieldName}): objProperty → {ObjProperty}", dataSource, fieldName, objProperty);
                 return objProperty;
             }
             else
             {
+				Logger.LogDebug("<<< Exiting GetProperty(dataSource={DataSource},fieldName={FieldName})", dataSource, fieldName);
                 return null;
             }
         }

@@ -1,5 +1,6 @@
 import { Component, Element, Host, h, State, Watch, Prop } from '@stencil/core';
 import state from "../../store/store";
+const logger = console;
 import { LocalizationClient } from "../../services/LocalizationClient";
 import { sortField } from '../../enums/SortField';
 import { ItemsClient } from '../../services/ItemsClient';
@@ -21,9 +22,12 @@ export class DnnResourceManager {
   private itemsClient: ItemsClient;
   
   constructor() {
+	logger.debug('>>> Entering constructor()');
     state.moduleId = this.moduleId;
     this.localizationClient = new LocalizationClient(this.moduleId);
+	logger.debug(`constructor(): state.moduleId → ${state.moduleId}`);
     this.itemsClient = new ItemsClient(this.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
   
   @Element() el: HTMLDnnResourceManagerElement;
@@ -32,16 +36,20 @@ export class DnnResourceManager {
   
   @Watch("foldersExpanded")
   foldersExpandedChanged(expanded: boolean){
+	logger.debug(`>>> Entering foldersExpandedChanged(expanded=${expanded})`);
     const lastWidth = parseFloat(localStorage.getItem(localStorageSplitWidthKey)) || 30;
     if (expanded){
+	logger.debug(`foldersExpandedChanged(expanded=${expanded}): lastWidth → ${lastWidth}`);
       void this.splitView.setSplitWidthPercentage(lastWidth);
       return;
     }
     
     void this.splitView.setSplitWidthPercentage(0);
+	logger.debug(`<<< Exiting foldersExpandedChanged(expanded=${expanded})`);
   }
   
   async componentWillLoad() {
+	logger.debug('>>> Entering componentWillLoad()');
     try {
       state.localization = await this.localizationClient.getResources();
       state.sortField = sortField.itemName;
@@ -49,17 +57,22 @@ export class DnnResourceManager {
       state.canManageFolderTypes = await this.itemsClient.canManageFolderTypes();
     } catch (error) {
       alert(error);
+	logger.debug('<<< Exiting componentWillLoad()');
     }
   }
 
 
   private handleSplitWidthChanged(event: CustomEvent<number>){
+	logger.debug(`>>> Entering handleSplitWidthChanged(event=${event})`);
     if (event.detail != 0){
       localStorage.setItem(localStorageSplitWidthKey, event.detail.toString());
+	logger.debug(`<<< Exiting handleSplitWidthChanged(event=${event})`);
     }
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <div class="container">

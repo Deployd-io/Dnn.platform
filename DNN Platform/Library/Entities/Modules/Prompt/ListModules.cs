@@ -18,6 +18,7 @@ namespace DotNetNuke.Entities.Modules.Prompt
     [ConsoleCommand("list-modules", Constants.CommandCategoryKeys.Modules, "Prompt_ListModules_Description")]
     public class ListModules : ConsoleCommand
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ListModules));
         /// <inheritdoc />
         public override string LocalResourceFile => Constants.DefaultPromptResourceFile;
 
@@ -42,26 +43,34 @@ namespace DotNetNuke.Entities.Modules.Prompt
         /// <inheritdoc />
         public override void Initialize(string[] args, IPortalSettings portalSettings, IUserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             base.Initialize(args, portalSettings, userInfo, activeTabId);
             this.ParseParameters(this);
+			Logger.LogDebug("<<< Exiting Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override IConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             var max = this.Max <= 0 ? 10 : (this.Max > 500 ? 500 : this.Max);
 
+			Logger.LogDebug("Run(): max → {Max}", max);
             int total;
             var portalDesktopModules = DesktopModuleController.GetPortalDesktopModules(this.PortalId);
+			Logger.LogDebug("Run(): portalDesktopModules → {PortalDesktopModules}", portalDesktopModules);
 
             var pageIndex = this.Page > 0 ? this.Page - 1 : 0;
+			Logger.LogDebug("Run(): pageIndex → {PageIndex}", pageIndex);
             pageIndex = pageIndex < 0 ? 0 : pageIndex;
             var pageSize = this.Max;
+			Logger.LogDebug("Run(): pageSize → {PageSize}", pageSize);
             pageSize = pageSize > 0 && pageSize <= 100 ? pageSize : 10;
             this.ModuleName = this.ModuleName?.Replace("*", string.Empty);
             this.ModuleTitle = this.ModuleTitle?.Replace("*", string.Empty);
             var modules = ModuleController.Instance.GetModules(this.PortalSettings.PortalId)
                     .Cast<ModuleInfo>().Where(ModulePermissionController.CanViewModule);
+					Logger.LogDebug("Run(): modules → {Modules}", modules);
             if (!string.IsNullOrEmpty(this.ModuleName))
             {
                 modules = modules.Where(module => module.DesktopModule.ModuleName.IndexOf(this.ModuleName, StringComparison.OrdinalIgnoreCase) >= 0);
@@ -86,20 +95,27 @@ namespace DotNetNuke.Entities.Modules.Prompt
             // Get distincts.
             modules = modules.GroupBy(x => x.ModuleID).Select(group => group.First()).OrderBy(x => x.ModuleID);
             var moduleInfos = modules as IList<ModuleInfo> ?? modules.ToList();
+			Logger.LogDebug("Run(): moduleInfos → {ModuleInfos}", moduleInfos);
             total = moduleInfos.Count;
             modules = moduleInfos.Skip(pageIndex * pageSize).Take(pageSize)
                 .Where(m =>
                 {
+					Logger.LogDebug("Run(): total → {Total}", total);
                     var moduleDefinition = ModuleDefinitionController.GetModuleDefinitionByID(m.ModuleDefID);
+					Logger.LogDebug("Run(): moduleDefinition → {ModuleDefinition}", moduleDefinition);
                     return portalDesktopModules.Any(kvp =>
                         kvp.Value.DesktopModuleID == moduleDefinition?.DesktopModuleID);
                 });
 
             var results = modules.Select(x => PromptModuleInfo.FromDnnModuleInfo(x, this.Deleted));
+			Logger.LogDebug("Run(): results → {Results}", results);
 
             var totalPages = (total / max) + (total % max == 0 ? 0 : 1);
             var pageNo = this.Page > 0 ? this.Page : 1;
+			Logger.LogDebug("Run(): totalPages → {TotalPages}", totalPages);
             var count = results.Count();
+			Logger.LogDebug("Run(): count → {Count}", count);
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel
             {
                 Data = results,

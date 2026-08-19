@@ -19,6 +19,7 @@ namespace DotNetNuke.Services.Search.Internals
                             : ServiceLocator<ISearchQueryStringParser, SearchQueryStringParser>,
                             ISearchQueryStringParser
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchQueryStringParser));
         private static readonly Regex TagRegex = new Regex(@"\[(.*?)\]", RegexOptions.Compiled);
 
         private static readonly Regex DateRegex = new Regex(@"after:(\w+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -31,17 +32,21 @@ namespace DotNetNuke.Services.Search.Internals
         /// <returns>List of tags.</returns>
         public IList<string> GetTags(string keywords, out string outputKeywords)
         {
+			Logger.LogDebug(">>> Entering GetTags(keywords={Keywords})", keywords);
             var tags = new List<string>();
             if (string.IsNullOrEmpty(keywords))
+			Logger.LogDebug("GetTags(keywords={Keywords}): tags → {Tags}", keywords, tags);
             {
                 outputKeywords = string.Empty;
             }
             else
             {
                 var m = TagRegex.Match(keywords);
+				Logger.LogDebug("GetTags(keywords={Keywords}): m → {M}", keywords, m);
                 while (m.Success)
                 {
                     var tag = m.Groups[1].ToString();
+					Logger.LogDebug("GetTags(keywords={Keywords}): tag → {Tag}", keywords, tag);
                     if (!string.IsNullOrEmpty(tag))
                     {
                         tags.Add(HttpUtility.HtmlEncode(tag.Trim()));
@@ -53,6 +58,7 @@ namespace DotNetNuke.Services.Search.Internals
                 outputKeywords = TagRegex.Replace(keywords, string.Empty).Trim();
             }
 
+			Logger.LogDebug("<<< Exiting GetTags(keywords={Keywords})", keywords);
             return tags;
         }
 
@@ -62,14 +68,18 @@ namespace DotNetNuke.Services.Search.Internals
         /// <returns>Last Modified Date.</returns>
         public DateTime GetLastModifiedDate(string keywords, out string outputKeywords)
         {
+			Logger.LogDebug(">>> Entering GetLastModifiedDate(keywords={Keywords})", keywords);
             var m = DateRegex.Match(keywords);
             var date = string.Empty;
+			Logger.LogDebug("GetLastModifiedDate(keywords={Keywords}): date → {Date}", keywords, date);
+			Logger.LogDebug("GetLastModifiedDate(keywords={Keywords}): m → {M}", keywords, m);
             while (m.Success && string.IsNullOrEmpty(date))
             {
                 date = m.Groups[1].ToString();
             }
 
             var result = DateTime.MinValue;
+			Logger.LogDebug("GetLastModifiedDate(keywords={Keywords}): result → {Result}", keywords, result);
             if (!string.IsNullOrEmpty(date))
             {
                 switch (date.ToLowerInvariant())
@@ -93,6 +103,8 @@ namespace DotNetNuke.Services.Search.Internals
             }
 
             outputKeywords = DateRegex.Replace(keywords, string.Empty).Trim();
+			Logger.LogDebug("GetLastModifiedDate(keywords={Keywords}): outputKeywords → {OutputKeywords}", keywords, outputKeywords);
+			Logger.LogDebug("<<< Exiting GetLastModifiedDate(keywords={Keywords})", keywords);
             return result;
         }
 
@@ -102,26 +114,34 @@ namespace DotNetNuke.Services.Search.Internals
         /// <returns>List of Search Types.</returns>
         public IList<string> GetSearchTypeList(string keywords, out string outputKeywords)
         {
+			Logger.LogDebug(">>> Entering GetSearchTypeList(keywords={Keywords})", keywords);
             var m = TypeRegex.Match(keywords);
             var types = string.Empty;
+			Logger.LogDebug("GetSearchTypeList(keywords={Keywords}): types → {Types}", keywords, types);
+			Logger.LogDebug("GetSearchTypeList(keywords={Keywords}): m → {M}", keywords, m);
             while (m.Success && string.IsNullOrEmpty(types))
             {
                 types = m.Groups[1].ToString().Trim();
             }
 
             var typesList = new List<string>();
+			Logger.LogDebug("GetSearchTypeList(keywords={Keywords}): typesList → {TypesList}", keywords, typesList);
             if (!string.IsNullOrEmpty(types))
             {
                 typesList = types.Split(',').ToList();
             }
 
             outputKeywords = TypeRegex.Replace(keywords, string.Empty).Trim();
+			Logger.LogDebug("GetSearchTypeList(keywords={Keywords}): outputKeywords → {OutputKeywords}", keywords, outputKeywords);
+			Logger.LogDebug("<<< Exiting GetSearchTypeList(keywords={Keywords})", keywords);
             return typesList;
         }
 
         /// <inheritdoc />
         protected override Func<ISearchQueryStringParser> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new SearchQueryStringParser();
         }
     }

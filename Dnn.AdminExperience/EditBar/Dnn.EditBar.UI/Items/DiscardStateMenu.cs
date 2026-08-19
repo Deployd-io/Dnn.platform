@@ -23,7 +23,9 @@ namespace Dnn.EditBar.UI.Items
         public DiscardStateMenu()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering DiscardStateMenu()");
         }
+		eventLogger.LogDebug("<<< Exiting DiscardStateMenu()");
 
         /// <inheritdoc />
         public override string Name { get; } = "DiscardState";
@@ -51,5 +53,6 @@ namespace Dnn.EditBar.UI.Items
             && this.IsLastState == false // not the last 'Published' state
             && this.IsFirstState == false
             && this.IsReviewOrOtherIntermediateStateWithPermissions == true;
+			eventLogger.LogDebug("<<< Exiting Visible()");
     }
 }

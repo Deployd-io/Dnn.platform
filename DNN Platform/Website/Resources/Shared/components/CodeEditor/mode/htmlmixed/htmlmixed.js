@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../xml/xml"), require("../javascript/javascript"), require("../css/css"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,12 +13,15 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
+logger.debug('>>> Entering defineMode()');
   var htmlMode = CodeMirror.getMode(config, {name: "xml",
                                              htmlMode: true,
                                              multilineTagIndentFactor: parserConfig.multilineTagIndentFactor,
                                              multilineTagIndentPastTag: parserConfig.multilineTagIndentPastTag});
   var cssMode = CodeMirror.getMode(config, "css");
+logger.debug(`defineMode(): cssMode → ${cssMode}`);
 
   var scriptTypes = [], scriptTypesConf = parserConfig && parserConfig.scriptTypes;
   scriptTypes.push({matches: /^(?:text|application)\/(?:x-)?(?:java|ecma)script$|^$/i,
@@ -27,8 +32,10 @@ CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
   }
   scriptTypes.push({matches: /./,
                     mode: CodeMirror.getMode(config, "text/plain")});
+					logger.debug('<<< Exiting defineMode()');
 
   function html(stream, state) {
+	logger.debug(`>>> Entering html(stream=${stream},state=${state})`);
     var tagName = state.htmlState.tagName;
     if (tagName) tagName = tagName.toLowerCase();
     var style = htmlMode.token(stream, state.htmlState);
@@ -38,11 +45,14 @@ CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
       scriptType = scriptType ? scriptType[1] : "";
       if (scriptType && /[\"\']/.test(scriptType.charAt(0))) scriptType = scriptType.slice(1, scriptType.length - 1);
       for (var i = 0; i < scriptTypes.length; ++i) {
+		logger.debug(`html(stream=${stream},state=${state}): scriptType → ${scriptType}`);
         var tp = scriptTypes[i];
         if (typeof tp.matches == "string" ? scriptType == tp.matches : tp.matches.test(scriptType)) {
           if (tp.mode) {
             state.token = script;
+			logger.debug(`html(stream=${stream},state=${state}): state.token → ${state.token}`);
             state.localMode = tp.mode;
+			logger.debug(`html(stream=${stream},state=${state}): state.localMode → ${state.localMode}`);
             state.localState = tp.mode.startState && tp.mode.startState(htmlMode.indent(state.htmlState, ""));
           }
           break;
@@ -56,28 +66,40 @@ CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
     return style;
   }
   function maybeBackup(stream, pat, style) {
+	logger.debug(`>>> Entering maybeBackup(stream=${stream},pat=${pat},style=${style})`);
     var cur = stream.current();
     var close = cur.search(pat);
+	logger.debug(`maybeBackup(stream=${stream},pat=${pat},style=${style}): cur → ${cur}`);
     if (close > -1) stream.backUp(cur.length - close);
     else if (cur.match(/<\/?$/)) {
+	logger.debug(`maybeBackup(stream=${stream},pat=${pat},style=${style}): close → ${close}`);
       stream.backUp(cur.length);
       if (!stream.match(pat, false)) stream.match(cur);
     }
+	logger.debug(`<<< Exiting maybeBackup(stream=${stream},pat=${pat},style=${style})`);
     return style;
   }
   function script(stream, state) {
+	logger.debug(`>>> Entering script(stream=${stream},state=${state})`);
     if (stream.match(/^<\/\s*script\s*>/i, false)) {
       state.token = html;
+	logger.debug(`script(stream=${stream},state=${state}): state.token → ${state.token}`);
       state.localState = state.localMode = null;
+	logger.debug(`script(stream=${stream},state=${state}): state.localState → ${state.localState}`);
+	logger.debug(`<<< Exiting script(stream=${stream},state=${state})`);
       return null;
     }
     return maybeBackup(stream, /<\/\s*script\s*>/,
                        state.localMode.token(stream, state.localState));
   }
   function css(stream, state) {
+	logger.debug(`>>> Entering css(stream=${stream},state=${state})`);
     if (stream.match(/^<\/\s*style\s*>/i, false)) {
       state.token = html;
+	logger.debug(`css(stream=${stream},state=${state}): state.token → ${state.token}`);
       state.localState = state.localMode = null;
+	logger.debug(`css(stream=${stream},state=${state}): state.localState → ${state.localState}`);
+	logger.debug(`<<< Exiting css(stream=${stream},state=${state})`);
       return null;
     }
     return maybeBackup(stream, /<\/\s*style\s*>/,
@@ -86,31 +108,41 @@ CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       var state = htmlMode.startState();
+	logger.debug('<<< Exiting startState()');
       return {token: html, localMode: null, localState: null, htmlState: state};
     },
 
     copyState: function(state) {
+	logger.debug(`>>> Entering copyState(state=${state})`);
       if (state.localState)
         var local = CodeMirror.copyState(state.localMode, state.localState);
       return {token: state.token, localMode: state.localMode, localState: local,
               htmlState: CodeMirror.copyState(htmlMode, state.htmlState)};
+			logger.debug(`<<< Exiting copyState(state=${state})`);
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return state.token(stream, state);
     },
 
     indent: function(state, textAfter) {
+	logger.debug(`>>> Entering indent(state=${state},textAfter=${textAfter})`);
       if (!state.localMode || /^\s*<\//.test(textAfter))
         return htmlMode.indent(state.htmlState, textAfter);
       else if (state.localMode.indent)
         return state.localMode.indent(state.localState, textAfter);
       else
+		logger.debug(`<<< Exiting indent(state=${state},textAfter=${textAfter})`);
         return CodeMirror.Pass;
     },
 
     innerMode: function(state) {
+	logger.debug(`>>> Entering innerMode(state=${state})`);
+	logger.debug(`<<< Exiting innerMode(state=${state})`);
       return {state: state.localState || state.htmlState, mode: state.localMode || htmlMode};
     }
   };

@@ -12,11 +12,14 @@ namespace DotNetNuke.Web.UI.WebControls
     [ParseChildren(true)]
     public class DnnFormTab : WebControl, INamingContainer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFormTab));
         /// <summary>Initializes a new instance of the <see cref="DnnFormTab"/> class.</summary>
         public DnnFormTab()
         {
+			Logger.LogDebug(">>> Entering DnnFormTab()");
             this.Sections = new List<DnnFormSection>();
             this.Items = new List<DnnFormItemBase>();
+			Logger.LogDebug("<<< Exiting DnnFormTab()");
         }
 
         /// <summary>Gets or sets a value indicating whether to include expand all.</summary>

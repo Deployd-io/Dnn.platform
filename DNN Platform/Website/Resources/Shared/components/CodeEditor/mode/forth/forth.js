@@ -1,9 +1,11 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 // Author: Aliaksei Chapyzhenka
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,12 +14,17 @@
     mod(CodeMirror);
 })(function(CodeMirror) {
   "use strict";
+logger.debug(`<<< Exiting function(exports=${exports})`);
 
   function toWordList(words) {
+	logger.debug(`>>> Entering toWordList(words=${words})`);
     var ret = [];
     words.split(' ').forEach(function(e){
+	logger.debug('>>> Entering forEach()');
       ret.push({name: e});
     });
+	logger.debug('<<< Exiting forEach()');
+	logger.debug(`<<< Exiting toWordList(words=${words})`);
     return ret;
   }
 
@@ -65,16 +72,19 @@
 
   CodeMirror.defineMode('forth', function() {
     function searchWordList (wordList, word) {
+	logger.debug(`>>> Entering searchWordList(wordList=${wordList},word=${word})`);
       var i;
       for (i = wordList.length - 1; i >= 0; i--) {
         if (wordList[i].name === word.toUpperCase()) {
           return wordList[i];
         }
       }
+	logger.debug(`<<< Exiting searchWordList(wordList=${wordList},word=${word})`);
       return undefined;
     }
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {
         state: '',
         base: 10,
@@ -82,8 +92,10 @@
         immediateWordList: immediateWordList,
         wordList: []
       };
+	logger.debug('<<< Exiting startState()');
     },
     token: function (stream, stt) {
+	logger.debug(`>>> Entering token(stream=${stream},stt=${stt})`);
       var mat;
       if (stream.eatSpace()) {
         return null;
@@ -91,6 +103,7 @@
       if (stt.state === '') { // interpretation
         if (stream.match(/^(\]|:NONAME)(\s|$)/i)) {
           stt.state = ' compilation';
+		logger.debug(`token(stream=${stream},stt=${stt}): stt.state → ${stt.state}`);
           return 'builtin compilation';
         }
         mat = stream.match(/^(\:)\s+(\S+)(\s|$)+/);
@@ -127,6 +140,7 @@
       // dynamic wordlist
       mat = stream.match(/^(\S+)(\s+|$)/);
       if (mat) {
+		logger.debug(`token(stream=${stream},stt=${stt}): mat → ${mat}`);
         if (searchWordList(stt.wordList, mat[1]) !== undefined) {
           return 'variable' + stt.state;
         }
@@ -165,6 +179,7 @@
 
           // numbers
           if (mat[1] - 0xfffffffff) {
+		logger.debug(`<<< Exiting token(stream=${stream},stt=${stt})`);
             return 'number' + stt.state;
           }
           // if (mat[1].match(/^[-+]?[0-9]+\.[0-9]*/)) {

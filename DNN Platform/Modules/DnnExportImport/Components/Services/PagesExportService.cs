@@ -81,6 +81,7 @@ namespace Dnn.ExportImport.Components.Services
         public PagesExportService()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering PagesExportService()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PagesExportService"/> class.</summary>
@@ -89,6 +90,7 @@ namespace Dnn.ExportImport.Components.Services
         public PagesExportService(IBusinessControllerProvider businessControllerProvider)
             : this(businessControllerProvider, null, null, null)
         {
+		Logger.LogDebug("<<< Exiting PagesExportService()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PagesExportService"/> class.</summary>
@@ -124,10 +126,12 @@ namespace Dnn.ExportImport.Components.Services
         /// <param name="repository">The repository.</param>
         public static void ResetContentsFlag(ExportImportRepository repository)
         {
+			Logger.LogDebug(">>> Entering ResetContentsFlag(repository={Repository})", repository);
             // reset restored flag; if it same extracted db is reused, then content will be restored
             var toSkip = 0;
             const int batchSize = 100;
             var totalCount = repository.GetCount<ExportModuleContent>();
+			Logger.LogDebug("ResetContentsFlag(repository={Repository}): totalCount → {TotalCount}", repository, totalCount);
             while (totalCount > 0)
             {
                 var items = repository.GetAllItems<ExportModuleContent>(skip: toSkip, max: batchSize)
@@ -135,17 +139,21 @@ namespace Dnn.ExportImport.Components.Services
                 if (items.Count > 0)
                 {
                     items.ForEach(item => item.IsRestored = false);
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
+					Logger.LogInformation("ResetContentsFlag(repository)={Repository}: update query executed in {Arg1} ms", repository, __logStart.ElapsedMilliseconds);
                     repository.UpdateItems(items);
                 }
 
                 toSkip += batchSize;
                 totalCount -= batchSize;
             }
+			Logger.LogDebug("<<< Exiting ResetContentsFlag(repository={Repository})", repository);
         }
 
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			Logger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
             if (this.CheckPoint.Stage > 0)
             {
                 return;
@@ -157,25 +165,36 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             var checkedPages = exportDto.Pages.Where(p => p.CheckedState == TriCheckedState.Checked || p.CheckedState == TriCheckedState.CheckedWithAllChildren);
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): checkedPages → {CheckedPages}", exportJob, exportDto, checkedPages);
             if (checkedPages.Any())
             {
                 this.exportImportJob = exportJob;
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportImportJob → {ExportImportJob}", exportJob, exportDto, exportImportJob);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): this.exportImportJob → {Arg2}", exportJob, exportDto, this.exportImportJob);
                 this.exportDto = exportDto;
                 this.tabController = TabController.Instance;
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportDto → {ExportDto1}", exportJob, exportDto, exportDto);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): this.exportDto → {Arg2}", exportJob, exportDto, this.exportDto);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): tabController → {TabController}", exportJob, exportDto, tabController);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): this.tabController → {Arg2}", exportJob, exportDto, this.tabController);
                 this.moduleController = ModuleController.Instance;
                 this.ProcessExportPages();
             }
 
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): moduleController → {ModuleController}", exportJob, exportDto, moduleController);
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): this.moduleController → {Arg2}", exportJob, exportDto, this.moduleController);
             this.CheckPoint.Progress = 100;
             this.CheckPoint.Completed = true;
             this.CheckPoint.Stage++;
             this.CheckPoint.StageData = null;
             this.CheckPointStageCallback(this);
+			Logger.LogDebug("<<< Exiting ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
         }
 
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
             if (this.CheckPoint.Stage > 0)
             {
                 return;
@@ -187,8 +206,17 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             this.exportImportJob = importJob;
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): exportImportJob → {ExportImportJob}", importJob, importDto, exportImportJob);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.exportImportJob → {Arg2}", importJob, importDto, this.exportImportJob);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): exportDto → {ExportDto}", importJob, importDto, exportDto);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.exportDto → {Arg2}", importJob, importDto, this.exportDto);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): tabController → {TabController}", importJob, importDto, tabController);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.tabController → {Arg2}", importJob, importDto, this.tabController);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): moduleController → {ModuleController}", importJob, importDto, moduleController);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.moduleController → {Arg2}", importJob, importDto, this.moduleController);
             this.ImportDto = importDto;
             this.exportDto = importDto.ExportDto;
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.ImportDto → {Arg2}", importJob, importDto, this.ImportDto);
             this.tabController = TabController.Instance;
             this.moduleController = ModuleController.Instance;
 
@@ -199,11 +227,14 @@ namespace Dnn.ExportImport.Components.Services
             this.CheckPoint.Stage++;
             this.CheckPoint.StageData = null;
             this.CheckPointStageCallback(this);
+			Logger.LogDebug("<<< Exiting ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
         }
 
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			Logger.LogDebug(">>> Entering GetImportTotal()");
+			Logger.LogDebug("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<ExportTab>(x => x.IsSystem == this.IncludeSystem);
         }
 
@@ -212,8 +243,10 @@ namespace Dnn.ExportImport.Components.Services
         /// <param name="portalSettings">The portal settings.</param>
         public void RestoreTab(TabInfo tab, PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering RestoreTab(tab={Tab},portalSettings={PortalSettings})", tab, portalSettings);
             var changeControlStateForTab = TabChangeSettings.Instance.GetChangeControlState(tab.PortalID, tab.TabID);
             if (changeControlStateForTab.IsChangeControlEnabledForTab)
+			Logger.LogDebug("RestoreTab(tab={Tab},portalSettings={PortalSettings}): changeControlStateForTab → {ChangeControlStateForTab}", tab, portalSettings, changeControlStateForTab);
             {
                 TabVersionSettings.Instance.SetEnabledVersioningForTab(tab.TabID, false);
                 TabWorkflowSettings.Instance.SetWorkflowEnabled(tab.PortalID, tab.TabID, false);
@@ -226,6 +259,7 @@ namespace Dnn.ExportImport.Components.Services
                 TabVersionSettings.Instance.SetEnabledVersioningForTab(tab.TabID, changeControlStateForTab.IsVersioningEnabledForTab);
                 TabWorkflowSettings.Instance.SetWorkflowEnabled(tab.PortalID, tab.TabID, changeControlStateForTab.IsWorkflowEnabledForTab);
             }
+			Logger.LogDebug("<<< Exiting RestoreTab(tab={Tab},portalSettings={PortalSettings})", tab, portalSettings);
         }
 
         /// <summary>Imports a page.</summary>
@@ -236,19 +270,24 @@ namespace Dnn.ExportImport.Components.Services
         /// <exception cref="ArgumentOutOfRangeException"><see cref="ImportDto"/> has an invalid <see cref="CollisionResolution"/>.</exception>
         protected virtual void ProcessImportPage(ExportTab otherTab, IList<ExportTab> exportedTabs, IList<TabInfo> localTabs, IList<int> referenceTabs)
         {
+			Logger.LogDebug(">>> Entering ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs})", otherTab, exportedTabs, localTabs, referenceTabs);
             var portalId = this.exportImportJob.PortalId;
             var createdBy = Util.GetUserIdByName(this.exportImportJob, otherTab.CreatedByUserID, otherTab.CreatedByUserName);
+			Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): createdBy → {CreatedBy}", otherTab, exportedTabs, localTabs, referenceTabs, createdBy);
             var modifiedBy = Util.GetUserIdByName(this.exportImportJob, otherTab.LastModifiedByUserID, otherTab.LastModifiedByUserName);
+			Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): modifiedBy → {ModifiedBy}", otherTab, exportedTabs, localTabs, referenceTabs, modifiedBy);
             var localTab = localTabs.FirstOrDefault(t => otherTab.UniqueId.Equals(t.UniqueId)) ?? localTabs.FirstOrDefault(t =>
                   otherTab.TabPath.Equals(t.TabPath, StringComparison.OrdinalIgnoreCase)
                   && IsSameCulture(t.CultureCode, otherTab.CultureCode));
 
             var isParentPresent = this.IsParentTabPresentInExport(otherTab, exportedTabs, localTabs);
+			Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): isParentPresent → {IsParentPresent}", otherTab, exportedTabs, localTabs, referenceTabs, isParentPresent);
 
             if (localTab != null)
             {
                 localTab.TabSettings.Remove("TabImported");
                 otherTab.LocalId = localTab.TabID;
+				Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): otherTab.LocalId → {Arg4}", otherTab, exportedTabs, localTabs, referenceTabs, otherTab.LocalId);
                 switch (this.ImportDto.CollisionResolution)
                 {
                     case CollisionResolution.Ignore:
@@ -263,6 +302,7 @@ namespace Dnn.ExportImport.Components.Services
                         SetTabData(localTab, otherTab);
                         localTab.StateID = this.GetLocalStateId(otherTab.StateID);
                         var parentId = this.IgnoreParentMatch ? otherTab.ParentId.GetValueOrDefault(Null.NullInteger) : TryFindLocalParentTabId(otherTab, exportedTabs, localTabs);
+						Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): parentId → {ParentId}", otherTab, exportedTabs, localTabs, referenceTabs, parentId);
                         if (parentId == -1 && otherTab.ParentId > 0)
                         {
                             if (!isParentPresent)
@@ -275,6 +315,7 @@ namespace Dnn.ExportImport.Components.Services
                         }
 
                         var tabType = Globals.GetURLType(otherTab.Url);
+						Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): tabType → {TabType}", otherTab, exportedTabs, localTabs, referenceTabs, tabType);
                         if (tabType == TabType.Tab && !referenceTabs.Contains(localTab.TabID))
                         {
                             referenceTabs.Add(localTab.TabID);
@@ -282,6 +323,8 @@ namespace Dnn.ExportImport.Components.Services
 
                         // this is not saved when adding the tab; so set it explicitly
                         localTab.IsVisible = otherTab.IsVisible;
+						Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): localTab.IsVisible → {Arg4}", otherTab, exportedTabs, localTabs, referenceTabs, localTab.IsVisible);
+						Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): localTab.IsDeleted → {Arg4}", otherTab, exportedTabs, localTabs, referenceTabs, localTab.IsDeleted);
                         localTab.IsDeleted = otherTab.IsDeleted;
                         EntitiesController.Instance.SetTabSpecificData(localTab.TabID, false, localTab.IsVisible);
 
@@ -289,6 +332,7 @@ namespace Dnn.ExportImport.Components.Services
                         if (localTab.UniqueId != otherTab.UniqueId && !DataProvider.Instance().CheckTabUniqueIdExists(otherTab.UniqueId))
                         {
                             localTab.UniqueId = otherTab.UniqueId;
+							Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): localTab.UniqueId → {Arg4}", otherTab, exportedTabs, localTabs, referenceTabs, localTab.UniqueId);
                             this.UpdateTabUniqueId(localTab.TabID, localTab.UniqueId);
                         }
 
@@ -296,9 +340,11 @@ namespace Dnn.ExportImport.Components.Services
                         {
                             localTab.TabPermissions.Clear(); // without this the UpdateTab() could fail
                             localTab.ParentId = parentId;
+							Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): localTab.ParentId → {Arg4}", otherTab, exportedTabs, localTabs, referenceTabs, localTab.ParentId);
                             if (tabType == TabType.Url)
                             {
                                 localTab.Url = otherTab.Url;
+								Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): localTab.Url → {Arg4}", otherTab, exportedTabs, localTabs, referenceTabs, localTab.Url);
                             }
 
                             this.SetPartialImportSettings(otherTab, localTab);
@@ -308,6 +354,7 @@ namespace Dnn.ExportImport.Components.Services
                         }
                         catch (Exception ex)
                         {
+							Logger.LogError("Exception in ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): {Arg4}", otherTab, exportedTabs, localTabs, referenceTabs, ex.getMessage());
                             this.Result.AddLogEntry($"Importing tab '{otherTab.TabName}' exception", ex.Message, ReportLevel.Error);
                             return;
                         }
@@ -320,6 +367,7 @@ namespace Dnn.ExportImport.Components.Services
                         this.totals.TotalTabs++;
                         break;
                     default:
+						Logger.LogWarning("Throwing ArgumentOutOfRangeException from ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs})", otherTab, exportedTabs, localTabs, referenceTabs);
                         throw new ArgumentOutOfRangeException(this.ImportDto.CollisionResolution.ToString());
                 }
             }
@@ -330,6 +378,7 @@ namespace Dnn.ExportImport.Components.Services
                 localTab.StateID = this.GetLocalStateId(otherTab.StateID);
                 var parentId = this.IgnoreParentMatch ? otherTab.ParentId.GetValueOrDefault(Null.NullInteger) : TryFindLocalParentTabId(otherTab, exportedTabs, localTabs);
                 var checkPartial = false;
+				Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): checkPartial → {CheckPartial}", otherTab, exportedTabs, localTabs, referenceTabs, checkPartial);
                 if (parentId == -1 && otherTab.ParentId > 0)
                 {
                     if (!isParentPresent)
@@ -394,6 +443,7 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             var portalSettings = new PortalSettings(portalId);
+			Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): portalSettings → {PortalSettings}", otherTab, exportedTabs, localTabs, referenceTabs, portalSettings);
 
             if (otherTab.IsDeleted)
             {
@@ -402,6 +452,7 @@ namespace Dnn.ExportImport.Components.Services
             else
             {
                 var tab = this.tabController.GetTab(localTab.TabID, portalId);
+				Logger.LogDebug("ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs}): tab → {Tab}", otherTab, exportedTabs, localTabs, referenceTabs, tab);
                 if (tab.IsDeleted)
                 {
                     this.RestoreTab(tab, portalSettings);
@@ -409,23 +460,29 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             this.UpdateParentInPartialImportTabs(localTab, otherTab, portalId, exportedTabs, localTabs);
+			Logger.LogDebug("<<< Exiting ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs})", otherTab, exportedTabs, localTabs, referenceTabs);
         }
 
         private static int TryFindLocalParentTabId(ExportTab exportedTab, IEnumerable<ExportTab> exportedTabs, IEnumerable<TabInfo> localTabs)
         {
+			Logger.LogDebug(">>> Entering TryFindLocalParentTabId(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs})", exportedTab, exportedTabs, localTabs);
+			Logger.LogDebug("<<< Exiting TryFindLocalParentTabId(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs})", exportedTab, exportedTabs, localTabs);
             return TryFindLocalTabId(exportedTab, exportedTabs, localTabs, exportedTab.ParentId);
         }
 
         private static int TryFindLocalTabId(ExportTab exportedTab, IEnumerable<ExportTab> exportedTabs, IEnumerable<TabInfo> localTabs, int? tabId)
         {
+			Logger.LogDebug(">>> Entering TryFindLocalTabId(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},tabId={TabId})", exportedTab, exportedTabs, localTabs, tabId);
             if (tabId.HasValue && tabId.Value > 0)
             {
                 var otherParent = exportedTabs.FirstOrDefault(t => t.TabId == tabId);
+				Logger.LogDebug("TryFindLocalTabId(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},tabId={TabId}): otherParent → {OtherParent}", exportedTab, exportedTabs, localTabs, tabId, otherParent);
                 if (otherParent != null)
                 {
                     if (otherParent.LocalId.HasValue)
                     {
                         var localTab = localTabs.FirstOrDefault(t => t.TabID == otherParent.LocalId);
+						Logger.LogDebug("TryFindLocalTabId(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},tabId={TabId}): localTab → {LocalTab}", exportedTab, exportedTabs, localTabs, tabId, localTab);
                         if (localTab != null)
                         {
                             return localTab.TabID;
@@ -438,6 +495,7 @@ namespace Dnn.ExportImport.Components.Services
                     if (index > 0)
                     {
                         var path = exportedTab.TabPath.Substring(0, index);
+						Logger.LogDebug("TryFindLocalTabId(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},tabId={TabId}): path → {Path}", exportedTab, exportedTabs, localTabs, tabId, path);
                         var localTab = localTabs.FirstOrDefault(t =>
                             path.Equals(t.TabPath, StringComparison.OrdinalIgnoreCase)
                             && IsSameCulture(t.CultureCode, exportedTab.CultureCode));
@@ -449,21 +507,34 @@ namespace Dnn.ExportImport.Components.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting TryFindLocalTabId(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},tabId={TabId})", exportedTab, exportedTabs, localTabs, tabId);
             return -1;
         }
 
         private static bool IsSameCulture(string sourceCultureCode, string targetCultureCode)
         {
+			Logger.LogDebug(">>> Entering IsSameCulture(sourceCultureCode={SourceCultureCode},targetCultureCode={TargetCultureCode})", sourceCultureCode, targetCultureCode);
             sourceCultureCode = !string.IsNullOrWhiteSpace(sourceCultureCode) ? sourceCultureCode : Localization.SystemLocale;
             targetCultureCode = !string.IsNullOrWhiteSpace(targetCultureCode) ? targetCultureCode : Localization.SystemLocale;
+			Logger.LogDebug("IsSameCulture(sourceCultureCode={SourceCultureCode},targetCultureCode={TargetCultureCode}): targetCultureCode → {TargetCultureCode1}", sourceCultureCode, targetCultureCode, targetCultureCode);
 
+			Logger.LogDebug("<<< Exiting IsSameCulture(sourceCultureCode={SourceCultureCode},targetCultureCode={TargetCultureCode})", sourceCultureCode, targetCultureCode);
             return sourceCultureCode == targetCultureCode;
         }
 
         private static void SetTabData(TabInfo localTab, ExportTab otherTab)
         {
+			Logger.LogDebug(">>> Entering SetTabData(localTab={LocalTab},otherTab={OtherTab})", localTab, otherTab);
             localTab.TabOrder = otherTab.TabOrder;
             localTab.TabName = otherTab.TabName;
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.TabName → {Arg2}", localTab, otherTab, localTab.TabName);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.IsVisible → {Arg2}", localTab, otherTab, localTab.IsVisible);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.IconFile → {Arg2}", localTab, otherTab, localTab.IconFile);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.DisableLink → {Arg2}", localTab, otherTab, localTab.DisableLink);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.Title → {Arg2}", localTab, otherTab, localTab.Title);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.Description → {Arg2}", localTab, otherTab, localTab.Description);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.KeyWords → {Arg2}", localTab, otherTab, localTab.KeyWords);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.TabOrder → {Arg2}", localTab, otherTab, localTab.TabOrder);
             localTab.IsVisible = otherTab.IsVisible;
             localTab.IconFile = otherTab.IconFile;
             localTab.DisableLink = otherTab.DisableLink;
@@ -473,6 +544,18 @@ namespace Dnn.ExportImport.Components.Services
 
             ////localTab.IsDeleted = otherTab.IsDeleted; // DO NOT enable this; leave this to other logic
             localTab.Url = otherTab.Url;
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.Url → {Arg2}", localTab, otherTab, localTab.Url);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.SkinSrc → {Arg2}", localTab, otherTab, localTab.SkinSrc);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.ContainerSrc → {Arg2}", localTab, otherTab, localTab.ContainerSrc);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.StartDate → {Arg2}", localTab, otherTab, localTab.StartDate);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.EndDate → {Arg2}", localTab, otherTab, localTab.EndDate);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.RefreshInterval → {Arg2}", localTab, otherTab, localTab.RefreshInterval);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.PageHeadText → {Arg2}", localTab, otherTab, localTab.PageHeadText);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.IsSecure → {Arg2}", localTab, otherTab, localTab.IsSecure);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.PermanentRedirect → {Arg2}", localTab, otherTab, localTab.PermanentRedirect);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.SiteMapPriority → {Arg2}", localTab, otherTab, localTab.SiteMapPriority);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.IconFileLarge → {Arg2}", localTab, otherTab, localTab.IconFileLarge);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.CultureCode → {Arg2}", localTab, otherTab, localTab.CultureCode);
             localTab.SkinSrc = otherTab.SkinSrc;
             localTab.ContainerSrc = otherTab.ContainerSrc;
             localTab.StartDate = otherTab.StartDate ?? DateTime.MinValue;
@@ -487,6 +570,12 @@ namespace Dnn.ExportImport.Components.Services
 
             ////localTab.UniqueId = otherTab.UniqueId;
             localTab.VersionGuid = otherTab.VersionGuid;
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.VersionGuid → {Arg2}", localTab, otherTab, localTab.VersionGuid);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.LocalizedVersionGuid → {Arg2}", localTab, otherTab, localTab.LocalizedVersionGuid);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.Level → {Arg2}", localTab, otherTab, localTab.Level);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.TabPath → {Arg2}", localTab, otherTab, localTab.TabPath);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.HasBeenPublished → {Arg2}", localTab, otherTab, localTab.HasBeenPublished);
+			Logger.LogDebug("SetTabData(localTab={LocalTab},otherTab={OtherTab}): localTab.IsSystem → {Arg2}", localTab, otherTab, localTab.IsSystem);
             localTab.LocalizedVersionGuid = otherTab.LocalizedVersionGuid;
             localTab.Level = otherTab.Level;
             localTab.TabPath = otherTab.TabPath;
@@ -494,14 +583,18 @@ namespace Dnn.ExportImport.Components.Services
             localTab.IsSystem = otherTab.IsSystem;
             localTab.Terms.Clear();
             localTab.Terms.AddRange(TermHelper.ToTabTerms(otherTab.Tags, localTab.PortalID));
+			Logger.LogDebug("<<< Exiting SetTabData(localTab={LocalTab},otherTab={OtherTab})", localTab, otherTab);
         }
 
         private static bool IsTabIncluded(ExportTabInfo tab, IList<ExportTabInfo> allTabs, PageToExport[] selectedPages)
         {
+			Logger.LogDebug(">>> Entering IsTabIncluded(tab={Tab},allTabs={AllTabs},selectedPages={SelectedPages})", tab, allTabs, selectedPages);
             var first = true;
             while (tab != null)
+			Logger.LogDebug("IsTabIncluded(tab={Tab},allTabs={AllTabs},selectedPages={SelectedPages}): first → {First}", tab, allTabs, selectedPages, first);
             {
                 var pg = selectedPages.FirstOrDefault(p => p.TabId == tab.TabID);
+				Logger.LogDebug("IsTabIncluded(tab={Tab},allTabs={AllTabs},selectedPages={SelectedPages}): pg → {Pg}", tab, allTabs, selectedPages, pg);
                 if (pg != null)
                 {
                     if (first)
@@ -519,13 +612,17 @@ namespace Dnn.ExportImport.Components.Services
 
                 first = false;
                 tab = allTabs.FirstOrDefault(t => t.TabID == tab.ParentID);
+				Logger.LogDebug("IsTabIncluded(tab={Tab},allTabs={AllTabs},selectedPages={SelectedPages}): tab → {Tab1}", tab, allTabs, selectedPages, tab);
             }
 
+			Logger.LogDebug("<<< Exiting IsTabIncluded(tab={Tab},allTabs={AllTabs},selectedPages={SelectedPages})", tab, allTabs, selectedPages);
             return false;
         }
 
         private static bool ModuleOrderMatched(ModuleInfo module, ExportTabModule exportTabModule, Dictionary<int, int> localOrders, Dictionary<int, int> exportOrders)
         {
+			Logger.LogDebug(">>> Entering ModuleOrderMatched(module={Module},exportTabModule={ExportTabModule},localOrders={LocalOrders},exportOrders={ExportOrders})", module, exportTabModule, localOrders, exportOrders);
+			Logger.LogDebug("<<< Exiting ModuleOrderMatched(module={Module},exportTabModule={ExportTabModule},localOrders={LocalOrders},exportOrders={ExportOrders})", module, exportTabModule, localOrders, exportOrders);
             return localOrders.ContainsKey(module.ModuleID)
                    && exportOrders.ContainsKey(exportTabModule.ModuleID)
                    && localOrders[module.ModuleID] == exportOrders[exportTabModule.ModuleID];
@@ -597,12 +694,15 @@ namespace Dnn.ExportImport.Components.Services
 
         private static void RepairReferenceTabs(IList<int> referenceTabs, IList<TabInfo> localTabs, IList<ExportTab> exportTabs)
         {
+			Logger.LogDebug(">>> Entering RepairReferenceTabs(referenceTabs={ReferenceTabs},localTabs={LocalTabs},exportTabs={ExportTabs})", referenceTabs, localTabs, exportTabs);
             foreach (var tabId in referenceTabs)
             {
                 var localTab = localTabs.FirstOrDefault(t => t.TabID == tabId);
+				Logger.LogDebug("RepairReferenceTabs(referenceTabs={ReferenceTabs},localTabs={LocalTabs},exportTabs={ExportTabs}): localTab → {LocalTab}", referenceTabs, localTabs, exportTabs, localTab);
                 if (localTab != null && int.TryParse(localTab.Url, out int urlTabId))
                 {
                     var exportTab = exportTabs.FirstOrDefault(t => t.TabId == urlTabId);
+					Logger.LogDebug("RepairReferenceTabs(referenceTabs={ReferenceTabs},localTabs={LocalTabs},exportTabs={ExportTabs}): exportTab → {ExportTab}", referenceTabs, localTabs, exportTabs, exportTab);
                     if (exportTab is { LocalId: not null, })
                     {
                         localTab.Url = exportTab.LocalId.Value.ToString(CultureInfo.InvariantCulture);
@@ -610,10 +710,12 @@ namespace Dnn.ExportImport.Components.Services
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting RepairReferenceTabs(referenceTabs={ReferenceTabs},localTabs={LocalTabs},exportTabs={ExportTabs})", referenceTabs, localTabs, exportTabs);
         }
 
         private static bool IsTabPublished(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering IsTabPublished(tab={Tab})", tab);
             var stateId = tab.StateID;
             if (stateId <= 0)
             {
@@ -621,14 +723,17 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             var state = WorkflowStateManager.Instance.GetWorkflowState(stateId);
+			Logger.LogDebug("IsTabPublished(tab={Tab}): state → {State}", tab, state);
             if (state == null)
             {
                 return true;
             }
 
             var workflow = WorkflowManager.Instance.GetWorkflow(state.WorkflowID);
+			Logger.LogDebug("IsTabPublished(tab={Tab}): workflow → {Workflow}", tab, workflow);
             if (workflow == null)
             {
+			Logger.LogDebug("<<< Exiting IsTabPublished(tab={Tab})", tab);
                 return true;
             }
 
@@ -637,14 +742,18 @@ namespace Dnn.ExportImport.Components.Services
 
         private void ProcessImportPages()
         {
+			Logger.LogDebug(">>> Entering ProcessImportPages()");
             this.dataProvider = DataProvider.Instance();
             this.totals = string.IsNullOrEmpty(this.CheckPoint.StageData)
                 ? new ProgressTotals()
                 : JsonConvert.DeserializeObject<ProgressTotals>(this.CheckPoint.StageData);
+				Logger.LogDebug("ProcessImportPages(): dataProvider → {DataProvider}", dataProvider);
+				Logger.LogDebug("ProcessImportPages(): totals → {Totals}", totals);
 
             var portalId = this.exportImportJob.PortalId;
 
             var localTabs = this.tabController.GetTabsByPortal(portalId).Values.ToList();
+			Logger.LogDebug("ProcessImportPages(): localTabs → {LocalTabs}", localTabs);
 
             var exportedTabs = this.Repository.GetItems<ExportTab>(x => x.IsSystem == (this.Category == Constants.Category_Templates))
                 .OrderBy(t => t.Level).ThenBy(t => t.ParentId).ThenBy(t => t.TabOrder).ToList();
@@ -657,9 +766,11 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             var progressStep = 100.0 / exportedTabs.OrderByDescending(x => x.Id).Count(x => x.Id < this.totals.LastProcessedId);
+			Logger.LogDebug("ProcessImportPages(): progressStep → {ProgressStep}", progressStep);
 
             var index = 0;
             var referenceTabs = new List<int>();
+			Logger.LogDebug("ProcessImportPages(): referenceTabs → {ReferenceTabs}", referenceTabs);
             this.importContentList.Clear();
             foreach (var otherTab in exportedTabs)
             {
@@ -691,6 +802,7 @@ namespace Dnn.ExportImport.Components.Services
 
             this.searchedParentTabs.Clear();
             this.ReportImportTotals();
+			Logger.LogDebug("<<< Exiting ProcessImportPages()");
         }
 
         /// <summary>Updates the default language unique identifier for the local page.</summary>
@@ -700,6 +812,7 @@ namespace Dnn.ExportImport.Components.Services
         /// <param name="exportedTabs">The list of all exported tabs.</param>
         private void UpdateDefaultLanguageGuid(int portalId, TabInfo localTab, ExportTab exportedTab, IList<ExportTab> exportedTabs)
         {
+			Logger.LogDebug(">>> Entering UpdateDefaultLanguageGuid(portalId={PortalId},localTab={LocalTab},exportedTab={ExportedTab},exportedTabs={ExportedTabs})", portalId, localTab, exportedTab, exportedTabs);
             // Tab language GUID should correspond to the unique ID of the default locale page (see dbo.[Tabs] for reference)
             // see sample below, DefaultLanguageGuid of translated pages is equal to UniqueId of default locale page
 
@@ -721,24 +834,29 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             var defaultLanguagePageToImport = exportedTabs.FirstOrDefault(tab => tab.UniqueId == exportedTab.DefaultLanguageGuid);
+			Logger.LogDebug("UpdateDefaultLanguageGuid(portalId={PortalId},localTab={LocalTab},exportedTab={ExportedTab},exportedTabs={ExportedTabs}): defaultLanguagePageToImport → {DefaultLanguagePageToImport}", portalId, localTab, exportedTab, exportedTabs, defaultLanguagePageToImport);
 
             if (defaultLanguagePageToImport != null &&
                 defaultLanguagePageToImport.LocalId.HasValue)
             {
                 var defaultLanguagePageLocal = this.tabController.GetTab(defaultLanguagePageToImport.LocalId.Value, portalId);
+				Logger.LogDebug("UpdateDefaultLanguageGuid(portalId={PortalId},localTab={LocalTab},exportedTab={ExportedTab},exportedTabs={ExportedTabs}): defaultLanguagePageLocal → {DefaultLanguagePageLocal}", portalId, localTab, exportedTab, exportedTabs, defaultLanguagePageLocal);
 
                 if (defaultLanguagePageLocal != null)
                 {
                     localTab.DefaultLanguageGuid = defaultLanguagePageLocal.UniqueId;
+					Logger.LogDebug("UpdateDefaultLanguageGuid(portalId={PortalId},localTab={LocalTab},exportedTab={ExportedTab},exportedTabs={ExportedTabs}): localTab.DefaultLanguageGuid → {Arg4}", portalId, localTab, exportedTab, exportedTabs, localTab.DefaultLanguageGuid);
                     return;
                 }
             }
 
             localTab.DefaultLanguageGuid = exportedTab.DefaultLanguageGuid ?? Null.NullGuid;
+			Logger.LogDebug("<<< Exiting UpdateDefaultLanguageGuid(portalId={PortalId},localTab={LocalTab},exportedTab={ExportedTab},exportedTabs={ExportedTabs})", portalId, localTab, exportedTab, exportedTabs);
         }
 
         private void TriggerImportEvent(TabInfo localTab)
         {
+			Logger.LogDebug(">>> Entering TriggerImportEvent(localTab={LocalTab})", localTab);
             try
             {
                 // update tab with import flag, to trigger update event handler.
@@ -756,29 +874,38 @@ namespace Dnn.ExportImport.Components.Services
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in TriggerImportEvent(localTab={LocalTab}): {Arg1}", localTab, Exception.Message);
                 TabController.Instance.DeleteTabSetting(localTab.TabID, "TabImported");
             }
+			Logger.LogDebug("<<< Exiting TriggerImportEvent(localTab={LocalTab})", localTab);
         }
 
         private void AddTabRelatedItems(TabInfo localTab, ExportTab otherTab, bool isNew)
         {
+			Logger.LogDebug(">>> Entering AddTabRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
             this.totals.TotalTabSettings += this.ImportTabSettings(localTab, otherTab, isNew);
             this.totals.TotalTabPermissions += this.ImportTabPermissions(localTab, otherTab, isNew);
             this.totals.TotalTabUrls += this.ImportTabUrls(localTab, otherTab, isNew);
             this.totals.TotalTabModules += this.ImportTabModulesAndRelatedItems(localTab, otherTab, isNew);
+			Logger.LogDebug("<<< Exiting AddTabRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
         }
 
         private int ImportTabSettings(TabInfo localTab, ExportTab otherTab, bool isNew)
         {
+			Logger.LogDebug(">>> Entering ImportTabSettings(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
             var tabSettings = this.Repository.GetRelatedItems<ExportTabSetting>(otherTab.Id).ToList();
             foreach (var other in tabSettings)
             {
+			Logger.LogDebug("ImportTabSettings(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): tabSettings → {TabSettings}", localTab, otherTab, isNew, tabSettings);
                 var localValue = isNew ? string.Empty : Convert.ToString(localTab.TabSettings[other.SettingName], CultureInfo.InvariantCulture);
+				Logger.LogDebug("ImportTabSettings(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): localValue → {LocalValue}", localTab, otherTab, isNew, localValue);
                 if (string.IsNullOrEmpty(localValue))
                 {
                     this.tabController.UpdateTabSetting(localTab.TabID, other.SettingName, other.SettingValue);
                     var createdBy = Util.GetUserIdByName(this.exportImportJob, other.CreatedByUserID, other.CreatedByUserName);
+					Logger.LogDebug("ImportTabSettings(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): createdBy → {CreatedBy}", localTab, otherTab, isNew, createdBy);
                     var modifiedBy = Util.GetUserIdByName(this.exportImportJob, other.LastModifiedByUserID, other.LastModifiedByUserName);
+					Logger.LogDebug("ImportTabSettings(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): modifiedBy → {ModifiedBy}", localTab, otherTab, isNew, modifiedBy);
                     this.dataProvider.UpdateSettingRecordChangers(
                         "TabSettings",
                         "TabID",
@@ -818,35 +945,45 @@ namespace Dnn.ExportImport.Components.Services
                             this.Result.AddLogEntry("Ignored tab setting", other.SettingName);
                             break;
                         default:
+							Logger.LogWarning("Throwing ArgumentOutOfRangeException from ImportTabSettings(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
                             throw new ArgumentOutOfRangeException(this.ImportDto.CollisionResolution.ToString());
                     }
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ImportTabSettings(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
             return tabSettings.Count;
         }
 
         private int ImportTabPermissions(TabInfo localTab, ExportTab otherTab, bool isNew)
         {
+			Logger.LogDebug(">>> Entering ImportTabPermissions(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
             if (!this.exportDto.IncludePermissions)
             {
                 return 0;
             }
 
             var noRole = Convert.ToInt32(Globals.glbRoleNothing, CultureInfo.InvariantCulture);
+			Logger.LogDebug("ImportTabPermissions(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): noRole → {NoRole}", localTab, otherTab, isNew, noRole);
             var count = 0;
+			Logger.LogDebug("ImportTabPermissions(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): count → {Count}", localTab, otherTab, isNew, count);
             var tabPermissions = this.Repository.GetRelatedItems<ExportTabPermission>(otherTab.Id).ToList();
+			Logger.LogDebug("ImportTabPermissions(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): tabPermissions → {TabPermissions}", localTab, otherTab, isNew, tabPermissions);
             var localTabPermissions = localTab.TabPermissions.OfType<TabPermissionInfo>().ToList();
+			Logger.LogDebug("ImportTabPermissions(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): localTabPermissions → {LocalTabPermissions}", localTab, otherTab, isNew, localTabPermissions);
             foreach (var other in tabPermissions)
             {
                 var roleId = Util.GetRoleIdByName(this.ImportDto.PortalId, other.RoleID ?? noRole, other.RoleName);
+				Logger.LogDebug("ImportTabPermissions(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): roleId → {RoleId}", localTab, otherTab, isNew, roleId);
                 var userId = UserController.GetUserByName(this.ImportDto.PortalId, other.Username)?.UserID;
+				Logger.LogDebug("ImportTabPermissions(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): userId → {UserId}", localTab, otherTab, isNew, userId);
 
                 var local = isNew ? null : localTabPermissions.FirstOrDefault(
                     x => x.PermissionCode == other.PermissionCode && x.PermissionKey == other.PermissionKey
                     && x.PermissionName.Equals(other.PermissionName, StringComparison.OrdinalIgnoreCase) &&
                     ((IPermissionInfo)x).RoleId == roleId && ((IPermissionInfo)x).UserId == userId);
                 var isUpdate = false;
+				Logger.LogDebug("ImportTabPermissions(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): isUpdate → {IsUpdate}", localTab, otherTab, isNew, isUpdate);
                 if (local != null)
                 {
                     switch (this.ImportDto.CollisionResolution)
@@ -858,6 +995,7 @@ namespace Dnn.ExportImport.Components.Services
                             this.Result.AddLogEntry("Ignored tab permission", other.PermissionKey);
                             break;
                         default:
+							Logger.LogWarning("Throwing ArgumentOutOfRangeException from ImportTabPermissions(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
                             throw new ArgumentOutOfRangeException(this.ImportDto.CollisionResolution.ToString());
                     }
                 }
@@ -870,6 +1008,7 @@ namespace Dnn.ExportImport.Components.Services
                 else
                 {
                     var permissionId = DataProvider.Instance().GetPermissionId(other.PermissionCode, other.PermissionKey, other.PermissionName);
+					Logger.LogDebug("ImportTabPermissions(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): permissionId → {PermissionId}", localTab, otherTab, isNew, permissionId);
                     if (permissionId != null)
                     {
                         local = new TabPermissionInfo
@@ -937,17 +1076,22 @@ namespace Dnn.ExportImport.Components.Services
                 TabPermissionController.SaveTabPermissions(this.eventLogger, localTab);
             }
 
+			Logger.LogDebug("<<< Exiting ImportTabPermissions(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
             return count;
         }
 
         private int ImportTabUrls(TabInfo localTab, ExportTab otherTab, bool isNew)
         {
+			Logger.LogDebug(">>> Entering ImportTabUrls(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
             var count = 0;
             var tabUrls = this.Repository.GetRelatedItems<ExportTabUrl>(otherTab.Id).ToList();
+			Logger.LogDebug("ImportTabUrls(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): tabUrls → {TabUrls}", localTab, otherTab, isNew, tabUrls);
+			Logger.LogDebug("ImportTabUrls(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): count → {Count}", localTab, otherTab, isNew, count);
             var localUrls = localTab.TabUrls;
             foreach (var other in tabUrls)
             {
                 var local = isNew ? null : localUrls.FirstOrDefault(url => url.SeqNum == other.SeqNum);
+				Logger.LogDebug("ImportTabUrls(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local → {Local}", localTab, otherTab, isNew, local);
                 if (local != null)
                 {
                     switch (this.ImportDto.CollisionResolution)
@@ -956,13 +1100,16 @@ namespace Dnn.ExportImport.Components.Services
                             try
                             {
                                 local.Url = other.Url;
+								Logger.LogDebug("ImportTabUrls(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.Url → {Arg3}", localTab, otherTab, isNew, local.Url);
                                 TabController.Instance.SaveTabUrl(local, this.ImportDto.PortalId, true);
                                 this.Result.AddLogEntry("Update Tab Url", other.Url);
                                 count++;
                             }
                             catch (Exception ex)
                             {
+								Logger.LogError("Exception in ImportTabUrls(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): {Arg3}", localTab, otherTab, isNew, ex.getMessage());
                                 this.Result.AddLogEntry("EXCEPTION updating tab, Tab ID=" + local.TabId, ex.Message, ReportLevel.Error);
+								Logger.LogDebug("ImportTabUrls(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): ID → {ID}", localTab, otherTab, isNew, ID);
                             }
 
                             break;
@@ -970,12 +1117,14 @@ namespace Dnn.ExportImport.Components.Services
                             this.Result.AddLogEntry("Ignored tab url", other.Url);
                             break;
                         default:
+							Logger.LogWarning("Throwing ArgumentOutOfRangeException from ImportTabUrls(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
                             throw new ArgumentOutOfRangeException(this.ImportDto.CollisionResolution.ToString());
                     }
                 }
                 else
                 {
                     var alias = this.portalAliasService.GetPortalAliasesByPortalId(this.ImportDto.PortalId).FirstOrDefault(a => a.IsPrimary);
+					Logger.LogDebug("ImportTabUrls(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): alias → {Alias}", localTab, otherTab, isNew, alias);
                     local = new TabUrlInfo
                     {
                         TabId = localTab.TabID,
@@ -994,7 +1143,9 @@ namespace Dnn.ExportImport.Components.Services
                         TabController.Instance.SaveTabUrl(local, this.ImportDto.PortalId, true);
 
                         var createdBy = Util.GetUserIdByName(this.exportImportJob, other.CreatedByUserID, other.CreatedByUserName);
+						Logger.LogDebug("ImportTabUrls(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): createdBy → {CreatedBy}", localTab, otherTab, isNew, createdBy);
                         var modifiedBy = Util.GetUserIdByName(this.exportImportJob, other.LastModifiedByUserID, other.LastModifiedByUserName);
+						Logger.LogDebug("ImportTabUrls(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): modifiedBy → {ModifiedBy}", localTab, otherTab, isNew, modifiedBy);
                         this.dataProvider.UpdateTabUrlChangers(local.TabId, local.SeqNum, createdBy, modifiedBy);
 
                         this.Result.AddLogEntry("Added Tab Url", other.Url);
@@ -1007,26 +1158,36 @@ namespace Dnn.ExportImport.Components.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ImportTabUrls(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
             return count;
         }
 
         private int ImportTabModulesAndRelatedItems(TabInfo localTab, ExportTab otherTab, bool isNew)
         {
+			Logger.LogDebug(">>> Entering ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
             var count = 0;
             var exportedModules = this.Repository.GetRelatedItems<ExportModule>(otherTab.Id).ToList();
+			Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): exportedModules → {ExportedModules}", localTab, otherTab, isNew, exportedModules);
             var exportedTabModules = this.Repository.GetRelatedItems<ExportTabModule>(otherTab.Id)
                 .OrderBy(m => m.PaneName?.ToLowerInvariant()).ThenBy(m => m.ModuleOrder).ToList();
+				Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): count → {Count}", localTab, otherTab, isNew, count);
             var localExportModules = isNew ? new List<ExportModule>()
                 : EntitiesController.Instance.GetModules(localTab.TabID, true, Constants.MaxDbTime, null).ToList();
             var localTabModules = isNew ? new List<ModuleInfo>() : this.moduleController.GetTabModules(localTab.TabID).Values.ToList();
+			Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): localTabModules → {LocalTabModules}", localTab, otherTab, isNew, localTabModules);
             var allExistingIds = localTabModules.Select(l => l.ModuleID).ToList();
+			Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): allExistingIds → {AllExistingIds}", localTab, otherTab, isNew, allExistingIds);
             var allImportedIds = new List<int>();
+			Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): allImportedIds → {AllImportedIds}", localTab, otherTab, isNew, allImportedIds);
 
             var localOrders = BuildModuleOrders(localTabModules);
+			Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): localOrders → {LocalOrders}", localTab, otherTab, isNew, localOrders);
             var exportOrders = BuildModuleOrders(exportedTabModules);
+			Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): exportOrders → {ExportOrders}", localTab, otherTab, isNew, exportOrders);
             foreach (var other in exportedTabModules)
             {
                 var locals = new List<ModuleInfo>(localTabModules.Where(m => m.UniqueId == other.UniqueId && m.IsDeleted == other.IsDeleted));
+				Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): locals → {Locals}", localTab, otherTab, isNew, locals);
                 if (locals.Count == 0)
                 {
                     locals = new List<ModuleInfo>(localTabModules.Where(m => m.ModuleDefinition.FriendlyName == other.FriendlyName
@@ -1036,12 +1197,14 @@ namespace Dnn.ExportImport.Components.Services
                 }
 
                 var otherModule = exportedModules.FirstOrDefault(m => m.ModuleID == other.ModuleID);
+				Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): otherModule → {OtherModule}", localTab, otherTab, isNew, otherModule);
                 if (otherModule == null)
                 {
                     continue; // must not happen
                 }
 
                 var moduleDefinition = ModuleDefinitionController.GetModuleDefinitionByFriendlyName(other.FriendlyName);
+				Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): moduleDefinition → {ModuleDefinition}", localTab, otherTab, isNew, moduleDefinition);
                 if (moduleDefinition == null)
                 {
                     this.Result.AddLogEntry(
@@ -1051,12 +1214,17 @@ namespace Dnn.ExportImport.Components.Services
                     continue; // the module is not installed, therefore ignore it
                 }
 
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 var sharedModules = this.Repository.FindItems<ExportModule>(m => m.ModuleID == other.ModuleID);
                 var sharedModule = sharedModules.FirstOrDefault(m => m.LocalId.HasValue);
+				Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): sharedModules → {SharedModules}", localTab, otherTab, isNew, sharedModules);
+				Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): sharedModule → {SharedModule}", localTab, otherTab, isNew, sharedModule);
+				Logger.LogInformation("ImportTabModulesAndRelatedItems(localTab,otherTab,isNew)={LocalTab},{OtherTab},{IsNew}: find query executed in {Arg3} ms", localTab, otherTab, isNew, __logStart.ElapsedMilliseconds);
 
                 if (locals.Count == 0)
                 {
                     var local = new ModuleInfo
+					Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local → {Local}", localTab, otherTab, isNew, local);
                     {
                         TabID = localTab.TabID,
                         ModuleID = sharedModule?.LocalId ?? -1,
@@ -1101,16 +1269,21 @@ namespace Dnn.ExportImport.Components.Services
                         other.LocalId = local.TabModuleID;
                         this.Repository.UpdateItem(otherModule);
                         allImportedIds.Add(local.ModuleID);
+						Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): other.LocalId → {Arg3}", localTab, otherTab, isNew, other.LocalId);
+						Logger.LogInformation("ImportTabModulesAndRelatedItems(localTab,otherTab,isNew)={LocalTab},{OtherTab},{IsNew}: update query executed in {Arg3} ms", localTab, otherTab, isNew, __logStart.ElapsedMilliseconds);
 
                         // this is not saved upon adding the module
                         if (other.IsDeleted && !otherTab.IsDeleted)
                         {
                             local.IsDeleted = other.IsDeleted;
+							Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.IsDeleted → {Arg3}", localTab, otherTab, isNew, local.IsDeleted);
                             this.moduleController.DeleteTabModule(local.TabID, local.ModuleID, true);
                         }
 
                         var createdBy = Util.GetUserIdByName(this.exportImportJob, other.CreatedByUserID, other.CreatedByUserName);
+						Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): createdBy → {CreatedBy}", localTab, otherTab, isNew, createdBy);
                         var modifiedBy = Util.GetUserIdByName(this.exportImportJob, other.LastModifiedByUserID, other.LastModifiedByUserName);
+						Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): modifiedBy → {ModifiedBy}", localTab, otherTab, isNew, modifiedBy);
                         this.UpdateTabModuleChangers(local.TabModuleID, createdBy, modifiedBy);
 
                         if (sharedModule == null)
@@ -1137,6 +1310,7 @@ namespace Dnn.ExportImport.Components.Services
                     catch (Exception ex)
                     {
                         this.Result.AddLogEntry("EXCEPTION importing tab module, Module ID=" + local.ModuleID, ex.Message, ReportLevel.Error);
+						Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): ID → {ID}", localTab, otherTab, isNew, ID);
                         Logger.Error(ex);
                     }
                 }
@@ -1213,6 +1387,13 @@ namespace Dnn.ExportImport.Components.Services
                             {
                                 // setting module properties
                                 localExpModule.AllTabs = otherModule.AllTabs;
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): localExpModule.AllTabs → {Arg3}", localTab, otherTab, isNew, localExpModule.AllTabs);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): localExpModule.StartDate → {Arg3}", localTab, otherTab, isNew, localExpModule.StartDate);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): localExpModule.EndDate → {Arg3}", localTab, otherTab, isNew, localExpModule.EndDate);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): localExpModule.InheritViewPermissions → {Arg3}", localTab, otherTab, isNew, localExpModule.InheritViewPermissions);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): localExpModule.IsDeleted → {Arg3}", localTab, otherTab, isNew, localExpModule.IsDeleted);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): localExpModule.IsShareable → {Arg3}", localTab, otherTab, isNew, localExpModule.IsShareable);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): localExpModule.IsShareableViewOnly → {Arg3}", localTab, otherTab, isNew, localExpModule.IsShareableViewOnly);
                                 localExpModule.StartDate = otherModule.StartDate;
                                 localExpModule.EndDate = otherModule.EndDate;
                                 localExpModule.InheritViewPermissions = otherModule.InheritViewPermissions;
@@ -1221,16 +1402,33 @@ namespace Dnn.ExportImport.Components.Services
                                 localExpModule.IsShareableViewOnly = otherModule.IsShareableViewOnly;
 
                                 local.AllTabs = otherModule.AllTabs;
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.AllTabs → {Arg3}", localTab, otherTab, isNew, local.AllTabs);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.StartDate → {Arg3}", localTab, otherTab, isNew, local.StartDate);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.EndDate → {Arg3}", localTab, otherTab, isNew, local.EndDate);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.InheritViewPermissions → {Arg3}", localTab, otherTab, isNew, local.InheritViewPermissions);
                                 local.StartDate = otherModule.StartDate ?? DateTime.MinValue;
                                 local.EndDate = otherModule.EndDate ?? DateTime.MaxValue;
                                 local.InheritViewPermissions = otherModule.InheritViewPermissions ?? true;
                                 local.IsDeleted = otherModule.IsDeleted;
                                 local.IsShareable = otherModule.IsShareable;
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.IsShareable → {Arg3}", localTab, otherTab, isNew, local.IsShareable);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.IsShareableViewOnly → {Arg3}", localTab, otherTab, isNew, local.IsShareableViewOnly);
                                 local.IsShareableViewOnly = otherModule.IsShareableViewOnly;
 
                                 // setting tab module properties
                                 local.AllTabs = otherModule.AllTabs;
                                 local.ModuleTitle = other.ModuleTitle;
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.ModuleTitle → {Arg3}", localTab, otherTab, isNew, local.ModuleTitle);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.Header → {Arg3}", localTab, otherTab, isNew, local.Header);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.Footer → {Arg3}", localTab, otherTab, isNew, local.Footer);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.ModuleOrder → {Arg3}", localTab, otherTab, isNew, local.ModuleOrder);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.PaneName → {Arg3}", localTab, otherTab, isNew, local.PaneName);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.CacheMethod → {Arg3}", localTab, otherTab, isNew, local.CacheMethod);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.CacheTime → {Arg3}", localTab, otherTab, isNew, local.CacheTime);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.Alignment → {Arg3}", localTab, otherTab, isNew, local.Alignment);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.Color → {Arg3}", localTab, otherTab, isNew, local.Color);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.Border → {Arg3}", localTab, otherTab, isNew, local.Border);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.IconFile → {Arg3}", localTab, otherTab, isNew, local.IconFile);
                                 local.Header = other.Header;
                                 local.Footer = other.Footer;
                                 local.ModuleOrder = other.ModuleOrder;
@@ -1243,18 +1441,27 @@ namespace Dnn.ExportImport.Components.Services
                                 local.IconFile = other.IconFile;
                                 local.Visibility = (VisibilityState)other.Visibility;
                                 local.ContainerSrc = other.ContainerSrc;
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.ContainerSrc → {Arg3}", localTab, otherTab, isNew, local.ContainerSrc);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.DisplayTitle → {Arg3}", localTab, otherTab, isNew, local.DisplayTitle);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.DisplayPrint → {Arg3}", localTab, otherTab, isNew, local.DisplayPrint);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.DisplaySyndicate → {Arg3}", localTab, otherTab, isNew, local.DisplaySyndicate);
                                 local.DisplayTitle = other.DisplayTitle;
                                 local.DisplayPrint = other.DisplayPrint;
                                 local.DisplaySyndicate = other.DisplaySyndicate;
                                 local.IsShareable = otherModule.IsShareable;
                                 local.IsShareableViewOnly = otherModule.IsShareableViewOnly;
                                 local.VersionGuid = other.VersionGuid;
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.VersionGuid → {Arg3}", localTab, otherTab, isNew, local.VersionGuid);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.DefaultLanguageGuid → {Arg3}", localTab, otherTab, isNew, local.DefaultLanguageGuid);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.LocalizedVersionGuid → {Arg3}", localTab, otherTab, isNew, local.LocalizedVersionGuid);
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.CultureCode → {Arg3}", localTab, otherTab, isNew, local.CultureCode);
                                 local.DefaultLanguageGuid = other.DefaultLanguageGuid ?? Guid.Empty;
                                 local.LocalizedVersionGuid = other.LocalizedVersionGuid;
                                 local.CultureCode = other.CultureCode;
                                 if (local.UniqueId != other.UniqueId && !DataProvider.Instance().CheckTabModuleUniqueIdExists(other.UniqueId))
                                 {
                                     local.UniqueId = other.UniqueId;
+									Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): local.UniqueId → {Arg3}", localTab, otherTab, isNew, local.UniqueId);
                                     this.UpdateModuleUniqueId(local.TabModuleID, other.UniqueId);
                                 }
 
@@ -1263,6 +1470,7 @@ namespace Dnn.ExportImport.Components.Services
 
                                 other.LocalId = local.TabModuleID;
                                 otherModule.LocalId = localExpModule.ModuleID;
+								Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): otherModule.LocalId → {Arg3}", localTab, otherTab, isNew, otherModule.LocalId);
                                 this.Repository.UpdateItem(otherModule);
                                 allImportedIds.Add(local.ModuleID);
 
@@ -1318,6 +1526,7 @@ namespace Dnn.ExportImport.Components.Services
             {
                 // delete left over tab modules for full import in an existing page
                 var unimported = allExistingIds.Distinct().Except(allImportedIds);
+				Logger.LogDebug("ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew}): unimported → {Unimported}", localTab, otherTab, isNew, unimported);
                 foreach (var moduleId in unimported)
                 {
                     try
@@ -1333,6 +1542,7 @@ namespace Dnn.ExportImport.Components.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ImportTabModulesAndRelatedItems(localTab={LocalTab},otherTab={OtherTab},isNew={IsNew})", localTab, otherTab, isNew);
             return count;
         }
 
@@ -1344,26 +1554,35 @@ namespace Dnn.ExportImport.Components.Services
         */
         private void UpdateModuleWithIsDeletedHandling(ExportTabModule exportTabModule, ExportModule exportModule, ModuleInfo importModule)
         {
+			Logger.LogDebug(">>> Entering UpdateModuleWithIsDeletedHandling(exportTabModule={ExportTabModule},exportModule={ExportModule},importModule={ImportModule})", exportTabModule, exportModule, importModule);
             importModule.IsDeleted = exportModule.IsDeleted;
             this.ActionInWorkflowlessContext(importModule.TabID, () =>
             {
+				Logger.LogDebug("UpdateModuleWithIsDeletedHandling(exportTabModule={ExportTabModule},exportModule={ExportModule},importModule={ImportModule}): importModule.IsDeleted → {Arg3}", exportTabModule, exportModule, importModule, importModule.IsDeleted);
                 this.moduleController.UpdateModule(importModule);
             });
             importModule.IsDeleted = exportTabModule.IsDeleted;
+			Logger.LogDebug("<<< Exiting UpdateModuleWithIsDeletedHandling(exportTabModule={ExportTabModule},exportModule={ExportModule},importModule={ImportModule})", exportTabModule, exportModule, importModule);
         }
 
         private int ImportModuleSettings(ModuleInfo localModule, ExportModule otherModule, bool isNew)
         {
+			Logger.LogDebug(">>> Entering ImportModuleSettings(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew})", localModule, otherModule, isNew);
             var count = 0;
             var moduleSettings = this.Repository.GetRelatedItems<ExportModuleSetting>(otherModule.Id).ToList();
+			Logger.LogDebug("ImportModuleSettings(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): moduleSettings → {ModuleSettings}", localModule, otherModule, isNew, moduleSettings);
+			Logger.LogDebug("ImportModuleSettings(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): count → {Count}", localModule, otherModule, isNew, count);
             foreach (var other in moduleSettings)
             {
                 var localValue = isNew ? string.Empty : Convert.ToString(localModule.ModuleSettings[other.SettingName], CultureInfo.InvariantCulture);
+				Logger.LogDebug("ImportModuleSettings(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): localValue → {LocalValue}", localModule, otherModule, isNew, localValue);
                 if (string.IsNullOrEmpty(localValue))
                 {
                     this.moduleController.UpdateModuleSetting(localModule.ModuleID, other.SettingName, other.SettingValue);
                     var createdBy = Util.GetUserIdByName(this.exportImportJob, other.CreatedByUserID, other.CreatedByUserName);
+					Logger.LogDebug("ImportModuleSettings(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): createdBy → {CreatedBy}", localModule, otherModule, isNew, createdBy);
                     var modifiedBy = Util.GetUserIdByName(this.exportImportJob, other.LastModifiedByUserID, other.LastModifiedByUserName);
+					Logger.LogDebug("ImportModuleSettings(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): modifiedBy → {ModifiedBy}", localModule, otherModule, isNew, modifiedBy);
                     this.dataProvider.UpdateSettingRecordChangers(
                         "ModuleSettings",
                         "ModuleID",
@@ -1405,27 +1624,36 @@ namespace Dnn.ExportImport.Components.Services
                             this.Result.AddLogEntry("Ignored module setting", other.SettingName);
                             break;
                         default:
+							Logger.LogWarning("Throwing ArgumentOutOfRangeException from ImportModuleSettings(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew})", localModule, otherModule, isNew);
                             throw new ArgumentOutOfRangeException(this.ImportDto.CollisionResolution.ToString());
                     }
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ImportModuleSettings(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew})", localModule, otherModule, isNew);
             return count;
         }
 
         private int ImportModulePermissions(ModuleInfo localModule, ExportModule otherModule, bool isNew)
         {
+			Logger.LogDebug(">>> Entering ImportModulePermissions(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew})", localModule, otherModule, isNew);
             var count = 0;
             var noRole = Convert.ToInt32(Globals.glbRoleNothing, CultureInfo.InvariantCulture);
+			Logger.LogDebug("ImportModulePermissions(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): noRole → {NoRole}", localModule, otherModule, isNew, noRole);
             var modulePermissions = this.Repository.GetRelatedItems<ExportModulePermission>(otherModule.Id).ToList();
+			Logger.LogDebug("ImportModulePermissions(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): modulePermissions → {ModulePermissions}", localModule, otherModule, isNew, modulePermissions);
             var localModulePermissions = isNew
                 ? []
                 : localModule.ModulePermissions.OfType<ModulePermissionInfo>().ToList();
+				Logger.LogDebug("ImportModulePermissions(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): count → {Count}", localModule, otherModule, isNew, count);
             foreach (var other in modulePermissions)
             {
                 var userId = UserController.GetUserByName(this.ImportDto.PortalId, other.Username)?.UserID;
+				Logger.LogDebug("ImportModulePermissions(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): userId → {UserId}", localModule, otherModule, isNew, userId);
                 var roleId = Util.GetRoleIdByName(this.ImportDto.PortalId, other.RoleID ?? noRole, other.RoleName);
+				Logger.LogDebug("ImportModulePermissions(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): roleId → {RoleId}", localModule, otherModule, isNew, roleId);
                 var permissionId = DataProvider.Instance().GetPermissionId(other.PermissionCode, other.PermissionKey, other.PermissionName);
+				Logger.LogDebug("ImportModulePermissions(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): permissionId → {PermissionId}", localModule, otherModule, isNew, permissionId);
 
                 if (permissionId != null)
                 {
@@ -1473,19 +1701,26 @@ namespace Dnn.ExportImport.Components.Services
                 ModulePermissionController.SaveModulePermissions(localModule);
             }
 
+			Logger.LogDebug("<<< Exiting ImportModulePermissions(localModule={LocalModule},otherModule={OtherModule},isNew={IsNew})", localModule, otherModule, isNew);
             return count;
         }
 
         private int ImportPortableContent(int tabId, ModuleInfo localModule, ExportModule otherModule, bool isNew)
         {
+			Logger.LogDebug(">>> Entering ImportPortableContent(tabId={TabId},localModule={LocalModule},otherModule={OtherModule},isNew={IsNew})", tabId, localModule, otherModule, isNew);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var exportedContent = this.Repository.FindItems<ExportModuleContent>(m => m.ModuleID == otherModule.ModuleID).ToList();
             if (exportedContent.Count <= 0)
             {
+				Logger.LogDebug("ImportPortableContent(tabId={TabId},localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): exportedContent → {ExportedContent}", tabId, localModule, otherModule, isNew, exportedContent);
+				Logger.LogInformation("ImportPortableContent(tabId,localModule,otherModule,isNew)={TabId},{LocalModule},{OtherModule},{IsNew}: find query executed in {Arg4} ms", tabId, localModule, otherModule, isNew, __logStart.ElapsedMilliseconds);
                 return 0;
             }
 
             var moduleDef = ModuleDefinitionController.GetModuleDefinitionByID(localModule.ModuleDefID);
+			Logger.LogDebug("ImportPortableContent(tabId={TabId},localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): moduleDef → {ModuleDef}", tabId, localModule, otherModule, isNew, moduleDef);
             var desktopModuleInfo = DesktopModuleController.GetDesktopModule(this.hostSettings, moduleDef.DesktopModuleID, this.exportDto.PortalId);
+			Logger.LogDebug("ImportPortableContent(tabId={TabId},localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): desktopModuleInfo → {DesktopModuleInfo}", tabId, localModule, otherModule, isNew, desktopModuleInfo);
             if (string.IsNullOrEmpty(desktopModuleInfo?.BusinessControllerClass))
             {
                 return 0;
@@ -1494,6 +1729,7 @@ namespace Dnn.ExportImport.Components.Services
             try
             {
                 var module = this.moduleController.GetModule(localModule.ModuleID, tabId, true);
+				Logger.LogDebug("ImportPortableContent(tabId={TabId},localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): module → {Module}", tabId, localModule, otherModule, isNew, module);
                 if (string.IsNullOrEmpty(module.DesktopModule.BusinessControllerClass) || !module.DesktopModule.IsPortable)
                 {
                     return 0;
@@ -1501,6 +1737,7 @@ namespace Dnn.ExportImport.Components.Services
 
                 var restoreCount = 0;
                 var controller = this.businessControllerProvider.GetInstance<IPortable>(module);
+				Logger.LogDebug("ImportPortableContent(tabId={TabId},localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): controller → {Controller}", tabId, localModule, otherModule, isNew, controller);
                 if (controller == null)
                 {
                     return 0;
@@ -1513,6 +1750,7 @@ namespace Dnn.ExportImport.Components.Services
                 }
 
                 var version = DotNetNukeContext.Current.Application.Version.ToString(3);
+				Logger.LogDebug("ImportPortableContent(tabId={TabId},localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): version → {Version}", tabId, localModule, otherModule, isNew, version);
 
                 this.ActionInWorkflowlessContext(
                     tabId,
@@ -1534,6 +1772,7 @@ namespace Dnn.ExportImport.Components.Services
                                             LocalModuleId = localModule.ModuleID,
                                         });
                                     var content = moduleContent.XmlContent;
+									Logger.LogDebug("ImportPortableContent(tabId={TabId},localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): content → {Content}", tabId, localModule, otherModule, isNew, content);
                                     if (content.IndexOf('\x03') >= 0)
                                     {
                                         // exported data contains this character sometimes
@@ -1548,6 +1787,8 @@ namespace Dnn.ExportImport.Components.Services
                                     moduleContent.IsRestored = true;
                                     this.Repository.UpdateItem(moduleContent);
                                     restoreCount++;
+									Logger.LogDebug("ImportPortableContent(tabId={TabId},localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): moduleContent.IsRestored → {Arg4}", tabId, localModule, otherModule, isNew, moduleContent.IsRestored);
+									Logger.LogInformation("ImportPortableContent(tabId,localModule,otherModule,isNew)={TabId},{LocalModule},{OtherModule},{IsNew}: update query executed in {Arg4} ms", tabId, localModule, otherModule, isNew, __logStart.ElapsedMilliseconds);
                                 }
                                 catch (Exception ex)
                                 {
@@ -1555,6 +1796,7 @@ namespace Dnn.ExportImport.Components.Services
                                         "Error importing module data, Module ID=" + localModule.ModuleID,
                                         ex.Message,
                                         ReportLevel.Error);
+										Logger.LogDebug("ImportPortableContent(tabId={TabId},localModule={LocalModule},otherModule={OtherModule},isNew={IsNew}): ID → {ID}", tabId, localModule, otherModule, isNew, ID);
                                     Logger.ErrorFormat(
                                         CultureInfo.InvariantCulture,
                                         "ModuleContent: (Module ID={0}). Error: {1}{2}{3}",
@@ -1579,11 +1821,13 @@ namespace Dnn.ExportImport.Components.Services
                 Logger.Error("Error creating business class type. " + ex);
             }
 
+			Logger.LogDebug("<<< Exiting ImportPortableContent(tabId={TabId},localModule={LocalModule},otherModule={OtherModule},isNew={IsNew})", tabId, localModule, otherModule, isNew);
             return 0;
         }
 
         private void ActionInWorkflowlessContext(int tabId, Action action)
         {
+			Logger.LogDebug(">>> Entering ActionInWorkflowlessContext(tabId={TabId},action={Action})", tabId, action);
             bool versionEnabledPortalLevel, versionEnabledTabLevel, workflowEnabledPortalLevel, workflowEnabledTabLevel;
             this.DisableVersioning(tabId, out versionEnabledPortalLevel, out versionEnabledTabLevel, out workflowEnabledPortalLevel, out workflowEnabledTabLevel);
 
@@ -1595,6 +1839,7 @@ namespace Dnn.ExportImport.Components.Services
             {
                 this.RestoreVersioning(tabId, versionEnabledPortalLevel, versionEnabledTabLevel, workflowEnabledPortalLevel, workflowEnabledTabLevel);
             }
+			Logger.LogDebug("<<< Exiting ActionInWorkflowlessContext(tabId={TabId},action={Action})", tabId, action);
         }
 
         private void DisableVersioning(
@@ -1604,16 +1849,22 @@ namespace Dnn.ExportImport.Components.Services
             out bool workflowEnabledPortalLevel,
             out bool workflowEnabledTabLevel)
         {
+			Logger.LogDebug(">>> Entering DisableVersioning(tabId={TabId})", tabId);
             var portalId = this.ImportDto.PortalId;
             versionEnabledPortalLevel = TabVersionSettings.Instance.IsVersioningEnabled(portalId);
             versionEnabledTabLevel = TabVersionSettings.Instance.IsVersioningEnabled(portalId, tabId);
             TabVersionSettings.Instance.SetEnabledVersioningForPortal(portalId, false);
+			Logger.LogDebug("DisableVersioning(tabId={TabId}): versionEnabledPortalLevel → {VersionEnabledPortalLevel}", tabId, versionEnabledPortalLevel);
+			Logger.LogDebug("DisableVersioning(tabId={TabId}): versionEnabledTabLevel → {VersionEnabledTabLevel}", tabId, versionEnabledTabLevel);
             TabVersionSettings.Instance.SetEnabledVersioningForTab(tabId, false);
 
             var workflowSettings = TabWorkflowSettings.Instance;
             workflowEnabledPortalLevel = workflowSettings.IsWorkflowEnabled(portalId);
             workflowEnabledTabLevel = workflowSettings.IsWorkflowEnabled(portalId, tabId);
             workflowSettings.SetWorkflowEnabled(portalId, tabId, false);
+			Logger.LogDebug("DisableVersioning(tabId={TabId}): workflowEnabledPortalLevel → {WorkflowEnabledPortalLevel}", tabId, workflowEnabledPortalLevel);
+			Logger.LogDebug("<<< Exiting DisableVersioning(tabId={TabId})", tabId);
+			Logger.LogDebug("DisableVersioning(tabId={TabId}): workflowEnabledTabLevel → {WorkflowEnabledTabLevel}", tabId, workflowEnabledTabLevel);
         }
 
         private void RestoreVersioning(
@@ -1623,26 +1874,34 @@ namespace Dnn.ExportImport.Components.Services
             bool workflowEnabledPortalLevel,
             bool workflowEnabledTabLevel)
         {
+			Logger.LogDebug(">>> Entering RestoreVersioning(tabId={TabId},versionEnabledPortalLevel={VersionEnabledPortalLevel},versionEnabledTabLevel={VersionEnabledTabLevel},workflowEnabledPortalLevel={WorkflowEnabledPortalLevel},workflowEnabledTabLevel={WorkflowEnabledTabLevel})", tabId, versionEnabledPortalLevel, versionEnabledTabLevel, workflowEnabledPortalLevel, workflowEnabledTabLevel);
             var portalId = this.ImportDto.PortalId;
             TabVersionSettings.Instance.SetEnabledVersioningForPortal(portalId, versionEnabledPortalLevel);
             TabVersionSettings.Instance.SetEnabledVersioningForTab(tabId, versionEnabledTabLevel);
             TabWorkflowSettings.Instance.SetWorkflowEnabled(portalId, workflowEnabledPortalLevel);
             TabWorkflowSettings.Instance.SetWorkflowEnabled(portalId, tabId, workflowEnabledTabLevel);
+			Logger.LogDebug("<<< Exiting RestoreVersioning(tabId={TabId},versionEnabledPortalLevel={VersionEnabledPortalLevel},versionEnabledTabLevel={VersionEnabledTabLevel},workflowEnabledPortalLevel={WorkflowEnabledPortalLevel},workflowEnabledTabLevel={WorkflowEnabledTabLevel})", tabId, versionEnabledPortalLevel, versionEnabledTabLevel, workflowEnabledPortalLevel, workflowEnabledTabLevel);
         }
 
         private int ImportTabModuleSettings(ModuleInfo localTabModule, ExportTabModule otherTabModule, bool isNew)
         {
+			Logger.LogDebug(">>> Entering ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew})", localTabModule, otherTabModule, isNew);
             var count = 0;
             var tabModuleSettings = this.Repository.GetRelatedItems<ExportTabModuleSetting>(otherTabModule.Id).ToList();
+			Logger.LogDebug("ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew}): tabModuleSettings → {TabModuleSettings}", localTabModule, otherTabModule, isNew, tabModuleSettings);
+			Logger.LogDebug("ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew}): count → {Count}", localTabModule, otherTabModule, isNew, count);
             foreach (var other in tabModuleSettings)
             {
                 var localValue = isNew ? string.Empty : Convert.ToString(localTabModule.TabModuleSettings[other.SettingName], CultureInfo.InvariantCulture);
+				Logger.LogDebug("ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew}): localValue → {LocalValue}", localTabModule, otherTabModule, isNew, localValue);
                 if (string.IsNullOrEmpty(localValue))
                 {
                     // the next will clear the cache
                     this.moduleController.UpdateTabModuleSetting(localTabModule.TabModuleID, other.SettingName, other.SettingValue);
                     var createdBy = Util.GetUserIdByName(this.exportImportJob, other.CreatedByUserID, other.CreatedByUserName);
+					Logger.LogDebug("ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew}): createdBy → {CreatedBy}", localTabModule, otherTabModule, isNew, createdBy);
                     var modifiedBy = Util.GetUserIdByName(this.exportImportJob, other.LastModifiedByUserID, other.LastModifiedByUserName);
+					Logger.LogDebug("ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew}): modifiedBy → {ModifiedBy}", localTabModule, otherTabModule, isNew, modifiedBy);
                     this.dataProvider.UpdateSettingRecordChangers(
                         "TabModuleSettings",
                         "TabModuleID",
@@ -1684,80 +1943,108 @@ namespace Dnn.ExportImport.Components.Services
                             this.Result.AddLogEntry("Ignored module setting", other.SettingName);
                             break;
                         default:
+							Logger.LogWarning("Throwing ArgumentOutOfRangeException from ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew})", localTabModule, otherTabModule, isNew);
                             throw new ArgumentOutOfRangeException(this.ImportDto.CollisionResolution.ToString());
                     }
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew})", localTabModule, otherTabModule, isNew);
             return count;
         }
 
         private void UpdateTabChangers(int tabId, int createdBy, int modifiedBy)
         {
+			Logger.LogDebug(">>> Entering UpdateTabChangers(tabId={TabId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabId, createdBy, modifiedBy);
             this.dataProvider.UpdateRecordChangers("Tabs", "TabID", tabId, createdBy, modifiedBy);
+			Logger.LogDebug("<<< Exiting UpdateTabChangers(tabId={TabId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabId, createdBy, modifiedBy);
         } // ReSharper disable UnusedMember.Local
 
         private void UpdateTabPermissionChangers(int tabPermissionId, int createdBy, int modifiedBy)
         {
+			Logger.LogDebug(">>> Entering UpdateTabPermissionChangers(tabPermissionId={TabPermissionId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabPermissionId, createdBy, modifiedBy);
             this.dataProvider.UpdateRecordChangers("TabPermission", "TabPermissionID", tabPermissionId, createdBy, modifiedBy);
+			Logger.LogDebug("<<< Exiting UpdateTabPermissionChangers(tabPermissionId={TabPermissionId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabPermissionId, createdBy, modifiedBy);
         }
 
         private void UpdateTabSettingChangers(int tabId, string settingName, int createdBy, int modifiedBy)
         {
+			Logger.LogDebug(">>> Entering UpdateTabSettingChangers(tabId={TabId},settingName={SettingName},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabId, settingName, createdBy, modifiedBy);
             this.dataProvider.UpdateSettingRecordChangers("TabSettings", "TabID", tabId, settingName, createdBy, modifiedBy);
+			Logger.LogDebug("<<< Exiting UpdateTabSettingChangers(tabId={TabId},settingName={SettingName},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabId, settingName, createdBy, modifiedBy);
         }
 
         private void UpdateTabUrlChangers(int tabUrlId, int createdBy, int modifiedBy)
         {
+			Logger.LogDebug(">>> Entering UpdateTabUrlChangers(tabUrlId={TabUrlId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabUrlId, createdBy, modifiedBy);
             this.dataProvider.UpdateRecordChangers("TabUrls", "TabUrlID", tabUrlId, createdBy, modifiedBy);
+			Logger.LogDebug("<<< Exiting UpdateTabUrlChangers(tabUrlId={TabUrlId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabUrlId, createdBy, modifiedBy);
         }
 
         private void UpdateTabModuleChangers(int tabModuleId, int createdBy, int modifiedBy)
         {
+			Logger.LogDebug(">>> Entering UpdateTabModuleChangers(tabModuleId={TabModuleId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabModuleId, createdBy, modifiedBy);
             this.dataProvider.UpdateRecordChangers("TabModules", "TabModuleID", tabModuleId, createdBy, modifiedBy);
+			Logger.LogDebug("<<< Exiting UpdateTabModuleChangers(tabModuleId={TabModuleId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabModuleId, createdBy, modifiedBy);
         }
 
         private void UpdateTabModuleSettingsChangers(int tabModuleId, string settingName, int createdBy, int modifiedBy)
         {
+			Logger.LogDebug(">>> Entering UpdateTabModuleSettingsChangers(tabModuleId={TabModuleId},settingName={SettingName},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabModuleId, settingName, createdBy, modifiedBy);
             this.dataProvider.UpdateSettingRecordChangers("TabModuleSettings", "TabModuleID", tabModuleId, settingName, createdBy, modifiedBy);
+			Logger.LogDebug("<<< Exiting UpdateTabModuleSettingsChangers(tabModuleId={TabModuleId},settingName={SettingName},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabModuleId, settingName, createdBy, modifiedBy);
         }
 
         private void UpdateModuleChangers(int moduleId, int createdBy, int modifiedBy)
         {
+			Logger.LogDebug(">>> Entering UpdateModuleChangers(moduleId={ModuleId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", moduleId, createdBy, modifiedBy);
             this.dataProvider.UpdateRecordChangers("Modules", "ModuleID", moduleId, createdBy, modifiedBy);
+			Logger.LogDebug("<<< Exiting UpdateModuleChangers(moduleId={ModuleId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", moduleId, createdBy, modifiedBy);
         }
 
         private void UpdateModulePermissionChangers(int modulePermissionId, int createdBy, int modifiedBy)
         {
+			Logger.LogDebug(">>> Entering UpdateModulePermissionChangers(modulePermissionId={ModulePermissionId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", modulePermissionId, createdBy, modifiedBy);
             this.dataProvider.UpdateRecordChangers("ModulePermission", "ModulePermissionID", modulePermissionId, createdBy, modifiedBy);
+			Logger.LogDebug("<<< Exiting UpdateModulePermissionChangers(modulePermissionId={ModulePermissionId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", modulePermissionId, createdBy, modifiedBy);
         }
 
         private void UpdateModuleSettingsChangers(int moduleId, string settingName, int createdBy, int modifiedBy)
         {
+			Logger.LogDebug(">>> Entering UpdateModuleSettingsChangers(moduleId={ModuleId},settingName={SettingName},createdBy={CreatedBy},modifiedBy={ModifiedBy})", moduleId, settingName, createdBy, modifiedBy);
             this.dataProvider.UpdateSettingRecordChangers("ModuleSettings", "ModuleID", moduleId, settingName, createdBy, modifiedBy);
+			Logger.LogDebug("<<< Exiting UpdateModuleSettingsChangers(moduleId={ModuleId},settingName={SettingName},createdBy={CreatedBy},modifiedBy={ModifiedBy})", moduleId, settingName, createdBy, modifiedBy);
         }
 
         private void UpdateTabUniqueId(int tabId, Guid uniqueId)
         {
+			Logger.LogDebug(">>> Entering UpdateTabUniqueId(tabId={TabId},uniqueId={UniqueId})", tabId, uniqueId);
             this.dataProvider.UpdateUniqueId("Tabs", "TabID", tabId, uniqueId);
+			Logger.LogDebug("<<< Exiting UpdateTabUniqueId(tabId={TabId},uniqueId={UniqueId})", tabId, uniqueId);
         }
 
         private void UpdateModuleUniqueId(int tabModuleId, Guid uniqueId)
         {
+			Logger.LogDebug(">>> Entering UpdateModuleUniqueId(tabModuleId={TabModuleId},uniqueId={UniqueId})", tabModuleId, uniqueId);
             this.dataProvider.UpdateUniqueId("TabModules", "TabModuleID", tabModuleId, uniqueId);
+			Logger.LogDebug("<<< Exiting UpdateModuleUniqueId(tabModuleId={TabModuleId},uniqueId={UniqueId})", tabModuleId, uniqueId);
         }
 
         private void ProcessExportPages()
         {
+			Logger.LogDebug(">>> Entering ProcessExportPages()");
             var selectedPages = this.exportDto.Pages;
             this.totals = string.IsNullOrEmpty(this.CheckPoint.StageData)
                 ? new ProgressTotals()
                 : JsonConvert.DeserializeObject<ProgressTotals>(this.CheckPoint.StageData);
+				Logger.LogDebug("ProcessExportPages(): totals → {Totals}", totals);
 
             var portalId = this.exportImportJob.PortalId;
 
             var toDate = this.exportImportJob.CreatedOnDate.ToLocalTime();
+			Logger.LogDebug("ProcessExportPages(): toDate → {ToDate}", toDate);
             var fromDate = (this.exportDto.FromDateUtc ?? Constants.MinDbTime).ToLocalTime();
+			Logger.LogDebug("ProcessExportPages(): fromDate → {FromDate}", fromDate);
             var isAllIncluded =
                 selectedPages.Any(p => p.TabId == -1 && p.CheckedState == TriCheckedState.CheckedWithAllChildren);
 
@@ -1782,6 +2069,7 @@ namespace Dnn.ExportImport.Components.Services
             this.CheckPoint.TotalItems = this.IncludeSystem || isAllIncluded
                 ? allTabs.Length
                 : allTabs.Count(otherPg => IsTabIncluded(otherPg, allTabs, selectedPages));
+				Logger.LogDebug("ProcessExportPages(): otherPg → {OtherPg}", otherPg);
 
             // Note: We assume no new tabs were added while running; otherwise, some tabs might get skipped.
             for (var index = 0; index < allTabs.Length; index++)
@@ -1800,11 +2088,13 @@ namespace Dnn.ExportImport.Components.Services
                 if (this.IncludeSystem || isAllIncluded || IsTabIncluded(otherPg, allTabs, selectedPages))
                 {
                     var tab = this.tabController.GetTab(otherPg.TabID, portalId);
+					Logger.LogDebug("ProcessExportPages(): tab → {Tab}", tab);
 
                     // Do not export tab which has never been published.
                     if (tab.HasBeenPublished)
                     {
                         var exportPage = this.SaveExportPage(tab);
+						Logger.LogDebug("ProcessExportPages(): exportPage → {ExportPage}", exportPage);
 
                         this.totals.TotalTabSettings +=
                             this.ExportTabSettings(exportPage, toDate, fromDate);
@@ -1840,74 +2130,104 @@ namespace Dnn.ExportImport.Components.Services
 
             this.ReportExportTotals();
             this.UpdateTotalProcessedPackages();
+			Logger.LogDebug("<<< Exiting ProcessExportPages()");
         }
 
         private int ExportTabSettings(ExportTab exportPage, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering ExportTabSettings(exportPage={ExportPage},toDate={ToDate},fromDate={FromDate})", exportPage, toDate, fromDate);
             var tabSettings = EntitiesController.Instance.GetTabSettings(exportPage.TabId, toDate, fromDate);
             if (tabSettings.Count > 0)
+			Logger.LogDebug("ExportTabSettings(exportPage={ExportPage},toDate={ToDate},fromDate={FromDate}): tabSettings → {TabSettings}", exportPage, toDate, fromDate, tabSettings);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(tabSettings, exportPage.Id);
+				Logger.LogInformation("ExportTabSettings(exportPage,toDate,fromDate)={ExportPage},{ToDate},{FromDate}: database query executed in {Arg3} ms", exportPage, toDate, fromDate, __logStart.ElapsedMilliseconds);
             }
 
+			Logger.LogDebug("<<< Exiting ExportTabSettings(exportPage={ExportPage},toDate={ToDate},fromDate={FromDate})", exportPage, toDate, fromDate);
             return tabSettings.Count;
         }
 
         private int ExportTabPermissions(ExportTab exportPage, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering ExportTabPermissions(exportPage={ExportPage},toDate={ToDate},fromDate={FromDate})", exportPage, toDate, fromDate);
             if (!this.exportDto.IncludePermissions)
             {
                 return 0;
             }
 
             var tabPermissions = EntitiesController.Instance.GetTabPermissions(exportPage.TabId, toDate, fromDate);
+			Logger.LogDebug("ExportTabPermissions(exportPage={ExportPage},toDate={ToDate},fromDate={FromDate}): tabPermissions → {TabPermissions}", exportPage, toDate, fromDate, tabPermissions);
             if (tabPermissions.Count > 0)
             {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				Logger.LogInformation("ExportTabPermissions(exportPage,toDate,fromDate)={ExportPage},{ToDate},{FromDate}: database query executed in {Arg3} ms", exportPage, toDate, fromDate, __logStart.ElapsedMilliseconds);
                 this.Repository.CreateItems(tabPermissions, exportPage.Id);
             }
 
+			Logger.LogDebug("<<< Exiting ExportTabPermissions(exportPage={ExportPage},toDate={ToDate},fromDate={FromDate})", exportPage, toDate, fromDate);
             return tabPermissions.Count;
         }
 
         private int ExportTabUrls(ExportTab exportPage, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering ExportTabUrls(exportPage={ExportPage},toDate={ToDate},fromDate={FromDate})", exportPage, toDate, fromDate);
             var tabUrls = EntitiesController.Instance.GetTabUrls(exportPage.TabId, toDate, fromDate);
             if (tabUrls.Count > 0)
+			Logger.LogDebug("ExportTabUrls(exportPage={ExportPage},toDate={ToDate},fromDate={FromDate}): tabUrls → {TabUrls}", exportPage, toDate, fromDate, tabUrls);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(tabUrls, exportPage.Id);
+				Logger.LogInformation("ExportTabUrls(exportPage,toDate,fromDate)={ExportPage},{ToDate},{FromDate}: database query executed in {Arg3} ms", exportPage, toDate, fromDate, __logStart.ElapsedMilliseconds);
             }
 
+			Logger.LogDebug("<<< Exiting ExportTabUrls(exportPage={ExportPage},toDate={ToDate},fromDate={FromDate})", exportPage, toDate, fromDate);
             return tabUrls.Count;
         }
 
         private int ExportTabModules(ExportTab exportPage, bool includeDeleted, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering ExportTabModules(exportPage={ExportPage},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate})", exportPage, includeDeleted, toDate, fromDate);
             var tabModules = EntitiesController.Instance.GetTabModules(exportPage.TabId, includeDeleted, toDate, fromDate);
             if (tabModules.Count > 0)
+			Logger.LogDebug("ExportTabModules(exportPage={ExportPage},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate}): tabModules → {TabModules}", exportPage, includeDeleted, toDate, fromDate, tabModules);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(tabModules, exportPage.Id);
+				Logger.LogInformation("ExportTabModules(exportPage,includeDeleted,toDate,fromDate)={ExportPage},{IncludeDeleted},{ToDate},{FromDate}: database query executed in {Arg4} ms", exportPage, includeDeleted, toDate, fromDate, __logStart.ElapsedMilliseconds);
             }
 
+			Logger.LogDebug("<<< Exiting ExportTabModules(exportPage={ExportPage},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate})", exportPage, includeDeleted, toDate, fromDate);
             return tabModules.Count;
         }
 
         private int ExportTabModuleSettings(ExportTab exportPage, bool includeDeleted, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering ExportTabModuleSettings(exportPage={ExportPage},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate})", exportPage, includeDeleted, toDate, fromDate);
             var tabModuleSettings = EntitiesController.Instance.GetTabModuleSettings(exportPage.TabId, includeDeleted, toDate, fromDate);
             if (tabModuleSettings.Count > 0)
+			Logger.LogDebug("ExportTabModuleSettings(exportPage={ExportPage},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate}): tabModuleSettings → {TabModuleSettings}", exportPage, includeDeleted, toDate, fromDate, tabModuleSettings);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(tabModuleSettings, exportPage.Id);
+				Logger.LogInformation("ExportTabModuleSettings(exportPage,includeDeleted,toDate,fromDate)={ExportPage},{IncludeDeleted},{ToDate},{FromDate}: database query executed in {Arg4} ms", exportPage, includeDeleted, toDate, fromDate, __logStart.ElapsedMilliseconds);
             }
 
+			Logger.LogDebug("<<< Exiting ExportTabModuleSettings(exportPage={ExportPage},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate})", exportPage, includeDeleted, toDate, fromDate);
             return tabModuleSettings.Count;
         }
 
         private int ExportTabModulesAndRelatedItems(ExportTab exportPage, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering ExportTabModulesAndRelatedItems(exportPage={ExportPage},toDate={ToDate},fromDate={FromDate})", exportPage, toDate, fromDate);
             var modules = EntitiesController.Instance.GetModules(exportPage.TabId, this.exportDto.IncludeDeletions, toDate, fromDate);
             if (modules.Count > 0)
+			Logger.LogDebug("ExportTabModulesAndRelatedItems(exportPage={ExportPage},toDate={ToDate},fromDate={FromDate}): modules → {Modules}", exportPage, toDate, fromDate, modules);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(modules, exportPage.Id);
+				Logger.LogInformation("ExportTabModulesAndRelatedItems(exportPage,toDate,fromDate)={ExportPage},{ToDate},{FromDate}: database query executed in {Arg3} ms", exportPage, toDate, fromDate, __logStart.ElapsedMilliseconds);
                 foreach (var exportModule in modules)
                 {
                     this.totals.TotalModuleSettings +=
@@ -1927,27 +2247,36 @@ namespace Dnn.ExportImport.Components.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ExportTabModulesAndRelatedItems(exportPage={ExportPage},toDate={ToDate},fromDate={FromDate})", exportPage, toDate, fromDate);
             return modules.Count;
         }
 
         private int ExportModulePackage(ExportModule exportModule)
         {
+			Logger.LogDebug(">>> Entering ExportModulePackage(exportModule={ExportModule})", exportModule);
             if (!this.exportedModuleDefinitions.Contains(exportModule.ModuleDefID) && this.exportDto.IncludeExtensions)
             {
                 var packageZipFile = $"{this.appStatus.ApplicationMapPath}{Constants.ExportFolder}{this.exportImportJob.Directory.TrimEnd('\\', '/')}\\{Constants.ExportZipPackages}";
+				Logger.LogDebug("ExportModulePackage(exportModule={ExportModule}): packageZipFile → {PackageZipFile}", exportModule, packageZipFile);
                 var moduleDefinition = ModuleDefinitionController.GetModuleDefinitionByID(exportModule.ModuleDefID);
+				Logger.LogDebug("ExportModulePackage(exportModule={ExportModule}): moduleDefinition → {ModuleDefinition}", exportModule, moduleDefinition);
                 var desktopModuleId = moduleDefinition.DesktopModuleID;
                 var desktopModule = DesktopModuleController.GetDesktopModule(this.hostSettings, desktopModuleId, Null.NullInteger);
+				Logger.LogDebug("ExportModulePackage(exportModule={ExportModule}): desktopModule → {DesktopModule}", exportModule, desktopModule);
                 var package = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.PackageID == desktopModule.PackageID);
+				Logger.LogDebug("ExportModulePackage(exportModule={ExportModule}): package → {Package}", exportModule, package);
 
                 var filePath = InstallerUtil.GetPackageBackupPath(package);
+				Logger.LogDebug("ExportModulePackage(exportModule={ExportModule}): filePath → {FilePath}", exportModule, filePath);
                 if (File.Exists(filePath))
                 {
                     try
                     {
                         var offset = Path.GetDirectoryName(filePath)?.Length + 1;
+						Logger.LogDebug("ExportModulePackage(exportModule={ExportModule}): offset → {Offset}", exportModule, offset);
                         CompressionUtil.AddFileToArchive(filePath, packageZipFile, offset.GetValueOrDefault(0));
 
+						var __logStart = System.Diagnostics.Stopwatch.StartNew();
                         this.Repository.CreateItem(
                             new ExportPackage
                             {
@@ -1957,6 +2286,7 @@ namespace Dnn.ExportImport.Components.Services
                                 PackageFileName = InstallerUtil.GetPackageBackupName(package),
                             },
                             null);
+							Logger.LogInformation("ExportModulePackage(exportModule)={ExportModule}: database query executed in {Arg1} ms", exportModule, __logStart.ElapsedMilliseconds);
 
                         this.exportedModuleDefinitions.Add(exportModule.ModuleDefID);
                         return 1;
@@ -1969,28 +2299,39 @@ namespace Dnn.ExportImport.Components.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ExportModulePackage(exportModule={ExportModule})", exportModule);
             return 0;
         }
 
         private int ExportModuleSettings(ExportModule exportModule, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering ExportModuleSettings(exportModule={ExportModule},toDate={ToDate},fromDate={FromDate})", exportModule, toDate, fromDate);
             var moduleSettings = EntitiesController.Instance.GetModuleSettings(exportModule.ModuleID, toDate, fromDate);
             if (moduleSettings.Count > 0)
+			Logger.LogDebug("ExportModuleSettings(exportModule={ExportModule},toDate={ToDate},fromDate={FromDate}): moduleSettings → {ModuleSettings}", exportModule, toDate, fromDate, moduleSettings);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(moduleSettings, exportModule.Id);
+				Logger.LogInformation("ExportModuleSettings(exportModule,toDate,fromDate)={ExportModule},{ToDate},{FromDate}: database query executed in {Arg3} ms", exportModule, toDate, fromDate, __logStart.ElapsedMilliseconds);
             }
 
+			Logger.LogDebug("<<< Exiting ExportModuleSettings(exportModule={ExportModule},toDate={ToDate},fromDate={FromDate})", exportModule, toDate, fromDate);
             return moduleSettings.Count;
         }
 
         private int ExportModulePermissions(ExportModule exportModule, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering ExportModulePermissions(exportModule={ExportModule},toDate={ToDate},fromDate={FromDate})", exportModule, toDate, fromDate);
             var modulePermission = EntitiesController.Instance.GetModulePermissions(exportModule.ModuleID, toDate, fromDate);
             if (modulePermission.Count > 0)
+			Logger.LogDebug("ExportModulePermissions(exportModule={ExportModule},toDate={ToDate},fromDate={FromDate}): modulePermission → {ModulePermission}", exportModule, toDate, fromDate, modulePermission);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(modulePermission, exportModule.Id);
+				Logger.LogInformation("ExportModulePermissions(exportModule,toDate,fromDate)={ExportModule},{ToDate},{FromDate}: database query executed in {Arg3} ms", exportModule, toDate, fromDate, __logStart.ElapsedMilliseconds);
             }
 
+			Logger.LogDebug("<<< Exiting ExportModulePermissions(exportModule={ExportModule},toDate={ToDate},fromDate={FromDate})", exportModule, toDate, fromDate);
             return modulePermission.Count;
         }
 
@@ -1998,15 +2339,21 @@ namespace Dnn.ExportImport.Components.Services
         // ReSharper disable once UnusedParameter.Local
         private int ExportPortableContent(ExportTab exportPage, ExportModule exportModule, DateTime toDate, DateTime? fromDat)
         {
+			Logger.LogDebug(">>> Entering ExportPortableContent(exportPage={ExportPage},exportModule={ExportModule},toDate={ToDate},fromDat={FromDat})", exportPage, exportModule, toDate, fromDat);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // check if module's content was exported before
             var existingItems = this.Repository.FindItems<ExportModuleContent>(m => m.ModuleID == exportModule.ModuleID);
             if (existingItems.Any())
+			Logger.LogDebug("ExportPortableContent(exportPage={ExportPage},exportModule={ExportModule},toDate={ToDate},fromDat={FromDat}): existingItems → {ExistingItems}", exportPage, exportModule, toDate, fromDat, existingItems);
+			Logger.LogInformation("ExportPortableContent(exportPage,exportModule,toDate,fromDat)={ExportPage},{ExportModule},{ToDate},{FromDat}: find query executed in {Arg4} ms", exportPage, exportModule, toDate, fromDat, __logStart.ElapsedMilliseconds);
             {
                 return 0;
             }
 
             var moduleDef = ModuleDefinitionController.GetModuleDefinitionByID(exportModule.ModuleDefID);
+			Logger.LogDebug("ExportPortableContent(exportPage={ExportPage},exportModule={ExportModule},toDate={ToDate},fromDat={FromDat}): moduleDef → {ModuleDef}", exportPage, exportModule, toDate, fromDat, moduleDef);
             var desktopModuleInfo = DesktopModuleController.GetDesktopModule(this.hostSettings, moduleDef.DesktopModuleID, this.exportDto.PortalId);
+			Logger.LogDebug("ExportPortableContent(exportPage={ExportPage},exportModule={ExportModule},toDate={ToDate},fromDat={FromDat}): desktopModuleInfo → {DesktopModuleInfo}", exportPage, exportModule, toDate, fromDat, desktopModuleInfo);
             if (string.IsNullOrEmpty(desktopModuleInfo?.BusinessControllerClass))
             {
                 return 0;
@@ -2015,6 +2362,7 @@ namespace Dnn.ExportImport.Components.Services
             try
             {
                 var module = this.moduleController.GetModule(exportModule.ModuleID, exportPage.TabId, true);
+				Logger.LogDebug("ExportPortableContent(exportPage={ExportPage},exportModule={ExportModule},toDate={ToDate},fromDat={FromDat}): module → {Module}", exportPage, exportModule, toDate, fromDat, module);
                 if (string.IsNullOrEmpty(module.DesktopModule.BusinessControllerClass) || !module.DesktopModule.IsPortable)
                 {
                     return 0;
@@ -2023,7 +2371,9 @@ namespace Dnn.ExportImport.Components.Services
                 try
                 {
                     var controller = this.businessControllerProvider.GetInstance<IPortable>(module);
+					Logger.LogDebug("ExportPortableContent(exportPage={ExportPage},exportModule={ExportModule},toDate={ToDate},fromDat={FromDat}): controller → {Controller}", exportPage, exportModule, toDate, fromDat, controller);
                     var content = controller?.ExportModule(module.ModuleID);
+					Logger.LogDebug("ExportPortableContent(exportPage={ExportPage},exportModule={ExportModule},toDate={ToDate},fromDat={FromDat}): content → {Content}", exportPage, exportModule, toDate, fromDat, content);
 
                     if (string.IsNullOrEmpty(content))
                     {
@@ -2037,11 +2387,13 @@ namespace Dnn.ExportImport.Components.Services
                         XmlContent = content,
                     };
 
+					Logger.LogInformation("ExportPortableContent(exportPage,exportModule,toDate,fromDat)={ExportPage},{ExportModule},{ToDate},{FromDat}: database query executed in {Arg4} ms", exportPage, exportModule, toDate, fromDat, __logStart.ElapsedMilliseconds);
                     this.Repository.CreateItem(record, exportModule.Id);
                     return 1;
                 }
                 catch (Exception e)
                 {
+					Logger.LogError("Exception in ExportPortableContent(exportPage={ExportPage},exportModule={ExportModule},toDate={ToDate},fromDat={FromDat}): {Arg4}", exportPage, exportModule, toDate, fromDat, e.Message);
                     this.Result.AddLogEntry(
                         "Error exporting module data, Module ID=" + exportModule.ModuleID,
                         e.Message,
@@ -2054,11 +2406,13 @@ namespace Dnn.ExportImport.Components.Services
                 Logger.Error("Error creating business class type. " + ex);
             }
 
+			Logger.LogDebug("<<< Exiting ExportPortableContent(exportPage={ExportPage},exportModule={ExportModule},toDate={ToDate},fromDat={FromDat})", exportPage, exportModule, toDate, fromDat);
             return 0;
         }
 
         private ExportTab SaveExportPage(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering SaveExportPage(tab={Tab})", tab);
             var exportPage = new ExportTab
             {
                 TabId = tab.TabID,
@@ -2100,23 +2454,31 @@ namespace Dnn.ExportImport.Components.Services
                 IsSystem = tab.IsSystem,
                 StateID = tab.StateID,
             };
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			Logger.LogInformation("SaveExportPage(tab)={Tab}: database query executed in {Arg1} ms", tab, __logStart.ElapsedMilliseconds);
             this.Repository.CreateItem(exportPage, null);
             this.Result.AddLogEntry("Exported page", tab.TabName + " (" + tab.TabPath + ")");
+			Logger.LogDebug("<<< Exiting SaveExportPage(tab={Tab})", tab);
             return exportPage;
         }
 
         private void ReportExportTotals()
         {
+			Logger.LogDebug(">>> Entering ReportExportTotals()");
             this.ReportTotals("Exported");
+			Logger.LogDebug("<<< Exiting ReportExportTotals()");
         }
 
         private void ReportImportTotals()
         {
+			Logger.LogDebug(">>> Entering ReportImportTotals()");
             this.ReportTotals("Imported");
+			Logger.LogDebug("<<< Exiting ReportImportTotals()");
         }
 
         private void ReportTotals(string prefix)
         {
+			Logger.LogDebug(">>> Entering ReportTotals(prefix={Prefix})", prefix);
             this.Result.AddSummary(prefix + " Tabs", this.totals.TotalTabs.ToString(CultureInfo.InvariantCulture));
             this.Result.AddLogEntry(prefix + " Tab Settings", this.totals.TotalTabSettings.ToString(CultureInfo.InvariantCulture));
             this.Result.AddLogEntry(prefix + " Tab Permissions", this.totals.TotalTabPermissions.ToString(CultureInfo.InvariantCulture));
@@ -2127,10 +2489,12 @@ namespace Dnn.ExportImport.Components.Services
             this.Result.AddLogEntry(prefix + " Tab Modules", this.totals.TotalTabModules.ToString(CultureInfo.InvariantCulture));
             this.Result.AddLogEntry(prefix + " Tab Module Settings", this.totals.TotalTabModuleSettings.ToString(CultureInfo.InvariantCulture));
             this.Result.AddLogEntry(prefix + " Module Packages", this.totals.TotalPackages.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting ReportTotals(prefix={Prefix})", prefix);
         }
 
         private void UpdateTotalProcessedPackages()
         {
+			Logger.LogDebug(">>> Entering UpdateTotalProcessedPackages()");
             // HACK: get skin packages checkpoint and add "totals.TotalPackages" to it
             var packagesCheckpoint = EntitiesController.Instance.GetJobChekpoints(this.exportImportJob.JobId).FirstOrDefault(
                 cp => cp.Category == Constants.Category_Packages);
@@ -2141,26 +2505,32 @@ namespace Dnn.ExportImport.Components.Services
                 packagesCheckpoint.ProcessedItems += this.totals.TotalPackages;
                 EntitiesController.Instance.UpdateJobChekpoint(packagesCheckpoint);
             }
+			Logger.LogDebug("<<< Exiting UpdateTotalProcessedPackages()");
         }
 
         private int GetLocalStateId(int exportedStateId)
         {
+			Logger.LogDebug(">>> Entering GetLocalStateId(exportedStateId={ExportedStateId})", exportedStateId);
             var exportWorkflowState = this.Repository.GetItem<ExportWorkflowState>(item => item.StateID == exportedStateId);
             var stateId = exportWorkflowState?.LocalId ?? Null.NullInteger;
+			Logger.LogDebug("GetLocalStateId(exportedStateId={ExportedStateId}): exportWorkflowState → {ExportWorkflowState}", exportedStateId, exportWorkflowState);
             if (stateId <= 0)
             {
                 return stateId;
             }
 
             var state = WorkflowStateManager.Instance.GetWorkflowState(stateId);
+			Logger.LogDebug("GetLocalStateId(exportedStateId={ExportedStateId}): state → {State}", exportedStateId, state);
             if (state == null)
             {
                 return -1;
             }
 
             var workflow = WorkflowManager.Instance.GetWorkflow(state.WorkflowID);
+			Logger.LogDebug("GetLocalStateId(exportedStateId={ExportedStateId}): workflow → {Workflow}", exportedStateId, workflow);
             if (workflow == null)
             {
+			Logger.LogDebug("<<< Exiting GetLocalStateId(exportedStateId={ExportedStateId})", exportedStateId);
                 return -1;
             }
 
@@ -2169,10 +2539,14 @@ namespace Dnn.ExportImport.Components.Services
 
         private bool IsParentTabPresentInExport(ExportTab exportedTab, IList<ExportTab> exportedTabs, IList<TabInfo> localTabs)
         {
+			Logger.LogDebug(">>> Entering IsParentTabPresentInExport(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs})", exportedTab, exportedTabs, localTabs);
             var isParentPresent = true;
             var parentId = exportedTab.ParentId.GetValueOrDefault(Null.NullInteger);
+			Logger.LogDebug("IsParentTabPresentInExport(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs}): parentId → {ParentId}", exportedTab, exportedTabs, localTabs, parentId);
+			Logger.LogDebug("IsParentTabPresentInExport(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs}): isParentPresent → {IsParentPresent}", exportedTab, exportedTabs, localTabs, isParentPresent);
             int parentIdUrl;
             var isTabUrlParsed = int.TryParse(exportedTab.Url, out parentIdUrl);
+			Logger.LogDebug("IsParentTabPresentInExport(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs}): isTabUrlParsed → {IsTabUrlParsed}", exportedTab, exportedTabs, localTabs, isTabUrlParsed);
 
             if (parentId != -1 || isTabUrlParsed)
             {
@@ -2184,10 +2558,12 @@ namespace Dnn.ExportImport.Components.Services
                     }
 
                     var localParentFound = localTabs.FirstOrDefault(t => t.TabID == parentId);
+					Logger.LogDebug("IsParentTabPresentInExport(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs}): localParentFound → {LocalParentFound}", exportedTab, exportedTabs, localTabs, localParentFound);
 
                     if (localParentFound == null)
                     {
                         var parentFound = exportedTabs.FirstOrDefault(t => t.TabId == parentId);
+						Logger.LogDebug("IsParentTabPresentInExport(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs}): parentFound → {ParentFound}", exportedTab, exportedTabs, localTabs, parentFound);
                         if (parentFound != null)
                         {
                             this.AddToParentSearched(parentFound.TabId, true);
@@ -2230,24 +2606,30 @@ namespace Dnn.ExportImport.Components.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsParentTabPresentInExport(exportedTab={ExportedTab},exportedTabs={ExportedTabs},localTabs={LocalTabs})", exportedTab, exportedTabs, localTabs);
             return isParentPresent;
         }
 
         private bool IsParentAlreadyCheck(int parentId)
         {
+			Logger.LogDebug(">>> Entering IsParentAlreadyCheck(parentId={ParentId})", parentId);
+			Logger.LogDebug("<<< Exiting IsParentAlreadyCheck(parentId={ParentId})", parentId);
             return this.searchedParentTabs.ContainsKey(parentId);
         }
 
         private void AddToParentSearched(int tabId, bool isParentId)
         {
+			Logger.LogDebug(">>> Entering AddToParentSearched(tabId={TabId},isParentId={IsParentId})", tabId, isParentId);
             if (!this.searchedParentTabs.ContainsKey(tabId))
             {
                 this.searchedParentTabs.Add(tabId, isParentId);
             }
+			Logger.LogDebug("<<< Exiting AddToParentSearched(tabId={TabId},isParentId={IsParentId})", tabId, isParentId);
         }
 
         private void UpdateParentInPartialImportTabs(TabInfo localTab, ExportTab parentExportedTab, int portalId, IList<ExportTab> exportTabs, IList<TabInfo> localTabs)
         {
+			Logger.LogDebug(">>> Entering UpdateParentInPartialImportTabs(localTab={LocalTab},parentExportedTab={ParentExportedTab},portalId={PortalId},exportTabs={ExportTabs},localTabs={LocalTabs})", localTab, parentExportedTab, portalId, exportTabs, localTabs);
             if (!this.searchedParentTabs.ContainsKey(parentExportedTab.TabId))
             {
                 return;
@@ -2256,25 +2638,31 @@ namespace Dnn.ExportImport.Components.Services
             var parentId = parentExportedTab.TabId;
 
             var tabsToUpdateGuids = this.partialImportedTabs.Where(t => t.Value == parentId).ToList();
+			Logger.LogDebug("UpdateParentInPartialImportTabs(localTab={LocalTab},parentExportedTab={ParentExportedTab},portalId={PortalId},exportTabs={ExportTabs},localTabs={LocalTabs}): tabsToUpdateGuids → {TabsToUpdateGuids}", localTab, parentExportedTab, portalId, exportTabs, localTabs, tabsToUpdateGuids);
 
             foreach (var tabGuid in tabsToUpdateGuids)
             {
                 var localTabToUpdate = localTabs.FirstOrDefault(t => t.TabID == tabGuid.Key);
+				Logger.LogDebug("UpdateParentInPartialImportTabs(localTab={LocalTab},parentExportedTab={ParentExportedTab},portalId={PortalId},exportTabs={ExportTabs},localTabs={LocalTabs}): localTabToUpdate → {LocalTabToUpdate}", localTab, parentExportedTab, portalId, exportTabs, localTabs, localTabToUpdate);
 
                 if (localTabToUpdate != null)
                 {
                     var tabWithoutParentId = this.tabController.GetTab(localTabToUpdate.TabID, portalId);
+					Logger.LogDebug("UpdateParentInPartialImportTabs(localTab={LocalTab},parentExportedTab={ParentExportedTab},portalId={PortalId},exportTabs={ExportTabs},localTabs={LocalTabs}): tabWithoutParentId → {TabWithoutParentId}", localTab, parentExportedTab, portalId, exportTabs, localTabs, tabWithoutParentId);
 
                     if (tabWithoutParentId != null)
                     {
                         if (this.searchedParentTabs[parentExportedTab.TabId])
                         {
                             tabWithoutParentId.ParentId = localTab.TabID;
+							Logger.LogDebug("UpdateParentInPartialImportTabs(localTab={LocalTab},parentExportedTab={ParentExportedTab},portalId={PortalId},exportTabs={ExportTabs},localTabs={LocalTabs}): tabWithoutParentId.ParentId → {Arg5}", localTab, parentExportedTab, portalId, exportTabs, localTabs, tabWithoutParentId.ParentId);
 
                             var exportedTab = exportTabs.FirstOrDefault(t => t.LocalId == tabGuid.Key);
+							Logger.LogDebug("UpdateParentInPartialImportTabs(localTab={LocalTab},parentExportedTab={ParentExportedTab},portalId={PortalId},exportTabs={ExportTabs},localTabs={LocalTabs}): exportedTab → {ExportedTab}", localTab, parentExportedTab, portalId, exportTabs, localTabs, exportedTab);
                             if (exportedTab != null)
                             {
                                 tabWithoutParentId.IsVisible = exportedTab.IsVisible;
+								Logger.LogDebug("UpdateParentInPartialImportTabs(localTab={LocalTab},parentExportedTab={ParentExportedTab},portalId={PortalId},exportTabs={ExportTabs},localTabs={LocalTabs}): tabWithoutParentId.IsVisible → {Arg5}", localTab, parentExportedTab, portalId, exportTabs, localTabs, tabWithoutParentId.IsVisible);
                             }
                         }
                         else
@@ -2287,21 +2675,28 @@ namespace Dnn.ExportImport.Components.Services
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting UpdateParentInPartialImportTabs(localTab={LocalTab},parentExportedTab={ParentExportedTab},portalId={PortalId},exportTabs={ExportTabs},localTabs={LocalTabs})", localTab, parentExportedTab, portalId, exportTabs, localTabs);
         }
 
         private void SetPartialImportSettings(ExportTab exportedTab, TabInfo localTab)
         {
+			Logger.LogDebug(">>> Entering SetPartialImportSettings(exportedTab={ExportedTab},localTab={LocalTab})", exportedTab, localTab);
             if (exportedTab.LocalId != null && this.partialImportedTabs.ContainsKey(exportedTab.LocalId.GetValueOrDefault(Null.NullInteger)) && (exportedTab.ParentId.GetValueOrDefault(Null.NullInteger) != -1))
             {
                 localTab.ParentId = -1;
+				Logger.LogDebug("SetPartialImportSettings(exportedTab={ExportedTab},localTab={LocalTab}): localTab.ParentId → {Arg2}", exportedTab, localTab, localTab.ParentId);
+				Logger.LogDebug("SetPartialImportSettings(exportedTab={ExportedTab},localTab={LocalTab}): localTab.IsVisible → {Arg2}", exportedTab, localTab, localTab.IsVisible);
                 localTab.IsVisible = false;
             }
+			Logger.LogDebug("<<< Exiting SetPartialImportSettings(exportedTab={ExportedTab},localTab={LocalTab})", exportedTab, localTab);
         }
 
         private void CheckForPartialImportedTabs(ExportTab tabToExport)
         {
+			Logger.LogDebug(">>> Entering CheckForPartialImportedTabs(tabToExport={TabToExport})", tabToExport);
             var exportTabParentId = tabToExport.ParentId.GetValueOrDefault(Null.NullInteger);
 
+			Logger.LogDebug("CheckForPartialImportedTabs(tabToExport={TabToExport}): exportTabParentId → {ExportTabParentId}", tabToExport, exportTabParentId);
             if (exportTabParentId == -1)
             {
                 if (int.TryParse(tabToExport.Url, out exportTabParentId))
@@ -2313,14 +2708,17 @@ namespace Dnn.ExportImport.Components.Services
             {
                 this.AddToPartialImportedTabs(tabToExport.LocalId.GetValueOrDefault(Null.NullInteger), exportTabParentId);
             }
+			Logger.LogDebug("<<< Exiting CheckForPartialImportedTabs(tabToExport={TabToExport})", tabToExport);
         }
 
         private void AddToPartialImportedTabs(int localTabId, int exportTabParentId)
         {
+			Logger.LogDebug(">>> Entering AddToPartialImportedTabs(localTabId={LocalTabId},exportTabParentId={ExportTabParentId})", localTabId, exportTabParentId);
             if (!this.partialImportedTabs.ContainsKey(localTabId) && exportTabParentId != -1)
             {
                 this.partialImportedTabs.Add(localTabId, exportTabParentId);
             }
+			Logger.LogDebug("<<< Exiting AddToPartialImportedTabs(localTabId={LocalTabId},exportTabParentId={ExportTabParentId})", localTabId, exportTabParentId);
         }
 
         [JsonObject]

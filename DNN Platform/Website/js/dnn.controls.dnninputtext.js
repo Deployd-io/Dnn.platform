@@ -1,3 +1,4 @@
+const logger = console;
 ﻿
 dnn.controls.DNNInputText=function(multiLine)
 {if(multiLine)

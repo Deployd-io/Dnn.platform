@@ -18,6 +18,7 @@ public class RoleGroupInfoTests
     [Test]
     public void ReadXml_WithRealisticXml_ReadsRoles()
     {
+		mockEventLogger.LogDebug(">>> Entering ReadXml_WithRealisticXml_ReadsRoles()");
         var roleGroup = ReadXml(
             """
             <rolegroups>
@@ -126,11 +127,13 @@ public class RoleGroupInfoTests
             Assert.That(roleGroup.Description, Is.EqualTo("A dummy role group that represents the Global roles"));
             Assert.That(roleGroup.Roles, Has.Count.EqualTo(5));
         }
+		mockEventLogger.LogDebug("<<< Exiting ReadXml_WithRealisticXml_ReadsRoles()");
     }
 
     [Test]
     public void ReadXml_WithEmptyRoles_ReadsZeroRoles()
     {
+		mockEventLogger.LogDebug(">>> Entering ReadXml_WithEmptyRoles_ReadsZeroRoles()");
         var roleGroup = ReadXml(
             """
             <rolegroups>
@@ -146,11 +149,13 @@ public class RoleGroupInfoTests
             Assert.That(roleGroup.Description, Is.EqualTo("D"));
             Assert.That(roleGroup.Roles, Is.Null);
         }
+		mockEventLogger.LogDebug("<<< Exiting ReadXml_WithEmptyRoles_ReadsZeroRoles()");
     }
 
     [Test]
     public void ReadXml_WithEmptyRolesWithWhiteSpace_ReadsZeroRoles()
     {
+		mockEventLogger.LogDebug(">>> Entering ReadXml_WithEmptyRolesWithWhiteSpace_ReadsZeroRoles()");
         var roleGroup = ReadXml(
             """
             <rolegroups>
@@ -167,11 +172,13 @@ public class RoleGroupInfoTests
             Assert.That(roleGroup.Description, Is.EqualTo("D"));
             Assert.That(roleGroup.Roles, Is.Null);
         }
+		mockEventLogger.LogDebug("<<< Exiting ReadXml_WithEmptyRolesWithWhiteSpace_ReadsZeroRoles()");
     }
 
     [Test]
     public void ReadXml_WithSelfClosingRoles_ReadsZeroRoles()
     {
+		mockEventLogger.LogDebug(">>> Entering ReadXml_WithSelfClosingRoles_ReadsZeroRoles()");
         var roleGroup = ReadXml(
             """
             <rolegroups>
@@ -187,11 +194,13 @@ public class RoleGroupInfoTests
             Assert.That(roleGroup.Description, Is.EqualTo("D"));
             Assert.That(roleGroup.Roles, Is.Null);
         }
+		mockEventLogger.LogDebug("<<< Exiting ReadXml_WithSelfClosingRoles_ReadsZeroRoles()");
     }
 
     [Test]
     public void ReadXml_WithNoRoles_ReadsZeroRoles()
     {
+		mockEventLogger.LogDebug(">>> Entering ReadXml_WithNoRoles_ReadsZeroRoles()");
         var roleGroup = ReadXml(
             """
             <rolegroups>
@@ -206,17 +215,23 @@ public class RoleGroupInfoTests
             Assert.That(roleGroup.Description, Is.EqualTo("D"));
             Assert.That(roleGroup.Roles, Is.Null);
         }
+		mockEventLogger.LogDebug("<<< Exiting ReadXml_WithNoRoles_ReadsZeroRoles()");
     }
 
     private static RoleGroupInfo ReadXml([StringSyntax(StringSyntaxAttribute.Xml)] string xml)
     {
+		mockEventLogger.LogDebug(">>> Entering ReadXml(xml={Xml})", xml);
         var roleGroup = new RoleGroupInfo();
 
+		mockEventLogger.LogDebug("ReadXml(xml={Xml}): roleGroup → {RoleGroup}", xml, roleGroup);
         using var textReader = new StringReader(xml);
+		mockEventLogger.LogDebug("ReadXml(xml={Xml}): textReader → {TextReader}", xml, textReader);
         using var xmlReader = XmlReader.Create(textReader);
+		mockEventLogger.LogDebug("ReadXml(xml={Xml}): xmlReader → {XmlReader}", xml, xmlReader);
         xmlReader.Read();
         roleGroup.ReadXml(xmlReader);
 
+		mockEventLogger.LogDebug("<<< Exiting ReadXml(xml={Xml})", xml);
         return roleGroup;
     }
 }

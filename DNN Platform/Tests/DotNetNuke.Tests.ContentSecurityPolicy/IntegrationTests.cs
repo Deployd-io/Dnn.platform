@@ -8,6 +8,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
     using System.Linq;
 
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Integration tests that test the complete parsing workflow with real-world examples.
@@ -16,16 +17,21 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
     [TestFixture]
     public class IntegrationTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Tests the complete example from CspParsingExample.ParseExample().
         /// </summary>
         [Test]
         public void ParseExample_CompleteWorkflow_ShouldWorkAsExpected()
         {
+			_logger.LogDebug(">>> Entering ParseExample_CompleteWorkflow_ShouldWorkAsExpected()");
             // Arrange - Example CSP header string from CspParsingExample
             var cspHeader = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.example.com 'nonce-abc123'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'; font-src 'self' https://fonts.googleapis.com; frame-ancestors 'none'; report-uri http://csp-report";
+			_logger.LogDebug("ParseExample_CompleteWorkflow_ShouldWorkAsExpected(): cspHeader → {CspHeader}", cspHeader);
             var policy = new ContentSecurityPolicy();
+			_logger.LogDebug("ParseExample_CompleteWorkflow_ShouldWorkAsExpected(): policy → {Policy}", policy);
             var parser = new ContentSecurityPolicyParser(policy);
+			_logger.LogDebug("ParseExample_CompleteWorkflow_ShouldWorkAsExpected(): parser → {Parser}", parser);
 
             // Act - Parse the CSP header
             parser.Parse(cspHeader);
@@ -40,8 +46,10 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             policy.StyleSource.AddHash("sha256-abc123def456");
 
             var modifiedPolicy = policy.GeneratePolicy();
+			_logger.LogDebug("ParseExample_CompleteWorkflow_ShouldWorkAsExpected(): modifiedPolicy → {ModifiedPolicy}", modifiedPolicy);
             Assert.That(modifiedPolicy, Does.Contain("newcdn.example.com"));
             Assert.That(modifiedPolicy, Does.Contain("'sha256-abc123def456'"));
+			_logger.LogDebug("<<< Exiting ParseExample_CompleteWorkflow_ShouldWorkAsExpected()");
         }
 
         /// <summary>
@@ -50,6 +58,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void ParseVariousFormats_AllExamples_ShouldParseSuccessfully()
         {
+			_logger.LogDebug(">>> Entering ParseVariousFormats_AllExamples_ShouldParseSuccessfully()");
             // Arrange - All examples from CspParsingExample.ParseVariousFormats()
             var examples = new[]
             {
@@ -82,12 +91,16 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             foreach (var example in examples)
             {
                 var policy = new ContentSecurityPolicy();
+				_logger.LogDebug("ParseVariousFormats_AllExamples_ShouldParseSuccessfully(): policy → {Policy}", policy);
                 var parser = new ContentSecurityPolicyParser(policy);
+				_logger.LogDebug("ParseVariousFormats_AllExamples_ShouldParseSuccessfully(): parser → {Parser}", parser);
                 var result = parser.TryParse(example);
+				_logger.LogDebug("ParseVariousFormats_AllExamples_ShouldParseSuccessfully(): result → {Result}", result);
                 Assert.That(result, Is.True, $"Failed to parse: {example}");
                 Assert.That(policy, Is.Not.Null, $"Policy should not be null for: {example}");
                 Assert.That(policy.GeneratePolicy(), Is.Not.Empty, $"Generated policy should not be empty for: {example}");
             }
+			_logger.LogDebug("<<< Exiting ParseVariousFormats_AllExamples_ShouldParseSuccessfully()");
         }
 
         /// <summary>
@@ -96,14 +109,19 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void ParseComplexRealWorldPolicy_ShouldPreserveAllDirectives()
         {
+			_logger.LogDebug(">>> Entering ParseComplexRealWorldPolicy_ShouldPreserveAllDirectives()");
             // Arrange - Real-world complex policy from the example
             var complexPolicy = "default-src 'self'; img-src 'self' https://front.satrabel.be https://www.googletagmanager.com https://region1.google-analytics.com; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com https://www.googletagmanager.com; frame-ancestors 'self'; frame-src 'self'; form-action 'self'; object-src 'none'; base-uri 'self'; script-src 'nonce-hq9CE6VltPZiiySID0F9914GvPObOnIAN3Qs/0R+AmQ=' 'strict-dynamic'; report-to csp-endpoint; report-uri https://dnncore.satrabel.be/DesktopModules/Csp/Report; connect-src https://www.googletagmanager.com https://region1.google-analytics.com https://www.google-analytics.com; upgrade-insecure-requests";
+			_logger.LogDebug("ParseComplexRealWorldPolicy_ShouldPreserveAllDirectives(): complexPolicy → {ComplexPolicy}", complexPolicy);
             var policy = new ContentSecurityPolicy();
+			_logger.LogDebug("ParseComplexRealWorldPolicy_ShouldPreserveAllDirectives(): policy → {Policy}", policy);
             var parser = new ContentSecurityPolicyParser(policy);
+			_logger.LogDebug("ParseComplexRealWorldPolicy_ShouldPreserveAllDirectives(): parser → {Parser}", parser);
 
             // Act
             parser.Parse(complexPolicy);
             var regeneratedPolicy = policy.GeneratePolicy();
+			_logger.LogDebug("ParseComplexRealWorldPolicy_ShouldPreserveAllDirectives(): regeneratedPolicy → {RegeneratedPolicy}", regeneratedPolicy);
 
             // Assert - Check that all key elements are preserved
             Assert.That(regeneratedPolicy, Does.Contain("default-src 'self'"));
@@ -126,6 +144,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             Assert.That(regeneratedPolicy, Does.Contain("connect-src"));
             Assert.That(regeneratedPolicy, Does.Contain("https://www.google-analytics.com"));
             Assert.That(regeneratedPolicy, Does.Contain("upgrade-insecure-requests"));
+			_logger.LogDebug("<<< Exiting ParseComplexRealWorldPolicy_ShouldPreserveAllDirectives()");
         }
 
         /// <summary>
@@ -134,10 +153,14 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void ParseAndExtendPolicy_ShouldWorkCorrectly()
         {
+			_logger.LogDebug(">>> Entering ParseAndExtendPolicy_ShouldWorkCorrectly()");
             // Arrange
             var originalPolicy = "default-src 'self'; script-src 'self'";
+			_logger.LogDebug("ParseAndExtendPolicy_ShouldWorkCorrectly(): originalPolicy → {OriginalPolicy}", originalPolicy);
             var policy = new ContentSecurityPolicy();
+			_logger.LogDebug("ParseAndExtendPolicy_ShouldWorkCorrectly(): policy → {Policy}", policy);
             var parser = new ContentSecurityPolicyParser(policy);
+			_logger.LogDebug("ParseAndExtendPolicy_ShouldWorkCorrectly(): parser → {Parser}", parser);
 
             // Act - Parse and extend
             parser.Parse(originalPolicy);
@@ -151,6 +174,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             policy.ImgSource.AddScheme("data:");
 
             var extendedPolicy = policy.GeneratePolicy();
+			_logger.LogDebug("ParseAndExtendPolicy_ShouldWorkCorrectly(): extendedPolicy → {ExtendedPolicy}", extendedPolicy);
 
             // Assert
             Assert.That(extendedPolicy, Does.Contain("default-src 'self'"));
@@ -162,6 +186,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             Assert.That(extendedPolicy, Does.Contain("fonts.googleapis.com"));
             Assert.That(extendedPolicy, Does.Contain("img-src"));
             Assert.That(extendedPolicy, Does.Contain("data:"));
+			_logger.LogDebug("<<< Exiting ParseAndExtendPolicy_ShouldWorkCorrectly()");
         }
 
         /// <summary>
@@ -170,6 +195,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void ParsePoliciesWithVariousSourceCombinations_ShouldHandleAllCorrectly()
         {
+			_logger.LogDebug(">>> Entering ParsePoliciesWithVariousSourceCombinations_ShouldHandleAllCorrectly()");
             // Arrange - Various source combinations
             var testCases = new[]
             {
@@ -185,15 +211,19 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             foreach (var (policyString, expectedSources) in testCases)
             {
                 var policy = new ContentSecurityPolicy();
+				_logger.LogDebug("ParsePoliciesWithVariousSourceCombinations_ShouldHandleAllCorrectly(): policy → {Policy}", policy);
                 var parser = new ContentSecurityPolicyParser(policy);
+				_logger.LogDebug("ParsePoliciesWithVariousSourceCombinations_ShouldHandleAllCorrectly(): parser → {Parser}", parser);
                 parser.Parse(policyString);
                 var generatedPolicy = policy.GeneratePolicy();
+				_logger.LogDebug("ParsePoliciesWithVariousSourceCombinations_ShouldHandleAllCorrectly(): generatedPolicy → {GeneratedPolicy}", generatedPolicy);
 
                 foreach (var expectedSource in expectedSources)
                 {
                     Assert.That(generatedPolicy, Does.Contain(expectedSource), $"Policy '{policyString}' should contain '{expectedSource}'");
                 }
             }
+			_logger.LogDebug("<<< Exiting ParsePoliciesWithVariousSourceCombinations_ShouldHandleAllCorrectly()");
         }
 
         /// <summary>
@@ -202,6 +232,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void ParseEdgeCases_ShouldHandleGracefully()
         {
+			_logger.LogDebug(">>> Entering ParseEdgeCases_ShouldHandleGracefully()");
             // Test cases that should parse successfully even with unusual formatting
             var edgeCases = new[]
             {
@@ -222,14 +253,18 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             {
                 // Should not throw exceptions
                 var policy = new ContentSecurityPolicy();
+				_logger.LogDebug("ParseEdgeCases_ShouldHandleGracefully(): policy → {Policy}", policy);
                 var parser = new ContentSecurityPolicyParser(policy);
+				_logger.LogDebug("ParseEdgeCases_ShouldHandleGracefully(): parser → {Parser}", parser);
                 var result = parser.TryParse(edgeCase);
+				_logger.LogDebug("ParseEdgeCases_ShouldHandleGracefully(): result → {Result}", result);
                 if (result)
                 {
                     Assert.That(policy, Is.Not.Null);
                     Assert.That(policy.GeneratePolicy(), Is.Not.Empty);
                 }
             }
+			_logger.LogDebug("<<< Exiting ParseEdgeCases_ShouldHandleGracefully()");
         }
 
         /// <summary>
@@ -238,6 +273,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void ParseLargeComplexPolicy_ShouldPerformWell()
         {
+			_logger.LogDebug(">>> Entering ParseLargeComplexPolicy_ShouldPerformWell()");
             // Arrange - Large policy with many directives and sources
             var largePolicy = string.Join("; ",
                 "default-src 'self'",
@@ -254,7 +290,9 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
                 "base-uri 'self'",
                 "upgrade-insecure-requests");
             var policy = new ContentSecurityPolicy();
+			_logger.LogDebug("ParseLargeComplexPolicy_ShouldPerformWell(): policy → {Policy}", policy);
             var parser = new ContentSecurityPolicyParser(policy);
+			_logger.LogDebug("ParseLargeComplexPolicy_ShouldPerformWell(): parser → {Parser}", parser);
 
             // Act - Should parse quickly
             var startTime = DateTime.UtcNow;
@@ -262,12 +300,14 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             var parseTime = DateTime.UtcNow - startTime;
 
             var generatedPolicy = policy.GeneratePolicy();
+			_logger.LogDebug("ParseLargeComplexPolicy_ShouldPerformWell(): generatedPolicy → {GeneratedPolicy}", generatedPolicy);
 
             // Assert - Should complete quickly (less than 1 second)
             Assert.That(parseTime, Is.LessThan(TimeSpan.FromSeconds(1)));
             Assert.That(generatedPolicy, Is.Not.Empty);
             Assert.That(generatedPolicy, Does.Contain("default-src 'self'"));
             Assert.That(generatedPolicy, Does.Contain("upgrade-insecure-requests"));
+			_logger.LogDebug("<<< Exiting ParseLargeComplexPolicy_ShouldPerformWell()");
         }
     }
 }

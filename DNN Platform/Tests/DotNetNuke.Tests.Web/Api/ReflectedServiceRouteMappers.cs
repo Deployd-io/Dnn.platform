@@ -16,6 +16,9 @@ namespace DotNetNuke.Tests.Web.Api
         {
             public void RegisterRoutes(IMapRoute mapRouteManager)
             {
+				eventLogger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
+				eventLogger.LogWarning("Throwing NotImplementedException from RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
+				eventLogger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
                 throw new NotImplementedException();
             }
         }
@@ -25,8 +28,10 @@ namespace DotNetNuke.Tests.Web.Api
     {
         public ExceptionOnCreateInstanceServiceRouteMapper(int i)
         {
+			eventLogger.LogDebug(">>> Entering ExceptionOnCreateInstanceServiceRouteMapper(i={I})", i);
             // no default constructor prevents Activator.CreateInstance from working
             Debug.WriteLine(i);
+			eventLogger.LogDebug("<<< Exiting ExceptionOnCreateInstanceServiceRouteMapper(i={I})", i);
         }
 
         public void RegisterRoutes(IMapRoute mapRouteManager)

@@ -42,6 +42,7 @@ namespace DotNetNuke.Framework
         /// <param name="checkCdn">Whether check cdn settings from host settings.</param>
         public static void AddScriptManager(IHostSettings hostSettings, Page page, bool checkCdn)
         {
+			Logger.LogDebug(">>> Entering AddScriptManager(hostSettings={HostSettings},page={Page},checkCdn={CheckCdn})", hostSettings, page, checkCdn);
             if (GetScriptManager(page) != null || page.Form == null)
             {
                 return;
@@ -56,6 +57,7 @@ namespace DotNetNuke.Framework
                     scriptManager.SupportsPartialRendering = true;
                     if (checkCdn)
                     {
+						private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AJAX));
                         scriptManager.EnableCdn = hostSettings.EnableMsAjaxCdn;
                         scriptManager.EnableCdnFallback = hostSettings.EnableMsAjaxCdn;
                     }
@@ -70,8 +72,12 @@ namespace DotNetNuke.Framework
             }
             catch
             {
+				Logger.LogError("Exception in AddScriptManager(page={Page}): {Arg1}", page, ex.Message);
                 // suppress error adding script manager to support edge-case of module developers custom aspx pages that inherit from basepage and use code blocks
+				Logger.LogError("Exception in AddScriptManager(hostSettings={HostSettings},page={Page}): {Arg2}", hostSettings, page, ex.Message);
             }
+			Logger.LogError("Exception in AddScriptManager(page={Page},checkCdn={CheckCdn}): {Arg2}", page, checkCdn, ex.Message);
+			Logger.LogDebug("<<< Exiting AddScriptManager(hostSettings={HostSettings},page={Page})", hostSettings, page);
         }
 
         /// <summary>Gets the current ScriptManager on the page.</summary>
@@ -79,6 +85,8 @@ namespace DotNetNuke.Framework
         /// <returns>The ScriptManager instance, or <c>null</c>.</returns>
         public static ScriptManager GetScriptManager(Page objPage)
         {
+			Logger.LogDebug(">>> Entering GetScriptManager(objPage={ObjPage})", objPage);
+			Logger.LogDebug("<<< Exiting GetScriptManager(objPage={ObjPage})", objPage);
             return objPage.FindControl("ScriptManager") as ScriptManager;
         }
 
@@ -86,8 +94,10 @@ namespace DotNetNuke.Framework
         /// <returns><see langword="true"/> if the current request has enabled the script manager, otherwise <see langword="false"/>.</returns>
         public static bool IsEnabled()
         {
+			Logger.LogDebug(">>> Entering IsEnabled()");
             if (HttpContext.Current.Items["System.Web.UI.ScriptManager"] == null)
             {
+			Logger.LogDebug("<<< Exiting IsEnabled()");
                 return false;
             }
 
@@ -98,6 +108,8 @@ namespace DotNetNuke.Framework
         /// <returns><see langword="true"/> if ASP.NET AJAX is installed (always), otherwise <see langword="false"/> (never).</returns>
         public static bool IsInstalled()
         {
+			Logger.LogDebug(">>> Entering IsInstalled()");
+			Logger.LogDebug("<<< Exiting IsInstalled()");
             return true;
         }
 
@@ -105,31 +117,38 @@ namespace DotNetNuke.Framework
         /// <param name="objControl">The control to register for postback.</param>
         public static void RegisterPostBackControl(Control objControl)
         {
+			Logger.LogDebug(">>> Entering RegisterPostBackControl(objControl={ObjControl})", objControl);
             var objScriptManager = GetScriptManager(objControl.Page);
             objScriptManager?.RegisterPostBackControl(objControl);
+			Logger.LogDebug("<<< Exiting RegisterPostBackControl(objControl={ObjControl})", objControl);
         }
 
         /// <summary>RegisterScriptManager must be used by developers to instruct the framework that AJAX is required on the page.</summary>
         public static void RegisterScriptManager()
         {
+			Logger.LogDebug(">>> Entering RegisterScriptManager()");
             if (!IsEnabled())
             {
                 HttpContext.Current.Items.Add("System.Web.UI.ScriptManager", true);
             }
+			Logger.LogDebug("<<< Exiting RegisterScriptManager()");
         }
 
         /// <summary>RemoveScriptManager will remove the <see cref="ScriptManager"/> control during Page Render if the RegisterScriptManager has not been called.</summary>
         /// <param name="objPage">The page from which to remove the <see cref="ScriptManager"/>.</param>
         public static void RemoveScriptManager(Page objPage)
         {
+			Logger.LogDebug(">>> Entering RemoveScriptManager(objPage={ObjPage})", objPage);
             if (!IsEnabled())
             {
                 Control objControl = objPage.FindControl("ScriptManager");
+				Logger.LogDebug("RemoveScriptManager(objPage={ObjPage}): objControl → {ObjControl}", objPage, objControl);
                 if (objControl != null)
                 {
                     objPage.Form.Controls.Remove(objControl);
                 }
             }
+			Logger.LogDebug("<<< Exiting RemoveScriptManager(objPage={ObjPage})", objPage);
         }
 
         /// <summary>Wraps a control in an update panel.</summary>
@@ -138,8 +157,12 @@ namespace DotNetNuke.Framework
         /// <returns>The <see cref="UpdatePanel"/>.</returns>
         public static Control WrapUpdatePanelControl(Control objControl, bool blnIncludeProgress)
         {
+			Logger.LogDebug(">>> Entering WrapUpdatePanelControl(objControl={ObjControl},blnIncludeProgress={BlnIncludeProgress})", objControl, blnIncludeProgress);
             var updatePanel = new UpdatePanel();
             updatePanel.ID = objControl.ID + "_UP";
+			Logger.LogDebug("WrapUpdatePanelControl(objControl={ObjControl},blnIncludeProgress={BlnIncludeProgress}): updatePanel.ID → {Arg2}", objControl, blnIncludeProgress, updatePanel.ID);
+			Logger.LogDebug("WrapUpdatePanelControl(objControl={ObjControl},blnIncludeProgress={BlnIncludeProgress}): updatePanel.UpdateMode → {Arg2}", objControl, blnIncludeProgress, updatePanel.UpdateMode);
+			Logger.LogDebug("WrapUpdatePanelControl(objControl={ObjControl},blnIncludeProgress={BlnIncludeProgress}): updatePanel → {UpdatePanel}", objControl, blnIncludeProgress, updatePanel);
             updatePanel.UpdateMode = UpdatePanelUpdateMode.Conditional;
 
             Control objContentTemplateContainer = updatePanel.ContentTemplateContainer;
@@ -164,12 +187,18 @@ namespace DotNetNuke.Framework
             {
                 // create image for update progress control
                 var objImage = new Image();
+				Logger.LogDebug("WrapUpdatePanelControl(objControl={ObjControl},blnIncludeProgress={BlnIncludeProgress}): objImage → {ObjImage}", objControl, blnIncludeProgress, objImage);
+				Logger.LogDebug("WrapUpdatePanelControl(objControl={ObjControl},blnIncludeProgress={BlnIncludeProgress}): objImage.ImageUrl → {Arg2}", objControl, blnIncludeProgress, objImage.ImageUrl);
                 objImage.ImageUrl = "~/images/progressbar.gif";
 
                 // hardcoded
                 objImage.AlternateText = "ProgressBar";
+				Logger.LogDebug("WrapUpdatePanelControl(objControl={ObjControl},blnIncludeProgress={BlnIncludeProgress}): objImage.AlternateText → {Arg2}", objControl, blnIncludeProgress, objImage.AlternateText);
 
                 var updateProgress = new UpdateProgress();
+				Logger.LogDebug("WrapUpdatePanelControl(objControl={ObjControl},blnIncludeProgress={BlnIncludeProgress}): updateProgress → {UpdateProgress}", objControl, blnIncludeProgress, updateProgress);
+				Logger.LogDebug("WrapUpdatePanelControl(objControl={ObjControl},blnIncludeProgress={BlnIncludeProgress}): updateProgress.AssociatedUpdatePanelID → {Arg2}", objControl, blnIncludeProgress, updateProgress.AssociatedUpdatePanelID);
+				Logger.LogDebug("WrapUpdatePanelControl(objControl={ObjControl},blnIncludeProgress={BlnIncludeProgress}): updateProgress.ID → {Arg2}", objControl, blnIncludeProgress, updateProgress.ID);
                 updateProgress.AssociatedUpdatePanelID = updatePanel.ID;
                 updateProgress.ID = updatePanel.ID + "_Prog";
                 updateProgress.ProgressTemplate = new LiteralTemplate(objImage);
@@ -177,6 +206,7 @@ namespace DotNetNuke.Framework
                 objContentTemplateContainer.Controls.Add(updateProgress);
             }
 
+			Logger.LogDebug("<<< Exiting WrapUpdatePanelControl(objControl={ObjControl},blnIncludeProgress={BlnIncludeProgress})", objControl, blnIncludeProgress);
             return updatePanel;
         }
     }

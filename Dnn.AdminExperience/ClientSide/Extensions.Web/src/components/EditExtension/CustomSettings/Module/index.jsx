@@ -6,21 +6,28 @@ import Localization from "localization";
 import AssignedSelector from "./AssignedSelector";
 import ModuleDefinitions from "./ModuleDefinitions";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 
 class Module extends Component {
     onClickOnPortal(index, type) {
+		logger.debug(`>>> Entering onClickOnPortal(index=${index},type=${type})`);
         const { props } = this;
         let _extensionBeingEdited = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+		logger.debug(`onClickOnPortal(index=${index},type=${type}): _extensionBeingEdited → ${_extensionBeingEdited}`);
         _extensionBeingEdited[type].value[index].selected = !_extensionBeingEdited[type].value[index].selected;
 
         props.onAssignedPortalsChange(type, _extensionBeingEdited[type].value);
+		logger.debug(`<<< Exiting onClickOnPortal(index=${index},type=${type})`);
     }
     moveItemsLeft() {
+		logger.debug('>>> Entering moveItemsLeft()');
         const { props } = this;
         let assignedPortals = JSON.parse(JSON.stringify(props.extensionBeingEdited.assignedPortals.value));
+		logger.debug(`moveItemsLeft(): assignedPortals → ${assignedPortals}`);
         let unassignedPortals = JSON.parse(JSON.stringify(props.extensionBeingEdited.unassignedPortals.value));
+		logger.debug(`moveItemsLeft(): unassignedPortals → ${unassignedPortals}`);
         let itemsToStay = [], itemsToMove = [];
         let selectedCount = 0;
         assignedPortals.forEach((portal) => {
@@ -37,12 +44,16 @@ class Module extends Component {
             props.onAssignedPortalsChange("unassignedPortals", unassignedPortals.concat(itemsToMove), () => {
                 props.onAssignedPortalsChange("assignedPortals", itemsToStay);
             });
+			logger.debug('<<< Exiting moveItemsLeft()');
         }
     }
     moveItemsRight() {
+		logger.debug('>>> Entering moveItemsRight()');
         const { props } = this;
         let unassignedPortals = JSON.parse(JSON.stringify(props.extensionBeingEdited.unassignedPortals.value));
+		logger.debug(`moveItemsRight(): unassignedPortals → ${unassignedPortals}`);
         let assignedPortals = JSON.parse(JSON.stringify(props.extensionBeingEdited.assignedPortals.value));
+		logger.debug(`moveItemsRight(): assignedPortals → ${assignedPortals}`);
         let itemsToStay = [], itemsToMove = [];
         let selectedCount = 0;
         unassignedPortals.forEach((portal) => {
@@ -59,11 +70,14 @@ class Module extends Component {
             props.onAssignedPortalsChange("assignedPortals", assignedPortals.concat(itemsToMove), () => {
                 props.onAssignedPortalsChange("unassignedPortals", itemsToStay);
             });
+			logger.debug('<<< Exiting moveItemsRight()');
         }
     }
     moveAll(direction) {
+		logger.debug(`>>> Entering moveAll(direction=${direction})`);
         const { props} = this;
         let assignedPortals = JSON.parse(JSON.stringify(props.extensionBeingEdited.assignedPortals.value));
+		logger.debug(`moveAll(direction=${direction}): assignedPortals → ${assignedPortals}`);
         let unassignedPortals = JSON.parse(JSON.stringify(props.extensionBeingEdited.unassignedPortals.value));
         switch (direction) {
             case "right":
@@ -75,6 +89,7 @@ class Module extends Component {
                 props.onAssignedPortalsChange("unassignedPortals", unassignedPortals.concat(assignedPortals), () => {
                     props.onAssignedPortalsChange("assignedPortals", []);
                 });
+				logger.debug(`<<< Exiting moveAll(direction=${direction})`);
                 break;
         }
     }
@@ -84,8 +99,11 @@ class Module extends Component {
     }
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         let { extensionBeingEdited } = props;
+		logger.debug(`render(): extensionBeingEdited → ${extensionBeingEdited}`);
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.editModule + (props.className ? " " + props.className : "")}>
                 <GridSystem className="with-right-border top-half">
@@ -256,6 +274,8 @@ Module.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         extensionBeingEdited: state.extension.extensionBeingEdited,
         extensionBeingEditedIndex: state.extension.extensionBeingEditedIndex,

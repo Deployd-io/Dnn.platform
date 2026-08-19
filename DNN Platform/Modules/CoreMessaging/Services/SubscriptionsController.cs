@@ -33,6 +33,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
     public class SubscriptionsController(IHostSettings hostSettings)
         : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SubscriptionsController));
         private const string SharedResources = "~/DesktopModules/CoreMessaging/App_LocalResources/SharedResources.resx";
         private const string ViewControlResources = "~/DesktopModules/CoreMessaging/App_LocalResources/View.ascx.resx";
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
@@ -42,7 +43,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         public SubscriptionsController()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering SubscriptionsController()");
         }
+		Logger.LogDebug("<<< Exiting SubscriptionsController()");
 
         private string LocalizationFolder
         {
@@ -61,6 +64,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [HttpGet]
         public HttpResponseMessage GetSubscriptions(int pageIndex, int pageSize, string sortExpression)
         {
+			Logger.LogDebug(">>> Entering GetSubscriptions(pageIndex={PageIndex},pageSize={PageSize},sortExpression={SortExpression})", pageIndex, pageSize, sortExpression);
             try
             {
                 var subscriptions = from s in SubscriptionController.Instance.GetUserSubscriptions(this.UserInfo, this.PortalSettings.PortalId)
@@ -74,7 +78,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
                 else
                 {
                     var sort = sortExpression.Split(' ');
+					Logger.LogDebug("GetSubscriptions(pageIndex={PageIndex},pageSize={PageSize},sortExpression={SortExpression}): sort → {Sort}", pageIndex, pageSize, sortExpression, sort);
                     var desc = sort.Length == 2 && sort[1] == "desc";
+					Logger.LogDebug("GetSubscriptions(pageIndex={PageIndex},pageSize={PageSize},sortExpression={SortExpression}): desc → {Desc}", pageIndex, pageSize, sortExpression, desc);
                     switch (sort[0])
                     {
                         case "Description":
@@ -101,13 +107,19 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
                     Results = sortedList.Skip(pageIndex * pageSize).Take(pageSize).ToList(),
                     TotalResults = sortedList.Count(),
                 };
+				Logger.LogDebug("GetSubscriptions(pageIndex={PageIndex},pageSize={PageSize},sortExpression={SortExpression}): TotalResults → {TotalResults}", pageIndex, pageSize, sortExpression, TotalResults);
+				Logger.LogDebug("GetSubscriptions(pageIndex={PageIndex},pageSize={PageSize},sortExpression={SortExpression}): Results → {Results}", pageIndex, pageSize, sortExpression, Results);
+				Logger.LogDebug("GetSubscriptions(pageIndex={PageIndex},pageSize={PageSize},sortExpression={SortExpression}): Success → {Success}", pageIndex, pageSize, sortExpression, Success);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetSubscriptions(pageIndex={PageIndex},pageSize={PageSize},sortExpression={SortExpression}): {Arg3}", pageIndex, pageSize, sortExpression, ex.getMessage());
                 var message = "An unexpected error occurred while attempting to get the subscriptions, consult the server logs for more information.";
+				Logger.LogDebug("GetSubscriptions(pageIndex={PageIndex},pageSize={PageSize},sortExpression={SortExpression}): message → {Message}", pageIndex, pageSize, sortExpression, message);
                 Exceptions.LogException(ex);
+				Logger.LogDebug("<<< Exiting GetSubscriptions(pageIndex={PageIndex},pageSize={PageSize},sortExpression={SortExpression})", pageIndex, pageSize, sortExpression);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -119,6 +131,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateSystemSubscription(InboxSubscriptionViewModel post)
         {
+			Logger.LogDebug(">>> Entering UpdateSystemSubscription(post={Post})", post);
             try
             {
                 var userPreferencesController = UserPreferencesController.Instance;
@@ -135,8 +148,11 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in UpdateSystemSubscription(post={Post}): {Arg1}", post, ex.getMessage());
                 var message = "An unexpected error occurred while attempting to update the system subscriptions, consult the server logs for more information.";
+				Logger.LogDebug("UpdateSystemSubscription(post={Post}): message → {Message}", post, message);
                 Exceptions.LogException(ex);
+				Logger.LogDebug("<<< Exiting UpdateSystemSubscription(post={Post})", post);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -148,6 +164,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DeleteContentSubscription(Subscription subscription)
         {
+			Logger.LogDebug(">>> Entering DeleteContentSubscription(subscription={Subscription})", subscription);
             try
             {
                 var sub = SubscriptionController.Instance.GetUserSubscriptions(this.UserInfo, this.PortalSettings.PortalId)
@@ -161,8 +178,11 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in DeleteContentSubscription(subscription={Subscription}): {Arg1}", subscription, ex.getMessage());
                 var message = "An unexpected error occurred while attempting to delete a content subscription, consult the server logs for more information.";
+				Logger.LogDebug("DeleteContentSubscription(subscription={Subscription}): message → {Message}", subscription, message);
                 Exceptions.LogException(ex);
+				Logger.LogDebug("<<< Exiting DeleteContentSubscription(subscription={Subscription})", subscription);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -174,6 +194,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [AllowAnonymous]
         public HttpResponseMessage GetLocalizationTable(string culture)
         {
+			Logger.LogDebug(">>> Entering GetLocalizationTable(culture={Culture})", culture);
             try
             {
                 if (!string.IsNullOrEmpty(culture))
@@ -182,10 +203,13 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
                 }
 
                 var dictionary = new Dictionary<string, string>();
+				Logger.LogDebug("GetLocalizationTable(culture={Culture}): dictionary → {Dictionary}", culture, dictionary);
 
                 var resourcesPath = this.LocalizationFolder;
                 var files =
                     Directory.GetFiles(System.Web.HttpContext.Current.Server.MapPath(resourcesPath)).Select(x => new FileInfo(x).Name).Where(f => !IsLanguageSpecific(f)).ToList();
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
+					Logger.LogInformation("GetLocalizationTable(culture)={Culture}: find query executed in {Arg1} ms", culture, __logStart.ElapsedMilliseconds);
 
                 foreach (var kvp in files.SelectMany(f => GetLocalizationValues(resourcesPath, f, culture)).Where(kvp => !dictionary.ContainsKey(kvp.Key)))
                 {
@@ -201,14 +225,18 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetLocalizationTable(culture={Culture}): {Arg1}", culture, ex.getMessage());
                 var message = "An unexpected error occurred while attempting to get the localization table, consult the server logs for more information.";
+				Logger.LogDebug("GetLocalizationTable(culture={Culture}): message → {Message}", culture, message);
                 Exceptions.LogException(ex);
+				Logger.LogDebug("<<< Exiting GetLocalizationTable(culture={Culture})", culture);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
 
         private static SubscriptionViewModel GetSubscriptionViewModel(Subscription subscription)
         {
+			Logger.LogDebug(">>> Entering GetSubscriptionViewModel(subscription={Subscription})", subscription);
             var model = new SubscriptionViewModel
             {
                 SubscriptionId = subscription.SubscriptionId,
@@ -222,16 +250,21 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             if (subscriptionType != null)
             {
                 var localizedName = Localization.GetString(subscriptionType.SubscriptionName, ViewControlResources);
+				Logger.LogDebug("GetSubscriptionViewModel(subscription={Subscription}): localizedName → {LocalizedName}", subscription, localizedName);
+				Logger.LogDebug("GetSubscriptionViewModel(subscription={Subscription}): model.SubscriptionType → {Arg1}", subscription, model.SubscriptionType);
                 model.SubscriptionType = localizedName ?? subscriptionType.FriendlyName;
             }
 
+			Logger.LogDebug("<<< Exiting GetSubscriptionViewModel(subscription={Subscription})", subscription);
             return model;
         }
 
         private static bool IsLanguageSpecific(string fileName)
         {
+			Logger.LogDebug(">>> Entering IsLanguageSpecific(fileName={FileName})", fileName);
             var components = fileName.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
             if (components.Length > 1)
+			Logger.LogDebug("IsLanguageSpecific(fileName={FileName}): components → {Components}", fileName, components);
             {
                 var language = components[components.Length - 2];
 
@@ -245,11 +278,13 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
                     }
                     catch (CultureNotFoundException)
                     {
+						Logger.LogError("Exception in IsLanguageSpecific(fileName={FileName}): {Arg1}", fileName, CultureNotFoundException.getMessage());
                         return false;
                     }
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsLanguageSpecific(fileName={FileName})", fileName);
             return false;
         }
 
@@ -288,31 +323,40 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
 
         private static void AssertHeaderValue(IEnumerable<XmlNode> headers, string key, string value)
         {
+			Logger.LogDebug(">>> Entering AssertHeaderValue(headers={Headers},key={Key},value={Value})", headers, key, value);
             var header = headers.FirstOrDefault(x => GetNameAttribute(x).Equals(key, StringComparison.InvariantCultureIgnoreCase));
             if (header != null)
+			Logger.LogDebug("AssertHeaderValue(headers={Headers},key={Key},value={Value}): header → {Header}", headers, key, value, header);
             {
                 if (!header.InnerText.Equals(value, StringComparison.InvariantCultureIgnoreCase))
                 {
+					Logger.LogWarning("Throwing ApplicationException from AssertHeaderValue(headers={Headers},key={Key},value={Value})", headers, key, value);
                     throw new ApplicationException(string.Format("Resource header '{0}' != '{1}'", key, value));
                 }
+				Logger.LogDebug(">>> Entering GetNameAttribute(node={Node})", node);
+				Logger.LogDebug("<<< Exiting GetNameAttribute(node={Node})", node);
             }
             else
             {
+			Logger.LogDebug("<<< Exiting AssertHeaderValue(headers={Headers},key={Key},value={Value})", headers, key, value);
                 throw new ApplicationException(string.Format("Resource header '{0}' is missing", key));
             }
         }
 
         private static string GetNameAttribute(XmlNode node)
         {
+			Logger.LogDebug(">>> Entering GetNameAttribute(node={Node})", node);
             if (node.Attributes != null)
             {
                 var attribute = node.Attributes.GetNamedItem("name");
+				Logger.LogDebug("GetNameAttribute(node={Node}): attribute → {Attribute}", node, attribute);
                 if (attribute != null)
                 {
                     return attribute.Value;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetNameAttribute(node={Node})", node);
             return null;
         }
     }

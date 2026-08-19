@@ -85,14 +85,19 @@ namespace DNNConnect.CKEditorProvider
         /// <summary>The add toolbar.</summary>
         public override void AddToolbar()
         {
+			eventLogger.LogDebug(">>> Entering AddToolbar()");
             // Must exist because it exists at the base class
+			eventLogger.LogDebug("<<< Exiting AddToolbar()");
         }
 
         /// <summary>The initialize.</summary>
         public override void Initialize()
         {
+			eventLogger.LogDebug(">>> Entering Initialize()");
             this.htmlEditorControl = ActivatorUtilities.CreateInstance<EditorControl>(HttpContextSource.Current.GetScope().ServiceProvider);
             this.htmlEditorControl.ID = this.ControlID;
+			eventLogger.LogDebug("Initialize(): htmlEditorControl → {HtmlEditorControl}", htmlEditorControl);
+			eventLogger.LogDebug("<<< Exiting Initialize()");
         }
     }
 }

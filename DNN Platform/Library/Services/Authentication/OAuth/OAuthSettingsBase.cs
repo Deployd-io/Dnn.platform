@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.Authentication.OAuth
 
     public class OAuthSettingsBase : AuthenticationSettingsBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(OAuthSettingsBase));
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Breaking Change")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
@@ -26,21 +27,27 @@ namespace DotNetNuke.Services.Authentication.OAuth
         /// <inheritdoc />
         public override void UpdateSettings()
         {
+			Logger.LogDebug(">>> Entering UpdateSettings()");
             if (this.SettingsEditor.IsValid && this.SettingsEditor.IsDirty)
             {
                 var config = (OAuthConfigBase)this.SettingsEditor.DataSource;
+				Logger.LogDebug("UpdateSettings(): config → {Config}", config);
                 OAuthConfigBase.UpdateConfig(config);
             }
+			Logger.LogDebug("<<< Exiting UpdateSettings()");
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             OAuthConfigBase config = OAuthConfigBase.GetConfig(this.AuthSystemApplicationName, this.PortalId);
+			Logger.LogDebug("OnLoad(e={E}): config → {Config}", e, config);
             this.SettingsEditor.DataSource = config;
             this.SettingsEditor.DataBind();
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

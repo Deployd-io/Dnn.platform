@@ -50,7 +50,9 @@ public partial class NewUserNotificationServiceController(RoleProvider roleProvi
     public NewUserNotificationServiceController()
         : this(null, null, null, null, null, null)
     {
+	eventLogger.LogDebug(">>> Entering NewUserNotificationServiceController()");
     }
+	eventLogger.LogDebug("<<< Exiting NewUserNotificationServiceController()");
 
     /// <summary>Initializes a new instance of the <see cref="NewUserNotificationServiceController"/> class.</summary>
     /// <param name="roleProvider">The role provider.</param>
@@ -80,12 +82,14 @@ public partial class NewUserNotificationServiceController(RoleProvider roleProvi
     [ValidateAntiForgeryToken]
     public HttpResponseMessage Authorize(NotificationRequest requestBody)
     {
+		eventLogger.LogDebug(">>> Entering Authorize(requestBody={RequestBody})", requestBody);
         if (!PortalSecurity.IsInRole(this.PortalSettings.AdministratorRoleName))
         {
             return this.Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         var user = this.GetUser(requestBody);
+		eventLogger.LogDebug("Authorize(requestBody={RequestBody}): user → {User}", requestBody, user);
         if (user == null)
         {
             NotificationsController.Instance.DeleteNotification(requestBody.NotificationId);
@@ -103,6 +107,7 @@ public partial class NewUserNotificationServiceController(RoleProvider roleProvi
 
         Mail.SendMail(user, MessageType.UserAuthorized, this.PortalSettings);
 
+		eventLogger.LogDebug("<<< Exiting Authorize(postData={PostData})", postData);
         return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
     }
 
@@ -121,12 +126,14 @@ public partial class NewUserNotificationServiceController(RoleProvider roleProvi
     [ValidateAntiForgeryToken]
     public HttpResponseMessage Reject(NotificationRequest requestBody)
     {
+		eventLogger.LogDebug(">>> Entering Reject(requestBody={RequestBody})", requestBody);
         if (!PortalSecurity.IsInRole(this.PortalSettings.AdministratorRoleName))
         {
             return this.Request.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         var user = this.GetUser(requestBody);
+		eventLogger.LogDebug("Reject(requestBody={RequestBody}): user → {User}", requestBody, user);
         if (user == null)
         {
             NotificationsController.Instance.DeleteNotification(requestBody.NotificationId);
@@ -135,6 +142,7 @@ public partial class NewUserNotificationServiceController(RoleProvider roleProvi
 
         UserController.RemoveUser(user);
 
+		eventLogger.LogDebug("<<< Exiting Reject(postData={PostData})", postData);
         return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
     }
 
@@ -158,19 +166,26 @@ public partial class NewUserNotificationServiceController(RoleProvider roleProvi
     [ValidateAntiForgeryToken]
     public HttpResponseMessage SendVerificationMail(NotificationRequest requestBody)
     {
+		eventLogger.LogDebug(">>> Entering SendVerificationMail(requestBody={RequestBody})", requestBody);
         if (this.UserInfo.Membership.Approved)
         {
+			eventLogger.LogWarning("Throwing UserAlreadyVerifiedException from SendVerificationMail(postData={PostData})", postData);
+			eventLogger.LogWarning("Throwing UserAlreadyVerifiedException from SendVerificationMail(requestBody={RequestBody})", requestBody);
             throw new UserAlreadyVerifiedException();
         }
 
         if (!this.UserInfo.IsInRole("Unverified Users"))
         {
+			eventLogger.LogWarning("Throwing InvalidVerificationCodeException from SendVerificationMail(postData={PostData})", postData);
+			eventLogger.LogWarning("Throwing InvalidVerificationCodeException from SendVerificationMail(requestBody={RequestBody})", requestBody);
             throw new InvalidVerificationCodeException();
         }
 
         var message = Mail.SendMail(this.UserInfo, MessageType.UserRegistrationVerified, this.PortalSettings);
+		eventLogger.LogDebug("SendVerificationMail(requestBody={RequestBody}): message → {Message}", requestBody, message);
         if (!string.IsNullOrEmpty(message))
         {
+		eventLogger.LogDebug("<<< Exiting SendVerificationMail(postData={PostData})", postData);
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message);
         }
 
@@ -184,9 +199,12 @@ public partial class NewUserNotificationServiceController(RoleProvider roleProvi
 
     private UserInfo GetUser(NotificationRequest requestBody)
     {
+		eventLogger.LogDebug(">>> Entering GetUser(requestBody={RequestBody})", requestBody);
         var notification = NotificationsController.Instance.GetNotification(requestBody.NotificationId);
         if (!int.TryParse(notification.Context, out var userId))
+		eventLogger.LogDebug("GetUser(requestBody={RequestBody}): notification → {Notification}", requestBody, notification);
         {
+		eventLogger.LogDebug("<<< Exiting GetUser(requestBody={RequestBody})", requestBody);
             return null;
         }
 

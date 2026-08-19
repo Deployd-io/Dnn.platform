@@ -1,9 +1,13 @@
+const logger = console;
 ﻿var pager = {
         init: function (viewModel, pageSize, load, resx, pagerItemFormatDesc, nopagerItemFormatDesc) {
+			logger.debug(`>>> Entering init(viewModel=${viewModel},pageSize=${pageSize},load=${load},resx=${resx},pagerItemFormatDesc=${pagerItemFormatDesc},nopagerItemFormatDesc=${nopagerItemFormatDesc})`);
             viewModel.pageSize = pageSize;
             viewModel.pageIndex = ko.observable(0);
+			logger.debug(`init(viewModel=${viewModel},pageSize=${pageSize},load=${load},resx=${resx},pagerItemFormatDesc=${pagerItemFormatDesc},nopagerItemFormatDesc=${nopagerItemFormatDesc}): viewModel.pageSize → ${viewModel.pageSize}`);
             
             viewModel.startIndex = ko.computed(function () {
+				logger.debug('>>> Entering computed()');
                 return viewModel.pageIndex() * viewModel.pageSize + 1;
             });
 
@@ -42,12 +46,15 @@
             });
 
             viewModel.prev = function () {
+				logger.debug('>>> Entering function()');
                 if (viewModel.pageIndex() <= 0) return;
                 viewModel.pageIndex(viewModel.pageIndex() - 1);
                 if (typeof load === 'function') load.apply(viewModel);
+				logger.debug('<<< Exiting function()');
             };
 
             viewModel.next = function () {
+				logger.debug(`<<< Exiting init(viewModel=${viewModel},pageSize=${pageSize},load=${load},resx=${resx},pagerItemFormatDesc=${pagerItemFormatDesc},nopagerItemFormatDesc=${nopagerItemFormatDesc})`);
                 if (viewModel.pageIndex() >= viewModel.totalPages() - 1) return;
                 viewModel.pageIndex(viewModel.pageIndex() + 1);
                 if (typeof load === 'function') load.apply(viewModel);

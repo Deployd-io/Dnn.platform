@@ -12,16 +12,21 @@ namespace DotNetNuke.Services.Journal
 
     public class JournalEntity : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JournalEntity));
         /// <summary>Initializes a new instance of the <see cref="JournalEntity"/> class.</summary>
         public JournalEntity()
         {
+		Logger.LogDebug(">>> Entering JournalEntity()");
+		Logger.LogDebug("<<< Exiting JournalEntity()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="JournalEntity"/> class.</summary>
         /// <param name="entityXML">XML serialized entity.</param>
         public JournalEntity(string entityXML)
         {
+			Logger.LogDebug(">>> Entering JournalEntity(entityXML={EntityXML})", entityXML);
             if (!string.IsNullOrEmpty(entityXML))
+			Logger.LogDebug("<<< Exiting JournalEntity()");
             {
                 var xDoc = new XmlDocument { XmlResolver = null, };
                 using (var entityReader = XmlReader.Create(new StringReader(entityXML), new XmlReaderSettings { XmlResolver = null, }))
@@ -33,6 +38,7 @@ namespace DotNetNuke.Services.Journal
                 {
                     XmlNode xRoot = xDoc.DocumentElement;
                     XmlNode xNode = null;
+					Logger.LogDebug("JournalEntity(entityXML={EntityXML}): xNode → {XNode}", entityXML, xNode);
                     xNode = xRoot.SelectSingleNode("//entity");
                     if (xNode != null)
                     {
@@ -64,8 +70,10 @@ namespace DotNetNuke.Services.Journal
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, System.Globalization.CultureInfo formatProvider, Entities.Users.UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             string outputFormat = string.Empty;
             if (format == string.Empty)
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): outputFormat → {OutputFormat}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, outputFormat);
             {
                 outputFormat = "g";
             }
@@ -75,6 +83,7 @@ namespace DotNetNuke.Services.Journal
             }
 
             propertyName = propertyName.ToLowerInvariant();
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): propertyName → {PropertyName1}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, propertyName);
             switch (propertyName)
             {
                 case "id":
@@ -88,6 +97,7 @@ namespace DotNetNuke.Services.Journal
             }
 
             propertyNotFound = true;
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return string.Empty;
         }
     }

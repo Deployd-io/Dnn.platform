@@ -10,17 +10,23 @@ namespace DotNetNuke.Services.Mail
 
     public class MailAttachment
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MailAttachment));
         private const string DefaultContentType = "application/octet-stream";
 
         /// <summary>Initializes a new instance of the <see cref="MailAttachment"/> class.</summary>
         /// <param name="filePath">The path to the file to attach.</param>
         public MailAttachment(string filePath)
         {
+			Logger.LogDebug(">>> Entering MailAttachment(filePath={FilePath})", filePath);
             var content = File.ReadAllBytes(filePath);
             var filename = Path.GetFileName(filePath);
+			Logger.LogDebug("MailAttachment(filePath={FilePath}): filename → {Filename}", filePath, filename);
             var contentType = MimeMapping.GetMimeMapping(filename);
+			Logger.LogDebug("MailAttachment(filePath={FilePath}): contentType → {ContentType}", filePath, contentType);
+			Logger.LogDebug("MailAttachment(filePath={FilePath}): content → {Content}", filePath, content);
 
             this.MailAttachmentInternal(filename, content, contentType);
+			Logger.LogDebug("<<< Exiting MailAttachment(filePath={FilePath})", filePath);
         }
 
         /// <summary>Initializes a new instance of the <see cref="MailAttachment"/> class.</summary>
@@ -28,7 +34,9 @@ namespace DotNetNuke.Services.Mail
         /// <param name="content">The contents of the attachment.</param>
         public MailAttachment(string filename, byte[] content)
         {
+			Logger.LogDebug(">>> Entering MailAttachment(filename={Filename},content={Content})", filename, content);
             this.MailAttachmentInternal(filename, content, MimeMapping.GetMimeMapping(filename));
+			Logger.LogDebug("<<< Exiting MailAttachment(filename={Filename},content={Content})", filename, content);
         }
 
         /// <summary>Initializes a new instance of the <see cref="MailAttachment"/> class.</summary>
@@ -37,7 +45,9 @@ namespace DotNetNuke.Services.Mail
         /// <param name="contentType">The MIME content type of the attachment.</param>
         public MailAttachment(string filename, byte[] content, string contentType)
         {
+			Logger.LogDebug(">>> Entering MailAttachment(filename={Filename},content={Content},contentType={ContentType})", filename, content, contentType);
             this.MailAttachmentInternal(filename, content, contentType);
+			Logger.LogDebug("<<< Exiting MailAttachment(filename={Filename},content={Content},contentType={ContentType})", filename, content, contentType);
         }
 
         public byte[] Content { get; set; }
@@ -48,9 +58,13 @@ namespace DotNetNuke.Services.Mail
 
         private void MailAttachmentInternal(string filename, byte[] content, string contentType)
         {
+			Logger.LogDebug(">>> Entering MailAttachmentInternal(filename={Filename},content={Content},contentType={ContentType})", filename, content, contentType);
             this.Filename = filename;
             this.Content = content;
+			Logger.LogDebug("MailAttachmentInternal(filename={Filename},content={Content},contentType={ContentType}): this.Filename → {Arg3}", filename, content, contentType, this.Filename);
+			Logger.LogDebug("MailAttachmentInternal(filename={Filename},content={Content},contentType={ContentType}): this.Content → {Arg3}", filename, content, contentType, this.Content);
             this.ContentType = contentType;
+			Logger.LogDebug("<<< Exiting MailAttachmentInternal(filename={Filename},content={Content},contentType={ContentType})", filename, content, contentType);
         }
     }
 }

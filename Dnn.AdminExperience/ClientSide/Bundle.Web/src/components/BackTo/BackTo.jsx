@@ -1,10 +1,13 @@
 import PropTypes from "prop-types";
 import React from "react";
 import styles from "./style.module.less";
+const logger = console;
 import { ArrowBack } from "@dnnsoftware/dnn-react-common";
 
  
 const BackToMain = ({onClick, label}) => {
+	logger.debug(`>>> Entering BackToMain(onClick=${onClick},label=${label})`);
+	logger.debug(`<<< Exiting BackToMain(onClick=${onClick},label=${label})`);
     return (
         <div         
             className={styles.backTo} 

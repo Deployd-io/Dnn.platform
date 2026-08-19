@@ -15,6 +15,7 @@ namespace DotNetNuke.Entities.Modules.Settings
     [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.ISerializationManager' instead")]
     public partial class SerializationController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SerializationController));
         private static ISerializationManager SerializationManager =>
             Globals.GetCurrentServiceProvider().GetRequiredService<ISerializationManager>();
 
@@ -22,6 +23,7 @@ namespace DotNetNuke.Entities.Modules.Settings
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.ISerializationManager' instead")]
         public static partial string SerializeProperty<T>(T myObject, PropertyInfo property) =>
             SerializationManager.SerializeProperty(myObject, property);
+			Logger.LogDebug(">>> Entering SerializeProperty(myObject={MyObject},property={Property})", myObject, property);
 
         /// <inheritdoc cref="ISerializationManager.SerializeProperty{T}(T,System.Reflection.PropertyInfo,string)" />
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.ISerializationManager' instead")]
@@ -32,6 +34,7 @@ namespace DotNetNuke.Entities.Modules.Settings
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.ISerializationManager' instead")]
         public static partial void DeserializeProperty<T>(T myObject, PropertyInfo property, string propertyValue)
             where T : class, new() => SerializationManager.DeserializeProperty(myObject, property, propertyValue);
+			Logger.LogDebug(">>> Entering DeserializeProperty(myObject={MyObject},property={Property},propertyValue={PropertyValue})", myObject, property, propertyValue);
 
         /// <inheritdoc cref="ISerializationManager.DeserializeProperty{T}(T,System.Reflection.PropertyInfo,string,string)" />
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.ISerializationManager' instead")]

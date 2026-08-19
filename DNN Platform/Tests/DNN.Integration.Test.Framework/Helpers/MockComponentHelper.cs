@@ -7,6 +7,7 @@ namespace DNN.Integration.Test.Framework.Helpers
     using DotNetNuke.ComponentModel;
     using DotNetNuke.Services.Cache;
     using Moq;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Class copied from Platform Tests: DotNetNuke.Tests.Utilities.Mocks.MockComponentProvider
@@ -15,14 +16,18 @@ namespace DNN.Integration.Test.Framework.Helpers
     /// </summary>
     public static class MockComponentHelper
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public static Mock<CachingProvider> CreateDataCacheProvider()
         {
+			_logger.LogDebug(">>> Entering CreateDataCacheProvider()");
+			_logger.LogDebug("<<< Exiting CreateDataCacheProvider()");
             return CreateNew<CachingProvider>();
         }
 
         public static Mock<T> CreateNew<T>()
             where T : class
         {
+			_logger.LogDebug(">>> Entering CreateNew()");
             if (ComponentFactory.Container == null)
             {
                 ComponentFactory.Container = new SimpleContainer();
@@ -30,7 +35,9 @@ namespace DNN.Integration.Test.Framework.Helpers
 
             // Try and get mock
             var mockComp = ComponentFactory.GetComponent<Mock<T>>();
+			_logger.LogDebug("CreateNew(): mockComp → {MockComp}", mockComp);
             var objComp = ComponentFactory.GetComponent<T>();
+			_logger.LogDebug("CreateNew(): objComp → {ObjComp}", objComp);
 
             if (mockComp == null)
             {
@@ -43,6 +50,7 @@ namespace DNN.Integration.Test.Framework.Helpers
                 ComponentFactory.RegisterComponentInstance<T>(mockComp.Object);
             }
 
+			_logger.LogDebug("<<< Exiting CreateNew()");
             return mockComp;
         }
     }

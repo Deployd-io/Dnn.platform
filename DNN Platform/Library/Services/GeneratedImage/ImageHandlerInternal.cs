@@ -28,6 +28,7 @@ using DotNetNuke.Services.UserRequest;
 /// <summary>A helper for <see cref="ImageHandler"/>.</summary>
 internal class ImageHandlerInternal
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImageHandlerInternal));
     private static readonly TimeSpan DefaultClientCacheExpiration = new TimeSpan(0, 10, 0);
 
     private readonly IEventLogger eventLogger;
@@ -39,12 +40,17 @@ internal class ImageHandlerInternal
     /// <param name="eventLogger">The event logger.</param>
     public ImageHandlerInternal(IEventLogger eventLogger)
     {
+		Logger.LogDebug(">>> Entering ImageHandlerInternal(eventLogger={EventLogger})", eventLogger);
         this.eventLogger = eventLogger;
 
+		Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger}): this.eventLogger → {Arg1}", eventLogger, this.eventLogger);
         this.ContentType = ImageFormat.Jpeg;
+		Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger}): this.ContentType → {Arg1}", eventLogger, this.ContentType);
         this.ImageCompression = 95;
         this.ImageTransforms = [];
+		Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger}): this.ImageCompression → {Arg1}", eventLogger, this.ImageCompression);
         this.AllowStandalone = false;
+		Logger.LogDebug("<<< Exiting ImageHandlerInternal(eventLogger={EventLogger})", eventLogger);
     }
 
     /// <summary>Initializes a new instance of the <see cref="ImageHandlerInternal"/> class.</summary>
@@ -56,6 +62,7 @@ internal class ImageHandlerInternal
     {
         this.imageStore = imageStore;
         this.now = now;
+		Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger},imageStore={ImageStore},now={Now}): this.imageStore → {Arg3}", eventLogger, imageStore, now, this.imageStore);
     }
 
     public TimeSpan ClientCacheExpiration
@@ -115,9 +122,11 @@ internal class ImageHandlerInternal
 
     public void HandleImageRequest(HttpContextBase context, Func<NameValueCollection, ImageInfo> imageGenCallback, string uniqueIdStringSeed)
     {
+		Logger.LogDebug(">>> Entering HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed})", context, imageGenCallback, uniqueIdStringSeed);
         context.Response.Clear();
 
         var ipAddress = UserRequestIPAddressController.Instance.GetUserRequestIPAddress(context.Request);
+		Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): ipAddress → {IpAddress}", context, imageGenCallback, uniqueIdStringSeed, ipAddress);
 
         // Check if allowed standalone
         if (!this.AllowStandalone && context.Request.UrlReferrer == null && !context.Request.IsLocal)
@@ -130,6 +139,8 @@ internal class ImageHandlerInternal
                     LogTypeKey = nameof(EventLogType.ADMIN_ALERT),
                 };
                 logInfo.LogUserId = PortalSettings.Current.UserId;
+				Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): logInfo.LogUserId → {Arg3}", context, imageGenCallback, uniqueIdStringSeed, logInfo.LogUserId);
+				Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): logInfo.LogPortalId → {Arg3}", context, imageGenCallback, uniqueIdStringSeed, logInfo.LogPortalId);
                 logInfo.LogPortalId = PortalSettings.Current.PortalId;
                 logInfo.AddProperty("DnnImageHandler", Message);
                 logInfo.AddProperty("IP", ipAddress);
@@ -148,6 +159,7 @@ internal class ImageHandlerInternal
             !context.Request.UrlReferrer.Host.Equals(context.Request.Url.Host, StringComparison.OrdinalIgnoreCase))
         {
             var allowed = false;
+			Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): allowed → {Allowed}", context, imageGenCallback, uniqueIdStringSeed, allowed);
             var allowedDomains = string.Empty;
             foreach (var allowedDomain in this.AllowedDomains)
             {
@@ -175,6 +187,7 @@ internal class ImageHandlerInternal
                     logInfo.LogUserId = PortalSettings.Current.UserId;
                     logInfo.LogPortalId = PortalSettings.Current.PortalId;
                     logInfo.AddProperty("DnnImageHandler", message);
+		Logger.LogDebug("<<< Exiting HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed})", context, imageGenCallback, uniqueIdStringSeed);
                     logInfo.AddProperty("IP", ipAddress);
 
 #pragma warning disable CA1507 // Use nameof in place of string
@@ -193,18 +206,22 @@ internal class ImageHandlerInternal
 
         // Generate Image
         var imageMethodData = imageGenCallback(context.Request.QueryString);
+		Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): imageMethodData → {ImageMethodData}", context, imageGenCallback, uniqueIdStringSeed, imageMethodData);
 
         context.Response.ContentType = GetImageMimeType(this.ContentType);
         if (imageMethodData == null)
         {
+			Logger.LogWarning("Throwing InvalidOperationException from HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed})", context, imageGenCallback, uniqueIdStringSeed);
             throw new InvalidOperationException("The DnnImageHandler cannot return null.");
         }
 
         if (imageMethodData.IsEmptyImage)
         {
             using var imageOutputBuffer = new MemoryStream();
+			Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): imageOutputBuffer → {ImageOutputBuffer}", context, imageGenCallback, uniqueIdStringSeed, imageOutputBuffer);
             this.RenderImage(imageMethodData.Image, imageOutputBuffer);
             var buffer = imageOutputBuffer.GetBuffer();
+			Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): buffer → {Buffer}", context, imageGenCallback, uniqueIdStringSeed, buffer);
             context.Response.OutputStream.Write(buffer, 0, buffer.Length);
             context.Response.End();
             return;
@@ -213,8 +230,11 @@ internal class ImageHandlerInternal
         string cacheId = this.GetUniqueIdString(context, uniqueIdStringSeed);
 
         var userId = -1;
+		Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): userId → {UserId}", context, imageGenCallback, uniqueIdStringSeed, userId);
         var cacheCleared = false;
+		Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): cacheCleared → {CacheCleared}", context, imageGenCallback, uniqueIdStringSeed, cacheCleared);
         var isProfilePic = "profilepic".Equals(context.Request.QueryString["mode"], StringComparison.OrdinalIgnoreCase);
+		Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): isProfilePic → {IsProfilePic}", context, imageGenCallback, uniqueIdStringSeed, isProfilePic);
         if (isProfilePic)
         {
             if (int.TryParse(context.Request.QueryString["userId"], out userId))
@@ -224,6 +244,7 @@ internal class ImageHandlerInternal
         }
 
         var isAuthorizedProfilePicRequest = !isProfilePic || userId <= 0 || IsPicVisibleToCurrentUser(userId);
+		Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): isAuthorizedProfilePicRequest → {IsAuthorizedProfilePicRequest}", context, imageGenCallback, uniqueIdStringSeed, isAuthorizedProfilePicRequest);
         if (!isAuthorizedProfilePicRequest)
         {
             const string message = "Not allowed to see profile picture";
@@ -254,7 +275,9 @@ internal class ImageHandlerInternal
             {
                 var provider = CultureInfo.InvariantCulture;
                 var lastMod = DateTime.ParseExact(context.Request.Headers["If-Modified-Since"], "r", provider).ToLocalTime();
+				Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): lastMod → {LastMod}", context, imageGenCallback, uniqueIdStringSeed, lastMod);
                 var etag = context.Request.Headers["If-None-Match"];
+				Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): etag → {Etag}", context, imageGenCallback, uniqueIdStringSeed, etag);
                 if (lastMod + this.ClientCacheExpiration > this.DateTime_Now && etag == cacheId)
                 {
                     context.Response.StatusCode = 304;
@@ -341,8 +364,10 @@ internal class ImageHandlerInternal
 
     internal static string GetImageMimeType(ImageFormat format)
     {
+		Logger.LogDebug(">>> Entering GetImageMimeType(format={Format})", format);
         string mimeType = "image/x-unknown";
 
+		Logger.LogDebug("GetImageMimeType(format={Format}): mimeType → {MimeType}", format, mimeType);
         if (format.Equals(ImageFormat.Gif))
         {
             mimeType = "image/gif";
@@ -368,18 +393,23 @@ internal class ImageHandlerInternal
             mimeType = "image/x-icon";
         }
 
+		Logger.LogDebug("<<< Exiting GetImageMimeType(format={Format})", format);
         return mimeType;
     }
 
     private static string GetIdFromBytes(byte[] buffer)
     {
+		Logger.LogDebug(">>> Entering GetIdFromBytes(buffer={Buffer})", buffer);
         using var hasher = CryptographyUtils.CreateSHA256();
         var sb = new StringBuilder();
+		Logger.LogDebug("GetIdFromBytes(buffer={Buffer}): sb → {Sb}", buffer, sb);
+		Logger.LogDebug("GetIdFromBytes(buffer={Buffer}): hasher → {Hasher}", buffer, hasher);
         foreach (var b in hasher.ComputeHash(buffer))
         {
             sb.Append(b.ToString("X2", CultureInfo.InvariantCulture));
         }
 
+		Logger.LogDebug("<<< Exiting GetIdFromBytes(buffer={Buffer})", buffer);
         return sb.ToString();
     }
 
@@ -388,39 +418,52 @@ internal class ImageHandlerInternal
     /// <returns>ImageCodecInfo.</returns>
     private static ImageCodecInfo GetEncoderInfo(string mimeType)
     {
+		Logger.LogDebug(">>> Entering GetEncoderInfo(mimeType={MimeType})", mimeType);
         var encoders = ImageCodecInfo.GetImageEncoders();
+		Logger.LogDebug("GetEncoderInfo(mimeType={MimeType}): encoders → {Encoders}", mimeType, encoders);
+		Logger.LogDebug("<<< Exiting GetEncoderInfo(mimeType={MimeType})", mimeType);
         return encoders.FirstOrDefault(x => x.MimeType == mimeType);
     }
 
     private static bool IsPicVisibleToCurrentUser(int profileUserId)
     {
+		Logger.LogDebug(">>> Entering IsPicVisibleToCurrentUser(profileUserId={ProfileUserId})", profileUserId);
         var settings = PortalController.Instance.GetCurrentSettings();
         var profileUser = UserController.Instance.GetUser(settings.PortalId, profileUserId);
+		Logger.LogDebug("IsPicVisibleToCurrentUser(profileUserId={ProfileUserId}): profileUser → {ProfileUser}", profileUserId, profileUser);
+		Logger.LogDebug("IsPicVisibleToCurrentUser(profileUserId={ProfileUserId}): settings → {Settings}", profileUserId, settings);
 
         var photoProperty = profileUser?.Profile.GetProperty("Photo");
+		Logger.LogDebug("IsPicVisibleToCurrentUser(profileUserId={ProfileUserId}): photoProperty → {PhotoProperty}", profileUserId, photoProperty);
         if (photoProperty == null)
         {
             return false;
         }
 
         var currentUser = UserController.Instance.GetCurrentUserInfo();
+		Logger.LogDebug("IsPicVisibleToCurrentUser(profileUserId={ProfileUserId}): currentUser → {CurrentUser}", profileUserId, currentUser);
+		Logger.LogDebug("<<< Exiting IsPicVisibleToCurrentUser(profileUserId={ProfileUserId})", profileUserId);
         return ProfilePropertyAccess.CheckAccessLevel(settings, photoProperty, currentUser, profileUser);
     }
 
     private static void ReturnDefaultProfilePicture(HttpContextBase context)
     {
+		Logger.LogDebug(">>> Entering ReturnDefaultProfilePicture(context={Context})", context);
         context.Response.Cache.SetCacheability(HttpCacheability.Private);
         context.Response.Cache.SetNoServerCaching();
         context.Response.Cache.SetNoStore();
         context.Response.ContentType = "image/gif";
         context.Response.WriteFile(context.Server.MapPath("~/images/no_avatar.gif"));
         context.Response.End();
+		Logger.LogDebug("<<< Exiting ReturnDefaultProfilePicture(context={Context})", context);
     }
 
     private string GetUniqueIdString(HttpContextBase context, string uniqueIdStringSeed)
     {
+		Logger.LogDebug(">>> Entering GetUniqueIdString(context={Context},uniqueIdStringSeed={UniqueIdStringSeed})", context, uniqueIdStringSeed);
         var builder = new StringBuilder();
         builder.Append(uniqueIdStringSeed);
+		Logger.LogDebug("GetUniqueIdString(context={Context},uniqueIdStringSeed={UniqueIdStringSeed}): builder → {Builder}", context, uniqueIdStringSeed, builder);
         foreach (var key in context.Request.QueryString.AllKeys.OrderBy(k => k))
         {
             builder.Append(key);
@@ -432,26 +475,32 @@ internal class ImageHandlerInternal
             builder.Append(tran.UniqueString);
         }
 
+		Logger.LogDebug("<<< Exiting GetUniqueIdString(context={Context},uniqueIdStringSeed={UniqueIdStringSeed})", context, uniqueIdStringSeed);
         return GetIdFromBytes(Encoding.ASCII.GetBytes(builder.ToString()));
     }
 
     private Image GetImageThroughTransforms(Image image)
     {
+		Logger.LogDebug(">>> Entering GetImageThroughTransforms(image={Image})", image);
         try
         {
+			Logger.LogDebug("<<< Exiting GetImageThroughTransforms(image={Image})", image);
             return this.ImageTransforms.Aggregate(image, (current, tran) => tran.ProcessImage(current));
         }
         finally
         {
             image?.Dispose();
+		Logger.LogDebug("<<< Exiting GetImageThroughTransforms(buffer={Buffer})", buffer);
         }
     }
 
     // Clear the user image disk cache if userid is found in clear list and is within ClientCacheExpiration time.
     private bool ClearDiskImageCacheIfNecessary(int userId, int portalId, string cacheId)
     {
+		Logger.LogDebug(">>> Entering ClearDiskImageCacheIfNecessary(userId={UserId},portalId={PortalId},cacheId={CacheId})", userId, portalId, cacheId);
         var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.UserIdListToClearDiskImageCacheKey, portalId);
         Dictionary<int, DateTime> userIds;
+		Logger.LogDebug("ClearDiskImageCacheIfNecessary(userId={UserId},portalId={PortalId},cacheId={CacheId}): cacheKey → {CacheKey}", userId, portalId, cacheId, cacheKey);
         if ((userIds = DataCache.GetCache<Dictionary<int, DateTime>>(cacheKey)) == null || !userIds.ContainsKey(userId))
         {
             return false;
@@ -468,23 +517,28 @@ internal class ImageHandlerInternal
         // Remove the userId from the clear list when timespan is > ClientCacheExpiration.
         userIds.Remove(userId);
         DataCache.SetCache(cacheKey, userIds);
+		Logger.LogDebug("<<< Exiting ClearDiskImageCacheIfNecessary(userId={UserId},portalId={PortalId},cacheId={CacheId})", userId, portalId, cacheId);
         return true;
     }
 
     private Image GetImageThroughTransforms(byte[] buffer)
     {
         using var memoryStream = new MemoryStream(buffer);
+		Logger.LogDebug("GetImageThroughTransforms(buffer={Buffer}): memoryStream → {MemoryStream}", buffer, memoryStream);
         return this.GetImageThroughTransforms(Image.FromStream(memoryStream));
     }
 
     private void RenderImage(Image image, Stream outStream)
     {
+		Logger.LogDebug(">>> Entering RenderImage(image={Image},outStream={OutStream})", image, outStream);
         try
         {
             if (Equals(this.ContentType, ImageFormat.Gif))
             {
                 var quantizer = new OctreeQuantizer(255, 8);
+				Logger.LogDebug("RenderImage(image={Image},outStream={OutStream}): quantizer → {Quantizer}", image, outStream, quantizer);
                 using var quantized = quantizer.Quantize(image);
+				Logger.LogDebug("RenderImage(image={Image},outStream={OutStream}): quantized → {Quantized}", image, outStream, quantized);
                 quantized.Save(outStream, ImageFormat.Gif);
             }
             else
@@ -494,6 +548,7 @@ internal class ImageHandlerInternal
                     Param = { [0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, this.ImageCompression) },
                 };
                 var ici = GetEncoderInfo(GetImageMimeType(this.ContentType));
+				Logger.LogDebug("RenderImage(image={Image},outStream={OutStream}): ici → {Ici}", image, outStream, ici);
                 image?.Save(outStream, ici, eps);
             }
         }
@@ -501,5 +556,6 @@ internal class ImageHandlerInternal
         {
             image?.Dispose();
         }
+		Logger.LogDebug("<<< Exiting RenderImage(image={Image},outStream={OutStream})", image, outStream);
     }
 }

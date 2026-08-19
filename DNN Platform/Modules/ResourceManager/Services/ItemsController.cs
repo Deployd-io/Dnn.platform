@@ -48,6 +48,7 @@ namespace Dnn.Modules.ResourceManager.Services
     [DnnModuleAuthorize(AccessLevel = SecurityAccessLevel.View)]
     public class ItemsController : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ItemsController));
         private readonly IFolderMappingController folderMappingController = FolderMappingController.Instance;
         private readonly IModuleControlPipeline modulePipeline;
         private readonly IApplicationStatusInfo applicationStatusInfo;
@@ -68,8 +69,10 @@ namespace Dnn.Modules.ResourceManager.Services
         public ItemsController(IModuleControlPipeline modulePipeline, IApplicationStatusInfo applicationStatusInfo, IPermissionDefinitionService permissionDefinitionService, IHostSettings hostSettings, RoleProvider roleProvider)
             : this(modulePipeline, applicationStatusInfo, permissionDefinitionService, hostSettings, roleProvider, null, null)
         {
+		Logger.LogDebug(">>> Entering ItemsController(modulePipeline={ModulePipeline},applicationStatusInfo={ApplicationStatusInfo},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},roleProvider={RoleProvider})", modulePipeline, applicationStatusInfo, permissionDefinitionService, hostSettings, roleProvider);
         }
 
+		Logger.LogDebug("<<< Exiting ItemsController(modulePipeline={ModulePipeline},applicationStatusInfo={ApplicationStatusInfo},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},roleProvider={RoleProvider})", modulePipeline, applicationStatusInfo, permissionDefinitionService, hostSettings, roleProvider);
         /// <summary>Initializes a new instance of the <see cref="ItemsController"/> class.</summary>
         /// <param name="modulePipeline">An instance of an <see cref="IModuleControlPipeline"/> used to hook into the EditUrl of the webforms folders provider settings UI.</param>
         /// <param name="applicationStatusInfo">The application status info.</param>
@@ -87,12 +90,19 @@ namespace Dnn.Modules.ResourceManager.Services
             ICryptographyProvider cryptographyProvider,
             IModuleController moduleController)
         {
+			Logger.LogDebug("ItemsController(modulePipeline={ModulePipeline},applicationStatusInfo={ApplicationStatusInfo},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},roleProvider={RoleProvider},cryptographyProvider={CryptographyProvider},moduleController={ModuleController}): applicationStatusInfo → {ApplicationStatusInfo1}", modulePipeline, applicationStatusInfo, permissionDefinitionService, hostSettings, roleProvider, cryptographyProvider, moduleController, applicationStatusInfo);
+			Logger.LogDebug("ItemsController(modulePipeline={ModulePipeline},applicationStatusInfo={ApplicationStatusInfo},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},roleProvider={RoleProvider},cryptographyProvider={CryptographyProvider},moduleController={ModuleController}): permissionDefinitionService → {PermissionDefinitionService1}", modulePipeline, applicationStatusInfo, permissionDefinitionService, hostSettings, roleProvider, cryptographyProvider, moduleController, permissionDefinitionService);
+			Logger.LogDebug("ItemsController(modulePipeline={ModulePipeline},applicationStatusInfo={ApplicationStatusInfo},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},roleProvider={RoleProvider},cryptographyProvider={CryptographyProvider},moduleController={ModuleController}): hostSettings → {HostSettings1}", modulePipeline, applicationStatusInfo, permissionDefinitionService, hostSettings, roleProvider, cryptographyProvider, moduleController, hostSettings);
             this.modulePipeline = modulePipeline;
+			Logger.LogDebug("ItemsController(modulePipeline={ModulePipeline},applicationStatusInfo={ApplicationStatusInfo},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},roleProvider={RoleProvider},cryptographyProvider={CryptographyProvider},moduleController={ModuleController}): modulePipeline → {ModulePipeline1}", modulePipeline, applicationStatusInfo, permissionDefinitionService, hostSettings, roleProvider, cryptographyProvider, moduleController, modulePipeline);
+			Logger.LogDebug("ItemsController(modulePipeline={ModulePipeline},applicationStatusInfo={ApplicationStatusInfo},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},roleProvider={RoleProvider},cryptographyProvider={CryptographyProvider},moduleController={ModuleController}): this.modulePipeline → {Arg7}", modulePipeline, applicationStatusInfo, permissionDefinitionService, hostSettings, roleProvider, cryptographyProvider, moduleController, this.modulePipeline);
             this.applicationStatusInfo = applicationStatusInfo;
             this.permissionDefinitionService = permissionDefinitionService;
             this.hostSettings = hostSettings;
+			Logger.LogDebug("ItemsController(modulePipeline={ModulePipeline},applicationStatusInfo={ApplicationStatusInfo},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},roleProvider={RoleProvider},cryptographyProvider={CryptographyProvider},moduleController={ModuleController}): this.applicationStatusInfo → {Arg7}", modulePipeline, applicationStatusInfo, permissionDefinitionService, hostSettings, roleProvider, cryptographyProvider, moduleController, this.applicationStatusInfo);
             this.roleProvider = roleProvider;
             this.cryptographyProvider = cryptographyProvider ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<ICryptographyProvider>();
+			Logger.LogDebug("ItemsController(modulePipeline={ModulePipeline},applicationStatusInfo={ApplicationStatusInfo},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},roleProvider={RoleProvider},cryptographyProvider={CryptographyProvider},moduleController={ModuleController}): this.permissionDefinitionService → {Arg7}", modulePipeline, applicationStatusInfo, permissionDefinitionService, hostSettings, roleProvider, cryptographyProvider, moduleController, this.permissionDefinitionService);
             this.moduleController = moduleController ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IModuleController>();
         }
 
@@ -107,6 +117,9 @@ namespace Dnn.Modules.ResourceManager.Services
         [HttpGet]
         public HttpResponseMessage GetFolderContent(int folderId, int startIndex, int numItems, string sorting)
         {
+			Logger.LogDebug(">>> Entering GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sorting={Sorting})", folderId, startIndex, numItems, sorting);
+			Logger.LogDebug("<<< Exiting GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sorting={Sorting})", folderId, startIndex, numItems, sorting);
+			Logger.LogDebug("<<< Exiting GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sorting={Sorting},sortingOrder={SortingOrder})", folderId, startIndex, numItems, sorting, sortingOrder);
             return this.GetFolderContent(folderId, startIndex, numItems, sorting, "Ascending");
         }
 
@@ -156,6 +169,8 @@ namespace Dnn.Modules.ResourceManager.Services
             var groupId = this.FindGroupId(this.Request);
             var moduleId = this.Request.FindModuleId();
             var settings = new SettingsManager(this.moduleController, moduleId, groupId);
+			Logger.LogDebug(">>> Entering GetSettings()");
+			Logger.LogDebug("<<< Exiting GetSettings()");
             return this.Ok(settings);
         }
 
@@ -165,8 +180,12 @@ namespace Dnn.Modules.ResourceManager.Services
         [HttpGet]
         public IHttpActionResult GetFolderItem(int folderId)
         {
+			Logger.LogDebug(">>> Entering GetFolderItem(folderId={FolderId})", folderId);
             var folder = FolderManager.Instance.GetFolder(folderId);
             var item = this.GetItemViewModel(folder);
+			Logger.LogDebug("GetFolderItem(folderId={FolderId}): item → {Item}", folderId, item);
+			Logger.LogDebug("GetFolderItem(folderId={FolderId}): folder → {Folder}", folderId, folder);
+			Logger.LogDebug("<<< Exiting GetFolderItem(folderId={FolderId})", folderId);
             return this.Ok(item);
         }
 
@@ -179,8 +198,11 @@ namespace Dnn.Modules.ResourceManager.Services
         [HttpGet]
         public HttpResponseMessage SyncFolderContent(int folderId, int numItems, string sorting, bool recursive)
         {
+			Logger.LogDebug(">>> Entering SyncFolderContent(folderId={FolderId},numItems={NumItems},sorting={Sorting},recursive={Recursive})", folderId, numItems, sorting, recursive);
             var folder = FolderManager.Instance.GetFolder(folderId);
             FolderManager.Instance.Synchronize(folder.PortalID, folder.FolderPath, recursive, true);
+			Logger.LogDebug("SyncFolderContent(folderId={FolderId},numItems={NumItems},sorting={Sorting},recursive={Recursive}): folder → {Folder}", folderId, numItems, sorting, recursive, folder);
+			Logger.LogDebug("<<< Exiting SyncFolderContent(folderId={FolderId},numItems={NumItems},sorting={Sorting},recursive={Recursive})", folderId, numItems, sorting, recursive);
             return this.GetFolderContent(folderId, 0, numItems, sorting);
         }
 
@@ -190,17 +212,23 @@ namespace Dnn.Modules.ResourceManager.Services
         [HttpGet]
         public HttpResponseMessage ThumbnailDownLoad([FromUri] ThumbnailDownloadRequest item)
         {
+			Logger.LogDebug(">>> Entering ThumbnailDownLoad(item={Item})", item);
             var file = FileManager.Instance.GetFile(item.FileId);
             if (file == null || !PermissionsManager.Instance.HasGetFileContentPermission(file.FolderId))
+			Logger.LogDebug("ThumbnailDownLoad(item={Item}): file → {File}", item, file);
             {
                 return this.Request.CreateResponse(HttpStatusCode.NotFound, new { Message = "File doesn't exist." });
             }
 
             var thumbnailsManager = ThumbnailsManager.Instance;
             var result = new HttpResponseMessage(HttpStatusCode.OK);
+			Logger.LogDebug("ThumbnailDownLoad(item={Item}): result → {Result}", item, result);
+			Logger.LogDebug("ThumbnailDownLoad(item={Item}): result.Content → {Arg1}", item, result.Content);
             var thumbnail = thumbnailsManager.GetThumbnailContent(file, item.Width, item.Height, true);
+			Logger.LogDebug("ThumbnailDownLoad(item={Item}): thumbnail → {Thumbnail}", item, thumbnail);
             result.Content = thumbnail.Content;
             result.Content.Headers.ContentType = new MediaTypeHeaderValue(thumbnail.ContentType);
+			Logger.LogDebug("<<< Exiting ThumbnailDownLoad(item={Item})", item);
             return result;
         }
 
@@ -215,12 +243,16 @@ namespace Dnn.Modules.ResourceManager.Services
         [HttpGet]
         public HttpResponseMessage Download(int fileId, bool forceDownload)
         {
+			Logger.LogDebug(">>> Entering Download(fileId={FileId},forceDownload={ForceDownload})", fileId, forceDownload);
             var result = new HttpResponseMessage(HttpStatusCode.OK);
             var streamContent = ItemsManager.Instance.GetFileContent(fileId, out var fileName, out var contentType);
+			Logger.LogDebug("Download(fileId={FileId},forceDownload={ForceDownload}): streamContent → {StreamContent}", fileId, forceDownload, streamContent);
+			Logger.LogDebug("Download(fileId={FileId},forceDownload={ForceDownload}): result → {Result}", fileId, forceDownload, result);
             result.Content = new StreamContent(streamContent);
             result.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
             result.Content.Headers.ContentDisposition =
                 new ContentDispositionHeaderValue(forceDownload ? "attachment" : "inline") { FileName = fileName };
+			Logger.LogDebug("<<< Exiting Download(fileId={FileId},forceDownload={ForceDownload})", fileId, forceDownload);
             return result;
         }
 
@@ -232,9 +264,11 @@ namespace Dnn.Modules.ResourceManager.Services
         [HttpGet]
         public HttpResponseMessage GetFolderMappings()
         {
+			Logger.LogDebug(">>> Entering GetFolderMappings()");
             var isSuperTab = this.PortalSettings.ActiveTab is { IsSuperTab: true };
 
             var moduleContext = this.GetModuleContext();
+			Logger.LogDebug("GetFolderMappings(): moduleContext → {ModuleContext}", moduleContext);
             var mappings = FolderMappingController.Instance.GetFolderMappings(
                 isSuperTab && this.UserInfo.IsSuperUser ?
                     Null.NullInteger :
@@ -249,6 +283,7 @@ namespace Dnn.Modules.ResourceManager.Services
                         IsDefault =
                         m.MappingName == "Standard" || m.MappingName == "Secure" || m.MappingName == "Database",
                         editUrl = this.UserInfo.IsAdmin ?
+							Logger.LogDebug("GetFolderMappings(): editUrl → {EditUrl}", editUrl);
                             moduleContext.EditUrl(
                                 "ItemID",
                                 m.FolderMappingID.ToString(),
@@ -259,6 +294,7 @@ namespace Dnn.Modules.ResourceManager.Services
                             string.Empty,
                     };
 
+			Logger.LogDebug("<<< Exiting GetFolderMappings()");
             return this.Request.CreateResponse(HttpStatusCode.OK, r);
         }
 
@@ -268,7 +304,10 @@ namespace Dnn.Modules.ResourceManager.Services
         [DnnModuleAuthorize(AccessLevel = SecurityAccessLevel.View)]
         public HttpResponseMessage CanManageFolderTypes()
         {
+			Logger.LogDebug(">>> Entering CanManageFolderTypes()");
             var canManage = this.UserInfo.IsSuperUser || this.UserInfo.IsInRole(this.PortalSettings.AdministratorRoleName);
+			Logger.LogDebug("CanManageFolderTypes(): canManage → {CanManage}", canManage);
+			Logger.LogDebug("<<< Exiting CanManageFolderTypes()");
             return this.Request.CreateResponse(HttpStatusCode.OK, canManage);
         }
 
@@ -278,7 +317,10 @@ namespace Dnn.Modules.ResourceManager.Services
         [DnnModuleAuthorize(AccessLevel = SecurityAccessLevel.Admin)]
         public HttpResponseMessage GetAddFolderTypeUrl()
         {
+			Logger.LogDebug(">>> Entering GetAddFolderTypeUrl()");
             var moduleContext = this.GetModuleContext();
+			Logger.LogDebug("GetAddFolderTypeUrl(): moduleContext → {ModuleContext}", moduleContext);
+			Logger.LogDebug("<<< Exiting GetAddFolderTypeUrl()");
             return this.Request.CreateResponse(
                 HttpStatusCode.OK,
                 moduleContext.EditUrl(
@@ -297,7 +339,9 @@ namespace Dnn.Modules.ResourceManager.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage RemoveFolderType([FromBody] int folderMappingId)
         {
+			Logger.LogDebug(">>> Entering RemoveFolderType(folderMappingId=<redacted>)");
             this.folderMappingController.DeleteFolderMapping(this.PortalSettings.PortalId, folderMappingId);
+			Logger.LogDebug("<<< Exiting RemoveFolderType(folderMappingId=<redacted>)");
             return this.Request.CreateResponse(HttpStatusCode.OK, folderMappingId);
         }
 
@@ -308,12 +352,18 @@ namespace Dnn.Modules.ResourceManager.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage CreateNewFolder(CreateNewFolderRequest request)
         {
+			Logger.LogDebug(">>> Entering CreateNewFolder(request={Request})", request);
             var groupId = this.FindGroupId(this.Request);
             var moduleId = this.Request.FindModuleId();
+			Logger.LogDebug("CreateNewFolder(request={Request}): moduleId → {ModuleId}", request, moduleId);
             var moduleMode = new SettingsManager(this.moduleController, moduleId, groupId).Mode;
+			Logger.LogDebug("CreateNewFolder(request={Request}): moduleMode → {ModuleMode}", request, moduleMode);
+			Logger.LogDebug("CreateNewFolder(request={Request}): groupId → {GroupId}", request, groupId);
 
             var folder = ItemsManager.Instance.CreateNewFolder(request.FolderName, request.ParentFolderId, request.FolderMappingId, request.MappedName, moduleMode);
+			Logger.LogDebug("CreateNewFolder(request={Request}): folder → {Folder}", request, folder);
 
+			Logger.LogDebug("<<< Exiting CreateNewFolder(request={Request})", request);
             return this.Request.CreateResponse(
                 HttpStatusCode.OK,
                 new
@@ -332,11 +382,16 @@ namespace Dnn.Modules.ResourceManager.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DeleteFolder(DeleteFolderRequest request)
         {
+			Logger.LogDebug(">>> Entering DeleteFolder(request={Request})", request);
             var groupId = this.FindGroupId(this.Request);
             var moduleId = this.Request.FindModuleId();
+			Logger.LogDebug("DeleteFolder(request={Request}): moduleId → {ModuleId}", request, moduleId);
             var moduleMode = new SettingsManager(this.moduleController, moduleId, groupId).Mode;
+			Logger.LogDebug("DeleteFolder(request={Request}): moduleMode → {ModuleMode}", request, moduleMode);
+			Logger.LogDebug("DeleteFolder(request={Request}): groupId → {GroupId}", request, groupId);
 
             ItemsManager.Instance.DeleteFolder(request.FolderId, request.UnlinkAllowedStatus, moduleMode);
+			Logger.LogDebug("<<< Exiting DeleteFolder(request={Request})", request);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 0 });
         }
 
@@ -347,11 +402,16 @@ namespace Dnn.Modules.ResourceManager.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DeleteFile(DeleteFileRequest request)
         {
+			Logger.LogDebug(">>> Entering DeleteFile(request={Request})", request);
             var groupId = this.FindGroupId(this.Request);
             var moduleId = this.Request.FindModuleId();
+			Logger.LogDebug("DeleteFile(request={Request}): moduleId → {ModuleId}", request, moduleId);
             var moduleMode = new SettingsManager(this.moduleController, moduleId, groupId).Mode;
+			Logger.LogDebug("DeleteFile(request={Request}): moduleMode → {ModuleMode}", request, moduleMode);
+			Logger.LogDebug("DeleteFile(request={Request}): groupId → {GroupId}", request, groupId);
 
             ItemsManager.Instance.DeleteFile(request.FileId, moduleMode, groupId);
+			Logger.LogDebug("<<< Exiting DeleteFile(request={Request})", request);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 0 });
         }
 
@@ -366,21 +426,30 @@ namespace Dnn.Modules.ResourceManager.Services
         [HttpGet]
         public HttpResponseMessage Search(int folderId, string search, int pageIndex, int pageSize, string sorting, string culture)
         {
+			Logger.LogDebug(">>> Entering Search(folderId={FolderId},search={Search},pageIndex={PageIndex},pageSize={PageSize},sorting={Sorting},culture={Culture})", folderId, search, pageIndex, pageSize, sorting, culture);
             var folder = FolderManager.Instance.GetFolder(folderId);
             if (folder == null)
+			Logger.LogDebug("Search(folderId={FolderId},search={Search},pageIndex={PageIndex},pageSize={PageSize},sorting={Sorting},culture={Culture}): folder → {Folder}", folderId, search, pageIndex, pageSize, sorting, culture, folder);
             {
+				Logger.LogWarning("Throwing Exception from Search(folderId={FolderId},search={Search},pageIndex={PageIndex},pageSize={PageSize},sorting={Sorting},culture={Culture})", folderId, search, pageIndex, pageSize, sorting, culture);
                 throw new Exception(LocalizationHelper.GetString("FolderDoesNotExist.Error"));
             }
 
             var groupId = this.FindGroupId(this.Request);
+			Logger.LogDebug("Search(folderId={FolderId},search={Search},pageIndex={PageIndex},pageSize={PageSize},sorting={Sorting},culture={Culture}): groupId → {GroupId}", folderId, search, pageIndex, pageSize, sorting, culture, groupId);
             var moduleId = this.Request.FindModuleId();
+			Logger.LogDebug("Search(folderId={FolderId},search={Search},pageIndex={PageIndex},pageSize={PageSize},sorting={Sorting},culture={Culture}): moduleId → {ModuleId}", folderId, search, pageIndex, pageSize, sorting, culture, moduleId);
             var moduleMode = new SettingsManager(this.moduleController, moduleId, groupId).Mode;
+			Logger.LogDebug("Search(folderId={FolderId},search={Search},pageIndex={PageIndex},pageSize={PageSize},sorting={Sorting},culture={Culture}): moduleMode → {ModuleMode}", folderId, search, pageIndex, pageSize, sorting, culture, moduleMode);
 
             var searchResults = SearchController.Instance.SearchFolderContent(moduleId, folder, true, search, pageIndex, pageSize, sorting, moduleMode, out int totalHits);
+			Logger.LogDebug("Search(folderId={FolderId},search={Search},pageIndex={PageIndex},pageSize={PageSize},sorting={Sorting},culture={Culture}): searchResults → {SearchResults}", folderId, search, pageIndex, pageSize, sorting, culture, searchResults);
 
             var items = (from file in searchResults
                          select this.GetItemViewModel(file)).ToArray();
 
+			Logger.LogDebug("Search(folderId={FolderId},search={Search},pageIndex={PageIndex},pageSize={PageSize},sorting={Sorting},culture={Culture}): totalCount → {TotalCount}", folderId, search, pageIndex, pageSize, sorting, culture, totalCount);
+			Logger.LogDebug("<<< Exiting Search(folderId={FolderId},search={Search},pageIndex={PageIndex},pageSize={PageSize},sorting={Sorting},culture={Culture})", folderId, search, pageIndex, pageSize, sorting, culture);
             return this.Request.CreateResponse(HttpStatusCode.OK, new
             {
                 items,
@@ -395,22 +464,29 @@ namespace Dnn.Modules.ResourceManager.Services
         [AllowAnonymous]
         public IHttpActionResult GetFileDetails(int fileId)
         {
+			Logger.LogDebug(">>> Entering GetFileDetails(fileId={FileId})", fileId);
             var file = FileManager.Instance.GetFile(fileId);
             if (file == null)
+			Logger.LogDebug("GetFileDetails(fileId={FileId}): file → {File}", fileId, file);
             {
                 return this.NotFound();
             }
 
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
+			Logger.LogDebug("GetFileDetails(fileId={FileId}): folder → {Folder}", fileId, folder);
             if (!FolderPermissionController.CanViewFolder((FolderInfo)folder))
             {
                 var message = LocalizationHelper.GetString("UserHasNoPermissionToReadFileProperties.Error");
+				Logger.LogDebug("GetFileDetails(fileId={FileId}): message → {Message}", fileId, message);
                 return this.InternalServerError(new Exception(message));
             }
 
             var createdBy = file.CreatedByUser(this.PortalSettings.PortalId);
+			Logger.LogDebug("GetFileDetails(fileId={FileId}): createdBy → {CreatedBy}", fileId, createdBy);
             var lastModifiedBy = file.LastModifiedByUser(this.PortalSettings.PortalId);
+			Logger.LogDebug("GetFileDetails(fileId={FileId}): lastModifiedBy → {LastModifiedBy}", fileId, lastModifiedBy);
 
+			Logger.LogDebug("<<< Exiting GetFileDetails(fileId={FileId})", fileId);
             return this.Ok(new
             {
                 fileId = file.FileId,
@@ -435,21 +511,26 @@ namespace Dnn.Modules.ResourceManager.Services
 
         public IHttpActionResult SaveFileDetails(FileDetailsRequest fileDetails)
         {
+			Logger.LogDebug(">>> Entering SaveFileDetails(fileDetails={FileDetails})", fileDetails);
             var file = FileManager.Instance.GetFile(fileDetails.FileId);
             if (file == null)
+			Logger.LogDebug("SaveFileDetails(fileDetails={FileDetails}): file → {File}", fileDetails, file);
             {
                 return this.NotFound();
             }
 
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
+			Logger.LogDebug("SaveFileDetails(fileDetails={FileDetails}): folder → {Folder}", fileDetails, folder);
             if (!FolderPermissionController.CanManageFolder((FolderInfo)folder))
             {
                 var message = LocalizationHelper.GetString("UserHasNoPermissionToManageFileProperties.Error");
+				Logger.LogDebug("SaveFileDetails(fileDetails={FileDetails}): message → {Message}", fileDetails, message);
                 return this.InternalServerError(new Exception(message));
             }
 
             ItemsManager.Instance.SaveFileDetails(file, fileDetails);
 
+			Logger.LogDebug("<<< Exiting SaveFileDetails(fileDetails={FileDetails})", fileDetails);
             return this.Ok(new { Status = 0 });
         }
 
@@ -460,17 +541,25 @@ namespace Dnn.Modules.ResourceManager.Services
 
         public IHttpActionResult GetFolderDetails(int folderId)
         {
+			Logger.LogDebug(">>> Entering GetFolderDetails(folderId={FolderId})", folderId);
             var folder = FolderManager.Instance.GetFolder(folderId);
 
+			Logger.LogDebug("GetFolderDetails(folderId={FolderId}): folder → {Folder}", folderId, folder);
             if (!FolderPermissionController.CanManageFolder((FolderInfo)folder))
             {
                 var message = LocalizationHelper.GetString("UserHasNoPermissionToManageFolder.Error");
+				Logger.LogDebug("GetFolderDetails(folderId={FolderId}): message → {Message}", folderId, message);
                 return this.InternalServerError(new Exception(message));
             }
 
             var createdBy = folder.CreatedByUser(this.PortalSettings.PortalId);
+			Logger.LogDebug("GetFolderDetails(folderId={FolderId}): createdBy → {CreatedBy}", folderId, createdBy);
             var lastModifiedBy = folder.LastModifiedByUser(this.PortalSettings.PortalId);
+			Logger.LogDebug("GetFolderDetails(folderId={FolderId}): lastModifiedBy → {LastModifiedBy}", folderId, lastModifiedBy);
 
+			Logger.LogDebug("GetFolderDetails(folderId={FolderId}): lastModifiedOnDate → {LastModifiedOnDate}", folderId, lastModifiedOnDate);
+			Logger.LogDebug("GetFolderDetails(folderId={FolderId}): folderName → {FolderName}", folderId, folderName);
+			Logger.LogDebug("<<< Exiting GetFolderDetails(folderId={FolderId})", folderId);
             return this.Ok(new
             {
                 folderId = folder.FolderID,
@@ -493,8 +582,10 @@ namespace Dnn.Modules.ResourceManager.Services
 
         public IHttpActionResult SaveFolderDetails(FolderDetailsRequest folderDetails)
         {
+			Logger.LogDebug(">>> Entering SaveFolderDetails(folderDetails={FolderDetails})", folderDetails);
             var folder = FolderManager.Instance.GetFolder(folderDetails.FolderId);
             if (folder == null)
+			Logger.LogDebug("SaveFolderDetails(folderDetails={FolderDetails}): folder → {Folder}", folderDetails, folder);
             {
                 return this.NotFound();
             }
@@ -502,11 +593,13 @@ namespace Dnn.Modules.ResourceManager.Services
             if (!FolderPermissionController.CanManageFolder((FolderInfo)folder))
             {
                 var message = LocalizationHelper.GetString("UserHasNoPermissionToManageFolder.Error");
+				Logger.LogDebug("SaveFolderDetails(folderDetails={FolderDetails}): message → {Message}", folderDetails, message);
                 return this.InternalServerError(new Exception(message));
             }
 
             ItemsManager.Instance.SaveFolderDetails(folder, folderDetails);
 
+			Logger.LogDebug("<<< Exiting SaveFolderDetails(folderDetails={FolderDetails})", folderDetails);
             return this.Ok(new { Status = 0 });
         }
 
@@ -515,12 +608,14 @@ namespace Dnn.Modules.ResourceManager.Services
         [HttpGet]
         public HttpResponseMessage GetSortOptions()
         {
+			Logger.LogDebug(">>> Entering GetSortOptions()");
             var sortOptions = new[]
             {
                 new { value = "LastModifiedOnDate", label = LocalizationHelper.GetString("LastModifiedOnDate") },
                 new { value = "CreatedOnDate", label = LocalizationHelper.GetString("CreatedOnDate") },
                 new { value = "ItemName", label= LocalizationHelper.GetString("ItemName") },
             };
+			Logger.LogDebug("<<< Exiting GetSortOptions()");
             return this.Request.CreateResponse(HttpStatusCode.OK, sortOptions);
         }
 
@@ -531,11 +626,16 @@ namespace Dnn.Modules.ResourceManager.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage MoveFile(MoveFileRequest moveFileRequest)
         {
+			Logger.LogDebug(">>> Entering MoveFile(moveFileRequest={MoveFileRequest})", moveFileRequest);
             var groupId = this.FindGroupId(this.Request);
             var moduleId = this.Request.FindModuleId();
+			Logger.LogDebug("MoveFile(moveFileRequest={MoveFileRequest}): moduleId → {ModuleId}", moveFileRequest, moduleId);
             var moduleMode = new SettingsManager(this.moduleController, moduleId, groupId).Mode;
+			Logger.LogDebug("MoveFile(moveFileRequest={MoveFileRequest}): moduleMode → {ModuleMode}", moveFileRequest, moduleMode);
+			Logger.LogDebug("MoveFile(moveFileRequest={MoveFileRequest}): groupId → {GroupId}", moveFileRequest, groupId);
 
             ItemsManager.Instance.MoveFile(moveFileRequest.SourceFileId, moveFileRequest.DestinationFolderId, moduleMode, groupId);
+			Logger.LogDebug("<<< Exiting MoveFile(moveFileRequest={MoveFileRequest})", moveFileRequest);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 0 });
         }
 
@@ -546,11 +646,16 @@ namespace Dnn.Modules.ResourceManager.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage MoveFolder(MoveFolderRequest moveFolderRequest)
         {
+			Logger.LogDebug(">>> Entering MoveFolder(moveFolderRequest={MoveFolderRequest})", moveFolderRequest);
             var groupId = this.FindGroupId(this.Request);
             var moduleId = this.Request.FindModuleId();
+			Logger.LogDebug("MoveFolder(moveFolderRequest={MoveFolderRequest}): moduleId → {ModuleId}", moveFolderRequest, moduleId);
             var moduleMode = new SettingsManager(this.moduleController, moduleId, groupId).Mode;
+			Logger.LogDebug("MoveFolder(moveFolderRequest={MoveFolderRequest}): moduleMode → {ModuleMode}", moveFolderRequest, moduleMode);
+			Logger.LogDebug("MoveFolder(moveFolderRequest={MoveFolderRequest}): groupId → {GroupId}", moveFolderRequest, groupId);
 
             ItemsManager.Instance.MoveFolder(moveFolderRequest.SourceFolderId, moveFolderRequest.DestinationFolderId, moduleMode, groupId);
+			Logger.LogDebug("<<< Exiting MoveFolder(moveFolderRequest={MoveFolderRequest})", moveFolderRequest);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 0 });
         }
 
@@ -561,8 +666,13 @@ namespace Dnn.Modules.ResourceManager.Services
         [ValidateAntiForgeryToken]
         public IHttpActionResult GetFolderIconUrl(int folderId)
         {
+			Logger.LogDebug(">>> Entering GetFolderIconUrl(folderId={FolderId})", folderId);
             var folderMappingId = FolderManager.Instance.GetFolder(folderId).FolderMappingID;
             var url = GetFolderIconUrl(this.PortalSettings.PortalId, folderMappingId);
+			Logger.LogDebug("GetFolderIconUrl(folderId={FolderId}): url → {Url}", folderId, url);
+			Logger.LogDebug("GetFolderIconUrl(folderId={FolderId}): folderMappingId → {FolderMappingId}", folderId, folderMappingId);
+			Logger.LogDebug("<<< Exiting GetFolderIconUrl(folderId={FolderId})", folderId);
+			Logger.LogDebug("<<< Exiting GetFolderIconUrl(portalId={PortalId},folderMappingId=<redacted>)", portalId);
             return this.Ok(new { url });
         }
 
@@ -572,6 +682,7 @@ namespace Dnn.Modules.ResourceManager.Services
         [ValidateAntiForgeryToken]
         public IHttpActionResult GetRoleGroups()
         {
+			Logger.LogDebug(">>> Entering GetRoleGroups()");
             if (!this.UserInfo.IsInRole(this.PortalSettings.AdministratorRoleName))
             {
                 return this.Unauthorized();
@@ -581,6 +692,7 @@ namespace Dnn.Modules.ResourceManager.Services
                             .Cast<RoleGroupInfo>()
                             .Select(RoleGroupDto.FromRoleGroupInfo);
 
+			Logger.LogDebug("<<< Exiting GetRoleGroups()");
             return this.Ok(groups);
         }
 
@@ -590,6 +702,7 @@ namespace Dnn.Modules.ResourceManager.Services
         [ValidateAntiForgeryToken]
         public IHttpActionResult GetRoles()
         {
+			Logger.LogDebug(">>> Entering GetRoles()");
             var matchedRoles = RoleController.Instance.GetRoles(this.PortalSettings.PortalId)
                 .Where(r => r.Status == RoleStatus.Approved)
                 .Select(r =>
@@ -606,7 +719,12 @@ namespace Dnn.Modules.ResourceManager.Services
                     RoleName = r.RoleName,
                 })
                 .ToList();
+				Logger.LogDebug("GetRoles(): RoleName → {RoleName}", RoleName);
+				Logger.LogDebug("GetRoles(): RoleGroupId → {RoleGroupId}", RoleGroupId);
+				Logger.LogDebug("GetRoles(): IsSystemRole → {IsSystemRole}", IsSystemRole);
+				Logger.LogDebug("GetRoles(): RoleId → {RoleId}", RoleId);
 
+			Logger.LogDebug("<<< Exiting GetRoles()");
             return this.Ok(matchedRoles);
         }
 
@@ -618,6 +736,7 @@ namespace Dnn.Modules.ResourceManager.Services
         [ValidateAntiForgeryToken]
         public IHttpActionResult GetSuggestionUsers(string keyword, int count)
         {
+			Logger.LogDebug(">>> Entering GetSuggestionUsers(keyword={Keyword},count={Count})", keyword, count);
             try
             {
                 if (string.IsNullOrEmpty(keyword))
@@ -626,6 +745,7 @@ namespace Dnn.Modules.ResourceManager.Services
                 }
 
                 var displayMatch = keyword + "%";
+				Logger.LogDebug("GetSuggestionUsers(keyword={Keyword},count={Count}): displayMatch → {DisplayMatch}", keyword, count, displayMatch);
                 var totalRecords = 0;
                 var totalRecords2 = 0;
                 var matchedUsers = UserController.GetUsersByDisplayName(
@@ -653,11 +773,15 @@ namespace Dnn.Modules.ResourceManager.Services
                         userId = u.UserID,
                         displayName = $"{u.DisplayName}",
                     });
+					Logger.LogDebug("GetSuggestionUsers(keyword={Keyword},count={Count}): userId → {UserId}", keyword, count, userId);
+					Logger.LogDebug("GetSuggestionUsers(keyword={Keyword},count={Count}): displayName → {DisplayName}", keyword, count, displayName);
 
                 return this.Ok(finalUsers.ToList().GroupBy(x => x.userId).Select(group => group.First()));
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetSuggestionUsers(keyword={Keyword},count={Count}): {Arg2}", keyword, count, ex.getMessage());
+				Logger.LogDebug("<<< Exiting GetSuggestionUsers(keyword={Keyword},count={Count})", keyword, count);
                 return this.InternalServerError(new Exception(ex.Message));
             }
         }
@@ -668,8 +792,10 @@ namespace Dnn.Modules.ResourceManager.Services
         [ValidateAntiForgeryToken]
         public IHttpActionResult GetAllowedFileExtensions()
         {
+			Logger.LogDebug(">>> Entering GetAllowedFileExtensions()");
             var allowedExtensions = FileManager.Instance.WhiteList.ToStorageString();
             var parameters = new List<object>
+			Logger.LogDebug("GetAllowedFileExtensions(): allowedExtensions → {AllowedExtensions}", allowedExtensions);
             {
                 allowedExtensions.Split(',').Select(i => i.Trim()).OrderBy(a => a).ToList(),
                 this.PortalSettings.UserInfo.UserID,
@@ -680,16 +806,21 @@ namespace Dnn.Modules.ResourceManager.Services
             }
 
             var validationCode = ValidationUtils.ComputeValidationCode(this.cryptographyProvider, this.hostSettings, parameters);
+			Logger.LogDebug("GetAllowedFileExtensions(): validationCode → {ValidationCode}", validationCode);
 
             var maxUploadFileSize = Config.GetMaxUploadSize(this.applicationStatusInfo);
+			Logger.LogDebug("GetAllowedFileExtensions(): maxUploadFileSize → {MaxUploadFileSize}", maxUploadFileSize);
 
+			Logger.LogDebug("<<< Exiting GetAllowedFileExtensions()");
             return this.Ok(new { allowedExtensions, validationCode, maxUploadFileSize });
         }
 
         private static string GetFileIconUrl(string extension)
         {
+			Logger.LogDebug(">>> Entering GetFileIconUrl(extension={Extension})", extension);
             if (!string.IsNullOrEmpty(extension) && File.Exists(HostingEnvironment.MapPath(IconController.IconURL("Ext" + extension, "32x32", "Standard"))))
             {
+			Logger.LogDebug("<<< Exiting GetFileIconUrl(extension={Extension})", extension);
                 return IconController.IconURL("Ext" + extension, "32x32", "Standard");
             }
 
@@ -722,14 +853,17 @@ namespace Dnn.Modules.ResourceManager.Services
 
         private int FindGroupId(HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering FindGroupId(request={Request})", request);
             var headers = request.Headers;
             int groupId;
             int.TryParse(headers.GetValues("GroupId").FirstOrDefault(), out groupId);
+			Logger.LogDebug("<<< Exiting FindGroupId(request={Request})", request);
             return groupId;
         }
 
         private object GetItemViewModel(object item)
         {
+			Logger.LogDebug(">>> Entering GetItemViewModel(item={Item})", item);
             var folder = item as IFolderInfo;
             if (folder != null)
             {
@@ -743,10 +877,18 @@ namespace Dnn.Modules.ResourceManager.Services
                     modifiedOn = folder.LastModifiedOnDate,
                     unlinkAllowedStatus = this.GetUnlinkAllowedStatus(folder),
                 };
+				Logger.LogDebug("GetItemViewModel(item={Item}): unlinkAllowedStatus → {UnlinkAllowedStatus}", item, unlinkAllowedStatus);
+				Logger.LogDebug("GetItemViewModel(item={Item}): itemId → {ItemId}", item, itemId);
+				Logger.LogDebug("GetItemViewModel(item={Item}): isFolder → {IsFolder}", item, isFolder);
+				Logger.LogDebug("GetItemViewModel(item={Item}): createdOn → {CreatedOn}", item, createdOn);
+				Logger.LogDebug("GetItemViewModel(item={Item}): itemName → {ItemName}", item, itemName);
+				Logger.LogDebug("GetItemViewModel(item={Item}): modifiedOn → {ModifiedOn}", item, modifiedOn);
+				Logger.LogDebug("GetItemViewModel(item={Item}): iconUrl → {IconUrl}", item, iconUrl);
             }
 
             var thumbnailsManager = ThumbnailsManager.Instance;
             var file = item as IFileInfo;
+			Logger.LogDebug("<<< Exiting GetItemViewModel(item={Item})", item);
             return new
             {
                 isFolder = false,
@@ -764,6 +906,7 @@ namespace Dnn.Modules.ResourceManager.Services
 
         private string GetUnlinkAllowedStatus(IFolderInfo folder)
         {
+			Logger.LogDebug(">>> Entering GetUnlinkAllowedStatus(folder={Folder})", folder);
             if (this.AreMappedPathsSupported(folder.FolderMappingID) && folder.ParentID > 0 && FolderManager.Instance.GetFolder(folder.ParentID).FolderMappingID != folder.FolderMappingID)
             {
                 return "onlyUnlink";
@@ -771,6 +914,7 @@ namespace Dnn.Modules.ResourceManager.Services
 
             if (this.AreMappedPathsSupported(folder.FolderMappingID))
             {
+			Logger.LogDebug("<<< Exiting GetUnlinkAllowedStatus(folder={Folder})", folder);
                 return "true";
             }
 
@@ -779,21 +923,29 @@ namespace Dnn.Modules.ResourceManager.Services
 
         private bool AreMappedPathsSupported(int folderMappingId)
         {
+			Logger.LogDebug(">>> Entering AreMappedPathsSupported(folderMappingId=<redacted>)");
             if (this.mappedPathsSupported.ContainsKey(folderMappingId))
             {
                 return (bool)this.mappedPathsSupported[folderMappingId];
             }
 
             var folderMapping = FolderMappingController.Instance.GetFolderMapping(folderMappingId);
+			Logger.LogDebug("AreMappedPathsSupported(folderMappingId=<redacted>): folderMapping → {FolderMapping}", folderMapping);
             var folderProvider = FolderProvider.Instance(folderMapping.FolderProviderType);
+			Logger.LogDebug("AreMappedPathsSupported(folderMappingId=<redacted>): folderProvider → {FolderProvider}", folderProvider);
             var result = folderProvider.SupportsMappedPaths;
+			Logger.LogDebug("AreMappedPathsSupported(folderMappingId=<redacted>): result → {Result}", result);
             this.mappedPathsSupported[folderMappingId] = result;
+			Logger.LogDebug("<<< Exiting AreMappedPathsSupported(folderMappingId=<redacted>)");
             return result;
         }
 
         private ModuleInstanceContext GetModuleContext()
         {
+			Logger.LogDebug(">>> Entering GetModuleContext()");
             IModuleControl moduleControl = this.modulePipeline.CreateModuleControl(this.ActiveModule) as IModuleControl;
+			Logger.LogDebug("GetModuleContext(): moduleControl → {ModuleControl}", moduleControl);
+			Logger.LogDebug("<<< Exiting GetModuleContext()");
             return new ModuleInstanceContext(moduleControl);
         }
     }

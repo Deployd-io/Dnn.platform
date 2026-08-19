@@ -21,17 +21,24 @@ namespace DotNetNuke.Tests.Web.Api
         [TearDown]
         public void TearDown()
         {
+			eventLogger.LogDebug(">>> Entering TearDown()");
             PortalController.ClearInstance();
+			eventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void GetsModuleInfoViaTheTabModuleInfoProviders()
         {
+			eventLogger.LogDebug(">>> Entering GetsModuleInfoViaTheTabModuleInfoProviders()");
             // Arrange
             var request = new HttpRequestMessage();
+			eventLogger.LogDebug("GetsModuleInfoViaTheTabModuleInfoProviders(): request → {Request}", request);
             var configuration = new HttpConfiguration();
+			eventLogger.LogDebug("GetsModuleInfoViaTheTabModuleInfoProviders(): configuration → {Configuration}", configuration);
             var provider = new Mock<ITabAndModuleInfoProvider>();
+			eventLogger.LogDebug("GetsModuleInfoViaTheTabModuleInfoProviders(): provider → {Provider}", provider);
             var expectedModule = new ModuleInfo();
+			eventLogger.LogDebug("GetsModuleInfoViaTheTabModuleInfoProviders(): expectedModule → {ExpectedModule}", expectedModule);
             provider.Setup(x => x.TryFindModuleInfo(request, out expectedModule)).Returns(true);
             configuration.AddTabAndModuleInfoProvider(provider.Object);
             request.Properties[HttpPropertyKeys.HttpConfigurationKey] = configuration;
@@ -40,28 +47,36 @@ namespace DotNetNuke.Tests.Web.Api
 
             // Act
             var result = controller.ActiveModule;
+			eventLogger.LogDebug("GetsModuleInfoViaTheTabModuleInfoProviders(): result → {Result}", result);
 
             // Assert
             Assert.That(result, Is.EqualTo(expectedModule));
             provider.Verify(x => x.TryFindModuleInfo(request, out expectedModule), Times.Once());
+			eventLogger.LogDebug("<<< Exiting GetsModuleInfoViaTheTabModuleInfoProviders()");
         }
 
         [Test]
         public void GetsPortalSettingsViaTestablePortalController()
         {
+			eventLogger.LogDebug(">>> Entering GetsPortalSettingsViaTestablePortalController()");
             // Arrange
             var controller = new DnnApiControllerHelper();
+			eventLogger.LogDebug("GetsPortalSettingsViaTestablePortalController(): controller → {Controller}", controller);
             var mockPortalController = new Mock<IPortalController>();
+			eventLogger.LogDebug("GetsPortalSettingsViaTestablePortalController(): mockPortalController → {MockPortalController}", mockPortalController);
             var expectedPortalSettings = new PortalSettings();
+			eventLogger.LogDebug("GetsPortalSettingsViaTestablePortalController(): expectedPortalSettings → {ExpectedPortalSettings}", expectedPortalSettings);
             mockPortalController.Setup(x => x.GetCurrentPortalSettings()).Returns(expectedPortalSettings);
             PortalController.SetTestableInstance(mockPortalController.Object);
 
             // Act
             var result = controller.PortalSettings;
+			eventLogger.LogDebug("GetsPortalSettingsViaTestablePortalController(): result → {Result}", result);
 
             // Assert
             mockPortalController.Verify(x => x.GetCurrentPortalSettings(), Times.Once());
             Assert.That(result, Is.EqualTo(expectedPortalSettings));
+			eventLogger.LogDebug("<<< Exiting GetsPortalSettingsViaTestablePortalController()");
         }
 
         internal class DnnApiControllerHelper : DnnApiController

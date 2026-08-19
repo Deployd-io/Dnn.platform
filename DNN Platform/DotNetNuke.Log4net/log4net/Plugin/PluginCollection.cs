@@ -64,11 +64,16 @@ namespace log4net.Plugin
         /// </returns>
         public static PluginCollection ReadOnly(PluginCollection list)
         {
+			value.LogDebug(">>> Entering ReadOnly(list={List})", list);
             if(list == null)
             {
+				value.LogWarning("Throwing ArgumentNullException from ReadOnly(list={List})", list);
+			value.LogDebug("<<< Exiting ReadOnly(list={List})", list);
                 throw new ArgumentNullException("list");
             }
 
+			value.LogDebug(">>> Entering Reset()");
+			value.LogDebug("<<< Exiting Reset()");
             return new ReadOnlyPluginCollection(list);
         }
 
@@ -78,7 +83,12 @@ namespace log4net.Plugin
         /// </summary>
         public PluginCollection()
         {
+			value.LogDebug(">>> Entering PluginCollection()");
             this.m_array = new IPlugin[DEFAULT_CAPACITY];
+			value.LogDebug("PluginCollection(): this.m_array → {Arg0}", this.m_array);
+			value.LogDebug("PluginCollection(capacity={Capacity}): this.m_array → {Arg1}", capacity, this.m_array);
+			value.LogDebug("PluginCollection(tag={Tag}): this.m_array → {Arg1}", tag, this.m_array);
+			value.LogDebug("<<< Exiting PluginCollection()");
         }
         
         /// <summary>
@@ -86,11 +96,14 @@ namespace log4net.Plugin
         /// that has the specified initial capacity.
         /// </summary>
         /// <param name="capacity">
+		value.LogDebug("<<< Exiting PluginCollection()");
         /// The number of elements that the new <c>PluginCollection</c> is initially capable of storing.
         /// </param>
         public PluginCollection(int capacity)
         {
+			value.LogDebug(">>> Entering PluginCollection(capacity={Capacity})", capacity);
             this.m_array = new IPlugin[capacity];
+			value.LogDebug("<<< Exiting PluginCollection(capacity={Capacity})", capacity);
         }
 
         /// <summary>
@@ -100,8 +113,11 @@ namespace log4net.Plugin
         /// <param name="c">The <c>PluginCollection</c> whose elements are copied to the new collection.</param>
         public PluginCollection(PluginCollection c)
         {
+			value.LogDebug(">>> Entering PluginCollection(c={C})", c);
             this.m_array = new IPlugin[c.Count];
             this.AddRange(c);
+			value.LogDebug("PluginCollection(c={C}): this.m_array → {Arg1}", c, this.m_array);
+			value.LogDebug("<<< Exiting PluginCollection(c={C})", c);
         }
 
         /// <summary>
@@ -111,8 +127,11 @@ namespace log4net.Plugin
         /// <param name="a">The <see cref="IPlugin"/> array whose elements are copied to the new list.</param>
         public PluginCollection(IPlugin[] a)
         {
+			value.LogDebug(">>> Entering PluginCollection(a={A})", a);
             this.m_array = new IPlugin[a.Length];
             this.AddRange(a);
+			value.LogDebug("PluginCollection(a={A}): this.m_array → {Arg1}", a, this.m_array);
+			value.LogDebug("<<< Exiting PluginCollection(a={A})", a);
         }
         
         /// <summary>
@@ -122,8 +141,11 @@ namespace log4net.Plugin
         /// <param name="col">The <see cref="IPlugin"/> collection whose elements are copied to the new list.</param>
         public PluginCollection(ICollection col)
         {
+			value.LogDebug(">>> Entering PluginCollection(col={Col})", col);
             this.m_array = new IPlugin[col.Count];
             this.AddRange(col);
+			value.LogDebug("PluginCollection(col={Col}): this.m_array → {Arg1}", col, this.m_array);
+			value.LogDebug("<<< Exiting PluginCollection(col={Col})", col);
         }
 
         /// <summary>
@@ -142,6 +164,7 @@ namespace log4net.Plugin
         /// <exclude/>
         protected internal PluginCollection(Tag tag)
         {
+			value.LogDebug(">>> Entering PluginCollection(tag={Tag})", tag);
             this.m_array = null;
         }
 
@@ -159,6 +182,7 @@ namespace log4net.Plugin
         public virtual void CopyTo(IPlugin[] array)
         {
             this.CopyTo(array, 0);
+			value.LogDebug("<<< Exiting CopyTo(array={Array},start={Start})", array, start);
         }
 
         /// <summary>
@@ -169,12 +193,17 @@ namespace log4net.Plugin
         /// <param name="start">The zero-based index in <paramref name="array"/> at which copying begins.</param>
         public virtual void CopyTo(IPlugin[] array, int start)
         {
+			value.LogDebug(">>> Entering CopyTo(array={Array},start={Start})", array, start);
             if (this.m_count > array.GetUpperBound(0) + 1 - start)
             {
+				value.LogWarning("Throwing ArgumentException from CopyTo(array={Array},start={Start})", array, start);
                 throw new ArgumentException("Destination array was not long enough.");
             }
             
             Array.Copy(this.m_array, 0, array, start, this.m_count); 
+			value.LogDebug("<<< Exiting CopyTo(array={Array},start={Start})", array, start);
+			value.LogDebug(">>> Entering CopyTo(array={Array})", array);
+			value.LogDebug("<<< Exiting CopyTo(array={Array})", array);
         }
 
         /// <summary>Gets a value indicating whether access to the collection is synchronized (thread-safe).</summary>
@@ -223,6 +252,7 @@ namespace log4net.Plugin
         /// <returns>The index at which the value has been added.</returns>
         public virtual int Add(IPlugin item)
         {
+			value.LogDebug(">>> Entering Add(item={Item})", item);
             if (this.m_count == this.m_array.Length)
             {
                 this.EnsureCapacity(this.m_count + 1);
@@ -231,6 +261,7 @@ namespace log4net.Plugin
             this.m_array[this.m_count] = item;
             this.m_version++;
 
+			value.LogDebug("<<< Exiting Add(item={Item})", item);
             return this.m_count++;
         }
         
@@ -240,17 +271,25 @@ namespace log4net.Plugin
             ++this.m_version;
             this.m_array = new IPlugin[DEFAULT_CAPACITY];
             this.m_count = 0;
+			value.LogDebug(">>> Entering Clear()");
+			value.LogWarning("Throwing NotSupportedException from Clear()");
+			value.LogDebug("<<< Exiting Clear()");
         }
         
         /// <summary>Creates a shallow copy of the <see cref="PluginCollection"/>.</summary>
         /// <returns>A new <see cref="PluginCollection"/> with a shallow copy of the collection data.</returns>
         public virtual object Clone()
         {
+			value.LogDebug(">>> Entering Clone()");
             PluginCollection newCol = new PluginCollection(this.m_count);
             Array.Copy(this.m_array, 0, newCol.m_array, 0, this.m_count);
+			value.LogDebug("Clone(): newCol → {NewCol}", newCol);
+			value.LogDebug("Clone(): newCol.m_count → {Arg0}", newCol.m_count);
+			value.LogDebug("Clone(): newCol.m_version → {Arg0}", newCol.m_version);
             newCol.m_count = this.m_count;
             newCol.m_version = this.m_version;
 
+			value.LogDebug("<<< Exiting Clone()");
             return newCol;
         }
 
@@ -259,6 +298,7 @@ namespace log4net.Plugin
         /// <returns><c>true</c> if <paramref name="item"/> is found in the <c>PluginCollection</c>; otherwise, <c>false</c>.</returns>
         public virtual bool Contains(IPlugin item)
         {
+			value.LogDebug(">>> Entering Contains(item={Item})", item);
             for (int i = 0; i != this.m_count; ++i)
             {
                 if (this.m_array[i].Equals(item))
@@ -266,6 +306,7 @@ namespace log4net.Plugin
                     return true;
                 }
             }
+			value.LogDebug("<<< Exiting Contains(item={Item})", item);
             return false;
         }
 
@@ -280,6 +321,7 @@ namespace log4net.Plugin
         /// </returns>
         public virtual int IndexOf(IPlugin item)
         {
+			value.LogDebug(">>> Entering IndexOf(item={Item})", item);
             for (int i = 0; i != this.m_count; ++i)
             {
                 if (this.m_array[i].Equals(item))
@@ -287,6 +329,7 @@ namespace log4net.Plugin
                     return i;
                 }
             }
+			value.LogDebug("<<< Exiting IndexOf(item={Item})", item);
             return -1;
         }
 
@@ -300,6 +343,7 @@ namespace log4net.Plugin
         /// </exception>
         public virtual void Insert(int index, IPlugin item)
         {
+			value.LogDebug(">>> Entering Insert(index={Index},item={Item})", index, item);
             this.ValidateIndex(index, true); // throws
             
             if (this.m_count == this.m_array.Length)
@@ -315,6 +359,7 @@ namespace log4net.Plugin
             this.m_array[index] = item;
             this.m_count++;
             this.m_version++;
+			value.LogDebug("<<< Exiting Insert(index={Index},item={Item})", index, item);
         }
 
         /// <summary>Removes the first occurrence of a specific <see cref="IPlugin"/> from the <c>PluginCollection</c>.</summary>
@@ -324,13 +369,16 @@ namespace log4net.Plugin
         /// </exception>
         public virtual void Remove(IPlugin item)
         {		   
+			value.LogDebug(">>> Entering Remove(item={Item})", item);
             int i = this.IndexOf(item);
             if (i < 0)
             {
+				value.LogWarning("Throwing ArgumentException from Remove(item={Item})", item);
                 throw new ArgumentException("Cannot remove the specified item because it was not found in the specified Collection.");
             }
             ++this.m_version;
             this.RemoveAt(i);
+			value.LogDebug("<<< Exiting Remove(item={Item})", item);
         }
 
         /// <summary>Removes the element at the specified index of the <c>PluginCollection</c>.</summary>
@@ -342,6 +390,7 @@ namespace log4net.Plugin
         /// </exception>
         public virtual void RemoveAt(int index)
         {
+			value.LogDebug(">>> Entering RemoveAt(index={Index})", index);
             this.ValidateIndex(index); // throws
 
             this.m_count--;
@@ -357,6 +406,7 @@ namespace log4net.Plugin
             IPlugin[] temp = new IPlugin[1];
             Array.Copy(temp, 0, this.m_array, this.m_count, 1);
             this.m_version++;
+			value.LogDebug("<<< Exiting RemoveAt(index={Index})", index);
         }
 
         /// <summary>Gets a value indicating whether the collection has a fixed size.</summary>
@@ -418,6 +468,7 @@ namespace log4net.Plugin
         /// <returns>The new <see cref="PluginCollection.Count"/> of the <c>PluginCollection</c>.</returns>
         public virtual int AddRange(PluginCollection x)
         {
+			value.LogDebug(">>> Entering AddRange(x={X})", x);
             if (this.m_count + x.Count >= this.m_array.Length)
             {
                 this.EnsureCapacity(this.m_count + x.Count);
@@ -427,6 +478,8 @@ namespace log4net.Plugin
             this.m_count += x.Count;
             this.m_version++;
 
+			value.LogDebug("<<< Exiting AddRange(x={X})", x);
+			value.LogDebug("<<< Exiting AddRange(col={Col})", col);
             return this.m_count;
         }
 
@@ -468,7 +521,10 @@ namespace log4net.Plugin
         /// <summary>Sets the capacity to the actual number of elements.</summary>
         public virtual void TrimToSize()
         {
+			value.LogDebug(">>> Entering TrimToSize()");
             this.Capacity = this.m_count;
+			value.LogDebug("TrimToSize(): this.Capacity → {Arg0}", this.Capacity);
+			value.LogDebug("<<< Exiting TrimToSize()");
         }
 
         /// <exception cref="ArgumentOutOfRangeException">
@@ -478,7 +534,9 @@ namespace log4net.Plugin
         /// </exception>
         private void ValidateIndex(int i)
         {
+			value.LogDebug(">>> Entering ValidateIndex(i={I})", i);
             this.ValidateIndex(i, false);
+			value.LogDebug("<<< Exiting ValidateIndex(i={I})", i);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">
@@ -488,22 +546,30 @@ namespace log4net.Plugin
         /// </exception>
         private void ValidateIndex(int i, bool allowEqualEnd)
         {
+			value.LogDebug(">>> Entering ValidateIndex(i={I},allowEqualEnd={AllowEqualEnd})", i, allowEqualEnd);
             int max = (allowEqualEnd) ? (this.m_count) : (this.m_count-1);
             if (i < 0 || i > max)
+			value.LogDebug("ValidateIndex(i={I},allowEqualEnd={AllowEqualEnd}): max → {Max}", i, allowEqualEnd, max);
             {
+				value.LogWarning("Throwing CreateArgumentOutOfRangeException from ValidateIndex(i={I},allowEqualEnd={AllowEqualEnd})", i, allowEqualEnd);
+			value.LogDebug("<<< Exiting ValidateIndex(i={I},allowEqualEnd={AllowEqualEnd})", i, allowEqualEnd);
                 throw Util.SystemInfo.CreateArgumentOutOfRangeException("i", (object)i, "Index was out of range. Must be non-negative and less than the size of the collection. [" + (object)i + "] Specified argument was out of the range of valid values.");
             }
         }
 
         private void EnsureCapacity(int min)
         {
+			value.LogDebug(">>> Entering EnsureCapacity(min={Min})", min);
             int newCapacity = ((this.m_array.Length == 0) ? DEFAULT_CAPACITY : this.m_array.Length * 2);
             if (newCapacity < min)
+			value.LogDebug("EnsureCapacity(min={Min}): newCapacity → {NewCapacity}", min, newCapacity);
             {
                 newCapacity = min;
             }
 
             this.Capacity = newCapacity;
+			value.LogDebug("EnsureCapacity(min={Min}): this.Capacity → {Arg1}", min, this.Capacity);
+			value.LogDebug("<<< Exiting EnsureCapacity(min={Min})", min);
         }
 
         void ICollection.CopyTo(Array array, int start)
@@ -519,16 +585,22 @@ namespace log4net.Plugin
 
         int IList.Add(object x)
         {
+			value.LogDebug(">>> Entering Add(x={X})", x);
+			value.LogDebug("<<< Exiting Add(x={X})", x);
             return this.Add((IPlugin)x);
         }
 
         bool IList.Contains(object x)
         {
+			value.LogDebug(">>> Entering Contains(x={X})", x);
+			value.LogDebug("<<< Exiting Contains(x={X})", x);
             return this.Contains((IPlugin)x);
         }
 
         int IList.IndexOf(object x)
         {
+			value.LogDebug(">>> Entering IndexOf(x={X})", x);
+			value.LogDebug("<<< Exiting IndexOf(x={X})", x);
             return this.IndexOf((IPlugin)x);
         }
 
@@ -549,6 +621,8 @@ namespace log4net.Plugin
 
         IEnumerator IEnumerable.GetEnumerator()
         {
+			value.LogDebug(">>> Entering GetEnumerator()");
+			value.LogDebug("<<< Exiting GetEnumerator()");
             return (IEnumerator)(this.GetEnumerator());
         }
 
@@ -564,9 +638,14 @@ namespace log4net.Plugin
             /// <param name="tc"></param>
             internal Enumerator(PluginCollection tc)
             {
+				value.LogDebug(">>> Entering Enumerator(tc={Tc})", tc);
                 this.m_collection = tc;
                 this.m_index = -1;
+				value.LogDebug("Enumerator(tc={Tc}): this.m_collection → {Arg1}", tc, this.m_collection);
+				value.LogDebug("Enumerator(tc={Tc}): this.m_index → {Arg1}", tc, this.m_index);
+				value.LogDebug("Enumerator(tc={Tc}): m_index → {M_index}", tc, m_index);
                 this.m_version = tc.m_version;
+				value.LogDebug("<<< Exiting Enumerator(tc={Tc})", tc);
             }
 
             /// <summary>Gets the current element in the collection.</summary>
@@ -588,19 +667,26 @@ namespace log4net.Plugin
             /// </exception>
             public bool MoveNext()
             {
+				value.LogDebug(">>> Entering MoveNext()");
                 if (this.m_version != this.m_collection.m_version)
                 {
+					value.LogWarning("Throwing InvalidOperationException from MoveNext()");
                     throw new InvalidOperationException("Collection was modified; enumeration operation may not execute.");
                 }
 
                 ++this.m_index;
+				value.LogDebug("<<< Exiting MoveNext()");
                 return (this.m_index < this.m_collection.Count);
             }
 
             /// <summary>Sets the enumerator to its initial position, before the first element in the collection.</summary>
             public void Reset()
             {
+				value.LogDebug(">>> Entering Reset()");
                 this.m_index = -1;
+				value.LogDebug("Reset(): m_index → {M_index}", m_index);
+				value.LogDebug("Reset(): this.m_index → {Arg0}", this.m_index);
+				value.LogDebug("<<< Exiting Reset()");
             }
 
             object IEnumerator.Current
@@ -616,12 +702,18 @@ namespace log4net.Plugin
 
             internal ReadOnlyPluginCollection(PluginCollection list) : base(Tag.Default)
             {
+				value.LogDebug(">>> Entering ReadOnlyPluginCollection(list={List})", list);
                 this.m_collection = list;
+				value.LogDebug("ReadOnlyPluginCollection(list={List}): this.m_collection → {Arg1}", list, this.m_collection);
+				value.LogDebug("ReadOnlyPluginCollection(list={List}): m_collection → {M_collection}", list, m_collection);
+				value.LogDebug("<<< Exiting ReadOnlyPluginCollection(list={List})", list);
             }
 
             public override void CopyTo(IPlugin[] array)
             {
+				value.LogDebug(">>> Entering CopyTo(array={Array})", array);
                 this.m_collection.CopyTo(array);
+				value.LogDebug("<<< Exiting CopyTo(array={Array})", array);
             }
 
             public override void CopyTo(IPlugin[] array, int start)
@@ -656,6 +748,8 @@ namespace log4net.Plugin
             
             public override void Clear()
             {
+				value.LogDebug(">>> Entering Clear()");
+				value.LogWarning("Throwing NotSupportedException from Clear()");
                 throw new NotSupportedException("This is a Read Only Collection and can not be modified");
             }
 
@@ -671,16 +765,25 @@ namespace log4net.Plugin
 
             public override void Insert(int pos, IPlugin x)
             {
+				value.LogDebug(">>> Entering Insert(pos={Pos},x={X})", pos, x);
+				value.LogWarning("Throwing NotSupportedException from Insert(pos={Pos},x={X})", pos, x);
+				value.LogDebug("<<< Exiting Insert(pos={Pos},x={X})", pos, x);
                 throw new NotSupportedException("This is a Read Only Collection and can not be modified");
             }
 
             public override void Remove(IPlugin x)
             {           
+				value.LogDebug(">>> Entering Remove(x={X})", x);
+				value.LogWarning("Throwing NotSupportedException from Remove(x={X})", x);
+				value.LogDebug("<<< Exiting Remove(x={X})", x);
                 throw new NotSupportedException("This is a Read Only Collection and can not be modified");
             }
 
             public override void RemoveAt(int pos)
             {
+				value.LogDebug(">>> Entering RemoveAt(pos={Pos})", pos);
+				value.LogWarning("Throwing NotSupportedException from RemoveAt(pos={Pos})", pos);
+				value.LogDebug("<<< Exiting RemoveAt(pos={Pos})", pos);
                 throw new NotSupportedException("This is a Read Only Collection and can not be modified");
             }
 

@@ -824,8 +824,10 @@ namespace log4net.Layout
         /// </remarks>
         static PatternLayout()
         {
+			log.DebugFormat(">>> Entering PatternLayout()");
             s_globalRulesRegistry = new Hashtable(45);
 
+			log.DebugFormat("PatternLayout(): s_globalRulesRegistry → {0}", s_globalRulesRegistry);
             s_globalRulesRegistry.Add("literal", typeof(LiteralPatternConverter));
             s_globalRulesRegistry.Add("newline", typeof(NewLinePatternConverter));
             s_globalRulesRegistry.Add("n", typeof(NewLinePatternConverter));
@@ -904,6 +906,7 @@ namespace log4net.Layout
 
             s_globalRulesRegistry.Add("w", typeof(UserNamePatternConverter));
             s_globalRulesRegistry.Add("username", typeof(UserNamePatternConverter));
+			log.DebugFormat("<<< Exiting PatternLayout()");
         }
 
         /// <summary>Constructs a PatternLayout using the DefaultConversionPattern</summary>
@@ -941,16 +944,20 @@ namespace log4net.Layout
         /// </remarks>
         public PatternLayout(string pattern) 
         {
+			log.DebugFormat(">>> Entering PatternLayout(pattern={0})", pattern);
             // By default we do not process the exception
             this.IgnoresException = true;
+			log.DebugFormat("PatternLayout(pattern={0}): this.IgnoresException → {1}", pattern, this.IgnoresException);
 
             this.m_pattern = pattern;
             if (this.m_pattern == null)
+			log.DebugFormat("PatternLayout(pattern={0}): this.m_pattern → {1}", pattern, this.m_pattern);
             {
                 this.m_pattern = DefaultConversionPattern;
             }
 
             this.ActivateOptions();
+			log.DebugFormat("<<< Exiting PatternLayout(pattern={0})", pattern);
         }
 
         /// <summary>The pattern formatting string</summary>
@@ -978,12 +985,15 @@ namespace log4net.Layout
         /// </remarks>
         protected virtual PatternParser CreatePatternParser(string pattern) 
         {
+			log.DebugFormat(">>> Entering CreatePatternParser(pattern={0})", pattern);
             PatternParser patternParser = new PatternParser(pattern);
 
+			log.DebugFormat("CreatePatternParser(pattern={0}): patternParser → {1}", pattern, patternParser);
             // Add all the builtin patterns
             foreach(DictionaryEntry entry in s_globalRulesRegistry)
             {
                 ConverterInfo converterInfo = new ConverterInfo();
+				log.DebugFormat("CreatePatternParser(pattern={0}): converterInfo → {1}", pattern, converterInfo);
                 converterInfo.Name = (string)entry.Key;
                 converterInfo.Type = (Type)entry.Value;
                 patternParser.PatternConverters[entry.Key] = converterInfo;
@@ -994,6 +1004,7 @@ namespace log4net.Layout
                 patternParser.PatternConverters[entry.Key] = entry.Value;
             }
 
+			log.DebugFormat("<<< Exiting CreatePatternParser(pattern={0})", pattern);
             return patternParser;
         }
 
@@ -1013,9 +1024,12 @@ namespace log4net.Layout
         /// </remarks>
         public override void ActivateOptions() 
         {
+			log.DebugFormat(">>> Entering ActivateOptions()");
             this.m_head = this.CreatePatternParser(this.m_pattern).Parse();
 
+			log.DebugFormat("ActivateOptions(): m_head → {0}", m_head);
             PatternConverter curConverter = this.m_head;
+			log.DebugFormat("ActivateOptions(): curConverter → {0}", curConverter);
             while(curConverter != null)
             {
                 PatternLayoutConverter layoutConverter = curConverter as PatternLayoutConverter;
@@ -1025,12 +1039,14 @@ namespace log4net.Layout
                     {
                         // Found converter that handles the exception
                         this.IgnoresException = false;
+						log.DebugFormat("ActivateOptions(): this.IgnoresException → {0}", this.IgnoresException);
 
                         break;
                     }
                 }
                 curConverter = curConverter.Next;
             }
+			log.DebugFormat("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>Produces a formatted string as specified by the conversion pattern.</summary>
@@ -1044,8 +1060,10 @@ namespace log4net.Layout
         /// </remarks>
         public override void Format(TextWriter writer, LoggingEvent loggingEvent) 
         {
+			log.DebugFormat(">>> Entering Format(writer={0},loggingEvent={1})", writer, loggingEvent);
             if (writer == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from Format(writer={0},loggingEvent={1})", writer, loggingEvent);
                 throw new ArgumentNullException("writer");
             }
             if (loggingEvent == null)
@@ -1054,6 +1072,7 @@ namespace log4net.Layout
             }
 
             PatternConverter c = this.m_head;
+			log.DebugFormat("Format(writer={0},loggingEvent={1}): c → {2}", writer, loggingEvent, c);
 
             // loop through the chain of pattern converters
             while(c != null) 
@@ -1061,6 +1080,7 @@ namespace log4net.Layout
                 c.Format(writer, loggingEvent);
                 c = c.Next;
             }
+			log.DebugFormat("<<< Exiting Format(writer={0},loggingEvent={1})", writer, loggingEvent);
         }
 
         /// <summary>Add a converter to this PatternLayout</summary>
@@ -1073,17 +1093,21 @@ namespace log4net.Layout
         /// </remarks>
         public void AddConverter(ConverterInfo converterInfo)
         {
+			log.DebugFormat(">>> Entering AddConverter(converterInfo={0})", converterInfo);
             if (converterInfo == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from AddConverter(converterInfo={0})", converterInfo);
                 throw new ArgumentNullException("converterInfo");
             }
 
             if (!typeof(PatternConverter).IsAssignableFrom(converterInfo.Type))
             {
+				log.WarnFormat("Throwing ArgumentException from AddConverter(converterInfo={0})", converterInfo);
                 throw new ArgumentException("The converter type specified [" + converterInfo.Type + "] must be a subclass of log4net.Util.PatternConverter", "converterInfo");
             }
 
             this.m_instanceRulesRegistry[converterInfo.Name] = converterInfo;
+			log.DebugFormat("<<< Exiting AddConverter(converterInfo={0})", converterInfo);
         }
 
         /// <summary>Add a converter to this PatternLayout</summary>
@@ -1102,8 +1126,10 @@ namespace log4net.Layout
         /// </remarks>
         public void AddConverter(string name, Type type)
         {
+			log.DebugFormat(">>> Entering AddConverter(name={0},type={1})", name, type);
             if (name == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from AddConverter(name={0},type={1})", name, type);
                 throw new ArgumentNullException("name");
             }
 
@@ -1113,10 +1139,14 @@ namespace log4net.Layout
             }
 
             ConverterInfo converterInfo = new ConverterInfo();
+			log.DebugFormat("AddConverter(name={0},type={1}): converterInfo → {2}", name, type, converterInfo);
+			log.DebugFormat("AddConverter(name={0},type={1}): converterInfo.Name → {2}", name, type, converterInfo.Name);
+			log.DebugFormat("AddConverter(name={0},type={1}): converterInfo.Type → {2}", name, type, converterInfo.Type);
             converterInfo.Name = name;
             converterInfo.Type = type;
 
             this.AddConverter(converterInfo);
+			log.DebugFormat("<<< Exiting AddConverter(name={0},type={1})", name, type);
         }
     }
 }

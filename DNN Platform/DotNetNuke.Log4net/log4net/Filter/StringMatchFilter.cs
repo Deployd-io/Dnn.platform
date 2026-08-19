@@ -52,6 +52,8 @@ namespace log4net.Filter
         /// <summary>Default constructor</summary>
         public StringMatchFilter()
         {
+		log.DebugFormat(">>> Entering StringMatchFilter()");
+		log.DebugFormat("<<< Exiting StringMatchFilter()");
         }
 
         /// <summary>Initialize and precompile the Regex if required</summary>
@@ -70,11 +72,14 @@ namespace log4net.Filter
         /// </remarks>
         public override void ActivateOptions() 
         {
+			log.DebugFormat(">>> Entering ActivateOptions()");
             if (this.m_stringRegexToMatch != null)
+			log.DebugFormat("<<< Exiting ActivateOptions()");
             {
 #if NETSTANDARD1_3
                 m_regexToMatch = new Regex(m_stringRegexToMatch);
 #else
+				log.DebugFormat("ActivateOptions(): m_regexToMatch → {0}", m_regexToMatch);
                 this.m_regexToMatch = new Regex(this.m_stringRegexToMatch, RegexOptions.Compiled);
 #endif
             }
@@ -153,8 +158,10 @@ namespace log4net.Filter
         /// </remarks>
         public override FilterDecision Decide(LoggingEvent loggingEvent) 
         {
+			log.DebugFormat(">>> Entering Decide(loggingEvent={0})", loggingEvent);
             if (loggingEvent == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from Decide(loggingEvent={0})", loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
             }
 
@@ -199,6 +206,7 @@ namespace log4net.Filter
                 {
                     return FilterDecision.Accept;
                 } 
+			log.DebugFormat("<<< Exiting Decide(loggingEvent={0})", loggingEvent);
                 return FilterDecision.Deny;
             }
             return FilterDecision.Neutral;

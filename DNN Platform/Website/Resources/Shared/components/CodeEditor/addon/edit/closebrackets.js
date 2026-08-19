@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -17,7 +19,9 @@
 
   var Pos = CodeMirror.Pos;
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
   CodeMirror.defineOption("autoCloseBrackets", false, function(cm, val, old) {
+	logger.debug(`>>> Entering defineOption(false=${false})`);
     if (old && old != CodeMirror.Init) {
       cm.removeKeyMap(keyMap);
       cm.state.closeBrackets = null;
@@ -25,12 +29,15 @@
     if (val) {
       cm.state.closeBrackets = val;
       cm.addKeyMap(keyMap);
+	logger.debug(`<<< Exiting defineOption(false=${false})`);
     }
   });
 
   function getOption(conf, name) {
+	logger.debug(`>>> Entering getOption(conf=${conf},name=${name})`);
     if (name == "pairs" && typeof conf == "string") return conf;
     if (typeof conf == "object" && conf[name] != null) return conf[name];
+	logger.debug(`<<< Exiting getOption(conf=${conf},name=${name})`);
     return defaults[name];
   }
 

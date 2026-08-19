@@ -9,10 +9,13 @@ namespace DotNetNuke.ExtensionPoints
     [MetadataAttribute]
     public class ExportClientScriptAttribute : ExportAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExportClientScriptAttribute));
         /// <summary>Initializes a new instance of the <see cref="ExportClientScriptAttribute"/> class.</summary>
         public ExportClientScriptAttribute()
             : base(typeof(IScriptItemExtensionPoint))
         {
+		Logger.LogDebug(">>> Entering ExportClientScriptAttribute()");
+		Logger.LogDebug("<<< Exiting ExportClientScriptAttribute()");
         }
     }
 }

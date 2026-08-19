@@ -14,9 +14,11 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
     using System.Web.Configuration;
     using System.Web.Hosting;
     using System.Web.SessionState;
+	using Microsoft.Extensions.Logging;
 
     public enum HttpVerb
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         GET = 0,
         HEAD = 1,
         POST = 2,
@@ -47,17 +49,22 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
         public HttpSimulator()
             : this("/", WebsitePhysicalAppPath)
         {
+		_logger.LogDebug(">>> Entering HttpSimulator()");
         }
 
+		_logger.LogDebug("<<< Exiting HttpSimulator()");
         public HttpSimulator(string applicationPath)
             : this(applicationPath, WebsitePhysicalAppPath)
         {
+		_logger.LogDebug(">>> Entering HttpSimulator(applicationPath={ApplicationPath})", applicationPath);
+		_logger.LogDebug("<<< Exiting HttpSimulator(applicationPath={ApplicationPath})", applicationPath);
         }
 
         public HttpSimulator(string applicationPath, string physicalApplicationPath)
         {
             this.ApplicationPath = applicationPath;
             this.PhysicalApplicationPath = physicalApplicationPath;
+			_logger.LogDebug("HttpSimulator(applicationPath={ApplicationPath},physicalApplicationPath={PhysicalApplicationPath}): this.ApplicationPath → {Arg2}", applicationPath, physicalApplicationPath, this.ApplicationPath);
         }
 
         /// <summary>Gets physical path to the requested file (used for simulation purposes).</summary>
@@ -124,6 +131,14 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
         /// <returns></returns>
         public HttpSimulator SimulateRequest()
         {
+			_logger.LogDebug(">>> Entering SimulateRequest()");
+			_logger.LogDebug("<<< Exiting SimulateRequest()");
+			_logger.LogDebug("<<< Exiting SimulateRequest(url={Url})", url);
+			_logger.LogDebug("<<< Exiting SimulateRequest(url={Url},httpVerb={HttpVerb})", url, httpVerb);
+			_logger.LogDebug("<<< Exiting SimulateRequest(url={Url},formVariables={FormVariables})", url, formVariables);
+			_logger.LogDebug("<<< Exiting SimulateRequest(url={Url},formVariables={FormVariables},headers={Headers})", url, formVariables, headers);
+			_logger.LogDebug("<<< Exiting SimulateRequest(url={Url},httpVerb={HttpVerb},headers={Headers})", url, httpVerb, headers);
+			_logger.LogDebug("<<< Exiting SimulateRequest(url={Url},httpVerb={HttpVerb},formVariables={FormVariables},headers={Headers})", url, httpVerb, formVariables, headers);
             return this.SimulateRequest(new Uri("http://localhost/"));
         }
 
@@ -178,12 +193,16 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
         /// <returns></returns>
         public HttpSimulator SetReferer(Uri referer)
         {
+			_logger.LogDebug(">>> Entering SetReferer(referer={Referer})", referer);
             if (this.WorkerRequest != null)
             {
                 this.WorkerRequest.SetReferer(referer);
             }
 
             this._referer = referer;
+			_logger.LogDebug("SetReferer(referer={Referer}): _referer → {_referer}", referer, _referer);
+			_logger.LogDebug("SetReferer(referer={Referer}): this._referer → {Arg1}", referer, this._referer);
+			_logger.LogDebug("<<< Exiting SetReferer(referer={Referer})", referer);
             return this;
         }
 
@@ -193,13 +212,16 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
         /// <returns></returns>
         public HttpSimulator SetFormVariable(string name, string value)
         {
+			_logger.LogDebug(">>> Entering SetFormVariable(name={Name},value={Value})", name, value);
             if (this.WorkerRequest != null)
             {
+				_logger.LogWarning("Throwing InvalidOperationException from SetFormVariable(name={Name},value={Value})", name, value);
                 throw new InvalidOperationException("Cannot set form variables after calling Simulate().");
             }
 
             this._formVars.Add(name, value);
 
+			_logger.LogDebug("<<< Exiting SetFormVariable(name={Name},value={Value})", name, value);
             return this;
         }
 
@@ -209,13 +231,16 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
         /// <returns></returns>
         public HttpSimulator SetHeader(string name, string value)
         {
+			_logger.LogDebug(">>> Entering SetHeader(name={Name},value={Value})", name, value);
             if (this.WorkerRequest != null)
             {
+				_logger.LogWarning("Throwing InvalidOperationException from SetHeader(name={Name},value={Value})", name, value);
                 throw new InvalidOperationException("Cannot set headers after calling Simulate().");
             }
 
             this._headers.Add(name, value);
 
+			_logger.LogDebug("<<< Exiting SetHeader(name={Name},value={Value})", name, value);
             return this;
         }
 
@@ -223,11 +248,15 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
         /// <filterpriority>2.</filterpriority>
         public void Dispose()
         {
+			_logger.LogDebug(">>> Entering Dispose()");
+			_logger.LogDebug("Dispose(): HttpContext.Current → {Arg0}", HttpContext.Current);
             HttpContext.Current = null;
+			_logger.LogDebug("<<< Exiting Dispose()");
         }
 
         protected static HostingEnvironment GetHostingEnvironment()
         {
+			_logger.LogDebug(">>> Entering GetHostingEnvironment()");
             HostingEnvironment environment;
             try
             {
@@ -235,15 +264,18 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
             }
             catch (InvalidOperationException)
             {
+				_logger.LogError("Exception in GetHostingEnvironment(): {Arg0}", InvalidOperationException.getMessage());
                 // Shoot, we need to grab it via reflection.
                 environment = ReflectionHelper.GetStaticFieldValue<HostingEnvironment>("_theHostingEnvironment", typeof(HostingEnvironment));
             }
 
+			_logger.LogDebug("<<< Exiting GetHostingEnvironment()");
             return environment;
         }
 
         protected static string NormalizeSlashes(string s)
         {
+			_logger.LogDebug(">>> Entering NormalizeSlashes(s={S})", s);
             if (string.IsNullOrEmpty(s) || s == "/")
             {
                 return "/";
@@ -259,21 +291,30 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
 
             // Strip right.
             normalized = StripTrailingSlashes(normalized);
+			_logger.LogDebug("NormalizeSlashes(s={S}): normalized → {Normalized}", s, normalized);
+			_logger.LogDebug("NormalizeSlashes(s={S}): s → {S1}", s, s);
+			_logger.LogDebug("<<< Exiting NormalizeSlashes(s={S})", s);
             return "/" + normalized;
         }
 
         protected static string StripPrecedingSlashes(string s)
         {
+			_logger.LogDebug(">>> Entering StripPrecedingSlashes(s={S})", s);
+			_logger.LogDebug("<<< Exiting StripPrecedingSlashes(s={S})", s);
             return Regex.Replace(s, "^/*(.*)", "$1");
         }
 
         protected static string StripTrailingSlashes(string s)
         {
+			_logger.LogDebug(">>> Entering StripTrailingSlashes(s={S})", s);
+			_logger.LogDebug("<<< Exiting StripTrailingSlashes(s={S})", s);
             return Regex.Replace(s, "(.*)/*$", "$1", RegexOptions.RightToLeft);
         }
 
         protected static string StripTrailingBackSlashes(string s)
         {
+			_logger.LogDebug(">>> Entering StripTrailingBackSlashes(s={S})", s);
+			_logger.LogDebug("<<< Exiting StripTrailingBackSlashes(s={S})", s);
             return string.IsNullOrEmpty(s) ? string.Empty : Regex.Replace(s, @"(.*)\\*$", "$1", RegexOptions.RightToLeft);
         }
 
@@ -354,21 +395,29 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
 
         private static void InitializeApplication()
         {
+			_logger.LogDebug(">>> Entering InitializeApplication()");
             var appFactoryType = Type.GetType("System.Web.HttpApplicationFactory, System.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
             var appFactory = ReflectionHelper.GetStaticFieldValue<object>("_theApplicationFactory", appFactoryType);
+			_logger.LogDebug("InitializeApplication(): appFactory → {AppFactory}", appFactory);
+			_logger.LogDebug("InitializeApplication(): appFactoryType → {AppFactoryType}", appFactoryType);
             ReflectionHelper.SetPrivateInstanceFieldValue("_state", appFactory, HttpContext.Current.Application);
+			_logger.LogDebug("<<< Exiting InitializeApplication()");
         }
 
         private static string RightAfter(string original, string search)
         {
+			_logger.LogDebug(">>> Entering RightAfter(original={Original},search={Search})", original, search);
             if (search.Length > original.Length || search.Length == 0)
             {
                 return original;
             }
 
             original = original.Trim();
+			_logger.LogDebug("RightAfter(original={Original},search={Search}): original → {Original1}", original, search, original);
             search = search.Trim();
+			_logger.LogDebug("RightAfter(original={Original},search={Search}): search → {Search1}", original, search, search);
             var searchIndex = original.IndexOf(search, 0, StringComparison.InvariantCultureIgnoreCase);
+			_logger.LogDebug("RightAfter(original={Original},search={Search}): searchIndex → {SearchIndex}", original, search, searchIndex);
 
             if (searchIndex < 0)
             {
@@ -381,46 +430,60 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
             // original = original.Substring(searchIndex, original.Length - searchIndex);
             // return original.Replace(search,"");
             var regexMatch = @"(" + search + ")(?<keep>.+)";
+			_logger.LogDebug("RightAfter(original={Original},search={Search}): regexMatch → {RegexMatch}", original, search, regexMatch);
             const string regexReplace = @"${keep}";
             var result = Regex.Replace(original, regexMatch, regexReplace, RegexOptions.IgnoreCase);
+			_logger.LogDebug("RightAfter(original={Original},search={Search}): result → {Result}", original, search, result);
+			_logger.LogDebug("<<< Exiting RightAfter(original={Original},search={Search})", original, search);
             return result;
         }
 
         private static string ExtractQueryStringPart(Uri url)
         {
+			_logger.LogDebug(">>> Entering ExtractQueryStringPart(url={Url})", url);
             var query = url.Query;
+			_logger.LogDebug("<<< Exiting ExtractQueryStringPart(url={Url})", url);
             return query.StartsWith("?", StringComparison.Ordinal) ? query.Substring(1) : query;
         }
 
         private void InitializeSession()
         {
+			_logger.LogDebug(">>> Entering InitializeSession()");
             HttpContext.Current = new HttpContext(this.WorkerRequest);
             HttpContext.Current.Items.Clear();
             var session = (HttpSessionState)ReflectionHelper.Instantiate(typeof(HttpSessionState), new[] { typeof(IHttpSessionState) }, new FakeHttpSessionState());
+			_logger.LogDebug("InitializeSession(): session → {Session}", session);
 
             HttpContext.Current.Items.Add("AspSession", session);
+			_logger.LogDebug("<<< Exiting InitializeSession()");
         }
 
         private void ParseRequestUrl(Uri url)
         {
+			_logger.LogDebug(">>> Entering ParseRequestUrl(url={Url})", url);
             if (url == null)
             {
                 return;
             }
 
             this.Host = url.Host;
+			_logger.LogDebug("ParseRequestUrl(url={Url}): this.Host → {Arg1}", url, this.Host);
             this.Port = url.Port;
             this.LocalPath = url.LocalPath;
+			_logger.LogDebug("ParseRequestUrl(url={Url}): this.Port → {Arg1}", url, this.Port);
+			_logger.LogDebug("ParseRequestUrl(url={Url}): this.LocalPath → {Arg1}", url, this.LocalPath);
             this.Page = StripPrecedingSlashes(RightAfter(url.LocalPath, this.ApplicationPath));
             this._physicalPath = Path.Combine(this._physicalApplicationPath, this.Page.Replace("/", @"\"));
         }
 
         private void SetHttpRuntimeInternals()
         {
+			_logger.LogDebug(">>> Entering SetHttpRuntimeInternals()");
             // We cheat by using reflection.
 
             // get singleton property value
             var runtime = ReflectionHelper.GetStaticFieldValue<HttpRuntime>("_theRuntime", typeof(HttpRuntime));
+			_logger.LogDebug("SetHttpRuntimeInternals(): runtime → {Runtime}", runtime);
 
             // set app path property value
             ReflectionHelper.SetPrivateInstanceFieldValue("_appDomainAppPath", runtime, this.PhysicalApplicationPath);
@@ -428,15 +491,18 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
             // set app virtual path property value
             const string vpathTypeName = "System.Web.VirtualPath, System.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
             var virtualPath = ReflectionHelper.Instantiate(vpathTypeName, new[] { typeof(string) }, new object[] { this.ApplicationPath });
+			_logger.LogDebug("SetHttpRuntimeInternals(): virtualPath → {VirtualPath}", virtualPath);
             ReflectionHelper.SetPrivateInstanceFieldValue("_appDomainAppVPath", runtime, virtualPath);
 
             // set codegen dir property value
             ReflectionHelper.SetPrivateInstanceFieldValue("_codegenDir", runtime, this.PhysicalApplicationPath);
 
             var environment = GetHostingEnvironment();
+			_logger.LogDebug("SetHttpRuntimeInternals(): environment → {Environment}", environment);
             ReflectionHelper.SetPrivateInstanceFieldValue("_appPhysicalPath", environment, this.PhysicalApplicationPath);
             ReflectionHelper.SetPrivateInstanceFieldValue("_appVirtualPath", environment, virtualPath);
             ReflectionHelper.SetPrivateInstanceFieldValue("_configMapPath", environment, new ConfigMapPath(this));
+			_logger.LogDebug("<<< Exiting SetHttpRuntimeInternals()");
         }
 
         public class FakeHttpSessionState : NameObjectCollectionBase, IHttpSessionState
@@ -606,7 +672,9 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
             ///
             public void Abandon()
             {
+				_logger.LogDebug(">>> Entering Abandon()");
                 this.BaseClear();
+				_logger.LogDebug("<<< Exiting Abandon()");
             }
 
             /// <summary>Adds a new item to the session-state collection.</summary>
@@ -615,7 +683,9 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
             /// <param name="value">The value of the item to add to the session-state collection. </param>
             public void Add(string name, object value)
             {
+				_logger.LogDebug(">>> Entering Add(name={Name},value={Value})", name, value);
                 this.BaseAdd(name, value);
+				_logger.LogDebug("<<< Exiting Add(name={Name},value={Value})", name, value);
             }
 
             /// <summary>Deletes an item from the session-state item collection.</summary>
@@ -623,7 +693,9 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
             /// <param name="name">The name of the item to delete from the session-state item collection. </param>
             public void Remove(string name)
             {
+				_logger.LogDebug(">>> Entering Remove(name={Name})", name);
                 this.BaseRemove(name);
+				_logger.LogDebug("<<< Exiting Remove(name={Name})", name);
             }
 
             /// <summary>Deletes an item at a specified index from the session-state item collection.</summary>
@@ -631,21 +703,27 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
             /// <param name="index">The index of the item to remove from the session-state collection. </param>
             public void RemoveAt(int index)
             {
+				_logger.LogDebug(">>> Entering RemoveAt(index={Index})", index);
                 this.BaseRemoveAt(index);
+				_logger.LogDebug("<<< Exiting RemoveAt(index={Index})", index);
             }
 
             /// <summary>Clears all values from the session-state item collection.</summary>
             ///
             public void Clear()
             {
+				_logger.LogDebug(">>> Entering Clear()");
                 this.BaseClear();
+				_logger.LogDebug("<<< Exiting Clear()");
             }
 
             /// <summary>Clears all values from the session-state item collection.</summary>
             ///
             public void RemoveAll()
             {
+				_logger.LogDebug(">>> Entering RemoveAll()");
                 this.BaseClear();
+				_logger.LogDebug("<<< Exiting RemoveAll()");
             }
 
             /// <summary>Copies the collection of session-state item values to a one-dimensional array, starting at the specified index in the array.</summary>
@@ -654,6 +732,9 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
             /// <param name="index">The index in array where copying starts. </param>
             public void CopyTo(Array array, int index)
             {
+				_logger.LogDebug(">>> Entering CopyTo(array={Array},index={Index})", array, index);
+				_logger.LogWarning("Throwing NotImplementedException from CopyTo(array={Array},index={Index})", array, index);
+				_logger.LogDebug("<<< Exiting CopyTo(array={Array},index={Index})", array, index);
                 throw new NotImplementedException();
             }
         }
@@ -664,42 +745,64 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
 
             public ConfigMapPath(HttpSimulator simulation)
             {
+				_logger.LogDebug(">>> Entering ConfigMapPath(simulation={Simulation})", simulation);
                 this._requestSimulation = simulation;
+				_logger.LogDebug("ConfigMapPath(simulation={Simulation}): _requestSimulation → {_requestSimulation}", simulation, _requestSimulation);
+				_logger.LogDebug("ConfigMapPath(simulation={Simulation}): this._requestSimulation → {Arg1}", simulation, this._requestSimulation);
+				_logger.LogDebug("<<< Exiting ConfigMapPath(simulation={Simulation})", simulation);
             }
 
             public string GetMachineConfigFilename()
             {
+				_logger.LogDebug(">>> Entering GetMachineConfigFilename()");
+				_logger.LogWarning("Throwing NotImplementedException from GetMachineConfigFilename()");
+				_logger.LogDebug("<<< Exiting GetMachineConfigFilename()");
                 throw new NotImplementedException();
             }
 
             public string GetRootWebConfigFilename()
             {
+				_logger.LogDebug(">>> Entering GetRootWebConfigFilename()");
+				_logger.LogWarning("Throwing NotImplementedException from GetRootWebConfigFilename()");
+				_logger.LogDebug("<<< Exiting GetRootWebConfigFilename()");
                 throw new NotImplementedException();
             }
 
             public void GetPathConfigFilename(string siteId, string path, out string directory, out string baseName)
             {
+				_logger.LogDebug(">>> Entering GetPathConfigFilename(siteId={SiteId},path={Path})", siteId, path);
+				_logger.LogWarning("Throwing NotImplementedException from GetPathConfigFilename(siteId={SiteId},path={Path})", siteId, path);
+				_logger.LogDebug("<<< Exiting GetPathConfigFilename(siteId={SiteId},path={Path})", siteId, path);
                 throw new NotImplementedException();
             }
 
             public void GetDefaultSiteNameAndID(out string siteName, out string siteId)
             {
+				_logger.LogDebug(">>> Entering GetDefaultSiteNameAndID()");
+				_logger.LogWarning("Throwing NotImplementedException from GetDefaultSiteNameAndID()");
+				_logger.LogDebug("<<< Exiting GetDefaultSiteNameAndID()");
                 throw new NotImplementedException();
             }
 
             public void ResolveSiteArgument(string siteArgument, out string siteName, out string siteId)
             {
+				_logger.LogDebug(">>> Entering ResolveSiteArgument(siteArgument={SiteArgument})", siteArgument);
+				_logger.LogWarning("Throwing NotImplementedException from ResolveSiteArgument(siteArgument={SiteArgument})", siteArgument);
+				_logger.LogDebug("<<< Exiting ResolveSiteArgument(siteArgument={SiteArgument})", siteArgument);
                 throw new NotImplementedException();
             }
 
             public string MapPath(string siteId, string path)
             {
+				_logger.LogDebug(">>> Entering MapPath(siteId={SiteId},path={Path})", siteId, path);
                 var page = StripPrecedingSlashes(RightAfter(path, this._requestSimulation.ApplicationPath));
                 return Path.Combine(this._requestSimulation.PhysicalApplicationPath, page.Replace("/", @"\"));
             }
 
             public string GetAppPathForPath(string siteId, string path)
             {
+				_logger.LogDebug(">>> Entering GetAppPathForPath(siteId={SiteId},path={Path})", siteId, path);
+				_logger.LogDebug("<<< Exiting GetAppPathForPath(siteId={SiteId},path={Path})", siteId, path);
                 return this._requestSimulation.ApplicationPath;
             }
         }

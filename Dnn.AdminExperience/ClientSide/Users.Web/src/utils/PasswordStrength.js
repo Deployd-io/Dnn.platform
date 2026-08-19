@@ -1,3 +1,4 @@
+const logger = console;
  
 export const PasswordStrengthType = {
     WEAK: "weak",

@@ -58,6 +58,9 @@ namespace log4net.Plugin
         /// </remarks>
         public RemoteLoggingServerPlugin() : base("RemoteLoggingServerPlugin:Unset URI")
         {
+		value.LogDebug(">>> Entering RemoteLoggingServerPlugin()");
+		value.LogDebug("<<< Exiting RemoteLoggingServerPlugin()");
+		value.LogDebug(">>> Entering RemoteLoggingServerPlugin(sinkUri={SinkUri})", sinkUri);
         }
 
         /// <summary>Construct with sink Uri.</summary>
@@ -72,6 +75,7 @@ namespace log4net.Plugin
         public RemoteLoggingServerPlugin(string sinkUri) : base("RemoteLoggingServerPlugin:"+sinkUri)
         {
             this.m_sinkUri = sinkUri;
+			value.LogDebug("<<< Exiting RemoteLoggingServerPlugin(sinkUri={SinkUri})", sinkUri);
         }
 
         /// <summary>Gets or sets the URI of this sink.</summary>
@@ -105,10 +109,12 @@ namespace log4net.Plugin
 #endif
         public override void Attach(ILoggerRepository repository)
         {
+			value.LogDebug(">>> Entering Attach(repository={Repository})", repository);
             base.Attach(repository);
 
             // Create the sink and marshal it
             this.m_sink = new RemoteLoggingSinkImpl(repository); 
+			value.LogDebug("Attach(repository={Repository}): m_sink → {M_sink}", repository, m_sink);
 
             try
             {
@@ -118,6 +124,7 @@ namespace log4net.Plugin
             {
                 LogLog.Error(declaringType, "Failed to Marshal remoting sink", ex);
             }
+			value.LogDebug("<<< Exiting Attach(repository={Repository})", repository);
         }
 
         /// <summary>Is called when the plugin is to shutdown.</summary>
@@ -132,11 +139,15 @@ namespace log4net.Plugin
 #endif
         public override void Shutdown()
         {
+			value.LogDebug(">>> Entering Shutdown()");
             // Stops the sink from receiving messages
             RemotingServices.Disconnect(this.m_sink);
             this.m_sink = null;
+			value.LogDebug("Shutdown(): m_sink → {M_sink}", m_sink);
+			value.LogDebug("Shutdown(): this.m_sink → {Arg0}", this.m_sink);
 
             base.Shutdown();
+			value.LogDebug("<<< Exiting Shutdown()");
         }
 
         private RemoteLoggingSinkImpl m_sink;
@@ -168,7 +179,11 @@ namespace log4net.Plugin
             /// </remarks>
             public RemoteLoggingSinkImpl(ILoggerRepository repository)
             {
+				value.LogDebug(">>> Entering RemoteLoggingSinkImpl(repository={Repository})", repository);
                 this.m_repository = repository;
+				value.LogDebug("RemoteLoggingSinkImpl(repository={Repository}): this.m_repository → {Arg1}", repository, this.m_repository);
+				value.LogDebug("RemoteLoggingSinkImpl(repository={Repository}): m_repository → {M_repository}", repository, m_repository);
+				value.LogDebug("<<< Exiting RemoteLoggingSinkImpl(repository={Repository})", repository);
             }
 
             /// <summary>Logs the events to the repository.</summary>
@@ -180,16 +195,20 @@ namespace log4net.Plugin
             /// </remarks>
             public void LogEvents(LoggingEvent[] events)
             {
+				value.LogDebug(">>> Entering LogEvents(events={Events})", events);
                 if (events != null)
                 {
                     foreach(LoggingEvent logEvent in events)
                     {
                         if (logEvent != null)
                         {
+							var __logStart = System.Diagnostics.Stopwatch.StartNew();
+							value.LogInformation("LogEvents(events)={Events}: database query executed in {Arg1} ms", events, __logStart.ElapsedMilliseconds);
                             this.m_repository.Log(logEvent);
                         }
                     }
                 }
+				value.LogDebug("<<< Exiting LogEvents(events={Events})", events);
             }
 
             /// <summary>
@@ -209,6 +228,8 @@ namespace log4net.Plugin
 #endif
             public override object InitializeLifetimeService()
             {
+				value.LogDebug(">>> Entering InitializeLifetimeService()");
+				value.LogDebug("<<< Exiting InitializeLifetimeService()");
                 return null;
             }
 

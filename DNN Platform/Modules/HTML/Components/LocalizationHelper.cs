@@ -10,12 +10,14 @@ namespace DotNetNuke.Modules.Html.Components
 
     using DotNetNuke.Common.Utilities;
     using DotNetNuke.Services.Localization;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Provides helper methods for retrieving localization values for HTML module content workflow states.
     /// </summary>
     public class LocalizationHelper
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Returns all possible localization values for a given key across all available languages.
         /// </summary>
@@ -23,6 +25,8 @@ namespace DotNetNuke.Modules.Html.Components
         /// <returns>A list of localized values for the specified key in all available languages.</returns>
         public List<string> StateLocalizations(string key)
         {
+			_logger.LogDebug(">>> Entering StateLocalizations(key={Key})", key);
+			_logger.LogDebug("<<< Exiting StateLocalizations(key={Key})", key);
             return this.GetLanguages().Select(language => Localization.GetString(key, Localization.GlobalResourceFile, language.Key)).ToList();
         }
 

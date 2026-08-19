@@ -14,6 +14,7 @@ namespace DotNetNuke.Web.DDRMenu
         /// <inheritdoc />
         public override void LoadSettings()
         {
+			eventLogger.LogDebug(">>> Entering LoadSettings()");
             if (this.IsPostBack)
             {
                 return;
@@ -29,11 +30,13 @@ namespace DotNetNuke.Web.DDRMenu
             this.IncludeHidden.Value = Convert.ToBoolean(this.Settings["IncludeHidden"] ?? "false");
             this.TemplateArguments.Value = this.Settings["TemplateArguments"] ?? string.Empty;
             this.ClientOptions.Value = this.Settings["ClientOptions"] ?? string.Empty;
+			eventLogger.LogDebug("<<< Exiting LoadSettings()");
         }
 
         /// <inheritdoc />
         public override void UpdateSettings()
         {
+			eventLogger.LogDebug(">>> Entering UpdateSettings()");
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "MenuStyle", (this.MenuStyle.Value ?? string.Empty).ToString());
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "NodeXmlPath", (this.NodeXmlPath.Value ?? string.Empty).ToString());
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "NodeSelector", (this.NodeSelector.Value ?? string.Empty).ToString());
@@ -44,12 +47,15 @@ namespace DotNetNuke.Web.DDRMenu
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "IncludeHidden", (this.IncludeHidden.Value ?? "false").ToString());
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "TemplateArguments", (this.TemplateArguments.Value ?? string.Empty).ToString());
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "ClientOptions", (this.ClientOptions.Value ?? string.Empty).ToString());
+			eventLogger.LogDebug("<<< Exiting UpdateSettings()");
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             this.IncludeHiddenSection.Visible = DNNAbstract.IncludeHiddenSupported();
+			eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

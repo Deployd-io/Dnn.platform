@@ -25,14 +25,20 @@ namespace Dnn.PersonaBar.SiteGroups.Services
         [HttpGet]
         public HttpResponseMessage GetSiteGroups()
         {
+			Logger.LogDebug(">>> Entering GetSiteGroups()");
             var groups = GroupManager.SiteGroups();
+			Logger.LogDebug("GetSiteGroups(): groups → {Groups}", groups);
+			Logger.LogDebug("<<< Exiting GetSiteGroups()");
             return this.Request.CreateResponse(HttpStatusCode.OK, groups);
         }
 
         [HttpGet]
         public HttpResponseMessage GetAvailablePortals()
         {
+			Logger.LogDebug(">>> Entering GetAvailablePortals()");
             var portals = GroupManager.AvailablePortals();
+			Logger.LogDebug("GetAvailablePortals(): portals → {Portals}", portals);
+			Logger.LogDebug("<<< Exiting GetAvailablePortals()");
             return this.Request.CreateResponse(HttpStatusCode.OK, portals);
         }
 
@@ -40,14 +46,17 @@ namespace Dnn.PersonaBar.SiteGroups.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Save(PortalGroupInfo portalGroup)
         {
+			Logger.LogDebug(">>> Entering Save(portalGroup={PortalGroup})", portalGroup);
             try
             {
                 var id = GroupManager.Save(portalGroup);
+				Logger.LogDebug("Save(portalGroup={PortalGroup}): id → {Id}", portalGroup, id);
                 return this.Request.CreateResponse(HttpStatusCode.OK, id);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting Save(portalGroup={PortalGroup})", portalGroup);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -56,6 +65,7 @@ namespace Dnn.PersonaBar.SiteGroups.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Delete(int groupId)
         {
+			Logger.LogDebug(">>> Entering Delete(groupId={GroupId})", groupId);
             try
             {
                 GroupManager.Delete(groupId);
@@ -64,6 +74,7 @@ namespace Dnn.PersonaBar.SiteGroups.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting Delete(groupId={GroupId})", groupId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }

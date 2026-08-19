@@ -27,6 +27,7 @@ namespace DotNetNuke.Entities.Urls
 
     public class RewriteController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RewriteController));
         internal const int SiteRootRewrite = -3;
         internal const int AllTabsRewrite = -1;
         private const string TabKeySeparator = "::";
@@ -53,11 +54,14 @@ namespace DotNetNuke.Entities.Urls
 
         internal static string CheckLanguageMatch(ref string url, UrlAction result)
         {
+			Logger.LogDebug(">>> Entering CheckLanguageMatch(url={Url},result={Result})", url, result);
             // ok now scan for the language modifier
             Match langMatch = LangMatchRegex.Match(url);
+			Logger.LogDebug("CheckLanguageMatch(url={Url},result={Result}): langMatch → {LangMatch}", url, result, langMatch);
 
             // searches for a string like language/en-US/ in the url
             string langParms = string.Empty;
+			Logger.LogDebug("CheckLanguageMatch(url={Url},result={Result}): langParms → {LangParms}", url, result, langParms);
             if (langMatch.Success)
             {
                 // OK there is a language modifier in the path
@@ -67,9 +71,12 @@ namespace DotNetNuke.Entities.Urls
                 // it doesn't matter if you get /home.aspx/language/en-US in the url field because the .aspx gets
                 // removed when matching with the tab dictionary
                 url = url.Replace(langParms, string.Empty) + langParms;
+				Logger.LogDebug("CheckLanguageMatch(url={Url},result={Result}): url → {Url1}", url, result, url);
+				Logger.LogDebug("CheckLanguageMatch(url={Url},result={Result}): result.CultureCode → {Arg2}", url, result, result.CultureCode);
                 result.CultureCode = langMatch.Groups["code"].Value; // get the culture code in the requested url
 
                 var primaryAliases = PortalAliasController.Instance.GetPortalAliasesByPortalId(result.PortalId).ToList();
+				Logger.LogDebug("CheckLanguageMatch(url={Url},result={Result}): primaryAliases → {PrimaryAliases}", url, result, primaryAliases);
                 if (primaryAliases.Count > 0)
                 {
                     string aliasCulture = primaryAliases.GetCultureByPortalIdAndAlias(result.PortalId, result.HttpAlias);
@@ -80,11 +87,13 @@ namespace DotNetNuke.Entities.Urls
                         if (result.Action == ActionType.Continue)
                         {
                             result.Action = ActionType.CheckFor301;
+							Logger.LogDebug("CheckLanguageMatch(url={Url},result={Result}): result.Action → {Arg2}", url, result, result.Action);
                         }
                     }
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CheckLanguageMatch(url={Url},result={Result})", url, result);
             return langParms;
         }
 
@@ -94,8 +103,10 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><see langword="true"/> if the <paramref name="rewritePath"/> was changed, otherwise <see langword="false"/>.</returns>
         internal static bool AddLanguageCodeToRewritePath(ref string rewritePath, string cultureCode)
         {
+			Logger.LogDebug(">>> Entering AddLanguageCodeToRewritePath(rewritePath={RewritePath},cultureCode={CultureCode})", rewritePath, cultureCode);
             bool changed = false;
 
+			Logger.LogDebug("AddLanguageCodeToRewritePath(rewritePath={RewritePath},cultureCode={CultureCode}): changed → {Changed}", rewritePath, cultureCode, changed);
             // 758 : check for any language identifier in the Url before adding a new one, not just the same one
             if (!string.IsNullOrEmpty(cultureCode) && !rewritePath.ToLowerInvariant().Contains("language="))
             {
@@ -110,6 +121,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting AddLanguageCodeToRewritePath(rewritePath={RewritePath},cultureCode={CultureCode})", rewritePath, cultureCode);
             return changed;
         }
 
@@ -123,9 +135,13 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><see langword="true"/> if the rewrite path was changed, otherwise <see langword="false"/>.</returns>
         internal static bool AddSkinToRewritePath(int tabId, int portalId, ref string rewritePath, string skin, out string message)
         {
+			Logger.LogDebug(">>> Entering AddSkinToRewritePath(tabId={TabId},portalId={PortalId},rewritePath={RewritePath},skin={Skin})", tabId, portalId, rewritePath, skin);
             bool changed = false;
             message = null;
             TabInfo tab = null;
+			Logger.LogDebug("AddSkinToRewritePath(tabId={TabId},portalId={PortalId},rewritePath={RewritePath},skin={Skin}): tab → {Tab}", tabId, portalId, rewritePath, skin, tab);
+			Logger.LogDebug("AddSkinToRewritePath(tabId={TabId},portalId={PortalId},rewritePath={RewritePath},skin={Skin}): message → {Message}", tabId, portalId, rewritePath, skin, message);
+			Logger.LogDebug("AddSkinToRewritePath(tabId={TabId},portalId={PortalId},rewritePath={RewritePath},skin={Skin}): changed → {Changed}", tabId, portalId, rewritePath, skin, changed);
             if (tabId > 0 && portalId > -1)
             {
                 tab = TabController.Instance.GetTab(tabId, portalId, false);
@@ -153,6 +169,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting AddSkinToRewritePath(tabId={TabId},portalId={PortalId},rewritePath={RewritePath},skin={Skin})", tabId, portalId, rewritePath, skin);
             return changed;
         }
 
@@ -163,6 +180,7 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><see langword="true"/> if the requested path is allowed to be rewritten, otherwise <see langword="false"/>.</returns>
         internal static bool CanRewriteRequest(UrlAction result, string requestedPath, FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering CanRewriteRequest(result={Result},requestedPath={RequestedPath},settings={Settings})", result, requestedPath, settings);
             bool retVal;
             try
             {
@@ -180,6 +198,8 @@ namespace DotNetNuke.Entities.Urls
                 {
                     retVal = true;
                     result.CanRewrite = StateBoolean.True;
+					Logger.LogDebug("CanRewriteRequest(result={Result},requestedPath={RequestedPath},settings={Settings}): retVal → {RetVal}", result, requestedPath, settings, retVal);
+					Logger.LogDebug("CanRewriteRequest(result={Result},requestedPath={RequestedPath},settings={Settings}): result.CanRewrite → {Arg3}", result, requestedPath, settings, result.CanRewrite);
                 }
                 else
                 {
@@ -191,17 +211,25 @@ namespace DotNetNuke.Entities.Urls
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in CanRewriteRequest(result={Result},requestedPath={RequestedPath},settings={Settings}): {Arg3}", result, requestedPath, settings, ex.getMessage());
                 retVal = true; // always rewrite if an error in the regex
 
                 UrlRewriterUtils.LogExceptionInRequest(ex, "NotSet", result);
                 result.Ex = ex;
+				Logger.LogDebug("CanRewriteRequest(result={Result},requestedPath={RequestedPath},settings={Settings}): result.Ex → {Arg3}", result, requestedPath, settings, result.Ex);
             }
 
+			Logger.LogDebug("<<< Exiting CanRewriteRequest(result={Result},requestedPath={RequestedPath},settings={Settings})", result, requestedPath, settings);
             return retVal;
         }
 
         internal static string CleanExtension(string value, string extension, out bool replaced)
         {
+			Logger.LogDebug(">>> Entering CleanExtension(value={Value},extension={Extension})", value, extension);
+			Logger.LogDebug("<<< Exiting CleanExtension(value={Value},extension={Extension})", value, extension);
+			Logger.LogDebug("<<< Exiting CleanExtension(value={Value},settings={Settings},langParms={LangParms})", value, settings, langParms);
+			Logger.LogDebug("<<< Exiting CleanExtension(value={Value},settings={Settings})", value, settings);
+			Logger.LogDebug("<<< Exiting CleanExtension(value={Value},extension={Extension},langParms={LangParms})", value, extension, langParms);
             return CleanExtension(value, extension, string.Empty, out replaced);
         }
 
@@ -262,8 +290,10 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>Url suitable for input into friendly url generation routine.</returns>
         internal static string GetRewriteOrRequestedPath(UrlAction result, Uri requestUri)
         {
+			Logger.LogDebug(">>> Entering GetRewriteOrRequestedPath(result={Result},requestUri={RequestUri})", result, requestUri);
             var pathOnly = result.RewritePath;
             if (result.DoRewrite == false)
+			Logger.LogDebug("GetRewriteOrRequestedPath(result={Result},requestUri={RequestUri}): pathOnly → {PathOnly}", result, requestUri, pathOnly);
             {
                 // if no rewrite, then the path should have been a non-friendly path, and therefore can be passed in to get the friendly Url
                 pathOnly = requestUri.Authority + requestUri.PathAndQuery;
@@ -279,11 +309,13 @@ namespace DotNetNuke.Entities.Urls
                 pathOnly = HttpUtility.UrlDecode(pathOnly, Encoding.UTF8);
             }
 
+			Logger.LogDebug("<<< Exiting GetRewriteOrRequestedPath(result={Result},requestUri={RequestUri})", result, requestUri);
             return pathOnly;
         }
 
         internal static string GetTabFromDictionary(IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, string url, NameValueCollection querystringCol, FriendlyUrlSettings settings, UrlAction result, Guid parentTraceId)
         {
+			Logger.LogDebug(">>> Entering GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId})", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId);
             // retrive the tab dictionary from the cache and get the path depth values
             int maxAliasPathDepth;
             int maxTabPathDepth;
@@ -306,10 +338,12 @@ namespace DotNetNuke.Entities.Urls
             if (url.EndsWith("/", StringComparison.Ordinal))
             {
                 url = url.TrimEnd('/');
+				Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): url → {Url1}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, url);
             }
 
             // ok now scan for the language modifier
             string langParms = CheckLanguageMatch(ref url, result);
+			Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): langParms → {LangParms}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, langParms);
 
             // clean off the extension before checking the url matches, but
             // remember if an extension existed
@@ -319,9 +353,12 @@ namespace DotNetNuke.Entities.Urls
 
             // initialise logic switches
             bool reWritten = false;
+			Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): reWritten → {ReWritten}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, reWritten);
             bool finished = false;
+			Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): finished → {Finished}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, finished);
 
             string newUrl = CheckIfPortalAlias(url, querystringCol, result, settings, tabDict);
+			Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): newUrl → {NewUrl}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, newUrl);
             if (newUrl != url)
             {
                 finished = true;
@@ -333,6 +370,7 @@ namespace DotNetNuke.Entities.Urls
             {
                 // first, try forming up a key based on alias/tabpath
                 int lastIndex = splitUrl.GetUpperBound(0);
+				Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): lastIndex → {LastIndex}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, lastIndex);
                 int arraySize = lastIndex + 1;
                 int totalDepth = maxAliasPathDepth + 1 + maxTabPathDepth + 1;
 
@@ -349,6 +387,7 @@ namespace DotNetNuke.Entities.Urls
                         if ((tabPathStart + tabPathLength) <= arraySize)
                         {
                             string tabPath = string.Empty;
+							Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): tabPath → {TabPath}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, tabPath);
                             if (tabPathLength > -1)
                             {
                                 tabPath = string.Join("/", splitUrl, tabPathStart, tabPathLength);
@@ -373,9 +412,11 @@ namespace DotNetNuke.Entities.Urls
 
                             // the :: allows separation of pagename and portal alias
                             string tabKeyVal = urlPart.ToLowerInvariant(); // force lower case lookup, all keys are lower case
+							Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): tabKeyVal → {TabKeyVal}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, tabKeyVal);
 
                             // Try with querystring first If last Index
                             bool found = false;
+							Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): found → {Found}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, found);
                             if (querystringCol.Count > 0)
                             {
                                 found = CheckTabPath(hostSettings, portalController, appStatus, portalGroupController, tabKeyVal.Replace(" ", settings.SpaceEncodingValue) + "?" + querystringCol.ToString().Split('&')[0].ToLowerInvariant(), result, settings, tabDict, ref newUrl);
@@ -387,6 +428,7 @@ namespace DotNetNuke.Entities.Urls
                             }
 
                             bool isSiteRootMatch = false;
+							Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): isSiteRootMatch → {IsSiteRootMatch}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, isSiteRootMatch);
                             if (!found && tabPathLength == 1)
                             {
                                 // look for special case where the site root has a * value
@@ -447,10 +489,13 @@ namespace DotNetNuke.Entities.Urls
                                             out action);
                                         newUrl = resultingUrl;
                                         result.Action = action;
+										Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): result.Action → {Arg9}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, result.Action);
+										Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): result.Reason → {Arg9}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, result.Reason);
                                         result.Reason = reason;
 
                                         // copy the parms into a separate array
                                         var urlParms = new string[parmsSize];
+										Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): urlParms → {UrlParms}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, urlParms);
                                         Array.ConstrainedCopy(splitUrl, parmStart, urlParms, 0, parmsSize);
 
                                         if (!isSiteRootMatch && result.Reason == RedirectReason.User_Profile_Url)
@@ -480,6 +525,7 @@ namespace DotNetNuke.Entities.Urls
                                                 ref messages,
                                                 parentTraceId);
                                             result.DebugMessages = messages;
+											Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): result.DebugMessages → {Arg9}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, result.DebugMessages);
                                             if (newAction)
                                             {
                                                 finished = true;
@@ -524,6 +570,7 @@ namespace DotNetNuke.Entities.Urls
                                             if (cultureCode != null)
                                             {
                                                 result.CultureCode = cultureCode;
+												Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): result.CultureCode → {Arg9}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, result.CultureCode);
                                             }
                                         }
 
@@ -655,6 +702,12 @@ namespace DotNetNuke.Entities.Urls
                                         reWritten = true;
                                         finished = true;
                                     }
+									Logger.LogDebug(">>> Entering SetRewriteParameters(result={Result},rewritePath={RewritePath})", result, rewritePath);
+									Logger.LogDebug("SetRewriteParameters(result={Result},rewritePath={RewritePath}): result.RewritePath → {Arg2}", result, rewritePath, result.RewritePath);
+									Logger.LogDebug("SetRewriteParameters(result={Result},rewritePath={RewritePath}): result.TabId → {Arg2}", result, rewritePath, result.TabId);
+									Logger.LogDebug("SetRewriteParameters(result={Result},rewritePath={RewritePath}): result.PortalId → {Arg2}", result, rewritePath, result.PortalId);
+									Logger.LogDebug("SetRewriteParameters(result={Result},rewritePath={RewritePath}): result.CultureCode → {Arg2}", result, rewritePath, result.CultureCode);
+									Logger.LogDebug("<<< Exiting SetRewriteParameters(result={Result},rewritePath={RewritePath})", result, rewritePath);
                                 }
 
                                 if (finished)
@@ -685,6 +738,7 @@ namespace DotNetNuke.Entities.Urls
                             {
                                 result.Reason = RedirectReason.Deleted_Page;
                                 result.DoRewrite = true;
+								Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): result.DoRewrite → {Arg9}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, result.DoRewrite);
                                 result.FinalUrl = Globals.AddHTTP(result.PortalAlias.HTTPAlias + "/");
                                 reWritten = true;
                             }
@@ -696,14 +750,18 @@ namespace DotNetNuke.Entities.Urls
             }
 
             result.FriendlyRewrite = reWritten;
+			Logger.LogDebug("GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId}): result.FriendlyRewrite → {Arg9}", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId, result.FriendlyRewrite);
             result.DoRewrite = reWritten;
+			Logger.LogDebug("<<< Exiting GetTabFromDictionary(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},url={Url},querystringCol={QuerystringCol},settings={Settings},result={Result},parentTraceId={ParentTraceId})", hostSettings, portalController, appStatus, portalGroupController, url, querystringCol, settings, result, parentTraceId);
             return newUrl;
         }
 
         internal static void GetUrlWithQuerystring(HttpRequest request, Uri requestUri, out string fullUrl, out string querystring)
         {
+			Logger.LogDebug(">>> Entering GetUrlWithQuerystring(request={Request},requestUri={RequestUri})", request, requestUri);
             // 699: incorrect encoding in absoluteUri.ToString()
             string urlWoutQuery = requestUri.AbsoluteUri;
+			Logger.LogDebug("GetUrlWithQuerystring(request={Request},requestUri={RequestUri}): urlWoutQuery → {UrlWoutQuery}", request, requestUri, urlWoutQuery);
             if (requestUri.Query != string.Empty)
             {
                 urlWoutQuery = urlWoutQuery.Replace(requestUri.Query, string.Empty);
@@ -715,9 +773,11 @@ namespace DotNetNuke.Entities.Urls
             // the encoding type is changed from utf-8 to latin-1
             querystring = requestUri.Query;
 
+			Logger.LogDebug("GetUrlWithQuerystring(request={Request},requestUri={RequestUri}): querystring → {Querystring}", request, requestUri, querystring);
             // get results
             fullUrl = urlWoutQuery;
             if (fullUrl.EndsWith("/_noext.aspx", StringComparison.InvariantCultureIgnoreCase))
+			Logger.LogDebug("GetUrlWithQuerystring(request={Request},requestUri={RequestUri}): fullUrl → {FullUrl}", request, requestUri, fullUrl);
             {
                 fullUrl = fullUrl.Replace("_noext.aspx", string.Empty);
 
@@ -734,6 +794,7 @@ namespace DotNetNuke.Entities.Urls
 
                 fullUrl += querystring;
             }
+			Logger.LogDebug("<<< Exiting GetUrlWithQuerystring(request={Request},requestUri={RequestUri})", request, requestUri);
         }
 
         /// <summary>Identifies a request for a physical file on the system.</summary>
@@ -822,6 +883,7 @@ namespace DotNetNuke.Entities.Urls
 
             // mark as physical request
             result.IsPhysicalResource = isPhysicalResource;
+			Logger.LogDebug("<<< Exiting IdentifyByPhysicalResource(physicalPath={PhysicalPath},fullUrl={FullUrl},queryStringCol={QueryStringCol},result={Result},useFriendlyUrls={UseFriendlyUrls},settings={Settings},parentTraceId={ParentTraceId})", physicalPath, fullUrl, queryStringCol, result, useFriendlyUrls, settings, parentTraceId);
         }
 
         internal static bool IdentifyByRegEx(
@@ -977,6 +1039,7 @@ namespace DotNetNuke.Entities.Urls
 
         internal static bool IdentifyByTabQueryString(Uri requestUri, NameValueCollection queryStringCol, bool useFriendlyUrls, UrlAction result)
         {
+			Logger.LogDebug(">>> Entering IdentifyByTabQueryString(requestUri={RequestUri},queryStringCol={QueryStringCol},useFriendlyUrls={UseFriendlyUrls},result={Result})", requestUri, queryStringCol, useFriendlyUrls, result);
             const bool doRewrite = false;
             string requestedPath = requestUri.LocalPath;
 
@@ -987,11 +1050,15 @@ namespace DotNetNuke.Entities.Urls
                         && (queryStringCol["tabId"] != null))
                 {
                     result.Action = ActionType.CheckFor301;
+					Logger.LogDebug("IdentifyByTabQueryString(requestUri={RequestUri},queryStringCol={QueryStringCol},useFriendlyUrls={UseFriendlyUrls},result={Result}): result.Action → {Arg4}", requestUri, queryStringCol, useFriendlyUrls, result, result.Action);
+					Logger.LogDebug("IdentifyByTabQueryString(requestUri={RequestUri},queryStringCol={QueryStringCol},useFriendlyUrls={UseFriendlyUrls},result={Result}): result.Reason → {Arg4}", requestUri, queryStringCol, useFriendlyUrls, result, result.Reason);
                     result.Reason = RedirectReason.Unfriendly_Url_TabId;
                 }
             }
 
             result.DoRewrite = doRewrite;
+			Logger.LogDebug("IdentifyByTabQueryString(requestUri={RequestUri},queryStringCol={QueryStringCol},useFriendlyUrls={UseFriendlyUrls},result={Result}): result.DoRewrite → {Arg4}", requestUri, queryStringCol, useFriendlyUrls, result, result.DoRewrite);
+			Logger.LogDebug("<<< Exiting IdentifyByTabQueryString(requestUri={RequestUri},queryStringCol={QueryStringCol},useFriendlyUrls={UseFriendlyUrls},result={Result})", requestUri, queryStringCol, useFriendlyUrls, result);
             return doRewrite;
         }
 
@@ -1002,8 +1069,11 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><see langword="true"/> if the page is an admin page, otherwise <see langword="false"/>.</returns>
         internal static bool IsAdminTab(int portalId, string tabPath, FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering IsAdminTab(portalId={PortalId},tabPath={TabPath},settings={Settings})", portalId, tabPath, settings);
             var portal = PortalController.Instance.GetPortal(portalId);
             var adminTab = TabController.Instance.GetTab(portal.AdminTabId, portalId);
+			Logger.LogDebug("IsAdminTab(portalId={PortalId},tabPath={TabPath},settings={Settings}): adminTab → {AdminTab}", portalId, tabPath, settings, adminTab);
+			Logger.LogDebug("IsAdminTab(portalId={PortalId},tabPath={TabPath},settings={Settings}): portal → {Portal}", portalId, tabPath, settings, portal);
 
             // return false if AdminTabId is -1, it could happen when a portal is in the middle of importing
             if (adminTab == null)
@@ -1018,6 +1088,7 @@ namespace DotNetNuke.Entities.Urls
             if (tabPath.StartsWith("//" + adminPageName + "//", StringComparison.CurrentCultureIgnoreCase)
                 || string.Equals(tabPath, "//" + adminPageName, StringComparison.OrdinalIgnoreCase))
             {
+			Logger.LogDebug("<<< Exiting IsAdminTab(portalId={PortalId},tabPath={TabPath},settings={Settings})", portalId, tabPath, settings);
                 return true;
             }
 
@@ -1031,8 +1102,11 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><see langword="true"/> if the page is excluded from friendly URLs, otherwise <see langword="false"/>.</returns>
         internal static bool IsExcludedFromFriendlyUrls(TabInfo tab, FriendlyUrlSettings settings, bool rewriting)
         {
+			Logger.LogDebug(">>> Entering IsExcludedFromFriendlyUrls(tab={Tab},settings={Settings},rewriting={Rewriting})", tab, settings, rewriting);
             bool exclude = false;
             string tabPath = (tab.TabPath.Replace("//", "/") + ";").ToLowerInvariant();
+			Logger.LogDebug("IsExcludedFromFriendlyUrls(tab={Tab},settings={Settings},rewriting={Rewriting}): tabPath → {TabPath}", tab, settings, rewriting, tabPath);
+			Logger.LogDebug("IsExcludedFromFriendlyUrls(tab={Tab},settings={Settings},rewriting={Rewriting}): exclude → {Exclude}", tab, settings, rewriting, exclude);
 
             // 553 change for dnn 5.0 isAdminTab no longer returns true in any case, so
             // check custom admin tab path header
@@ -1047,6 +1121,7 @@ namespace DotNetNuke.Entities.Urls
                 exclude = settings.UseBaseFriendlyUrls.ToLowerInvariant().Contains(tabPath);
             }
 
+			Logger.LogDebug("<<< Exiting IsExcludedFromFriendlyUrls(tab={Tab},settings={Settings},rewriting={Rewriting})", tab, settings, rewriting);
             return exclude;
         }
 
@@ -1057,14 +1132,18 @@ namespace DotNetNuke.Entities.Urls
         /// <remarks>Sets the Action parameter of the Result to 'CheckFor301' if suspected. Actual redirect taken care of by friendly url redirection logic.</remarks>
         internal static void RequestRedirectOnBuiltInUrl(string urlParm, string rewritePath, UrlAction result)
         {
+			Logger.LogDebug(">>> Entering RequestRedirectOnBuiltInUrl(urlParm={UrlParm},rewritePath={RewritePath},result={Result})", urlParm, rewritePath, result);
             // on the lookout for items to potentially redirect
             if ("terms|privacy|login|register".Contains(urlParm.ToLowerInvariant()))
             {
                 // likely that this should be redirected, because we don't want ctl/terms, ctl/register, etc
                 result.Reason = RedirectReason.Built_In_Url;
+				Logger.LogDebug("RequestRedirectOnBuiltInUrl(urlParm={UrlParm},rewritePath={RewritePath},result={Result}): result.Reason → {Arg3}", urlParm, rewritePath, result, result.Reason);
+				Logger.LogDebug("RequestRedirectOnBuiltInUrl(urlParm={UrlParm},rewritePath={RewritePath},result={Result}): result.Action → {Arg3}", urlParm, rewritePath, result, result.Action);
                 result.Action = ActionType.CheckFor301;
                 result.DebugMessages.Add("Built-in Url found: " + rewritePath);
             }
+			Logger.LogDebug("<<< Exiting RequestRedirectOnBuiltInUrl(urlParm={UrlParm},rewritePath={RewritePath},result={Result})", urlParm, rewritePath, result);
         }
 
         /// <summary>converts an array of URL path sections into the rewritten string of parameters for the requested URL.</summary>
@@ -1265,6 +1344,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting RewriteParameters(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},result={Result},langParms={LangParms},settings={Settings})", newUrl, tabKeyVal, urlParms, result, langParms, settings);
             return newUrl;
         }
 
@@ -1422,13 +1502,16 @@ namespace DotNetNuke.Entities.Urls
 
         private static string AddQueryStringToRewritePath(string rewritePath, string queryString)
         {
+			Logger.LogDebug(">>> Entering AddQueryStringToRewritePath(rewritePath={RewritePath},queryString={QueryString})", rewritePath, queryString);
             // now add back querystring if they existed
             if (queryString != string.Empty)
             {
                 bool rewritePathHasQuery = rewritePath.IndexOf("?", StringComparison.Ordinal) != -1;
+				Logger.LogDebug("AddQueryStringToRewritePath(rewritePath={RewritePath},queryString={QueryString}): rewritePathHasQuery → {RewritePathHasQuery}", rewritePath, queryString, rewritePathHasQuery);
                 if (queryString.StartsWith("?", StringComparison.Ordinal))
                 {
                     queryString = queryString.Substring(1);
+					Logger.LogDebug("AddQueryStringToRewritePath(rewritePath={RewritePath},queryString={QueryString}): queryString → {QueryString1}", rewritePath, queryString, queryString);
                 }
 
                 string[] parms = queryString.Split('&');
@@ -1437,6 +1520,7 @@ namespace DotNetNuke.Entities.Urls
                 for (int i = 0; i < parms.Length; i++)
                 {
                     bool hasValue = false;
+					Logger.LogDebug("AddQueryStringToRewritePath(rewritePath={RewritePath},queryString={QueryString}): hasValue → {HasValue}", rewritePath, queryString, hasValue);
 
                     // get parameter name
                     string parmName = parms[i];
@@ -1476,6 +1560,7 @@ namespace DotNetNuke.Entities.Urls
                         if (rewritePathHasQuery)
                         {
                             rewritePath = rewritePath + "&" + queryStringPiece;
+							Logger.LogDebug("AddQueryStringToRewritePath(rewritePath={RewritePath},queryString={QueryString}): rewritePath → {RewritePath1}", rewritePath, queryString, rewritePath);
                         }
                         else
                         {
@@ -1486,19 +1571,24 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting AddQueryStringToRewritePath(rewritePath={RewritePath},queryString={QueryString})", rewritePath, queryString);
             return rewritePath;
         }
 
         private static string CheckIfPortalAlias(string url, NameValueCollection querystringCol, UrlAction result, FriendlyUrlSettings settings, SharedDictionary<string, string> tabDict)
         {
+			Logger.LogDebug(">>> Entering CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict})", url, querystringCol, result, settings, tabDict);
             string newUrl = url;
             bool reWritten = false;
+			Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): reWritten → {ReWritten}", url, querystringCol, result, settings, tabDict, reWritten);
+			Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): newUrl → {NewUrl}", url, querystringCol, result, settings, tabDict, newUrl);
 
             string defaultPage = Globals.glbDefaultPage.ToLowerInvariant();
             string portalAliasUrl = url.ToLowerInvariant().Replace("/" + defaultPage, string.Empty);
 
             // if there is a straight match on a portal alias, it's the home page for that portal requested
             var portalAlias = PortalAliasController.Instance.GetPortalAlias(portalAliasUrl);
+			Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): portalAlias → {PortalAlias}", url, querystringCol, result, settings, tabDict, portalAlias);
             if (portalAlias != null)
             {
                 // special case : sometimes, some servers issue root/default.aspx when root/ was requested, sometimes not.  It depends
@@ -1509,6 +1599,7 @@ namespace DotNetNuke.Entities.Urls
                 {
                     // special case - change the url to be equal to the raw Url
                     url = url.Substring(0, url.Length - defaultPage.Length);
+					Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): url → {Url1}", url, querystringCol, result, settings, tabDict, url);
                 }
 
                 if (settings.RedirectDefaultPage
@@ -1516,17 +1607,21 @@ namespace DotNetNuke.Entities.Urls
                     && result.RedirectAllowed)
                 {
                     result.Reason = RedirectReason.Site_Root_Home;
+					Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): result.Reason → {Arg5}", url, querystringCol, result, settings, tabDict, result.Reason);
                     result.FinalUrl = Globals.AddHTTP(portalAliasUrl + "/");
                     result.Action = ActionType.Redirect301;
+					Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): result.Action → {Arg5}", url, querystringCol, result, settings, tabDict, result.Action);
                 }
                 else
                 {
                     // special case -> look in the tabdict for a blank intercept
                     // 735 : switch to custom method for getting portal
                     PortalInfo portal = CacheController.GetPortal(portalAlias.PortalID, true);
+					Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): portal → {Portal}", url, querystringCol, result, settings, tabDict, portal);
                     if (portal.HomeTabId == -1)
                     {
                         string tabKey = url;
+						Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): tabKey → {TabKey}", url, querystringCol, result, settings, tabDict, tabKey);
                         if (tabKey.EndsWith("/", StringComparison.Ordinal))
                         {
                             tabKey = tabKey.TrimEnd('/');
@@ -1558,11 +1653,15 @@ namespace DotNetNuke.Entities.Urls
                         // set rewrite to home page of site
                         // 760: check for portal alias specific culture before choosing home tabid
                         bool checkForCustomAlias = false;
+						Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): checkForCustomAlias → {CheckForCustomAlias}", url, querystringCol, result, settings, tabDict, checkForCustomAlias);
                         bool customTabAlias = false;
+						Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): customTabAlias → {CustomTabAlias}", url, querystringCol, result, settings, tabDict, customTabAlias);
 
                         // check for culture-specific aliases
                         string culture = null;
+						Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): culture → {Culture}", url, querystringCol, result, settings, tabDict, culture);
                         var portalAliases = PortalAliasController.Instance.GetPortalAliasesByPortalId(portal.PortalID).ToList();
+						Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): portalAliases → {PortalAliases}", url, querystringCol, result, settings, tabDict, portalAliases);
 
                         // if there are chosen portal aliases, check to see if the found alias is one of them
                         // if not, then will check for a custom alias per tab
@@ -1580,6 +1679,7 @@ namespace DotNetNuke.Entities.Urls
                         {
                             // ok, this isn't a chosen portal alias, check the list of custom aliases
                             List<string> customAliasesForTabs = TabIndexController.GetCustomPortalAliases(settings);
+							Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): customAliasesForTabs → {CustomAliasesForTabs}", url, querystringCol, result, settings, tabDict, customAliasesForTabs);
                             if (customAliasesForTabs != null && customAliasesForTabs.Contains(portalAlias.HTTPAlias.ToLowerInvariant()))
                             {
                                 // ok, the alias is used as a custom tab, so now look in the dictionary to see if it's used a 'root' context
@@ -1614,6 +1714,7 @@ namespace DotNetNuke.Entities.Urls
                             {
                                 tabId = Convert.ToInt32(querystringCol["TabId"], CultureInfo.InvariantCulture);
                                 result.Action = ActionType.CheckFor301;
+								Logger.LogDebug("CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict}): tabId → {TabId}", url, querystringCol, result, settings, tabDict, tabId);
                             }
                             else
                             {
@@ -1687,14 +1788,19 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CheckIfPortalAlias(url={Url},querystringCol={QuerystringCol},result={Result},settings={Settings},tabDict={TabDict})", url, querystringCol, result, settings, tabDict);
             return newUrl;
         }
 
         private static bool CheckSpecialCase(string tabKeyVal, SharedDictionary<string, string> tabDict)
         {
+			Logger.LogDebug(">>> Entering CheckSpecialCase(tabKeyVal={TabKeyVal},tabDict={TabDict})", tabKeyVal, tabDict);
             bool found = false;
             int pathStart = tabKeyVal.LastIndexOf(TabKeySeparator, StringComparison.Ordinal); // look for portal alias separator
+			Logger.LogDebug("CheckSpecialCase(tabKeyVal={TabKeyVal},tabDict={TabDict}): pathStart → {PathStart}", tabKeyVal, tabDict, pathStart);
             int lastPath = tabKeyVal.LastIndexOf('/');
+			Logger.LogDebug("CheckSpecialCase(tabKeyVal={TabKeyVal},tabDict={TabDict}): lastPath → {LastPath}", tabKeyVal, tabDict, lastPath);
+			Logger.LogDebug("CheckSpecialCase(tabKeyVal={TabKeyVal},tabDict={TabDict}): found → {Found}", tabKeyVal, tabDict, found);
 
             // get any path separator in the tab path portion
             if (pathStart > lastPath)
@@ -1705,12 +1811,14 @@ namespace DotNetNuke.Entities.Urls
             if (lastPath >= 0)
             {
                 int defaultStart = tabKeyVal.IndexOf("default", lastPath, StringComparison.OrdinalIgnoreCase);
+				Logger.LogDebug("CheckSpecialCase(tabKeyVal={TabKeyVal},tabDict={TabDict}): defaultStart → {DefaultStart}", tabKeyVal, tabDict, defaultStart);
 
                 // no .aspx on the end anymore
                 if (defaultStart > 0 && defaultStart > lastPath)
                 {
                     // there is a default in the path, and it's not the entire path (ie pagnamedefault and not default)
                     tabKeyVal = tabKeyVal.Substring(0, defaultStart);
+					Logger.LogDebug("CheckSpecialCase(tabKeyVal={TabKeyVal},tabDict={TabDict}): tabKeyVal → {TabKeyVal1}", tabKeyVal, tabDict, tabKeyVal);
 
                     // get rid of the default.aspx part
                     using (tabDict.GetReadLock())
@@ -1722,11 +1830,13 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CheckSpecialCase(tabKeyVal={TabKeyVal},tabDict={TabDict})", tabKeyVal, tabDict);
             return found;
         }
 
         private static UserInfo GetUser(IHostSettings hostSettings, int portalId, string vanityUrl)
         {
+			Logger.LogDebug(">>> Entering GetUser(hostSettings={HostSettings},portalId={PortalId},vanityUrl={VanityUrl})", hostSettings, portalId, vanityUrl);
             string cacheKey = string.Format(CultureInfo.InvariantCulture, CacheController.VanityUrlLookupKey, portalId);
             var vanityUrlLookupDictionary = CBO.GetCachedObject<Dictionary<string, UserInfo>>(
                 hostSettings,
@@ -1737,16 +1847,20 @@ namespace DotNetNuke.Entities.Urls
             {
                 user = UserController.GetUserByVanityUrl(portalId, vanityUrl);
                 vanityUrlLookupDictionary[vanityUrl] = user;
+				Logger.LogDebug("GetUser(hostSettings={HostSettings},portalId={PortalId},vanityUrl={VanityUrl}): user → {User}", hostSettings, portalId, vanityUrl, user);
             }
 
+			Logger.LogDebug("<<< Exiting GetUser(hostSettings={HostSettings},portalId={PortalId},vanityUrl={VanityUrl})", hostSettings, portalId, vanityUrl);
             return user;
         }
 
         private static bool CheckTabPath(IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, string tabKeyVal, UrlAction result, FriendlyUrlSettings settings, SharedDictionary<string, string> tabDict, ref string newUrl)
         {
+			Logger.LogDebug(">>> Entering CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl})", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl);
             bool found;
             string userParam = string.Empty;
             string tabLookUpKey = tabKeyVal;
+			Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): tabLookUpKey → {TabLookUpKey}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, tabLookUpKey);
             using (tabDict.GetReadLock())
             {
                 found = tabDict.ContainsKey(tabLookUpKey); // lookup the tabpath in the tab dictionary
@@ -1761,6 +1875,7 @@ namespace DotNetNuke.Entities.Urls
 
             // Check for VanityUrl
             var doNotRedirectRegex = RegexUtils.GetCachedRegex(settings.DoNotRedirectRegex);
+			Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): doNotRedirectRegex → {DoNotRedirectRegex}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, doNotRedirectRegex);
             if (!found && !Globals.ServicesFrameworkRegex.IsMatch(result.RawUrl) && !doNotRedirectRegex.IsMatch(result.RawUrl))
             {
                 string[] urlParams = tabLookUpKey.Split(TabKeySeparators, StringSplitOptions.None);
@@ -1768,8 +1883,10 @@ namespace DotNetNuke.Entities.Urls
                 {
                     // Extract the first Url parameter
                     string tabPath = urlParams[1];
+					Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): tabPath → {TabPath}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, tabPath);
 
                     var urlSegments = tabPath.Split('/');
+					Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): urlSegments → {UrlSegments}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, urlSegments);
 
                     string prefix = urlSegments[0];
 
@@ -1779,15 +1896,19 @@ namespace DotNetNuke.Entities.Urls
 
                         // check if its a vanityUrl
                         var user = GetUser(hostSettings, PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, result.PortalId), vanityUrl);
+						Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): user → {User}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, user);
                         if (user != null)
                         {
                             userParam = "UserId=" + user.UserID.ToString(CultureInfo.InvariantCulture);
 
                             // Get the User profile Tab
                             var portal = PortalController.Instance.GetPortal(result.PortalId);
+							Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): portal → {Portal}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, portal);
                             var profilePage = TabController.Instance.GetTab(portal.UserTabId, result.PortalId, false);
+							Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): profilePage → {ProfilePage}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, profilePage);
 
                             FriendlyUrlOptions options = UrlRewriterUtils.GetOptionsFromSettings(settings);
+							Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): options → {Options}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, options);
                             string profilePagePath = TabPathHelper.GetFriendlyUrlTabPath(profilePage, options, Guid.NewGuid());
 
                             // modify lookup key;
@@ -1808,15 +1929,18 @@ namespace DotNetNuke.Entities.Urls
                 {
                     // determine what the rewritten URl will be
                     newUrl = tabDict[tabLookUpKey];
+					Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): newUrl → {NewUrl1}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, newUrl);
                 }
 
                 // DNN-6747: if found match doesn't match current culture, then try to find correct match.
                 if (result.PortalId != Null.NullInteger && newUrl.Contains("language="))
                 {
                     var currentLocale = result.CultureCode;
+					Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): currentLocale → {CurrentLocale}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, currentLocale);
                     if (string.IsNullOrEmpty(currentLocale))
                     {
                         IPortalSettings portalSettings = new PortalSettings(result.PortalId);
+						Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): portalSettings → {PortalSettings}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, portalSettings);
                         currentLocale = Localization.GetPageLocale(portalSettings).Name;
                     }
 
@@ -1848,16 +1972,21 @@ namespace DotNetNuke.Entities.Urls
                 // 677 : only match if is on actual tabKeyVal match, to prevent site root redirects
                 // statements were moved into this 'if' statement
                 result.dictVal = newUrl;
+				Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): result.dictVal → {Arg9}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, result.dictVal);
+				Logger.LogDebug("CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl}): result.dictKey → {Arg9}", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl, result.dictKey);
                 result.dictKey = tabKeyVal;
             }
 
+			Logger.LogDebug("<<< Exiting CheckTabPath(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},tabKeyVal={TabKeyVal},result={Result},settings={Settings},tabDict={TabDict},newUrl={NewUrl})", hostSettings, portalController, appStatus, portalGroupController, tabKeyVal, result, settings, tabDict, newUrl);
             return found;
         }
 
         private static string ReplaceDefaultPage(string newUrl, string requestUrl, IEnumerable<string> list)
         {
+			Logger.LogDebug(">>> Entering ReplaceDefaultPage(newUrl={NewUrl},requestUrl={RequestUrl},list={List})", newUrl, requestUrl, list);
             string url = newUrl; // fall back case: we don't change anything
 
+			Logger.LogDebug("ReplaceDefaultPage(newUrl={NewUrl},requestUrl={RequestUrl},list={List}): url → {Url}", newUrl, requestUrl, list, url);
             // iterate the list and replace in the url is a match is found
             foreach (string requestPage in list)
             {
@@ -1868,6 +1997,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ReplaceDefaultPage(newUrl={NewUrl},requestUrl={RequestUrl},list={List})", newUrl, requestUrl, list);
             return url;
         }
 
@@ -1905,9 +2035,11 @@ namespace DotNetNuke.Entities.Urls
 
         private static void SetRewriteParameters(ref UrlAction result, string rewritePath)
         {
+			Logger.LogDebug(">>> Entering SetRewriteParameters(result={Result},rewritePath={RewritePath})", result, rewritePath);
             // split out found replaced and store tabid, rulePortalId and do301 if found
             result.RewritePath = rewritePath;
             MatchCollection qsItems = RewriteParamsRegex.Matches(rewritePath);
+			Logger.LogDebug("SetRewriteParameters(result={Result},rewritePath={RewritePath}): qsItems → {QsItems}", result, rewritePath, qsItems);
             foreach (Match itemMatch in qsItems)
             {
                 string val = itemMatch.Groups["val"].Value;
@@ -1942,6 +2074,7 @@ namespace DotNetNuke.Entities.Urls
 
             // remove the application path
             result.RewritePath = result.RewritePath.Replace(result.ApplicationPath + "/", string.Empty);
+			Logger.LogDebug("<<< Exiting SetRewriteParameters(result={Result},rewritePath={RewritePath})", result, rewritePath);
         }
     }
 }

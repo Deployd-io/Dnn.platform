@@ -18,10 +18,12 @@ import "./style.less";
 import util from "../../utils";
 import resx from "../../resources";
 import "./style.less";
+const logger = console;
 
 class CspSettingsPanelBody extends Component {
   constructor() {
     super();
+	logger.debug('>>> Entering constructor()');
     this.state = {
       cspSettings: undefined,
       error: {
@@ -32,9 +34,11 @@ class CspSettingsPanelBody extends Component {
       },
       cspLockConfirm: false,
     };
+	logger.debug('<<< Exiting constructor()');
   }
 
   UNSAFE_componentWillMount() {
+	logger.debug('>>> Entering UNSAFE_componentWillMount()');
     const { props } = this;
     if (props.cspSettings) {
       this.setState({
@@ -50,9 +54,11 @@ class CspSettingsPanelBody extends Component {
       return;
     }
     this.getSettings();
+	logger.debug('<<< Exiting UNSAFE_componentWillMount()');
   }
 
   getCspHeaderModeOptions() {
+	logger.debug('>>> Entering getCspHeaderModeOptions()');
     let cspHeaderModeOptions = [];
     cspHeaderModeOptions.push({
       value: 0,
@@ -64,22 +70,30 @@ class CspSettingsPanelBody extends Component {
     });
     cspHeaderModeOptions.push({ value: 2, label: resx.get("CspHeaderModeOn") });
 
+	logger.debug('<<< Exiting getCspHeaderModeOptions()');
     return cspHeaderModeOptions;
   }
 
   onCspHeaderValueChange(key, event) {
+	logger.debug(`>>> Entering onCspHeaderValueChange(key=${key},event=${event})`);
     this.onSettingChange(key, event);
+	logger.debug(`<<< Exiting onCspHeaderValueChange(key=${key},event=${event})`);
   }
 
   onCspReportingHeaderValueChange(key, event) {
+	logger.debug(`>>> Entering onCspReportingHeaderValueChange(key=${key},event=${event})`);
     this.onSettingChange(key, event);
+	logger.debug(`<<< Exiting onCspReportingHeaderValueChange(key=${key},event=${event})`);
   }
 
   onSettingChange(key, event) {
+	logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
     const { state, props } = this;
     let cspSettings = Object.assign({}, state.cspSettings);
+	logger.debug(`onSettingChange(key=${key},event=${event}): cspSettings → ${cspSettings}`);
     cspSettings[key] = typeof event === "object" ? event.target.value : event;
     let error = Object.assign({}, state.error);
+	logger.debug(`onSettingChange(key=${key},event=${event}): error → ${error}`);
     error[key] = false;
     error[key + "Errors"] = [];
     this.setState(
@@ -90,9 +104,11 @@ class CspSettingsPanelBody extends Component {
       () => {}
     );
     props.dispatch(SecurityActions.cspSettingsClientModified(cspSettings));
+	logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
   }
 
   onUpdate(event) {
+	logger.debug(`>>> Entering onUpdate(event=${event})`);
     event.preventDefault();
     const { props, state } = this;
 
@@ -113,23 +129,27 @@ class CspSettingsPanelBody extends Component {
         },
         () => {
           util.utilities.notifyError(resx.get("CspSettingsError"));
+		logger.debug(`<<< Exiting onUpdate(event=${event})`);
         }
       )
     );
   }
 
   onCancel() {
+	logger.debug('>>> Entering onCancel()');
     util.utilities.confirm(
       resx.get("CspSettingsRestoreWarning"),
       resx.get("Yes"),
       resx.get("No"),
       () => {
         this.getSettings();
+		logger.debug('<<< Exiting onCancel()');
       }
     );
   }
 
   getSettings() {
+	logger.debug('>>> Entering getSettings()');
     const { props } = this;
     props.dispatch(
       SecurityActions.getCspSettings((data) => {
@@ -145,12 +165,15 @@ class CspSettingsPanelBody extends Component {
         });
       })
     );
+	logger.debug('<<< Exiting getSettings()');
   }
 
   render() {
+	logger.debug('>>> Entering render()');
     const { state } = this;
 
     if (state.cspSettings) {
+	logger.debug('<<< Exiting render()');
       return (
         <div id="cspSettings-container">
           <div className="warningBox">
@@ -263,6 +286,8 @@ CspSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
   return {
     tabIndex: state.pagination.tabIndex,
     cspSettings: state.security.cspSettings,

@@ -14,17 +14,29 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <summary>Initializes a new instance of the <see cref="EditorProviderSettings"/> class.</summary>
         public EditorProviderSettings()
         {
+			eventLogger.LogDebug(">>> Entering EditorProviderSettings()");
             this.OverrideFileOnUpload = false;
             this.UseAnchorSelector = true;
+			eventLogger.LogDebug("EditorProviderSettings(): this.OverrideFileOnUpload → {Arg0}", this.OverrideFileOnUpload);
+			eventLogger.LogDebug("EditorProviderSettings(): this.UseAnchorSelector → {Arg0}", this.UseAnchorSelector);
             this.FileListPageSize = 20;
             this.FileListViewMode = FileListView.DetailView;
             this.SettingMode = SettingsMode.Portal;
+			eventLogger.LogDebug("EditorProviderSettings(): this.FileListPageSize → {Arg0}", this.FileListPageSize);
+			eventLogger.LogDebug("EditorProviderSettings(): this.FileListViewMode → {Arg0}", this.FileListViewMode);
+			eventLogger.LogDebug("EditorProviderSettings(): this.SettingMode → {Arg0}", this.SettingMode);
             this.DefaultLinkMode = LinkMode.RelativeURL;
             this.DefaultLinkProtocol = LinkProtocol.Https;
             this.InjectSyntaxJs = true;
             this.BrowserRootDirId = -1;
             this.BrowserRootDirForImgId = -1;
             this.UploadDirId = -1;
+			eventLogger.LogDebug("EditorProviderSettings(): this.DefaultLinkMode → {Arg0}", this.DefaultLinkMode);
+			eventLogger.LogDebug("EditorProviderSettings(): this.DefaultLinkProtocol → {Arg0}", this.DefaultLinkProtocol);
+			eventLogger.LogDebug("EditorProviderSettings(): this.InjectSyntaxJs → {Arg0}", this.InjectSyntaxJs);
+			eventLogger.LogDebug("EditorProviderSettings(): this.BrowserRootDirId → {Arg0}", this.BrowserRootDirId);
+			eventLogger.LogDebug("EditorProviderSettings(): this.BrowserRootDirForImgId → {Arg0}", this.BrowserRootDirForImgId);
+			eventLogger.LogDebug("EditorProviderSettings(): this.UploadDirId → {Arg0}", this.UploadDirId);
             this.UploadDirForImgId = -1;
             this.ResizeHeight = -1;
             this.ResizeWidthUpload = -1;
@@ -39,8 +51,12 @@ namespace DNNConnect.CKEditorProvider.Objects
                                        {
                                            new UploadSizeRoles { RoleId = 0, UploadFileLimit = -1 },
                                        };
+									eventLogger.LogDebug("EditorProviderSettings(): this.UploadDirForImgId → {Arg0}", this.UploadDirForImgId);
+									eventLogger.LogDebug("EditorProviderSettings(): this.ResizeHeight → {Arg0}", this.ResizeHeight);
+									eventLogger.LogDebug("EditorProviderSettings(): this.ResizeWidthUpload → {Arg0}", this.ResizeWidthUpload);
 
             this.Config = new EditorConfig();
+			eventLogger.LogDebug("<<< Exiting EditorProviderSettings()");
         }
 
         /// <summary>Gets or sets a value indicating whether [override file on upload].</summary>

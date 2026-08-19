@@ -2,11 +2,13 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Tooltip from "../Tooltip";
 import "./style.less";
+const logger = console;
 
 class Switch extends Component {
 
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
 
         this.state = {
             switchActive: props.value,
@@ -15,14 +17,17 @@ class Switch extends Component {
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         if (this.props.value !== prevProps.value) {
             this.setState({
                 switchActive: this.props.value
             });
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
         }
     }
 
     toggleStatus() {
+		logger.debug('>>> Entering toggleStatus()');
         const { props, state } = this;
 
         if (props.readOnly) {
@@ -32,9 +37,11 @@ class Switch extends Component {
         if (typeof this.props.onChange === "function") {
             props.onChange(!state.switchActive);
         }
+		logger.debug('<<< Exiting toggleStatus()');
     }
 
     getClassName() {
+		logger.debug('>>> Entering getClassName()');
         const { props } = this;
 
         let className = "dnn-switch";
@@ -49,10 +56,12 @@ class Switch extends Component {
             className += (" place-" + props.labelPlacement);
         }
 
+		logger.debug('<<< Exiting getClassName()');
         return className;
     }
 
     renderComponent() {
+		logger.debug('>>> Entering renderComponent()');
         const { props, state } = this;
         if (props.labelHidden) {
             return <span className={this.getClassName()} onClick={this.toggleStatus.bind(this)}>
@@ -60,6 +69,7 @@ class Switch extends Component {
             </span>;
         }
         else {
+			logger.debug('<<< Exiting renderComponent()');
             return <div className="switch-button">
                 <label className={"on-off-text place-" + props.labelPlacement}>
                     {(state.switchActive ? props.onText : props.offText)}
@@ -72,8 +82,10 @@ class Switch extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
         const tooltipMessages = props.tooltipMessage instanceof Array ? props.tooltipMessage : [props.tooltipMessage];
+		logger.debug('<<< Exiting render()');
         return (
             <div className="dnn-switch-container">
                 {props.label && <span className="switch-label">{props.label}</span>}

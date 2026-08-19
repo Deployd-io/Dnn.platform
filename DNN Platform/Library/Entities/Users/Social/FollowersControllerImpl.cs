@@ -13,6 +13,7 @@ namespace DotNetNuke.Entities.Users.Social.Internal
 
     internal class FollowersControllerImpl : IFollowersController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FollowersControllerImpl));
         internal const string FollowerRequest = "FollowerRequest";
         internal const string FollowBackRequest = "FollowBackRequest";
 
@@ -23,7 +24,9 @@ namespace DotNetNuke.Entities.Users.Social.Internal
         /// </remarks>
         public void FollowUser(UserInfo targetUser)
         {
+			Logger.LogDebug(">>> Entering FollowUser(targetUser={TargetUser})", targetUser);
             this.FollowUser(UserController.Instance.GetCurrentUserInfo(), targetUser);
+			Logger.LogDebug("<<< Exiting FollowUser(targetUser={TargetUser})", targetUser);
         }
 
         /// <summary>FollowUser - Initiating User initiates a Follow Request to the Target User.</summary>
@@ -34,6 +37,7 @@ namespace DotNetNuke.Entities.Users.Social.Internal
         /// </remarks>
         public void FollowUser(UserInfo initiatingUser, UserInfo targetUser)
         {
+			Logger.LogDebug(">>> Entering FollowUser(initiatingUser={InitiatingUser},targetUser={TargetUser})", initiatingUser, targetUser);
             Requires.NotNull("user1", initiatingUser);
 
             var relationship = RelationshipController.Instance.InitiateUserRelationship(
@@ -44,27 +48,34 @@ namespace DotNetNuke.Entities.Users.Social.Internal
             AddFollowerRequestNotification(initiatingUser, targetUser);
 
             EventManager.Instance.OnFollowRequested(new RelationshipEventArgs(relationship, initiatingUser.PortalID));
+			Logger.LogDebug("<<< Exiting FollowUser(initiatingUser={InitiatingUser},targetUser={TargetUser})", initiatingUser, targetUser);
         }
 
         /// <summary>UnFollowUser - Current User initiates an UnFollow Request to the Target User.</summary>
         /// <param name="targetUser">UserInfo for Target User.</param>
         public void UnFollowUser(UserInfo targetUser)
         {
+			Logger.LogDebug(">>> Entering UnFollowUser(targetUser={TargetUser})", targetUser);
             var initiatingUser = UserController.Instance.GetCurrentUserInfo();
             var followRelationship = RelationshipController.Instance.GetFollowerRelationship(initiatingUser, targetUser);
+			Logger.LogDebug("UnFollowUser(targetUser={TargetUser}): followRelationship → {FollowRelationship}", targetUser, followRelationship);
+			Logger.LogDebug("UnFollowUser(targetUser={TargetUser}): initiatingUser → {InitiatingUser}", targetUser, initiatingUser);
 
             RelationshipController.Instance.DeleteUserRelationship(followRelationship);
 
             EventManager.Instance.OnUnfollowRequested(new RelationshipEventArgs(followRelationship, initiatingUser.PortalID));
+			Logger.LogDebug("<<< Exiting UnFollowUser(targetUser={TargetUser})", targetUser);
         }
 
         private static void AddFollowerRequestNotification(UserInfo initiatingUser, UserInfo targetUser)
         {
+			Logger.LogDebug(">>> Entering AddFollowerRequestNotification(initiatingUser={InitiatingUser},targetUser={TargetUser})", initiatingUser, targetUser);
             var notificationType = NotificationsController.Instance.GetNotificationType(IsFollowing(targetUser, initiatingUser) ? FollowerRequest : FollowBackRequest);
             var subject = string.Format(
                 CultureInfo.CurrentCulture,
                 Localization.GetString("AddFollowerRequestSubject", Localization.GlobalResourceFile),
                 initiatingUser.DisplayName);
+				Logger.LogDebug("AddFollowerRequestNotification(initiatingUser={InitiatingUser},targetUser={TargetUser}): notificationType → {NotificationType}", initiatingUser, targetUser, notificationType);
 
             var body = string.Format(
                 CultureInfo.CurrentCulture,
@@ -82,12 +93,16 @@ namespace DotNetNuke.Entities.Users.Social.Internal
             };
 
             NotificationsController.Instance.SendNotification(notification, initiatingUser.PortalID, null, [targetUser,]);
+			Logger.LogDebug("<<< Exiting AddFollowerRequestNotification(initiatingUser={InitiatingUser},targetUser={TargetUser})", initiatingUser, targetUser);
         }
 
         private static bool IsFollowing(UserInfo user1, UserInfo user2)
         {
+			Logger.LogDebug(">>> Entering IsFollowing(user1={User1},user2={User2})", user1, user2);
             var userRelationship = RelationshipController.Instance.GetFollowerRelationship(user1, user2);
 
+			Logger.LogDebug("IsFollowing(user1={User1},user2={User2}): userRelationship → {UserRelationship}", user1, user2, userRelationship);
+			Logger.LogDebug("<<< Exiting IsFollowing(user1={User1},user2={User2})", user1, user2);
             return userRelationship is { Status: RelationshipStatus.Accepted, };
         }
     }

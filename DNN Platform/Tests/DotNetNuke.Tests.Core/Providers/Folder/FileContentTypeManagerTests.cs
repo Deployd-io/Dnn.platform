@@ -25,10 +25,15 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
         [SetUp]
         public void Setup()
         {
+			mockEventLogger.LogDebug(">>> Entering Setup()");
             var mockData = MockComponentProvider.CreateDataProvider();
             var mockCache = MockComponentProvider.CreateDataCacheProvider();
+			mockEventLogger.LogDebug("Setup(): mockCache → {MockCache}", mockCache);
             var mockGlobals = new Mock<IGlobals>();
+			mockEventLogger.LogDebug("Setup(): mockGlobals → {MockGlobals}", mockGlobals);
             var mockCbo = new Mock<ICBO>();
+			mockEventLogger.LogDebug("Setup(): mockCbo → {MockCbo}", mockCbo);
+			mockEventLogger.LogDebug("Setup(): mockData → {MockData}", mockData);
 
             mockData.Setup(m => m.GetProviderPath()).Returns(string.Empty);
 
@@ -38,39 +43,49 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+					mockEventLogger.LogDebug("Setup(): serviceProvider → {ServiceProvider}", serviceProvider);
                     services.AddSingleton(mockCache.Object);
                     services.AddSingleton(mockData.Object);
                     services.AddSingleton(mockGlobals.Object);
                     services.AddSingleton(mockCbo.Object);
                 });
+				mockEventLogger.LogDebug("<<< Exiting Setup()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			mockEventLogger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
             TestableGlobals.ClearInstance();
             CBO.ClearInstance();
+			mockEventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void GetContentType_Returns_Known_Value_When_Extension_Is_Not_Managed()
         {
+			mockEventLogger.LogDebug(">>> Entering GetContentType_Returns_Known_Value_When_Extension_Is_Not_Managed()");
             const string notManagedExtension = "asdf609vas21AS:F,l/&%/(%$";
 
             var contentType = FileContentTypeManager.Instance.GetContentType(notManagedExtension);
+			mockEventLogger.LogDebug("GetContentType_Returns_Known_Value_When_Extension_Is_Not_Managed(): contentType → {ContentType}", contentType);
 
             Assert.That(contentType, Is.EqualTo("application/octet-stream"));
+			mockEventLogger.LogDebug("<<< Exiting GetContentType_Returns_Known_Value_When_Extension_Is_Not_Managed()");
         }
 
         [Test]
         public void GetContentType_Returns_Correct_Value_For_Extension()
         {
+			mockEventLogger.LogDebug(">>> Entering GetContentType_Returns_Correct_Value_For_Extension()");
             const string notManagedExtension = "htm";
 
             var contentType = FileContentTypeManager.Instance.GetContentType(notManagedExtension);
+			mockEventLogger.LogDebug("GetContentType_Returns_Correct_Value_For_Extension(): contentType → {ContentType}", contentType);
 
             Assert.That(contentType, Is.EqualTo("text/html"));
+			mockEventLogger.LogDebug("<<< Exiting GetContentType_Returns_Correct_Value_For_Extension()");
         }
     }
 }

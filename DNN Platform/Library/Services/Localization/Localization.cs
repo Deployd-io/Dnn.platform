@@ -191,14 +191,18 @@ namespace DotNetNuke.Services.Localization
 
         public static int ActiveLanguagesByPortalID(int portalID)
         {
+			Logger.LogDebug(">>> Entering ActiveLanguagesByPortalID(portalID={PortalID})", portalID);
             // Default to 1 (maybe called during portal creation before languages are enabled for portal)
             int count = 1;
+			Logger.LogDebug("ActiveLanguagesByPortalID(portalID={PortalID}): count → {Count}", portalID, count);
             Dictionary<string, Locale> locales = LocaleController.Instance.GetLocales(portalID);
+			Logger.LogDebug("ActiveLanguagesByPortalID(portalID={PortalID}): locales → {Locales}", portalID, locales);
             if (locales != null)
             {
                 count = locales.Count;
             }
 
+			Logger.LogDebug("<<< Exiting ActiveLanguagesByPortalID(portalID={PortalID})", portalID);
             return count;
         }
 
@@ -217,14 +221,18 @@ namespace DotNetNuke.Services.Localization
         /// <param name="clearCache">Whether to clear the cache after adding.</param>
         public static void AddLanguageToPortal(IEventLogger eventLogger, int portalId, int languageId, bool clearCache)
         {
+			Logger.LogDebug(">>> Entering AddLanguageToPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},clearCache={ClearCache})", eventLogger, portalId, languageId, clearCache);
             // try to get valid locale reference
+			Logger.LogDebug("<<< Exiting AddLanguageToPortal(portalID={PortalID},languageID={LanguageID},clearCache={ClearCache})", portalID, languageID, clearCache);
             var newLocale = LocaleController.Instance.GetLocale(languageId);
+			Logger.LogDebug("AddLanguageToPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},clearCache={ClearCache}): newLocale → {NewLocale}", eventLogger, portalId, languageId, clearCache, newLocale);
 
             // we can only add a valid locale
             if (newLocale != null)
             {
                 // check if locale has not been added to portal already
                 var portalLocale = LocaleController.Instance.GetLocale(portalId, newLocale.Code);
+				Logger.LogDebug("AddLanguageToPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},clearCache={ClearCache}): portalLocale → {PortalLocale}", eventLogger, portalId, languageId, clearCache, portalLocale);
 
                 // locale needs to be added
                 if (portalLocale == null)
@@ -249,11 +257,14 @@ namespace DotNetNuke.Services.Localization
                         EventLogType.LANGUAGETOPORTAL_CREATED);
 
                     var portalInfo = PortalController.Instance.GetPortal(portalId);
+					Logger.LogDebug("AddLanguageToPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},clearCache={ClearCache}): portalInfo → {PortalInfo}", eventLogger, portalId, languageId, clearCache, portalInfo);
                     if (portalInfo != null && newLocale.Code != portalInfo.DefaultLanguage)
                     {
                         // check to see if this is the first extra language being added to the portal
                         var portalLocales = LocaleController.Instance.GetLocales(portalId);
+						Logger.LogDebug("AddLanguageToPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},clearCache={ClearCache}): portalLocales → {PortalLocales}", eventLogger, portalId, languageId, clearCache, portalLocales);
                         var firstExtraLanguage = (portalLocales != null) && portalLocales.Count == 2;
+						Logger.LogDebug("AddLanguageToPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},clearCache={ClearCache}): firstExtraLanguage → {FirstExtraLanguage}", eventLogger, portalId, languageId, clearCache, firstExtraLanguage);
 
                         if (firstExtraLanguage)
                         {
@@ -273,6 +284,7 @@ namespace DotNetNuke.Services.Localization
 
         public static void AddLanguagesToPortal(int portalID)
         {
+			Logger.LogDebug(">>> Entering AddLanguagesToPortal(portalID={PortalID})", portalID);
             foreach (Locale language in LocaleController.Instance.GetLocales(Null.NullInteger).Values)
             {
                 // Add Portal/Language to PortalLanguages
@@ -280,10 +292,12 @@ namespace DotNetNuke.Services.Localization
             }
 
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.LocalesCacheKey, portalID));
+			Logger.LogDebug("<<< Exiting AddLanguagesToPortal(portalID={PortalID})", portalID);
         }
 
         public static void AddLanguageToPortals(int languageID)
         {
+			Logger.LogDebug(">>> Entering AddLanguageToPortals(languageID={LanguageID})", languageID);
             foreach (PortalInfo portal in PortalController.Instance.GetPortals())
             {
                 // Add Portal/Language to PortalLanguages
@@ -291,13 +305,16 @@ namespace DotNetNuke.Services.Localization
 
                 DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.LocalesCacheKey, portal.PortalID));
             }
+			Logger.LogDebug("<<< Exiting AddLanguageToPortals(languageID={LanguageID})", languageID);
         }
 
         public static void AddTranslatorRole(int portalID, Locale language)
         {
+			Logger.LogDebug(">>> Entering AddTranslatorRole(portalID={PortalID},language={Language})", portalID, language);
             // Create new Translator Role
             string roleName = $"Translator ({language.Code})";
             RoleInfo role = RoleController.Instance.GetRole(portalID, r => r.RoleName == roleName);
+			Logger.LogDebug("AddTranslatorRole(portalID={PortalID},language={Language}): role → {Role}", portalID, language, role);
 
             if (role == null)
             {
@@ -313,6 +330,7 @@ namespace DotNetNuke.Services.Localization
             string roles = $"Administrators;Translator ({language.Code})";
 
             PortalController.UpdatePortalSetting(portalID, $"DefaultTranslatorRoles-{language.Code}", roles);
+			Logger.LogDebug("<<< Exiting AddTranslatorRole(portalID={PortalID},language={Language})", portalID, language);
         }
 
         /// <summary>Converts old TimeZoneOffset to new <see cref="TimeZoneInfo"/>.</summary>
@@ -323,8 +341,10 @@ namespace DotNetNuke.Services.Localization
         /// When mapping is not found, a default TimeZoneInfo.Local us returned.</remarks>
         public static TimeZoneInfo ConvertLegacyTimeZoneOffsetToTimeZoneInfo(int timeZoneOffsetInMinutes)
         {
+			Logger.LogDebug(">>> Entering ConvertLegacyTimeZoneOffsetToTimeZoneInfo(timeZoneOffsetInMinutes={TimeZoneOffsetInMinutes})", timeZoneOffsetInMinutes);
             TimeZoneInfo timeZoneInfo = TimeZoneInfo.Local;
 
+			Logger.LogDebug("ConvertLegacyTimeZoneOffsetToTimeZoneInfo(timeZoneOffsetInMinutes={TimeZoneOffsetInMinutes}): timeZoneInfo → {TimeZoneInfo}", timeZoneOffsetInMinutes, timeZoneInfo);
             // lookup existing mapping
             switch (timeZoneOffsetInMinutes)
             {
@@ -440,6 +460,7 @@ namespace DotNetNuke.Services.Localization
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting ConvertLegacyTimeZoneOffsetToTimeZoneInfo(timeZoneOffsetInMinutes={TimeZoneOffsetInMinutes})", timeZoneOffsetInMinutes);
             return timeZoneInfo;
         }
 
@@ -468,16 +489,21 @@ namespace DotNetNuke.Services.Localization
         /// <param name="isInstalling">Whether the site is installing.</param>
         public static void DeleteLanguage(IEventLogger eventLogger, Locale language, bool isInstalling)
         {
+			Logger.LogDebug(">>> Entering DeleteLanguage(eventLogger={EventLogger},language={Language},isInstalling={IsInstalling})", eventLogger, language, isInstalling);
             // remove languages from all portals
             RemoveLanguageFromPortals(language.LanguageId, isInstalling);
 
             DataProvider.Instance().DeleteLanguage(language.LanguageId);
             eventLogger.AddLog(language, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.LANGUAGE_DELETED);
+			Logger.LogDebug("<<< Exiting DeleteLanguage(eventLogger={EventLogger},language={Language})", eventLogger, language);
             DataCache.ClearHostCache(true);
         }
 
         public static string BestCultureCodeBasedOnBrowserLanguages(IEnumerable<string> cultureCodes, string fallback)
         {
+			Logger.LogDebug(">>> Entering BestCultureCodeBasedOnBrowserLanguages(cultureCodes={CultureCodes},fallback={Fallback})", cultureCodes, fallback);
+			Logger.LogDebug("<<< Exiting BestCultureCodeBasedOnBrowserLanguages(cultureCodes={CultureCodes},fallback={Fallback})", cultureCodes, fallback);
+			Logger.LogDebug("<<< Exiting BestCultureCodeBasedOnBrowserLanguages(cultureCodes={CultureCodes})", cultureCodes);
             return TestableLocalization.Instance.BestCultureCodeBasedOnBrowserLanguages(cultureCodes, fallback);
         }
 
@@ -490,6 +516,7 @@ namespace DotNetNuke.Services.Localization
         {
             if (HttpContext.Current == null)
             {
+			Logger.LogDebug("<<< Exiting GetExceptionMessage(key={Key},defaultValue={DefaultValue})", key, defaultValue);
                 return defaultValue;
             }
 
@@ -509,28 +536,34 @@ namespace DotNetNuke.Services.Localization
 
         public static string GetLanguageDisplayMode(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetLanguageDisplayMode(portalId={PortalId})", portalId);
             string viewTypePersonalizationKey = "ViewType" + portalId;
             string viewType = Convert.ToString(Personalization.Personalization.GetProfile("LanguageDisplayMode", viewTypePersonalizationKey), CultureInfo.InvariantCulture);
+			Logger.LogDebug("GetLanguageDisplayMode(portalId={PortalId}): viewType → {ViewType}", portalId, viewType);
             if (string.IsNullOrEmpty(viewType))
             {
                 viewType = "NATIVE";
             }
 
+			Logger.LogDebug("<<< Exiting GetLanguageDisplayMode(portalId={PortalId})", portalId);
             return viewType;
         }
 
         public static string GetLocaleName(string code, CultureDropDownTypes displayType)
         {
+			Logger.LogDebug(">>> Entering GetLocaleName(code={Code},displayType={DisplayType})", code, displayType);
             string name;
 
             // Create a CultureInfo class based on culture
             CultureInfo info = CultureInfo.GetCultureInfo(code);
+			Logger.LogDebug("GetLocaleName(code={Code},displayType={DisplayType}): info → {Info}", code, displayType, info);
 
             // Based on the display type desired by the user, select the correct property
             switch (displayType)
             {
                 case CultureDropDownTypes.EnglishName:
                     name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(info.EnglishName);
+					Logger.LogDebug("GetLocaleName(code={Code},displayType={DisplayType}): name → {Name}", code, displayType, name);
                     break;
                 case CultureDropDownTypes.Lcid:
                     name = info.LCID.ToString(CultureInfo.CurrentCulture);
@@ -552,6 +585,7 @@ namespace DotNetNuke.Services.Localization
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting GetLocaleName(code={Code},displayType={DisplayType})", code, displayType);
             return name;
         }
 
@@ -573,6 +607,7 @@ namespace DotNetNuke.Services.Localization
         [DnnDeprecated(9, 8, 0, "Use overload taking IPortalSettings instead")]
         public static partial CultureInfo GetPageLocale(PortalSettings portalSettings)
         {
+			Logger.LogDebug("<<< Exiting GetPageLocale(portalSettings={PortalSettings})", portalSettings);
             return GetPageLocale((IPortalSettings)portalSettings);
         }
 
@@ -641,16 +676,19 @@ namespace DotNetNuke.Services.Localization
         /// <returns>A valid CultureInfo if any is found.</returns>
         public static CultureInfo GetBrowserCulture(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetBrowserCulture(portalId={PortalId})", portalId);
             if (HttpContext.Current == null || HttpContext.Current.Request == null || HttpContext.Current.Request.UserLanguages == null)
             {
                 return null;
             }
 
             CultureInfo culture = null;
+			Logger.LogDebug("GetBrowserCulture(portalId={PortalId}): culture → {Culture}", portalId, culture);
             foreach (string userLang in HttpContext.Current.Request.UserLanguages)
             {
                 // split userlanguage by ";"... all but the first language will contain a preferrence index eg. ;q=.5
                 string language = userLang.Split(';')[0];
+				Logger.LogDebug("GetBrowserCulture(portalId={PortalId}): language → {Language}", portalId, language);
                 culture = GetCultureFromString(portalId, language);
                 if (culture != null)
                 {
@@ -658,11 +696,13 @@ namespace DotNetNuke.Services.Localization
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetBrowserCulture(portalId={PortalId})", portalId);
             return culture;
         }
 
         public static string GetResourceFileName(string resourceFileName, string language, string mode, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetResourceFileName(resourceFileName={ResourceFileName},language={Language},mode={Mode},portalId={PortalId})", resourceFileName, language, mode, portalId);
             if (!resourceFileName.EndsWith(".resx", StringComparison.OrdinalIgnoreCase))
             {
                 resourceFileName += ".resx";
@@ -673,6 +713,7 @@ namespace DotNetNuke.Services.Localization
                 if (resourceFileName.EndsWith(".en-us.resx", StringComparison.OrdinalIgnoreCase))
                 {
                     resourceFileName = $"{resourceFileName.Substring(0, resourceFileName.Length - 11)}.{language}.resx";
+					Logger.LogDebug("GetResourceFileName(resourceFileName={ResourceFileName},language={Language},mode={Mode},portalId={PortalId}): resourceFileName → {ResourceFileName1}", resourceFileName, language, mode, portalId, resourceFileName);
                 }
                 else
                 {
@@ -689,16 +730,20 @@ namespace DotNetNuke.Services.Localization
                 resourceFileName = $"{resourceFileName.Substring(0, resourceFileName.Length - 5)}.Portal-{portalId}.resx";
             }
 
+			Logger.LogDebug("<<< Exiting GetResourceFileName(resourceFileName={ResourceFileName},language={Language},mode={Mode},portalId={PortalId})", resourceFileName, language, mode, portalId);
             return resourceFileName;
         }
 
         public static string GetResourceFile(Control control, string fileName)
         {
+			Logger.LogDebug(">>> Entering GetResourceFile(control={Control},fileName={FileName})", control, fileName);
+			Logger.LogDebug("<<< Exiting GetResourceFile(control={Control},fileName={FileName})", control, fileName);
             return control.TemplateSourceDirectory + "/" + LocalResourceDirectory + "/" + fileName;
         }
 
         public static string GetString(string key, Control ctrl)
         {
+			Logger.LogDebug(">>> Entering GetString(key={Key},ctrl={Ctrl})", key, ctrl);
             // We need to find the parent module
             Control parentControl = ctrl.Parent;
             string localizedText;
@@ -706,6 +751,7 @@ namespace DotNetNuke.Services.Localization
             if (moduleControl == null)
             {
                 PropertyInfo pi = parentControl.GetType().GetProperty("LocalResourceFile");
+				Logger.LogDebug("GetString(key={Key},ctrl={Ctrl}): pi → {Pi}", key, ctrl, pi);
                 if (pi != null)
                 {
                     // If control has a LocalResourceFile property use this
@@ -724,6 +770,14 @@ namespace DotNetNuke.Services.Localization
                 localizedText = GetString(key, moduleControl.LocalResourceFile);
             }
 
+			Logger.LogDebug("<<< Exiting GetString(key={Key},ctrl={Ctrl})", key, ctrl);
+			Logger.LogDebug("<<< Exiting GetString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting GetString(key={Key},portalSettings={PortalSettings})", key, portalSettings);
+			Logger.LogDebug("<<< Exiting GetString(key={Key},resourceFileRoot={ResourceFileRoot},disableShowMissingKeys={DisableShowMissingKeys})", key, resourceFileRoot, disableShowMissingKeys);
+			Logger.LogDebug("<<< Exiting GetString(key={Key},resourceFileRoot={ResourceFileRoot})", key, resourceFileRoot);
+			Logger.LogDebug("<<< Exiting GetString(key={Key},resourceFileRoot={ResourceFileRoot},language={Language})", key, resourceFileRoot, language);
+			Logger.LogDebug("<<< Exiting GetString(key={Key},resourceFileRoot={ResourceFileRoot},portalSettings={PortalSettings},language={Language})", key, resourceFileRoot, portalSettings, language);
+			Logger.LogDebug("<<< Exiting GetString(key={Key},resourceFileRoot={ResourceFileRoot},portalSettings={PortalSettings},language={Language},disableShowMissingKeys={DisableShowMissingKeys})", key, resourceFileRoot, portalSettings, language, disableShowMissingKeys);
             return localizedText;
         }
 
@@ -815,6 +869,8 @@ namespace DotNetNuke.Services.Localization
         /// </remarks>
         public static string GetStringUrl(string key, string resourceFileRoot)
         {
+			Logger.LogDebug(">>> Entering GetStringUrl(key={Key},resourceFileRoot={ResourceFileRoot})", key, resourceFileRoot);
+			Logger.LogDebug("<<< Exiting GetStringUrl(key={Key},resourceFileRoot={ResourceFileRoot})", key, resourceFileRoot);
             return GetString(key, resourceFileRoot, PortalSettings.Current, null, true);
         }
 
@@ -823,11 +879,14 @@ namespace DotNetNuke.Services.Localization
         /// <returns>the string that is safe to use in a JavaScript function.</returns>
         public static string GetSafeJSString(string unsafeString)
         {
+			Logger.LogDebug(">>> Entering GetSafeJSString(unsafeString={UnsafeString})", unsafeString);
             if (string.IsNullOrEmpty(unsafeString))
             {
+			Logger.LogDebug("<<< Exiting GetSafeJSString(unsafeString={UnsafeString})", unsafeString);
                 return string.Empty;
             }
 
+			Logger.LogDebug("<<< Exiting GetSafeJSString(key={Key},resourceFileRoot={ResourceFileRoot})", key, resourceFileRoot);
             return HttpUtility.JavaScriptStringEncode(unsafeString);
         }
 
@@ -838,6 +897,7 @@ namespace DotNetNuke.Services.Localization
         public static string GetSafeJSString(string key, string resourceFileRoot)
         {
             var unsafeString = GetString(key, resourceFileRoot);
+			Logger.LogDebug("GetSafeJSString(key={Key},resourceFileRoot={ResourceFileRoot}): unsafeString → {UnsafeString}", key, resourceFileRoot, unsafeString);
             return GetSafeJSString(unsafeString);
         }
 
@@ -859,6 +919,17 @@ namespace DotNetNuke.Services.Localization
         /// </remarks>
         public static string GetSystemMessage(PortalSettings portalSettings, string messageName)
         {
+			Logger.LogDebug(">>> Entering GetSystemMessage(portalSettings={PortalSettings},messageName={MessageName})", portalSettings, messageName);
+			Logger.LogDebug("<<< Exiting GetSystemMessage(portalSettings={PortalSettings},messageName={MessageName})", portalSettings, messageName);
+			Logger.LogDebug("<<< Exiting GetSystemMessage(portalSettings={PortalSettings},messageName={MessageName},userInfo={UserInfo})", portalSettings, messageName, userInfo);
+			Logger.LogDebug("<<< Exiting GetSystemMessage(strLanguage={StrLanguage},portalSettings={PortalSettings},messageName={MessageName},userInfo={UserInfo})", strLanguage, portalSettings, messageName, userInfo);
+			Logger.LogDebug("<<< Exiting GetSystemMessage(portalSettings={PortalSettings},messageName={MessageName},resourceFile={ResourceFile})", portalSettings, messageName, resourceFile);
+			Logger.LogDebug("<<< Exiting GetSystemMessage(portalSettings={PortalSettings},messageName={MessageName},userInfo={UserInfo},resourceFile={ResourceFile})", portalSettings, messageName, userInfo, resourceFile);
+			Logger.LogDebug("<<< Exiting GetSystemMessage(portalSettings={PortalSettings},messageName={MessageName},resourceFile={ResourceFile},custom={Custom})", portalSettings, messageName, resourceFile, custom);
+			Logger.LogDebug("<<< Exiting GetSystemMessage(portalSettings={PortalSettings},messageName={MessageName},userInfo={UserInfo},resourceFile={ResourceFile},custom={Custom})", portalSettings, messageName, userInfo, resourceFile, custom);
+			Logger.LogDebug("<<< Exiting GetSystemMessage(strLanguage={StrLanguage},portalSettings={PortalSettings},messageName={MessageName},userInfo={UserInfo},resourceFile={ResourceFile},custom={Custom})", strLanguage, portalSettings, messageName, userInfo, resourceFile, custom);
+			Logger.LogDebug("<<< Exiting GetSystemMessage(strLanguage={StrLanguage},portalSettings={PortalSettings},messageName={MessageName},userInfo={UserInfo},resourceFile={ResourceFile},custom={Custom},customCaption={CustomCaption},accessingUserID={AccessingUserID})", strLanguage, portalSettings, messageName, userInfo, resourceFile, custom, customCaption, accessingUserID);
+			Logger.LogDebug("<<< Exiting GetSystemMessage(strLanguage={StrLanguage},portalSettings={PortalSettings},messageName={MessageName},userInfo={UserInfo},resourceFile={ResourceFile},customArray={CustomArray},customDictionary={CustomDictionary},customCaption={CustomCaption},accessingUserID={AccessingUserID})", strLanguage, portalSettings, messageName, userInfo, resourceFile, customArray, customDictionary, customCaption, accessingUserID);
             return GetSystemMessage(null, portalSettings, messageName, null, GlobalResourceFile, null);
         }
 
@@ -1084,7 +1155,9 @@ namespace DotNetNuke.Services.Localization
         /// <param name="selectedValue">Name of the default culture to select.</param>
         public static void LoadCultureDropDownList(DropDownList list, CultureDropDownTypes displayType, string selectedValue)
         {
+			Logger.LogDebug(">>> Entering LoadCultureDropDownList(list={List},displayType={DisplayType},selectedValue={SelectedValue})", list, displayType, selectedValue);
             LoadCultureDropDownList(list, displayType, selectedValue, string.Empty, false);
+			Logger.LogDebug("<<< Exiting LoadCultureDropDownList(list={List},displayType={DisplayType},selectedValue={SelectedValue})", list, displayType, selectedValue);
         }
 
         /// <summary>
@@ -1097,7 +1170,9 @@ namespace DotNetNuke.Services.Localization
         /// <param name="loadHost">Boolean that defines whether or not to load host (i.e. all available) locales.</param>
         public static void LoadCultureDropDownList(DropDownList list, CultureDropDownTypes displayType, string selectedValue, bool loadHost)
         {
+			Logger.LogDebug(">>> Entering LoadCultureDropDownList(list={List},displayType={DisplayType},selectedValue={SelectedValue},loadHost={LoadHost})", list, displayType, selectedValue, loadHost);
             LoadCultureDropDownList(list, displayType, selectedValue, string.Empty, loadHost);
+			Logger.LogDebug("<<< Exiting LoadCultureDropDownList(list={List},displayType={DisplayType},selectedValue={SelectedValue},loadHost={LoadHost})", list, displayType, selectedValue, loadHost);
         }
 
         /// <summary>
@@ -1112,8 +1187,10 @@ namespace DotNetNuke.Services.Localization
         /// <param name="host">Boolean that defines whether or not to load host (ie. all available) locales.</param>
         public static void LoadCultureDropDownList(DropDownList list, CultureDropDownTypes displayType, string selectedValue, string filter, bool host)
         {
+			Logger.LogDebug(">>> Entering LoadCultureDropDownList(list={List},displayType={DisplayType},selectedValue={SelectedValue},filter={Filter},host={Host})", list, displayType, selectedValue, filter, host);
             IEnumerable<ListItem> cultureListItems = LoadCultureInListItems(displayType, selectedValue, filter, host);
 
+			Logger.LogDebug("LoadCultureDropDownList(list={List},displayType={DisplayType},selectedValue={SelectedValue},filter={Filter},host={Host}): cultureListItems → {CultureListItems}", list, displayType, selectedValue, filter, host, cultureListItems);
             // add the items to the list
             foreach (var cultureItem in cultureListItems)
             {
@@ -1124,12 +1201,16 @@ namespace DotNetNuke.Services.Localization
             if (selectedValue != null)
             {
                 ListItem item = list.Items.FindByValue(selectedValue);
+				Logger.LogDebug("LoadCultureDropDownList(list={List},displayType={DisplayType},selectedValue={SelectedValue},filter={Filter},host={Host}): item → {Item}", list, displayType, selectedValue, filter, host, item);
                 if (item != null)
                 {
                     list.SelectedIndex = -1;
+					Logger.LogDebug("LoadCultureDropDownList(list={List},displayType={DisplayType},selectedValue={SelectedValue},filter={Filter},host={Host}): list.SelectedIndex → {Arg5}", list, displayType, selectedValue, filter, host, list.SelectedIndex);
+					Logger.LogDebug("LoadCultureDropDownList(list={List},displayType={DisplayType},selectedValue={SelectedValue},filter={Filter},host={Host}): item.Selected → {Arg5}", list, displayType, selectedValue, filter, host, item.Selected);
                     item.Selected = true;
                 }
             }
+			Logger.LogDebug("<<< Exiting LoadCultureDropDownList(list={List},displayType={DisplayType},selectedValue={SelectedValue},filter={Filter},host={Host})", list, displayType, selectedValue, filter, host);
         }
 
         /// <summary>
@@ -1144,8 +1225,10 @@ namespace DotNetNuke.Services.Localization
         /// <returns>A sequence of new <see cref="ListItem"/> instances.</returns>
         public static IEnumerable<ListItem> LoadCultureInListItems(CultureDropDownTypes displayType, string selectedValue, string filter, bool host)
         {
+			Logger.LogDebug(">>> Entering LoadCultureInListItems(displayType={DisplayType},selectedValue={SelectedValue},filter={Filter},host={Host})", displayType, selectedValue, filter, host);
             var objPortalSettings = PortalController.Instance.GetCurrentSettings();
             Dictionary<string, Locale> enabledLanguages;
+			Logger.LogDebug("LoadCultureInListItems(displayType={DisplayType},selectedValue={SelectedValue},filter={Filter},host={Host}): objPortalSettings → {ObjPortalSettings}", displayType, selectedValue, filter, host, objPortalSettings);
             if (host)
             {
                 enabledLanguages = LocaleController.Instance.GetLocales(Null.NullInteger);
@@ -1156,6 +1239,7 @@ namespace DotNetNuke.Services.Localization
             }
 
             var cultureListItems = new List<ListItem>(enabledLanguages.Count);
+			Logger.LogDebug("LoadCultureInListItems(displayType={DisplayType},selectedValue={SelectedValue},filter={Filter},host={Host}): cultureListItems → {CultureListItems}", displayType, selectedValue, filter, host, cultureListItems);
             foreach (KeyValuePair<string, Locale> kvp in enabledLanguages)
             {
                 if (kvp.Value.Code != filter)
@@ -1164,6 +1248,7 @@ namespace DotNetNuke.Services.Localization
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadCultureInListItems(displayType={DisplayType},selectedValue={SelectedValue},filter={Filter},host={Host})", displayType, selectedValue, filter, host);
             return cultureListItems;
         }
 
@@ -1177,8 +1262,10 @@ namespace DotNetNuke.Services.Localization
         /// </remarks>
         public static string LocalizeControlTitle(IModuleControl moduleControl)
         {
+			Logger.LogDebug(">>> Entering LocalizeControlTitle(moduleControl={ModuleControl})", moduleControl);
             string controlTitle = moduleControl.ModuleContext.Configuration.ModuleTitle;
             string controlKey = moduleControl.ModuleContext.Configuration.ModuleControl.ControlKey.ToLowerInvariant();
+			Logger.LogDebug("LocalizeControlTitle(moduleControl={ModuleControl}): controlTitle → {ControlTitle}", moduleControl, controlTitle);
 
             if (!string.IsNullOrEmpty(controlKey))
             {
@@ -1196,6 +1283,7 @@ namespace DotNetNuke.Services.Localization
             else
             {
                 bool isAdminPage = false;
+				Logger.LogDebug("LocalizeControlTitle(moduleControl={ModuleControl}): isAdminPage → {IsAdminPage}", moduleControl, isAdminPage);
 
                 // we should be checking that the tab path matches //Admin//pagename or //admin
                 // in this way we should avoid partial matches (ie //Administrators
@@ -1215,6 +1303,7 @@ namespace DotNetNuke.Services.Localization
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LocalizeControlTitle(moduleControl={ModuleControl})", moduleControl);
             return controlTitle;
         }
 
@@ -1223,6 +1312,7 @@ namespace DotNetNuke.Services.Localization
         /// <param name="resourceFile">The root name of the Resource File where the localized text can be found.</param>
         public static void LocalizeDataGrid(ref DataGrid grid, string resourceFile)
         {
+			Logger.LogDebug(">>> Entering LocalizeDataGrid(grid={Grid},resourceFile={ResourceFile})", grid, resourceFile);
             string localizedText;
             foreach (DataGridColumn col in grid.Columns)
             {
@@ -1231,20 +1321,24 @@ namespace DotNetNuke.Services.Localization
                 {
                     localizedText = GetString(col.HeaderText + ".Header", resourceFile);
                     if (!string.IsNullOrEmpty(localizedText))
+					Logger.LogDebug("LocalizeDataGrid(grid={Grid},resourceFile={ResourceFile}): localizedText → {LocalizedText}", grid, resourceFile, localizedText);
                     {
                         col.HeaderText = localizedText;
+						Logger.LogDebug("LocalizeDataGrid(grid={Grid},resourceFile={ResourceFile}): col.HeaderText → {Arg2}", grid, resourceFile, col.HeaderText);
                     }
                 }
 
                 if (col is EditCommandColumn)
                 {
                     var editCol = (EditCommandColumn)col;
+					Logger.LogDebug("LocalizeDataGrid(grid={Grid},resourceFile={ResourceFile}): editCol → {EditCol}", grid, resourceFile, editCol);
 
                     // Edit Text - maintained for backward compatibility
                     localizedText = GetString(editCol.EditText + ".EditText", resourceFile);
                     if (!string.IsNullOrEmpty(localizedText))
                     {
                         editCol.EditText = localizedText;
+						Logger.LogDebug("LocalizeDataGrid(grid={Grid},resourceFile={ResourceFile}): editCol.EditText → {Arg2}", grid, resourceFile, editCol.EditText);
                     }
 
                     // Edit Text
@@ -1259,6 +1353,7 @@ namespace DotNetNuke.Services.Localization
                     if (!string.IsNullOrEmpty(localizedText))
                     {
                         editCol.CancelText = localizedText;
+						Logger.LogDebug("LocalizeDataGrid(grid={Grid},resourceFile={ResourceFile}): editCol.CancelText → {Arg2}", grid, resourceFile, editCol.CancelText);
                     }
 
                     // Update Text
@@ -1266,20 +1361,24 @@ namespace DotNetNuke.Services.Localization
                     if (!string.IsNullOrEmpty(localizedText))
                     {
                         editCol.UpdateText = localizedText;
+						Logger.LogDebug("LocalizeDataGrid(grid={Grid},resourceFile={ResourceFile}): editCol.UpdateText → {Arg2}", grid, resourceFile, editCol.UpdateText);
                     }
                 }
                 else if (col is ButtonColumn)
                 {
                     var buttonCol = (ButtonColumn)col;
+					Logger.LogDebug("LocalizeDataGrid(grid={Grid},resourceFile={ResourceFile}): buttonCol → {ButtonCol}", grid, resourceFile, buttonCol);
 
                     // Edit Text
                     localizedText = GetString(buttonCol.Text, resourceFile);
                     if (!string.IsNullOrEmpty(localizedText))
                     {
                         buttonCol.Text = localizedText;
+						Logger.LogDebug("LocalizeDataGrid(grid={Grid},resourceFile={ResourceFile}): buttonCol.Text → {Arg2}", grid, resourceFile, buttonCol.Text);
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting LocalizeDataGrid(grid={Grid},resourceFile={ResourceFile})", grid, resourceFile);
         }
 
         /// <summary>Localizes headers and fields on a <see cref="DetailsView"/> control.</summary>
@@ -1287,10 +1386,12 @@ namespace DotNetNuke.Services.Localization
         /// <param name="resourceFile">The root name of the resource file where the localized texts can be found.</param>
         public static void LocalizeDetailsView(ref DetailsView detailsView, string resourceFile)
         {
+			Logger.LogDebug(">>> Entering LocalizeDetailsView(detailsView={DetailsView},resourceFile={ResourceFile})", detailsView, resourceFile);
             foreach (DataControlField field in detailsView.Fields)
             {
                 LocalizeDataControlField(field, resourceFile);
             }
+			Logger.LogDebug("<<< Exiting LocalizeDetailsView(detailsView={DetailsView},resourceFile={ResourceFile})", detailsView, resourceFile);
         }
 
         /// <summary>Localizes headers and fields on a GridView control.</summary>
@@ -1299,10 +1400,12 @@ namespace DotNetNuke.Services.Localization
         ///  texts can be found.</param>
         public static void LocalizeGridView(ref GridView gridView, string resourceFile)
         {
+			Logger.LogDebug(">>> Entering LocalizeGridView(gridView={GridView},resourceFile={ResourceFile})", gridView, resourceFile);
             foreach (DataControlField column in gridView.Columns)
             {
                 LocalizeDataControlField(column, resourceFile);
             }
+			Logger.LogDebug("<<< Exiting LocalizeGridView(gridView={GridView},resourceFile={ResourceFile})", gridView, resourceFile);
         }
 
         /// <summary>Localizes the "Built In" Roles.</summary>
@@ -1313,11 +1416,14 @@ namespace DotNetNuke.Services.Localization
         /// <returns>The role name, potentially localized.</returns>
         public static string LocalizeRole(string role)
         {
+			Logger.LogDebug(">>> Entering LocalizeRole(role={Role})", role);
             string localRole;
             string roleKey = role + ".Role";
             localRole = GetString(roleKey, GlobalResourceFile);
             if (string.IsNullOrEmpty(localRole))
+			Logger.LogDebug("LocalizeRole(role={Role}): localRole → {LocalRole}", role, localRole);
             {
+			Logger.LogDebug("<<< Exiting LocalizeRole(role={Role})", role);
                 return role;
             }
 
@@ -1332,11 +1438,14 @@ namespace DotNetNuke.Services.Localization
         /// <returns>The localized description or null if not found.</returns>
         public static string LocalizeRoleDescription(string role, string fallback)
         {
+			Logger.LogDebug(">>> Entering LocalizeRoleDescription(role={Role},fallback={Fallback})", role, fallback);
             string roleDescription;
             string roleKey = role + ".RoleDescription";
             roleDescription = GetString(roleKey, GlobalResourceFile);
             if (string.IsNullOrEmpty(roleDescription))
+			Logger.LogDebug("LocalizeRoleDescription(role={Role},fallback={Fallback}): roleDescription → {RoleDescription}", role, fallback, roleDescription);
             {
+			Logger.LogDebug("<<< Exiting LocalizeRoleDescription(role={Role},fallback={Fallback})", role, fallback);
                 return fallback;
             }
 
@@ -1372,28 +1481,38 @@ namespace DotNetNuke.Services.Localization
         /// <param name="isInstalling">Whether the site is installing.</param>
         public static void RemoveLanguageFromPortal(IEventLogger eventLogger, int portalId, int languageId, bool isInstalling)
         {
+			Logger.LogDebug(">>> Entering RemoveLanguageFromPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},isInstalling={IsInstalling})", eventLogger, portalId, languageId, isInstalling);
             if (!isInstalling)
             {
                 var portalLocales = GetPortalLocalizations(portalId);
+				Logger.LogDebug("RemoveLanguageFromPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},isInstalling={IsInstalling}): portalLocales → {PortalLocales}", eventLogger, portalId, languageId, isInstalling, portalLocales);
                 if (portalLocales.Count <= 1)
                 {
+					Logger.LogWarning("Throwing PortalLocalizationRequiredException from RemoveLanguageFromPortal(portalID={PortalID},languageID={LanguageID})", portalID, languageID);
+					Logger.LogWarning("Throwing PortalLocalizationRequiredException from RemoveLanguageFromPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId})", eventLogger, portalId, languageId);
+				Logger.LogWarning("Throwing PortalLocalizationRequiredException from RemoveLanguageFromPortal(portalID={PortalID},languageID={LanguageID},isInstalling={IsInstalling})", portalID, languageID, isInstalling);
                     throw new PortalLocalizationRequiredException("You are trying to delete the only Portal localization entry in the system. This is NOT allowed!");
                 }
             }
+			Logger.LogWarning("Throwing PortalLocalizationRequiredException from RemoveLanguageFromPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},isInstalling={IsInstalling})", eventLogger, portalId, languageId, isInstalling);
 
             var language = LocaleController.Instance.GetLocale(languageId);
+			Logger.LogDebug("RemoveLanguageFromPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},isInstalling={IsInstalling}): language → {Language}", eventLogger, portalId, languageId, isInstalling, language);
             if (language != null)
             {
                 if (Config.GetFriendlyUrlProvider() == "advanced")
                 {
                     // only do this with Advanced URL Management
                     var portalInfo = PortalController.Instance.GetPortal(portalId);
+					Logger.LogDebug("RemoveLanguageFromPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},isInstalling={IsInstalling}): portalInfo → {PortalInfo}", eventLogger, portalId, languageId, isInstalling, portalInfo);
                     if (portalInfo != null)
                     {
                         // check to see if this is the last extra language being added to the portal
                         var lastLanguage = LocaleController.Instance.GetLocales(portalId).Count == 2;
+						Logger.LogDebug("RemoveLanguageFromPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},isInstalling={IsInstalling}): lastLanguage → {LastLanguage}", eventLogger, portalId, languageId, isInstalling, lastLanguage);
 
                         var portalAliases = PortalAliasController.Instance.GetPortalAliasesByPortalId(portalId).ToList();
+						Logger.LogDebug("RemoveLanguageFromPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},isInstalling={IsInstalling}): portalAliases → {PortalAliases}", eventLogger, portalId, languageId, isInstalling, portalAliases);
                         foreach (var portalAliasInfo in portalAliases)
                         {
                             if (portalAliasInfo.CultureCode == language.Code)
@@ -1407,6 +1526,7 @@ namespace DotNetNuke.Services.Localization
 
                                 // Fix PortalSettings for the rest of this request
                                 var newDefaultAlias = portalAliases.SingleOrDefault(a => a.IsPrimary && a.CultureCode == string.Empty);
+								Logger.LogDebug("RemoveLanguageFromPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},isInstalling={IsInstalling}): newDefaultAlias → {NewDefaultAlias}", eventLogger, portalId, languageId, isInstalling, newDefaultAlias);
                                 if (newDefaultAlias != null)
                                 {
                                     PortalSettings.Current?.PortalAlias = newDefaultAlias;
@@ -1419,6 +1539,7 @@ namespace DotNetNuke.Services.Localization
                 // Get Translator Role
                 string roleName = $"Translator ({language.Code})";
                 RoleInfo role = RoleController.Instance.GetRole(portalId, r => r.RoleName == roleName);
+				Logger.LogDebug("RemoveLanguageFromPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId},isInstalling={IsInstalling}): role → {Role}", eventLogger, portalId, languageId, isInstalling, role);
 
                 if (role != null)
                 {
@@ -1435,6 +1556,7 @@ namespace DotNetNuke.Services.Localization
                     EventLogType.LANGUAGETOPORTAL_DELETED);
 
                 DataCache.ClearPortalCache(portalId, false);
+			Logger.LogDebug("<<< Exiting RemoveLanguageFromPortal(eventLogger={EventLogger},portalId={PortalId},languageId={LanguageId})", eventLogger, portalId, languageId);
             }
         }
 
@@ -1463,9 +1585,11 @@ namespace DotNetNuke.Services.Localization
         /// <param name="isInstalling">Whether the site is installing.</param>
         public static void RemoveLanguageFromPortals(IEventLogger eventLogger, int languageId, bool isInstalling)
         {
+			Logger.LogDebug(">>> Entering RemoveLanguageFromPortals(eventLogger={EventLogger},languageId={LanguageId},isInstalling={IsInstalling})", eventLogger, languageId, isInstalling);
             foreach (IPortalInfo portal in PortalController.Instance.GetPortals())
             {
                 RemoveLanguageFromPortal(eventLogger, portal.PortalId, languageId, isInstalling);
+			Logger.LogDebug("<<< Exiting RemoveLanguageFromPortals(eventLogger={EventLogger},languageId={LanguageId})", eventLogger, languageId);
             }
         }
 
@@ -1480,10 +1604,12 @@ namespace DotNetNuke.Services.Localization
         /// <param name="portalId">The portal ID.</param>
         public static void RemoveLanguagesFromPortal(IEventLogger eventLogger, int portalId)
         {
+			Logger.LogDebug(">>> Entering RemoveLanguagesFromPortal(eventLogger={EventLogger},portalId={PortalId})", eventLogger, portalId);
             foreach (var locale in LocaleController.Instance.GetLocales(portalId).Values)
             {
                 RemoveLanguageFromPortal(eventLogger, portalId, locale.LanguageId);
             }
+			Logger.LogDebug("<<< Exiting RemoveLanguagesFromPortal(eventLogger={EventLogger},portalId={PortalId})", eventLogger, portalId);
         }
 
         /// <summary>Adds or updates the language.</summary>
@@ -1511,6 +1637,7 @@ namespace DotNetNuke.Services.Localization
         /// <param name="clearCache">Whether to clear the cache afterwards.</param>
         public static void SaveLanguage(IEventLogger eventLogger, Locale locale, bool clearCache)
         {
+			Logger.LogDebug(">>> Entering SaveLanguage(eventLogger={EventLogger},locale={Locale},clearCache={ClearCache})", eventLogger, locale, clearCache);
             if (locale.LanguageId == Null.NullInteger)
             {
                 locale.LanguageId = DataProvider.Instance().AddLanguage(locale.Code, locale.Text, locale.Fallback, UserController.Instance.GetCurrentUserInfo().UserID);
@@ -1525,14 +1652,17 @@ namespace DotNetNuke.Services.Localization
             if (clearCache)
             {
                 DataCache.ClearHostCache(true);
+			Logger.LogDebug("<<< Exiting SaveLanguage(eventLogger={EventLogger},locale={Locale})", eventLogger, locale);
             }
         }
 
         public static void SetLanguage(string value)
         {
+			Logger.LogDebug(">>> Entering SetLanguage(value={Value})", value);
             try
             {
                 var response = HttpContext.Current == null ? null : HttpContext.Current.Response;
+				Logger.LogDebug("SetLanguage(value={Value}): response → {Response}", value, response);
                 if (response == null)
                 {
                     return;
@@ -1540,6 +1670,7 @@ namespace DotNetNuke.Services.Localization
 
                 // save the page culture as a cookie
                 HttpCookie cookie = response.Cookies.Get("language");
+				Logger.LogDebug("SetLanguage(value={Value}): cookie → {Cookie}", value, cookie);
                 if (cookie == null)
                 {
                     if (!string.IsNullOrEmpty(value))
@@ -1551,6 +1682,7 @@ namespace DotNetNuke.Services.Localization
                 else
                 {
                     cookie.Value = value;
+					Logger.LogDebug("SetLanguage(value={Value}): cookie.Value → {Arg1}", value, cookie.Value);
                     if (!string.IsNullOrEmpty(value))
                     {
                         response.Cookies.Set(cookie);
@@ -1563,6 +1695,8 @@ namespace DotNetNuke.Services.Localization
             }
             catch
             {
+				Logger.LogError("Exception in SetLanguage(value={Value}): {Arg1}", value, ex.Message);
+				Logger.LogDebug("<<< Exiting SetLanguage(value={Value})", value);
                 return;
             }
         }
@@ -1578,6 +1712,10 @@ namespace DotNetNuke.Services.Localization
         public static partial void SetThreadCultures(CultureInfo cultureInfo, PortalSettings portalSettings)
         {
             SetThreadCultures(cultureInfo, (IPortalSettings)portalSettings);
+			Logger.LogDebug(">>> Entering SetThreadCultures(cultureInfo={CultureInfo},portalSettings={PortalSettings})", cultureInfo, portalSettings);
+			Logger.LogWarning("Throwing ArgumentNullException from SetThreadCultures(cultureInfo={CultureInfo},portalSettings={PortalSettings})", cultureInfo, portalSettings);
+			Logger.LogDebug("SetThreadCultures(cultureInfo={CultureInfo},portalSettings={PortalSettings}): cultureInfo → {CultureInfo1}", cultureInfo, portalSettings, cultureInfo);
+			Logger.LogDebug("<<< Exiting SetThreadCultures(cultureInfo={CultureInfo},portalSettings={PortalSettings})", cultureInfo, portalSettings);
         }
 
         /// <summary>Sets the culture codes on the current Thread.</summary>
@@ -1591,6 +1729,7 @@ namespace DotNetNuke.Services.Localization
         {
             if (cultureInfo == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetThreadCultures(cultureInfo={CultureInfo},portalSettings={PortalSettings})", cultureInfo, portalSettings);
                 throw new ArgumentNullException(nameof(cultureInfo));
             }
 
@@ -1622,29 +1761,40 @@ namespace DotNetNuke.Services.Localization
         /// <returns>Language ID integer.</returns>
         public static int GetCultureLanguageID(string cultureCode)
         {
+			Logger.LogDebug(">>> Entering GetCultureLanguageID(cultureCode={CultureCode})", cultureCode);
             var locale = LocaleController.Instance.GetLocale(cultureCode);
+			Logger.LogDebug("GetCultureLanguageID(cultureCode={CultureCode}): locale → {Locale}", cultureCode, locale);
+			Logger.LogDebug("<<< Exiting GetCultureLanguageID(cultureCode={CultureCode})", cultureCode);
             return locale != null ? locale.LanguageId : Null.NullInteger;
         }
 
         public string GetFixedCurrency(decimal expression, string culture, int numDigitsAfterDecimal)
         {
+			Logger.LogDebug(">>> Entering GetFixedCurrency(expression={Expression},culture={Culture},numDigitsAfterDecimal={NumDigitsAfterDecimal})", expression, culture, numDigitsAfterDecimal);
             string oldCurrentCulture = this.CurrentUICulture;
             var newCulture = new CultureInfo(culture);
+			Logger.LogDebug("GetFixedCurrency(expression={Expression},culture={Culture},numDigitsAfterDecimal={NumDigitsAfterDecimal}): newCulture → {NewCulture}", expression, culture, numDigitsAfterDecimal, newCulture);
             Thread.CurrentThread.CurrentUICulture = newCulture;
             string currencyStr = expression.ToString(newCulture.NumberFormat.CurrencySymbol, newCulture);
             var oldCulture = new CultureInfo(oldCurrentCulture);
+			Logger.LogDebug("GetFixedCurrency(expression={Expression},culture={Culture},numDigitsAfterDecimal={NumDigitsAfterDecimal}): oldCulture → {OldCulture}", expression, culture, numDigitsAfterDecimal, oldCulture);
             Thread.CurrentThread.CurrentUICulture = oldCulture;
+			Logger.LogDebug("<<< Exiting GetFixedCurrency(expression={Expression},culture={Culture},numDigitsAfterDecimal={NumDigitsAfterDecimal})", expression, culture, numDigitsAfterDecimal);
             return currencyStr;
         }
 
         public string GetFixedDate(DateTime expression, string culture)
         {
+			Logger.LogDebug(">>> Entering GetFixedDate(expression={Expression},culture={Culture})", expression, culture);
             string oldCurrentCulture = this.CurrentUICulture;
             var newCulture = new CultureInfo(culture);
+			Logger.LogDebug("GetFixedDate(expression={Expression},culture={Culture}): newCulture → {NewCulture}", expression, culture, newCulture);
             Thread.CurrentThread.CurrentUICulture = newCulture;
             string dateStr = expression.ToString(newCulture.DateTimeFormat.FullDateTimePattern, newCulture);
             var oldCulture = new CultureInfo(oldCurrentCulture);
+			Logger.LogDebug("GetFixedDate(expression={Expression},culture={Culture}): oldCulture → {OldCulture}", expression, culture, oldCulture);
             Thread.CurrentThread.CurrentUICulture = oldCulture;
+			Logger.LogDebug("<<< Exiting GetFixedDate(expression={Expression},culture={Culture})", expression, culture);
             return dateStr;
         }
 
@@ -1658,8 +1808,10 @@ namespace DotNetNuke.Services.Localization
         /// <returns>A valid and enabled CultureInfo that matches the language passed if any.</returns>
         internal static CultureInfo GetCultureFromString(int portalId, string language)
         {
+			Logger.LogDebug(">>> Entering GetCultureFromString(portalId={PortalId},language={Language})", portalId, language);
             CultureInfo culture = null;
             if (!string.IsNullOrEmpty(language))
+			Logger.LogDebug("GetCultureFromString(portalId={PortalId},language={Language}): culture → {Culture}", portalId, language, culture);
             {
                 if (LocaleController.Instance.IsEnabled(ref language, portalId))
                 {
@@ -1670,6 +1822,7 @@ namespace DotNetNuke.Services.Localization
                     string preferredLanguage = language.Split('-')[0];
 
                     Dictionary<string, Locale> enabledLocales = new Dictionary<string, Locale>();
+					Logger.LogDebug("GetCultureFromString(portalId={PortalId},language={Language}): enabledLocales → {EnabledLocales}", portalId, language, enabledLocales);
                     if (portalId > Null.NullInteger)
                     {
                         enabledLocales = LocaleController.Instance.GetLocales(portalId);
@@ -1686,11 +1839,13 @@ namespace DotNetNuke.Services.Localization
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetCultureFromString(portalId={PortalId},language={Language})", portalId, language);
             return culture;
         }
 
         private static void LocalizeDataControlField(DataControlField controlField, string resourceFile)
         {
+			Logger.LogDebug(">>> Entering LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile})", controlField, resourceFile);
             string localizedText;
 
             // Localize Header Text
@@ -1698,8 +1853,11 @@ namespace DotNetNuke.Services.Localization
             {
                 localizedText = GetString(controlField.HeaderText + ".Header", resourceFile);
                 if (!string.IsNullOrEmpty(localizedText))
+				Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): localizedText → {LocalizedText}", controlField, resourceFile, localizedText);
                 {
                     controlField.HeaderText = localizedText;
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): controlField.HeaderText → {Arg2}", controlField, resourceFile, controlField.HeaderText);
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): controlField.AccessibleHeaderText → {Arg2}", controlField, resourceFile, controlField.AccessibleHeaderText);
                     controlField.AccessibleHeaderText = controlField.HeaderText;
                 }
             }
@@ -1711,97 +1869,119 @@ namespace DotNetNuke.Services.Localization
             else if (controlField is ButtonField)
             {
                 var button = (ButtonField)controlField;
+				Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): button → {Button}", controlField, resourceFile, button);
                 localizedText = GetString(button.Text, resourceFile);
                 if (!string.IsNullOrEmpty(localizedText))
                 {
                     button.Text = localizedText;
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): button.Text → {Arg2}", controlField, resourceFile, button.Text);
                 }
             }
             else if (controlField is CheckBoxField)
             {
                 var checkbox = (CheckBoxField)controlField;
+				Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): checkbox → {Checkbox}", controlField, resourceFile, checkbox);
                 localizedText = GetString(checkbox.Text, resourceFile);
                 if (!string.IsNullOrEmpty(localizedText))
                 {
                     checkbox.Text = localizedText;
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): checkbox.Text → {Arg2}", controlField, resourceFile, checkbox.Text);
                 }
             }
             else if (controlField is CommandField)
             {
                 var commands = (CommandField)controlField;
+				Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): commands → {Commands}", controlField, resourceFile, commands);
                 localizedText = GetString(commands.CancelText, resourceFile);
                 if (!string.IsNullOrEmpty(localizedText))
                 {
                     commands.CancelText = localizedText;
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): commands.CancelText → {Arg2}", controlField, resourceFile, commands.CancelText);
                 }
 
                 localizedText = GetString(commands.DeleteText, resourceFile);
                 if (!string.IsNullOrEmpty(localizedText))
                 {
                     commands.DeleteText = localizedText;
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): commands.DeleteText → {Arg2}", controlField, resourceFile, commands.DeleteText);
                 }
 
                 localizedText = GetString(commands.EditText, resourceFile);
                 if (!string.IsNullOrEmpty(localizedText))
                 {
                     commands.EditText = localizedText;
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): commands.EditText → {Arg2}", controlField, resourceFile, commands.EditText);
                 }
 
                 localizedText = GetString(commands.InsertText, resourceFile);
                 if (!string.IsNullOrEmpty(localizedText))
                 {
                     commands.InsertText = localizedText;
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): commands.InsertText → {Arg2}", controlField, resourceFile, commands.InsertText);
                 }
 
                 localizedText = GetString(commands.NewText, resourceFile);
                 if (!string.IsNullOrEmpty(localizedText))
                 {
                     commands.NewText = localizedText;
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): commands.NewText → {Arg2}", controlField, resourceFile, commands.NewText);
                 }
 
                 localizedText = GetString(commands.SelectText, resourceFile);
                 if (!string.IsNullOrEmpty(localizedText))
                 {
                     commands.SelectText = localizedText;
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): commands.SelectText → {Arg2}", controlField, resourceFile, commands.SelectText);
                 }
 
                 localizedText = GetString(commands.UpdateText, resourceFile);
                 if (!string.IsNullOrEmpty(localizedText))
                 {
                     commands.UpdateText = localizedText;
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): commands.UpdateText → {Arg2}", controlField, resourceFile, commands.UpdateText);
                 }
             }
             else if (controlField is HyperLinkField)
             {
                 var link = (HyperLinkField)controlField;
+				Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): link → {Link}", controlField, resourceFile, link);
                 localizedText = GetString(link.Text, resourceFile);
                 if (!string.IsNullOrEmpty(localizedText))
                 {
                     link.Text = localizedText;
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): link.Text → {Arg2}", controlField, resourceFile, link.Text);
                 }
             }
             else if (controlField is ImageField)
             {
                 var image = (ImageField)controlField;
+				Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): image → {Image}", controlField, resourceFile, image);
                 localizedText = GetString(image.AlternateText, resourceFile);
                 if (!string.IsNullOrEmpty(localizedText))
                 {
                     image.AlternateText = localizedText;
+					Logger.LogDebug("LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile}): image.AlternateText → {Arg2}", controlField, resourceFile, image.AlternateText);
                 }
             }
+			Logger.LogDebug("<<< Exiting LocalizeDataControlField(controlField={ControlField},resourceFile={ResourceFile})", controlField, resourceFile);
         }
 
         private static void AddLanguageHttpAlias(int portalId, Locale locale)
         {
+			Logger.LogDebug(">>> Entering AddLanguageHttpAlias(portalId={PortalId},locale={Locale})", portalId, locale);
             if (Config.GetFriendlyUrlProvider() == "advanced")
             {
                 // create new HTTPAlias for language
                 var portalInfo = PortalController.Instance.GetPortal(portalId);
+				Logger.LogDebug("AddLanguageHttpAlias(portalId={PortalId},locale={Locale}): portalInfo → {PortalInfo}", portalId, locale, portalInfo);
                 PortalAliasInfo currentAlias = null;
                 string httpAlias = null;
+				Logger.LogDebug("AddLanguageHttpAlias(portalId={PortalId},locale={Locale}): httpAlias → {HttpAlias}", portalId, locale, httpAlias);
 
                 var portalAliasses = PortalAliasController.Instance.GetPortalAliasesByPortalId(portalId);
+				Logger.LogDebug("AddLanguageHttpAlias(portalId={PortalId},locale={Locale}): portalAliasses → {PortalAliasses}", portalId, locale, portalAliasses);
                 var portalAliasInfos = portalAliasses as IList<PortalAliasInfo> ?? portalAliasses.ToList();
+				Logger.LogDebug("AddLanguageHttpAlias(portalId={PortalId},locale={Locale}): portalAliasInfos → {PortalAliasInfos}", portalId, locale, portalAliasInfos);
                 if (portalAliasses != null && portalAliasInfos.Any())
                 {
                     currentAlias = currentAlias
@@ -1827,6 +2007,7 @@ namespace DotNetNuke.Services.Localization
                     }
 
                     var alias = GetValidLanguageUrl(portalId, httpAlias, locale.Code.ToLowerInvariant());
+					Logger.LogDebug("AddLanguageHttpAlias(portalId={PortalId},locale={Locale}): alias → {Alias}", portalId, locale, alias);
                     if (!string.IsNullOrEmpty(alias))
                     {
                         var newAlias = new PortalAliasInfo(currentAlias)
@@ -1840,10 +2021,12 @@ namespace DotNetNuke.Services.Localization
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting AddLanguageHttpAlias(portalId={PortalId},locale={Locale})", portalId, locale);
         }
 
         private static string GetValidLanguageUrl(int portalId, string httpAlias, string locale)
         {
+			Logger.LogDebug(">>> Entering GetValidLanguageUrl(portalId={PortalId},httpAlias={HttpAlias},locale={Locale})", portalId, httpAlias, locale);
             string alias;
 
             bool isValid;
@@ -1858,20 +2041,25 @@ namespace DotNetNuke.Services.Localization
 
                 alias = $"{httpAlias}/{modifiedLocale}";
 
+				Logger.LogDebug("GetValidLanguageUrl(portalId={PortalId},httpAlias={HttpAlias},locale={Locale}): alias → {Alias}", portalId, httpAlias, locale, alias);
                 var tab = TabController.Instance.GetTabByName(modifiedLocale, portalId);
+				Logger.LogDebug("GetValidLanguageUrl(portalId={PortalId},httpAlias={HttpAlias},locale={Locale}): tab → {Tab}", portalId, httpAlias, locale, tab);
                 isValid = tab == null;
 
                 if (isValid)
                 {
                     var user = UserController.GetUserByVanityUrl(portalId, modifiedLocale);
+					Logger.LogDebug("GetValidLanguageUrl(portalId={PortalId},httpAlias={HttpAlias},locale={Locale}): user → {User}", portalId, httpAlias, locale, user);
                     isValid = user == null;
                 }
 
                 if (isValid)
                 {
                     var aliases = PortalAliasController.Instance.GetPortalAliases();
+					Logger.LogDebug("GetValidLanguageUrl(portalId={PortalId},httpAlias={HttpAlias},locale={Locale}): aliases → {Aliases}", portalId, httpAlias, locale, aliases);
                     isValid = !aliases.Contains(alias);
                 }
+				Logger.LogDebug("GetValidLanguageUrl(portalId={PortalId},httpAlias={HttpAlias},locale={Locale}): isValid → {IsValid}", portalId, httpAlias, locale, isValid);
 
                 if (isValid)
                 {
@@ -1882,6 +2070,7 @@ namespace DotNetNuke.Services.Localization
             }
             while (!isValid);
 
+			Logger.LogDebug("<<< Exiting GetValidLanguageUrl(portalId={PortalId},httpAlias={HttpAlias},locale={Locale})", portalId, httpAlias, locale);
             return alias;
         }
 
@@ -1890,13 +2079,17 @@ namespace DotNetNuke.Services.Localization
         /// <returns>A valid CultureInfo if any is found.</returns>
         private static CultureInfo GetCultureFromQs(IPortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering GetCultureFromQs(portalSettings={PortalSettings})", portalSettings);
             if (HttpContext.Current == null || HttpContext.Current.Request["language"] == null)
             {
                 return null;
             }
 
             string language = HttpContext.Current.Request["language"];
+			Logger.LogDebug("GetCultureFromQs(portalSettings={PortalSettings}): language → {Language}", portalSettings, language);
             CultureInfo culture = GetCultureFromString(portalSettings.PortalId, language);
+			Logger.LogDebug("GetCultureFromQs(portalSettings={PortalSettings}): culture → {Culture}", portalSettings, culture);
+			Logger.LogDebug("<<< Exiting GetCultureFromQs(portalSettings={PortalSettings})", portalSettings);
             return culture;
         }
 
@@ -1905,6 +2098,7 @@ namespace DotNetNuke.Services.Localization
         /// <returns>A valid CultureInfo if any is found.</returns>
         private static CultureInfo GetCultureFromCookie(IPortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering GetCultureFromCookie(portalSettings={PortalSettings})", portalSettings);
             CultureInfo culture;
             if (HttpContext.Current == null || HttpContext.Current.Request.Cookies["language"] == null)
             {
@@ -1912,7 +2106,10 @@ namespace DotNetNuke.Services.Localization
             }
 
             string language = HttpContext.Current.Request.Cookies["language"].Value;
+			Logger.LogDebug("GetCultureFromCookie(portalSettings={PortalSettings}): language → {Language}", portalSettings, language);
             culture = GetCultureFromString(portalSettings.PortalId, language);
+			Logger.LogDebug("GetCultureFromCookie(portalSettings={PortalSettings}): culture → {Culture}", portalSettings, culture);
+			Logger.LogDebug("<<< Exiting GetCultureFromCookie(portalSettings={PortalSettings})", portalSettings);
             return culture;
         }
 
@@ -1921,8 +2118,10 @@ namespace DotNetNuke.Services.Localization
         /// <returns>A valid CultureInfo if any is found.</returns>
         private static CultureInfo GetCultureFromProfile(IPortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering GetCultureFromProfile(portalSettings={PortalSettings})", portalSettings);
             UserInfo objUserInfo = UserController.Instance.GetCurrentUserInfo();
 
+			Logger.LogDebug("GetCultureFromProfile(portalSettings={PortalSettings}): objUserInfo → {ObjUserInfo}", portalSettings, objUserInfo);
             if (HttpContext.Current == null || !HttpContext.Current.Request.IsAuthenticated || objUserInfo.UserID == -1)
             {
                 return null;
@@ -1930,6 +2129,8 @@ namespace DotNetNuke.Services.Localization
 
             string language = objUserInfo.Profile.PreferredLocale;
             CultureInfo culture = GetCultureFromString(portalSettings.PortalId, language);
+			Logger.LogDebug("GetCultureFromProfile(portalSettings={PortalSettings}): culture → {Culture}", portalSettings, culture);
+			Logger.LogDebug("<<< Exiting GetCultureFromProfile(portalSettings={PortalSettings})", portalSettings);
             return culture;
         }
 
@@ -1938,12 +2139,14 @@ namespace DotNetNuke.Services.Localization
         /// <returns>A valid CultureInfo if any is found.</returns>
         private static CultureInfo GetCultureFromBrowser(IPortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering GetCultureFromBrowser(portalSettings={PortalSettings})", portalSettings);
             if (!portalSettings.EnableBrowserLanguage)
             {
                 return null;
             }
             else
             {
+				Logger.LogDebug("<<< Exiting GetCultureFromBrowser(portalSettings={PortalSettings})", portalSettings);
                 return GetBrowserCulture(portalSettings.PortalId);
             }
         }
@@ -1953,8 +2156,10 @@ namespace DotNetNuke.Services.Localization
         /// <returns>A valid CultureInfo if any is found.</returns>
         private static CultureInfo GetCultureFromPortal(IPortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering GetCultureFromPortal(portalSettings={PortalSettings})", portalSettings);
             CultureInfo culture = null;
             if (!string.IsNullOrEmpty(portalSettings.DefaultLanguage))
+			Logger.LogDebug("GetCultureFromPortal(portalSettings={PortalSettings}): culture → {Culture}", portalSettings, culture);
             {
                 // As the portal default language can never be disabled, we know this language is available and enabled
                 culture = new CultureInfo(portalSettings.DefaultLanguage);
@@ -1963,6 +2168,7 @@ namespace DotNetNuke.Services.Localization
             {
                 // Get the first enabled locale on the portal
                 Dictionary<string, Locale> enabledLocales = new Dictionary<string, Locale>();
+				Logger.LogDebug("GetCultureFromPortal(portalSettings={PortalSettings}): enabledLocales → {EnabledLocales}", portalSettings, enabledLocales);
                 if (portalSettings.PortalId > Null.NullInteger)
                 {
                     enabledLocales = LocaleController.Instance.GetLocales(portalSettings.PortalId);
@@ -1978,11 +2184,14 @@ namespace DotNetNuke.Services.Localization
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetCultureFromPortal(portalSettings={PortalSettings})", portalSettings);
             return culture;
         }
 
         private static List<object> GetPortalLocalizations(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetPortalLocalizations(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetPortalLocalizations(portalId={PortalId})", portalId);
             return CBO.FillCollection<object>(DataProvider.Instance().GetPortalLocalizations(portalId));
         }
 
@@ -1996,13 +2205,17 @@ namespace DotNetNuke.Services.Localization
         /// <returns>A <see cref="CultureInfo"/> instance representing the user's UI culture.</returns>
         private static CultureInfo GetUserUICulture(CultureInfo currentCulture, IPortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering GetUserUICulture(currentCulture={CurrentCulture},portalSettings={PortalSettings})", currentCulture, portalSettings);
             CultureInfo uiCulture = currentCulture;
             try
+			Logger.LogDebug("GetUserUICulture(currentCulture={CurrentCulture},portalSettings={PortalSettings}): uiCulture → {UiCulture}", currentCulture, portalSettings, uiCulture);
             {
                 object oCulture = Personalization.Personalization.GetProfile("Usability", "UICulture");
+				Logger.LogDebug("GetUserUICulture(currentCulture={CurrentCulture},portalSettings={PortalSettings}): oCulture → {OCulture}", currentCulture, portalSettings, oCulture);
                 if (oCulture != null)
                 {
                     CultureInfo ci = GetCultureFromString(portalSettings.PortalId, oCulture.ToString());
+					Logger.LogDebug("GetUserUICulture(currentCulture={CurrentCulture},portalSettings={PortalSettings}): ci → {Ci}", currentCulture, portalSettings, ci);
                     if (ci != null)
                     {
                         uiCulture = ci;
@@ -2011,10 +2224,12 @@ namespace DotNetNuke.Services.Localization
             }
             catch
             {
+				Logger.LogError("Exception in GetUserUICulture(currentCulture={CurrentCulture},portalSettings={PortalSettings}): {Arg2}", currentCulture, portalSettings, ex.Message);
                 // UserCulture seems not valid anymore, update to current culture
                 Personalization.Personalization.SetProfile("Usability", "UICulture", currentCulture.Name);
             }
 
+			Logger.LogDebug("<<< Exiting GetUserUICulture(currentCulture={CurrentCulture},portalSettings={PortalSettings})", currentCulture, portalSettings);
             return uiCulture;
         }
     }

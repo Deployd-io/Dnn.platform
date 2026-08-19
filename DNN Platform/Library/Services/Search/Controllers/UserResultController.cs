@@ -23,6 +23,7 @@ namespace DotNetNuke.Services.Search.Controllers
     [Serializable]
     public class UserResultController : BaseResultController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserResultController));
         private const string LocalizedResxFile = "~/DesktopModules/Admin/SearchResults/App_LocalResources/SearchableModules.resx";
 
         private static readonly Regex SearchResultMatchRegex = new Regex(@"^(\d+)_", RegexOptions.Compiled);
@@ -36,13 +37,16 @@ namespace DotNetNuke.Services.Search.Controllers
         /// <inheritdoc />
         public override bool HasViewPermission(SearchResult searchResult)
         {
+			Logger.LogDebug(">>> Entering HasViewPermission(searchResult={SearchResult})", searchResult);
             var userId = GetUserId(searchResult);
             if (userId == Null.NullInteger)
+			Logger.LogDebug("HasViewPermission(searchResult={SearchResult}): userId → {UserId}", searchResult, userId);
             {
                 return false;
             }
 
             var userInSearchResult = UserController.GetUserById(PortalSettings.PortalId, userId);
+			Logger.LogDebug("HasViewPermission(searchResult={SearchResult}): userInSearchResult → {UserInSearchResult}", searchResult, userInSearchResult);
             if (userInSearchResult == null || userInSearchResult.IsDeleted)
             {
                 return false;
@@ -51,6 +55,7 @@ namespace DotNetNuke.Services.Search.Controllers
             if (searchResult.UniqueKey.Contains("adminonly", StringComparison.OrdinalIgnoreCase))
             {
                 var currentUser = UserController.Instance.GetCurrentUserInfo();
+				Logger.LogDebug("HasViewPermission(searchResult={SearchResult}): currentUser → {CurrentUser}", searchResult, currentUser);
                 return currentUser.IsSuperUser
                         || currentUser.IsInRole("Administrators")
                         || currentUser.UserID == userId;
@@ -86,6 +91,7 @@ namespace DotNetNuke.Services.Search.Controllers
                     return scopeForRoles.Any(i => userInSearchResult.IsInRole(i));
                 }
 
+			Logger.LogDebug("<<< Exiting HasViewPermission(searchResult={SearchResult})", searchResult);
                 return true;
             }
 
@@ -95,26 +101,35 @@ namespace DotNetNuke.Services.Search.Controllers
         /// <inheritdoc />
         public override string GetDocUrl(SearchResult searchResult)
         {
+			Logger.LogDebug(">>> Entering GetDocUrl(searchResult={SearchResult})", searchResult);
             var url = TestableGlobals.Instance.NavigateURL(PortalSettings.UserTabId, string.Empty, "userid=" + GetUserId(searchResult));
+			Logger.LogDebug("GetDocUrl(searchResult={SearchResult}): url → {Url}", searchResult, url);
+			Logger.LogDebug("<<< Exiting GetDocUrl(searchResult={SearchResult})", searchResult);
             return url;
         }
 
         private static int GetUserId(SearchDocumentToDelete searchResult)
         {
+			Logger.LogDebug(">>> Entering GetUserId(searchResult={SearchResult})", searchResult);
             var match = SearchResultMatchRegex.Match(searchResult.UniqueKey);
+			Logger.LogDebug("GetUserId(searchResult={SearchResult}): match → {Match}", searchResult, match);
+			Logger.LogDebug("<<< Exiting GetUserId(searchResult={SearchResult})", searchResult);
             return match.Success ? Convert.ToInt32(match.Groups[1].Value, CultureInfo.InvariantCulture) : Null.NullInteger;
         }
 
         private static bool HasSocialRelationship(UserInfo targetUser, UserInfo accessingUser, string extendedVisibility)
         {
+			Logger.LogDebug(">>> Entering HasSocialRelationship(targetUser={TargetUser},accessingUser={AccessingUser},extendedVisibility={ExtendedVisibility})", targetUser, accessingUser, extendedVisibility);
             if (string.IsNullOrEmpty(extendedVisibility))
             {
                 return false;
             }
 
             var profileVisibility = new ProfileVisibility(PortalSettings.PortalId, extendedVisibility);
+			Logger.LogDebug("HasSocialRelationship(targetUser={TargetUser},accessingUser={AccessingUser},extendedVisibility={ExtendedVisibility}): profileVisibility → {ProfileVisibility}", targetUser, accessingUser, extendedVisibility, profileVisibility);
 
             var isVisible = accessingUser.UserID == targetUser.UserID;
+			Logger.LogDebug("HasSocialRelationship(targetUser={TargetUser},accessingUser={AccessingUser},extendedVisibility={ExtendedVisibility}): isVisible → {IsVisible}", targetUser, accessingUser, extendedVisibility, isVisible);
             if (!isVisible)
             {
                 // Relationships
@@ -149,6 +164,7 @@ namespace DotNetNuke.Services.Search.Controllers
                 }
             }
 
+			Logger.LogDebug("<<< Exiting HasSocialRelationship(targetUser={TargetUser},accessingUser={AccessingUser},extendedVisibility={ExtendedVisibility})", targetUser, accessingUser, extendedVisibility);
             return isVisible;
         }
     }

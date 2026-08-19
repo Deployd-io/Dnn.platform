@@ -16,6 +16,7 @@ namespace DotNetNuke.UI.UserControls
 
     public abstract class DualListControl : UserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DualListControl));
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Breaking Change")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
@@ -150,6 +151,7 @@ namespace DotNetNuke.UI.UserControls
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdAdd.Click += this.CmdAdd_Click;
@@ -207,15 +209,19 @@ namespace DotNetNuke.UI.UserControls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private static void Sort(ListBox ctlListBox)
         {
+			Logger.LogDebug(">>> Entering Sort(ctlListBox={CtlListBox})", ctlListBox);
             var arrListItems = new ArrayList();
             foreach (ListItem objListItem in ctlListBox.Items)
             {
+			Logger.LogDebug("Sort(ctlListBox={CtlListBox}): arrListItems → {ArrListItems}", ctlListBox, arrListItems);
                 arrListItems.Add(objListItem);
             }
 
@@ -225,13 +231,16 @@ namespace DotNetNuke.UI.UserControls
             {
                 ctlListBox.Items.Add(objListItem);
             }
+			Logger.LogDebug("<<< Exiting Sort(ctlListBox={CtlListBox})", ctlListBox);
         }
 
         private void CmdAdd_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdAdd_Click(sender={Sender},e={E})", sender, e);
             var objList = new ArrayList();
             foreach (ListItem objListItem in this.lstAvailable.Items)
             {
+			Logger.LogDebug("CmdAdd_Click(sender={Sender},e={E}): objList → {ObjList}", sender, e, objList);
                 objList.Add(objListItem);
             }
 
@@ -247,13 +256,16 @@ namespace DotNetNuke.UI.UserControls
             this.lstAvailable.ClearSelection();
             this.lstAssigned.ClearSelection();
             Sort(this.lstAssigned);
+			Logger.LogDebug("<<< Exiting CmdAdd_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdRemove_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdRemove_Click(sender={Sender},e={E})", sender, e);
             var objList = new ArrayList();
             foreach (ListItem objListItem in this.lstAssigned.Items)
             {
+			Logger.LogDebug("CmdRemove_Click(sender={Sender},e={E}): objList → {ObjList}", sender, e, objList);
                 objList.Add(objListItem);
             }
 
@@ -269,10 +281,12 @@ namespace DotNetNuke.UI.UserControls
             this.lstAvailable.ClearSelection();
             this.lstAssigned.ClearSelection();
             Sort(this.lstAvailable);
+			Logger.LogDebug("<<< Exiting CmdRemove_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdAddAll_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdAddAll_Click(sender={Sender},e={E})", sender, e);
             foreach (ListItem objListItem in this.lstAvailable.Items)
             {
                 this.lstAssigned.Items.Add(objListItem);
@@ -282,10 +296,12 @@ namespace DotNetNuke.UI.UserControls
             this.lstAvailable.ClearSelection();
             this.lstAssigned.ClearSelection();
             Sort(this.lstAssigned);
+			Logger.LogDebug("<<< Exiting CmdAddAll_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdRemoveAll_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdRemoveAll_Click(sender={Sender},e={E})", sender, e);
             foreach (ListItem objListItem in this.lstAssigned.Items)
             {
                 this.lstAvailable.Items.Add(objListItem);
@@ -295,6 +311,7 @@ namespace DotNetNuke.UI.UserControls
             this.lstAvailable.ClearSelection();
             this.lstAssigned.ClearSelection();
             Sort(this.lstAvailable);
+			Logger.LogDebug("<<< Exiting CmdRemoveAll_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

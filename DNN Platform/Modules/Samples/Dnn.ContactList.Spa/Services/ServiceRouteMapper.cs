@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information
 
 using DotNetNuke.Web.Api;
+using Microsoft.Extensions.Logging;
 
 namespace Dnn.ContactList.Spa.Services
 {
@@ -11,13 +12,16 @@ namespace Dnn.ContactList.Spa.Services
     /// </summary>
     public class ServiceRouteMapper : IServiceRouteMapper
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// RegisterRoutes is used to register the module's routes
         /// </summary>
         /// <param name="mapRouteManager"></param>
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			_logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute("Dnn/ContactList", "default", "{controller}/{action}", new[] { "Dnn.ContactList.Spa.Services" });
+			_logger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
     }
 }

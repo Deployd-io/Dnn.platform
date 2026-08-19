@@ -14,16 +14,19 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging.Helpers
     {
         public static void SetupCachingProvider(Mock<CachingProvider> mockCachingProvider)
         {
+			mockEventLogger.LogDebug(">>> Entering SetupCachingProvider(mockCachingProvider={MockCachingProvider})", mockCachingProvider);
             mockCachingProvider.Setup(c => c.GetItem(It.IsAny<string>()))
                 .Returns<string>(key =>
                 {
                     if (key.Contains("Portal-1_"))
                     {
                         var portals = new List<PortalInfo> { new PortalInfo() { PortalID = 0 } };
+						mockEventLogger.LogDebug("SetupCachingProvider(mockCachingProvider={MockCachingProvider}): portals → {Portals}", mockCachingProvider, portals);
 
                         return portals;
                     }
 
+				mockEventLogger.LogDebug("<<< Exiting SetupCachingProvider(mockCachingProvider={MockCachingProvider})", mockCachingProvider);
                     return key.Contains("PortalGroups") ? new List<PortalGroupInfo>() : null;
                 });
         }

@@ -13,6 +13,7 @@ Imports System.Web.UI.WebControls
 Imports DotNetNuke.Abstractions.ClientResources
 Imports DotNetNuke.Web.Client.ResourceManager
 Imports Microsoft.Extensions.DependencyInjection
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.Utilities
 
@@ -30,6 +31,7 @@ Namespace DotNetNuke.UI.Utilities
     ''' </history>
     ''' -----------------------------------------------------------------------------
     Public Class ClientAPI
+	Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
 
 #Region "Public Constants"
 
@@ -126,6 +128,8 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Private Shared Function FindForm(ByVal oCtl As Control) As Control
+			_logger.LogDebug(">>> Entering FindForm(oCtl={OCtl})", oCtl)
+			_logger.LogDebug("<<< Exiting FindForm(oCtl={OCtl})", oCtl)
             Return oCtl.Page.Form
             'Do While Not TypeOf oCtl Is HtmlControls.HtmlForm
             '    If oCtl Is Nothing OrElse TypeOf oCtl Is Page Then Return Nothing
@@ -145,6 +149,8 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Private Shared Function GetDNNVariableControl(ByVal objParent As Control) As HtmlInputHidden
+			_logger.LogDebug(">>> Entering GetDNNVariableControl(objParent={ObjParent})", objParent)
+			_logger.LogDebug("<<< Exiting GetDNNVariableControl(objParent={ObjParent})", objParent)
             Return CType(DotNetNuke.UI.Utilities.Globals.FindControlRecursive(objParent.Page, DNNVARIABLE_CONTROLID), System.Web.UI.HtmlControls.HtmlInputHidden)
         End Function
 

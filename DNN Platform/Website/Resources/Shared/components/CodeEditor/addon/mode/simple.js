@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -13,6 +15,7 @@
 
   CodeMirror.defineSimpleMode = function(name, states) {
     CodeMirror.defineMode(name, function(config) {
+	logger.debug(`>>> Entering defineMode(name=${name})`);
       return CodeMirror.simpleMode(config, states);
     });
   };
@@ -30,11 +33,14 @@
     }
     var mode = {
       startState: function() {
+		logger.debug('>>> Entering startState()');
         return {state: "start", pending: null,
                 local: null, localState: null,
                 indent: hasIndentation ? [] : null};
+				logger.debug('<<< Exiting startState()');
       },
       copyState: function(state) {
+		logger.debug(`>>> Entering copyState(state=${state})`);
         var s = {state: state.state, pending: state.pending,
                  local: state.local, localState: null,
                  indent: state.indent && state.indent.slice(0)};
@@ -47,6 +53,10 @@
                                 spec: pers.spec,
                                 state: pers.state == state.localState ? s.localState : CodeMirror.copyState(pers.mode, pers.state),
                                 next: s.persistentStates};
+								logger.debug(`function(config=${config},states=${states}): s.persistentStates → ${s.persistentStates}`);
+								logger.debug(`function(exports=${exports}): s.persistentStates → ${s.persistentStates}`);
+		logger.debug(`<<< Exiting copyState(state=${state})`);
+		logger.debug(`copyState(state=${state}): s.persistentStates → ${s.persistentStates}`);
         return s;
       },
       token: tokenFunction(states_, config),
@@ -55,44 +65,59 @@
     };
     if (meta) for (var prop in meta) if (meta.hasOwnProperty(prop))
       mode[prop] = meta[prop];
+	logger.debug(`<<< Exiting function(exports=${exports})`);
     return mode;
   };
 
   function ensureState(states, name) {
+	logger.debug(`>>> Entering ensureState(states=${states},name=${name})`);
     if (!states.hasOwnProperty(name))
+	logger.debug(`<<< Exiting ensureState(states=${states},name=${name})`);
       throw new Error("Undefined state " + name + "in simple mode");
   }
 
   function toRegex(val, caret) {
+	logger.debug(`>>> Entering toRegex(val=${val},caret=${caret})`);
     if (!val) return /(?:)/;
     var flags = "";
+	logger.debug(`toRegex(val=${val},caret=${caret}): flags → ${flags}`);
     if (val instanceof RegExp) {
       if (val.ignoreCase) flags = "i";
       val = val.source;
     } else {
       val = String(val);
     }
+	logger.debug(`toRegex(val=${val},caret=${caret}): val → ${val}`);
+	logger.debug(`<<< Exiting toRegex(val=${val},caret=${caret})`);
     return new RegExp((caret === false ? "" : "^") + "(?:" + val + ")", flags);
   }
 
   function asToken(val) {
+	logger.debug(`>>> Entering asToken(val=${val})`);
     if (!val) return null;
     if (typeof val == "string") return val.replace(/\./g, " ");
     var result = [];
+	logger.debug(`asToken(val=${val}): result → ${result}`);
     for (var i = 0; i < val.length; i++)
       result.push(val[i] && val[i].replace(/\./g, " "));
+	logger.debug(`<<< Exiting asToken(val=${val})`);
     return result;
   }
 
   function Rule(data, states) {
+	logger.debug(`>>> Entering Rule(data=${data},states=${states})`);
     if (data.next || data.push) ensureState(states, data.next || data.push);
     this.regex = toRegex(data.regex);
     this.token = asToken(data.token);
     this.data = data;
+	logger.debug(`Rule(data=${data},states=${states}): data → ${data}`);
+	logger.debug(`Rule(data=${data},states=${states}): this.data → ${this.data}`);
+	logger.debug(`<<< Exiting Rule(data=${data},states=${states})`);
   }
 
   function tokenFunction(states, config) {
     return function(stream, state) {
+	logger.debug(`>>> Entering tokenFunction(states=${states},config=${config})`);
       if (state.pending) {
         var pend = state.pending.shift();
         if (state.pending.length == 0) state.pending = null;
@@ -104,15 +129,19 @@
         if (state.local.end && stream.match(state.local.end)) {
           var tok = state.local.endToken || null;
           state.local = state.localState = null;
+		logger.debug(`tokenFunction(states=${states},config=${config}): state.local → ${state.local}`);
+		logger.debug(`function(stream=${stream},state=${state}): state.local → ${state.local}`);
           return tok;
         } else {
           var tok = state.local.mode.token(stream, state.localState), m;
           if (state.local.endScan && (m = state.local.endScan.exec(stream.current())))
             stream.pos = stream.start + m.index;
+		logger.debug(`tokenFunction(states=${states},config=${config}): stream.pos → ${stream.pos}`);
           return tok;
         }
       }
 
+	logger.debug(`function(stream=${stream},state=${state}): stream.pos → ${stream.pos}`);
       var curState = states[state.state];
       for (var i = 0; i < curState.length; i++) {
         var rule = curState[i];
@@ -120,7 +149,9 @@
         if (matches) {
           if (rule.data.next) {
             state.state = rule.data.next;
+			logger.debug(`tokenFunction(states=${states},config=${config}): state.state → ${state.state}`);
           } else if (rule.data.push) {
+			logger.debug(`function(stream=${stream},state=${state}): state.state → ${state.state}`);
             (state.stack || (state.stack = [])).push(state.state);
             state.state = rule.data.push;
           } else if (rule.data.pop && state.stack && state.stack.length) {
@@ -135,7 +166,9 @@
             state.indent.pop();
           if (matches.length > 2) {
             state.pending = [];
+			logger.debug(`tokenFunction(states=${states},config=${config}): state.pending → ${state.pending}`);
             for (var j = 2; j < matches.length; j++)
+			logger.debug(`function(stream=${stream},state=${state}): state.pending → ${state.pending}`);
               if (matches[j])
                 state.pending.push({text: matches[j], token: rule.token[j - 1]});
             stream.backUp(matches[0].length - (matches[1] ? matches[1].length : 0));
@@ -148,11 +181,13 @@
         }
       }
       stream.next();
+	logger.debug(`<<< Exiting tokenFunction(states=${states},config=${config})`);
       return null;
     };
   }
 
   function cmp(a, b) {
+	logger.debug(`>>> Entering cmp(a=${a},b=${b})`);
     if (a === b) return true;
     if (!a || typeof a != "object" || !b || typeof b != "object") return false;
     var props = 0;
@@ -161,6 +196,7 @@
       props++;
     }
     for (var prop in b) if (b.hasOwnProperty(prop)) props--;
+	logger.debug(`<<< Exiting cmp(a=${a},b=${b})`);
     return props == 0;
   }
 
@@ -181,10 +217,13 @@
   }
 
   function indexOf(val, arr) {
+	logger.debug(`>>> Entering indexOf(val=${val},arr=${arr})`);
     for (var i = 0; i < arr.length; i++) if (arr[i] === val) return true;
+	logger.debug(`<<< Exiting indexOf(val=${val},arr=${arr})`);
   }
 
   function indentFunction(states, meta) {
+	logger.debug(`>>> Entering indentFunction(states=${states},meta=${meta})`);
     return function(state, textAfter, line) {
       if (state.local && state.local.mode.indent)
         return state.local.mode.indent(state.localState, textAfter, line);
@@ -207,6 +246,7 @@
         }
         break;
       }
+	logger.debug(`<<< Exiting indentFunction(states=${states},meta=${meta})`);
       return pos < 0 ? 0 : state.indent[pos];
     };
   }

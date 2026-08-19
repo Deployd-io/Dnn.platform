@@ -6,18 +6,24 @@ namespace DotNetNuke.ExtensionPoints.Filters
 {
     public class FilterByHostMenu : IExtensionPointFilter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FilterByHostMenu));
         private readonly bool isHostMenu;
 
         /// <summary>Initializes a new instance of the <see cref="FilterByHostMenu"/> class.</summary>
         /// <param name="isHostMenu">Whether this filter is for the host menu.</param>
         public FilterByHostMenu(bool isHostMenu)
         {
+			Logger.LogDebug(">>> Entering FilterByHostMenu(isHostMenu={IsHostMenu})", isHostMenu);
             this.isHostMenu = isHostMenu;
+			Logger.LogDebug("FilterByHostMenu(isHostMenu={IsHostMenu}): this.isHostMenu → {Arg1}", isHostMenu, this.isHostMenu);
+			Logger.LogDebug("<<< Exiting FilterByHostMenu(isHostMenu={IsHostMenu})", isHostMenu);
         }
 
         /// <inheritdoc />
         public bool Condition(IExtensionPointData m)
         {
+			Logger.LogDebug(">>> Entering Condition(m={M})", m);
+			Logger.LogDebug("<<< Exiting Condition(m={M})", m);
             return !this.isHostMenu || !m.DisableOnHost;
         }
     }

@@ -7,36 +7,47 @@ import ExtensionList from "./ExtensionList";
 import { GridCell, DropdownWithError } from "@dnnsoftware/dnn-react-common";
 import FetchingIcon from "../../../img/fetching.svg";
 import "./style.less";
+const logger = console;
 
 class InstalledExtensions extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.handleSelect = this.handleSelect.bind(this);
+		logger.debug('<<< Exiting constructor()');
         this.state = {
             loading: false
         };
     }
 
     checkIfPackageTypesEmpty(props) {
+		logger.debug(`>>> Entering checkIfPackageTypesEmpty(props=${props})`);
+		logger.debug(`<<< Exiting checkIfPackageTypesEmpty(props=${props})`);
         return !props.installedPackageTypes || props.installedPackageTypes.length === 0;
     }
 
     checkIfInstalledPackagesEmpty(props) {
+		logger.debug(`>>> Entering checkIfInstalledPackagesEmpty(props=${props})`);
+		logger.debug(`<<< Exiting checkIfInstalledPackagesEmpty(props=${props})`);
         return !props.installedPackages || props.installedPackages.length === 0;
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         if (this.checkIfPackageTypesEmpty(props)) {
             props.dispatch(ExtensionActions.getPackageTypes());
+			logger.debug('<<< Exiting UNSAFE_componentWillMount()');
         }
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`);
         if (!this.checkIfPackageTypesEmpty(props) && this.checkIfInstalledPackagesEmpty(props) && props.selectedInstalledPackageType === "") {
             this.setState({loading: true}, () => {
                 props.dispatch(ExtensionActions.getInstalledPackages(props.installedPackageTypes[0].Type, ()=> {
                     this.setState({loading: false});
+					logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`);
                 }));
             });
         }
@@ -54,24 +65,30 @@ class InstalledExtensions extends Component {
     }
 
     onFilterSelect(option) {
+		logger.debug(`>>> Entering onFilterSelect(option=${option})`);
         const {props} = this;
         this.setState({loading: true}, () => {
             props.dispatch(ExtensionActions.getInstalledPackages(option.value, () => {
                 this.setState({loading: false});
+				logger.debug(`<<< Exiting onFilterSelect(option=${option})`);
             }));
         });
     }
 
     onDelete(_package, index) {
+		logger.debug(`>>> Entering onDelete(_package=${_package},index=${index})`);
         const {props} = this;
         props.dispatch(ExtensionActions.setPackageBeingDeleted(Object.assign({ packageType: props.selectedInstalledPackageType }, _package), index, () => {
             props.dispatch(VisiblePanelActions.selectPanel(6));
+			logger.debug(`<<< Exiting onDelete(_package=${_package},index=${index})`);
         }));
     }
 
     renderLoading() {
+	logger.debug('>>> Entering renderLoading()');
 
 
+		logger.debug('<<< Exiting renderLoading()');
         return <div className="loading-extensions">
             <h2>{Localization.get("Loading")}</h2>
             <p>{Localization.get("Loading.Tooltip")}</p>
@@ -81,7 +98,9 @@ class InstalledExtensions extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className="extension-list">
                 <GridCell className="collapse-section filter-section">
@@ -117,6 +136,8 @@ InstalledExtensions.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         installedPackageTypes: state.extension.installedPackageTypes,
         installedPackages: state.extension.installedPackages,

@@ -73,6 +73,8 @@ namespace log4net.Config
         /// </remarks>
         private BasicConfigurator()
         {
+		value.LogDebug(">>> Entering BasicConfigurator()");
+		value.LogDebug("<<< Exiting BasicConfigurator()");
         }
 
 #if !NETSTANDARD1_3
@@ -90,6 +92,13 @@ namespace log4net.Config
         /// </remarks>
         public static ICollection Configure()
         {
+			value.LogDebug(">>> Entering Configure()");
+			value.LogDebug("<<< Exiting Configure()");
+			value.LogDebug("<<< Exiting Configure(appenders={Appenders})", appenders);
+			value.LogDebug("<<< Exiting Configure(appender={Appender})", appender);
+			value.LogDebug("<<< Exiting Configure(repository={Repository})", repository);
+			value.LogDebug("<<< Exiting Configure(repository={Repository},appender={Appender})", repository, appender);
+			value.LogDebug("<<< Exiting Configure(repository={Repository},appenders={Appenders})", repository, appenders);
             return Configure(LogManager.GetRepository(Assembly.GetCallingAssembly()));
         }
 
@@ -212,14 +221,18 @@ namespace log4net.Config
         private static void InternalConfigure(ILoggerRepository repository, params IAppender[] appenders) 
         {
             IBasicRepositoryConfigurator configurableRepository = repository as IBasicRepositoryConfigurator;
+			value.LogDebug(">>> Entering InternalConfigure(repository={Repository},appenders={Appenders})", repository, appenders);
             if (configurableRepository != null)
             {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				value.LogInformation("InternalConfigure(repository,appenders)={Repository},{Appenders}: database query executed in {Arg2} ms", repository, appenders, __logStart.ElapsedMilliseconds);
                 configurableRepository.Configure(appenders);
             }
             else
             {
                 LogLog.Warn(declaringType, "BasicConfigurator: Repository [" + repository + "] does not support the BasicConfigurator");
             }
+			value.LogDebug("<<< Exiting InternalConfigure(repository={Repository},appenders={Appenders})", repository, appenders);
         }
     }
 }

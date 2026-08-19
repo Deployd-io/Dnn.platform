@@ -15,6 +15,7 @@ namespace DotNetNuke.Tests.Core.Collections
         [Test]
         public void DoubleDisposeAllowed()
         {
+			mockEventLogger.LogDebug(">>> Entering DoubleDisposeAllowed()");
             using (var l = new ReaderWriterLockSlim())
             {
                 var scl = new ReaderWriterSlimLock(l);
@@ -24,6 +25,7 @@ namespace DotNetNuke.Tests.Core.Collections
 
                 // no exception on 2nd dispose
             }
+			mockEventLogger.LogDebug("<<< Exiting DoubleDisposeAllowed()");
         }
     }
 }

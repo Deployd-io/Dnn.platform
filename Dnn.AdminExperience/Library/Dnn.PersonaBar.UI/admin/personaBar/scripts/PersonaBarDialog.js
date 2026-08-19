@@ -1,3 +1,4 @@
+const logger = console;
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
@@ -35,10 +36,13 @@
  */
 
 define(['jquery', 'knockout', 'jquery-ui.min', 'css!cssPath/personaBarDialog.css'], function ($, ko) {
+	logger.debug(`>>> Entering define(PersonaBarDialogClass=${PersonaBarDialogClass})`);
     var PersonaBarDialogClass;
 
     PersonaBarDialogClass = (function IIFE() {
+		logger.debug('>>> Entering IIFE()');
         'use strict';
+		logger.debug('<<< Exiting IIFE()');
 
         var _options, _html, _viewModel, _htmlForPannels, _personaBarDialogMask, _personaBarDialog, _height, _docHeight, _bottomPercent, _originalHeight, _top, _win;
 
@@ -74,6 +78,7 @@ define(['jquery', 'knockout', 'jquery-ui.min', 'css!cssPath/personaBarDialog.css
         _personaBarDialog = null;
         _personaBarDialogMask = null;
 
+		logger.debug(`<<< Exiting define(PersonaBarDialogClass=${PersonaBarDialogClass})`);
         /* Costructor */
         function PersonaBarDialog(options, htmlForPannels, koObserveCallback, afterBindCallback) {
             //console.log('~PersonaBarDialog');

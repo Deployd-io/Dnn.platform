@@ -29,24 +29,33 @@ namespace DotNetNuke.Entities.Portals
         /// <summary>Initializes a new instance of the <see cref="PortalSettings"/> class.</summary>
         public PortalSettings()
         {
+			Logger.LogDebug(">>> Entering PortalSettings()");
             this.Registration = new RegistrationSettings();
+			Logger.LogDebug("<<< Exiting PortalSettings()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PortalSettings"/> class.</summary>
+		Logger.LogDebug("<<< Exiting PortalSettings()");
         /// <param name="portalId">The portal ID.</param>
         public PortalSettings(int portalId)
             : this(Null.NullInteger, portalId)
         {
+		Logger.LogDebug(">>> Entering PortalSettings(portalId={PortalId})", portalId);
         }
+		Logger.LogDebug("<<< Exiting PortalSettings(portalId={PortalId})", portalId);
 
         /// <summary>Initializes a new instance of the <see cref="PortalSettings"/> class.</summary>
         /// <param name="tabId">The active tab ID.</param>
         /// <param name="portalId">The portal ID.</param>
         public PortalSettings(int tabId, int portalId)
         {
+			Logger.LogDebug(">>> Entering PortalSettings(tabId={TabId},portalId={PortalId})", tabId, portalId);
             this.PortalId = portalId;
             var portal = PortalController.Instance.GetPortal(portalId);
+			Logger.LogDebug("PortalSettings(tabId={TabId},portalId={PortalId}): portal → {Portal}", tabId, portalId, portal);
+			Logger.LogDebug("PortalSettings(tabId={TabId},portalId={PortalId}): this.PortalId → {Arg2}", tabId, portalId, this.PortalId);
             this.BuildPortalSettings(tabId, portal);
+			Logger.LogDebug("<<< Exiting PortalSettings(tabId={TabId},portalId={PortalId})", tabId, portalId);
         }
 
         /// <summary>
@@ -59,11 +68,14 @@ namespace DotNetNuke.Entities.Portals
         /// <param name="portalAliasInfo">The current portal.</param>
         public PortalSettings(int tabId, PortalAliasInfo portalAliasInfo)
         {
+			Logger.LogDebug(">>> Entering PortalSettings(tabId={TabId},portalAliasInfo={PortalAliasInfo})", tabId, portalAliasInfo);
             this.PortalId = portalAliasInfo.PortalID;
             this.PortalAlias = portalAliasInfo;
+			Logger.LogDebug("PortalSettings(tabId={TabId},portalAliasInfo={PortalAliasInfo}): this.PortalId → {Arg2}", tabId, portalAliasInfo, this.PortalId);
             var portal = string.IsNullOrEmpty(portalAliasInfo.CultureCode) ?
                             PortalController.Instance.GetPortal(portalAliasInfo.PortalID)
                             : PortalController.Instance.GetPortal(portalAliasInfo.PortalID, portalAliasInfo.CultureCode);
+							Logger.LogDebug("PortalSettings(tabId={TabId},portalAliasInfo={PortalAliasInfo}): this.PortalAlias → {Arg2}", tabId, portalAliasInfo, this.PortalAlias);
 
             this.BuildPortalSettings(tabId, portal);
         }
@@ -82,11 +94,13 @@ namespace DotNetNuke.Entities.Portals
         {
             this.PortalId = portal?.PortalID ?? Null.NullInteger;
             this.BuildPortalSettings(tabId, portal);
+			Logger.LogDebug("PortalSettings(tabId={TabId},portal={Portal}): this.PortalId → {Arg2}", tabId, portal, this.PortalId);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "Breaking change")]
         public enum ControlPanelPermission
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalSettings));
             /// <summary>A page editor.</summary>
             TabEditor = 0,
 
@@ -600,22 +614,29 @@ namespace DotNetNuke.Entities.Portals
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             var outputFormat = string.Empty;
+			Logger.LogDebug(">>> Entering Create(tabId={TabId},portal={Portal})", tabId, portal);
             if (format == string.Empty)
             {
+				Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): outputFormat → {OutputFormat}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, outputFormat);
                 outputFormat = "g";
             }
 
             var lowerPropertyName = propertyName.ToLowerInvariant();
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): lowerPropertyName → {LowerPropertyName}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, lowerPropertyName);
             if (accessLevel == Scope.NoSettings)
             {
                 propertyNotFound = true;
+				Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): propertyNotFound → {PropertyNotFound1}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, propertyNotFound);
                 return PropertyAccess.ContentLocked;
             }
 
             propertyNotFound = true;
             var result = string.Empty;
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): result → {Result}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, result);
             var isPublic = true;
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): isPublic → {IsPublic}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, isPublic);
             switch (lowerPropertyName)
             {
                 case "scheme":
@@ -633,6 +654,7 @@ namespace DotNetNuke.Entities.Portals
                 case "passwordreminderurl": // if regsiter page defined in portal settings, then get that page url, otherwise return home page. - note this depends on HttpContext
                     propertyNotFound = false;
                     var reminderUrl = Globals.AddHTTP(this.PortalAlias.HTTPAlias);
+					Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): reminderUrl → {ReminderUrl}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, reminderUrl);
                     if (this.RegisterTabId > Null.NullInteger)
                     {
                         reminderUrl = Globals.RegisterURL(string.Empty, string.Empty);
@@ -664,6 +686,7 @@ namespace DotNetNuke.Entities.Portals
                 case "footertext":
                     propertyNotFound = false;
                     var footerText = this.FooterText.Replace("[year]", DateTime.Now.Year.ToString(formatProvider));
+					Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): footerText → {FooterText}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, footerText);
                     result = PropertyAccess.FormatString(footerText, format);
                     break;
                 case "expirydate":
@@ -811,16 +834,21 @@ namespace DotNetNuke.Entities.Portals
                 result = PropertyAccess.ContentLocked;
             }
 
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
+			Logger.LogDebug("<<< Exiting Create(portalController={PortalController},portalId={PortalId})", portalController, portalId);
             return result;
         }
 
         public PortalSettings Clone()
         {
+			Logger.LogDebug(">>> Entering Clone()");
+			Logger.LogDebug("<<< Exiting Clone()");
             return (PortalSettings)this.MemberwiseClone();
         }
 
         private void BuildPortalSettings(int tabId, PortalInfo portal)
         {
+			Logger.LogDebug(">>> Entering BuildPortalSettings(tabId={TabId},portal={Portal})", tabId, portal);
             PortalSettingsController.Instance().LoadPortalSettings(this);
 
             if (portal == null)
@@ -831,10 +859,12 @@ namespace DotNetNuke.Entities.Portals
             PortalSettingsController.Instance().LoadPortal(portal, this);
 
             var key = string.Join(":", "ActiveTab", portal.PortalID.ToString(CultureInfo.InvariantCulture), tabId.ToString(CultureInfo.InvariantCulture));
+			Logger.LogWarning("BuildPortalSettings(tabId={TabId},portal={Portal}): key → {Key}", tabId, portal, key);
             var items = HttpContext.Current != null ? HttpContext.Current.Items : null;
             if (items != null && items.Contains(key))
             {
                 this.ActiveTab = items[key] as TabInfo;
+				Logger.LogDebug("BuildPortalSettings(tabId={TabId},portal={Portal}): this.ActiveTab → {Arg2}", tabId, portal, this.ActiveTab);
             }
             else
             {
@@ -844,6 +874,7 @@ namespace DotNetNuke.Entities.Portals
                     items[key] = this.ActiveTab;
                 }
             }
+			Logger.LogDebug("<<< Exiting BuildPortalSettings(tabId={TabId},portal={Portal})", tabId, portal);
         }
     }
 }

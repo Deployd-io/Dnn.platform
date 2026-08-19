@@ -18,6 +18,7 @@ namespace Dnn.PersonaBar.Security.Attributes
         /// <inheritdoc />
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+			eventLogger.LogDebug(">>> Entering IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             var propertyName = validationContext.DisplayName;
 
             if (string.IsNullOrWhiteSpace(value.ToString()))
@@ -26,9 +27,11 @@ namespace Dnn.PersonaBar.Security.Attributes
             }
 
             var allLocales = LocaleController.Instance.GetLocales(PortalController.Instance.GetCurrentSettings().PortalId);
+			eventLogger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): allLocales → {AllLocales}", value, validationContext, allLocales);
 
             if (!allLocales.Select(l => l.Value.Code.ToLowerInvariant()).Contains(value.ToString().ToLowerInvariant()))
             {
+			eventLogger.LogDebug("<<< Exiting IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
                 return new ValidationResult(string.Format(CultureInfo.CurrentCulture, Localization.GetString(Components.Constants.NotValid, Components.Constants.LocalResourcesFile), propertyName, value.ToString()));
             }
 

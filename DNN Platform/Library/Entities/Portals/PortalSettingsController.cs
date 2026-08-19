@@ -26,6 +26,7 @@ namespace DotNetNuke.Entities.Portals
 
     public class PortalSettingsController : IPortalSettingsController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalSettingsController));
         private readonly IHostSettings hostSettings;
         private readonly IHostSettingsService hostSettingsService;
 
@@ -33,6 +34,10 @@ namespace DotNetNuke.Entities.Portals
         public PortalSettingsController()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering PortalSettingsController()");
+		Logger.LogDebug("<<< Exiting PortalSettingsController()");
+		Logger.LogDebug(">>> Entering PortalSettingsController(hostSettings={HostSettings},hostSettingsService={HostSettingsService})", hostSettings, hostSettingsService);
+		Logger.LogDebug("PortalSettingsController(hostSettings={HostSettings},hostSettingsService={HostSettingsService}): hostSettingsService → {HostSettingsService1}", hostSettings, hostSettingsService, hostSettingsService);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PortalSettingsController"/> class.</summary>
@@ -42,6 +47,7 @@ namespace DotNetNuke.Entities.Portals
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+			Logger.LogDebug("<<< Exiting PortalSettingsController(hostSettings={HostSettings},hostSettingsService={HostSettingsService})", hostSettings, hostSettingsService);
         }
 
         public static IPortalSettingsController Instance() =>
@@ -51,8 +57,11 @@ namespace DotNetNuke.Entities.Portals
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public virtual void ConfigureActiveTab(PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering ConfigureActiveTab(portalSettings={PortalSettings})", portalSettings);
             var activeTab = portalSettings.ActiveTab;
+			Logger.LogDebug(">>> Entering Instance()");
 
+			Logger.LogDebug("<<< Exiting Instance()");
             if (activeTab == null || activeTab.TabID == Null.NullInteger)
             {
                 return;
@@ -61,24 +70,30 @@ namespace DotNetNuke.Entities.Portals
             this.UpdateSkinSettings(activeTab, portalSettings);
 
             activeTab.BreadCrumbs = new ArrayList(this.GetBreadcrumbs(activeTab.TabID, portalSettings.PortalId));
+			Logger.LogDebug("<<< Exiting ConfigureActiveTab(portalSettings={PortalSettings})", portalSettings);
         }
 
         /// <inheritdoc />
         public virtual TabInfo GetActiveTab(int tabId, PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering GetActiveTab(tabId={TabId},portalSettings={PortalSettings})", tabId, portalSettings);
             var portalId = portalSettings.PortalId;
             var portalTabs = TabController.Instance.GetTabsByPortal(portalId);
+			Logger.LogDebug("GetActiveTab(tabId={TabId},portalSettings={PortalSettings}): portalTabs → {PortalTabs}", tabId, portalSettings, portalTabs);
             var hostTabs = TabController.Instance.GetTabsByPortal(Null.NullInteger);
+			Logger.LogDebug("GetActiveTab(tabId={TabId},portalSettings={PortalSettings}): hostTabs → {HostTabs}", tabId, portalSettings, hostTabs);
 
             // Check portal
             var activeTab = GetTab(tabId, portalTabs)
                 ?? GetTab(tabId, hostTabs) // check host
                 ?? GetSpecialTab(portalId, portalSettings.SplashTabId) // check splash tab
                 ?? GetSpecialTab(portalId, portalSettings.HomeTabId); // check home tab
+				Logger.LogDebug("GetActiveTab(tabId={TabId},portalSettings={PortalSettings}): activeTab → {ActiveTab}", tabId, portalSettings, activeTab);
 
             if (activeTab == null)
             {
                 var tab = (from TabInfo t in portalTabs.AsList() where !t.IsDeleted && t.IsVisible && t.HasAVisibleVersion select t).FirstOrDefault();
+				Logger.LogDebug("GetActiveTab(tabId={TabId},portalSettings={PortalSettings}): tab → {Tab}", tabId, portalSettings, tab);
 
                 if (tab != null)
                 {
@@ -91,22 +106,27 @@ namespace DotNetNuke.Entities.Portals
                 if (Null.IsNull(activeTab.StartDate))
                 {
                     activeTab.StartDate = DateTime.MinValue;
+					Logger.LogDebug("GetActiveTab(tabId={TabId},portalSettings={PortalSettings}): activeTab.StartDate → {Arg2}", tabId, portalSettings, activeTab.StartDate);
                 }
 
                 if (Null.IsNull(activeTab.EndDate))
                 {
                     activeTab.EndDate = DateTime.MaxValue;
+					Logger.LogDebug("GetActiveTab(tabId={TabId},portalSettings={PortalSettings}): activeTab.EndDate → {Arg2}", tabId, portalSettings, activeTab.EndDate);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetActiveTab(tabId={TabId},portalSettings={PortalSettings})", tabId, portalSettings);
             return activeTab;
         }
 
         /// <inheritdoc />
         public virtual PortalSettings.PortalAliasMapping GetPortalAliasMappingMode(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetPortalAliasMappingMode(portalId={PortalId})", portalId);
             var aliasMapping = PortalSettings.PortalAliasMapping.None;
             if (PortalController.Instance.GetPortalSettings(portalId).TryGetValue("PortalAliasMapping", out var setting))
+			Logger.LogDebug("GetPortalAliasMappingMode(portalId={PortalId}): aliasMapping → {AliasMapping}", portalId, aliasMapping);
             {
                 switch (setting.ToUpperInvariant())
                 {
@@ -122,20 +142,56 @@ namespace DotNetNuke.Entities.Portals
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetPortalAliasMappingMode(portalId={PortalId})", portalId);
             return aliasMapping;
         }
 
         /// <inheritdoc />
         public virtual IList<ModuleInfo> GetTabModules(PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering GetTabModules(portalSettings={PortalSettings})", portalSettings);
+			Logger.LogDebug("<<< Exiting GetTabModules(portalSettings={PortalSettings})", portalSettings);
             return portalSettings.ActiveTab.Modules.Cast<ModuleInfo>().Select(m => m).ToList();
         }
 
         /// <inheritdoc />
         public virtual void LoadPortal(PortalInfo portal, PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering LoadPortal(portal={Portal},portalSettings={PortalSettings})", portal, portalSettings);
             portalSettings.PortalName = portal.PortalName;
             portalSettings.LogoFile = portal.LogoFile;
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.LogoFile → {Arg2}", portal, portalSettings, portalSettings.LogoFile);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.FooterText → {Arg2}", portal, portalSettings, portalSettings.FooterText);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.ExpiryDate → {Arg2}", portal, portalSettings, portalSettings.ExpiryDate);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.UserRegistration → {Arg2}", portal, portalSettings, portalSettings.UserRegistration);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.BannerAdvertising → {Arg2}", portal, portalSettings, portalSettings.BannerAdvertising);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.Currency → {Arg2}", portal, portalSettings, portalSettings.Currency);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.AdministratorId → {Arg2}", portal, portalSettings, portalSettings.AdministratorId);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.Email → {Arg2}", portal, portalSettings, portalSettings.Email);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.HostFee → {Arg2}", portal, portalSettings, portalSettings.HostFee);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.PortalName → {Arg2}", portal, portalSettings, portalSettings.PortalName);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.PageQuota → {Arg2}", portal, portalSettings, portalSettings.PageQuota);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.UserQuota → {Arg2}", portal, portalSettings, portalSettings.UserQuota);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.AdministratorRoleId → {Arg2}", portal, portalSettings, portalSettings.AdministratorRoleId);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.AdministratorRoleName → {Arg2}", portal, portalSettings, portalSettings.AdministratorRoleName);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.RegisteredRoleId → {Arg2}", portal, portalSettings, portalSettings.RegisteredRoleId);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.RegisteredRoleName → {Arg2}", portal, portalSettings, portalSettings.RegisteredRoleName);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.Description → {Arg2}", portal, portalSettings, portalSettings.Description);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.KeyWords → {Arg2}", portal, portalSettings, portalSettings.KeyWords);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.BackgroundFile → {Arg2}", portal, portalSettings, portalSettings.BackgroundFile);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.GUID → {Arg2}", portal, portalSettings, portalSettings.GUID);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.AdminTabId → {Arg2}", portal, portalSettings, portalSettings.AdminTabId);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.SuperTabId → {Arg2}", portal, portalSettings, portalSettings.SuperTabId);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.SplashTabId → {Arg2}", portal, portalSettings, portalSettings.SplashTabId);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.HomeTabId → {Arg2}", portal, portalSettings, portalSettings.HomeTabId);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.LoginTabId → {Arg2}", portal, portalSettings, portalSettings.LoginTabId);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.RegisterTabId → {Arg2}", portal, portalSettings, portalSettings.RegisterTabId);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.UserTabId → {Arg2}", portal, portalSettings, portalSettings.UserTabId);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.SearchTabId → {Arg2}", portal, portalSettings, portalSettings.SearchTabId);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.ErrorPage404 → {Arg2}", portal, portalSettings, portalSettings.ErrorPage404);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.ErrorPage500 → {Arg2}", portal, portalSettings, portalSettings.ErrorPage500);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.TermsTabId → {Arg2}", portal, portalSettings, portalSettings.TermsTabId);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.PrivacyTabId → {Arg2}", portal, portalSettings, portalSettings.PrivacyTabId);
             portalSettings.FooterText = portal.FooterText;
             portalSettings.ExpiryDate = portal.ExpiryDate;
             portalSettings.UserRegistration = portal.UserRegistration;
@@ -169,21 +225,32 @@ namespace DotNetNuke.Entities.Portals
             portalSettings.PrivacyTabId = portal.PrivacyTabId;
             portalSettings.DefaultLanguage = Null.IsNull(portal.DefaultLanguage) ? Localization.SystemLocale : portal.DefaultLanguage;
             portalSettings.HomeDirectory = Globals.ApplicationPath + "/" + portal.HomeDirectory + "/";
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.HomeDirectory → {Arg2}", portal, portalSettings, portalSettings.HomeDirectory);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.HomeDirectoryMapPath → {Arg2}", portal, portalSettings, portalSettings.HomeDirectoryMapPath);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.HomeSystemDirectory → {Arg2}", portal, portalSettings, portalSettings.HomeSystemDirectory);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.HomeSystemDirectoryMapPath → {Arg2}", portal, portalSettings, portalSettings.HomeSystemDirectoryMapPath);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.Pages → {Arg2}", portal, portalSettings, portalSettings.Pages);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.Users → {Arg2}", portal, portalSettings, portalSettings.Users);
+			Logger.LogDebug("LoadPortal(portal={Portal},portalSettings={PortalSettings}): portalSettings.CultureCode → {Arg2}", portal, portalSettings, portalSettings.CultureCode);
             portalSettings.HomeDirectoryMapPath = portal.HomeDirectoryMapPath;
             portalSettings.HomeSystemDirectory = Globals.ApplicationPath + "/" + portal.HomeSystemDirectory + "/";
             portalSettings.HomeSystemDirectoryMapPath = portal.HomeSystemDirectoryMapPath;
             portalSettings.Pages = portal.Pages;
             portalSettings.Users = portal.Users;
             portalSettings.CultureCode = portal.CultureCode;
+			Logger.LogDebug("<<< Exiting LoadPortal(portal={Portal},portalSettings={PortalSettings})", portal, portalSettings);
         }
 
         /// <inheritdoc />
         public virtual void LoadPortalSettings(PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering LoadPortalSettings(portalSettings={PortalSettings})", portalSettings);
             var settings = PortalController.Instance.GetPortalSettings(portalSettings.PortalId);
             portalSettings.Registration = new RegistrationSettings(settings);
+			Logger.LogDebug("LoadPortalSettings(portalSettings={PortalSettings}): settings → {Settings}", portalSettings, settings);
 
             var clientResourcesSettings = new ClientResourceSettings();
+			Logger.LogDebug("LoadPortalSettings(portalSettings={PortalSettings}): clientResourcesSettings → {ClientResourcesSettings}", portalSettings, clientResourcesSettings);
             bool overridingDefaultSettings = clientResourcesSettings.IsOverridingDefaultSettingsEnabled(portalSettings.PortalId);
 
             int crmVersion;
@@ -199,6 +266,7 @@ namespace DotNetNuke.Entities.Portals
 
             portalSettings.AllowUserUICulture = settings.GetValueOrDefault("AllowUserUICulture", false);
             portalSettings.CdfVersion = crmVersion;
+			Logger.LogDebug("LoadPortalSettings(portalSettings={PortalSettings}): portalSettings.CdfVersion → {Arg1}", portalSettings, portalSettings.CdfVersion);
             portalSettings.ContentLocalizationEnabled = settings.GetValueOrDefault("ContentLocalizationEnabled", false);
             portalSettings.DefaultAdminContainer = settings.GetValueOrDefault("DefaultAdminContainer", this.hostSettings.DefaultAdminContainer);
             portalSettings.DefaultAdminSkin = settings.GetValueOrDefault("DefaultAdminSkin", this.hostSettings.DefaultAdminSkin);
@@ -237,13 +305,16 @@ namespace DotNetNuke.Entities.Portals
             portalSettings.SMTPMaxIdleTime = settings.GetValueOrDefault("SMTPMaxIdleTime", 100000);
 
             portalSettings.ControlPanelSecurity = PortalSettings.ControlPanelPermission.ModuleEditor;
+			Logger.LogDebug("LoadPortalSettings(portalSettings={PortalSettings}): portalSettings.ControlPanelSecurity → {Arg1}", portalSettings, portalSettings.ControlPanelSecurity);
             var setting = settings.GetValueOrDefault("ControlPanelSecurity", string.Empty);
+			Logger.LogDebug("LoadPortalSettings(portalSettings={PortalSettings}): setting → {Setting}", portalSettings, setting);
             if (setting.Equals("TAB", StringComparison.OrdinalIgnoreCase))
             {
                 portalSettings.ControlPanelSecurity = PortalSettings.ControlPanelPermission.TabEditor;
             }
 
             portalSettings.DefaultControlPanelMode = PortalSettings.Mode.View;
+			Logger.LogDebug("LoadPortalSettings(portalSettings={PortalSettings}): portalSettings.DefaultControlPanelMode → {Arg1}", portalSettings, portalSettings.DefaultControlPanelMode);
             setting = settings.GetValueOrDefault("ControlPanelMode", string.Empty);
             if (setting.Equals("EDIT", StringComparison.OrdinalIgnoreCase))
             {
@@ -257,9 +328,11 @@ namespace DotNetNuke.Entities.Portals
             if (!string.IsNullOrEmpty(setting))
             {
                 var timeZone = TimeZoneInfo.FindSystemTimeZoneById(setting);
+				Logger.LogDebug("LoadPortalSettings(portalSettings={PortalSettings}): timeZone → {TimeZone}", portalSettings, timeZone);
                 if (timeZone != null)
                 {
                     portalSettings.TimeZone = timeZone;
+					Logger.LogDebug("LoadPortalSettings(portalSettings={PortalSettings}): portalSettings.TimeZone → {Arg1}", portalSettings, portalSettings.TimeZone);
                 }
             }
 
@@ -279,6 +352,7 @@ namespace DotNetNuke.Entities.Portals
             portalSettings.DataConsentDelay = int.Parse(setting, CultureInfo.InvariantCulture);
             setting = settings.GetValueOrDefault("DataConsentDelayMeasurement", "d");
             portalSettings.DataConsentDelayMeasurement = setting;
+			Logger.LogDebug("LoadPortalSettings(portalSettings={PortalSettings}): portalSettings.DataConsentDelayMeasurement → {Arg1}", portalSettings, portalSettings.DataConsentDelayMeasurement);
             setting = settings.GetValueOrDefault("AllowedExtensionsWhitelist", this.hostSettingsService.GetString("DefaultEndUserExtensionWhitelist"));
             portalSettings.AllowedExtensionsWhitelist = new FileExtensionWhitelist(setting);
 
@@ -287,6 +361,7 @@ namespace DotNetNuke.Entities.Portals
             {
                 case "ON":
                     portalSettings.CspHeaderMode = PortalSettings.CspMode.On;
+					Logger.LogDebug("LoadPortalSettings(portalSettings={PortalSettings}): portalSettings.CspHeaderMode → {Arg1}", portalSettings, portalSettings.CspHeaderMode);
                     break;
                 case "REPORTONLY":
                     portalSettings.CspHeaderMode = PortalSettings.CspMode.ReportOnly;
@@ -299,18 +374,23 @@ namespace DotNetNuke.Entities.Portals
             portalSettings.CspHeaderFixed = settings.GetValueOrDefault("CspHeaderFixed", false);
             portalSettings.CspHeader = settings.GetValueOrDefault("CspHeader", "style-src 'unsafe-inline'; object-src 'none'; frame-ancestors 'none';");
             portalSettings.CspReportingHeader = settings.GetValueOrDefault("CspReportingHeader", string.Empty);
+			Logger.LogDebug("<<< Exiting LoadPortalSettings(portalSettings={PortalSettings})", portalSettings);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected List<TabInfo> GetBreadcrumbs(int tabId, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetBreadcrumbs(tabId={TabId},portalId={PortalId})", tabId, portalId);
             var breadCrumbs = new List<TabInfo>();
             GetBreadCrumbs(breadCrumbs, tabId, portalId);
+			Logger.LogDebug("GetBreadcrumbs(tabId={TabId},portalId={PortalId}): breadCrumbs → {BreadCrumbs}", tabId, portalId, breadCrumbs);
+			Logger.LogDebug("<<< Exiting GetBreadcrumbs(tabId={TabId},portalId={PortalId})", tabId, portalId);
             return breadCrumbs;
         }
 
         protected virtual void UpdateSkinSettings(TabInfo activeTab, PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering UpdateSkinSettings(activeTab={ActiveTab},portalSettings={PortalSettings})", activeTab, portalSettings);
             if (Globals.IsAdminSkin())
             {
                 // DNN-6170 ensure skin value is culture specific
@@ -380,12 +460,16 @@ namespace DotNetNuke.Entities.Portals
 
             activeTab.ContainerSrc = SkinController.FormatSkinSrc(activeTab.ContainerSrc, portalSettings);
             activeTab.ContainerPath = SkinController.FormatSkinPath(activeTab.ContainerSrc);
+			Logger.LogDebug("<<< Exiting UpdateSkinSettings(activeTab={ActiveTab},portalSettings={PortalSettings})", activeTab, portalSettings);
         }
 
         private static void GetBreadCrumbs(List<TabInfo> breadCrumbs, int tabId, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetBreadCrumbs(breadCrumbs={BreadCrumbs},tabId={TabId},portalId={PortalId})", breadCrumbs, tabId, portalId);
             var portalTabs = TabController.Instance.GetTabsByPortal(portalId);
             var hostTabs = TabController.Instance.GetTabsByPortal(Null.NullInteger);
+			Logger.LogDebug("GetBreadCrumbs(breadCrumbs={BreadCrumbs},tabId={TabId},portalId={PortalId}): hostTabs → {HostTabs}", breadCrumbs, tabId, portalId, hostTabs);
+			Logger.LogDebug("GetBreadCrumbs(breadCrumbs={BreadCrumbs},tabId={TabId},portalId={PortalId}): portalTabs → {PortalTabs}", breadCrumbs, tabId, portalId, portalTabs);
             while (true)
             {
                 TabInfo tab;
@@ -404,21 +488,26 @@ namespace DotNetNuke.Entities.Portals
 
                 break;
             }
+			Logger.LogDebug("<<< Exiting GetBreadCrumbs(breadCrumbs={BreadCrumbs},tabId={TabId},portalId={PortalId})", breadCrumbs, tabId, portalId);
         }
 
         private static TabInfo GetSpecialTab(int portalId, int tabId)
         {
+			Logger.LogDebug(">>> Entering GetSpecialTab(portalId={PortalId},tabId={TabId})", portalId, tabId);
             TabInfo activeTab = null;
 
+			Logger.LogDebug("GetSpecialTab(portalId={PortalId},tabId={TabId}): activeTab → {ActiveTab}", portalId, tabId, activeTab);
             if (tabId > 0)
             {
                 var tab = TabController.Instance.GetTab(tabId, portalId, false);
+				Logger.LogDebug("GetSpecialTab(portalId={PortalId},tabId={TabId}): tab → {Tab}", portalId, tabId, tab);
                 if (tab != null)
                 {
                     activeTab = tab.Clone();
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetSpecialTab(portalId={PortalId},tabId={TabId})", portalId, tabId);
             return activeTab;
         }
 
@@ -426,6 +515,8 @@ namespace DotNetNuke.Entities.Portals
         // better to have it cache the "activeTab" for a short period.
         private static TabInfo GetTab(int tabId, TabCollection tabs)
         {
+			Logger.LogDebug(">>> Entering GetTab(tabId={TabId},tabs={Tabs})", tabId, tabs);
+			Logger.LogDebug("<<< Exiting GetTab(tabId={TabId},tabs={Tabs})", tabId, tabs);
             return tabId != Null.NullInteger && tabs.TryGetValue(tabId, out var tab) && !tab.IsDeleted
                 ? tab.Clone()
                 : null;

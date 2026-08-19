@@ -14,11 +14,15 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
 
     public class DnnModuleAuthorizeAttribute : AuthorizeAttributeBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnModuleAuthorizeAttribute));
         private ModuleInfo module;
 
         public DnnModuleAuthorizeAttribute()
         {
+			Logger.LogDebug(">>> Entering DnnModuleAuthorizeAttribute()");
             this.AccessLevel = SecurityAccessLevel.Host;
+			Logger.LogDebug("DnnModuleAuthorizeAttribute(): this.AccessLevel → {Arg0}", this.AccessLevel);
+			Logger.LogDebug("<<< Exiting DnnModuleAuthorizeAttribute()");
         }
 
         public SecurityAccessLevel AccessLevel { get; set; }
@@ -28,23 +32,30 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
         /// <inheritdoc />
         public override void OnAuthorization(AuthorizationContext filterContext)
         {
+			Logger.LogDebug(">>> Entering OnAuthorization(filterContext={FilterContext})", filterContext);
             var controller = filterContext.Controller as IDnnController;
 
             if (controller == null)
             {
+				Logger.LogWarning("Throwing InvalidOperationException from OnAuthorization(filterContext={FilterContext})", filterContext);
                 throw new InvalidOperationException("This attribute can only be applied to Controllers that implement IDnnController");
             }
 
             this.module = controller.ModuleContext.Configuration;
+			Logger.LogDebug("OnAuthorization(filterContext={FilterContext}): module → {Module}", filterContext, module);
+			Logger.LogDebug("OnAuthorization(filterContext={FilterContext}): this.module → {Arg1}", filterContext, this.module);
 
             base.OnAuthorization(filterContext);
+			Logger.LogDebug("<<< Exiting OnAuthorization(filterContext={FilterContext})", filterContext);
         }
 
         /// <inheritdoc />
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
+			Logger.LogDebug(">>> Entering AuthorizeCore(httpContext={HttpContext})", httpContext);
             if (this.module != null)
             {
+			Logger.LogDebug("<<< Exiting AuthorizeCore(httpContext={HttpContext})", httpContext);
                 return this.HasModuleAccess();
             }
 
@@ -53,6 +64,8 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
 
         protected virtual bool HasModuleAccess()
         {
+			Logger.LogDebug(">>> Entering HasModuleAccess()");
+			Logger.LogDebug("<<< Exiting HasModuleAccess()");
             return ModulePermissionController.HasModuleAccess(this.AccessLevel, this.PermissionKey, this.module);
         }
     }

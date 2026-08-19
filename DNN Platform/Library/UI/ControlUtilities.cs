@@ -10,11 +10,14 @@ namespace DotNetNuke.UI
 
     public class ControlUtilities
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ControlUtilities));
         public static T FindParentControl<T>(Control control)
             where T : Control
         {
+			Logger.LogDebug(">>> Entering FindParentControl(control={Control})", control);
             T parent = default(T);
             if (control.Parent == null)
+			Logger.LogDebug("FindParentControl(control={Control}): parent → {Parent}", control, parent);
             {
                 parent = null;
             }
@@ -31,14 +34,17 @@ namespace DotNetNuke.UI
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FindParentControl(control={Control})", control);
             return parent;
         }
 
         public static T FindControl<T>(Control control, string id, bool recursive)
             where T : Control
         {
+			Logger.LogDebug(">>> Entering FindControl(control={Control},id={Id},recursive={Recursive})", control, id, recursive);
             T target = null;
             if (control.Parent != null)
+			Logger.LogDebug("FindControl(control={Control},id={Id},recursive={Recursive}): target → {Target}", control, id, recursive, target);
             {
                 target = control.Parent.FindControl(id) as T;
 
@@ -48,12 +54,16 @@ namespace DotNetNuke.UI
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FindControl(control={Control},id={Id},recursive={Recursive})", control, id, recursive);
             return target;
         }
 
         public static T FindFirstDescendent<T>(Control control)
             where T : Control
         {
+			Logger.LogDebug(">>> Entering FindFirstDescendent(control={Control})", control);
+			Logger.LogDebug("<<< Exiting FindFirstDescendent(control={Control})", control);
+			Logger.LogDebug("<<< Exiting FindFirstDescendent(control={Control},predicate={Predicate})", control, predicate);
             return FindFirstDescendent<T>(control, idx => idx is T);
         }
 
@@ -68,6 +78,7 @@ namespace DotNetNuke.UI
             foreach (Control childControl in control.Controls)
             {
                 T descendent = FindFirstDescendent<T>(childControl, predicate);
+				Logger.LogDebug("FindFirstDescendent(control={Control},predicate={Predicate}): descendent → {Descendent}", control, predicate, descendent);
                 if (descendent != null)
                 {
                     return descendent;
@@ -86,6 +97,7 @@ namespace DotNetNuke.UI
         public static T LoadControl<T>(TemplateControl containerControl, string controlSrc)
             where T : Control
         {
+			Logger.LogDebug(">>> Entering LoadControl(containerControl={ContainerControl},controlSrc={ControlSrc})", containerControl, controlSrc);
             T ctrl;
 
             // load the control dynamically
@@ -98,9 +110,11 @@ namespace DotNetNuke.UI
             {
                 // load from a typename in an assembly ( ie. server control )
                 Type objType = Reflection.CreateType(controlSrc);
+				Logger.LogDebug("LoadControl(containerControl={ContainerControl},controlSrc={ControlSrc}): objType → {ObjType}", containerControl, controlSrc, objType);
                 ctrl = (T)containerControl.LoadControl(objType, null);
             }
 
+			Logger.LogDebug("<<< Exiting LoadControl(containerControl={ContainerControl},controlSrc={ControlSrc})", containerControl, controlSrc);
             return ctrl;
         }
     }

@@ -1,3 +1,4 @@
+const logger = console;
 (function ($) {
     if (typeof dnn === "undefined" || dnn === null) { dnn = {}; };
     if (dnn.permissionGridManager) return;
@@ -51,12 +52,16 @@
             updateHiddenField();
 
             function updateHiddenField() {
+				logger.debug('>>> Entering updateHiddenField()');
                 var Id = roleSelector.val();
                 roleId.val(Id);
+				logger.debug('<<< Exiting updateHiddenField()');
             }
         }
 
         $(document).ready(function() {
+			logger.debug(`>>> Entering ready(document=${document})`);
+			logger.debug(`<<< Exiting ready(document=${document})`);
             init();
         });
         return this;

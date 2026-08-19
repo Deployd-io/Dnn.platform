@@ -16,13 +16,16 @@ import JustifyFull from "./icons/justifyFull.svg";
 import InsertUnorderedList from "./icons/insertUnorderedList.svg";
 import InsertOrderedList from "./icons/insertOrderedList.svg";
 import "./fullEditor.less";
+const logger = console;
 
 class FullEditor extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
         };
 
+		logger.debug(`constructor(): this.state → ${this.state}`);
         this.editorToolbar = [
             [
                 { name: "undo", icon: Undo, },
@@ -45,36 +48,47 @@ class FullEditor extends Component {
                 { name: "insertOrderedList", icon: InsertOrderedList, }
             ]
         ];
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.editorControl.focus();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     execCommand(button, e) {
+		logger.debug(`>>> Entering execCommand(button=${button},e=${e})`);
         this.editorControl.focus();
         document.execCommand(button, false, null);
         
         e.preventDefault();
+		logger.debug(`<<< Exiting execCommand(button=${button},e=${e})`);
     }
 
     onSave() {
+		logger.debug('>>> Entering onSave()');
         const { props } = this;
 
         if (typeof props.onChange === "function") {
             let content = this.editorControl.innerHTML;
             props.onChange(content);
+			logger.debug('<<< Exiting onSave()');
         }
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const { props } = this;
 
         props.onCancel();
+		logger.debug('<<< Exiting onCancel()');
     }
 
      
     renderToolbar() {
+		logger.debug('>>> Entering renderToolbar()');
+		logger.debug('<<< Exiting renderToolbar()');
         return (
             <div className='fulleditor-controls'>
                 {
@@ -104,7 +118,9 @@ class FullEditor extends Component {
 
      
     renderEditor() {
+		logger.debug('>>> Entering renderEditor()');
         const { props } = this;
+		logger.debug('<<< Exiting renderEditor()');
         return (
             <div className='fulleditor-editor' 
                 contentEditable
@@ -115,6 +131,8 @@ class FullEditor extends Component {
     }
 
     renderButtons() {
+		logger.debug('>>> Entering renderButtons()');
+		logger.debug('<<< Exiting renderButtons()');
         return [
             <Button type="neutral" onClick={this.onCancel.bind(this)} key="first">
                 <TextOverflowWrapper text={resx.get("Cancel") } maxWidth={100} />
@@ -126,6 +144,8 @@ class FullEditor extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className="dnn-language-resource-full-editor">
                 {this.renderToolbar()}

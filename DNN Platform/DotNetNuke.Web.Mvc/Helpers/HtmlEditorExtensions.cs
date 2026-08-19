@@ -12,6 +12,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Represents support for the HTML input element in an application.</summary>
     public static class HtmlEditorExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlEditorExtensions));
         /// <summary>Returns an HTML input element for each property in the object that is represented by the expression.</summary>
         ///
         /// <returns>
@@ -20,6 +21,13 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the properties to display.</param>
         public static MvcHtmlString Editor(this DnnHtmlHelper html, string expression)
         {
+			Logger.LogDebug(">>> Entering Editor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting Editor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting Editor(html={Html},expression={Expression},additionalViewData={AdditionalViewData})", html, expression, additionalViewData);
+			Logger.LogDebug("<<< Exiting Editor(html={Html},expression={Expression},templateName={TemplateName})", html, expression, templateName);
+			Logger.LogDebug("<<< Exiting Editor(html={Html},expression={Expression},templateName={TemplateName},additionalViewData={AdditionalViewData})", html, expression, templateName, additionalViewData);
+			Logger.LogDebug("<<< Exiting Editor(html={Html},expression={Expression},templateName={TemplateName},htmlFieldName={HtmlFieldName})", html, expression, templateName, htmlFieldName);
+			Logger.LogDebug("<<< Exiting Editor(html={Html},expression={Expression},templateName={TemplateName},htmlFieldName={HtmlFieldName},additionalViewData={AdditionalViewData})", html, expression, templateName, htmlFieldName, additionalViewData);
             return html.HtmlHelper.Editor(expression);
         }
 
@@ -86,6 +94,13 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the properties to display.</param><typeparam name="TModel">The type of the model.</typeparam><typeparam name="TValue">The type of the value.</typeparam>
         public static MvcHtmlString EditorFor<TModel, TValue>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TValue>> expression)
         {
+			Logger.LogDebug(">>> Entering EditorFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting EditorFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting EditorFor(html={Html},expression={Expression},additionalViewData={AdditionalViewData})", html, expression, additionalViewData);
+			Logger.LogDebug("<<< Exiting EditorFor(html={Html},expression={Expression},templateName={TemplateName})", html, expression, templateName);
+			Logger.LogDebug("<<< Exiting EditorFor(html={Html},expression={Expression},templateName={TemplateName},additionalViewData={AdditionalViewData})", html, expression, templateName, additionalViewData);
+			Logger.LogDebug("<<< Exiting EditorFor(html={Html},expression={Expression},templateName={TemplateName},htmlFieldName={HtmlFieldName})", html, expression, templateName, htmlFieldName);
+			Logger.LogDebug("<<< Exiting EditorFor(html={Html},expression={Expression},templateName={TemplateName},htmlFieldName={HtmlFieldName},additionalViewData={AdditionalViewData})", html, expression, templateName, htmlFieldName, additionalViewData);
             return html.HtmlHelper.EditorFor(expression);
         }
 
@@ -152,6 +167,13 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param>
         public static MvcHtmlString EditorForModel(this DnnHtmlHelper html)
         {
+			Logger.LogDebug(">>> Entering EditorForModel(html={Html})", html);
+			Logger.LogDebug("<<< Exiting EditorForModel(html={Html})", html);
+			Logger.LogDebug("<<< Exiting EditorForModel(html={Html},additionalViewData={AdditionalViewData})", html, additionalViewData);
+			Logger.LogDebug("<<< Exiting EditorForModel(html={Html},templateName={TemplateName})", html, templateName);
+			Logger.LogDebug("<<< Exiting EditorForModel(html={Html},templateName={TemplateName},additionalViewData={AdditionalViewData})", html, templateName, additionalViewData);
+			Logger.LogDebug("<<< Exiting EditorForModel(html={Html},templateName={TemplateName},htmlFieldName={HtmlFieldName})", html, templateName, htmlFieldName);
+			Logger.LogDebug("<<< Exiting EditorForModel(html={Html},templateName={TemplateName},htmlFieldName={HtmlFieldName},additionalViewData={AdditionalViewData})", html, templateName, htmlFieldName, additionalViewData);
             return html.HtmlHelper.EditorForModel();
         }
 

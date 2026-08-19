@@ -8,6 +8,7 @@ using DotNetNuke.Collections;
 using DotNetNuke.Security;
 using DotNetNuke.Web.Mvc.Framework.ActionFilters;
 using DotNetNuke.Web.Mvc.Framework.Controllers;
+using Microsoft.Extensions.Logging;
 
 namespace Dnn.ContactList.Mvc.Controllers
 {
@@ -18,6 +19,7 @@ namespace Dnn.ContactList.Mvc.Controllers
     [DnnHandleError]
     public class SettingsController : DnnController
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// The Index action renders the default Settings View
         /// </summary>
@@ -25,9 +27,13 @@ namespace Dnn.ContactList.Mvc.Controllers
         [HttpGet]
         public ActionResult Index()
         {
+			_logger.LogDebug(">>> Entering Index()");
             var settings = new Settings();
             settings.PageSize = ModuleContext.Configuration.ModuleSettings.GetValueOrDefault("PageSize", 9);
+			_logger.LogDebug("Index(): settings → {Settings}", settings);
             settings.AllowContactCreation = ModuleContext.Configuration.ModuleSettings.GetValueOrDefault("AllowContactCreation", false);
+			_logger.LogDebug("<<< Exiting Index()");
+			_logger.LogDebug("<<< Exiting Index(settings={Settings})", settings);
             return View(settings);
         }
 

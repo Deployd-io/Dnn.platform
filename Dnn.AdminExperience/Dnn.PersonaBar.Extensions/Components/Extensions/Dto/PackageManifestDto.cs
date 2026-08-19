@@ -14,6 +14,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
         /// <summary>Initializes a new instance of the <see cref="PackageManifestDto"/> class.</summary>
         public PackageManifestDto()
         {
+		eventLogger.LogDebug(">>> Entering PackageManifestDto()");
+		eventLogger.LogDebug("<<< Exiting PackageManifestDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PackageManifestDto"/> class.</summary>

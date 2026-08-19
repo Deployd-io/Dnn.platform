@@ -10,23 +10,29 @@ import {
 import util from "../../../utils";
 import CheckmarkIcon from "./../../svg/checkmark.svg";
 import HistoryIcon from "./../../svg/history.svg";
+const logger = console;
 
 class SchedulerRow extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             panelOpened: -1
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     toggle(index) {
+		logger.debug(`>>> Entering toggle(index=${index})`);
         const { props } = this;
         if (props.settingsClientModified) {
             util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
@@ -36,10 +42,12 @@ class SchedulerRow extends Component {
         }
         else {
             this.toggleInternal(index);
+			logger.debug(`<<< Exiting toggle(index=${index})`);
         }
     }
 
     toggleInternal(index) {
+		logger.debug(`>>> Entering toggleInternal(index=${index})`);
         if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
             if (this.state.panelOpened !== index) {
                 this.setState({
@@ -56,11 +64,13 @@ class SchedulerRow extends Component {
                 panelOpened: index
             });
             this.props.OpenCollapse(this.props.id, index);
+			logger.debug(`<<< Exiting toggleInternal(index=${index})`);
         }
     }
 
 
     getEnabledDisplay() {
+		logger.debug('>>> Entering getEnabledDisplay()');
         if (this.props.id !== "add") {
             if (this.props.enabled) {
                 return <div className="checkMarkIcon"><CheckmarkIcon /></div>;
@@ -68,13 +78,16 @@ class SchedulerRow extends Component {
             else return <span>&nbsp; </span>;
         }
         else return <span>-</span>;
+		logger.debug('<<< Exiting getEnabledDisplay()');
     }
 
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={"collapsible-component-scheduler" + (opened ? " row-opened" : "")}>
                 <div className={"collapsible-header-scheduler " + !opened} >
@@ -128,6 +141,8 @@ SchedulerRow.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         scheduleItemDetail: state.task.scheduleItemDetail,
         settingsClientModified: state.task.settingsClientModified

@@ -3,12 +3,16 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import Localization from "localization";
 import itemsToExportService from "../../services/itemsToExportService";
+const logger = console;
 import { GridCell, Label, Switch } from "@dnnsoftware/dnn-react-common";
 
 class ImportSummary extends Component {
     getSummaryItem(category) {
+		logger.debug(`>>> Entering getSummaryItem(category=${category})`);
         const { props } = this;
         let detail = props.importSummary.SummaryItems.find(c => c.Category.toUpperCase() === category.toUpperCase());
+		logger.debug(`getSummaryItem(category=${category}): detail → ${detail}`);
+		logger.debug(`<<< Exiting getSummaryItem(category=${category})`);
         return detail ? detail.TotalItemsString : "-";
     }
 
@@ -17,8 +21,10 @@ class ImportSummary extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
         const registeredItemsToExport = itemsToExportService.getRegisteredItemsToExport();
+		logger.debug('<<< Exiting render()');
         return (
             <div style={{ float: "left", width: "100%" }}>
                 {props.importSummary && props.selectedPackage &&
@@ -205,6 +211,8 @@ ImportSummary.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         selectedPackage: state.importExport.selectedPackage,
         importSummary: state.importExport.importSummary,

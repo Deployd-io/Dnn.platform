@@ -16,9 +16,11 @@ namespace DotNetNuke.Modules.Admin.Users
     /// <summary>A settings control for the profile module.</summary>
     public partial class ViewProfileSettings : ModuleSettingsBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Settings.ascx));
         /// <inheritdoc />
         public override void LoadSettings()
         {
+			Logger.LogDebug(">>> Entering LoadSettings()");
             try
             {
                 ClientAPI.AddButtonConfirm(this.cmdLoadDefault, Localization.GetString("LoadDefault.Confirm", this.LocalResourceFile));
@@ -39,14 +41,17 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in LoadSettings(): {Arg0}", exc.getMessage());
                 // Module failed to load
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting LoadSettings()");
         }
 
         /// <inheritdoc />
         public override void UpdateSettings()
         {
+			Logger.LogDebug(">>> Entering UpdateSettings()");
             try
             {
                 ModuleController.Instance.UpdateTabModuleSetting(this.TabModuleId, "ProfileTemplate", this.txtTemplate.Text);
@@ -54,16 +59,20 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in UpdateSettings(): {Arg0}", exc.getMessage());
                 // Module failed to load
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting UpdateSettings()");
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             this.cmdLoadDefault.Click += this.cmdLoadDefault_Click;
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -71,7 +80,9 @@ namespace DotNetNuke.Modules.Admin.Users
         // ReSharper disable once InconsistentNaming
         protected void cmdLoadDefault_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering cmdLoadDefault_Click(sender={Sender},e={E})", sender, e);
             this.txtTemplate.Text = Localization.GetString("DefaultTemplate", this.LocalResourceFile);
+			Logger.LogDebug("<<< Exiting cmdLoadDefault_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

@@ -82,6 +82,9 @@ namespace log4net.Appender
         /// </remarks>
         protected BufferingAppenderSkeleton() : this(true)
         {
+		value.LogDebug(">>> Entering BufferingAppenderSkeleton()");
+		value.LogDebug("<<< Exiting BufferingAppenderSkeleton()");
+		value.LogDebug(">>> Entering BufferingAppenderSkeleton(eventMustBeFixed={EventMustBeFixed})", eventMustBeFixed);
         }
 
         /// <summary>
@@ -102,6 +105,7 @@ namespace log4net.Appender
         protected BufferingAppenderSkeleton(bool eventMustBeFixed) : base()
         {
             this.m_eventMustBeFixed = eventMustBeFixed;
+			value.LogDebug("<<< Exiting BufferingAppenderSkeleton(eventMustBeFixed={EventMustBeFixed})", eventMustBeFixed);
         }
 
         /// <summary>
@@ -260,7 +264,10 @@ namespace log4net.Appender
         /// <returns><c>True</c> if all logging events were flushed successfully, else <c>false</c>.</returns>
         public override bool Flush(int millisecondsTimeout)
         {
+			value.LogDebug(">>> Entering Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
             this.Flush();
+			value.LogDebug("<<< Exiting Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
+			value.LogDebug("<<< Exiting Flush()");
             return true;
         }
 
@@ -370,6 +377,7 @@ namespace log4net.Appender
         /// </remarks>
         public override void ActivateOptions() 
         {
+			value.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
 
             // If the appender is in Lossy mode then we will
@@ -383,11 +391,14 @@ namespace log4net.Appender
             if (this.m_bufferSize > 1)
             {
                 this.m_cb = new CyclicBuffer(this.m_bufferSize);
+				value.LogDebug("ActivateOptions(): m_cb → {M_cb}", m_cb);
             }
             else
             {
                 this.m_cb = null;
             }
+			value.LogDebug("ActivateOptions(): this.m_cb → {Arg0}", this.m_cb);
+			value.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>
@@ -402,8 +413,10 @@ namespace log4net.Appender
         /// </remarks>
         protected override void OnClose() 
         {
+			value.LogDebug(">>> Entering OnClose()");
             // Flush the buffer on close
             this.Flush(true);
+			value.LogDebug("<<< Exiting OnClose()");
         }
 
         /// <summary>
@@ -438,6 +451,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			value.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             // If the buffer size is set to 1 or less then the buffer will be
             // sent immediately because there is not enough space in the buffer
             // to buffer up more than 1 event. Therefore as a special case
@@ -453,6 +467,7 @@ namespace log4net.Appender
                     {
                         // Derive class expects fixed events
                         loggingEvent.Fix = this.Fix;
+						value.LogDebug("Append(loggingEvent={LoggingEvent}): loggingEvent.Fix → {Arg1}", loggingEvent, loggingEvent.Fix);
                     }
 
                     // Not buffering events, send immediately
@@ -468,6 +483,7 @@ namespace log4net.Appender
 
                 // Add to the buffer, returns the event discarded from the buffer if there is no space remaining after the append
                 LoggingEvent discardedLoggingEvent = this.m_cb.Append(loggingEvent);
+				value.LogDebug("Append(loggingEvent={LoggingEvent}): discardedLoggingEvent → {DiscardedLoggingEvent}", loggingEvent, discardedLoggingEvent);
 
                 if (discardedLoggingEvent != null)
                 {
@@ -509,6 +525,7 @@ namespace log4net.Appender
                     }
                 }
             }
+			value.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>
@@ -523,6 +540,7 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void SendFromBuffer(LoggingEvent firstLoggingEvent, CyclicBuffer buffer)
         {
+			value.LogDebug(">>> Entering SendFromBuffer(firstLoggingEvent={FirstLoggingEvent},buffer={Buffer})", firstLoggingEvent, buffer);
             LoggingEvent[] bufferEvents = buffer.PopAll();
 
             if (firstLoggingEvent == null)
@@ -542,6 +560,7 @@ namespace log4net.Appender
 
                 this.SendBuffer(events);
             }
+			value.LogDebug("<<< Exiting SendFromBuffer(firstLoggingEvent={FirstLoggingEvent},buffer={Buffer})", firstLoggingEvent, buffer);
         }
 
         /// <summary>

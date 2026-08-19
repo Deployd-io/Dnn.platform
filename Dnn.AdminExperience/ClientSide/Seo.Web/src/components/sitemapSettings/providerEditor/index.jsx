@@ -3,18 +3,22 @@ import PropTypes from "prop-types";
 import { GridSystem as Grid, Label, InputGroup, Button, Switch, Dropdown } from "@dnnsoftware/dnn-react-common";
 import resx from "../../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let priorityOptions = [];
 
 class ProviderEditor extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             settings: {}
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
 
         priorityOptions = [];
@@ -29,6 +33,7 @@ class ProviderEditor extends Component {
         priorityOptions.push({ "value": 0.3, "label": "0.3" });
         priorityOptions.push({ "value": 0.2, "label": "0.2" });
         priorityOptions.push({ "value": 0.1, "label": "0.1" });
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
         priorityOptions.push({ "value": 0, "label": "0" });
 
         this.setState({
@@ -37,6 +42,7 @@ class ProviderEditor extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {settings} = this.state;
 
         if (key === "Priority") {
@@ -50,6 +56,7 @@ class ProviderEditor extends Component {
         }
         else {
             settings[key] = typeof (event) === "object" ? event.target.value : event;
+			logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
         }
 
         this.setState({
@@ -58,13 +65,16 @@ class ProviderEditor extends Component {
     }
 
     onUpdateItem(event) {
+		logger.debug(`>>> Entering onUpdateItem(event=${event})`);
         event.preventDefault();
         const {state} = this;
         this.props.onUpdate(state.settings);
+		logger.debug(`<<< Exiting onUpdateItem(event=${event})`);
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {state} = this;
         if (state.settings) {
             const columnOne = <div className="left-column">
@@ -98,6 +108,7 @@ class ProviderEditor extends Component {
             </div>;
 
              
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.providerSettingEditor}>
                     <div style={{ height: "15px" }} />
