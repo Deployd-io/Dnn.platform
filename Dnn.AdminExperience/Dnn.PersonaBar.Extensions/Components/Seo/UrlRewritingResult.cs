@@ -12,12 +12,17 @@ namespace Dnn.PersonaBar.Seo.Components
     {
         public UrlRewritingResult()
         {
+			eventLogger.LogDebug(">>> Entering UrlRewritingResult()");
             var noneText = Localization.GetString("None", Localization.GlobalResourceFile);
             this.RewritingResult = noneText;
+			eventLogger.LogDebug("UrlRewritingResult(): this.RewritingResult → {Arg0}", this.RewritingResult);
             this.Culture = noneText;
             this.IdentifiedPage = noneText;
+			eventLogger.LogDebug("UrlRewritingResult(): this.Culture → {Arg0}", this.Culture);
+			eventLogger.LogDebug("UrlRewritingResult(): this.IdentifiedPage → {Arg0}", this.IdentifiedPage);
             this.RedirectionResult = noneText;
             this.OperationMessages = noneText;
+			eventLogger.LogDebug("<<< Exiting UrlRewritingResult()");
         }
 
         [JsonProperty("rewritingResult")]

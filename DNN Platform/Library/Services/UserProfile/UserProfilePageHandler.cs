@@ -30,8 +30,11 @@ namespace DotNetNuke.Services.UserProfile
         /// <param name="context">System.Web.HttpContext.</param>
         public void ProcessRequest(HttpContext context)
         {
+			Logger.LogDebug(">>> Entering ProcessRequest(context={Context})", context);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             int userId = Null.NullInteger;
+			Logger.LogDebug("ProcessRequest(context={Context}): userId → {UserId}", context, userId);
+			Logger.LogDebug("ProcessRequest(context={Context}): portalSettings → {PortalSettings}", context, portalSettings);
             int portalId = portalSettings.PortalId;
 
             try
@@ -94,12 +97,16 @@ namespace DotNetNuke.Services.UserProfile
 
             // Redirect to Userprofile Page
             context.Response.Redirect(Globals.UserProfileURL(userId), true);
+			Logger.LogDebug("<<< Exiting ProcessRequest(context={Context})", context);
         }
 
         private static int GetUserId(string username, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetUserId(username={Username},portalId={PortalId})", username, portalId);
             int userId = Null.NullInteger;
             UserInfo userInfo = UserController.GetUserByName(portalId, username);
+			Logger.LogDebug("GetUserId(username={Username},portalId={PortalId}): userInfo → {UserInfo}", username, portalId, userInfo);
+			Logger.LogDebug("GetUserId(username={Username},portalId={PortalId}): userId → {UserId}", username, portalId, userId);
             if (userInfo != null)
             {
                 userId = userInfo.UserID;
@@ -110,6 +117,7 @@ namespace DotNetNuke.Services.UserProfile
                 Exceptions.Exceptions.ProcessHttpException();
             }
 
+			Logger.LogDebug("<<< Exiting GetUserId(username={Username},portalId={PortalId})", username, portalId);
             return userId;
         }
     }

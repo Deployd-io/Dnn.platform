@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The SkinInstaller installs Skin Components to a DotNetNuke site.</summary>
     public class SkinInstaller : FileInstaller
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinInstaller));
         private static readonly string[] MessageSeparator = ["<br />",];
         private readonly ArrayList skinFiles = new ArrayList();
 
@@ -133,11 +134,14 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <summary>The Install method installs the skin component.</summary>
         public override void Install()
         {
+			Logger.LogDebug(">>> Entering Install()");
             bool bAdd = Null.NullBoolean;
             try
+			Logger.LogDebug("Install(): bAdd → {BAdd}", bAdd);
             {
                 // Attempt to get the Skin Package
                 this.tempSkinPackage = SkinController.GetSkinPackage(this.skinPackage.PortalID, this.skinPackage.SkinName, this.SkinType);
+				Logger.LogDebug("Install(): tempSkinPackage → {TempSkinPackage}", tempSkinPackage);
                 if (this.tempSkinPackage == null)
                 {
                     bAdd = true;
@@ -149,6 +153,7 @@ namespace DotNetNuke.Services.Installer.Installers
                     if (this.tempSkinPackage.PackageID != this.Package.PackageID)
                     {
                         this.Completed = false;
+						Logger.LogDebug("Install(): this.Completed → {Arg0}", this.Completed);
                         this.Log.AddFailure(Util.SKIN_Installed);
                         return;
                     }
@@ -181,12 +186,14 @@ namespace DotNetNuke.Services.Installer.Installers
                     this.Log.StartJob(Util.SKIN_BeginProcessing);
                     string strMessage = Null.NullString;
                     var newSkin = new SkinFileProcessor(this.RootPath, this.SkinRoot, this.skinPackage.SkinName);
+					Logger.LogDebug("Install(): newSkin → {NewSkin}", newSkin);
                     foreach (string skinFile in this.SkinFiles)
                     {
                         strMessage += newSkin.ProcessFile(skinFile, SkinParser.Portable);
                         var skinSrc = skinFile.Replace($@"{Globals.HostMapPath}\", "[G]");
                         switch (Path.GetExtension(skinFile))
                         {
+							Logger.LogDebug("Install(): skinSrc → {SkinSrc}", skinSrc);
                             case ".htm":
                                 SkinController.AddSkin(this.skinPackage.SkinPackageID, skinSrc.Replace("htm", "ascx"));
                                 break;
@@ -200,6 +207,7 @@ namespace DotNetNuke.Services.Installer.Installers
                     }
 
                     Array arrMessage = strMessage.Split(MessageSeparator, StringSplitOptions.None);
+					Logger.LogDebug("Install(): arrMessage → {ArrMessage}", arrMessage);
                     foreach (string strRow in arrMessage)
                     {
                         this.Log.AddInfo(HtmlUtils.StripTags(strRow, true));
@@ -222,6 +230,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// </summary>
         public override void Rollback()
         {
+			Logger.LogDebug(">>> Entering Rollback()");
             // If Temp Skin exists then we need to update the DataStore with this
             if (this.tempSkinPackage == null)
             {
@@ -236,15 +245,18 @@ namespace DotNetNuke.Services.Installer.Installers
 
             // Call base class to prcoess files
             base.Rollback();
+			Logger.LogDebug("<<< Exiting Rollback()");
         }
 
         /// <summary>The UnInstall method uninstalls the skin component.</summary>
         public override void UnInstall()
         {
+			Logger.LogDebug(">>> Entering UnInstall()");
             this.DeleteSkinPackage();
 
             // Call base class to prcoess files
             base.UnInstall();
+			Logger.LogDebug("<<< Exiting UnInstall()");
         }
 
         /// <summary>The ProcessFile method determines what to do with parsed "file" node.</summary>
@@ -252,6 +264,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <param name="nav">The XPathNavigator representing the node.</param>
         protected override void ProcessFile(InstallFile file, XPathNavigator nav)
         {
+			Logger.LogDebug(">>> Entering ProcessFile(file={File},nav={Nav})", file, nav);
             switch (file.Extension)
             {
                 case "htm":
@@ -268,26 +281,31 @@ namespace DotNetNuke.Services.Installer.Installers
 
             // Call base method to set up for file processing
             base.ProcessFile(file, nav);
+			Logger.LogDebug("<<< Exiting ProcessFile(file={File},nav={Nav})", file, nav);
         }
 
         /// <summary>The ReadCustomManifest method reads the custom manifest items.</summary>
         /// <param name="nav">The XPathNavigator representing the node.</param>
         protected override void ReadCustomManifest(XPathNavigator nav)
         {
+			Logger.LogDebug(">>> Entering ReadCustomManifest(nav={Nav})", nav);
             this.skinPackage = new SkinPackageInfo();
             this.skinPackage.PortalID = this.Package.PortalID;
+			Logger.LogDebug("ReadCustomManifest(nav={Nav}): skinPackage → {SkinPackage}", nav, skinPackage);
 
             // Get the Skin name
             this.skinPackage.SkinName = Util.ReadElement(nav, this.SkinNameNodeName);
 
             // Call base class
             base.ReadCustomManifest(nav);
+			Logger.LogDebug("<<< Exiting ReadCustomManifest(nav={Nav})", nav);
         }
 
         /// <summary>The UnInstallFile method unInstalls a single file.</summary>
         /// <param name="unInstallFile">The InstallFile to unInstall.</param>
         protected override void UnInstallFile(InstallFile unInstallFile)
         {
+			Logger.LogDebug(">>> Entering UnInstallFile(unInstallFile={UnInstallFile})", unInstallFile);
             // Uninstall file
             base.UnInstallFile(unInstallFile);
 
@@ -295,9 +313,11 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 // Try to remove "processed file"
                 string fileName = unInstallFile.FullName;
+				Logger.LogDebug("UnInstallFile(unInstallFile={UnInstallFile}): fileName → {FileName}", unInstallFile, fileName);
                 fileName = fileName.Replace(Path.GetExtension(fileName), ".ascx");
                 Util.DeleteFile(fileName, this.PhysicalBasePath, this.Log);
             }
+			Logger.LogDebug("<<< Exiting UnInstallFile(unInstallFile={UnInstallFile})", unInstallFile);
         }
 
         /// <summary>
@@ -306,10 +326,12 @@ namespace DotNetNuke.Services.Installer.Installers
         /// </summary>
         private void DeleteSkinPackage()
         {
+			Logger.LogDebug(">>> Entering DeleteSkinPackage()");
             try
             {
                 // Attempt to get the Authentication Service
                 SkinPackageInfo skinPackage = SkinController.GetSkinByPackageID(this.Package.PackageID);
+				Logger.LogDebug("DeleteSkinPackage(): skinPackage → {SkinPackage}", skinPackage);
                 if (skinPackage != null)
                 {
                     SkinController.DeleteSkinPackage(skinPackage);
@@ -321,6 +343,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 this.Log.AddFailure(ex);
             }
+			Logger.LogDebug("<<< Exiting DeleteSkinPackage()");
         }
     }
 }

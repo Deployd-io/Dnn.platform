@@ -4,18 +4,22 @@ import { DropdownWithError, SingleLineInputWithError, Button, GridCell } from "@
 import Collapsible from "react-collapse";
 import Localization from "localization";
 import styles from "./style.module.less";
+const logger = console;
 
 class FolderDropdown extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             addNewFolderOpen: false,
             newFolderValue: "",
             triedToSave: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     onOwnerFolderSelect(option) {
+		logger.debug(`>>> Entering onOwnerFolderSelect(option=${option})`);
         const { props } = this;
         if (option && option.value === "AddNewFolder") {
             this.setState({
@@ -23,17 +27,21 @@ class FolderDropdown extends Component {
             });
         } else {
             props.onFolderSelect(option);
+			logger.debug(`<<< Exiting onOwnerFolderSelect(option=${option})`);
         }
     }
 
     closeAddNewFolderBox() {
+		logger.debug('>>> Entering closeAddNewFolderBox()');
         this.setState({
             addNewFolderOpen: false,
             newFolderValue: ""
         });
+		logger.debug('<<< Exiting closeAddNewFolderBox()');
     }
 
     onAddNewFolder() {
+		logger.debug('>>> Entering onAddNewFolder()');
         const { props, state } = this;
         if (this.state.newFolderValue === "") {
             this.setState({
@@ -42,16 +50,20 @@ class FolderDropdown extends Component {
             return;
         }
         props.onAddNewFolder(state.newFolderValue, props.type, this.closeAddNewFolderBox.bind(this));
+		logger.debug('<<< Exiting onAddNewFolder()');
     }
 
     onFolderNameChange(event) {
+		logger.debug(`>>> Entering onFolderNameChange(event=${event})`);
         this.setState({
             newFolderValue: event.target.value,
             triedToSave: false
         });
+		logger.debug(`<<< Exiting onFolderNameChange(event=${event})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props, state } = this;
         const folders = [
             {
@@ -63,6 +75,7 @@ class FolderDropdown extends Component {
                 value: ""
             }
         ].concat(props.folders);
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.folderDropdown} style={{ padding: 0 }}>
                 <Collapsible 

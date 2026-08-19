@@ -8,6 +8,7 @@ namespace DotNetNuke.Services.Journal
 
     public class ItemData : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ItemData));
         /// <inheritdoc />
         public CacheLevel Cacheability
         {
@@ -28,6 +29,7 @@ namespace DotNetNuke.Services.Journal
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, System.Globalization.CultureInfo formatProvider, Entities.Users.UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             string outputFormat = string.Empty;
             if (format == string.Empty)
             {
@@ -39,6 +41,7 @@ namespace DotNetNuke.Services.Journal
             }
 
             propertyName = propertyName.ToLowerInvariant();
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): propertyName → {PropertyName1}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, propertyName);
             switch (propertyName)
             {
                 case "url":
@@ -52,6 +55,7 @@ namespace DotNetNuke.Services.Journal
             }
 
             propertyNotFound = true;
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return string.Empty;
         }
     }

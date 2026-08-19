@@ -34,17 +34,24 @@ namespace Dnn.PersonaBar.TaskScheduler.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.Enabled = this.GetFlagValue<bool?>(FlagEnabled, "Enabled", null, false, true);
             this.TaskName = this.GetFlagValue(FlagName, "Task Name", string.Empty, false, !this.Enabled.HasValue);
+			eventLogger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogDebug(">>> Entering Run()");
             var controller = new TaskSchedulerController();
             var tasks = new List<TaskModelBase>();
+			eventLogger.LogDebug("Run(): tasks → {Tasks}", tasks);
             var schedulerItems = controller.GetScheduleItems(this.Enabled, string.Empty, this.TaskName?.Replace("*", string.Empty));
+			eventLogger.LogDebug("Run(): schedulerItems → {SchedulerItems}", schedulerItems);
+			eventLogger.LogDebug("Run(): controller → {Controller}", controller);
             tasks.AddRange(schedulerItems.Select(x => new TaskModelBase(x)));
+			eventLogger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel(string.Format(CultureInfo.InvariantCulture, this.LocalizeString("Prompt_TasksFound"), tasks.Count))
             {
                 Data = tasks,

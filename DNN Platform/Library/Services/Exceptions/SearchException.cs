@@ -8,9 +8,12 @@ namespace DotNetNuke.Services.Exceptions
     /// <summary>An exception related to search indexing.</summary>
     public class SearchException : BasePortalException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchException));
         /// <summary>Initializes a new instance of the <see cref="SearchException"/> class.</summary>
         public SearchException()
         {
+		Logger.LogDebug(">>> Entering SearchException()");
+		Logger.LogDebug("<<< Exiting SearchException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="SearchException"/> class.</summary>

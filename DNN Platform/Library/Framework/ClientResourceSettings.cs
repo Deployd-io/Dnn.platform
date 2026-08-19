@@ -11,6 +11,7 @@ namespace DotNetNuke.Framework
     /// <inheritdoc />
     internal class ClientResourceSettings : IClientResourceSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ClientResourceSettings));
         private readonly IHostSettings hostSettings;
         private readonly IPortalController portalController;
 
@@ -21,8 +22,12 @@ namespace DotNetNuke.Framework
         /// <param name="portalController">The portal controller to be used.</param>
         public ClientResourceSettings(IHostSettings hostSettings, IPortalController portalController)
         {
+			Logger.LogDebug(">>> Entering ClientResourceSettings(hostSettings={HostSettings},portalController={PortalController})", hostSettings, portalController);
             this.hostSettings = hostSettings;
             this.portalController = portalController;
+			Logger.LogDebug("ClientResourceSettings(hostSettings={HostSettings},portalController={PortalController}): this.hostSettings → {Arg2}", hostSettings, portalController, this.hostSettings);
+			Logger.LogDebug("ClientResourceSettings(hostSettings={HostSettings},portalController={PortalController}): portalController → {PortalController1}", hostSettings, portalController, portalController);
+			Logger.LogDebug("<<< Exiting ClientResourceSettings(hostSettings={HostSettings},portalController={PortalController})", hostSettings, portalController);
         }
 
         /// <inheritdoc />

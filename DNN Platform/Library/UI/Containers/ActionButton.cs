@@ -15,6 +15,7 @@ namespace DotNetNuke.UI.Containers
     [DnnDeprecated(7, 0, 0, "This class has been deprecated in favour of the new ActionCommandButton and ActionButtonList", RemovalVersion = 11)]
     public partial class ActionButton : ActionBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ActionButton));
         private ActionButtonList buttonList;
 
         /// <summary>  Gets or sets the Command Name.</summary>
@@ -140,18 +141,23 @@ namespace DotNetNuke.UI.Containers
         /// <summary>  CreateChildControls builds the control tree.</summary>
         protected override void CreateChildControls()
         {
+			Logger.LogDebug(">>> Entering CreateChildControls()");
             base.CreateChildControls();
 
             this.buttonList = new ActionButtonList();
+			Logger.LogDebug("CreateChildControls(): buttonList → {ButtonList}", buttonList);
             this.buttonList.Action += this.Action_Click;
 
             this.Controls.Add(this.buttonList);
+			Logger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <summary>  Action_Click responds to an Action Event in the contained actionButtonList.</summary>
         private void Action_Click(object sender, ActionEventArgs e)
         {
+			Logger.LogDebug(">>> Entering Action_Click(sender={Sender},e={E})", sender, e);
             this.ProcessAction(e.Action.ID.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting Action_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

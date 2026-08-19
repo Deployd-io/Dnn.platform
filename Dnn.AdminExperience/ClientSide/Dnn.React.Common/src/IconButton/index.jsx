@@ -23,13 +23,17 @@ import {
 } from "../SvgIcons";
 
 import "./style.less";
+const logger = console;
 
 export default class IconButton extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     getIcon() {
+		logger.debug('>>> Entering getIcon()');
         const {props} = this;
 
         if (props.customIcon) {
@@ -76,22 +80,27 @@ export default class IconButton extends Component {
             case "checkbox":
                 return CheckboxIcon;
             default:
+				logger.debug('<<< Exiting getIcon()');
                 return null;
         }
     }
 
     getClassName() {
+		logger.debug('>>> Entering getClassName()');
         const {props} = this;
 
         let name = "icon-button";
+		logger.debug(`getClassName(): name → ${name}`);
         if (props.className) {
             name += " " + props.className;
         }
 
+		logger.debug('<<< Exiting getClassName()');
         return name;
     }
 
     getStyle() {
+		logger.debug('>>> Entering getStyle()');
         const {props} = this;
 
         let style = {};
@@ -102,24 +111,30 @@ export default class IconButton extends Component {
             style["height"] = props.height + "px";
         }
 
+		logger.debug('<<< Exiting getStyle()');
         return style;
     }
 
     onClick(event) {
+		logger.debug(`>>> Entering onClick(event=${event})`);
         const {props} = this;
 
         event.preventDefault();
 
         props.onClick(event);
+		logger.debug(`<<< Exiting onClick(event=${event})`);
     }
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const Icon = this.getIcon();
+		logger.debug(`render(): Icon → ${Icon}`);
 
         if (typeof props.onClick === "function") {
             return <a href="#" className={this.getClassName()} style={this.getStyle()} onClick={this.onClick.bind(this)} aria-label={props.type}><Icon /></a>;
         } else {
+			logger.debug('<<< Exiting render()');
             return <span className="icon-flat" style={this.getStyle()}><Icon /></span>;
         }
     }

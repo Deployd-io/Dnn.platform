@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Dropdown from "./index";
+const logger = console;
 
 export default {
     component: Dropdown,
@@ -8,7 +9,10 @@ export default {
 class MyDropdown extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = { option: {} };
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug('<<< Exiting constructor()');
     }
 
     handleSelect(option) {
@@ -16,6 +20,8 @@ class MyDropdown extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <Dropdown
                 label="Test"

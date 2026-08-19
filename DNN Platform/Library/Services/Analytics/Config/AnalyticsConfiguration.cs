@@ -54,13 +54,16 @@ namespace DotNetNuke.Services.Analytics.Config
 
         public static AnalyticsConfiguration GetConfig(string analyticsEngineName)
         {
+			Logger.LogDebug(">>> Entering GetConfig(analyticsEngineName={AnalyticsEngineName})", analyticsEngineName);
             string cacheKey = analyticsEngineName + "." + PortalSettings.Current.PortalId;
 
             var config = new AnalyticsConfiguration();
+			Logger.LogDebug("GetConfig(analyticsEngineName={AnalyticsEngineName}): config → {Config}", analyticsEngineName, config);
             config.Rules = new AnalyticsRuleCollection();
             config.Settings = new AnalyticsSettingCollection();
 
             string filePath = string.Empty;
+			Logger.LogDebug("GetConfig(analyticsEngineName={AnalyticsEngineName}): filePath → {FilePath}", analyticsEngineName, filePath);
             try
             {
                 config = (AnalyticsConfiguration)DataCache.GetCache(cacheKey);
@@ -80,15 +83,18 @@ namespace DotNetNuke.Services.Analytics.Config
                     {
                         doc = new XPathDocument(xmlReader);
                     }
+					Logger.LogDebug("GetConfig(analyticsEngineName={AnalyticsEngineName}): doc → {Doc}", analyticsEngineName, doc);
 
                     config = new AnalyticsConfiguration();
                     config.Rules = new AnalyticsRuleCollection();
                     config.Settings = new AnalyticsSettingCollection();
 
                     var allSettings = new Hashtable();
+					Logger.LogDebug("GetConfig(analyticsEngineName={AnalyticsEngineName}): allSettings → {AllSettings}", analyticsEngineName, allSettings);
                     foreach (XPathNavigator nav in doc.CreateNavigator().Select("AnalyticsConfig/Settings/AnalyticsSetting"))
                     {
                         var setting = new AnalyticsSetting();
+						Logger.LogDebug("GetConfig(analyticsEngineName={AnalyticsEngineName}): setting → {Setting}", analyticsEngineName, setting);
                         setting.SettingName = nav.SelectSingleNode("SettingName").Value;
                         setting.SettingValue = nav.SelectSingleNode("SettingValue")?.Value;
                         config.Settings.Add(setting);
@@ -97,13 +103,16 @@ namespace DotNetNuke.Services.Analytics.Config
                     foreach (XPathNavigator nav in doc.CreateNavigator().Select("AnalyticsConfig/Rules/AnalyticsRule"))
                     {
                         var rule = new AnalyticsRule();
+						Logger.LogDebug("GetConfig(analyticsEngineName={AnalyticsEngineName}): rule → {Rule}", analyticsEngineName, rule);
                         rule.RoleId = Convert.ToInt32(nav.SelectSingleNode("RoleId").Value, CultureInfo.InvariantCulture);
                         rule.TabId = Convert.ToInt32(nav.SelectSingleNode("TabId").Value, CultureInfo.InvariantCulture);
                         rule.Label = nav.SelectSingleNode("Label").Value;
                         var valueNode = nav.SelectSingleNode("Value");
+						Logger.LogDebug("GetConfig(analyticsEngineName={AnalyticsEngineName}): valueNode → {ValueNode}", analyticsEngineName, valueNode);
                         if (valueNode != null)
                         {
                             rule.Value = valueNode.Value;
+							Logger.LogDebug("GetConfig(analyticsEngineName={AnalyticsEngineName}): rule.Value → {Arg1}", analyticsEngineName, rule.Value);
                         }
 
                         config.Rules.Add(rule);
@@ -120,6 +129,7 @@ namespace DotNetNuke.Services.Analytics.Config
             {
                 // log it
                 var log = new LogInfo { LogTypeKey = nameof(EventLogType.ADMIN_ALERT) };
+				Logger.LogDebug("GetConfig(analyticsEngineName={AnalyticsEngineName}): log → {Log}", analyticsEngineName, log);
                 log.AddProperty("Analytics.AnalyticsConfiguration", "GetConfig Failed");
                 log.AddProperty("FilePath", filePath);
                 log.AddProperty("ExceptionMessage", ex.Message);
@@ -127,17 +137,21 @@ namespace DotNetNuke.Services.Analytics.Config
                 Logger.Error(ex);
             }
 
+			Logger.LogDebug("<<< Exiting GetConfig(analyticsEngineName={AnalyticsEngineName})", analyticsEngineName);
             return config;
         }
 
         public static void SaveConfig(string analyticsEngineName, AnalyticsConfiguration config)
         {
+			Logger.LogDebug(">>> Entering SaveConfig(analyticsEngineName={AnalyticsEngineName},config={Config})", analyticsEngineName, config);
             string cacheKey = analyticsEngineName + "." + PortalSettings.Current.PortalId;
             if (config.Settings != null)
             {
                 // Create a new Xml Serializer
                 var ser = new XmlSerializer(typeof(AnalyticsConfiguration));
+				Logger.LogDebug("SaveConfig(analyticsEngineName={AnalyticsEngineName},config={Config}): ser → {Ser}", analyticsEngineName, config, ser);
                 string filePath = string.Empty;
+				Logger.LogDebug("SaveConfig(analyticsEngineName={AnalyticsEngineName},config={Config}): filePath → {FilePath}", analyticsEngineName, config, filePath);
 
                 // Create a FileStream for the Config file
                 filePath = PortalSettings.Current.HomeDirectoryMapPath + @"\" + analyticsEngineName + ".config";
@@ -159,6 +173,7 @@ namespace DotNetNuke.Services.Analytics.Config
 
                 DataCache.SetCache(cacheKey, config, new DNNCacheDependency(filePath));
             }
+			Logger.LogDebug("<<< Exiting SaveConfig(analyticsEngineName={AnalyticsEngineName},config={Config})", analyticsEngineName, config);
         }
     }
 }

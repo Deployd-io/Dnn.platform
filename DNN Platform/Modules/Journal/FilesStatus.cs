@@ -7,9 +7,12 @@ namespace DotNetNuke.Modules.Journal
 
     public class FilesStatus
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FilesStatus));
         /// <summary>Initializes a new instance of the <see cref="FilesStatus"/> class.</summary>
         public FilesStatus()
         {
+		Logger.LogDebug(">>> Entering FilesStatus()");
+		Logger.LogDebug("<<< Exiting FilesStatus()");
         }
 
         // ReSharper disable InconsistentNaming

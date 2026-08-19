@@ -50,7 +50,9 @@ namespace log4net.Core
         /// </summary>
         public ExceptionEvaluator()
         {
+			value.LogDebug(">>> Entering ExceptionEvaluator()");
             // empty
+			value.LogDebug("<<< Exiting ExceptionEvaluator()");
         }
 
         /// <summary>
@@ -60,13 +62,18 @@ namespace log4net.Core
         /// <param name="triggerOnSubClass">If true, this evaluator will trigger on subclasses of <see cref="ExceptionType"/>.</param>
         public ExceptionEvaluator(Type exType, bool triggerOnSubClass)
         {
+			value.LogDebug(">>> Entering ExceptionEvaluator(exType={ExType},triggerOnSubClass={TriggerOnSubClass})", exType, triggerOnSubClass);
             if (exType == null)
             {
+				value.LogWarning("Throwing ArgumentNullException from ExceptionEvaluator(exType={ExType},triggerOnSubClass={TriggerOnSubClass})", exType, triggerOnSubClass);
                 throw new ArgumentNullException("exType");
             }
 
             this.m_type = exType;
+			value.LogDebug("ExceptionEvaluator(exType={ExType},triggerOnSubClass={TriggerOnSubClass}): m_type → {M_type}", exType, triggerOnSubClass, m_type);
+			value.LogDebug("ExceptionEvaluator(exType={ExType},triggerOnSubClass={TriggerOnSubClass}): this.m_type → {Arg2}", exType, triggerOnSubClass, this.m_type);
             this.m_triggerOnSubclass = triggerOnSubClass;
+			value.LogDebug("<<< Exiting ExceptionEvaluator(exType={ExType},triggerOnSubClass={TriggerOnSubClass})", exType, triggerOnSubClass);
         }
 
         /// <summary>
@@ -103,8 +110,10 @@ namespace log4net.Core
         /// </remarks>
         public bool IsTriggeringEvent(LoggingEvent loggingEvent)
         {
+			value.LogDebug(">>> Entering IsTriggeringEvent(loggingEvent={LoggingEvent})", loggingEvent);
             if (loggingEvent == null)
             {
+				value.LogWarning("Throwing ArgumentNullException from IsTriggeringEvent(loggingEvent={LoggingEvent})", loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
             }
 
@@ -112,6 +121,7 @@ namespace log4net.Core
             {
                 // check if loggingEvent.ExceptionObject is of type ExceptionType or subclass of ExceptionType
                 Type exceptionObjectType = loggingEvent.ExceptionObject.GetType();
+				value.LogDebug("IsTriggeringEvent(loggingEvent={LoggingEvent}): exceptionObjectType → {ExceptionObjectType}", loggingEvent, exceptionObjectType);
                 return exceptionObjectType == this.m_type || this.m_type.IsAssignableFrom(exceptionObjectType);
             }
             else if (!this.m_triggerOnSubclass && loggingEvent.ExceptionObject != null)
@@ -120,6 +130,7 @@ namespace log4net.Core
             }
             else
             {   // loggingEvent.ExceptionObject is null
+				value.LogDebug("<<< Exiting IsTriggeringEvent(loggingEvent={LoggingEvent})", loggingEvent);
                 return false;
             }
         }

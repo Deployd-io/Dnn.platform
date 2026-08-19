@@ -26,6 +26,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin/theme object which provides a search input.</summary>
     public partial class Search : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Search.ascx));
         private const string MyFileName = "Search.ascx";
 
         private readonly INavigationManager navigationManager;
@@ -47,8 +48,10 @@ namespace DotNetNuke.UI.Skins.Controls
         public Search()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering Search()");
         }
 
+		Logger.LogDebug("<<< Exiting Search()");
         /// <summary>Initializes a new instance of the <see cref="Search"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
         /// <param name="clientResourceController">The client resources controller.</param>
@@ -56,6 +59,10 @@ namespace DotNetNuke.UI.Skins.Controls
         public Search(INavigationManager navigationManager, IClientResourceController clientResourceController)
             : this(navigationManager, clientResourceController, null)
         {
+		Logger.LogDebug(">>> Entering Search(navigationManager={NavigationManager},clientResourceController={ClientResourceController})", navigationManager, clientResourceController);
+		Logger.LogDebug("<<< Exiting Search(navigationManager={NavigationManager},clientResourceController={ClientResourceController})", navigationManager, clientResourceController);
+		Logger.LogDebug("Search(navigationManager={NavigationManager},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): clientResourceController → {ClientResourceController1}", navigationManager, clientResourceController, servicesFramework, clientResourceController);
+		Logger.LogDebug("Search(navigationManager={NavigationManager},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", navigationManager, clientResourceController, servicesFramework, servicesFramework);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Search"/> class.</summary>
@@ -344,8 +351,10 @@ namespace DotNetNuke.UI.Skins.Controls
         /// </remarks>
         protected void ExecuteSearch(string searchText, string searchType)
         {
+			Logger.LogDebug(">>> Entering ExecuteSearch(searchText={SearchText},searchType={SearchType})", searchText, searchType);
             int searchTabId = this.GetSearchTabId();
 
+			Logger.LogDebug("ExecuteSearch(searchText={SearchText},searchType={SearchType}): searchTabId → {SearchTabId}", searchText, searchType, searchTabId);
             if (searchTabId == Null.NullInteger)
             {
                 return;
@@ -391,12 +400,14 @@ namespace DotNetNuke.UI.Skins.Controls
             {
                 this.Response.Redirect(this.navigationManager.NavigateURL(searchTabId));
             }
+			Logger.LogDebug("<<< Exiting ExecuteSearch(searchText={SearchText},searchType={SearchType})", searchText, searchType);
         }
 
         /// <summary>Handles the Load event of the Page control.</summary>
         /// <param name="e">The <see cref="System.EventArgs" /> instance containing the event data.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.servicesFramework.RequestAjaxAntiForgerySupport();
@@ -409,14 +420,17 @@ namespace DotNetNuke.UI.Skins.Controls
             if (this.MinCharRequired == 0)
             {
                 this.MinCharRequired = 2;
+				Logger.LogDebug("OnLoad(e={E}): this.MinCharRequired → {Arg1}", e, this.MinCharRequired);
             }
 
             if (this.AutoSearchDelayInMilliSecond == 0)
             {
                 this.AutoSearchDelayInMilliSecond = 400;
+				Logger.LogDebug("OnLoad(e={E}): this.AutoSearchDelayInMilliSecond → {Arg1}", e, this.AutoSearchDelayInMilliSecond);
             }
 
             this.PortalId = this.PortalSettings.ActiveTab.IsSuperTab ? this.PortalSettings.PortalId : -1;
+			Logger.LogDebug("OnLoad(e={E}): this.PortalId → {Arg1}", e, this.PortalId);
 
             if (!string.IsNullOrEmpty(this.Submit))
             {
@@ -440,6 +454,7 @@ namespace DotNetNuke.UI.Skins.Controls
                 this.cmdSearch.CssClass = this.CssClass;
                 this.cmdSearchNew.CssClass = this.CssClass;
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>Handles the Click event of the cmdSearchNew control.</summary>
@@ -448,8 +463,10 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <remarks>This event is only used when <see cref="UseDropDownList">UseDropDownList</see> is true.</remarks>
         protected void CmdSearchNewClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdSearchNewClick(sender={Sender},e={E})", sender, e);
             this.SearchType = ClientAPI.GetClientVariable(this.Page, "SearchIconSelected");
             this.ExecuteSearch(this.txtSearchNew.Text.Trim(), this.SearchType);
+			Logger.LogDebug("<<< Exiting CmdSearchNewClick(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Handles the PreRender event of the Page control.</summary>
@@ -457,6 +474,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <remarks>This event performs final initialization tasks for the search object UI.</remarks>
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             this.ClassicSearch.Visible = !this.UseDropDownList;
@@ -477,6 +495,7 @@ namespace DotNetNuke.UI.Skins.Controls
                     // We are going to use a dnn client variable to store which search option (web/site) is selected.
                     ClientAPI.RegisterClientVariable(this.Page, "SearchIconSelected", "S", true);
                     this.SearchType = "S";
+					Logger.LogDebug("OnPreRender(e={E}): this.SearchType → {Arg1}", e, this.SearchType);
                 }
 
                 JavaScript.RegisterClientReference(this.Page, ClientAPI.ClientNamespaceReferences.dnn);
@@ -508,14 +527,17 @@ namespace DotNetNuke.UI.Skins.Controls
                 this.txtSearch.Attributes.Add("autocomplete", "off");
                 this.txtSearch.Attributes.Add("placeholder", this.PlaceHolderText);
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private int GetSearchTabId()
         {
+			Logger.LogDebug(">>> Entering GetSearchTabId()");
             int searchTabId = this.PortalSettings.SearchTabId;
             if (searchTabId == Null.NullInteger)
             {
                 ArrayList arrModules = ModuleController.Instance.GetModulesByDefinition(this.PortalSettings.PortalId, "Search Results");
+				Logger.LogDebug("GetSearchTabId(): arrModules → {ArrModules}", arrModules);
                 if (arrModules.Count > 1)
                 {
                     foreach (ModuleInfo searchModule in arrModules)
@@ -532,6 +554,7 @@ namespace DotNetNuke.UI.Skins.Controls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetSearchTabId()");
             return searchTabId;
         }
 
@@ -541,6 +564,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <remarks>This event is only used when <see cref="UseDropDownList">UseDropDownList</see> is false.</remarks>
         private void CmdSearchClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdSearchClick(sender={Sender},e={E})", sender, e);
             this.SearchType = "S";
             if (this.WebRadioButton.Visible)
             {
@@ -551,6 +575,7 @@ namespace DotNetNuke.UI.Skins.Controls
             }
 
             this.ExecuteSearch(this.txtSearch.Text.Trim(), this.SearchType);
+			Logger.LogDebug("<<< Exiting CmdSearchClick(sender={Sender},e={E})", sender, e);
         }
     }
 }

@@ -5,13 +5,17 @@ import utils from "../../utils";
 import "./css/pages-hierarchy.css";
 import Html from "../Html";
 import pagesHtml from "./pages.html?raw";
+const logger = console;
 
 class PageHierarchy extends Component {
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {itemTemplate, dragItemTemplate, searchKeyword} = this.props;
         pageHierarchyManager.utility = utils.getUtilities();
         pageHierarchyManager.resx = pageHierarchyManager.utility.resx.Pages;
+		logger.debug(`componentDidMount(): pageHierarchyManager.resx → ${pageHierarchyManager.resx}`);
         pageHierarchyManager._viewModel = {};
+		logger.debug(`componentDidMount(): pageHierarchyManager._viewModel → ${pageHierarchyManager._viewModel}`);
         pageHierarchyManager.callPageSettings = this.callPageSettings.bind(this);
         pageHierarchyManager.init(this.node, this.initCallback.bind(this));
         pageHierarchyManager.setItemTemplate(itemTemplate);
@@ -19,9 +23,11 @@ class PageHierarchy extends Component {
         pageHierarchyManager.setSearchKeyword(searchKeyword);   
         pageHierarchyManager.setCurrentTabIdAndSiteRoot(utils.getCurrentPageId(), utils.getSiteRoot());
         pageHierarchyManager.selectedPagePathChanged = p => this.props.onSelectedPagePathChanged([...p]);
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const {itemTemplate, dragItemTemplate, searchKeyword, selectedPage} = prevProps;
         if (itemTemplate && itemTemplate !== this.props.itemTemplate) {
             pageHierarchyManager.setItemTemplate(this.props.itemTemplate);
@@ -37,20 +43,25 @@ class PageHierarchy extends Component {
 
         if (selectedPage && selectedPage !== this.props.selectedPage) {
             pageHierarchyManager.selectPageFromBreadCrumbs(this.props.selectedPage);
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
         }
     }
     
     initCallback() {
+		logger.debug('>>> Entering initCallback()');
         const {createdPage} = this.props;
 
         if (createdPage !== null) {
             pageHierarchyManager.addPage(createdPage);
+			logger.debug('<<< Exiting initCallback()');
         }
     }
 
     callPageSettings(action, params) {
+		logger.debug(`>>> Entering callPageSettings(action=${action},params=${params})`);
         const pageId = params[0];
         this.props.onPageSettings(pageId);
+		logger.debug(`<<< Exiting callPageSettings(action=${action},params=${params})`);
     }
     
     render() {

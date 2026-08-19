@@ -4,18 +4,25 @@ import styles from "./style.module.less";
 import resx from "../../../resources";
 import ClockStopIcon from "./../taskStatusItemRow/svg/clock_stop.svg";
 import CycleIcon from "./../taskStatusItemRow/svg/cycle.svg";
+const logger = console;
 
 class LeftPane extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
     onEnter(key, value) {
+		logger.debug(`>>> Entering onEnter(key=${key},value=${value})`);
         const {props} = this;
         props.onEnter(key, value, props.index);
+		logger.debug(`<<< Exiting onEnter(key=${key},value=${value})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.taskStatusItemLeftPane}>
                 <div hidden={!this.props.nextStart} className="taskIcon"><ClockStopIcon /></div>

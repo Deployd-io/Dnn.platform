@@ -7,29 +7,37 @@ import AllowIcon from "./../../svg/checkbox.svg?react";
 import DenyIcon from "./../../svg/cross_out.svg?react";
 import EditIcon from "./../../svg/edit.svg?react";
 import DeleteIcon from "./../../svg/trash.svg?react";
+const logger = console;
 
 class IpFilterRow extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     toggle() {
+		logger.debug('>>> Entering toggle()');
         if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
             this.props.Collapse();
         } else {
             this.props.OpenCollapse(this.props.id);
+			logger.debug('<<< Exiting toggle()');
         }
     }
 
 
     getRuleTypeDisplay() {
+		logger.debug('>>> Entering getRuleTypeDisplay()');
         const {props} = this;
         if (props.id !== "add") {
             if (props.ruleType === 1) {
@@ -50,15 +58,19 @@ class IpFilterRow extends Component {
             }
         }
         else {
+			logger.debug('<<< Exiting getRuleTypeDisplay()');
             return "-";
         }
     }
 
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
+		logger.debug(`render(): opened → ${opened}`);
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={"collapsible-component-ipfilters" + (opened ? " row-opened" : "") }>
                 {props.visible &&

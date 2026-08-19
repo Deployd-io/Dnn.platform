@@ -11,19 +11,23 @@ namespace DotNetNuke.Collections
     /// <summary>Provides extensions to IEnumerable.</summary>
     public static class EnumerableExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EnumerableExtensions));
         /// <summary>Converts dynamic data to a DataTable. Useful for databinding.</summary>
         /// <param name="items">The items in the IEnumerable.</param>
         /// <returns>A DataTable with the copied dynamic data.</returns>
         public static DataTable ToDataTable(this IEnumerable<dynamic> items)
         {
+			Logger.LogDebug(">>> Entering ToDataTable(items={Items})", items);
             var data = items.ToArray();
 
+			Logger.LogDebug("ToDataTable(items={Items}): data → {Data}", items, data);
             if (data.Length == 0)
             {
                 return null;
             }
 
             var dt = new DataTable();
+			Logger.LogDebug("ToDataTable(items={Items}): dt → {Dt}", items, dt);
 
             // Create the columns
             foreach (var key in ((IDictionary<string, object>)data[0]).Keys)
@@ -37,6 +41,7 @@ namespace DotNetNuke.Collections
                 dt.Rows.Add(((IDictionary<string, object>)d).Values.ToArray());
             }
 
+			Logger.LogDebug("<<< Exiting ToDataTable(items={Items})", items);
             return dt;
         }
     }

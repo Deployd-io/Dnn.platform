@@ -8,6 +8,7 @@ namespace DotNetNuke.Entities.Modules.Communications
     /// <summary>Specifies communications between modules. There are listeners and communicators.</summary>
     public class ModuleCommunicate
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleCommunicate));
         /// <summary>Gets the module communicators.</summary>
         public ModuleCommunicators ModuleCommunicators { get; } = new ModuleCommunicators();
 
@@ -18,6 +19,7 @@ namespace DotNetNuke.Entities.Modules.Communications
         /// <param name="ctrl">The control.</param>
         public void LoadCommunicator(Control ctrl)
         {
+			Logger.LogDebug(">>> Entering LoadCommunicator(ctrl={Ctrl})", ctrl);
             // Check and see if the module implements IModuleCommunicator
             if (ctrl is IModuleCommunicator communicator)
             {
@@ -29,18 +31,22 @@ namespace DotNetNuke.Entities.Modules.Communications
             {
                 this.Add(listener);
             }
+			Logger.LogDebug("<<< Exiting LoadCommunicator(ctrl={Ctrl})", ctrl);
         }
 
         private int Add(IModuleCommunicator item)
         {
+			Logger.LogDebug(">>> Entering Add(item={Item})", item);
             int returnData = this.ModuleCommunicators.Add(item);
 
+			Logger.LogDebug("Add(item={Item}): returnData → {ReturnData}", item, returnData);
             int i = 0;
             for (i = 0; i <= this.ModuleListeners.Count - 1; i++)
             {
                 item.ModuleCommunication += this.ModuleListeners[i].OnModuleCommunication;
             }
 
+			Logger.LogDebug("<<< Exiting Add(item={Item})", item);
             return returnData;
         }
 

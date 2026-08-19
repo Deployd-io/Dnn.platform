@@ -12,6 +12,7 @@ namespace DotNetNuke.Modules.HTMLEditorProvider
 
     public abstract class HtmlEditorProvider : UserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlEditorProvider));
         public abstract Control HtmlEditorControl { get; }
 
         public abstract ArrayList AdditionalToolbars { get; set; }
@@ -29,6 +30,8 @@ namespace DotNetNuke.Modules.HTMLEditorProvider
         // return the provider
         public static HtmlEditorProvider Instance()
         {
+			Logger.LogDebug(">>> Entering Instance()");
+			Logger.LogDebug("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<HtmlEditorProvider>();
         }
 

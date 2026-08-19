@@ -60,16 +60,23 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.RoleId = this.GetFlagValue(FlagId, "Role Id", -1, true, true, true);
             this.RoleName = this.GetFlagValue(FlagRoleName, "Role Name", string.Empty);
+			Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): IsPublic → {IsPublic}", args, portalSettings, userInfo, activeTabId, IsPublic);
+			Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): AutoAssign → {AutoAssign}", args, portalSettings, userInfo, activeTabId, AutoAssign);
             this.Description = this.GetFlagValue(FlagDescription, "Description", string.Empty);
+			Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): Description → {Description}", args, portalSettings, userInfo, activeTabId, Description);
             this.IsPublic = this.GetFlagValue<bool?>(FlagIsPublic, "Is Public", null);
             this.AutoAssign = this.GetFlagValue<bool?>(FlagAutoAssign, "Auto Assign", null);
             var status = this.GetFlagValue(FlagStatus, "Status", string.Empty);
+			Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): status → {Status}", args, portalSettings, userInfo, activeTabId, status);
             switch (status)
             {
                 case "pending":
                     this.Status = RoleStatus.Pending;
+					Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): Status → {Status}", args, portalSettings, userInfo, activeTabId, Status);
+					Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.Status → {Arg4}", args, portalSettings, userInfo, activeTabId, this.Status);
                     break;
                 case "approved":
                     this.Status = RoleStatus.Approved;
@@ -86,16 +93,20 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
             {
                 this.AddMessage(this.LocalizeString("Prompt_NothingToUpdate"));
             }
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             try
             {
                 var existingRole = RoleController.Instance.GetRoleById(this.PortalId, this.RoleId);
+				Logger.LogDebug("Run(): existingRole → {ExistingRole}", existingRole);
                 if (existingRole.IsSystemRole)
                 {
+					Logger.LogWarning("Throwing SetRoleException from Run()");
                     throw new SetRoleException("Cannot modify System Roles.");
                 }
 
@@ -113,6 +124,7 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
                 };
                 KeyValuePair<HttpStatusCode, string> message;
                 var success = RolesController.Instance.SaveRole(this.PortalSettings, roleDto, false, out message);
+				Logger.LogDebug("Run(): success → {Success}", success);
                 if (!success)
                 {
                     return new ConsoleErrorResultModel(message.Value);
@@ -132,6 +144,7 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(this.LocalizeString("RoleUpdated.Error"));
             }
         }

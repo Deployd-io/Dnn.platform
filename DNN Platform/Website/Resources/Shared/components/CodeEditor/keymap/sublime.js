@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -5,6 +6,7 @@
 // Depends on addon/search/searchcursor.js and optionally addon/dialog/dialogs.js
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../lib/codemirror"), require("../addon/search/searchcursor"), require("../addon/edit/matchbrackets"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -15,20 +17,27 @@
   "use strict";
 
   var map = CodeMirror.keyMap.sublime = {fallthrough: "default"};
+logger.debug(`function(exports=${exports}): map → ${map}`);
   var cmds = CodeMirror.commands;
   var Pos = CodeMirror.Pos;
   var mac = CodeMirror.keyMap["default"] == CodeMirror.keyMap.macDefault;
+logger.debug(`function(exports=${exports}): mac → ${mac}`);
   var ctrl = mac ? "Cmd-" : "Ctrl-";
+logger.debug(`function(exports=${exports}): ctrl → ${ctrl}`);
 
   // This is not exactly Sublime's algorithm. I couldn't make heads or tails of that.
   function findPosSubword(doc, start, dir) {
+	logger.debug(`>>> Entering findPosSubword(doc=${doc},start=${start},dir=${dir})`);
     if (dir < 0 && start.ch == 0) return doc.clipPos(Pos(start.line - 1));
     var line = doc.getLine(start.line);
+	logger.debug(`findPosSubword(doc=${doc},start=${start},dir=${dir}): line → ${line}`);
     if (dir > 0 && start.ch >= line.length) return doc.clipPos(Pos(start.line + 1, 0));
     var state = "start", type;
     for (var pos = start.ch, e = dir < 0 ? 0 : line.length, i = 0; pos != e; pos += dir, i++) {
       var next = line.charAt(dir < 0 ? pos - 1 : pos);
+	logger.debug(`findPosSubword(doc=${doc},start=${start},dir=${dir}): next → ${next}`);
       var cat = next != "_" && CodeMirror.isWordChar(next) ? "w" : "o";
+	logger.debug(`findPosSubword(doc=${doc},start=${start},dir=${dir}): cat → ${cat}`);
       if (cat == "w" && next.toUpperCase() == next) cat = "W";
       if (state == "start") {
         if (cat != "o") { state = "in"; type = cat; }
@@ -40,11 +49,14 @@
         }
       }
     }
+	logger.debug(`<<< Exiting findPosSubword(doc=${doc},start=${start},dir=${dir})`);
     return Pos(start.line, pos);
   }
 
   function moveSubword(cm, dir) {
+	logger.debug(`>>> Entering moveSubword(cm=${cm},dir=${dir})`);
     cm.extendSelectionsBy(function(range) {
+	logger.debug('>>> Entering extendSelectionsBy()');
       if (cm.display.shift || cm.doc.extend || range.empty())
         return findPosSubword(cm.doc, range.head, dir);
       else
@@ -70,6 +82,8 @@
     var info = cm.getScrollInfo();
     if (!cm.somethingSelected()) {
       var visibleTopLine = cm.lineAtHeight(info.top, "local")+1;
+	logger.debug(`function(cm=${cm}): visibleBottomLine → ${visibleBottomLine}`);
+	logger.debug(`function(cm=${cm}): visibleTopLine → ${visibleTopLine}`);
       if (cm.getCursor().line <= visibleTopLine)
         cm.execCommand("goLineDown");
     }
@@ -78,8 +92,10 @@
 
   cmds[map["Shift-" + ctrl + "L"] = "splitSelectionByLine"] = function(cm) {
     var ranges = cm.listSelections(), lineRanges = [];
+	logger.debug(`function(cm=${cm}): ranges → ${ranges}`);
     for (var i = 0; i < ranges.length; i++) {
       var from = ranges[i].from(), to = ranges[i].to();
+	logger.debug(`function(cm=${cm}): from → ${from}`);
       for (var line = from.line; line <= to.line; ++line)
         if (!(to.line > from.line && line == to.line && to.ch == 0))
           lineRanges.push({anchor: line == from.line ? from : Pos(line, 0),
@@ -92,6 +108,7 @@
 
   cmds[map["Esc"] = "singleSelectionTop"] = function(cm) {
     var range = cm.listSelections()[0];
+	logger.debug(`function(cm=${cm}): range → ${range}`);
     cm.setSelection(range.anchor, range.head, {scroll: false});
   };
 
@@ -108,12 +125,16 @@
   map["Shift-" + ctrl + "K"] = "deleteLine";
 
   function insertLine(cm, above) {
+	logger.debug(`>>> Entering insertLine(cm=${cm},above=${above})`);
     cm.operation(function() {
       var len = cm.listSelections().length, newSelection = [], last = -1;
       for (var i = 0; i < len; i++) {
+		logger.debug(`operation(len=${len}): len → ${len}`);
         var head = cm.listSelections()[i].head;
+		logger.debug(`operation(len=${len}): head → ${head}`);
         if (head.line <= last) continue;
         var at = Pos(head.line + (above ? 0 : 1), 0);
+		logger.debug(`operation(len=${len}): at → ${at}`);
         cm.replaceRange("\n", at, null, "+insertLine");
         cm.indentLine(at.line, null, true);
         newSelection.push({head: at, anchor: at});
@@ -121,6 +142,7 @@
       }
       cm.setSelections(newSelection);
     });
+	logger.debug(`<<< Exiting insertLine(cm=${cm},above=${above})`);
   }
 
   cmds[map[ctrl + "Enter"] = "insertLineAfter"] = function(cm) { insertLine(cm, false); };
@@ -128,9 +150,11 @@
   cmds[map["Shift-" + ctrl + "Enter"] = "insertLineBefore"] = function(cm) { insertLine(cm, true); };
 
   function wordAt(cm, pos) {
+	logger.debug(`>>> Entering wordAt(cm=${cm},pos=${pos})`);
     var start = pos.ch, end = start, line = cm.getLine(pos.line);
     while (start && CodeMirror.isWordChar(line.charAt(start - 1))) --start;
     while (end < line.length && CodeMirror.isWordChar(line.charAt(end))) ++end;
+	logger.debug(`<<< Exiting wordAt(cm=${cm},pos=${pos})`);
     return {from: Pos(pos.line, start), to: Pos(pos.line, end), word: line.slice(start, end)};
   }
 
@@ -139,12 +163,15 @@
     var fullWord = cm.state.sublimeFindFullWord == cm.doc.sel;
     if (CodeMirror.cmpPos(from, to) == 0) {
       var word = wordAt(cm, from);
+	logger.debug(`function(cm=${cm}): word → ${word}`);
       if (!word.word) return;
       cm.setSelection(word.from, word.to);
       fullWord = true;
     } else {
       var text = cm.getRange(from, to);
+	logger.debug(`function(cm=${cm}): text → ${text}`);
       var query = fullWord ? new RegExp("\\b" + text + "\\b") : text;
+	logger.debug(`function(cm=${cm}): query → ${query}`);
       var cur = cm.getSearchCursor(query, to);
       if (cur.findNext()) {
         cm.addSelection(cur.from(), cur.to());
@@ -160,13 +187,17 @@
 
   var mirror = "(){}[]";
   function selectBetweenBrackets(cm) {
+	logger.debug(`>>> Entering selectBetweenBrackets(cm=${cm})`);
     var pos = cm.getCursor(), opening = cm.scanForBracket(pos, -1);
     if (!opening) return;
+	logger.debug(`selectBetweenBrackets(cm=${cm}): pos → ${pos}`);
     for (;;) {
       var closing = cm.scanForBracket(pos, 1);
+	logger.debug(`selectBetweenBrackets(cm=${cm}): closing → ${closing}`);
       if (!closing) return;
       if (closing.ch == mirror.charAt(mirror.indexOf(opening.ch) + 1)) {
         cm.setSelection(Pos(opening.pos.line, opening.pos.ch + 1), closing.pos, false);
+		logger.debug(`<<< Exiting selectBetweenBrackets(cm=${cm})`);
         return true;
       }
       pos = Pos(closing.pos.line, closing.pos.ch + 1);
@@ -184,7 +215,9 @@
     cm.extendSelectionsBy(function(range) {
       var next = cm.scanForBracket(range.head, 1);
       if (next && CodeMirror.cmpPos(next.pos, range.head) != 0) return next.pos;
+	logger.debug(`extendSelectionsBy(next=${next}): next → ${next}`);
       var prev = cm.scanForBracket(range.head, -1);
+	logger.debug(`extendSelectionsBy(next=${next}): prev → ${prev}`);
       return prev && Pos(prev.pos.line, prev.pos.ch + 1) || range.head;
     });
   };
@@ -203,9 +236,11 @@
       at = to;
     }
     cm.operation(function() {
+	logger.debug(`>>> Entering operation(i=${i})`);
       for (var i = 0; i < linesToMove.length; i += 2) {
         var from = linesToMove[i], to = linesToMove[i + 1];
         var line = cm.getLine(from);
+		logger.debug(`operation(i=${i}): line → ${line}`);
         cm.replaceRange("", Pos(from, 0), Pos(from + 1, 0), "+swapLine");
         if (to > cm.lastLine())
           cm.replaceRange("\n" + line, Pos(cm.lastLine()), null, "+swapLine");
@@ -214,6 +249,7 @@
       }
       cm.setSelections(newSels);
       cm.scrollIntoView();
+	logger.debug(`<<< Exiting operation(len=${len})`);
     });
   };
 
@@ -253,9 +289,11 @@
     }
     cm.operation(function() {
       var offset = 0, ranges = [];
+	logger.debug(`function(cm=${cm}): end → ${end}`);
       for (var i = 0; i < joined.length; i++) {
         var obj = joined[i];
         var anchor = obj.anchor && Pos(obj.anchor.line - offset, obj.anchor.ch), head;
+		logger.debug(`operation(offset=${offset}): anchor → ${anchor}`);
         for (var line = obj.start; line <= obj.end; line++) {
           var actual = line - offset;
           if (line == obj.end) head = Pos(actual, cm.getLine(actual).length + 1);
@@ -273,6 +311,7 @@
   cmds[map["Shift-" + ctrl + "D"] = "duplicateLine"] = function(cm) {
     cm.operation(function() {
       var rangeCount = cm.listSelections().length;
+	logger.debug(`operation(rangeCount=${rangeCount}): rangeCount → ${rangeCount}`);
       for (var i = 0; i < rangeCount; i++) {
         var range = cm.listSelections()[i];
         if (range.empty())
@@ -287,6 +326,7 @@
   map[ctrl + "T"] = "transposeChars";
 
   function sortLines(cm, caseSensitive) {
+	logger.debug(`>>> Entering sortLines(cm=${cm},caseSensitive=${caseSensitive})`);
     var ranges = cm.listSelections(), toSort = [], selected;
     for (var i = 0; i < ranges.length; i++) {
       var range = ranges[i];
@@ -305,12 +345,14 @@
         var from = toSort[i], to = toSort[i + 1];
         var start = Pos(from, 0), end = Pos(to);
         var lines = cm.getRange(start, end, false);
+		logger.debug(`operation(ranges=${ranges}): lines → ${lines}`);
         if (caseSensitive)
           lines.sort();
         else
           lines.sort(function(a, b) {
             var au = a.toUpperCase(), bu = b.toUpperCase();
             if (au != bu) { a = au; b = bu; }
+			logger.debug(`sort(au=${au}): au → ${au}`);
             return a < b ? -1 : a == b ? 0 : 1;
           });
         cm.replaceRange(lines, start, end);
@@ -318,6 +360,7 @@
       }
       if (selected) cm.setSelections(ranges, 0);
     });
+	logger.debug(`<<< Exiting sortLines(cm=${cm},caseSensitive=${caseSensitive})`);
   }
 
   cmds[map["F9"] = "sortLines"] = function(cm) { sortLines(cm, true); };
@@ -328,6 +371,8 @@
     if (marks) while (marks.length) {
       var current = marks.shift();
       var found = current.find();
+	logger.debug(`function(cm=${cm}): current → ${current}`);
+	logger.debug(`function(cm=${cm}): found → ${found}`);
       if (found) {
         marks.push(current);
         return cm.setSelection(found.from, found.to);
@@ -350,6 +395,7 @@
   cmds[map[ctrl + "F2"] = "toggleBookmark"] = function(cm) {
     var ranges = cm.listSelections();
     var marks = cm.state.sublimeBookmarks || (cm.state.sublimeBookmarks = []);
+	logger.debug(`function(cm=${cm}): marks → ${marks}`);
     for (var i = 0; i < ranges.length; i++) {
       var from = ranges[i].from(), to = ranges[i].to();
       var found = cm.findMarks(from, to);
@@ -371,6 +417,7 @@
     var marks = cm.state.sublimeBookmarks;
     if (marks) for (var i = 0; i < marks.length; i++) marks[i].clear();
     marks.length = 0;
+	logger.debug(`function(cm=${cm}): marks.length → ${marks.length}`);
   };
 
   cmds[map["Alt-F2"] = "selectBookmarks"] = function(cm) {
@@ -391,6 +438,7 @@
   var cK = ctrl + "K ";
 
   function modifyWordOrSelection(cm, mod) {
+	logger.debug(`>>> Entering modifyWordOrSelection(cm=${cm},mod=${mod})`);
     cm.operation(function() {
       var ranges = cm.listSelections(), indices = [], replacements = [];
       for (var i = 0; i < ranges.length; i++) {
@@ -403,10 +451,12 @@
         var range = ranges[indices[i]];
         if (at && CodeMirror.cmpPos(range.head, at) > 0) continue;
         var word = wordAt(cm, range.head);
+		logger.debug(`operation(ranges=${ranges}): word → ${word}`);
         at = word.from;
         cm.replaceRange(mod(word.word), word.from, word.to);
       }
     });
+	logger.debug(`<<< Exiting modifyWordOrSelection(cm=${cm},mod=${mod})`);
   }
 
   map[cK + ctrl + "Backspace"] = "delLineLeft";
@@ -418,6 +468,8 @@
     var toStartOfLine = cm.getRange({line: cursor.line, ch: 0}, cursor);
     var column = CodeMirror.countColumn(toStartOfLine, null, cm.getOption("tabSize"));
 
+	logger.debug(`function(cm=${cm}): cursor → ${cursor}`);
+	logger.debug(`function(cm=${cm}): toStartOfLine → ${toStartOfLine}`);
     if (toStartOfLine && !/\S/.test(toStartOfLine) && column % cm.getOption("indentUnit") == 0)
       return cm.indentSelection("subtract");
     else
@@ -473,6 +525,7 @@
   map[cK + ctrl + "G"] = "clearBookmarks";
   cmds[map[cK + ctrl + "C"] = "showInCenter"] = function(cm) {
     var pos = cm.cursorCoords(null, "local");
+	logger.debug(`function(cm=${cm}): pos → ${pos}`);
     cm.scrollTo(null, (pos.top + pos.bottom) / 2 - cm.getScrollInfo().clientHeight / 2);
   };
 
@@ -489,6 +542,7 @@
   cmds[map["Shift-Alt-Down"] = "selectLinesDownward"] = function(cm) {
     cm.operation(function() {
       var ranges = cm.listSelections();
+	logger.debug(`operation(ranges=${ranges}): ranges → ${ranges}`);
       for (var i = 0; i < ranges.length; i++) {
         var range = ranges[i];
         if (range.head.line < cm.lastLine())
@@ -498,21 +552,27 @@
   };
 
   function getTarget(cm) {
+	logger.debug(`>>> Entering getTarget(cm=${cm})`);
     var from = cm.getCursor("from"), to = cm.getCursor("to");
     if (CodeMirror.cmpPos(from, to) == 0) {
       var word = wordAt(cm, from);
+	logger.debug(`getTarget(cm=${cm}): word → ${word}`);
       if (!word.word) return;
       from = word.from;
       to = word.to;
     }
+	logger.debug(`<<< Exiting getTarget(cm=${cm})`);
     return {from: from, to: to, query: cm.getRange(from, to), word: word};
   }
 
   function findAndGoTo(cm, forward) {
+	logger.debug(`>>> Entering findAndGoTo(cm=${cm},forward=${forward})`);
     var target = getTarget(cm);
     if (!target) return;
+	logger.debug(`findAndGoTo(cm=${cm},forward=${forward}): target → ${target}`);
     var query = target.query;
     var cur = cm.getSearchCursor(query, forward ? target.to : target.from);
+	logger.debug(`findAndGoTo(cm=${cm},forward=${forward}): cur → ${cur}`);
 
     if (forward ? cur.findNext() : cur.findPrevious()) {
       cm.setSelection(cur.from(), cur.to());
@@ -530,7 +590,9 @@
   cmds[map["Alt-F3"] = "findAllUnder"] = function(cm) {
     var target = getTarget(cm);
     if (!target) return;
+	logger.debug(`function(cm=${cm}): target → ${target}`);
     var cur = cm.getSearchCursor(target.query);
+	logger.debug(`function(cm=${cm}): cur → ${cur}`);
     var matches = [];
     var primaryIndex = -1;
     while (cur.findNext()) {

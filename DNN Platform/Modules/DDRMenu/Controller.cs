@@ -39,6 +39,7 @@ namespace DotNetNuke.Web.DDRMenu
         public Controller()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering Controller()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="Controller"/> class.</summary>
@@ -48,11 +49,13 @@ namespace DotNetNuke.Web.DDRMenu
         public Controller(IEventLogger eventLogger, IPermissionDefinitionService permissionDefinitionService)
             : this(eventLogger, permissionDefinitionService, null)
         {
+		eventLogger.LogDebug("<<< Exiting Controller()");
         }
 
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			eventLogger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             UpdateWebConfig();
 
             TidyModuleDefinitions(this.eventLogger, this.permissionDefinitionService, this.hostSettings);
@@ -61,14 +64,17 @@ namespace DotNetNuke.Web.DDRMenu
 
             CheckSkinReferences();
 
+			eventLogger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
             return "UpgradeModule completed OK";
         }
 
         /// <inheritdoc />
         public string ExportModule(int moduleId)
         {
+			eventLogger.LogDebug(">>> Entering ExportModule(moduleId={ModuleId})", moduleId);
             var module = ModuleController.Instance.GetModule(moduleId, Null.NullInteger, true);
             var moduleSettings = module.ModuleSettings;
+			eventLogger.LogDebug("ExportModule(moduleId={ModuleId}): module → {Module}", moduleId, module);
 
             var settings = new Settings
             {
@@ -84,14 +90,17 @@ namespace DotNetNuke.Web.DDRMenu
                 TemplateArguments =
                                 Settings.TemplateArgumentsFromSettingString(Convert.ToString(moduleSettings["TemplateArguments"])),
             };
+			eventLogger.LogDebug("<<< Exiting ExportModule(moduleId={ModuleId})", moduleId);
             return settings.ToXml();
         }
 
         /// <inheritdoc />
         public void ImportModule(int moduleId, string content, string version, int userId)
         {
+			eventLogger.LogDebug(">>> Entering ImportModule(moduleId={ModuleId},content={Content},version={Version},userId={UserId})", moduleId, content, version, userId);
             var settings = Settings.FromXml(content);
 
+			eventLogger.LogDebug("ImportModule(moduleId={ModuleId},content={Content},version={Version},userId={UserId}): settings → {Settings}", moduleId, content, version, userId, settings);
             ModuleController.Instance.UpdateModuleSetting(moduleId, "MenuStyle", settings.MenuStyle ?? string.Empty);
             ModuleController.Instance.UpdateModuleSetting(moduleId, "NodeXmlPath", settings.NodeXmlPath ?? string.Empty);
             ModuleController.Instance.UpdateModuleSetting(moduleId, "NodeSelector", settings.NodeSelector ?? string.Empty);
@@ -102,15 +111,18 @@ namespace DotNetNuke.Web.DDRMenu
             ModuleController.Instance.UpdateModuleSetting(moduleId, "IncludeHidden", settings.IncludeHidden.ToString());
             ModuleController.Instance.UpdateModuleSetting(moduleId, "TemplateArguments", Settings.ToSettingString(settings.TemplateArguments));
             ModuleController.Instance.UpdateModuleSetting(moduleId, "ClientOptions", Settings.ToSettingString(settings.ClientOptions));
+			eventLogger.LogDebug("<<< Exiting ImportModule(moduleId={ModuleId},content={Content},version={Version},userId={UserId})", moduleId, content, version, userId);
         }
 
         private static void UpdateWebConfig()
         {
+			eventLogger.LogDebug(">>> Entering UpdateWebConfig()");
             const string navName = "DDRMenuNavigationProvider";
             const string navType = "DotNetNuke.Web.DDRMenu.DDRMenuNavigationProvider, DotNetNuke.Web.DDRMenu";
 
             var server = HttpContext.Current.Server;
             var webConfig = server.MapPath("~/web.config");
+			eventLogger.LogDebug("UpdateWebConfig(): webConfig → {WebConfig}", webConfig);
 
             var configXml = new XmlDocument { XmlResolver = null };
             using (var configReader = XmlReader.Create(webConfig, new XmlReaderSettings { XmlResolver = null, }))
@@ -119,12 +131,15 @@ namespace DotNetNuke.Web.DDRMenu
             }
 
             var navProviders = configXml.SelectSingleNode("/configuration/dotnetnuke/navigationControl/providers") as XmlElement;
+			eventLogger.LogDebug("UpdateWebConfig(): navProviders → {NavProviders}", navProviders);
 
             // ReSharper disable PossibleNullReferenceException
             var addProvider = navProviders.SelectSingleNode("add[@name='" + navName + "']") as XmlElement;
+			eventLogger.LogDebug("UpdateWebConfig(): addProvider → {AddProvider}", addProvider);
 
             // ReSharper restore PossibleNullReferenceException
             var needsUpdate = true;
+			eventLogger.LogDebug("UpdateWebConfig(): needsUpdate → {NeedsUpdate}", needsUpdate);
             if (addProvider == null)
             {
                 addProvider = configXml.CreateElement("add");
@@ -141,19 +156,25 @@ namespace DotNetNuke.Web.DDRMenu
                 addProvider.SetAttribute("type", navType);
                 configXml.Save(webConfig);
             }
+			eventLogger.LogDebug("<<< Exiting UpdateWebConfig()");
         }
 
         private static void TidyModuleDefinitions(IEventLogger eventLogger, IPermissionDefinitionService permissionDefinitionService, IHostSettings hostSettings)
         {
+			eventLogger.LogDebug(">>> Entering TidyModuleDefinitions(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings})", eventLogger, permissionDefinitionService, hostSettings);
             RemoveLegacyModuleDefinitions(eventLogger, permissionDefinitionService, hostSettings, DdrMenuModuleName, DdrMenuModuleDefinitionName);
             RemoveLegacyModuleDefinitions(eventLogger, permissionDefinitionService, hostSettings, "DDRMenuAdmin", "N/A");
+			eventLogger.LogDebug("<<< Exiting TidyModuleDefinitions(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings})", eventLogger, permissionDefinitionService, hostSettings);
         }
 
         private static void RemoveLegacyModuleDefinitions(IEventLogger eventLogger, IPermissionDefinitionService permissionDefinitionService, IHostSettings hostSettings, string moduleName, string currentModuleDefinitionName)
         {
+			eventLogger.LogDebug(">>> Entering RemoveLegacyModuleDefinitions(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},moduleName={ModuleName},currentModuleDefinitionName={CurrentModuleDefinitionName})", eventLogger, permissionDefinitionService, hostSettings, moduleName, currentModuleDefinitionName);
             var mdc = new ModuleDefinitionController(permissionDefinitionService);
 
+			eventLogger.LogDebug("RemoveLegacyModuleDefinitions(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},moduleName={ModuleName},currentModuleDefinitionName={CurrentModuleDefinitionName}): mdc → {Mdc}", eventLogger, permissionDefinitionService, hostSettings, moduleName, currentModuleDefinitionName, mdc);
             var desktopModule = DesktopModuleController.GetDesktopModuleByModuleName(hostSettings, moduleName, Null.NullInteger);
+			eventLogger.LogDebug("RemoveLegacyModuleDefinitions(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},moduleName={ModuleName},currentModuleDefinitionName={CurrentModuleDefinitionName}): desktopModule → {DesktopModule}", eventLogger, permissionDefinitionService, hostSettings, moduleName, currentModuleDefinitionName, desktopModule);
             if (desktopModule == null)
             {
                 return;
@@ -161,8 +182,10 @@ namespace DotNetNuke.Web.DDRMenu
 
             var desktopModuleId = desktopModule.DesktopModuleID;
             var modDefs = ModuleDefinitionController.GetModuleDefinitionsByDesktopModuleID(desktopModuleId);
+			eventLogger.LogDebug("RemoveLegacyModuleDefinitions(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},moduleName={ModuleName},currentModuleDefinitionName={CurrentModuleDefinitionName}): modDefs → {ModDefs}", eventLogger, permissionDefinitionService, hostSettings, moduleName, currentModuleDefinitionName, modDefs);
 
             var currentModDefId = 0;
+			eventLogger.LogDebug("RemoveLegacyModuleDefinitions(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},moduleName={ModuleName},currentModuleDefinitionName={CurrentModuleDefinitionName}): currentModDefId → {CurrentModDefId}", eventLogger, permissionDefinitionService, hostSettings, moduleName, currentModuleDefinitionName, currentModDefId);
             foreach (var modDefKeyPair in modDefs)
             {
                 if (modDefKeyPair.Value.FriendlyName.Equals(currentModuleDefinitionName, StringComparison.InvariantCultureIgnoreCase))
@@ -181,6 +204,7 @@ namespace DotNetNuke.Web.DDRMenu
                         if (mod.ModuleDefID == oldModDefId)
                         {
                             mod.ModuleDefID = currentModDefId;
+							eventLogger.LogDebug("RemoveLegacyModuleDefinitions(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},moduleName={ModuleName},currentModuleDefinitionName={CurrentModuleDefinitionName}): mod.ModuleDefID → {Arg5}", eventLogger, permissionDefinitionService, hostSettings, moduleName, currentModuleDefinitionName, mod.ModuleDefID);
                             ModuleController.Instance.UpdateModule(mod);
                         }
                     }
@@ -194,24 +218,31 @@ namespace DotNetNuke.Web.DDRMenu
             {
                 new DesktopModuleController(eventLogger).DeleteDesktopModule(desktopModuleId);
             }
+			eventLogger.LogDebug("<<< Exiting RemoveLegacyModuleDefinitions(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},moduleName={ModuleName},currentModuleDefinitionName={CurrentModuleDefinitionName})", eventLogger, permissionDefinitionService, hostSettings, moduleName, currentModuleDefinitionName);
         }
 
         private static void CleanOldAssemblies()
         {
+			eventLogger.LogDebug(">>> Entering CleanOldAssemblies()");
             var assembliesToRemove = new[] { "DNNDoneRight.DDRMenu.dll", "DNNGarden.DDRMenu.dll", };
 
+			eventLogger.LogDebug("CleanOldAssemblies(): assembliesToRemove → {AssembliesToRemove}", assembliesToRemove);
             var server = HttpContext.Current.Server;
             var assemblyPath = server.MapPath("~/bin/");
+			eventLogger.LogDebug("CleanOldAssemblies(): assemblyPath → {AssemblyPath}", assemblyPath);
             foreach (var assembly in assembliesToRemove)
             {
                 File.Delete(Path.Combine(assemblyPath, assembly));
             }
+			eventLogger.LogDebug("<<< Exiting CleanOldAssemblies()");
         }
 
         private static void CheckSkinReferences()
         {
+			eventLogger.LogDebug(">>> Entering CheckSkinReferences()");
             var server = HttpContext.Current.Server;
             var portalsRoot = server.MapPath("~/Portals/");
+			eventLogger.LogDebug("CheckSkinReferences(): portalsRoot → {PortalsRoot}", portalsRoot);
             foreach (var portal in Directory.GetDirectories(portalsRoot))
             {
                 foreach (var skinControl in Directory.GetFiles(portal, "*.ascx", SearchOption.AllDirectories))
@@ -219,12 +250,17 @@ namespace DotNetNuke.Web.DDRMenu
                     try
                     {
                         var ascxText = File.ReadAllText(skinControl);
+						eventLogger.LogDebug("CheckSkinReferences(): ascxText → {AscxText}", ascxText);
                         var originalText = ascxText;
 
                         Regex ascxText1Regex = new Regex(Regex.Escape(@"Namespace=""DNNDoneRight.DDRMenu"""), RegexOptions.IgnoreCase | RegexOptions.Compiled);
                         Regex ascxText2Regex = new Regex(Regex.Escape(@"Namespace=""DNNGarden.TemplateEngine"""), RegexOptions.IgnoreCase | RegexOptions.Compiled);
+						eventLogger.LogDebug("CheckSkinReferences(): ascxText1Regex → {AscxText1Regex}", ascxText1Regex);
+						eventLogger.LogDebug("CheckSkinReferences(): ascxText2Regex → {AscxText2Regex}", ascxText2Regex);
                         Regex ascxText3Regex = new Regex(Regex.Escape(@"Assembly=""DNNDoneRight.DDRMenu"""), RegexOptions.IgnoreCase | RegexOptions.Compiled);
                         Regex ascxText4Regex = new Regex(Regex.Escape(@"Assembly=""DNNGarden.DDRMenu"""), RegexOptions.IgnoreCase | RegexOptions.Compiled);
+						eventLogger.LogDebug("CheckSkinReferences(): ascxText4Regex → {AscxText4Regex}", ascxText4Regex);
+						eventLogger.LogDebug("CheckSkinReferences(): ascxText3Regex → {AscxText3Regex}", ascxText3Regex);
 
                         ascxText = ascxText1Regex.Replace(ascxText, @"Namespace=""DotNetNuke.Web.DDRMenu.TemplateEngine""");
                         ascxText = ascxText2Regex.Replace(ascxText, @"Namespace=""DotNetNuke.Web.DDRMenu.TemplateEngine""");
@@ -238,15 +274,19 @@ namespace DotNetNuke.Web.DDRMenu
                     }
                     catch (IOException)
                     {
+					eventLogger.LogError("Exception in CheckSkinReferences(): {Arg0}", IOException.getMessage());
                     }
                     catch (UnauthorizedAccessException)
                     {
+					eventLogger.LogError("Exception in CheckSkinReferences(): {Arg0}", UnauthorizedAccessException.getMessage());
                     }
                     catch (SecurityException)
                     {
+					eventLogger.LogError("Exception in CheckSkinReferences(): {Arg0}", SecurityException.getMessage());
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting CheckSkinReferences()");
         }
     }
 }

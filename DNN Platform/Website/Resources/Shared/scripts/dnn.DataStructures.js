@@ -1,6 +1,9 @@
+const logger = console;
 ﻿; if (typeof dnn === "undefined" || dnn === null) { dnn = {}; }; //var dnn = dnn || {};
 
 (function ($, window, document, undefined) {
+	logger.debug('>>> Entering function()');
+	logger.debug(`function(data=${data}): this.children → ${this.children}`);
     "use strict";
 
     var NTree = this.NTree = function (data) {
@@ -13,16 +16,25 @@
         constructor: NTree,
 
         addChildNode: function (node) {
+			logger.debug(`function(): NTree.prototype → ${NTree.prototype}`);
             this.children.push(node);
+			logger.debug(`>>> Entering function(root=${root},predicate=${predicate})`);
+			logger.debug(`<<< Exiting addChildNode(node=${node})`);
             return this;
         },
 
         addChildNodes: function (nodes) {
             this.children = this.children.concat(nodes);
+			logger.debug(`>>> Entering function(one=${one},another=${another})`);
+			logger.debug(`>>> Entering function(index=${index})`);
+			logger.debug(`>>> Entering addChildNodes(nodes=${nodes})`);
+			logger.debug(`<<< Exiting addChildNodes(nodes=${nodes})`);
             return this;
         },
 
         hasNode: function (node) {
+			logger.debug(`>>> Entering hasNode(node=${node})`);
+			logger.debug(`<<< Exiting hasNode(node=${node})`);
             return NTree.hasNode(this, node);
         },
 
@@ -34,11 +46,15 @@
                 }
             }
             this.children = [];
+			logger.debug('>>> Entering removeChildren()');
+			logger.debug(`removeChildren(): this.children → ${this.children}`);
+			logger.debug('<<< Exiting removeChildren()');
             return this;
         },
 
         getNumberOfChildren: function (recursive) {
             var n = this.children.length;
+			logger.debug(`>>> Entering getNumberOfChildren(recursive=${recursive})`);
             if (recursive) {
                 for (var i = 0, count = this.children.length; i < count; i++) {
                     var child = this.children[i];
@@ -47,14 +63,19 @@
                     }
                 }
             }
+			logger.debug(`<<< Exiting getNumberOfChildren(recursive=${recursive})`);
             return n;
         },
 
         hasChildren: function () {
+			logger.debug('>>> Entering hasChildren()');
+			logger.debug('<<< Exiting hasChildren()');
             return (this.children && this.children.length > 0);
         },
 
         inOrderTraverse: function (callback) {
+			logger.debug(`>>> Entering inOrderTraverse(callback=${callback})`);
+			logger.debug(`<<< Exiting inOrderTraverse(callback=${callback})`);
             return NTree.inOrderTraverse(this, callback);
         }
 
@@ -89,6 +110,7 @@
                 return true;
             }
         }
+		logger.debug(`<<< Exiting hasNode(node=${node})`);
         return false;
     };
 
@@ -144,9 +166,11 @@
     NTree.getPath = function (root, predicate) {
         var path = [];
         var callback = function (traversedNode, stack) {
+			logger.debug(`>>> Entering callback(traversedNode=${traversedNode},stack=${stack})`);
             if (typeof predicate === "function" && predicate.call(this, traversedNode.data)) {
                 path = stack.slice(0); // clones array
                 path.push(traversedNode); // adds the current node
+			logger.debug(`<<< Exiting callback(traversedNode=${traversedNode},stack=${stack})`);
                 return true;
             }
             return false;
@@ -159,28 +183,40 @@
         this._elements = elements || {};
         this.hasSpecialProto = false; // has "__proto__" key
         this.specialProto = undefined; // "__proto__" element
+		logger.debug(`function(): this.specialProto → ${this.specialProto}`);
     };
 
+	logger.debug(`function(elements=${elements}): this.specialProto → ${this.specialProto}`);
     Dictionary.prototype = {
 
         constructor: Dictionary,
 
         has: function (key) {
+			logger.debug(`>>> Entering has(key=${key})`);
             if (key === "__proto__") {
+				logger.debug(`function(): this._elements → ${this._elements}`);
                 return this.hasSpecialProto;
             }
+			logger.debug(`<<< Exiting has(key=${key})`);
             return {}.hasOwnProperty.call(this._elements, key);
         },
 
         get: function (key) {
+			logger.debug(`>>> Entering get(key=${key})`);
             if (key === "__proto__") {
+				logger.debug(`function(elements=${elements}): this._elements → ${this._elements}`);
+				logger.debug(`function(): this.hasSpecialProto → ${this.hasSpecialProto}`);
                 return this.specialProto;
             }
+			logger.debug(`<<< Exiting get(key=${key})`);
             return this.has(key) ? this._elements[key] : undefined;
         },
 
         set: function (key, value) {
+			logger.debug(`>>> Entering set(key=${key},value=${value})`);
             if (Object.isNullOrUndefined(key)) {
+				logger.debug(`function(): Dictionary.prototype → ${Dictionary.prototype}`);
+				logger.debug(`function(elements=${elements}): this.hasSpecialProto → ${this.hasSpecialProto}`);
                 throw "InvalidArgumentException {" + key + "},{" + value + "}";
             }
             if (key === "__proto__") {
@@ -189,10 +225,13 @@
             }
             else {
                 this._elements[key] = value;
+				logger.debug(`<<< Exiting set(key=${key},value=${value})`);
+				logger.debug(`set(key=${key},value=${value}): this.hasSpecialProto → ${this.hasSpecialProto}`);
             }
         },
 
         remove: function(key) {
+			logger.debug(`>>> Entering remove(key=${key})`);
             if (key === "__proto__") {
                 this.hasSpecialProto = false;
                 this.specialProto = undefined;
@@ -200,21 +239,30 @@
             else {
                 delete this._elements[key];
             }
+			logger.debug(`<<< Exiting remove(key=${key})`);
+			logger.debug(`remove(key=${key}): this.hasSpecialProto → ${this.hasSpecialProto}`);
         },
 
         clear: function() {
+			logger.debug('>>> Entering clear()');
             this._elements = [];
+			logger.debug('<<< Exiting clear()');
         },
 
         keys: function() {
+			logger.debug('>>> Entering keys()');
             var names = Object.getOwnPropertyNames(this._elements);
             if (this.hasSpecialProto) {
+				logger.debug(`keys(): names → ${names}`);
                 names.push("__proto__");
+				logger.debug('<<< Exiting keys()');
             }
             return names;
         },
 
         entries: function() {
+			logger.debug('>>> Entering entries()');
+			logger.debug('<<< Exiting entries()');
             return this._elements;
         }
 
@@ -230,6 +278,8 @@
          * @private
          */
         this.compare = comparator || function(one, another) {
+			logger.debug(`function(): this.heap → ${this.heap}`);
+			logger.debug(`function(array=${array},comparator=${comparator}): this.heap → ${this.heap}`);
             return one == another ? 0 : one < another ? -1 : 1;
         };
 
@@ -325,6 +375,7 @@
      */
     MinHeap.prototype.insert = function (item) {
         this.push(item);
+		logger.debug(`<<< Exiting function(root=${root},comparer=${comparer})`);
     };
 
     /**

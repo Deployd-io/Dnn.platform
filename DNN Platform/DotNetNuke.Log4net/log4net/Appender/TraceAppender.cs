@@ -60,6 +60,8 @@ namespace log4net.Appender
         /// </remarks>
         public TraceAppender()
         {
+		value.LogDebug(">>> Entering TraceAppender()");
+		value.LogDebug("<<< Exiting TraceAppender()");
         }
 
         /// <summary>
@@ -75,7 +77,9 @@ namespace log4net.Appender
         [System.Obsolete("Instead use the default constructor and set the Layout property")]
         public TraceAppender(ILayout layout)
         {
+			value.LogDebug(">>> Entering TraceAppender(layout={Layout})", layout);
             this.Layout = layout;
+			value.LogDebug("<<< Exiting TraceAppender(layout={Layout})", layout);
         }
 
         /// <summary>
@@ -126,8 +130,10 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			value.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             //
             // Write the string to the Trace system
+			value.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
             //
 #if NETCF
             System.Diagnostics.Debug.Write(RenderLoggingEvent(loggingEvent), m_category.Format(loggingEvent));
@@ -185,12 +191,14 @@ namespace log4net.Appender
         /// <returns><c>True</c> if all logging events were flushed successfully, else <c>false</c>.</returns>
         public override bool Flush(int millisecondsTimeout)
         {
+			value.LogDebug(">>> Entering Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
             // Nothing to do if ImmediateFlush is true
             if (this.m_immediateFlush)
             {
                 return true;
             }
 
+			value.LogDebug("<<< Exiting Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
             // System.Diagnostics.Trace and System.Diagnostics.Debug are thread-safe, so no need for lock(this).
 #if NETCF
             System.Diagnostics.Debug.Flush();

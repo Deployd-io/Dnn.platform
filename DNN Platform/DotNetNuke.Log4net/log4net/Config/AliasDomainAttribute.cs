@@ -64,6 +64,8 @@ namespace log4net.Config
         /// </remarks>
         public AliasDomainAttribute(string name) : base(name)
         {
+		value.LogDebug(">>> Entering AliasDomainAttribute(name={Name})", name);
+		value.LogDebug("<<< Exiting AliasDomainAttribute(name={Name})", name);
         }
     }
 }

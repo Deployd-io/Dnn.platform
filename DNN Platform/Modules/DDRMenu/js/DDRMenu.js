@@ -1,3 +1,4 @@
+const logger = console;
 if (!window.DDR)
 	window.DDR = {};
 if (!DDR.Menu)
@@ -6,10 +7,15 @@ if (!DDR.Menu.Providers)
 	DDR.Menu.Providers = {};
 
 DDRjQuery(function ($) {
+	logger.debug('>>> Entering DDRjQuery()');
 	DDR.Menu.Providers.BaseRenderer = function () {
+	logger.debug('>>> Entering function()');
 	}
+	logger.debug('<<< Exiting function()');
 
 	DDR.Menu.Providers.BaseRenderer.prototype.baseConstructor = function (jqContainer, dnnNavParams) {
+		logger.debug(`>>> Entering function(jq=${jq})`);
+		logger.debug(`>>> Entering function(jqContainer=${jqContainer},dnnNavParams=${dnnNavParams})`);
 		var me = this;
 
 		me.jqContainer = jqContainer;
@@ -29,9 +35,12 @@ DDRjQuery(function ($) {
 		me.orientHorizontal = (dnnNavParams.ControlOrientation != "Vertical");
 
 		me.useShim = $.browser.msie && dnnNavParams.shim;
+		logger.debug(`<<< Exiting function(jqContainer=${jqContainer},dnnNavParams=${dnnNavParams})`);
 	}
 
 	DDR.Menu.Providers.BaseRenderer.prototype.mapToRendered = function (jq) {
+		logger.debug(`<<< Exiting function(jq=${jq})`);
+		logger.debug('<<< Exiting DDRjQuery()');
 		return $($.map(jq.get(), function (elt) { return $(elt).ddrData().rendered.get(0); }));
 	}
 
@@ -42,7 +51,9 @@ DDRjQuery(function ($) {
 		var coveringBase = $("<a style='position:absolute;display:block;border:0;padding:0;margin:0;top:0;left:0;bottom:0;right:0;text-decoration:none'><span style='visibility:hidden'/></a>").css("background", $.browser.msie ? "url(" + me.dnnNavParams.PathSystemImage + "spacer.gif)" : "transparent");
 		var overrideDimensions = ($.browser.msie && $.browser.version.startsWith("6.")) || !$.support.boxModel;
 		me.menus.each(function (m) {
+			logger.debug('>>> Entering each()');
 			m.coverings = new Array();
+			logger.debug('<<< Exiting each()');
 			m.childItems.each(function (i) {
 				if (i.coveringHere) {
 					var itemText = i.rendered.text();
@@ -122,6 +133,8 @@ DDRjQuery(function ($) {
 			var childMenu = i.childMenu;
 
 			var hideThese = me.subMenus.filter(function (m) {
+				logger.debug('>>> Entering filter()');
+				logger.debug('<<< Exiting filter()');
 				return (m.flyout && !(allParents.contains(m) || allChildren.contains(m)));
 			});
 
@@ -150,7 +163,9 @@ DDRjQuery(function ($) {
 							}
 						);
 					i.rendered.focus(function () {
+						logger.debug('>>> Entering focus()');
 						i.hideThese.allRendered().each(function () { this.hideMenu() });
+						logger.debug('<<< Exiting focus()');
 						i.showThese.allRendered().each(function () { this.showMenu(true) });
 					});
 				});
@@ -160,6 +175,7 @@ DDRjQuery(function ($) {
 
 				menuElt.hideMenu = function () {
 					jqMenu.stop(true, true);
+					logger.debug(`>>> Entering function(instant=${instant})`);
 					if (this.style.display != "none") {
 						jqMenu.hide();
 						if (menu.shim)
@@ -167,6 +183,7 @@ DDRjQuery(function ($) {
 					}
 				};
 				menuElt.showMenu = function (instant) {
+					logger.debug(`<<< Exiting function(instant=${instant})`);
 					if (this.style.display == "none") {
 						jqMenu.stop(true, true);
 						menu.childItems.allRendered().stop(true, true).off('mouseenter mouseleave');
@@ -176,6 +193,8 @@ DDRjQuery(function ($) {
 						} else {
 							if (me.showEffect == "none") {
 								jqMenu.queue(function () {
+									logger.debug('>>> Entering queue()');
+									logger.debug('<<< Exiting queue()');
 									setTimeout(function () { jqMenu.dequeue(); }, me.showEffectSpeed);
 								});
 								jqMenu.show(1);
@@ -217,14 +236,18 @@ DDRjQuery(function ($) {
 			}
 
 			menu.rendered.mouseover(function () {
+				logger.debug('>>> Entering mouseover()');
 				if (me.timeoutID) {
 					window.clearTimeout(me.timeoutID);
 					me.timeoutID = null;
+					logger.debug('<<< Exiting mouseover()');
 				}
 			});
 			menu.rendered.mouseout(function () {
+				logger.debug('>>> Entering mouseout()');
 				if (!me.timeoutID) {
 					me.timeoutID = window.setTimeout(function () { me.closeUp(); }, 400);
+					logger.debug('<<< Exiting mouseout()');
 				}
 			});
 			menu.rendered.mouseover(function () {
@@ -393,6 +416,7 @@ DDRjQuery(function ($) {
 	}
 
 	DDR.Menu.getCSS = function (elt, css) {
+		logger.debug(`>>> Entering function(fn=${fn})`);
 	    return parseFloat("0" + $(elt).css(css));
 	};
 
@@ -410,6 +434,7 @@ DDRjQuery(function ($) {
 					result[result.length] = this[n];
 				}
 			}
+			logger.debug(`<<< Exiting function(o=${o})`);
 			return result;
 		}
 
@@ -430,6 +455,7 @@ DDRjQuery(function ($) {
 
 	$.fn.extend({
 		getLeft: function (index) {
+			logger.debug(`>>> Entering getLeft(index=${index})`);
 			var o = this;
 			//            if (this[0].tagName == "TR")
 			//                o = o.children("td:first");
@@ -445,6 +471,7 @@ DDRjQuery(function ($) {
 			return result;
 		},
 		getTop: function (index) {
+			logger.debug(`>>> Entering getTop(index=${index})`);
 			var o = this;
 			//            if (this[0].tagName == "TR")
 			//                o = o.children("td:first");
@@ -460,6 +487,7 @@ DDRjQuery(function ($) {
 			return result;
 		},
 		getRight: function (index) {
+			logger.debug(`>>> Entering getRight(index=${index})`);
 			var result = this.getLeft(4) + this.width();
 			var htmlThis = this[0];
 			if (index < 4)
@@ -471,6 +499,7 @@ DDRjQuery(function ($) {
 			return result;
 		},
 		getBottom: function (index) {
+			logger.debug(`>>> Entering getBottom(index=${index})`);
 			var result = this.getTop(4) + this.height();
 			var htmlThis = this[0];
 			if (index < 4)
@@ -482,8 +511,10 @@ DDRjQuery(function ($) {
 			return result;
 		},
 		alignElement: function (horizontalFn, horizontalVal, verticalFn, verticalVal) {
+			logger.debug(`>>> Entering alignElement(horizontalFn=${horizontalFn},horizontalVal=${horizontalVal},verticalFn=${verticalFn},verticalVal=${verticalVal})`);
 			return this.each(function () {
 				var jqThis = $(this);
+				logger.debug(`<<< Exiting alignElement(horizontalFn=${horizontalFn},horizontalVal=${horizontalVal},verticalFn=${verticalFn},verticalVal=${verticalVal})`);
 				var prevDisplay = jqThis.css("display");
 				jqThis.css({ "left": "-999px", "top": "-999px", "position": "absolute", "display": "block" });
 				horizontalVal -= (999 + horizontalFn());
@@ -494,6 +525,8 @@ DDRjQuery(function ($) {
 			});
 		},
 		alignHorizontal: function (horizontalFn, horizontalVal) {
+			logger.debug(`>>> Entering alignHorizontal(horizontalFn=${horizontalFn},horizontalVal=${horizontalVal})`);
+			logger.debug(`<<< Exiting alignHorizontal(horizontalFn=${horizontalFn},horizontalVal=${horizontalVal})`);
 			return this.each(function () {
 				var jqThis = $(this);
 				var prevDisplay = jqThis.css("display");
@@ -505,6 +538,8 @@ DDRjQuery(function ($) {
 			});
 		},
 		alignVertical: function (verticalFn, verticalVal) {
+			logger.debug(`>>> Entering alignVertical(verticalFn=${verticalFn},verticalVal=${verticalVal})`);
+			logger.debug(`<<< Exiting alignVertical(verticalFn=${verticalFn},verticalVal=${verticalVal})`);
 			return this.each(function () {
 				var jqThis = $(this);
 				var prevDisplay = jqThis.css("display");
@@ -516,6 +551,8 @@ DDRjQuery(function ($) {
 			});
 		},
 		sizeElement: function (horizontalFn, horizontalVal, verticalFn, verticalVal) {
+			logger.debug(`>>> Entering sizeElement(horizontalFn=${horizontalFn},horizontalVal=${horizontalVal},verticalFn=${verticalFn},verticalVal=${verticalVal})`);
+			logger.debug(`<<< Exiting sizeElement(horizontalFn=${horizontalFn},horizontalVal=${horizontalVal},verticalFn=${verticalFn},verticalVal=${verticalVal})`);
 			return this.each(function () {
 				var jqThis = $(this);
 				var prevDisplay = jqThis.css("display");
@@ -528,20 +565,26 @@ DDRjQuery(function ($) {
 			});
 		},
 		setContentWidth: function (width) {
+			logger.debug(`>>> Entering setContentWidth(width=${width})`);
+			logger.debug(`<<< Exiting setContentWidth(width=${width})`);
 			return this.each(function () {
 				var jqThis = $(this);
 				jqThis.width($.support.boxModel ? width : width + jqThis.fullWidth() - jqThis.width());
 			});
 		},
 		setContentHeight: function (height) {
+			logger.debug(`>>> Entering setContentHeight(height=${height})`);
+			logger.debug(`<<< Exiting setContentHeight(height=${height})`);
 			return this.each(function () {
 				var jqThis = $(this);
 				jqThis.height($.support.boxModel ? height : height + jqThis.fullHeight() - jqThis.height());
 			});
 		},
 		setFullWidth: function (width) {
+			logger.debug(`>>> Entering setFullWidth(width=${width})`);
 			return this.each(function () {
 				var jqThis = $(this);
+				logger.debug(`<<< Exiting setFullWidth(width=${width})`);
 				var delta = jqThis.width() - jqThis.fullWidth();
 				jqThis.width(width + delta);
 				for (var n = 0; n < 100; n++) {
@@ -554,6 +597,8 @@ DDRjQuery(function ($) {
 			});
 		},
 		setFullHeight: function (height) {
+			logger.debug(`>>> Entering setFullHeight(height=${height})`);
+			logger.debug(`<<< Exiting setFullHeight(height=${height})`);
 			return this.each(function () {
 				var jqThis = $(this);
 				var delta = jqThis.height() - jqThis.fullHeight();
@@ -568,21 +613,25 @@ DDRjQuery(function ($) {
 			});
 		},
 		fullWidth: function () {
+			logger.debug('>>> Entering fullWidth()');
 			var result = 0;
 			this.each(function () {
 				var max = $(this).outerWidth(true);
 				if (max > result)
 					result = max;
 			});
+			logger.debug('<<< Exiting fullWidth()');
 			return result;
 		},
 		fullHeight: function () {
+			logger.debug('>>> Entering fullHeight()');
 			var result = 0;
 			this.each(function () {
 				var max = $(this).outerHeight(true);
 				if (max > result)
 					result = max;
 			});
+			logger.debug('<<< Exiting fullHeight()');
 			return result;
 		},
 		totalWidth: function () {
@@ -590,26 +639,36 @@ DDRjQuery(function ($) {
 			this.each(function () {
 				result += $(this).outerWidth(true);
 			});
+			logger.debug('>>> Entering totalWidth()');
+			logger.debug('<<< Exiting totalWidth()');
 			return result;
 		},
 		totalHeight: function () {
 			var result = 0;
+			logger.debug('>>> Entering totalHeight()');
 			this.each(function () {
 				result += $(this).outerHeight(true);
 			});
+			logger.debug('<<< Exiting totalHeight()');
 			return result;
 		},
 		matchWidths: function () {
+			logger.debug('>>> Entering matchWidths()');
+			logger.debug('<<< Exiting matchWidths()');
 			return this.setFullWidth(this.fullWidth());
 		},
 		matchHeights: function () {
+			logger.debug('>>> Entering matchHeights()');
+			logger.debug('<<< Exiting matchHeights()');
 			return this.setFullHeight(this.fullHeight());
 		},
 		lineUpHorizontal: function (columns) {
+			logger.debug(`>>> Entering lineUpHorizontal(columns=${columns})`);
 			var firstElt = $(this[0]);
 			var left0 = left = firstElt.getLeft(1);
 			var top = firstElt.getTop(2);
 			var column = 0;
+			logger.debug(`<<< Exiting lineUpHorizontal(columns=${columns})`);
 			return this.each(function () {
 				var jqThis = $(this);
 				jqThis.alignElement(
@@ -626,9 +685,11 @@ DDRjQuery(function ($) {
 			});
 		},
 		lineUpVertical: function () {
+			logger.debug('>>> Entering lineUpVertical()');
 			var firstElt = $(this[0]);
 			var left = firstElt.getLeft(2);
 			var top = firstElt.getTop(1);
+			logger.debug('<<< Exiting lineUpVertical()');
 			return this.each(function () {
 				var jqThis = $(this);
 				jqThis.alignElement(
@@ -639,6 +700,8 @@ DDRjQuery(function ($) {
 			});
 		},
 		fitToContent: function () {
+			logger.debug('>>> Entering fitToContent()');
+			logger.debug('<<< Exiting fitToContent()');
 			return this.each(function () {
 				var maxRight = -999999;
 				var maxBottom = -999999;
@@ -665,6 +728,7 @@ DDRjQuery(function ($) {
 			});
 		},
 		stretchBlockHyperlinks: function () {
+			logger.debug('>>> Entering stretchBlockHyperlinks()');
 			this.find("a").each(function () {
 				var jqThis = $(this);
 				if (jqThis.css("display") == "block") {
@@ -672,8 +736,11 @@ DDRjQuery(function ($) {
 					jqThis.setFullHeight(jqThis.parent().height());
 				}
 			});
+			logger.debug('<<< Exiting stretchBlockHyperlinks()');
 		},
 		setHoverClass: function (cssClass, alter, prevClass) {
+			logger.debug(`>>> Entering setHoverClass(cssClass=${cssClass},alter=${alter},prevClass=${prevClass})`);
+			logger.debug(`<<< Exiting setHoverClass(cssClass=${cssClass},alter=${alter},prevClass=${prevClass})`);
 			return this.each(function () {
 				if (cssClass) {
 					var jqThis = $(this);
@@ -701,8 +768,10 @@ DDRjQuery(function ($) {
 			});
 		},
 		ddrData: function () {
+			logger.debug('>>> Entering ddrData()');
 			if (!this.data("ddrData"))
 				this.data("ddrData", {});
+			logger.debug('<<< Exiting ddrData()');
 			return this.data("ddrData");
 		},
 		setMenuData: function (level, parentItem) {
@@ -796,6 +865,8 @@ DDRjQuery(function ($) {
 			return result;
 		},
 		toDDRObjectArray: function () {
+			logger.debug('>>> Entering toDDRObjectArray()');
+			logger.debug('<<< Exiting toDDRObjectArray()');
 			return $.map(this, function (elt) { return $(elt).toDDRObject(); });
 		}
 	});

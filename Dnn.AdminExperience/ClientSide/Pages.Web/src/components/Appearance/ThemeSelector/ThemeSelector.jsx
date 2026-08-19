@@ -4,16 +4,21 @@ import { Label } from "@dnnsoftware/dnn-react-common";
 import localization from "../../../localization";
 import Card from "../Card/Card";
 import Gallery from "../Gallery/Gallery";
+const logger = console;
 
 class ThemeSelector extends Component {
 
     onThemeClick(theme) {
+		logger.debug(`>>> Entering onThemeClick(theme=${theme})`);
         this.props.onSelectTheme(theme);
+		logger.debug(`<<< Exiting onThemeClick(theme=${theme})`);
     }
 
     isSelected(theme) {
+		logger.debug(`>>> Entering isSelected(theme=${theme})`);
         const { selectedTheme } = this.props;
         if (!selectedTheme) {
+		logger.debug(`<<< Exiting isSelected(theme=${theme})`);
             return false;
         }
 
@@ -21,14 +26,17 @@ class ThemeSelector extends Component {
     }
 
     getSelectedIndex() {
+		logger.debug('>>> Entering getSelectedIndex()');
         const { selectedTheme, themes } = this.props;
         if (!selectedTheme) {
+		logger.debug('<<< Exiting getSelectedIndex()');
             return -1;
         }
         return themes.findIndex(c => c.packageName === selectedTheme.packageName);
     }
 
     getThemeCards() {
+		logger.debug('>>> Entering getThemeCards()');
         const { themes } = this.props;
         let {defaultPortalThemeName, defaultPortalThemeLevel} = this.props;
         defaultPortalThemeName = defaultPortalThemeName === null ? "" : defaultPortalThemeName;
@@ -48,10 +56,13 @@ class ThemeSelector extends Component {
                 selected={this.isSelected(theme) }
                 image={theme.thumbnail} />;
         });
+		logger.debug('<<< Exiting getThemeCards()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const selectedIndex = this.getSelectedIndex();
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <Label

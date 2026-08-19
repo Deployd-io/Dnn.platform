@@ -35,6 +35,10 @@ public class ModuleServiceController : DnnApiController
     public ModuleServiceController()
         : this(null, null)
     {
+	Logger.LogDebug(">>> Entering ModuleServiceController()");
+	Logger.LogDebug("<<< Exiting ModuleServiceController()");
+	Logger.LogDebug(">>> Entering ModuleServiceController(hostSettings={HostSettings},dataProvider={DataProvider})", hostSettings, dataProvider);
+	Logger.LogDebug("ModuleServiceController(hostSettings={HostSettings},dataProvider={DataProvider}): dataProvider → {DataProvider1}", hostSettings, dataProvider, dataProvider);
     }
 
     /// <summary>Initializes a new instance of the <see cref="ModuleServiceController"/> class.</summary>
@@ -44,6 +48,7 @@ public class ModuleServiceController : DnnApiController
     {
         this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
         this.dataProvider = dataProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>();
+		Logger.LogDebug("<<< Exiting ModuleServiceController(hostSettings={HostSettings},dataProvider={DataProvider})", hostSettings, dataProvider);
     }
 
     /// <summary>Gets a value determining whether a module is shareable.</summary>
@@ -55,11 +60,14 @@ public class ModuleServiceController : DnnApiController
     [DnnAuthorize(StaticRoles = "Registered Users")]
     public HttpResponseMessage GetModuleShareable(int moduleId, int tabId, int portalId = -1)
     {
+		Logger.LogDebug(">>> Entering GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId})", moduleId, tabId, portalId);
         var requiresWarning = false;
         if (portalId <= -1)
         {
             var portalDict = PortalController.GetPortalDictionary(this.hostSettings, this.dataProvider);
+			Logger.LogDebug("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): portalDict → {PortalDict}", moduleId, tabId, portalId, portalDict);
             portalId = portalDict[tabId];
+			Logger.LogDebug("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): portalId → {PortalId1}", moduleId, tabId, portalId, portalId);
         }
         else
         {
@@ -74,6 +82,7 @@ public class ModuleServiceController : DnnApiController
         else
         {
             var moduleInfo = ModuleController.Instance.GetModule(moduleId, tabId, false);
+			Logger.LogDebug("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): moduleInfo → {ModuleInfo}", moduleId, tabId, portalId, moduleInfo);
 
             desktopModule = moduleInfo.DesktopModule;
 
@@ -83,7 +92,9 @@ public class ModuleServiceController : DnnApiController
         if (desktopModule == null)
         {
             var message = $"Cannot find module ID {moduleId} (tab ID {tabId}, portal ID {portalId})";
+			Logger.LogDebug("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): message → {Message}", moduleId, tabId, portalId, message);
             Logger.Error(message);
+		Logger.LogDebug("<<< Exiting GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId})", moduleId, tabId, portalId);
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message);
         }
 
@@ -98,12 +109,14 @@ public class ModuleServiceController : DnnApiController
     [DnnPageEditor]
     public HttpResponseMessage MoveModule(MoveModuleDTO postData)
     {
+		Logger.LogDebug(">>> Entering MoveModule(postData={PostData})", postData);
         var moduleOrder = postData.ModuleOrder;
         if (moduleOrder > 0)
         {
             // DNN-7099: the deleted modules won't show in page, so when the module index calculated from client, it will lost the
             // index count of deleted modules and will cause order issue.
             var deletedModules = ModuleController.Instance.GetTabModules(postData.TabId).Values.Where(m => m.IsDeleted);
+			Logger.LogDebug("MoveModule(postData={PostData}): deletedModules → {DeletedModules}", postData, deletedModules);
             foreach (var module in deletedModules)
             {
                 if (module.ModuleOrder < moduleOrder && module.PaneName == postData.Pane)
@@ -116,6 +129,7 @@ public class ModuleServiceController : DnnApiController
         ModuleController.Instance.UpdateModuleOrder(postData.TabId, postData.ModuleId, moduleOrder, postData.Pane);
         ModuleController.Instance.UpdateTabModuleOrder(postData.TabId);
 
+		Logger.LogDebug("<<< Exiting MoveModule(postData={PostData})", postData);
         return this.Request.CreateResponse(HttpStatusCode.OK);
     }
 
@@ -128,13 +142,17 @@ public class ModuleServiceController : DnnApiController
     [DnnAuthorize(StaticRoles = "Administrators")]
     public HttpResponseMessage DeleteModule(DeleteModuleDto deleteModuleDto)
     {
+		Logger.LogDebug(">>> Entering DeleteModule(deleteModuleDto={DeleteModuleDto})", deleteModuleDto);
         ModuleController.Instance.DeleteTabModule(deleteModuleDto.TabId, deleteModuleDto.ModuleId, deleteModuleDto.SoftDelete);
 
+		Logger.LogDebug("<<< Exiting DeleteModule(deleteModuleDto={DeleteModuleDto})", deleteModuleDto);
         return this.Request.CreateResponse(HttpStatusCode.OK);
     }
 
     private int FixPortalId(int portalId)
     {
+		Logger.LogDebug(">>> Entering FixPortalId(portalId={PortalId})", portalId);
+		Logger.LogDebug("<<< Exiting FixPortalId(portalId={PortalId})", portalId);
         return this.UserInfo.IsSuperUser &&
                this.PortalSettings.PortalId != portalId &&
                PortalController.Instance.GetPortals().OfType<IPortalInfo>().Any(x => x.PortalId == portalId)

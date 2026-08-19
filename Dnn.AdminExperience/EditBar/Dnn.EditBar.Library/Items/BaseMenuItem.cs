@@ -7,12 +7,14 @@ namespace Dnn.EditBar.Library.Items
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.Serialization;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>Represents an Edit Bar menu item.</summary>
     [Serializable]
     [DataContract]
     public abstract class BaseMenuItem
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>Gets the menu item name.</summary>
         [DataMember(Name = "name")]
         public abstract string Name { get; }
@@ -61,6 +63,8 @@ namespace Dnn.EditBar.Library.Items
         /// <returns><see langword="true"/> if this menu item is visible, otherwise <see langword="false"/>.</returns>
         public virtual bool Visible()
         {
+			_logger.LogDebug(">>> Entering Visible()");
+			_logger.LogDebug("<<< Exiting Visible()");
             return true;
         }
     }

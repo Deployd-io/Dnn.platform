@@ -7,11 +7,14 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A label control.</summary>
     public class DnnFieldLabel : DnnLabel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFieldLabel));
         /// <inheritdoc />
         public override void LocalizeStrings()
         {
+			Logger.LogDebug(">>> Entering LocalizeStrings()");
             base.LocalizeStrings();
             this.Text = this.Text + Utilities.GetLocalizedString("FieldSuffix.Text");
+			Logger.LogDebug("<<< Exiting LocalizeStrings()");
         }
     }
 }

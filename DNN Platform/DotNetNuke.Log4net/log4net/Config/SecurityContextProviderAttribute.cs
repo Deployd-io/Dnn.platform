@@ -57,7 +57,11 @@ namespace log4net.Config
         /// </remarks>
         public SecurityContextProviderAttribute(Type providerType) : base(100) /* configurator priority 100 to execute before the XmlConfigurator */
         {
+			value.LogDebug(">>> Entering SecurityContextProviderAttribute(providerType={ProviderType})", providerType);
             this.m_providerType = providerType;
+			value.LogDebug("SecurityContextProviderAttribute(providerType={ProviderType}): this.m_providerType → {Arg1}", providerType, this.m_providerType);
+			value.LogDebug("SecurityContextProviderAttribute(providerType={ProviderType}): m_providerType → {M_providerType}", providerType, m_providerType);
+			value.LogDebug("<<< Exiting SecurityContextProviderAttribute(providerType={ProviderType})", providerType);
         }
 
         /// <summary>Gets or sets the type of the provider to use.</summary>
@@ -87,6 +91,7 @@ namespace log4net.Config
         /// </remarks>
         public override void Configure(Assembly sourceAssembly, ILoggerRepository targetRepository)
         {
+			value.LogDebug(">>> Entering Configure(sourceAssembly={SourceAssembly},targetRepository={TargetRepository})", sourceAssembly, targetRepository);
             if (this.m_providerType == null)
             {
                 LogLog.Error(declaringType, "Attribute specified on assembly ["+sourceAssembly.FullName+"] with null ProviderType.");
@@ -96,6 +101,7 @@ namespace log4net.Config
                 LogLog.Debug(declaringType, "Creating provider of type ["+ this.m_providerType.FullName +"]");
 
                 SecurityContextProvider provider = Activator.CreateInstance(this.m_providerType) as SecurityContextProvider;
+				value.LogDebug("Configure(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): provider → {Provider}", sourceAssembly, targetRepository, provider);
 
                 if (provider == null)
                 {
@@ -104,8 +110,10 @@ namespace log4net.Config
                 else
                 {
                     SecurityContextProvider.DefaultProvider = provider;
+					value.LogDebug("Configure(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): SecurityContextProvider.DefaultProvider → {Arg2}", sourceAssembly, targetRepository, SecurityContextProvider.DefaultProvider);
                 }
             }
+			value.LogDebug("<<< Exiting Configure(sourceAssembly={SourceAssembly},targetRepository={TargetRepository})", sourceAssembly, targetRepository);
         }
 
         private Type m_providerType = null;

@@ -7,10 +7,12 @@ import { ContentLoadWrapper, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import resx from "../../resources";
 import Html from "../Html";
 import styles from "./style.module.less";
+const logger = console;
 
 class AuditCheckPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
 
         this.state = {
             checking: false
@@ -18,14 +20,17 @@ class AuditCheckPanelBody extends Component {
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         if (props.auditCheckResults) {
             return;
         }
         props.dispatch(SecurityActions.getAuditCheckResults());
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         const tableFields = [
             { "name": resx.get("SecurityCheck"), "id": "SecurityCheck" },
             { "name": resx.get("Result"), "id": "Result" },
@@ -38,10 +43,13 @@ class AuditCheckPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderHeader(): tableHeaders → ${tableHeaders}`);
+		logger.debug('<<< Exiting renderHeader()');
         return <div className="auditCheckHeader-wrapper">{tableHeaders}</div>;
     }
 
     getResultDisplay(result) {
+		logger.debug(`>>> Entering getResultDisplay(result=${result})`);
         const severity = result.Severity;
         const successText = result.SuccessText;
         const failureText = result.FailureText;
@@ -80,6 +88,7 @@ class AuditCheckPanelBody extends Component {
                     </div>
                 );
             default:
+				logger.debug(`<<< Exiting getResultDisplay(result=${result})`);
                 return (
                     <div className="label-result-severity">
                         <div className="label-result-severity-unverified" onClick={this.onAuditCheck.bind(this, result)}>
@@ -94,6 +103,7 @@ class AuditCheckPanelBody extends Component {
     }
 
     onAuditCheck(result) {
+		logger.debug(`>>> Entering onAuditCheck(result=${result})`);
         const {state, props} = this;
         if (state.checking) {
             return;
@@ -104,20 +114,25 @@ class AuditCheckPanelBody extends Component {
                 this.setState({checking: false});
             }));
         });
+		logger.debug(`<<< Exiting onAuditCheck(result=${result})`);
     }
 
      
     getNotesDisplay(notes) {
+		logger.debug(`>>> Entering getNotesDisplay(notes=${notes})`);
         if (notes && notes.length > 0) {
             return <div className="log-detail"><Html html={notes } /></div>;
         }
         else {
+			logger.debug(`<<< Exiting getNotesDisplay(notes=${notes})`);
             return "N/A";
         }
     }
 
     renderedList() {
+		logger.debug('>>> Entering renderedList()');
         const {props} = this;
+		logger.debug('<<< Exiting renderedList()');
         return props.auditCheckResults.map((term, i) => {
             return (
                 <div className="auditCheckItem" key={i}>
@@ -143,8 +158,10 @@ class AuditCheckPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         let contentShouldShow = (props.auditCheckResults && props.auditCheckResults.length > 0) ? true : false;
+		logger.debug('<<< Exiting render()');
         return (
             <ContentLoadWrapper loadComplete={contentShouldShow}
                 svgSkeleton={<div><SvgIcons.TableEmptyState /></div>}>
@@ -170,6 +187,8 @@ AuditCheckPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         auditCheckResults: state.security.auditCheckResults

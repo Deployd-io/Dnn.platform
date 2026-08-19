@@ -44,6 +44,8 @@ namespace log4net.Filter
         /// </summary>
         public DenyAllFilter()
         {
+		value.LogDebug(">>> Entering DenyAllFilter()");
+		value.LogDebug("<<< Exiting DenyAllFilter()");
         }
 
         /// <summary>
@@ -62,6 +64,8 @@ namespace log4net.Filter
         /// </remarks>
         public override FilterDecision Decide(LoggingEvent loggingEvent) 
         {
+			value.LogDebug(">>> Entering Decide(loggingEvent={LoggingEvent})", loggingEvent);
+			value.LogDebug("<<< Exiting Decide(loggingEvent={LoggingEvent})", loggingEvent);
             return FilterDecision.Deny;
         }
     }

@@ -23,7 +23,9 @@ namespace Dnn.EditBar.UI.Items
         public CompleteStateMenu()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering CompleteStateMenu()");
         }
+		eventLogger.LogDebug("<<< Exiting CompleteStateMenu()");
 
         /// <inheritdoc />
         public override string Name { get; } = "CompleteState";

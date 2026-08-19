@@ -17,6 +17,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>Language Selector control.</summary>
     public class LanguageSelector : Control, INamingContainer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LanguageSelector));
         private Panel pnlControl;
 
         public enum LanguageItemStyle
@@ -208,6 +209,7 @@ namespace DotNetNuke.UI.WebControls
                                 a.Add(c.Name);
                             }
                         }
+						Logger.LogDebug("<<< Exiting GetCultures(specific={Specific})", specific);
                     }
                 }
 
@@ -259,8 +261,10 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>Create Child Controls.</summary>
         protected override void CreateChildControls()
         {
+			Logger.LogDebug(">>> Entering CreateChildControls()");
             this.Controls.Clear();
             this.pnlControl = new Panel();
+			Logger.LogDebug("CreateChildControls(): pnlControl → {PnlControl}", pnlControl);
             this.pnlControl.CssClass = "dnnLangSelector";
 
             this.Controls.Add(this.pnlControl);
@@ -271,14 +275,19 @@ namespace DotNetNuke.UI.WebControls
                 this.pnlControl.Controls.Add(new LiteralControl("<li>"));
 
                 var lblLocale = new HtmlGenericControl("label");
+				Logger.LogDebug("CreateChildControls(): lblLocale → {LblLocale}", lblLocale);
                 if (this.SelectionMode == LanguageSelectionMode.Single)
                 {
                     var optLocale = new RadioButton();
+					Logger.LogDebug("CreateChildControls(): optLocale → {OptLocale}", optLocale);
+					Logger.LogDebug("CreateChildControls(): optLocale.ID → {Arg0}", optLocale.ID);
+					Logger.LogDebug("CreateChildControls(): optLocale.GroupName → {Arg0}", optLocale.GroupName);
                     optLocale.ID = "opt" + c.Name;
                     optLocale.GroupName = this.pnlControl.ID + "_Locale";
                     if (c.Name == Localization.SystemLocale)
                     {
                         optLocale.Checked = true;
+						Logger.LogDebug("CreateChildControls(): optLocale.Checked → {Arg0}", optLocale.Checked);
                     }
 
                     this.pnlControl.Controls.Add(optLocale);
@@ -287,6 +296,8 @@ namespace DotNetNuke.UI.WebControls
                 else
                 {
                     var chkLocale = new CheckBox();
+					Logger.LogDebug("CreateChildControls(): chkLocale → {ChkLocale}", chkLocale);
+					Logger.LogDebug("CreateChildControls(): chkLocale.ID → {Arg0}", chkLocale.ID);
                     chkLocale.ID = "chk" + c.Name;
                     this.pnlControl.Controls.Add(chkLocale);
                     lblLocale.Attributes["for"] = chkLocale.ClientID;
@@ -296,8 +307,10 @@ namespace DotNetNuke.UI.WebControls
                 if (this.ItemStyle != LanguageItemStyle.CaptionOnly)
                 {
                     var imgLocale = new Image();
+					Logger.LogDebug("CreateChildControls(): imgLocale → {ImgLocale}", imgLocale);
                     imgLocale.ImageUrl = this.ResolveUrl("~/images/Flags/" + c.Name + ".gif");
                     imgLocale.AlternateText = c.DisplayName;
+					Logger.LogDebug("CreateChildControls(): imgLocale.AlternateText → {Arg0}", imgLocale.AlternateText);
                     imgLocale.Style["vertical-align"] = "middle";
                     lblLocale.Controls.Add(imgLocale);
                 }
@@ -308,6 +321,9 @@ namespace DotNetNuke.UI.WebControls
                 }
 
                 this.pnlControl.Controls.Add(new LiteralControl("</li>"));
+				Logger.LogDebug(">>> Entering GetCultures(specific={Specific})", specific);
+				Logger.LogDebug("GetCultures(specific={Specific}): c → {C}", specific, c);
+				Logger.LogDebug("<<< Exiting GetCultures(specific={Specific})", specific);
             }
 
             this.pnlControl.Controls.Add(new LiteralControl("</ul>"));
@@ -316,7 +332,9 @@ namespace DotNetNuke.UI.WebControls
             if (GetCultures(this.SelectionObject == LanguageSelectionObject.SpecificCulture).Length < 2)
             {
                 this.Visible = false;
+				Logger.LogDebug("CreateChildControls(): this.Visible → {Arg0}", this.Visible);
             }
+			Logger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <summary>retrieve the cultures, currently supported by the portal.</summary>
@@ -324,8 +342,11 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>Array of cultures.</returns>
         private static CultureInfo[] GetCultures(bool specific)
         {
+			Logger.LogDebug(">>> Entering GetCultures(specific={Specific})", specific);
             var a = new ArrayList();
             var settings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogDebug("GetCultures(specific={Specific}): settings → {Settings}", specific, settings);
+			Logger.LogDebug("GetCultures(specific={Specific}): a → {A}", specific, a);
             foreach (string strLocale in LocaleController.Instance.GetLocales(settings.PortalId).Keys)
             {
                 var c = new CultureInfo(strLocale);

@@ -23,6 +23,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Portal
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             if (args.Length == 1)
             {
                 // do nothing
@@ -31,17 +32,24 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Portal
             {
                 this.AddMessage(this.LocalizeString("Prompt_ListPortals_NoArgs"));
             }
+			eventLogger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogDebug(">>> Entering Run()");
             var pc = PortalController.Instance;
 
             var alPortals = pc.GetPortals();
+			eventLogger.LogDebug("Run(): alPortals → {AlPortals}", alPortals);
             var lst = (from PortalInfo portal in alPortals select new PortalModelBase(portal)).ToList();
+			eventLogger.LogDebug("Run(): lst → {Lst}", lst);
             var count = lst.Count > 0 ? lst.Count.ToString(CultureInfo.CurrentCulture) : "No";
+			eventLogger.LogDebug("Run(): count → {Count}", count);
             var pluralSuffix = lst.Count > 1 ? "s" : string.Empty;
+			eventLogger.LogDebug("Run(): pluralSuffix → {PluralSuffix}", pluralSuffix);
+			eventLogger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel(string.Empty)
             {
                 Data = lst,

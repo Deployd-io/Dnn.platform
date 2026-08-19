@@ -101,6 +101,8 @@ namespace log4net.Filter
         /// </remarks>
         public virtual void ActivateOptions() 
         {
+		value.LogDebug(">>> Entering ActivateOptions()");
+		value.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>

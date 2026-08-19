@@ -9,9 +9,12 @@ namespace DotNetNuke.Services.Journal
 
     public class JournalController : ServiceLocator<IJournalController, JournalController>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JournalController));
         /// <inheritdoc />
         protected override Func<IJournalController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new JournalControllerImpl();
         }
     }

@@ -16,6 +16,7 @@ import UpgradeList from "./UpgradeList";
 import FileUpload from "./Upload";
 import Upgrading from "./Upgrading";
 import Done from "./Done";
+const logger = console;
 import { UpgradeSettings } from "models/UpgradeSettings";
 
 interface IProps {
@@ -23,6 +24,7 @@ interface IProps {
 }
 
 const UpgradesTab: React.FC<IProps> = (props) => {
+logger.debug(`>>> Entering UpgradesTab(props=${props})`);
   const [upgrades, setUpgrades] = useState<LocalUpgradeInfo[]>([]);
   const [upgradeSettings, setUpgradeSettings] = useState<UpgradeSettings>({
     AllowDnnUpgradeUpload: false,
@@ -33,22 +35,28 @@ const UpgradesTab: React.FC<IProps> = (props) => {
   const [showUploadCancelButton, setShowUploadCancelButton] = useState(true);
 
   const getUpgrades = () => {
+	logger.debug('>>> Entering getUpgrades()');
     upgradeService.listUpgrades().then((upgrades) => {
       setUpgrades(upgrades);
     });
+	logger.debug('<<< Exiting getUpgrades()');
   };
 
   const deletePackage = (packageName: string) => {
+	logger.debug(`>>> Entering deletePackage(packageName=${packageName})`);
     upgradeService.deletePackage(packageName).then(() => {
       getUpgrades();
     });
+	logger.debug(`<<< Exiting deletePackage(packageName=${packageName})`);
   };
 
   const installPackage = (packageName: string) => {
+	logger.debug(`>>> Entering installPackage(packageName=${packageName})`);
     setPanelToShow("upgrading");
     upgradeService.startUpgrade(packageName).then(() => {
       setPanelToShow("done");
     });
+	logger.debug(`<<< Exiting installPackage(packageName=${packageName})`);
   };
 
   useEffect(() => {
@@ -83,6 +91,7 @@ const UpgradesTab: React.FC<IProps> = (props) => {
                 type="secondary"
                 size="large"
                 onClick={() => {
+				logger.debug(`UpgradesTab(props=${props}): panel → ${panel}`);
                   setPanelToShow("upload");
                 }}
               >
@@ -154,6 +163,7 @@ const UpgradesTab: React.FC<IProps> = (props) => {
       <GridCell className="dnn-servers-grid-panel">{panel}</GridCell>
     </GridCell>
   );
+logger.debug(`<<< Exiting UpgradesTab(props=${props})`);
 };
 
 export default UpgradesTab;

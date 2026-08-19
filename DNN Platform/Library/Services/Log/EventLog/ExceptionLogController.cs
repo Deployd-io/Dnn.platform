@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Log.EventLog
 
     public class ExceptionLogController : LogController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExceptionLogController));
         public enum ExceptionLogType
         {
 #pragma warning disable CA1707 // Identifiers should not contain underscores
@@ -44,11 +45,14 @@ namespace DotNetNuke.Services.Log.EventLog
 
         public void AddLog(Exception objException)
         {
+			Logger.LogDebug(">>> Entering AddLog(objException={ObjException})", objException);
             this.AddLog(objException, ExceptionLogType.GENERAL_EXCEPTION);
+			Logger.LogDebug("<<< Exiting AddLog(objException={ObjException})", objException);
         }
 
         public void AddLog(BasePortalException objBasePortalException)
         {
+			Logger.LogDebug(">>> Entering AddLog(objBasePortalException={ObjBasePortalException})", objBasePortalException);
             var log = new LogInfo
             {
                 Exception = Exceptions.GetExceptionInfo(objBasePortalException),
@@ -84,22 +88,28 @@ namespace DotNetNuke.Services.Log.EventLog
             {
                 this.AddLog(objBasePortalException, log, ExceptionLogType.GENERAL_EXCEPTION);
             }
+			Logger.LogDebug("<<< Exiting AddLog(objBasePortalException={ObjBasePortalException})", objBasePortalException);
         }
 
         public void AddLog(Exception objException, ExceptionLogType logType)
         {
+			Logger.LogDebug(">>> Entering AddLog(objException={ObjException},logType={LogType})", objException, logType);
             var log = new LogInfo { Exception = new ExceptionInfo(objException) };
             this.AddLog(objException, log, logType);
+			Logger.LogDebug("AddLog(objException={ObjException},logType={LogType}): log → {Log}", objException, logType, log);
+			Logger.LogDebug("<<< Exiting AddLog(objException={ObjException},logType={LogType})", objException, logType);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void AddLog(Exception objException, LogInfo log, ExceptionLogType logType)
         {
+			Logger.LogDebug(">>> Entering AddLog(objException={ObjException},log={Log},logType={LogType})", objException, log, logType);
             log.LogTypeKey = logType.ToString();
             if (logType == ExceptionLogType.MODULE_LOAD_EXCEPTION)
             {
                 // Add ModuleLoadException Properties
                 var objModuleLoadException = (ModuleLoadException)objException;
+				Logger.LogDebug("AddLog(objException={ObjException},log={Log},logType={LogType}): objModuleLoadException → {ObjModuleLoadException}", objException, log, logType, objModuleLoadException);
                 log.LogProperties.Add(new LogDetailInfo("ModuleId", objModuleLoadException.ModuleId.ToString(CultureInfo.InvariantCulture)));
                 log.LogProperties.Add(new LogDetailInfo("ModuleDefId", objModuleLoadException.ModuleDefId.ToString(CultureInfo.InvariantCulture)));
                 log.LogProperties.Add(new LogDetailInfo("FriendlyName", objModuleLoadException.FriendlyName));
@@ -109,16 +119,19 @@ namespace DotNetNuke.Services.Log.EventLog
             {
                 // Add SecurityException Properties
                 var objSecurityException = (SecurityException)objException;
+				Logger.LogDebug("AddLog(objException={ObjException},log={Log},logType={LogType}): objSecurityException → {ObjSecurityException}", objException, log, logType, objSecurityException);
                 log.LogProperties.Add(new LogDetailInfo("Querystring", objSecurityException.Querystring));
                 log.LogProperties.Add(new LogDetailInfo("IP", objSecurityException.IP));
             }
 
             // Add BasePortalException Properties
             var objBasePortalException = new BasePortalException(objException.ToString(), objException);
+			Logger.LogDebug("AddLog(objException={ObjException},log={Log},logType={LogType}): objBasePortalException → {ObjBasePortalException}", objException, log, logType, objBasePortalException);
             log.LogProperties.Add(new LogDetailInfo("AbsoluteURL", objBasePortalException.AbsoluteURL));
             log.LogProperties.Add(new LogDetailInfo("DefaultDataProvider", objBasePortalException.DefaultDataProvider));
             log.LogProperties.Add(new LogDetailInfo("ExceptionGUID", objBasePortalException.ExceptionGUID));
             log.LogPortalID = objBasePortalException.PortalID;
+			Logger.LogDebug("AddLog(objException={ObjException},log={Log},logType={LogType}): log.LogPortalID → {Arg3}", objException, log, logType, log.LogPortalID);
 
             var sqlException = objException as SqlException;
             if (sqlException != null && (uint)sqlException.ErrorCode == 0x80131904 && sqlException.Number == 4060)
@@ -136,6 +149,7 @@ namespace DotNetNuke.Services.Log.EventLog
             // so that this log can be picked and do more action on it later.
             if (logType == ExceptionLogType.PAGE_LOAD_EXCEPTION && HttpContext.Current != null && UserController.Instance.GetCurrentUserInfo().IsSuperUser)
             {
+				Logger.LogDebug("<<< Exiting AddLog(objException={ObjException},log={Log},logType={LogType})", objException, log, logType);
                 HttpContext.Current.Response.Cookies.Add(
                     new HttpCookie("LogGUID", log.LogGUID) { HttpOnly = false, Path = !string.IsNullOrEmpty(Globals.ApplicationPath) ? Globals.ApplicationPath : "/" });
             }

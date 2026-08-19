@@ -15,6 +15,7 @@ namespace DotNetNuke.UI.Modules
     /// </summary>
     public class ModuleUserControlBase : UserControl, IModuleControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleUserControlBase));
         private string localResourceFile;
         private ModuleInstanceContext moduleContext;
 
@@ -64,6 +65,8 @@ namespace DotNetNuke.UI.Modules
         /// <returns>The localized value.</returns>
         protected string LocalizeString(string key)
         {
+			Logger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, this.LocalResourceFile);
         }
 
@@ -72,6 +75,8 @@ namespace DotNetNuke.UI.Modules
         /// <returns>The localized text cleaned up for JavaScript usage.</returns>
         protected string LocalizeSafeJsString(string key)
         {
+			Logger.LogDebug(">>> Entering LocalizeSafeJsString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting LocalizeSafeJsString(key={Key})", key);
             return Localization.GetSafeJSString(key, this.LocalResourceFile);
         }
     }

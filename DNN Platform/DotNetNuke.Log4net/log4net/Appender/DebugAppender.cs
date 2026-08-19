@@ -53,6 +53,8 @@ namespace log4net.Appender
         /// </remarks>
         public DebugAppender()
         {
+		value.LogDebug(">>> Entering DebugAppender()");
+		value.LogDebug("<<< Exiting DebugAppender()");
         }
 
         /// <summary>
@@ -68,7 +70,9 @@ namespace log4net.Appender
         [System.Obsolete("Instead use the default constructor and set the Layout property")]
         public DebugAppender(ILayout layout)
         {
+			value.LogDebug(">>> Entering DebugAppender(layout={Layout})", layout);
             this.Layout = layout;
+			value.LogDebug("<<< Exiting DebugAppender(layout={Layout})", layout);
         }
 
 #if !NETSTANDARD1_3 // System.Diagnostics.Debug has no Flush() in netstandard1.3
@@ -122,6 +126,7 @@ namespace log4net.Appender
             /// <returns><c>True</c> if all logging events were flushed successfully, else <c>false</c>.</returns>
             public override bool Flush(int millisecondsTimeout)
             {
+				value.LogDebug(">>> Entering Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
                 // Nothing to do if ImmediateFlush is true
                 if (this.m_immediateFlush)
                 {
@@ -131,6 +136,7 @@ namespace log4net.Appender
                 // System.Diagnostics.Debug is thread-safe, so no need for lock(this).
                 System.Diagnostics.Debug.Flush();
 
+				value.LogDebug("<<< Exiting Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
                 return true;
             }
 #endif
@@ -160,6 +166,7 @@ namespace log4net.Appender
 #endif
         protected override void Append(LoggingEvent loggingEvent)
         {
+			value.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             //
             // Write the string to the Debug system
             //
@@ -178,6 +185,7 @@ namespace log4net.Appender
                 {
                     System.Diagnostics.Debug.Write(this.RenderLoggingEvent(loggingEvent), category);
                 }
+			value.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
             }
 #if !NETSTANDARD1_3
             //

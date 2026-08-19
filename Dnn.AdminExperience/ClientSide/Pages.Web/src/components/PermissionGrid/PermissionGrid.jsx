@@ -5,21 +5,26 @@ import utils from "../../utils";
 import cloneDeep from "lodash/cloneDeep";
 import style from "./style.module.less";
 import Localization from "localization";
+const logger = console;
 
 class PermissionGrid extends Component {
         
     onPermissionsChanged(permissions) {
+		logger.debug(`>>> Entering onPermissionsChanged(permissions=${permissions})`);
         
         const p = { 
             ...this.props.permissions,
             ...permissions
         };
+		logger.debug(`<<< Exiting onPermissionsChanged(permissions=${permissions})`);
         this.props.onPermissionsChanged(p);
 
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const serviceFramework = utils.getServiceFramework(); 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={style.permissionGrid}>
                 <DnnPermissionGrid 

@@ -23,6 +23,7 @@ namespace DotNetNuke.Services.Social.Subscriptions
     public class SubscriptionTypeController(IDataService dataService, IHostSettings hostSettings)
         : ServiceLocator<ISubscriptionTypeController, SubscriptionTypeController>, ISubscriptionTypeController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SubscriptionTypeController));
         private readonly IDataService dataService = dataService ?? DataService.Instance;
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
 
@@ -31,11 +32,14 @@ namespace DotNetNuke.Services.Social.Subscriptions
         public SubscriptionTypeController()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering SubscriptionTypeController()");
+		Logger.LogDebug("<<< Exiting SubscriptionTypeController()");
         }
 
         /// <inheritdoc />
         public void AddSubscriptionType(SubscriptionType subscriptionType)
         {
+			Logger.LogDebug(">>> Entering AddSubscriptionType(subscriptionType={SubscriptionType})", subscriptionType);
             Requires.NotNull("subscriptionType", subscriptionType);
 
             subscriptionType.SubscriptionTypeId = this.dataService.AddSubscriptionType(
@@ -44,27 +48,33 @@ namespace DotNetNuke.Services.Social.Subscriptions
                 subscriptionType.DesktopModuleId);
 
             CleanCache();
+			Logger.LogDebug("<<< Exiting AddSubscriptionType(subscriptionType={SubscriptionType})", subscriptionType);
         }
 
         /// <inheritdoc />
         public SubscriptionType GetSubscriptionType(Func<SubscriptionType, bool> predicate)
         {
+			Logger.LogDebug(">>> Entering GetSubscriptionType(predicate={Predicate})", predicate);
             Requires.NotNull("predicate", predicate);
 
+			Logger.LogDebug("<<< Exiting GetSubscriptionType(predicate={Predicate})", predicate);
             return this.GetSubscriptionTypes().SingleOrDefault(predicate);
         }
 
         /// <inheritdoc />
         public IEnumerable<SubscriptionType> GetSubscriptionTypes()
         {
+			Logger.LogDebug(">>> Entering GetSubscriptionTypes()");
             var cacheArgs = new CacheItemArgs(
                 DataCache.SubscriptionTypesCacheKey,
                 DataCache.SubscriptionTypesTimeOut,
                 DataCache.SubscriptionTypesCachePriority);
 
+			Logger.LogDebug("<<< Exiting GetSubscriptionTypes()");
             return CBO.GetCachedObject<IEnumerable<SubscriptionType>>(
                 this.hostSettings,
                 cacheArgs,
+			Logger.LogDebug("<<< Exiting GetSubscriptionTypes(predicate={Predicate})", predicate);
                 _ => CBO.FillCollection<SubscriptionType>(this.dataService.GetSubscriptionTypes()));
         }
 
@@ -79,22 +89,28 @@ namespace DotNetNuke.Services.Social.Subscriptions
         /// <inheritdoc />
         public void DeleteSubscriptionType(SubscriptionType subscriptionType)
         {
+			Logger.LogDebug(">>> Entering DeleteSubscriptionType(subscriptionType={SubscriptionType})", subscriptionType);
             Requires.NotNull("subscriptionType", subscriptionType);
             Requires.NotNegative("subscriptionType.SubscriptionTypeId", subscriptionType.SubscriptionTypeId);
 
             this.dataService.DeleteSubscriptionType(subscriptionType.SubscriptionTypeId);
             CleanCache();
+			Logger.LogDebug("<<< Exiting DeleteSubscriptionType(subscriptionType={SubscriptionType})", subscriptionType);
         }
 
         /// <inheritdoc />
         protected override Func<ISubscriptionTypeController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<ISubscriptionTypeController>();
         }
 
         private static void CleanCache()
         {
+			Logger.LogDebug(">>> Entering CleanCache()");
             DataCache.RemoveCache(DataCache.SubscriptionTypesCacheKey);
+			Logger.LogDebug("<<< Exiting CleanCache()");
         }
     }
 }

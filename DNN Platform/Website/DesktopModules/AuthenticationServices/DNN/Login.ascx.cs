@@ -39,8 +39,10 @@ namespace DotNetNuke.Modules.Admin.Authentication.DNN
         public Login()
             : this(null, null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering Login()");
         }
 
+		Logger.LogDebug("<<< Exiting Login()");
         /// <summary>Initializes a new instance of the <see cref="Login"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
         /// <param name="portalController">The portal controller.</param>
@@ -51,6 +53,13 @@ namespace DotNetNuke.Modules.Admin.Authentication.DNN
         public Login(INavigationManager navigationManager, IPortalController portalController, IHostSettings hostSettings, IPortalGroupController portalGroupController, IApplicationStatusInfo appStatus)
             : this(navigationManager, portalController, hostSettings, portalGroupController, appStatus, null)
         {
+		Logger.LogDebug(">>> Entering Login(navigationManager={NavigationManager},portalController={PortalController},hostSettings={HostSettings},portalGroupController={PortalGroupController},appStatus={AppStatus})", navigationManager, portalController, hostSettings, portalGroupController, appStatus);
+		Logger.LogDebug("<<< Exiting Login(navigationManager={NavigationManager},portalController={PortalController},hostSettings={HostSettings},portalGroupController={PortalGroupController},appStatus={AppStatus})", navigationManager, portalController, hostSettings, portalGroupController, appStatus);
+		Logger.LogDebug("Login(navigationManager={NavigationManager},portalController={PortalController},hostSettings={HostSettings},portalGroupController={PortalGroupController},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): portalController → {PortalController1}", navigationManager, portalController, hostSettings, portalGroupController, appStatus, cryptographyProvider, portalController);
+		Logger.LogDebug("Login(navigationManager={NavigationManager},portalController={PortalController},hostSettings={HostSettings},portalGroupController={PortalGroupController},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): hostSettings → {HostSettings1}", navigationManager, portalController, hostSettings, portalGroupController, appStatus, cryptographyProvider, hostSettings);
+		Logger.LogDebug("Login(navigationManager={NavigationManager},portalController={PortalController},hostSettings={HostSettings},portalGroupController={PortalGroupController},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): portalGroupController → {PortalGroupController1}", navigationManager, portalController, hostSettings, portalGroupController, appStatus, cryptographyProvider, portalGroupController);
+		Logger.LogDebug("Login(navigationManager={NavigationManager},portalController={PortalController},hostSettings={HostSettings},portalGroupController={PortalGroupController},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): appStatus → {AppStatus1}", navigationManager, portalController, hostSettings, portalGroupController, appStatus, cryptographyProvider, appStatus);
+		Logger.LogDebug("Login(navigationManager={NavigationManager},portalController={PortalController},hostSettings={HostSettings},portalGroupController={PortalGroupController},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): cryptographyProvider → {CryptographyProvider1}", navigationManager, portalController, hostSettings, portalGroupController, appStatus, cryptographyProvider, cryptographyProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Login"/> class.</summary>
@@ -81,6 +90,7 @@ namespace DotNetNuke.Modules.Admin.Authentication.DNN
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdLogin.Click += this.OnLoginClick;
@@ -115,6 +125,7 @@ namespace DotNetNuke.Modules.Admin.Authentication.DNN
                 returnUrl = HttpUtility.UrlEncode(returnUrl);
 
                 url = Globals.RegisterURL(returnUrl, Null.NullString);
+				Logger.LogInformation("OnLoad(e={E}): url → {Url}", e, url);
                 this.registerLink.NavigateUrl = url;
                 if (this.PortalSettings.EnablePopUps && this.PortalSettings.RegisterTabId == Null.NullInteger
                     && !AuthenticationController.HasSocialAuthenticationEnabled(this))
@@ -180,18 +191,22 @@ namespace DotNetNuke.Modules.Admin.Authentication.DNN
                     }
                     catch (UserAlreadyVerifiedException)
                     {
+						Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, UserAlreadyVerifiedException.getMessage());
                         UI.Skins.Skin.AddModuleMessage(this, Localization.GetString("UserAlreadyVerified", this.LocalResourceFile), ModuleMessage.ModuleMessageType.YellowWarning);
                     }
                     catch (InvalidVerificationCodeException)
                     {
+						Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, InvalidVerificationCodeException.getMessage());
                         UI.Skins.Skin.AddModuleMessage(this, Localization.GetString("InvalidVerificationCode", this.LocalResourceFile), ModuleMessage.ModuleMessageType.RedError);
                     }
                     catch (UserDoesNotExistException)
                     {
+						Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, UserDoesNotExistException.getMessage());
                         UI.Skins.Skin.AddModuleMessage(this, Localization.GetString("UserDoesNotExist", this.LocalResourceFile), ModuleMessage.ModuleMessageType.RedError);
                     }
                     catch (Exception)
                     {
+						Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, Exception.Message);
                         UI.Skins.Skin.AddModuleMessage(this, Localization.GetString("InvalidVerificationCode", this.LocalResourceFile), ModuleMessage.ModuleMessageType.RedError);
                     }
                 }
@@ -238,6 +253,7 @@ namespace DotNetNuke.Modules.Admin.Authentication.DNN
             if (registrationType == 0)
             {
                 useEmailAsUserName = this.PortalSettings.Registration.UseEmailAsUserName;
+				Logger.LogDebug("OnLoad(e={E}): useEmailAsUserName → {UseEmailAsUserName}", e, useEmailAsUserName);
             }
             else
             {
@@ -252,8 +268,10 @@ namespace DotNetNuke.Modules.Admin.Authentication.DNN
 
         protected string GetRedirectUrl(bool checkSettings = true)
         {
+			Logger.LogDebug(">>> Entering GetRedirectUrl(checkSettings={CheckSettings})", checkSettings);
             var redirectUrl = string.Empty;
             var redirectAfterLogin = this.PortalSettings.Registration.RedirectAfterLogin;
+			Logger.LogDebug("GetRedirectUrl(checkSettings={CheckSettings}): redirectUrl → {RedirectUrl}", checkSettings, redirectUrl);
             if (checkSettings && redirectAfterLogin > 0)
             {
                 // redirect to after registration page
@@ -288,24 +306,30 @@ namespace DotNetNuke.Modules.Admin.Authentication.DNN
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetRedirectUrl(checkSettings={CheckSettings})", checkSettings);
             return redirectUrl;
         }
 
         private void OnLoginClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoginClick(sender={Sender},e={E})", sender, e);
             if ((this.UseCaptcha && this.ctlCaptcha.IsValid) || !this.UseCaptcha)
             {
+			Logger.LogDebug("<<< Exiting OnLoginClick(sender={Sender},e={E})", sender, e);
                 var loginStatus = UserLoginStatus.LOGIN_FAILURE;
 #pragma warning disable CS0618 // PortalSecurity.FilterFlag.NoScripting is deprecated
                 string userName = PortalSecurity.Instance.InputFilter(
                     this.txtUsername.Text,
                     PortalSecurity.FilterFlag.NoScripting | PortalSecurity.FilterFlag.NoAngleBrackets | PortalSecurity.FilterFlag.NoMarkup | PortalSecurity.FilterFlag.NoControlCharacters);
+					Logger.LogDebug("OnLoginClick(sender={Sender},e={E}): userName → {UserName}", sender, e, userName);
 #pragma warning restore CS0618 // PortalSecurity.FilterFlag.NoScripting is deprecated
 
                 // DNN-6093
                 // check if we use email address here rather than username
                 UserInfo userByEmail = null;
+				Logger.LogDebug("OnLoginClick(sender={Sender},e={E}): userByEmail → {UserByEmail}", sender, e, userByEmail);
                 var emailUsedAsUsername = PortalController.GetPortalSettingAsBoolean(this.portalController, "Registration_UseEmailAsUserName", this.PortalId, false);
+				Logger.LogDebug("OnLoginClick(sender={Sender},e={E}): emailUsedAsUsername → {EmailUsedAsUsername}", sender, e, emailUsedAsUsername);
 
                 if (emailUsedAsUsername)
                 {
@@ -320,6 +344,7 @@ namespace DotNetNuke.Modules.Admin.Authentication.DNN
                 }
 
                 UserInfo objUser = null;
+				Logger.LogDebug("OnLoginClick(sender={Sender},e={E}): objUser → {ObjUser}", sender, e, objUser);
 
                 if (!emailUsedAsUsername || userByEmail != null)
                 {
@@ -327,7 +352,9 @@ namespace DotNetNuke.Modules.Admin.Authentication.DNN
                 }
 
                 var authenticated = Null.NullBoolean;
+				Logger.LogDebug("OnLoginClick(sender={Sender},e={E}): authenticated → {Authenticated}", sender, e, authenticated);
                 var message = Null.NullString;
+				Logger.LogDebug("OnLoginClick(sender={Sender},e={E}): message → {Message}", sender, e, message);
                 if (loginStatus == UserLoginStatus.LOGIN_USERNOTAPPROVED)
                 {
                     message = "UserNotAuthorized";

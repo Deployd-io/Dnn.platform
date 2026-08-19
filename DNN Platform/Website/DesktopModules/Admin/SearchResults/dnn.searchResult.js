@@ -1,4 +1,6 @@
+const logger = console;
 ﻿(function ($, dnn) {
+	logger.debug('>>> Entering function()');
     if (typeof dnn == 'undefined' || dnn == null) dnn = {};
     dnn.searchResult = {};
 
@@ -96,6 +98,7 @@
 
         // binding pager event
         $('.dnnSearchResultPager > .dnnRight a').on('click', function () {
+			logger.debug('>>> Entering on()');
             if ($(this).hasClass('dnnPager-disable')) return false;
 
             if ($(this).hasClass('dnnPager-prev'))
@@ -166,6 +169,7 @@
         
         markup += '</div>';
 
+		logger.debug(`<<< Exiting function(totalHits=${totalHits},pageIndex=${pageIndex},more=${more})`);
         return markup;
     };
     

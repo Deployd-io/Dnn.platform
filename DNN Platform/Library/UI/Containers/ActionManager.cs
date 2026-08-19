@@ -41,8 +41,10 @@ namespace DotNetNuke.UI.Containers
         public ActionManager(IActionControl actionControl)
             : this(null, actionControl)
         {
+		eventLogger.LogDebug(">>> Entering ActionManager(actionControl={ActionControl})", actionControl);
         }
 
+		eventLogger.LogDebug("<<< Exiting ActionManager(actionControl={ActionControl})", actionControl);
         /// <summary>Initializes a new instance of the <see cref="ActionManager"/> class.</summary>
         /// <param name="eventLogger">The event logger.</param>
         /// <param name="actionControl">The action control.</param>
@@ -64,6 +66,7 @@ namespace DotNetNuke.UI.Containers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public bool DisplayControl(DNNNodeCollection objNodes)
         {
+			eventLogger.LogDebug(">>> Entering DisplayControl(objNodes={ObjNodes})", objNodes);
             if (objNodes is { Count: > 0 } && Personalization.GetUserMode() != PortalSettings.Mode.View)
             {
                 DNNNode objRootNode = objNodes[0];
@@ -86,6 +89,7 @@ namespace DotNetNuke.UI.Containers
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting DisplayControl(objNodes={ObjNodes})", objNodes);
             return false;
         }
 
@@ -94,6 +98,9 @@ namespace DotNetNuke.UI.Containers
         /// <returns>The <see cref="ModuleAction"/> instance or <see langword="null"/>.</returns>
         public ModuleAction GetAction(string commandName)
         {
+			eventLogger.LogDebug(">>> Entering GetAction(commandName={CommandName})", commandName);
+			eventLogger.LogDebug("<<< Exiting GetAction(commandName={CommandName})", commandName);
+			eventLogger.LogDebug("<<< Exiting GetAction(id={Id})", id);
             return this.ActionControl.ModuleControl.ModuleContext.Actions.GetActionByCommandName(commandName);
         }
 
@@ -111,10 +118,13 @@ namespace DotNetNuke.UI.Containers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void GetClientScriptURL(ModuleAction action, WebControl control)
         {
+			eventLogger.LogDebug(">>> Entering GetClientScriptURL(action={Action},control={Control})", action, control);
             if (!string.IsNullOrEmpty(action.ClientScript))
             {
                 string script = action.ClientScript;
+				eventLogger.LogDebug("GetClientScriptURL(action={Action},control={Control}): script → {Script}", action, control, script);
                 int jSPos = script.IndexOf("javascript:", StringComparison.InvariantCultureIgnoreCase);
+				eventLogger.LogDebug("GetClientScriptURL(action={Action},control={Control}): jSPos → {JSPos}", action, control, jSPos);
                 if (jSPos > -1)
                 {
                     script = script.Substring(jSPos + 11);
@@ -122,6 +132,7 @@ namespace DotNetNuke.UI.Containers
 
                 control.Attributes.Add("onClick", $"javascript: return {script};");
             }
+			eventLogger.LogDebug("<<< Exiting GetClientScriptURL(action={Action},control={Control})", action, control);
         }
 
         /// <summary>IsVisible determines whether the action control is Visible.</summary>
@@ -129,6 +140,7 @@ namespace DotNetNuke.UI.Containers
         /// <returns><see langword="true"/> if the action is visible, otherwise <see langword="false"/>.</returns>
         public bool IsVisible(ModuleAction action)
         {
+			eventLogger.LogDebug(">>> Entering IsVisible(action={Action})", action);
             bool isVisible;
             if (action.Visible && ModulePermissionController.HasModuleAccess(action.Secure, Null.NullString, this.ModuleContext.Configuration))
             {
@@ -146,6 +158,7 @@ namespace DotNetNuke.UI.Containers
                 isVisible = false;
             }
 
+			eventLogger.LogDebug("<<< Exiting IsVisible(action={Action})", action);
             return isVisible;
         }
 
@@ -154,13 +167,17 @@ namespace DotNetNuke.UI.Containers
         /// <returns><see langword="true"/> if the action was processed, otherwise <see langword="false"/> (if it's a custom action that can't be found).</returns>
         public bool ProcessAction(string id)
         {
+			eventLogger.LogDebug(">>> Entering ProcessAction(id={Id})", id);
             bool bProcessed = true;
             int actionId;
+			eventLogger.LogDebug("ProcessAction(id={Id}): bProcessed → {BProcessed}", id, bProcessed);
             if (int.TryParse(id, out actionId))
             {
                 bProcessed = this.ProcessAction(this.ActionControl.ModuleControl.ModuleContext.Actions.GetActionByID(actionId));
             }
 
+			eventLogger.LogDebug("<<< Exiting ProcessAction(id={Id})", id);
+			eventLogger.LogDebug("<<< Exiting ProcessAction(action={Action})", action);
             return bProcessed;
         }
 
@@ -230,19 +247,24 @@ namespace DotNetNuke.UI.Containers
 
         private void ClearCache(ModuleAction command)
         {
+			eventLogger.LogDebug(">>> Entering ClearCache(command={Command})", command);
             // synchronize cache
             ModuleController.SynchronizeModule(this.ModuleContext.ModuleId);
 
             // Redirect to the same page to pick up changes
             this.response.Redirect(this.request.RawUrl, true);
+			eventLogger.LogDebug("<<< Exiting ClearCache(command={Command})", command);
         }
 
         private void Delete(ModuleAction command)
         {
+			eventLogger.LogDebug(">>> Entering Delete(command={Command})", command);
             var module = ModuleController.Instance.GetModule(int.Parse(command.CommandArgument, CultureInfo.InvariantCulture), this.ModuleContext.TabId, true);
 
+			eventLogger.LogDebug("Delete(command={Command}): module → {Module}", command, module);
             // Check if this is the owner instance of a shared module.
             var user = UserController.Instance.GetCurrentUserInfo();
+			eventLogger.LogDebug("Delete(command={Command}): user → {User}", command, user);
             if (!module.IsShared)
             {
                 foreach (ModuleInfo instance in ModuleController.Instance.GetTabModulesByModule(module.ModuleID))
@@ -261,10 +283,12 @@ namespace DotNetNuke.UI.Containers
 
             // Redirect to the same page to pick up changes
             this.response.Redirect(this.request.RawUrl, true);
+			eventLogger.LogDebug("<<< Exiting Delete(command={Command})", command);
         }
 
         private void DoAction(ModuleAction command)
         {
+			eventLogger.LogDebug(">>> Entering DoAction(command={Command})", command);
             if (command.NewWindow)
             {
                 UrlUtils.OpenNewWindow(this.ActionControl.ModuleControl.Control.Page, this.GetType(), command.Url);
@@ -273,12 +297,15 @@ namespace DotNetNuke.UI.Containers
             {
                 this.response.Redirect(command.Url, true);
             }
+			eventLogger.LogDebug("<<< Exiting DoAction(command={Command})", command);
         }
 
         private void Localize(ModuleAction command)
         {
+			eventLogger.LogDebug(">>> Entering Localize(command={Command})", command);
             ModuleInfo sourceModule = ModuleController.Instance.GetModule(this.ModuleContext.ModuleId, this.ModuleContext.TabId, false);
 
+			eventLogger.LogDebug("Localize(command={Command}): sourceModule → {SourceModule}", command, sourceModule);
             switch (command.CommandName)
             {
                 case ModuleActionType.LocalizeModule:
@@ -291,10 +318,12 @@ namespace DotNetNuke.UI.Containers
 
             // Redirect to the same page to pick up changes
             this.response.Redirect(this.request.RawUrl, true);
+			eventLogger.LogDebug("<<< Exiting Localize(command={Command})", command);
         }
 
         private void Translate(ModuleAction command)
         {
+			eventLogger.LogDebug(">>> Entering Translate(command={Command})", command);
             ModuleInfo sourceModule = ModuleController.Instance.GetModule(this.ModuleContext.ModuleId, this.ModuleContext.TabId, false);
             switch (command.CommandName)
             {
@@ -308,19 +337,23 @@ namespace DotNetNuke.UI.Containers
 
             // Redirect to the same page to pick up changes
             this.response.Redirect(this.request.RawUrl, true);
+			eventLogger.LogDebug("<<< Exiting Translate(command={Command})", command);
         }
 
         private void MoveToPane(ModuleAction command)
         {
+			eventLogger.LogDebug(">>> Entering MoveToPane(command={Command})", command);
             ModuleController.Instance.UpdateModuleOrder(this.ModuleContext.TabId, this.ModuleContext.ModuleId, -1, command.CommandArgument);
             ModuleController.Instance.UpdateTabModuleOrder(this.ModuleContext.TabId);
 
             // Redirect to the same page to pick up changes
             this.response.Redirect(this.request.RawUrl, true);
+			eventLogger.LogDebug("<<< Exiting MoveToPane(command={Command})", command);
         }
 
         private void MoveUpDown(ModuleAction command)
         {
+			eventLogger.LogDebug(">>> Entering MoveUpDown(command={Command})", command);
             switch (command.CommandName)
             {
                 case ModuleActionType.MoveTop:
@@ -341,6 +374,7 @@ namespace DotNetNuke.UI.Containers
 
             // Redirect to the same page to pick up changes
             this.response.Redirect(this.request.RawUrl, true);
+			eventLogger.LogDebug("<<< Exiting MoveUpDown(command={Command})", command);
         }
     }
 }

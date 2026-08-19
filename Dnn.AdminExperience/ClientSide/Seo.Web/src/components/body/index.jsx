@@ -11,14 +11,17 @@ import TestUrl from "../testUrl";
 import "./style.less";
 import util from "../../utils";
 import resx from "../../resources";
+const logger = console;
 
 let isHost = false;
 
 export class Body extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.handleSelect = this.handleSelect.bind(this);
         isHost = util.settings.isHost;
+		logger.debug('<<< Exiting constructor()');
     }
 
     handleSelect(index) {
@@ -27,6 +30,7 @@ export class Body extends Component {
     }
 
     renderTabs() {
+		logger.debug('>>> Entering renderTabs()');
         if (isHost) {
             return <Tabs onSelect={this.handleSelect.bind(this)}
                 tabHeaders={[resx.get("URLManagementTab"),
@@ -55,6 +59,7 @@ export class Body extends Component {
             </Tabs>;
         }
         else {
+			logger.debug('<<< Exiting renderTabs()');
             return <Tabs onSelect={this.handleSelect.bind(this)}
                 tabHeaders={[resx.get("URLManagementTab"),
                     resx.get("SitemapSettingsTab")]}
@@ -73,6 +78,8 @@ export class Body extends Component {
 
     /*eslint no-mixed-spaces-and-tabs: "error"*/
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <PersonaBarPageBody>
                 {this.renderTabs()}
@@ -87,6 +94,8 @@ Body.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.index
     };

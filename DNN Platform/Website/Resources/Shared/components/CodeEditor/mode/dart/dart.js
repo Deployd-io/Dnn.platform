@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../clike/clike"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -17,12 +19,17 @@
     "try catch finally do else for if switch while import library export " +
     "part of show hide is").split(" ");
   var blockKeywords = "try catch finally do else for if switch while".split(" ");
+logger.debug(`function(): blockKeywords → ${blockKeywords}`);
   var atoms = "true false null".split(" ");
+logger.debug(`function(): atoms → ${atoms}`);
   var builtins = "void bool num int double dynamic var String".split(" ");
+logger.debug(`function(): builtins → ${builtins}`);
 
   function set(words) {
+	logger.debug(`>>> Entering set(words=${words})`);
     var obj = {};
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.debug(`<<< Exiting set(words=${words})`);
     return obj;
   }
 
@@ -45,6 +52,9 @@
 
   // This is needed to make loading through meta.js work.
   CodeMirror.defineMode("dart", function(conf) {
+	logger.debug('>>> Entering defineMode()');
+	logger.debug('<<< Exiting function()');
+	logger.debug('<<< Exiting defineMode()');
     return CodeMirror.getMode(conf, "application/dart");
   }, "clike");
 });

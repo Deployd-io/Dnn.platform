@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+const logger = console;
 
 const helper = {
     renderActions(template, actions) {
+	logger.debug(`>>> Entering renderActions(template=${template},actions=${actions})`);
 
         const components = [];
         let actionTemplate = template;
@@ -30,6 +32,7 @@ const helper = {
             components.push(actionTemplate);
         }
 
+		logger.debug(`<<< Exiting renderActions(template=${template},actions=${actions})`);
         return components;
     }
 };

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -14,6 +15,7 @@
   var Pos = CodeMirror.Pos;
 
   function getHints(cm, options) {
+	logger.debug(`>>> Entering getHints(cm=${cm},options=${options})`);
     var tags = options && options.schemaInfo;
     var quote = (options && options.quoteChar) || '"';
     if (!tags) return;
@@ -99,6 +101,7 @@
           result.push(attr);
       }
     }
+	logger.debug(`<<< Exiting getHints(cm=${cm},options=${options})`);
     return {
       list: result,
       from: replaceToken ? Pos(cur.line, tagStart == null ? token.start : tagStart) : cur,

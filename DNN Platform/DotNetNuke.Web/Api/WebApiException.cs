@@ -13,13 +13,17 @@ namespace DotNetNuke.Web.Api
     /// <summary>Represents a non-successful response while executing a WebApi call.</summary>
     public class WebApiException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WebApiException));
         /// <summary>Initializes a new instance of the <see cref="WebApiException"/> class, with the specified inner exception and response message that caused the exception.</summary>
         /// <param name="innerException">The original exception.</param>
         /// <param name="result">The result of the request.</param>
         public WebApiException(Exception innerException, HttpResponseMessage result)
             : base(innerException.Message, innerException)
         {
+			Logger.LogDebug(">>> Entering WebApiException(innerException={InnerException},result={Result})", innerException, result);
             this.Result = result;
+			Logger.LogDebug("WebApiException(innerException={InnerException},result={Result}): this.Result → {Arg2}", innerException, result, this.Result);
+			Logger.LogDebug("<<< Exiting WebApiException(innerException={InnerException},result={Result})", innerException, result);
         }
 
         /// <summary>Initializes a new instance of the <see cref="WebApiException"/> class.</summary>
@@ -42,6 +46,8 @@ namespace DotNetNuke.Web.Api
         /// <returns>A dynamic <see cref="JContainer"/>.</returns>
         public dynamic BodyAsJson()
         {
+			Logger.LogDebug(">>> Entering BodyAsJson()");
+			Logger.LogDebug("<<< Exiting BodyAsJson()");
             return JsonConvert.DeserializeObject<JContainer>(this.Body);
         }
     }

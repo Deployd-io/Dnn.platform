@@ -4,11 +4,13 @@ import GridCell from "../GridCell";
 import Label from "../Label";
 import RoleGroupFilter from "./RoleGroupFilter";
 import Suggestion from "./Suggestion";
+const logger = console;
 
 class GridCaption extends Component {
 
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
 
         this.state = {
             roleGroupId: -1
@@ -16,20 +18,25 @@ class GridCaption extends Component {
     }
 
     onRoleGroupChange(value) {
+		logger.debug(`>>> Entering onRoleGroupChange(value=${value})`);
         const { props, state } = this;
 
         this.setState({ roleGroupId: value.id });
+		logger.debug(`<<< Exiting onRoleGroupChange(value=${value})`);
     }
 
     onSuggestionSelected(value) {
+		logger.debug(`>>> Entering onSuggestionSelected(value=${value})`);
         const { props, state } = this;
 
         if (typeof props.onSuggestion === "function") {
             props.onSuggestion(value);
+			logger.debug(`<<< Exiting onSuggestionSelected(value=${value})`);
         }
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props, state } = this;
 
         let suggestionOptions = props.type === "role" ? {
@@ -41,6 +48,8 @@ class GridCaption extends Component {
             count: 10
         };
 
+		logger.debug(`render(): suggestionOptions → ${suggestionOptions}`);
+		logger.debug('<<< Exiting render()');
         return <GridCell className="grid-caption">
             <Label className="title" label={props.type === "role" ? props.localization.permissionsByRole : props.localization.permissionsByUser}></Label>
             {props.type === "role" && <GridCell columnSize="40" className="left">

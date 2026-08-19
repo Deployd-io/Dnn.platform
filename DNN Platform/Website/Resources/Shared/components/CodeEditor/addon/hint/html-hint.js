@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("./xml-hint"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,14 +14,20 @@
   "use strict";
 
   var langs = "ab aa af ak sq am ar an hy as av ae ay az bm ba eu be bn bh bi bs br bg my ca ch ce ny zh cv kw co cr hr cs da dv nl dz en eo et ee fo fj fi fr ff gl ka de el gn gu ht ha he hz hi ho hu ia id ie ga ig ik io is it iu ja jv kl kn kr ks kk km ki rw ky kv kg ko ku kj la lb lg li ln lo lt lu lv gv mk mg ms ml mt mi mr mh mn na nv nb nd ne ng nn no ii nr oc oj cu om or os pa pi fa pl ps pt qu rm rn ro ru sa sc sd se sm sg sr gd sn si sk sl so st es su sw ss sv ta te tg th ti bo tk tl tn to tr ts tt tw ty ug uk ur uz ve vi vo wa cy wo fy xh yi yo za zu".split(" ");
+logger.debug(`function(exports=${exports}): langs → ${langs}`);
   var targets = ["_blank", "_self", "_top", "_parent"];
+logger.debug(`function(exports=${exports}): targets → ${targets}`);
   var charsets = ["ascii", "utf-8", "utf-16", "latin1", "latin1"];
+logger.debug(`function(exports=${exports}): charsets → ${charsets}`);
   var methods = ["get", "post", "put", "delete"];
+logger.debug(`function(exports=${exports}): methods → ${methods}`);
   var encs = ["application/x-www-form-urlencoded", "multipart/form-data", "text/plain"];
+logger.debug(`function(exports=${exports}): encs → ${encs}`);
   var media = ["all", "screen", "print", "embossed", "braille", "handheld", "print", "projection", "screen", "tty", "tv", "speech",
                "3d-glasses", "resolution [>][<][=] [X]", "device-aspect-ratio: X/Y", "orientation:portrait",
                "orientation:landscape", "device-height: [X]", "device-width: [X]"];
   var s = { attrs: {} }; // Simple tag, reused for a whole lot of tags
+logger.debug(`function(exports=${exports}): media → ${media}`);
 
   var data = {
     a: {
@@ -304,6 +312,7 @@
     wbr: s
   };
 
+logger.debug(`function(exports=${exports}): data → ${data}`);
   var globalAttrs = {
     accesskey: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
     "class": null,
@@ -330,8 +339,10 @@
     rel: ["stylesheet", "alternate", "author", "bookmark", "help", "license", "next", "nofollow", "noreferrer", "prefetch", "prev", "search", "tag"]
   };
   function populate(obj) {
+	logger.debug(`>>> Entering populate(obj=${obj})`);
     for (var attr in globalAttrs) if (globalAttrs.hasOwnProperty(attr))
       obj.attrs[attr] = globalAttrs[attr];
+	logger.debug(`<<< Exiting populate(obj=${obj})`);
   }
 
   populate(s);
@@ -340,8 +351,10 @@
 
   CodeMirror.htmlSchema = data;
   function htmlHint(cm, options) {
+	logger.debug(`>>> Entering htmlHint(cm=${cm},options=${options})`);
     var local = {schemaInfo: data};
     if (options) for (var opt in options) local[opt] = options[opt];
+	logger.debug(`<<< Exiting htmlHint(cm=${cm},options=${options})`);
     return CodeMirror.hint.xml(cm, local);
   }
   CodeMirror.registerHelper("hint", "html", htmlHint);

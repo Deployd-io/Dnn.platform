@@ -28,6 +28,10 @@ namespace Dnn.EditBar.UI.Items
         public PageSettingsMenu()
             : this(null)
         {
+		eventLogger.LogDebug(">>> Entering PageSettingsMenu()");
+		eventLogger.LogDebug("<<< Exiting PageSettingsMenu()");
+		eventLogger.LogDebug(">>> Entering PageSettingsMenu(hostSettings={HostSettings})", hostSettings);
+		eventLogger.LogDebug("PageSettingsMenu(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PageSettingsMenu"/> class.</summary>
@@ -35,6 +39,7 @@ namespace Dnn.EditBar.UI.Items
         public PageSettingsMenu(IHostSettings hostSettings)
         {
             this.hostSettings = hostSettings ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("<<< Exiting PageSettingsMenu(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <inheritdoc />
@@ -55,15 +60,22 @@ namespace Dnn.EditBar.UI.Items
         /// <inheritdoc />
         public override bool Visible()
         {
+			eventLogger.LogDebug(">>> Entering Visible()");
             var isInEditMode = Personalization.GetUserMode() == PortalSettings.Mode.Edit;
             var isCurrentControlPanel = this.hostSettings.ControlPanel.EndsWith("PersonaBarContainer.ascx", StringComparison.InvariantCultureIgnoreCase);
+			eventLogger.LogDebug("Visible(): isCurrentControlPanel → {IsCurrentControlPanel}", isCurrentControlPanel);
             var canEditPageSettings = CanEditPageSettings();
+			eventLogger.LogDebug("Visible(): canEditPageSettings → {CanEditPageSettings}", canEditPageSettings);
+			eventLogger.LogDebug("Visible(): isInEditMode → {IsInEditMode}", isInEditMode);
 
+			eventLogger.LogDebug("<<< Exiting Visible()");
             return isInEditMode && isCurrentControlPanel && canEditPageSettings;
         }
 
         private static bool CanEditPageSettings()
         {
+			eventLogger.LogDebug(">>> Entering CanEditPageSettings()");
+				eventLogger.LogDebug("<<< Exiting CanEditPageSettings()");
             return
                 TabPermissionController.CanAddPage() ||
                 TabPermissionController.CanAdminPage() ||

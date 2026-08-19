@@ -4,6 +4,7 @@ import Resx from "../localization";
 import SiteGroupRow from "./Row";
 import { GridCell } from "@dnnsoftware/dnn-react-common";
 import "./Table.less";
+const logger = console;
 
 const tableFields = [
     {
@@ -23,11 +24,14 @@ const tableFields = [
 export default class SiteGroupsTable extends React.Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             renderIndex: -1
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         let tableHeaders = tableFields.map(field => {
             return (
                 <GridCell
@@ -43,6 +47,7 @@ export default class SiteGroupsTable extends React.Component {
                 </GridCell>
             );
         });
+		logger.debug('<<< Exiting renderHeader()');
         return (
             <div id="sitegroups-header-row" className="sitegroups-header-row">
                 {tableHeaders}
@@ -50,6 +55,7 @@ export default class SiteGroupsTable extends React.Component {
         );
     }
     renderList() {
+		logger.debug('>>> Entering renderList()');
         const existingGroupRows = (this.props.groups || []).map(group => {
             return (
                 <SiteGroupRow
@@ -70,6 +76,7 @@ export default class SiteGroupsTable extends React.Component {
                 ></SiteGroupRow>
             );
         });
+		logger.debug('<<< Exiting renderList()');
         const newRow = this.props.currentGroup &&
       this.props.currentGroup.PortalGroupId === -1 && (
             <SiteGroupRow
@@ -96,6 +103,8 @@ export default class SiteGroupsTable extends React.Component {
         }
     }
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className="sitegroups-list-container">
                 <div className="container">

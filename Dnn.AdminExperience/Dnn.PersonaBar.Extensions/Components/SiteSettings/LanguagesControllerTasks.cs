@@ -29,14 +29,17 @@ namespace Dnn.PersonaBar.SiteSettings.Components
 
         public static void LocalizeSitePages(LocalizationProgress progress, int portalId, bool translatePages, string defaultLanguage)
         {
+			Logger.LogDebug(">>> Entering LocalizeSitePages(progress={Progress},portalId={PortalId},translatePages={TranslatePages},defaultLanguage={DefaultLanguage})", progress, portalId, translatePages, defaultLanguage);
             Task.Factory.StartNew(() =>
             {
                 try
                 {
                     var languageCount = LocaleController.Instance.GetLocales(portalId).Count;
+					Logger.LogDebug("LocalizeSitePages(progress={Progress},portalId={PortalId},translatePages={TranslatePages},defaultLanguage={DefaultLanguage}): languageCount → {LanguageCount}", progress, portalId, translatePages, defaultLanguage, languageCount);
                     var languageCounter = 0;
 
                     var pageList = GetPages(portalId).Where(p => string.IsNullOrEmpty(p.CultureCode)).ToList();
+					Logger.LogDebug("LocalizeSitePages(progress={Progress},portalId={PortalId},translatePages={TranslatePages},defaultLanguage={DefaultLanguage}): pageList → {PageList}", progress, portalId, translatePages, defaultLanguage, pageList);
 
                     if (translatePages)
                     {
@@ -89,20 +92,25 @@ namespace Dnn.PersonaBar.SiteSettings.Components
                     }
                     catch (Exception)
                     {
+						Logger.LogError("Exception in LocalizeSitePages(progress={Progress},portalId={PortalId},translatePages={TranslatePages},defaultLanguage={DefaultLanguage}): {Arg4}", progress, portalId, translatePages, defaultLanguage, Exception.Message);
                         // ignore
                     }
                 }
             });
+			Logger.LogDebug("<<< Exiting LocalizeSitePages(progress={Progress},portalId={PortalId},translatePages={TranslatePages},defaultLanguage={DefaultLanguage})", progress, portalId, translatePages, defaultLanguage);
         }
 
         public static void LocalizeLanguagePages(LocalizationProgress progress, int portalId, string cultureCode, string defaultLocale)
         {
+			Logger.LogDebug(">>> Entering LocalizeLanguagePages(progress={Progress},portalId={PortalId},cultureCode={CultureCode},defaultLocale={DefaultLocale})", progress, portalId, cultureCode, defaultLocale);
             Task.Factory.StartNew(() =>
             {
                 try
                 {
                     var pageList = GetTabsToLocalize(portalId, cultureCode, defaultLocale);
+					Logger.LogDebug("LocalizeLanguagePages(progress={Progress},portalId={PortalId},cultureCode={CultureCode},defaultLocale={DefaultLocale}): pageList → {PageList}", progress, portalId, cultureCode, defaultLocale, pageList);
                     var locale = LocaleController.Instance.GetLocale(cultureCode);
+					Logger.LogDebug("LocalizeLanguagePages(progress={Progress},portalId={PortalId},cultureCode={CultureCode},defaultLocale={DefaultLocale}): locale → {Locale}", progress, portalId, cultureCode, defaultLocale, locale);
 
                     // add translator role
                     Localization.AddTranslatorRole(portalId, locale);
@@ -128,16 +136,21 @@ namespace Dnn.PersonaBar.SiteSettings.Components
                     }
                     catch (Exception)
                     {
+						Logger.LogError("Exception in LocalizeLanguagePages(progress={Progress},portalId={PortalId},cultureCode={CultureCode},defaultLocale={DefaultLocale}): {Arg4}", progress, portalId, cultureCode, defaultLocale, Exception.Message);
                         // ignore
                     }
                 }
             });
+			Logger.LogDebug("<<< Exiting LocalizeLanguagePages(progress={Progress},portalId={PortalId},cultureCode={CultureCode},defaultLocale={DefaultLocale})", progress, portalId, cultureCode, defaultLocale);
         }
 
         internal static LocalizationProgress ReadProgressFile()
         {
+			Logger.LogDebug(">>> Entering ReadProgressFile()");
             var path = Path.Combine(Globals.ApplicationMapPath, "App_Data", LocalizationProgressFile);
             using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 256);
+			Logger.LogDebug("ReadProgressFile(): file → {File}", file);
+			Logger.LogDebug("ReadProgressFile(): path → {Path}", path);
             var bytes = new byte[file.Length];
             var bytesToRead = file.Length;
             var bytesRead = 0;
@@ -145,21 +158,26 @@ namespace Dnn.PersonaBar.SiteSettings.Components
             do
             {
                 var readCount = file.Read(bytes, bytesRead, bytes.Length);
+				Logger.LogDebug("ReadProgressFile(): readCount → {ReadCount}", readCount);
                 bytesRead += readCount;
                 bytesToRead -= readCount;
             }
             while (bytesToRead > 0);
 
             var text = Encoding.UTF8.GetString(bytes);
+			Logger.LogDebug("ReadProgressFile(): text → {Text}", text);
+			Logger.LogDebug("<<< Exiting ReadProgressFile()");
             return JsonConvert.DeserializeObject<LocalizationProgress>(text);
         }
 
         private static List<TabInfo> GetTabsToLocalize(int portalId, string code, string defaultLocale)
         {
+			Logger.LogDebug(">>> Entering GetTabsToLocalize(portalId={PortalId},code={Code},defaultLocale={DefaultLocale})", portalId, code, defaultLocale);
             var results = new List<TabInfo>();
             var portalTabs = TabController.Instance.GetTabsByPortal(portalId)
                 .Where(kvp => (kvp.Value.CultureCode == defaultLocale || string.IsNullOrEmpty(kvp.Value.CultureCode))
                 && !kvp.Value.IsDeleted && !kvp.Value.IsSystem && !kvp.Value.TabPath.StartsWith("//Admin", StringComparison.OrdinalIgnoreCase));
+				Logger.LogDebug("GetTabsToLocalize(portalId={PortalId},code={Code},defaultLocale={DefaultLocale}): results → {Results}", portalId, code, defaultLocale, results);
 
             foreach (var kvp in portalTabs)
             {
@@ -170,6 +188,7 @@ namespace Dnn.PersonaBar.SiteSettings.Components
                 else
                 {
                     var tabLocalizedInCulture = kvp.Value.LocalizedTabs.Any(localizedTab => localizedTab.Value.CultureCode == code);
+					Logger.LogDebug("GetTabsToLocalize(portalId={PortalId},code={Code},defaultLocale={DefaultLocale}): tabLocalizedInCulture → {TabLocalizedInCulture}", portalId, code, defaultLocale, tabLocalizedInCulture);
                     if (!tabLocalizedInCulture)
                     {
                         results.Add(kvp.Value);
@@ -177,18 +196,26 @@ namespace Dnn.PersonaBar.SiteSettings.Components
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetTabsToLocalize(portalId={PortalId},code={Code},defaultLocale={DefaultLocale})", portalId, code, defaultLocale);
             return results;
         }
 
         private static void ProcessLanguage(List<TabInfo> pageList, Locale locale, string defaultLocale, int languageCount, int totalLanguages, LocalizationProgress progress)
         {
+			Logger.LogDebug(">>> Entering ProcessLanguage(pageList={PageList},locale={Locale},defaultLocale={DefaultLocale},languageCount={LanguageCount},totalLanguages={TotalLanguages},progress={Progress})", pageList, locale, defaultLocale, languageCount, totalLanguages, progress);
             progress.PrimaryTotal = totalLanguages;
             progress.PrimaryValue = languageCount;
+			Logger.LogDebug("ProcessLanguage(pageList={PageList},locale={Locale},defaultLocale={DefaultLocale},languageCount={LanguageCount},totalLanguages={TotalLanguages},progress={Progress}): progress.PrimaryValue → {Arg6}", pageList, locale, defaultLocale, languageCount, totalLanguages, progress, progress.PrimaryValue);
+			Logger.LogDebug("ProcessLanguage(pageList={PageList},locale={Locale},defaultLocale={DefaultLocale},languageCount={LanguageCount},totalLanguages={TotalLanguages},progress={Progress}): progress.PrimaryTotal → {Arg6}", pageList, locale, defaultLocale, languageCount, totalLanguages, progress, progress.PrimaryTotal);
 
             var total = pageList.Count;
+			Logger.LogDebug("ProcessLanguage(pageList={PageList},locale={Locale},defaultLocale={DefaultLocale},languageCount={LanguageCount},totalLanguages={TotalLanguages},progress={Progress}): total → {Total}", pageList, locale, defaultLocale, languageCount, totalLanguages, progress, total);
             if (total == 0)
             {
                 progress.SecondaryTotal = 0;
+				Logger.LogDebug("ProcessLanguage(pageList={PageList},locale={Locale},defaultLocale={DefaultLocale},languageCount={LanguageCount},totalLanguages={TotalLanguages},progress={Progress}): progress.SecondaryTotal → {Arg6}", pageList, locale, defaultLocale, languageCount, totalLanguages, progress, progress.SecondaryTotal);
+				Logger.LogDebug("ProcessLanguage(pageList={PageList},locale={Locale},defaultLocale={DefaultLocale},languageCount={LanguageCount},totalLanguages={TotalLanguages},progress={Progress}): progress.SecondaryValue → {Arg6}", pageList, locale, defaultLocale, languageCount, totalLanguages, progress, progress.SecondaryValue);
+				Logger.LogDebug("ProcessLanguage(pageList={PageList},locale={Locale},defaultLocale={DefaultLocale},languageCount={LanguageCount},totalLanguages={TotalLanguages},progress={Progress}): progress.SecondaryPercent → {Arg6}", pageList, locale, defaultLocale, languageCount, totalLanguages, progress, progress.SecondaryPercent);
                 progress.SecondaryValue = 0;
                 progress.SecondaryPercent = 100;
             }
@@ -196,6 +223,7 @@ namespace Dnn.PersonaBar.SiteSettings.Components
             for (var i = 0; i < total; i++)
             {
                 var currentTab = pageList.ElementAt(i);
+				Logger.LogDebug("ProcessLanguage(pageList={PageList},locale={Locale},defaultLocale={DefaultLocale},languageCount={LanguageCount},totalLanguages={TotalLanguages},progress={Progress}): currentTab → {CurrentTab}", pageList, locale, defaultLocale, languageCount, totalLanguages, progress, currentTab);
                 var stepNo = i + 1;
 
                 progress.SecondaryTotal = total;
@@ -230,20 +258,29 @@ namespace Dnn.PersonaBar.SiteSettings.Components
                     TabController.Instance.CreateLocalizedCopy(currentTab, locale, false);
                 }
             }
+			Logger.LogDebug("<<< Exiting ProcessLanguage(pageList={PageList},locale={Locale},defaultLocale={DefaultLocale},languageCount={LanguageCount},totalLanguages={TotalLanguages},progress={Progress})", pageList, locale, defaultLocale, languageCount, totalLanguages, progress);
         }
 
         private static void SaveProgressToFile(LocalizationProgress progress)
         {
+			Logger.LogDebug(">>> Entering SaveProgressToFile(progress={Progress})", progress);
             var path = Path.Combine(Globals.ApplicationMapPath, "App_Data", LocalizationProgressFile);
             var text = JsonConvert.SerializeObject(progress);
+			Logger.LogDebug("SaveProgressToFile(progress={Progress}): text → {Text}", progress, text);
             using var file = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read, 256);
+			Logger.LogDebug("SaveProgressToFile(progress={Progress}): file → {File}", progress, file);
             var bytes = Encoding.UTF8.GetBytes(text);
+			Logger.LogDebug("SaveProgressToFile(progress={Progress}): bytes → {Bytes}", progress, bytes);
+			Logger.LogDebug("SaveProgressToFile(progress={Progress}): path → {Path}", progress, path);
             file.Write(bytes, 0, bytes.Length);
             file.Flush();
+			Logger.LogDebug("<<< Exiting SaveProgressToFile(progress={Progress})", progress);
         }
 
         private static List<TabInfo> GetPages(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetPages(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetPages(portalId={PortalId})", portalId);
             return (
                 from kvp in TabController.Instance.GetTabsByPortal(portalId)
                 where !kvp.Value.TabPath.StartsWith("//Admin", StringComparison.OrdinalIgnoreCase)
@@ -255,12 +292,15 @@ namespace Dnn.PersonaBar.SiteSettings.Components
 
         private static void PublishLanguage(string cultureCode, int portalId, bool publish)
         {
+			Logger.LogDebug(">>> Entering PublishLanguage(cultureCode={CultureCode},portalId={PortalId},publish={Publish})", cultureCode, portalId, publish);
             var enabledLanguages = LocaleController.Instance.GetLocales(portalId);
             if (enabledLanguages.TryGetValue(cultureCode, out var enabledLanguage))
             {
                 enabledLanguage.IsPublished = publish;
+				Logger.LogDebug("PublishLanguage(cultureCode={CultureCode},portalId={PortalId},publish={Publish}): enabledLanguage.IsPublished → {Arg3}", cultureCode, portalId, publish, enabledLanguage.IsPublished);
                 LocaleController.Instance.UpdatePortalLocale(enabledLanguage);
             }
+			Logger.LogDebug("<<< Exiting PublishLanguage(cultureCode={CultureCode},portalId={PortalId},publish={Publish})", cultureCode, portalId, publish);
         }
     }
 }

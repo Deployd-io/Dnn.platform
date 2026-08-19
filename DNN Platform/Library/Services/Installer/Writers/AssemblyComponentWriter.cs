@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// </summary>
     public class AssemblyComponentWriter : FileComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AssemblyComponentWriter));
         /// <summary>Initializes a new instance of the <see cref="AssemblyComponentWriter"/> class.</summary>
         /// <param name="basePath">The assembly file base path.</param>
         /// <param name="assemblies">The assembly files.</param>
@@ -20,6 +21,8 @@ namespace DotNetNuke.Services.Installer.Writers
         public AssemblyComponentWriter(string basePath, Dictionary<string, InstallFile> assemblies, PackageInfo package)
             : base(basePath, assemblies, package)
         {
+		Logger.LogDebug(">>> Entering AssemblyComponentWriter(basePath={BasePath},assemblies={Assemblies},package={Package})", basePath, assemblies, package);
+		Logger.LogDebug("<<< Exiting AssemblyComponentWriter(basePath={BasePath},assemblies={Assemblies},package={Package})", basePath, assemblies, package);
         }
 
         /// <summary>Gets the name of the Collection Node ("assemblies").</summary>

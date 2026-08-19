@@ -2,28 +2,40 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { ErrorStateIcon } from "../SvgIcons";
 import "./style.less";
+const logger = console;
 
 export default class ContentLoadWrapper extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             percent: 0
         };
         this.timeout = 50;
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug(`constructor(): this.timeout → ${this.timeout}`);
+		logger.debug(`constructor(): this.setTimeout → ${this.setTimeout}`);
         this.delta = 1.00;
         this.setTimeout = null;
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         setTimeout(this.increase.bind(this), 100);
         this._isMounted = true;
+		logger.debug(`componentDidMount(): this._isMounted → ${this._isMounted}`);
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         this._isMounted = false;
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         let { props } = this;
         if (props.loadComplete !== prevProps.loadComplete) {
             if (props.loadComplete) {
@@ -51,11 +63,13 @@ export default class ContentLoadWrapper extends Component {
                         props.onErrorCallback();
                     }
                 }, 300);
+				logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
             }
         }
     }    
 
     increase() {
+		logger.debug('>>> Entering increase()');
         let {percent} = this.state;
         percent++;
         this.timeout *= this.delta;
@@ -67,9 +81,11 @@ export default class ContentLoadWrapper extends Component {
         }
         if (percent < 95) {
             this.setTimeout = setTimeout(this.increase.bind(this), this.timeout);
+			logger.debug('<<< Exiting increase()');
         }
     }
     onTryAgain() {
+		logger.debug('>>> Entering onTryAgain()');
         this.setState({
             percent: 0
         }, () => {
@@ -77,14 +93,17 @@ export default class ContentLoadWrapper extends Component {
         });
         if (typeof this.props.onTryAgain === "function") {
             this.props.onTryAgain();
+			logger.debug('<<< Exiting onTryAgain()');
         }
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         let {percent} = this.state;
         const className = "dnn-content-load-wrapper" + (this.props.loadComplete ? " complete" : "") + (this.props.loadError ? " upload-error" : "");
         if (typeof this.props.loadComplete === "undefined" || this.props.loadComplete) {
+		logger.debug('<<< Exiting render()');
             return this.props.children;
         }
 

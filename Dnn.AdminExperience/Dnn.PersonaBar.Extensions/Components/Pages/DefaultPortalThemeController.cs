@@ -20,21 +20,26 @@ namespace Dnn.PersonaBar.Pages.Components
         public DefaultPortalThemeController()
             : this(null)
         {
+		eventLogger.LogDebug(">>> Entering DefaultPortalThemeController()");
         }
+		eventLogger.LogDebug("<<< Exiting DefaultPortalThemeController()");
 
         /// <summary>Initializes a new instance of the <see cref="DefaultPortalThemeController"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
         public DefaultPortalThemeController(IHostSettings hostSettings)
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("DefaultPortalThemeController(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         }
 
         /// <inheritdoc />
         public string GetDefaultPortalContainer()
         {
+			eventLogger.LogDebug(">>> Entering GetDefaultPortalContainer()");
             var portalSettings = PortalSettings.Current;
             if (portalSettings == null)
             {
+			eventLogger.LogDebug("<<< Exiting GetDefaultPortalContainer()");
                 return null;
             }
 
@@ -44,9 +49,11 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         public string GetDefaultPortalLayout()
         {
+			eventLogger.LogDebug(">>> Entering GetDefaultPortalLayout()");
             var portalSettings = PortalSettings.Current;
             if (portalSettings == null)
             {
+			eventLogger.LogDebug("<<< Exiting GetDefaultPortalLayout()");
                 return null;
             }
 
@@ -56,6 +63,8 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         protected override Func<IDefaultPortalThemeController> GetFactory()
         {
+			eventLogger.LogDebug(">>> Entering GetFactory()");
+			eventLogger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.GetCurrentServiceProvider().GetRequiredService<IDefaultPortalThemeController>();
         }
     }

@@ -30,6 +30,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(),
             clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>())
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TermsSelector));
         private static readonly char[] TermIdSeparator = [',',];
         private readonly ITermController termController = termController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITermController>();
 
@@ -38,6 +39,8 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         public TermsSelector()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering TermsSelector()");
+		Logger.LogDebug("<<< Exiting TermsSelector()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="TermsSelector"/> class.</summary>
@@ -100,11 +103,13 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (!string.IsNullOrEmpty(this.CssClass))
             {
                 this.CssClass = $"{this.CssClass} TermsSelector";
+				Logger.LogDebug("OnInit(e={E}): this.CssClass → {Arg1}", e, this.CssClass);
             }
             else
             {
@@ -112,16 +117,20 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             }
 
             var includeSystem = this.IncludeSystemVocabularies.ToString().ToLowerInvariant();
+			Logger.LogDebug("OnInit(e={E}): includeSystem → {IncludeSystem}", e, includeSystem);
             var includeTags = this.IncludeTags.ToString().ToLowerInvariant();
+			Logger.LogDebug("OnInit(e={E}): includeTags → {IncludeTags}", e, includeTags);
             var apiPath = Globals.ResolveUrl($"~/API/InternalServices/ItemListService/GetTerms?includeSystem={includeSystem}&includeTags={includeTags}&q=");
 
             this.Options.Preload = "focus";
+			Logger.LogDebug("OnInit(e={E}): apiPath → {ApiPath}", e, apiPath);
             this.Options.Plugins.Add("remove_button");
             this.Options.Render = new RenderOption
             {
                 Option = "function(item, escape) {return '<div>' + item.text + '</div>';}",
             };
 
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
             this.Options.Load = $$"""
                                   function(query, callback) {
                                       $.ajax({

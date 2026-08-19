@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import debounce from "lodash/debounce";
 import MagnifyingGlassIcon from "./MagnifyingGlassIcon";
 import "./style.less";
+const logger = console;
 
 const style = {
     main: {
@@ -33,31 +34,41 @@ const style = {
 class SearchBox extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             text: ""
         };
+		logger.debug('<<< Exiting constructor()');
     }
     
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         this.debouncedSearch = debounce(this.search, 1000);
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
     
     search() {
+		logger.debug('>>> Entering search()');
         // TODO: do not search if no text, except if the text has been deleted
         // if (this.state.text.trim() === "") {
         //     return;
         // }
         
         this.props.onSearch(this.state.text);                
+		logger.debug('<<< Exiting search()');
     }    
     
     onTextChanged(e) {
+		logger.debug(`>>> Entering onTextChanged(e=${e})`);
         this.setState({text: e.target.value}, () => {
             this.debouncedSearch();
         });     
+		logger.debug(`<<< Exiting onTextChanged(e=${e})`);
     }
     
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className={"dnn-search-box" + (this.props.className ? " " + this.props.className : "")} style={{...style.main, ...this.props.style}}>
                 <input disabled={this.props.inputDisabled} defaultValue={this.props.initialValue} style={{...style.input, ...this.props.inputStyle}} type="search" placeholder={this.props.placeholder} onChange={this.onTextChanged.bind(this)} aria-label="Search" />

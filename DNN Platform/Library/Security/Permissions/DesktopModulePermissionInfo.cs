@@ -14,6 +14,7 @@ namespace DotNetNuke.Security.Permissions
     [Serializable]
     public class DesktopModulePermissionInfo : PermissionInfoBase, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DesktopModulePermissionInfo));
         // local property declarations
         private int desktopModulePermissionID;
         private int portalDesktopModuleID;
@@ -21,11 +22,16 @@ namespace DotNetNuke.Security.Permissions
         /// <summary>Initializes a new instance of the <see cref="DesktopModulePermissionInfo"/> class.</summary>
         public DesktopModulePermissionInfo()
         {
+			Logger.LogDebug(">>> Entering DesktopModulePermissionInfo()");
             this.desktopModulePermissionID = Null.NullInteger;
             this.portalDesktopModuleID = Null.NullInteger;
+			Logger.LogDebug("DesktopModulePermissionInfo(): this.desktopModulePermissionID → {Arg0}", this.desktopModulePermissionID);
+			Logger.LogDebug("DesktopModulePermissionInfo(): portalDesktopModuleID → {PortalDesktopModuleID}", portalDesktopModuleID);
+			Logger.LogDebug("<<< Exiting DesktopModulePermissionInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DesktopModulePermissionInfo"/> class.</summary>
+		Logger.LogDebug("<<< Exiting DesktopModulePermissionInfo()");
         /// <param name="permission">A PermissionInfo object.</param>
         public DesktopModulePermissionInfo(PermissionInfo permission)
             : this((IPermissionDefinitionInfo)permission)
@@ -37,10 +43,13 @@ namespace DotNetNuke.Security.Permissions
         public DesktopModulePermissionInfo(IPermissionDefinitionInfo permission)
             : this()
         {
+			Logger.LogDebug(">>> Entering DesktopModulePermissionInfo(permission={Permission})", permission);
             ((IPermissionInfo)this).ModuleDefId = permission.ModuleDefId;
             this.PermissionCode = permission.PermissionCode;
+			Logger.LogDebug("DesktopModulePermissionInfo(permission={Permission}): this.PermissionCode → {Arg1}", permission, this.PermissionCode);
             ((IPermissionInfo)this).PermissionId = permission.PermissionId;
             this.PermissionKey = permission.PermissionKey;
+			Logger.LogDebug("DesktopModulePermissionInfo(permission={Permission}): this.PermissionKey → {Arg1}", permission, this.PermissionKey);
             this.PermissionName = permission.PermissionName;
         }
 
@@ -72,9 +81,11 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.FillInternal(dr);
             this.DesktopModulePermissionID = Null.SetNullInteger(dr["DesktopModulePermissionID"]);
             this.PortalDesktopModuleID = Null.SetNullInteger(dr["PortalDesktopModuleID"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <summary>Compares if two DesktopModulePermissionInfo objects are equivalent/equal.</summary>
@@ -89,6 +100,7 @@ namespace DotNetNuke.Security.Permissions
         /// </remarks>
         public bool Equals(DesktopModulePermissionInfo other)
         {
+			Logger.LogDebug(">>> Entering Equals(other={Other})", other);
             if (ReferenceEquals(null, other))
             {
                 return false;
@@ -96,9 +108,11 @@ namespace DotNetNuke.Security.Permissions
 
             if (ReferenceEquals(this, other))
             {
+			Logger.LogDebug("<<< Exiting Equals(other={Other})", other);
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting Equals(obj={Obj})", obj);
             return (this.AllowAccess == other.AllowAccess) && (this.PortalDesktopModuleID == other.PortalDesktopModuleID) && (this.RoleID == other.RoleID) && (this.PermissionID == other.PermissionID);
         }
 
@@ -135,8 +149,10 @@ namespace DotNetNuke.Security.Permissions
         /// <inheritdoc />
         public override int GetHashCode()
         {
+			Logger.LogDebug(">>> Entering GetHashCode()");
             unchecked
             {
+				Logger.LogDebug("<<< Exiting GetHashCode()");
                 return (this.desktopModulePermissionID * 397) ^ this.portalDesktopModuleID;
             }
         }

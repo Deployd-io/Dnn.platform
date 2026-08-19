@@ -4,6 +4,7 @@
 
 namespace DotNetNuke.Instrumentation
 {
+	private static readonly DnnLogger Logger = DnnLogger.GetClassLogger(typeof(LoggerSource));
     /// <summary>Provides access to an <see cref="ILoggerSource"/> instance.</summary>
     public static class LoggerSource
     {
@@ -14,7 +15,10 @@ namespace DotNetNuke.Instrumentation
         /// <param name="loggerSource">A test <see cref="ILoggerSource"/> instance.</param>
         public static void SetTestableInstance(ILoggerSource loggerSource)
         {
+			Logger.LogDebug(">>> Entering SetTestableInstance(loggerSource={LoggerSource})", loggerSource);
             Instance = loggerSource;
+			Logger.LogDebug("SetTestableInstance(loggerSource={LoggerSource}): Instance → {Instance}", loggerSource, Instance);
+			Logger.LogDebug("<<< Exiting SetTestableInstance(loggerSource={LoggerSource})", loggerSource);
         }
     }
 }

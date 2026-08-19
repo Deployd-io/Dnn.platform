@@ -8,10 +8,12 @@ import {
 } from "../SvgIcons";
 import DropDown from "../Dropdown";
 import "./style.less";
+const logger = console;
 
 class Pager extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             currentPage: 0,
             pageSize: props.pageSize,
@@ -19,22 +21,31 @@ class Pager extends Component {
             startIndex: 0,
             endIndex: props.numericCounters !== undefined ? props.numericCounters : 0
         };        
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.calculateTotalPages(this.props);
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         if (prevProps.totalRecords !== this.props.totalRecords)
             this.calculateTotalPages(this.props);
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
     }
     
     formatCommaSeparate(number) {
+		logger.debug(`>>> Entering formatCommaSeparate(number=${number})`);
         const numberFormat = new Intl.NumberFormat();
+		logger.debug(`formatCommaSeparate(number=${number}): numberFormat → ${numberFormat}`);
+		logger.debug(`<<< Exiting formatCommaSeparate(number=${number})`);
         return numberFormat.format(number);
     }
     calculateTotalPages(props) {
+		logger.debug(`>>> Entering calculateTotalPages(props=${props})`);
         const { state } = this;
         let { startIndex } = state;
         let { endIndex } = state;
@@ -47,6 +58,7 @@ class Pager extends Component {
                 state.endIndex = props.numericCounters !== undefined ? props.numericCounters : 0;
             }
             let totalPages = parseInt(props.totalRecords / state.pageSize);
+			logger.debug(`calculateTotalPages(props=${props}): totalPages → ${totalPages}`);
             if (props.totalRecords % state.pageSize !== 0) {
                 totalPages++;
             }
@@ -55,6 +67,7 @@ class Pager extends Component {
                 if (currentPage >= totalPages - 1) {
                     endIndex = totalPages;
                     startIndex = (endIndex - props.numericCounters) > 0 ? (endIndex - props.numericCounters) : 0;
+					logger.debug(`calculateTotalPages(props=${props}): endIndex → ${endIndex}`);
                 }
                 else if (currentPage <= 0) {
                     startIndex = 0;
@@ -76,17 +89,21 @@ class Pager extends Component {
         this.setState({
             state
         });
+		logger.debug(`<<< Exiting calculateTotalPages(props=${props})`);
     }
 
     format() {
+		logger.debug('>>> Entering format()');
         let format = arguments[0];
         let methodsArgs = arguments;
         return format.replace(/{(\d+)}/gi, function (value, index) {
             let argsIndex = parseInt(index) + 1;
+			logger.debug(`<<< Exiting function(argsIndex=${argsIndex})`);
             return methodsArgs[argsIndex];
         });
     }
     onPageSizeSelected(option) {
+		logger.debug(`>>> Entering onPageSizeSelected(option=${option})`);
         let { state } = this;
         if (state.pageSize !== option.value) {
             state.pageSize = option.value;
@@ -95,9 +112,11 @@ class Pager extends Component {
             });
             this.calculateTotalPages(this.props);
             this.onPageChanged(0);
+			logger.debug(`<<< Exiting onPageSizeSelected(option=${option})`);
         }
     }
     onPageChanged(step) {
+		logger.debug(`>>> Entering onPageChanged(step=${step})`);
         let { currentPage } = this.state;
         let { state } = this;
         switch (step) {
@@ -123,9 +142,12 @@ class Pager extends Component {
             }
         }
         let { startIndex } = state;
+		logger.debug(`onPageChanged(step=${step}): startIndex → ${startIndex}`);
+		logger.debug(`onPageChanged(step=${step}): endIndex → ${endIndex}`);
         let { endIndex } = state;
         if (this.props.numericCounters > 0) {
             let boxesHalf = parseInt(this.props.numericCounters / 2);
+			logger.debug(`onPageChanged(step=${step}): boxesHalf → ${boxesHalf}`);
             if (currentPage < startIndex && currentPage < state.totalPages && currentPage > 0) {
                 startIndex = (startIndex - boxesHalf) < 0 ? 0 : startIndex - boxesHalf;
                 endIndex = startIndex > 0 ? endIndex - boxesHalf : endIndex;
@@ -134,6 +156,7 @@ class Pager extends Component {
                 endIndex = (endIndex + boxesHalf) > state.totalPages ? state.totalPages : endIndex + boxesHalf;
                 startIndex = endIndex < state.totalPages ? startIndex + boxesHalf :
                     ((endIndex - this.props.numericCounters) > 0 ? (endIndex - this.props.numericCounters) : 0);
+					logger.debug(`<<< Exiting onPageChanged(step=${step})`);
             }
             else if (currentPage >= state.totalPages - 1) {
                 endIndex = state.totalPages;
@@ -156,6 +179,7 @@ class Pager extends Component {
     }
 
     getPageSummary() {
+		logger.debug('>>> Entering getPageSummary()');
         if (this.props.showSummary) {
             const { props, state } = this;
             if (props.totalRecords <= 0) {
@@ -166,11 +190,13 @@ class Pager extends Component {
             if (end > props.totalRecords) {
                 end = props.totalRecords;
             }
+		logger.debug('<<< Exiting getPageSummary()');
             return this.format(this.props.summaryText, this.formatCommaSeparate(start), this.formatCommaSeparate(end), this.formatCommaSeparate(props.totalRecords));
         }
         return "&nbsp;";
     }
     getPagingBoxes() {
+		logger.debug('>>> Entering getPagingBoxes()');
         let { state } = this;
         let { currentPage } = state;
         let { startIndex } = state;
@@ -189,6 +215,7 @@ class Pager extends Component {
         else if (this.props.numericCounters === 1) {
             pagingBoxes = pagingBoxes.concat(<li key="li-single" className="pages current do-not-close">{this.formatCommaSeparate(currentPage + 1)}</li>);
         }
+		logger.debug('<<< Exiting getPagingBoxes()');
         return pagingBoxes;
     }
     getPageSizeDropDown() {
@@ -222,17 +249,20 @@ class Pager extends Component {
     }
      
     renderIcon(OnClick, Type, Disabled) {
+		logger.debug(`>>> Entering renderIcon(OnClick=${OnClick},Type=${Type},Disabled=${Disabled})`);
         if (!Disabled) {
             return <li className={"do-not-close pages prev"} onClick={OnClick.bind(this)}>
                 <span className="icon-button"><Type /></span>
             </li>;
         } else {
+			logger.debug(`<<< Exiting renderIcon(OnClick=${OnClick},Type=${Type},Disabled=${Disabled})`);
             return <li className={"do-not-close pages prev disabled"} >
                 <span className="icon-flat"><Type /></span>
             </li>;
         }
     }
     render() {
+		logger.debug('>>> Entering render()');
         const { state, props } = this;
         if (state.totalPages > 1 || (props.totalRecords >= 10 && state.totalPages === 1 && this.props.showPageSizeOptions)) {
             return (
@@ -275,6 +305,7 @@ class Pager extends Component {
                 </div >
             );
         } else {
+			logger.debug('<<< Exiting render()');
             return <div />;
         }
     }

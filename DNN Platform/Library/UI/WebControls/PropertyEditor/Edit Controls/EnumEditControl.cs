@@ -13,19 +13,25 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:EnumEditControl runat=server></{0}:EnumEditControl>")]
     public class EnumEditControl : EditControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EnumEditControl));
         private readonly Type enumType;
 
         /// <summary>Initializes a new instance of the <see cref="EnumEditControl"/> class.</summary>
         public EnumEditControl()
         {
+		Logger.LogDebug(">>> Entering EnumEditControl()");
+		Logger.LogDebug("<<< Exiting EnumEditControl()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="EnumEditControl"/> class.</summary>
         /// <param name="type">The name of the <see cref="Type"/> of the enum.</param>
         public EnumEditControl(string type)
         {
+			Logger.LogDebug(">>> Entering EnumEditControl(type={Type})", type);
             this.SystemType = type;
             this.enumType = Type.GetType(type);
+			Logger.LogDebug("EnumEditControl(type={Type}): this.SystemType → {Arg1}", type, this.SystemType);
+			Logger.LogDebug("<<< Exiting EnumEditControl(type={Type})", type);
         }
 
         /// <summary>Gets or sets stringValue is the value of the control expressed as a String.</summary>
@@ -49,21 +55,28 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments.</param>
         protected override void OnDataChanged(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnDataChanged(e={E})", e);
             int intValue = Convert.ToInt32(this.Value, CultureInfo.InvariantCulture);
             int intOldValue = Convert.ToInt32(this.OldValue, CultureInfo.InvariantCulture);
+			Logger.LogDebug("OnDataChanged(e={E}): intOldValue → {IntOldValue}", e, intOldValue);
+			Logger.LogDebug("OnDataChanged(e={E}): intValue → {IntValue}", e, intValue);
 
             var args = new PropertyEditorEventArgs(this.Name)
             { Value = Enum.ToObject(this.enumType, intValue), OldValue = Enum.ToObject(this.enumType, intOldValue) };
 
             this.OnValueChanged(args);
+			Logger.LogDebug("<<< Exiting OnDataChanged(e={E})", e);
         }
 
         /// <summary>RenderEditMode renders the Edit mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderEditMode(writer={Writer})", writer);
             int propValue = Convert.ToInt32(this.Value, CultureInfo.InvariantCulture);
             var enumValues = Enum.GetValues(this.enumType);
+			Logger.LogDebug("RenderEditMode(writer={Writer}): enumValues → {EnumValues}", writer, enumValues);
+			Logger.LogDebug("RenderEditMode(writer={Writer}): propValue → {PropValue}", writer, propValue);
 
             // Render the Select Tag
             this.ControlStyle.AddAttributesToRender(writer);
@@ -75,7 +88,9 @@ namespace DotNetNuke.UI.WebControls
             for (int i = 0; i <= enumValues.Length - 1; i++)
             {
                 int enumValue = (int)enumValues.GetValue(i);
+				Logger.LogDebug("RenderEditMode(writer={Writer}): enumValue → {EnumValue}", writer, enumValue);
                 string enumName = Enum.GetName(this.enumType, enumValue);
+				Logger.LogDebug("RenderEditMode(writer={Writer}): enumName → {EnumName}", writer, enumName);
                 enumName = Localization.GetString(enumName, this.LocalResourceFile);
 
                 // Add the Value Attribute
@@ -95,19 +110,24 @@ namespace DotNetNuke.UI.WebControls
 
             // Close Select Tag
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
 
         /// <summary>RenderViewMode renders the View (readonly) mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderViewMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderViewMode(writer={Writer})", writer);
             int propValue = Convert.ToInt32(this.Value, CultureInfo.InvariantCulture);
             string enumValue = Enum.Format(this.enumType, propValue, "G");
+			Logger.LogDebug("RenderViewMode(writer={Writer}): enumValue → {EnumValue}", writer, enumValue);
+			Logger.LogDebug("RenderViewMode(writer={Writer}): propValue → {PropValue}", writer, propValue);
 
             this.ControlStyle.AddAttributesToRender(writer);
             writer.RenderBeginTag(HtmlTextWriterTag.Span);
             writer.Write(enumValue);
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderViewMode(writer={Writer})", writer);
         }
     }
 }

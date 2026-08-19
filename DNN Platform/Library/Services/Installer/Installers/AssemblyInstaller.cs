@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The AssemblyInstaller installs Assembly Components to a DotNetNuke site.</summary>
     public class AssemblyInstaller : FileInstaller
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AssemblyInstaller));
         private static readonly Regex PublicKeyTokenRegex = new Regex(@"PublicKeyToken=(\w+)", RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
         private static readonly string OldVersion = "0.0.0.0-" + new Version(short.MaxValue, short.MaxValue, short.MaxValue, short.MaxValue);
@@ -40,6 +41,7 @@ namespace DotNetNuke.Services.Installer.Installers
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         protected override void DeleteFile(InstallFile file)
         {
+			Logger.LogDebug(">>> Entering DeleteFile(file={File})", file);
             // Attempt to unregister assembly
             // this will only log if the assembly is used by another package and cannot be deleted
             // if it is not being used it will be deleted
@@ -56,11 +58,14 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 this.Log.AddInfo(Util.ASSEMBLY_InUse + " - " + file.FullName);
             }
+			Logger.LogDebug("<<< Exiting DeleteFile(file={File})", file);
         }
 
         /// <inheritdoc />
         protected override bool IsCorrectType(InstallFileType type)
         {
+			Logger.LogDebug(">>> Entering IsCorrectType(type={Type})", type);
+			Logger.LogDebug("<<< Exiting IsCorrectType(type={Type})", type);
             return type == InstallFileType.Assembly;
         }
 
@@ -68,6 +73,7 @@ namespace DotNetNuke.Services.Installer.Installers
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         protected override bool InstallFile(InstallFile file)
         {
+			Logger.LogDebug(">>> Entering InstallFile(file={File})", file);
             bool bSuccess = true;
             if (file.Action == "UnRegister")
             {
@@ -75,6 +81,7 @@ namespace DotNetNuke.Services.Installer.Installers
                 try
                 {
                     this.DeleteFiles = true;
+					Logger.LogDebug("InstallFile(file={File}): this.DeleteFiles → {Arg1}", file, this.DeleteFiles);
                     this.DeleteFile(file);
                 }
                 finally
@@ -86,6 +93,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 // Attempt to register assembly this will return False if the assembly exists and true if it does not or is older
                 int returnCode = DataProvider.Instance().RegisterAssembly(this.Package.PackageID, file.Name, file.Version.ToString(3));
+				Logger.LogDebug("InstallFile(file={File}): returnCode → {ReturnCode}", file, returnCode);
                 switch (returnCode)
                 {
                     case 0:
@@ -112,6 +120,7 @@ namespace DotNetNuke.Services.Installer.Installers
                 }
             }
 
+			Logger.LogDebug("<<< Exiting InstallFile(file={File})", file);
             return bSuccess;
         }
 
@@ -120,36 +129,44 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <returns>An <see cref="AssemblyName"/> or <c>null</c>.</returns>
         private static AssemblyName ReadAssemblyName(string assemblyFile)
         {
+			Logger.LogDebug(">>> Entering ReadAssemblyName(assemblyFile={AssemblyFile})", assemblyFile);
             try
             {
                 return AssemblyName.GetAssemblyName(assemblyFile);
             }
             catch (BadImageFormatException)
             {
+				Logger.LogError("Exception in ReadAssemblyName(assemblyFile={AssemblyFile}): {Arg1}", assemblyFile, BadImageFormatException.getMessage());
                 // assemblyFile is not a valid assembly.
                 return null;
             }
             catch (ArgumentException)
             {
+				Logger.LogError("Exception in ReadAssemblyName(assemblyFile={AssemblyFile}): {Arg1}", assemblyFile, ArgumentException.getMessage());
                 // assemblyFile is invalid, such as an assembly with an invalid culture.
                 return null;
             }
             catch (SecurityException)
             {
+				Logger.LogError("Exception in ReadAssemblyName(assemblyFile={AssemblyFile}): {Arg1}", assemblyFile, SecurityException.getMessage());
                 // The caller does not have path discovery permission.
                 return null;
             }
             catch (FileLoadException)
             {
+				Logger.LogError("Exception in ReadAssemblyName(assemblyFile={AssemblyFile}): {Arg1}", assemblyFile, FileLoadException.getMessage());
                 // An assembly or module was loaded twice with two different sets of evidence.
+				Logger.LogDebug("<<< Exiting ReadAssemblyName(assemblyFile={AssemblyFile})", assemblyFile);
                 return null;
             }
         }
 
         private static string ReadPublicKey(AssemblyName assemblyName)
         {
+			Logger.LogDebug(">>> Entering ReadPublicKey(assemblyName={AssemblyName})", assemblyName);
             if (assemblyName == null || !assemblyName.Flags.HasFlag(AssemblyNameFlags.PublicKey))
             {
+			Logger.LogDebug("<<< Exiting ReadPublicKey(assemblyName={AssemblyName})", assemblyName);
                 return null;
             }
 
@@ -165,6 +182,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <returns>An <see cref="XmlDocument"/> instance.</returns>
         private static XmlDocument GetXmlMergeDoc(string xmlMergePath, string name, string publicKeyToken, string oldVersion, string newVersion)
         {
+			Logger.LogDebug(">>> Entering GetXmlMergeDoc(xmlMergePath={XmlMergePath},name={Name},publicKeyToken=<redacted>,oldVersion={OldVersion},newVersion={NewVersion})", xmlMergePath, name, oldVersion, newVersion);
             var xmlMergeDoc = new XmlDocument { XmlResolver = null };
             using (var xmlMergeReader = XmlReader.Create(xmlMergePath, new XmlReaderSettings { XmlResolver = null, }))
             {
@@ -172,13 +190,16 @@ namespace DotNetNuke.Services.Installer.Installers
             }
 
             var namespaceManager = new XmlNamespaceManager(xmlMergeDoc.NameTable);
+			Logger.LogDebug("GetXmlMergeDoc(xmlMergePath={XmlMergePath},name={Name},publicKeyToken=<redacted>,oldVersion={OldVersion},newVersion={NewVersion}): namespaceManager → {NamespaceManager}", xmlMergePath, name, oldVersion, newVersion, namespaceManager);
             namespaceManager.AddNamespace("ab", "urn:schemas-microsoft-com:asm.v1");
 
             var node = xmlMergeDoc.SelectSingleNode("/configuration/nodes/node", namespaceManager);
+			Logger.LogDebug("GetXmlMergeDoc(xmlMergePath={XmlMergePath},name={Name},publicKeyToken=<redacted>,oldVersion={OldVersion},newVersion={NewVersion}): node → {Node}", xmlMergePath, name, oldVersion, newVersion, node);
             ReplaceInAttributeValue(node, namespaceManager, "@path", "$$name$$", name);
             ReplaceInAttributeValue(node, namespaceManager, "@path", "$$publicKeyToken$$", publicKeyToken);
 
             var dependentAssembly = node.SelectSingleNode("ab:dependentAssembly", namespaceManager);
+			Logger.LogDebug("GetXmlMergeDoc(xmlMergePath={XmlMergePath},name={Name},publicKeyToken=<redacted>,oldVersion={OldVersion},newVersion={NewVersion}): dependentAssembly → {DependentAssembly}", xmlMergePath, name, oldVersion, newVersion, dependentAssembly);
             if (dependentAssembly == null)
             {
                 return xmlMergeDoc;
@@ -188,13 +209,16 @@ namespace DotNetNuke.Services.Installer.Installers
             ReplaceInAttributeValue(node, namespaceManager, "@targetpath", "$$publicKeyToken$$", publicKeyToken);
 
             var assemblyIdentity = dependentAssembly.SelectSingleNode("ab:assemblyIdentity", namespaceManager);
+			Logger.LogDebug("GetXmlMergeDoc(xmlMergePath={XmlMergePath},name={Name},publicKeyToken=<redacted>,oldVersion={OldVersion},newVersion={NewVersion}): assemblyIdentity → {AssemblyIdentity}", xmlMergePath, name, oldVersion, newVersion, assemblyIdentity);
             ReplaceInAttributeValue(assemblyIdentity, namespaceManager, "@name", "$$name$$", name);
             ReplaceInAttributeValue(assemblyIdentity, namespaceManager, "@publicKeyToken", "$$publicKeyToken$$", publicKeyToken);
 
             var bindingRedirect = dependentAssembly.SelectSingleNode("ab:bindingRedirect", namespaceManager);
+			Logger.LogDebug("GetXmlMergeDoc(xmlMergePath={XmlMergePath},name={Name},publicKeyToken=<redacted>,oldVersion={OldVersion},newVersion={NewVersion}): bindingRedirect → {BindingRedirect}", xmlMergePath, name, oldVersion, newVersion, bindingRedirect);
             ReplaceInAttributeValue(bindingRedirect, namespaceManager, "@oldVersion", "$$oldVersion$$", oldVersion);
             ReplaceInAttributeValue(bindingRedirect, namespaceManager, "@newVersion", "$$newVersion$$", newVersion);
 
+			Logger.LogDebug("<<< Exiting GetXmlMergeDoc(xmlMergePath={XmlMergePath},name={Name},publicKeyToken=<redacted>,oldVersion={OldVersion},newVersion={NewVersion})", xmlMergePath, name, oldVersion, newVersion);
             return xmlMergeDoc;
         }
 
@@ -206,28 +230,35 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <param name="newValue">The real value with which to replace <paramref name="oldValue"/>.</param>
         private static void ReplaceInAttributeValue(XmlNode parentNode, XmlNamespaceManager namespaceManager, string xpath, string oldValue, string newValue)
         {
+			Logger.LogDebug(">>> Entering ReplaceInAttributeValue(parentNode={ParentNode},namespaceManager={NamespaceManager},xpath={Xpath},oldValue={OldValue},newValue={NewValue})", parentNode, namespaceManager, xpath, oldValue, newValue);
             var attribute = parentNode.SelectSingleNode(xpath, namespaceManager);
             attribute.Value = attribute.Value.Replace(oldValue, newValue);
+			Logger.LogDebug("ReplaceInAttributeValue(parentNode={ParentNode},namespaceManager={NamespaceManager},xpath={Xpath},oldValue={OldValue},newValue={NewValue}): attribute → {Attribute}", parentNode, namespaceManager, xpath, oldValue, newValue, attribute);
+			Logger.LogDebug("<<< Exiting ReplaceInAttributeValue(parentNode={ParentNode},namespaceManager={NamespaceManager},xpath={Xpath},oldValue={OldValue},newValue={NewValue})", parentNode, namespaceManager, xpath, oldValue, newValue);
         }
 
         /// <summary>Adds or updates the binding redirect for the assembly file, if the assembly file it strong-named.</summary>
         /// <param name="file">The assembly file.</param>
         private void AddOrUpdateBindingRedirect(InstallFile file)
         {
+			Logger.LogDebug(">>> Entering AddOrUpdateBindingRedirect(file={File})", file);
             if (this.ApplyXmlMerge(file, "BindingRedirect.config"))
             {
                 this.Log.AddInfo(Util.ASSEMBLY_AddedBindingRedirect + " - " + file.FullName);
             }
+			Logger.LogDebug("<<< Exiting AddOrUpdateBindingRedirect(file={File})", file);
         }
 
         /// <summary>Removes the binding redirect for the assembly file, if the assembly is strong-named.</summary>
         /// <param name="file">The assembly file.</param>
         private void RemoveBindingRedirect(InstallFile file)
         {
+			Logger.LogDebug(">>> Entering RemoveBindingRedirect(file={File})", file);
             if (this.ApplyXmlMerge(file, "RemoveBindingRedirect.config"))
             {
                 this.Log.AddInfo(Util.ASSEMBLY_RemovedBindingRedirect + " - " + file.FullName);
             }
+			Logger.LogDebug("<<< Exiting RemoveBindingRedirect(file={File})", file);
         }
 
         /// <summary>If the <paramref name="file"/> is a strong-named assembly, applies the XML merge.</summary>
@@ -236,6 +267,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <returns><see langword="true"/> if the XML Merge was applied successfully, <see langword="false"/> if the file was not a strong-named assembly or could not be read.</returns>
         private bool ApplyXmlMerge(InstallFile file, string xmlMergeFile)
         {
+			Logger.LogDebug(">>> Entering ApplyXmlMerge(file={File},xmlMergeFile={XmlMergeFile})", file, xmlMergeFile);
             var assemblyFileFullPath = Path.Combine(this.PhysicalBasePath, file.FullName);
             if (!File.Exists(assemblyFileFullPath))
             {
@@ -243,21 +275,29 @@ namespace DotNetNuke.Services.Installer.Installers
             }
 
             var assemblyName = ReadAssemblyName(assemblyFileFullPath);
+			Logger.LogDebug("ApplyXmlMerge(file={File},xmlMergeFile={XmlMergeFile}): assemblyName → {AssemblyName}", file, xmlMergeFile, assemblyName);
             var publicKeyToken = ReadPublicKey(assemblyName);
+			Logger.LogDebug("ApplyXmlMerge(file={File},xmlMergeFile={XmlMergeFile}): publicKeyToken → {PublicKeyToken}", file, xmlMergeFile, publicKeyToken);
             if (string.IsNullOrEmpty(publicKeyToken))
             {
                 return false;
             }
 
             var name = assemblyName.Name;
+			Logger.LogDebug("ApplyXmlMerge(file={File},xmlMergeFile={XmlMergeFile}): name → {Name}", file, xmlMergeFile, name);
             var assemblyVersion = assemblyName.Version;
             var newVersion = assemblyVersion.ToString();
+			Logger.LogDebug("ApplyXmlMerge(file={File},xmlMergeFile={XmlMergeFile}): newVersion → {NewVersion}", file, xmlMergeFile, newVersion);
 
             var xmlMergePath = Path.Combine(Globals.InstallMapPath, "Config", xmlMergeFile);
+			Logger.LogDebug("ApplyXmlMerge(file={File},xmlMergeFile={XmlMergeFile}): xmlMergePath → {XmlMergePath}", file, xmlMergeFile, xmlMergePath);
             var xmlMergeDoc = GetXmlMergeDoc(xmlMergePath, name, publicKeyToken, OldVersion, newVersion);
+			Logger.LogDebug("ApplyXmlMerge(file={File},xmlMergeFile={XmlMergeFile}): xmlMergeDoc → {XmlMergeDoc}", file, xmlMergeFile, xmlMergeDoc);
             var xmlMerge = new XmlMerge(xmlMergeDoc, this.Package.Version.ToString(), this.Package.Name);
+			Logger.LogDebug("ApplyXmlMerge(file={File},xmlMergeFile={XmlMergeFile}): xmlMerge → {XmlMerge}", file, xmlMergeFile, xmlMerge);
             xmlMerge.UpdateConfigs();
 
+			Logger.LogDebug("<<< Exiting ApplyXmlMerge(file={File},xmlMergeFile={XmlMergeFile})", file, xmlMergeFile);
             return true;
         }
     }

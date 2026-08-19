@@ -1,8 +1,10 @@
+const logger = console;
 ﻿
 Type.registerNamespace('dnn.controls');dnn.extend(dnn.controls,{initMultiStateBox:function(ctl)
 {if(ctl&&dnn.controls.controls[ctl.id]==null)
 {var ts=new dnn.controls.DNNMultiStateBox(ctl);ts.initialize();return ts;}}});dnn.controls.DNNMultiStateBox=function(o)
 {dnn.controls.DNNMultiStateBox.initializeBase(this,[o]);this.css=this.getProp('css','');this.enabled=(this.getProp('enabled','1')=='1');this.imgPath=this.getProp('imgpath','images/');this.states=this.getProp('states','[]');this.states=Sys.Serialization.JavaScriptSerializer.deserialize(this.states);this.stateIndex=[]
+logger.debug('>>> Entering initMultiStateBox()');
 for(var i=0;i<this.states.length;i++)
 this.stateIndex[this.states[i].Key]=i;this.js=this.getProp('js','');this._img=document.createElement('img');this.container.parentNode.insertBefore(this._img,this.container);this.container.checked=true;this.container.style.position='absolute';this.container.style.top='-999px';this._label=dnn.dom.getByTagName('label',this.container.parentNode);if(this._label)
 {for(var i=0;i<this._label.length;i++)

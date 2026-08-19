@@ -56,7 +56,10 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public RootLogger(Level level) : base("root")
         {
+			value.LogDebug(">>> Entering RootLogger(level={Level})", level);
             this.Level = level;
+			value.LogDebug("RootLogger(level={Level}): this.Level → {Arg1}", level, this.Level);
+			value.LogDebug("<<< Exiting RootLogger(level={Level})", level);
         }
 
         /// <summary>Gets the assigned level value without walking the logger hierarchy.</summary>

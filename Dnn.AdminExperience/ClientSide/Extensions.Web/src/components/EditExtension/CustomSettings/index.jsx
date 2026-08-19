@@ -6,9 +6,11 @@ import JavascriptLibrary from "./JavascriptLibrary";
 import ExtensionLanguagePack from "./ExtensionLanguagePack";
 import CoreLanguagePack from "./CoreLanguagePack";
 import SkinObject from "./SkinObject";
+const logger = console;
 
 class CustomSettings extends Component {
     getExtensionSetting(props) {
+		logger.debug(`>>> Entering getExtensionSetting(props=${props})`);
         switch (props.type) {
             case "Auth_System":
                 return !props.isAddMode && <EditAuthenticationSystem {...props} className={props.isAddMode ? "add-mode": ""} />;
@@ -26,6 +28,7 @@ class CustomSettings extends Component {
             case "Module":
                 return <Module {...props} className={props.isAddMode ? "add-mode": ""} />;
             default:
+				logger.debug(`<<< Exiting getExtensionSetting(props=${props})`);
                 return <div></div>;
         }
     }

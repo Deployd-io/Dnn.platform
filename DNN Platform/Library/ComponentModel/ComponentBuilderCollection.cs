@@ -7,10 +7,12 @@ namespace DotNetNuke.ComponentModel
 
     internal class ComponentBuilderCollection : SharedDictionary<string, IComponentBuilder>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ComponentBuilderCollection));
         internal IComponentBuilder DefaultBuilder { get; set; }
 
         internal void AddBuilder(IComponentBuilder builder, bool setDefault)
         {
+			Logger.LogDebug(">>> Entering AddBuilder(builder={Builder},setDefault={SetDefault})", builder, setDefault);
             if (!this.ContainsKey(builder.Name))
             {
                 this[builder.Name] = builder;
@@ -18,8 +20,10 @@ namespace DotNetNuke.ComponentModel
                 if (setDefault && this.DefaultBuilder == null)
                 {
                     this.DefaultBuilder = builder;
+					Logger.LogDebug("AddBuilder(builder={Builder},setDefault={SetDefault}): this.DefaultBuilder → {Arg2}", builder, setDefault, this.DefaultBuilder);
                 }
             }
+			Logger.LogDebug("<<< Exiting AddBuilder(builder={Builder},setDefault={SetDefault})", builder, setDefault);
         }
     }
 }

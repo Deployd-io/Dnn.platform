@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * @license text 2.0.15 Copyright jQuery Foundation and other contributors.
  * Released under MIT license, http://github.com/requirejs/text/LICENSE
@@ -8,6 +9,7 @@
   java, location, Components, FileUtils */
 
 define(['module'], function (module) {
+	logger.debug('>>> Entering define()');
     'use strict';
 
     var text, fs, Cc, Ci, xpcIsWindows,
@@ -22,11 +24,14 @@ define(['module'], function (module) {
         masterConfig = (module.config && module.config()) || {};
 
     function useDefault(value, defaultValue) {
+		logger.debug(`>>> Entering useDefault(value=${value},defaultValue=${defaultValue})`);
+		logger.debug(`<<< Exiting useDefault(value=${value},defaultValue=${defaultValue})`);
         return value === undefined || value === '' ? defaultValue : value;
     }
 
     //Allow for default ports for http and https.
     function isSamePort(protocol1, port1, protocol2, port2) {
+		logger.debug(`>>> Entering isSamePort(protocol1=${protocol1},port1=${port1},protocol2=${protocol2},port2=${port2})`);
         if (port1 === port2) {
             return true;
         } else if (protocol1 === protocol2) {
@@ -36,6 +41,7 @@ define(['module'], function (module) {
                 return useDefault(port1, '443') === useDefault(port2, '443');
             }
         }
+		logger.debug(`<<< Exiting isSamePort(protocol1=${protocol1},port1=${port1},protocol2=${protocol2},port2=${port2})`);
         return false;
     }
 
@@ -43,18 +49,22 @@ define(['module'], function (module) {
         version: '2.0.15',
 
         strip: function (content) {
+			logger.debug(`>>> Entering strip(content=${content})`);
             //Strips <?xml ...?> declarations so that external SVG and XML
             //documents can be added to a document without worry. Also, if the string
             //is an HTML document, only the part inside the body tag is returned.
             if (content) {
                 content = content.replace(xmlRegExp, "");
                 var matches = content.match(bodyRegExp);
+				logger.debug(`strip(content=${content}): matches → ${matches}`);
                 if (matches) {
                     content = matches[1];
                 }
             } else {
                 content = "";
+				logger.debug(`<<< Exiting strip(content=${content})`);
             }
+			logger.debug(`strip(content=${content}): content → ${content}`);
             return content;
         },
 
@@ -70,6 +80,7 @@ define(['module'], function (module) {
         },
 
         createXhr: masterConfig.createXhr || function () {
+			logger.debug('>>> Entering function()'); const _start = Date.now();
             //Would love to dump the ActiveX crap in here. Need IE 6 to die first.
             var xhr, i, progId;
             if (typeof XMLHttpRequest !== "undefined") {
@@ -80,6 +91,7 @@ define(['module'], function (module) {
                     try {
                         xhr = new ActiveXObject(progId);
                     } catch (e) {}
+					logger.error('Exception in function():', e.message, e);
 
                     if (xhr) {
                         progIds = [progId];  // so faster next time
@@ -88,6 +100,11 @@ define(['module'], function (module) {
                 }
             }
 
+			logger.info(`function(): API call took ${Date.now() - _start} ms`);
+			logger.debug('<<< Exiting function()');
+			logger.debug(`<<< Exiting function(moduleName=${moduleName},contents=${contents})`);
+			logger.error(`Exception in function(url=${url},callback=${callback},errback=${errback}): ${e.message}`, e);
+			logger.error(`Exception in function(url=${url},callback=${callback}): ${e.message}`, e);
             return xhr;
         },
 
@@ -100,6 +117,7 @@ define(['module'], function (module) {
          * where strip is a boolean.
          */
         parseName: function (name) {
+			logger.debug(`>>> Entering parseName(name=${name})`);
             var modName, ext, temp,
                 strip = false,
                 index = name.lastIndexOf("."),
@@ -123,6 +141,7 @@ define(['module'], function (module) {
                     ext = temp;
                 } else {
                     modName = temp;
+					logger.debug(`<<< Exiting parseName(name=${name})`);
                 }
             }
 
@@ -144,6 +163,7 @@ define(['module'], function (module) {
          * @returns Boolean
          */
         useXhr: function (url, protocol, hostname, port) {
+			logger.debug(`>>> Entering useXhr(url=${url},protocol=${protocol},hostname=${hostname},port=${port})`);
             var uProtocol, uHostName, uPort,
                 match = text.xdRegExp.exec(url);
             if (!match) {
@@ -159,17 +179,23 @@ define(['module'], function (module) {
             return (!uProtocol || uProtocol === protocol) &&
                    (!uHostName || uHostName.toLowerCase() === hostname.toLowerCase()) &&
                    ((!uPort && !uHostName) || isSamePort(uProtocol, uPort, protocol, port));
+				logger.debug(`useXhr(url=${url},protocol=${protocol},hostname=${hostname},port=${port}): uHostName → ${uHostName}`);
+				logger.debug(`<<< Exiting useXhr(url=${url},protocol=${protocol},hostname=${hostname},port=${port})`);
         },
 
         finishLoad: function (name, strip, content, onLoad) {
+			logger.debug(`>>> Entering finishLoad(name=${name},strip=${strip},content=${content},onLoad=${onLoad})`);
             content = strip ? text.strip(content) : content;
             if (masterConfig.isBuild) {
                 buildMap[name] = content;
             }
             onLoad(content);
+			logger.debug(`finishLoad(name=${name},strip=${strip},content=${content},onLoad=${onLoad}): content → ${content}`);
+			logger.debug(`<<< Exiting finishLoad(name=${name},strip=${strip},content=${content},onLoad=${onLoad})`);
         },
 
         load: function (name, req, onLoad, config) {
+			logger.debug(`>>> Entering load(name=${name},req=${req},onLoad=${onLoad},config=${config})`);
             //Name has format: some.module.filext!strip
             //The strip part is optional.
             //if strip is present, then that means only get the string contents
@@ -185,6 +211,7 @@ define(['module'], function (module) {
             }
 
             masterConfig.isBuild = config && config.isBuild;
+			logger.debug(`load(name=${name},req=${req},onLoad=${onLoad},config=${config}): masterConfig.isBuild → ${masterConfig.isBuild}`);
 
             var parsed = text.parseName(name),
                 nonStripName = parsed.moduleName +
@@ -192,6 +219,7 @@ define(['module'], function (module) {
                 url = req.toUrl(nonStripName),
                 useXhr = (masterConfig.useXhr) ||
                          text.useXhr;
+						logger.debug(`load(name=${name},req=${req},onLoad=${onLoad},config=${config}): parsed → ${parsed}`);
 
             // Do not load if it is an empty: url
             if (url.indexOf('empty:') === 0) {
@@ -202,6 +230,8 @@ define(['module'], function (module) {
             //Load the text. Use XHR if possible and in a browser.
             if (!hasLocation || useXhr(url, defaultProtocol, defaultHostName, defaultPort)) {
                 text.get(url, function (content) {
+					logger.debug(`>>> Entering get(url=${url})`);
+					logger.debug(`<<< Exiting get(url=${url})`);
                     text.finishLoad(name, parsed.strip, content, onLoad);
                 }, function (err) {
                     if (onLoad.error) {
@@ -214,23 +244,30 @@ define(['module'], function (module) {
                 //by the module name + extension, but do not include the
                 //!strip part to avoid file system issues.
                 req([nonStripName], function (content) {
+					logger.debug(`>>> Entering req(nonStripName=${nonStripName})`);
                     text.finishLoad(parsed.moduleName + '.' + parsed.ext,
                                     parsed.strip, content, onLoad);
+									logger.debug(`<<< Exiting req(nonStripName=${nonStripName})`);
                 });
             }
+			logger.debug(`<<< Exiting load(name=${name},req=${req},onLoad=${onLoad},config=${config})`);
         },
 
         write: function (pluginName, moduleName, write, config) {
+			logger.debug(`>>> Entering write(pluginName=${pluginName},moduleName=${moduleName},write=${write},config=${config})`);
             if (buildMap.hasOwnProperty(moduleName)) {
                 var content = text.jsEscape(buildMap[moduleName]);
+				logger.debug(`write(pluginName=${pluginName},moduleName=${moduleName},write=${write},config=${config}): content → ${content}`);
                 write.asModule(pluginName + "!" + moduleName,
                                "define(function () { return '" +
                                    content +
                                "';});\n");
+							logger.debug(`<<< Exiting write(pluginName=${pluginName},moduleName=${moduleName},write=${write},config=${config})`);
             }
         },
 
         writeFile: function (pluginName, moduleName, req, write, config) {
+			logger.debug(`>>> Entering writeFile(pluginName=${pluginName},moduleName=${moduleName},req=${req},write=${write},config=${config})`);
             var parsed = text.parseName(moduleName),
                 extPart = parsed.ext ? '.' + parsed.ext : '',
                 nonStripName = parsed.moduleName + extPart,
@@ -238,7 +275,9 @@ define(['module'], function (module) {
                 //script that can be loaded across domains.
                 fileName = req.toUrl(parsed.moduleName + extPart) + '.js';
 
+			logger.debug(`writeFile(pluginName=${pluginName},moduleName=${moduleName},req=${req},write=${write},config=${config}): fileName → ${fileName}`);
             //Leverage own load() method to load plugin value, but only
+			logger.debug(`<<< Exiting writeFile(pluginName=${pluginName},moduleName=${moduleName},req=${req},write=${write},config=${config})`);
             //write out values that do not have the strip argument,
             //to avoid any potential issues with ! in file names.
             text.load(nonStripName, req, function (value) {
@@ -246,6 +285,8 @@ define(['module'], function (module) {
                 //But need to create shell that translates writeFile's
                 //write() to the right interface.
                 var textWrite = function (contents) {
+					logger.debug(`>>> Entering textWrite(contents=${contents})`);
+					logger.debug(`<<< Exiting textWrite(contents=${contents})`);
                     return write(fileName, contents);
                 };
                 textWrite.asModule = function (moduleName, contents) {
@@ -274,6 +315,7 @@ define(['module'], function (module) {
                     file = file.substring(1);
                 }
                 callback(file);
+				logger.debug(`function(url=${url},callback=${callback},errback=${errback}): file → ${file}`);
             } catch (e) {
                 if (errback) {
                     errback(e);
@@ -284,6 +326,7 @@ define(['module'], function (module) {
             text.createXhr())) {
         text.get = function (url, callback, errback, headers) {
             var xhr = text.createXhr(), header;
+			logger.debug(`function(url=${url},callback=${callback},errback=${errback},headers=${headers}): xhr → ${xhr}`);
             xhr.open('GET', url, true);
 
             //Allow plugins direct access to xhr headers
@@ -314,6 +357,8 @@ define(['module'], function (module) {
                             errback(err);
                         }
                     } else {
+						logger.debug(`function(url=${url},callback=${callback},errback=${errback},headers=${headers}): err.xhr → ${err.xhr}`);
+						logger.debug(`function(evt=${evt}): err.xhr → ${err.xhr}`);
                         callback(xhr.responseText);
                     }
 
@@ -348,6 +393,7 @@ define(['module'], function (module) {
                     // and we plan to concatenating this buffer with others; the BOM should
                     // only appear at the top of a file.
                     line = line.substring(1);
+					logger.debug(`function(url=${url},callback=${callback}): line → ${line}`);
                 }
 
                 if (line !== null) {
@@ -360,6 +406,7 @@ define(['module'], function (module) {
                 }
                 //Make sure we return a JavaScript string and not a Java string.
                 content = String(stringBuffer.toString()); //String
+				logger.debug(`function(url=${url},callback=${callback}): content → ${content}`);
             } finally {
                 input.close();
             }
@@ -382,6 +429,7 @@ define(['module'], function (module) {
                 url = url.replace(/\//g, '\\');
             }
 
+			logger.debug(`function(url=${url},callback=${callback}): url → ${url}`);
             fileObj = new FileUtils.File(url);
 
             //XPCOM, you so crazy

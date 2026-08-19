@@ -14,12 +14,16 @@ namespace DotNetNuke.Entities.Urls
     [Serializable]
     public class ExtensionUrlProviderInfo : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExtensionUrlProviderInfo));
         /// <summary>Initializes a new instance of the <see cref="ExtensionUrlProviderInfo"/> class.</summary>
         public ExtensionUrlProviderInfo()
         {
+			Logger.LogDebug(">>> Entering ExtensionUrlProviderInfo()");
             this.ExtensionUrlProviderId = -1;
             this.Settings = new Dictionary<string, string>();
+			Logger.LogDebug("ExtensionUrlProviderInfo(): this.ExtensionUrlProviderId → {Arg0}", this.ExtensionUrlProviderId);
             this.TabIds = new List<int>();
+			Logger.LogDebug("<<< Exiting ExtensionUrlProviderInfo()");
         }
 
         /// <summary>Gets a value indicating whether when true, the module provider will be used for all tabs in the current portal.  Including a specific tabid switches value to false.</summary>
@@ -76,6 +80,7 @@ namespace DotNetNuke.Entities.Urls
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.ExtensionUrlProviderId = Null.SetNullInteger(dr["ExtensionUrlProviderId"]);
             this.PortalId = Null.SetNullInteger(dr["PortalId"]);
             this.DesktopModuleId = Null.SetNullInteger(dr["DesktopModuleId"]);
@@ -86,6 +91,7 @@ namespace DotNetNuke.Entities.Urls
             this.RewriteAllUrls = Null.SetNullBoolean(dr["RewriteAllUrls"]);
             this.RedirectAllUrls = Null.SetNullBoolean(dr["RedirectAllUrls"]);
             this.ReplaceAllUrls = Null.SetNullBoolean(dr["ReplaceAllUrls"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

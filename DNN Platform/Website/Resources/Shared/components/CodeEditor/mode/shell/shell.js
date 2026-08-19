@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,13 +13,18 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode('shell', function() {
+logger.debug('>>> Entering defineMode()');
 
   var words = {};
   function define(style, string) {
+	logger.debug(`>>> Entering define(style=${style},string=${string})`);
     var split = string.split(' ');
     for(var i = 0; i < split.length; i++) {
+	logger.debug(`define(style=${style},string=${string}): split → ${split}`);
       words[split[i]] = style;
+	logger.debug(`<<< Exiting define(style=${style},string=${string})`);
     }
   };
 
@@ -36,10 +43,13 @@ CodeMirror.defineMode('shell', function() {
     'touch vi vim wall wc wget who write yes zsh');
 
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     if (stream.eatSpace()) return null;
 
     var sol = stream.sol();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): sol → ${sol}`);
     var ch = stream.next();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
 
     if (ch === '\\') {
       stream.next();
@@ -78,6 +88,7 @@ CodeMirror.defineMode('shell', function() {
     stream.eatWhile(/[\w-]/);
     var cur = stream.current();
     if (stream.peek() === '=' && /\w+/.test(cur)) return 'def';
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
     return words.hasOwnProperty(cur) ? words[cur] : null;
   }
 
@@ -100,13 +111,16 @@ CodeMirror.defineMode('shell', function() {
       if (end || !escaped) {
         state.tokens.shift();
       }
+	logger.debug(`<<< Exiting tokenString(quote=${quote})`);
       return (quote === '`' || quote === ')' ? 'quote' : 'string');
     };
   };
 
   var tokenDollar = function(stream, state) {
+	logger.debug(`>>> Entering tokenDollar(stream=${stream},state=${state})`);
     if (state.tokens.length > 1) stream.eat('$');
     var ch = stream.next(), hungry = /\w/;
+	logger.debug(`tokenDollar(stream=${stream},state=${state}): ch → ${ch}`);
     if (ch === '{') hungry = /[^}]/;
     if (ch === '(') {
       state.tokens[0] = tokenString(')');
@@ -117,16 +131,22 @@ CodeMirror.defineMode('shell', function() {
       stream.eat('}');
     }
     state.tokens.shift();
+	logger.debug('<<< Exiting defineMode()');
+	logger.debug(`<<< Exiting tokenDollar(stream=${stream},state=${state})`);
     return 'def';
   };
 
   function tokenize(stream, state) {
+	logger.debug(`>>> Entering tokenize(stream=${stream},state=${state})`);
+	logger.debug(`<<< Exiting tokenize(stream=${stream},state=${state})`);
     return (state.tokens[0] || tokenBase) (stream, state);
   };
 
   return {
     startState: function() {return {tokens:[]};},
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return tokenize(stream, state);
     },
     lineComment: '#',

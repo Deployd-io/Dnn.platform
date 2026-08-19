@@ -9,25 +9,32 @@ import ApplicationTabActions from "../../actions/applicationTab";
 import utils from "../../utils";
 
 import "./tabs.less";
+const logger = console;
 
 const defaultPlaceHolder = "...";
 
 class Application extends Component {
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         if (!this.props.isApplicationInfoLoaded) {
             this.props.onRetrieveApplicationInfo();
+			logger.debug('<<< Exiting componentDidMount()');
         }        
     }
 
     UNSAFE_componentWillReceiveProps(newProps) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
         if (this.props.errorMessage !== newProps.errorMessage && newProps.errorMessage) {
             utils.notifyError(newProps.errorMessage);
+			logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
         }
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return <div className="dnn-servers-info-panel">
             <GridSystem>
                 <div>
@@ -103,6 +110,8 @@ Application.propTypes = {
 };
 
 function mapStateToProps(state) {    
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         applicationInfo: state.applicationTab.applicationInfo,
         isApplicationInfoLoaded: state.applicationTab.isApplicationInfoLoaded,
@@ -111,6 +120,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.debug(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`);
+	logger.debug(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`);
     return {
         ...bindActionCreators ({
             onRetrieveApplicationInfo: ApplicationTabActions.loadApplicationInfo     

@@ -11,6 +11,7 @@ namespace DotNetNuke.Web.Client.ResourceManager
     /// <summary>Provides extension methods for <see cref="IResource"/> to set various resource properties in a fluent manner.</summary>
     public static class GenericResourceExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(GenericResourceExtensions));
         /// <summary>Sets the priority of the resource.</summary>
         /// <param name="input">The resource to set the priority for.</param>
         /// <param name="priority">The priority value to set.</param>
@@ -19,12 +20,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetPriority<T>(this T input, int priority)
             where T : IResource
         {
+			Logger.LogDebug(">>> Entering SetPriority(input={Input},priority={Priority})", input, priority);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetPriority(input={Input},priority={Priority})", input, priority);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.Priority = priority;
+			Logger.LogDebug("SetPriority(input={Input},priority={Priority}): input.Priority → {Arg2}", input, priority, input.Priority);
+			Logger.LogDebug("<<< Exiting SetPriority(input={Input},priority={Priority})", input, priority);
             return input;
         }
 
@@ -38,14 +43,20 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetNameAndVersion<T>(this T input, string name, string version, bool forceVersion)
             where T : IResource
         {
+			Logger.LogDebug(">>> Entering SetNameAndVersion(input={Input},name={Name},version={Version},forceVersion={ForceVersion})", input, name, version, forceVersion);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetNameAndVersion(input={Input},name={Name},version={Version},forceVersion={ForceVersion})", input, name, version, forceVersion);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.Name = name;
+			Logger.LogDebug("SetNameAndVersion(input={Input},name={Name},version={Version},forceVersion={ForceVersion}): input.Name → {Arg4}", input, name, version, forceVersion, input.Name);
+			Logger.LogDebug("SetNameAndVersion(input={Input},name={Name},version={Version},forceVersion={ForceVersion}): input.Version → {Arg4}", input, name, version, forceVersion, input.Version);
+			Logger.LogDebug("SetNameAndVersion(input={Input},name={Name},version={Version},forceVersion={ForceVersion}): input.ForceVersion → {Arg4}", input, name, version, forceVersion, input.ForceVersion);
             input.Version = version;
             input.ForceVersion = forceVersion;
+			Logger.LogDebug("<<< Exiting SetNameAndVersion(input={Input},name={Name},version={Version},forceVersion={ForceVersion})", input, name, version, forceVersion);
             return input;
         }
 
@@ -57,12 +68,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetCdnUrl<T>(this T input, string cdnUrl)
             where T : IResource
         {
+			Logger.LogDebug(">>> Entering SetCdnUrl(input={Input},cdnUrl={CdnUrl})", input, cdnUrl);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetCdnUrl(input={Input},cdnUrl={CdnUrl})", input, cdnUrl);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.CdnUrl = cdnUrl;
+			Logger.LogDebug("SetCdnUrl(input={Input},cdnUrl={CdnUrl}): input.CdnUrl → {Arg2}", input, cdnUrl, input.CdnUrl);
+			Logger.LogDebug("<<< Exiting SetCdnUrl(input={Input},cdnUrl={CdnUrl})", input, cdnUrl);
             return input;
         }
 
@@ -74,12 +89,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetProvider<T>(this T input, string provider)
             where T : IResource
         {
+			Logger.LogDebug(">>> Entering SetProvider(input={Input},provider={Provider})", input, provider);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetProvider(input={Input},provider={Provider})", input, provider);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.Provider = provider;
+			Logger.LogDebug("SetProvider(input={Input},provider={Provider}): input.Provider → {Arg2}", input, provider, input.Provider);
+			Logger.LogDebug("<<< Exiting SetProvider(input={Input},provider={Provider})", input, provider);
             return input;
         }
 
@@ -90,12 +109,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetBlocking<T>(this T input)
             where T : IResource
         {
+			Logger.LogDebug(">>> Entering SetBlocking(input={Input})", input);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetBlocking(input={Input})", input);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.Blocking = true;
+			Logger.LogDebug("SetBlocking(input={Input}): input.Blocking → {Arg1}", input, input.Blocking);
+			Logger.LogDebug("<<< Exiting SetBlocking(input={Input})", input);
             return input;
         }
 
@@ -107,12 +130,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetIntegrity<T>(this T input, string hash)
             where T : IResource
         {
+			Logger.LogDebug(">>> Entering SetIntegrity(input={Input},hash=<redacted>)", input);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetIntegrity(input={Input},hash=<redacted>)", input);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.Integrity = hash;
+			Logger.LogDebug("SetIntegrity(input={Input},hash=<redacted>): input.Integrity → {Arg2}", input, input.Integrity);
+			Logger.LogDebug("<<< Exiting SetIntegrity(input={Input},hash=<redacted>)", input);
             return input;
         }
 
@@ -124,12 +151,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetCrossOrigin<T>(this T input, CrossOrigin crossOrigin)
             where T : IResource
         {
+			Logger.LogDebug(">>> Entering SetCrossOrigin(input={Input},crossOrigin={CrossOrigin})", input, crossOrigin);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetCrossOrigin(input={Input},crossOrigin={CrossOrigin})", input, crossOrigin);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.CrossOrigin = crossOrigin;
+			Logger.LogDebug("SetCrossOrigin(input={Input},crossOrigin={CrossOrigin}): input.CrossOrigin → {Arg2}", input, crossOrigin, input.CrossOrigin);
+			Logger.LogDebug("<<< Exiting SetCrossOrigin(input={Input},crossOrigin={CrossOrigin})", input, crossOrigin);
             return input;
         }
 
@@ -141,12 +172,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetFetchPriority<T>(this T input, FetchPriority fetchPriority)
             where T : IResource
         {
+			Logger.LogDebug(">>> Entering SetFetchPriority(input={Input},fetchPriority={FetchPriority})", input, fetchPriority);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetFetchPriority(input={Input},fetchPriority={FetchPriority})", input, fetchPriority);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.FetchPriority = fetchPriority;
+			Logger.LogDebug("SetFetchPriority(input={Input},fetchPriority={FetchPriority}): input.FetchPriority → {Arg2}", input, fetchPriority, input.FetchPriority);
+			Logger.LogDebug("<<< Exiting SetFetchPriority(input={Input},fetchPriority={FetchPriority})", input, fetchPriority);
             return input;
         }
 
@@ -158,12 +193,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetReferrerPolicy<T>(this T input, ReferrerPolicy referrerPolicy)
             where T : IResource
         {
+			Logger.LogDebug(">>> Entering SetReferrerPolicy(input={Input},referrerPolicy={ReferrerPolicy})", input, referrerPolicy);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetReferrerPolicy(input={Input},referrerPolicy={ReferrerPolicy})", input, referrerPolicy);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.ReferrerPolicy = referrerPolicy;
+			Logger.LogDebug("SetReferrerPolicy(input={Input},referrerPolicy={ReferrerPolicy}): input.ReferrerPolicy → {Arg2}", input, referrerPolicy, input.ReferrerPolicy);
+			Logger.LogDebug("<<< Exiting SetReferrerPolicy(input={Input},referrerPolicy={ReferrerPolicy})", input, referrerPolicy);
             return input;
         }
 
@@ -176,8 +215,10 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T AddAttribute<T>(this T input, string attributeName, string attributeValue)
             where T : IResource
         {
+			Logger.LogDebug(">>> Entering AddAttribute(input={Input},attributeName={AttributeName},attributeValue={AttributeValue})", input, attributeName, attributeValue);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from AddAttribute(input={Input},attributeName={AttributeName},attributeValue={AttributeValue})", input, attributeName, attributeValue);
                 throw new ArgumentNullException(nameof(input));
             }
 
@@ -186,6 +227,7 @@ namespace DotNetNuke.Web.Client.ResourceManager
                 input.Attributes[attributeName.ToLowerInvariant()] = attributeValue;
             }
 
+			Logger.LogDebug("<<< Exiting AddAttribute(input={Input},attributeName={AttributeName},attributeValue={AttributeValue})", input, attributeName, attributeValue);
             return input;
         }
     }

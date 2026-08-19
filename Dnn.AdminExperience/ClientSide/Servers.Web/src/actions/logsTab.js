@@ -1,9 +1,12 @@
 import {logsTab as ActionTypes}  from "../constants/actionTypes";
 import logsTabService from "../services/logsTabService";
 import localization from "../localization";
+const logger = console;
 
 const logsTabActions = {
     loadLogsServerInfo() {       
+		logger.debug('>>> Entering loadLogsServerInfo()');
+		logger.debug('<<< Exiting loadLogsServerInfo()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.LOAD_LOGS_TAB               
@@ -17,6 +20,7 @@ const logsTabActions = {
                     }
                 });  
             }).catch(() => {
+				logger.error('Exception in loadLogsServerInfo()');
                 dispatch({
                     type: ActionTypes.ERROR_LOADING_LOGS_TAB,
                     payload: {
@@ -28,6 +32,8 @@ const logsTabActions = {
     },
        
     loadSelectedLog(log) {
+		logger.debug(`>>> Entering loadSelectedLog(log=${log})`);
+		logger.debug(`<<< Exiting loadSelectedLog(log=${log})`);
         return (dispatch) => {
             if (!log) {
                 return;
@@ -55,6 +61,7 @@ const logsTabActions = {
                     }
                 });  
             }).catch(() => {
+				logger.error(`Exception in loadSelectedLog(log=${log}): (no error binding)`);
                 dispatch({
                     type: ActionTypes.ERROR_LOADING_LOG,
                     payload: {

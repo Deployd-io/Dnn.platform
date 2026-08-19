@@ -27,8 +27,10 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         public DnnGrid()
             : this(null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering DnnGrid()");
         }
 
+		eventLogger.LogDebug("<<< Exiting DnnGrid()");
         /// <summary>Initializes a new instance of the <see cref="DnnGrid"/> class.</summary>
         /// <param name="appStatus">The application status.</param>
         /// <param name="eventLogger">The event logger.</param>
@@ -37,7 +39,9 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         {
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("DnnGrid(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController}): eventLogger → {EventLogger1}", appStatus, eventLogger, clientResourceController, eventLogger);
             this.clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
+			eventLogger.LogDebug("DnnGrid(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", appStatus, eventLogger, clientResourceController, clientResourceController);
         }
 
         /// <summary>Gets the item style.</summary>
@@ -68,20 +72,25 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.CssClass = "dnn-grid";
+			eventLogger.LogDebug("OnInit(e={E}): this.CssClass → {Arg1}", e, this.CssClass);
             Utilities.ApplyControlSkin(this.clientResourceController, this, string.Empty, string.Empty);
 
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, PortalSettings.Current, CommonJs.DnnPlugins);
+			eventLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             this.AlternatingRowStyle.CssClass = "alter-row";
             this.Style.Remove("border-collapse");
+			eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

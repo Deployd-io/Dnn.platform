@@ -12,6 +12,7 @@ namespace DotNetNuke.Services.Analytics
 
     public class GoogleAnalyticsEngine : AnalyticsEngineBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(GoogleAnalyticsEngine));
         /// <inheritdoc />
         public override string EngineName
         {
@@ -24,16 +25,21 @@ namespace DotNetNuke.Services.Analytics
         /// <inheritdoc />
         public override string RenderScript(string scriptTemplate)
         {
+			Logger.LogDebug(">>> Entering RenderScript(scriptTemplate={ScriptTemplate})", scriptTemplate);
             AnalyticsConfiguration config = this.GetConfig();
 
+			Logger.LogDebug("RenderScript(scriptTemplate={ScriptTemplate}): config → {Config}", scriptTemplate, config);
             if (config == null)
             {
                 return string.Empty;
             }
 
             var trackingId = string.Empty;
+			Logger.LogDebug("RenderScript(scriptTemplate={ScriptTemplate}): trackingId → {TrackingId}", scriptTemplate, trackingId);
             var urlParameter = string.Empty;
+			Logger.LogDebug("RenderScript(scriptTemplate={ScriptTemplate}): urlParameter → {UrlParameter}", scriptTemplate, urlParameter);
             var trackForAdmin = true;
+			Logger.LogDebug("RenderScript(scriptTemplate={ScriptTemplate}): trackForAdmin → {TrackForAdmin}", scriptTemplate, trackForAdmin);
 
             foreach (AnalyticsSetting setting in config.Settings)
             {
@@ -71,6 +77,7 @@ namespace DotNetNuke.Services.Analytics
             }
 
             scriptTemplate = scriptTemplate.Replace("[TRACKING_ID]", trackingId);
+			Logger.LogDebug("RenderScript(scriptTemplate={ScriptTemplate}): scriptTemplate → {ScriptTemplate1}", scriptTemplate, scriptTemplate);
             if (!string.IsNullOrEmpty(urlParameter))
             {
                 scriptTemplate = scriptTemplate.Replace("[PAGE_URL]", urlParameter);
@@ -82,16 +89,20 @@ namespace DotNetNuke.Services.Analytics
 
             scriptTemplate = scriptTemplate.Replace("[CUSTOM_SCRIPT]", this.RenderCustomScript(config));
 
+			Logger.LogDebug("<<< Exiting RenderScript(scriptTemplate={ScriptTemplate})", scriptTemplate);
             return scriptTemplate;
         }
 
         /// <inheritdoc />
         public override string RenderCustomScript(AnalyticsConfiguration config)
         {
+			Logger.LogDebug(">>> Entering RenderCustomScript(config={Config})", config);
             try
             {
                 var anonymize = false;
+				Logger.LogDebug("RenderCustomScript(config={Config}): anonymize → {Anonymize}", config, anonymize);
                 var trackingUserId = false;
+				Logger.LogDebug("RenderCustomScript(config={Config}): trackingUserId → {TrackingUserId}", config, trackingUserId);
 
                 foreach (AnalyticsSetting setting in config.Settings)
                 {
@@ -120,6 +131,7 @@ namespace DotNetNuke.Services.Analytics
                 }
 
                 var customScripts = new System.Text.StringBuilder();
+				Logger.LogDebug("RenderCustomScript(config={Config}): customScripts → {CustomScripts}", config, customScripts);
 
                 if (anonymize || PortalSettings.Current.DataConsentActive)
                 {
@@ -135,8 +147,10 @@ namespace DotNetNuke.Services.Analytics
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in RenderCustomScript(config={Config}): {Arg1}", config, ex.getMessage());
                 Exceptions.Exceptions.LogException(ex);
 
+				Logger.LogDebug("<<< Exiting RenderCustomScript(config={Config})", config);
                 return string.Empty;
             }
         }

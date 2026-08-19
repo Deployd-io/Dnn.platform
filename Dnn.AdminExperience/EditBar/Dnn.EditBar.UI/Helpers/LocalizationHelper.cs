@@ -18,6 +18,8 @@ namespace Dnn.EditBar.UI.Helpers
 
         public static string GetString(string key, string resourcesFile = ResourcesFile)
         {
+			eventLogger.LogDebug(">>> Entering GetString(key={Key},resourcesFile={ResourcesFile})", key, resourcesFile);
+			eventLogger.LogDebug("<<< Exiting GetString(key={Key},resourcesFile={ResourcesFile})", key, resourcesFile);
             return Localization.GetString(key, resourcesFile);
         }
     }

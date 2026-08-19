@@ -29,6 +29,27 @@ namespace DotNetNuke.Framework
         [DnnDeprecated(9, 11, 3, "Please use overload with IServiceProvider")]
         public static partial object CreateObject(string objectProviderType)
         {
+			Logger.LogDebug(">>> Entering CreateObject(objectProviderType={ObjectProviderType})", objectProviderType);
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType})", objectProviderType);
+			Logger.LogDebug("<<< Exiting CreateObject()");
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType})", serviceProvider, objectProviderType);
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider})", serviceProvider);
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType},useCache={UseCache})", objectProviderType, useCache);
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType},useCache={UseCache})", serviceProvider, objectProviderType, useCache);
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName})", objectProviderType, objectNamespace, objectAssemblyName);
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName})", serviceProvider, objectProviderType, objectNamespace, objectAssemblyName);
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName},useCache={UseCache})", objectProviderType, objectNamespace, objectAssemblyName, useCache);
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName},useCache={UseCache})", serviceProvider, objectProviderType, objectNamespace, objectAssemblyName, useCache);
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType},objectProviderName={ObjectProviderName},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName})", objectProviderType, objectProviderName, objectNamespace, objectAssemblyName);
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType},objectProviderName={ObjectProviderName},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName})", serviceProvider, objectProviderType, objectProviderName, objectNamespace, objectAssemblyName);
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType},objectProviderName={ObjectProviderName},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName},useCache={UseCache})", objectProviderType, objectProviderName, objectNamespace, objectAssemblyName, useCache);
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType},objectProviderName={ObjectProviderName},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName},useCache={UseCache})", serviceProvider, objectProviderType, objectProviderName, objectNamespace, objectAssemblyName, useCache);
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType},objectProviderName={ObjectProviderName},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName},useCache={UseCache},fixAssemblyName={FixAssemblyName})", objectProviderType, objectProviderName, objectNamespace, objectAssemblyName, useCache, fixAssemblyName);
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType},objectProviderName={ObjectProviderName},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName},useCache={UseCache},fixAssemblyName={FixAssemblyName})", serviceProvider, objectProviderType, objectProviderName, objectNamespace, objectAssemblyName, useCache, fixAssemblyName);
+			Logger.LogDebug("<<< Exiting CreateObject(typeName={TypeName},cacheKey={CacheKey})", typeName, cacheKey);
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},typeName={TypeName},cacheKey={CacheKey})", serviceProvider, typeName, cacheKey);
+			Logger.LogDebug("<<< Exiting CreateObject(typeName={TypeName},cacheKey={CacheKey},useCache={UseCache})", typeName, cacheKey, useCache);
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},typeName={TypeName},cacheKey={CacheKey},useCache={UseCache})", serviceProvider, typeName, cacheKey, useCache);
             return CreateObject(objectProviderType, true);
         }
 
@@ -297,6 +318,7 @@ namespace DotNetNuke.Framework
         public static object CreateObject(IServiceProvider serviceProvider, string typeName, string cacheKey, bool useCache)
         {
             var type = CreateType(typeName, cacheKey, useCache);
+			Logger.LogDebug("CreateObject(serviceProvider={ServiceProvider},typeName={TypeName},cacheKey={CacheKey},useCache={UseCache}): type → {Type}", serviceProvider, typeName, cacheKey, useCache, type);
             return CreateObject(serviceProvider, type);
         }
 
@@ -358,6 +380,11 @@ namespace DotNetNuke.Framework
         /// <returns>The <see cref="Type"/> instance or <see langword="null"/>.</returns>
         public static Type CreateType(string typeName)
         {
+			Logger.LogDebug(">>> Entering CreateType(typeName={TypeName})", typeName);
+			Logger.LogDebug("<<< Exiting CreateType(typeName={TypeName})", typeName);
+			Logger.LogDebug("<<< Exiting CreateType(typeName={TypeName},ignoreErrors={IgnoreErrors})", typeName, ignoreErrors);
+			Logger.LogDebug("<<< Exiting CreateType(typeName={TypeName},cacheKey={CacheKey},useCache={UseCache})", typeName, cacheKey, useCache);
+			Logger.LogDebug("<<< Exiting CreateType(typeName={TypeName},cacheKey={CacheKey},useCache={UseCache},ignoreErrors={IgnoreErrors})", typeName, cacheKey, useCache, ignoreErrors);
             return CreateType(typeName, string.Empty, true, false);
         }
 
@@ -431,6 +458,9 @@ namespace DotNetNuke.Framework
         /// <returns>An instance of the object, or <see langword="null"/> if <paramref name="type"/> is <see langword="null"/>.</returns>
         public static object CreateInstance(Type type)
         {
+			Logger.LogDebug(">>> Entering CreateInstance(type={Type})", type);
+			Logger.LogDebug("<<< Exiting CreateInstance(type={Type})", type);
+			Logger.LogDebug("<<< Exiting CreateInstance(type={Type},args={Args})", type, args);
             return CreateInstance(type, null);
         }
 
@@ -457,6 +487,8 @@ namespace DotNetNuke.Framework
         /// <returns>The property's value, or <see langword="null"/> if <paramref name="type"/> is <see langword="null"/>.</returns>
         public static object GetProperty(Type type, string propertyName, object target)
         {
+			Logger.LogDebug(">>> Entering GetProperty(type={Type},propertyName={PropertyName},target={Target})", type, propertyName, target);
+			Logger.LogDebug("<<< Exiting GetProperty(type={Type},propertyName={PropertyName},target={Target})", type, propertyName, target);
             return type?.InvokeMember(propertyName, BindingFlags.GetProperty, null, target, null, CultureInfo.InvariantCulture);
         }
 
@@ -467,7 +499,9 @@ namespace DotNetNuke.Framework
         /// <param name="args">The input to the property.</param>
         public static void SetProperty(Type type, string propertyName, object target, object[] args)
         {
+			Logger.LogDebug(">>> Entering SetProperty(type={Type},propertyName={PropertyName},target={Target},args={Args})", type, propertyName, target, args);
             type?.InvokeMember(propertyName, BindingFlags.SetProperty, null, target, args, CultureInfo.InvariantCulture);
+			Logger.LogDebug("<<< Exiting SetProperty(type={Type},propertyName={PropertyName},target={Target},args={Args})", type, propertyName, target, args);
         }
 
         /// <summary>Dynamically invoke a method on an object.</summary>
@@ -477,7 +511,9 @@ namespace DotNetNuke.Framework
         /// <param name="args">The input to the method.</param>
         public static void InvokeMethod(Type type, string propertyName, object target, object[] args)
         {
+			Logger.LogDebug(">>> Entering InvokeMethod(type={Type},propertyName={PropertyName},target={Target},args={Args})", type, propertyName, target, args);
             type?.InvokeMember(propertyName, BindingFlags.InvokeMethod, null, target, args, CultureInfo.InvariantCulture);
+			Logger.LogDebug("<<< Exiting InvokeMethod(type={Type},propertyName={PropertyName},target={Target},args={Args})", type, propertyName, target, args);
         }
 
         /// <summary>Dynamically create a default Provider from a ProviderType.</summary>
@@ -486,11 +522,15 @@ namespace DotNetNuke.Framework
         [DnnDeprecated(7, 0, 0, "Please use CreateObject(string objectProviderType, bool useCache)", RemovalVersion = 11)]
         internal static partial object CreateObjectNotCached(string objectProviderType)
         {
+			Logger.LogDebug(">>> Entering CreateObjectNotCached(objectProviderType={ObjectProviderType})", objectProviderType);
             string typeName = string.Empty;
             Type objType = null;
+			Logger.LogDebug("CreateObjectNotCached(objectProviderType={ObjectProviderType}): objType → {ObjType}", objectProviderType, objType);
+			Logger.LogDebug("CreateObjectNotCached(objectProviderType={ObjectProviderType}): typeName → {TypeName}", objectProviderType, typeName);
 
             // get the provider configuration based on the type
             ProviderConfiguration objProviderConfiguration = ProviderConfiguration.GetProviderConfiguration(objectProviderType);
+			Logger.LogDebug("CreateObjectNotCached(objectProviderType={ObjectProviderType}): objProviderConfiguration → {ObjProviderConfiguration}", objectProviderType, objProviderConfiguration);
 
             // get the typename of the Base DataProvider from web.config
             typeName = ((Provider)objProviderConfiguration.Providers[objProviderConfiguration.DefaultProvider]).Type;
@@ -501,11 +541,13 @@ namespace DotNetNuke.Framework
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in CreateObjectNotCached(objectProviderType={ObjectProviderType}): {Arg1}", objectProviderType, exc.getMessage());
                 // could not load the type
                 Exceptions.LogException(exc);
             }
 
             // dynamically create the object
+			Logger.LogDebug("<<< Exiting CreateObjectNotCached(objectProviderType={ObjectProviderType})", objectProviderType);
             return Activator.CreateInstance(objType);
         }
     }

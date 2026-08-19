@@ -53,7 +53,10 @@ namespace log4net.Layout
         /// </remarks>
         public ExceptionLayout()
         {
+			value.LogDebug(">>> Entering ExceptionLayout()");
             this.IgnoresException = false;
+			value.LogDebug("ExceptionLayout(): this.IgnoresException → {Arg0}", this.IgnoresException);
+			value.LogDebug("<<< Exiting ExceptionLayout()");
         }
 
         /// <summary>
@@ -70,7 +73,9 @@ namespace log4net.Layout
         /// </remarks>
         public override void ActivateOptions() 
         {
+			value.LogDebug(">>> Entering ActivateOptions()");
             // nothing to do.
+			value.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>
@@ -86,12 +91,15 @@ namespace log4net.Layout
         /// </remarks>
         public override void Format(TextWriter writer, LoggingEvent loggingEvent) 
         {
+			value.LogDebug(">>> Entering Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             if (loggingEvent == null)
             {
+				value.LogWarning("Throwing ArgumentNullException from Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
             }
 
             writer.Write(loggingEvent.GetExceptionString());
+			value.LogDebug("<<< Exiting Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
     }
 }

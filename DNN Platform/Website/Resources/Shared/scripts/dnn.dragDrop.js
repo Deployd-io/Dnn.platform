@@ -1,10 +1,14 @@
+const logger = console;
 ﻿(function ($) {
+	logger.debug('>>> Entering function()');
     $.fn.dnnModuleDragDrop = function (options) {
 
         var isEditMode = $('body').hasClass('dnnEditState');
         if (!isEditMode) {
             $(function () {
                 $('.DNNEmptyPane').each(function () {
+					logger.debug('>>> Entering each()');
+					logger.debug('<<< Exiting each()');
                     $(this).removeClass('DNNEmptyPane').addClass('dnnDropEmptyPanes');
                 });
                 $('.contentPane').each(function () {
@@ -39,6 +43,7 @@
 
         var getModuleId = function ($mod) {
             var result = $mod.attr("class").match(/\bDnnModule-([0-9]+)\b/);
+			logger.debug('<<< Exiting function()');
             return (result && result.length === 2) ? result[1] : null;
         };
 

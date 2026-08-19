@@ -22,7 +22,10 @@ namespace DotNetNuke.UI.WebControls
         /// </summary>
         public IntegerEditControl()
         {
+			Logger.LogDebug(">>> Entering IntegerEditControl()");
             this.SystemType = "System.Int32";
+			Logger.LogDebug("IntegerEditControl(): this.SystemType → {Arg0}", this.SystemType);
+			Logger.LogDebug("<<< Exiting IntegerEditControl()");
         }
 
         /// <summary>Gets integerValue returns the Integer representation of the Value.</summary>
@@ -96,17 +99,24 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments.</param>
         protected override void OnDataChanged(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnDataChanged(e={E})", e);
             var args = new PropertyEditorEventArgs(this.Name);
             args.Value = this.IntegerValue;
+			Logger.LogDebug("OnDataChanged(e={E}): args.Value → {Arg1}", e, args.Value);
+			Logger.LogDebug("OnDataChanged(e={E}): args.OldValue → {Arg1}", e, args.OldValue);
+			Logger.LogDebug("OnDataChanged(e={E}): args.StringValue → {Arg1}", e, args.StringValue);
+			Logger.LogDebug("OnDataChanged(e={E}): args → {Args}", e, args);
             args.OldValue = this.OldIntegerValue;
             args.StringValue = this.StringValue;
             this.OnValueChanged(args);
+			Logger.LogDebug("<<< Exiting OnDataChanged(e={E})", e);
         }
 
         /// <summary>RenderEditMode renders the Edit mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderEditMode(writer={Writer})", writer);
             this.ControlStyle.AddAttributesToRender(writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Type, "text");
             writer.AddAttribute(HtmlTextWriterAttribute.Size, "5");
@@ -115,6 +125,7 @@ namespace DotNetNuke.UI.WebControls
             writer.AddAttribute(HtmlTextWriterAttribute.Id, this.ClientID);
             writer.RenderBeginTag(HtmlTextWriterTag.Input);
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
     }
 }

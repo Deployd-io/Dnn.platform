@@ -29,6 +29,7 @@ namespace Dnn.ExportImport.Components.Services
     /// <summary>An export service for templates.</summary>
     public class PageTemplatesExportService : AssetsExportService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PageTemplatesExportService));
         private readonly string templatesFolder;
 
         /// <summary>Initializes a new instance of the <see cref="PageTemplatesExportService"/> class.</summary>
@@ -36,6 +37,10 @@ namespace Dnn.ExportImport.Components.Services
         public PageTemplatesExportService()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering PageTemplatesExportService()");
+		Logger.LogDebug("<<< Exiting PageTemplatesExportService()");
+		Logger.LogDebug(">>> Entering PageTemplatesExportService(appStatus={AppStatus})", appStatus);
+		Logger.LogDebug("<<< Exiting PageTemplatesExportService(appStatus={AppStatus})", appStatus);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PageTemplatesExportService"/> class.</summary>
@@ -68,6 +73,7 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			Logger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
             if (this.CheckCancelled(exportJob))
             {
                 return;
@@ -81,18 +87,24 @@ namespace Dnn.ExportImport.Components.Services
 
             // Create Zip File to hold files
             var skip = this.GetCurrentSkip();
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): skip → {Skip}", exportJob, exportDto, skip);
             var currentIndex = skip;
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): currentIndex → {CurrentIndex}", exportJob, exportDto, currentIndex);
             var totalTemplatesExported = 0;
             var portalId = exportJob.PortalId;
             try
             {
                 var templatesFile = string.Format(CultureInfo.InvariantCulture, this.templatesFolder, exportJob.Directory.TrimEnd('\\').TrimEnd('/'));
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): templatesFile → {TemplatesFile}", exportJob, exportDto, templatesFile);
 
                 if (this.CheckPoint.Stage == 0)
                 {
                     var fromDate = (exportDto.FromDateUtc ?? Constants.MinDbTime).ToLocalTime();
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): fromDate → {FromDate}", exportJob, exportDto, fromDate);
                     var toDate = exportDto.ToDateUtc.ToLocalTime();
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): toDate → {ToDate}", exportJob, exportDto, toDate);
                     var portal = PortalController.Instance.GetPortal(portalId);
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): portal → {Portal}", exportJob, exportDto, portal);
 
                     var templates =
                         CBO.FillCollection<ExportPageTemplate>(
@@ -111,6 +123,8 @@ namespace Dnn.ExportImport.Components.Services
 
                     foreach (var template in templates)
                     {
+						var __logStart = System.Diagnostics.Stopwatch.StartNew();
+						Logger.LogInformation("ExportData(exportJob,exportDto)={ExportJob},{ExportDto}: database query executed in {Arg2} ms", exportJob, exportDto, __logStart.ElapsedMilliseconds);
                         this.Repository.CreateItem(template, null);
                         totalTemplatesExported += 1;
                         var folderOffset = portal.HomeDirectoryMapPath.Length +
@@ -129,6 +143,7 @@ namespace Dnn.ExportImport.Components.Services
                         // After every 10 items, call the checkpoint stage. This is to avoid too many frequent updates to DB.
                         if (currentIndex % 10 == 0 && this.CheckPointStageCallback(this))
                         {
+							Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): folder → {Folder}", exportJob, exportDto, folder);
                             return;
                         }
                     }
@@ -150,6 +165,7 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
             if (this.CheckCancelled(importJob))
             {
                 return;
@@ -163,7 +179,9 @@ namespace Dnn.ExportImport.Components.Services
 
             var portalId = importJob.PortalId;
             var templatesFile = string.Format(CultureInfo.InvariantCulture, this.templatesFolder, importJob.Directory.TrimEnd('\\').TrimEnd('/'));
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): templatesFile → {TemplatesFile}", importJob, importDto, templatesFile);
             var totalTemplates = this.GetImportTotal();
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): totalTemplates → {TotalTemplates}", importJob, importDto, totalTemplates);
 
             this.CheckPoint.TotalItems = this.CheckPoint.TotalItems <= 0 ? totalTemplates : this.CheckPoint.TotalItems;
             if (this.CheckPointStageCallback(this))
@@ -185,6 +203,7 @@ namespace Dnn.ExportImport.Components.Services
                 else
                 {
                     var portal = PortalController.Instance.GetPortal(portalId);
+					Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): portal → {Portal}", importJob, importDto, portal);
 
                     CompressionUtil.UnZipArchive(
                         templatesFile,
@@ -209,6 +228,8 @@ namespace Dnn.ExportImport.Components.Services
                 Func<ExportPageTemplate, object> predicate = x => x.Folder;
                 var templates = this.Repository.GetAllItems(predicate).Select(x => x.Folder).Distinct();
                 templates.ForEach(x => FolderManager.Instance.Synchronize(importJob.PortalId, x));
+				Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): templates → {Templates}", importJob, importDto, templates);
+				Logger.LogInformation("ImportData(importJob,importDto)={ImportJob},{ImportDto}: find query executed in {Arg2} ms", importJob, importDto, __logStart.ElapsedMilliseconds);
                 this.CheckPoint.Stage++;
                 this.CheckPoint.Completed = true;
                 this.CheckPoint.Progress = 100;
@@ -219,11 +240,15 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			Logger.LogDebug(">>> Entering GetImportTotal()");
+			Logger.LogDebug("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<ExportPageTemplate>();
         }
 
         private static string GetActualFileName(ExportPageTemplate objFile)
         {
+			Logger.LogDebug(">>> Entering GetActualFileName(objFile={ObjFile})", objFile);
+			Logger.LogDebug("<<< Exiting GetActualFileName(objFile={ObjFile})", objFile);
             return (objFile.StorageLocation == (int)FolderController.StorageLocationTypes.SecureFileSystem)
                 ? objFile.FileName + Globals.glbProtectedExtension
                 : objFile.FileName;
@@ -231,9 +256,11 @@ namespace Dnn.ExportImport.Components.Services
 
         private int GetCurrentSkip()
         {
+			Logger.LogDebug(">>> Entering GetCurrentSkip()");
             if (!string.IsNullOrEmpty(this.CheckPoint.StageData))
             {
                 dynamic stageData = JsonConvert.DeserializeObject(this.CheckPoint.StageData);
+			Logger.LogDebug("<<< Exiting GetCurrentSkip()");
                 return Convert.ToInt32(stageData.skip) ?? 0;
             }
 

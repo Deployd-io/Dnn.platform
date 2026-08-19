@@ -21,12 +21,14 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
     /// </summary>
     internal abstract class TabActionBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabActionBase));
         /// <summary>
         /// Removes the cache for the tab.
         /// </summary>
         /// <param name="stateTransaction">The state transaction.</param>
         internal static void RemoveCache(StateTransaction stateTransaction)
         {
+			Logger.LogDebug(">>> Entering RemoveCache(stateTransaction={StateTransaction})", stateTransaction);
             var tab = GetTab(stateTransaction.ContentItemId);
             if (tab == null)
             {
@@ -34,6 +36,7 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
             }
 
             DataCache.RemoveCache($"Tab_Tabs{tab.PortalID}");
+			Logger.LogDebug("<<< Exiting RemoveCache(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <summary>
@@ -51,6 +54,7 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
         /// <returns>The tab information.</returns>
         internal static TabInfo GetTab(int contentItemId)
         {
+			Logger.LogDebug(">>> Entering GetTab(contentItemId={ContentItemId})", contentItemId);
             const string Sql = "SELECT * FROM dbo.vw_Tabs WHERE ContentItemId = @ContentItemId";
 
             IDataParameter[] parameters =
@@ -58,6 +62,7 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
                 new SqlParameter("@ContentItemId", SqlDbType.Int) { Value = contentItemId },
             ];
 
+			Logger.LogDebug("<<< Exiting GetTab(contentItemId={ContentItemId})", contentItemId);
             return CBO.FillObject<TabInfo>(DataProvider.Instance().ExecuteSQL(Sql, parameters));
         }
 
@@ -69,7 +74,10 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
         /// <returns>The localized string value.</returns>
         internal static string GetString(string key, string defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetString(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             var content = Localization.GetString(key, Localization.GlobalResourceFile);
+			Logger.LogDebug("GetString(key={Key},defaultValue={DefaultValue}): content → {Content}", key, defaultValue, content);
+			Logger.LogDebug("<<< Exiting GetString(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return string.IsNullOrEmpty(content) ? defaultValue : content;
         }
 

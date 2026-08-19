@@ -22,12 +22,14 @@ namespace Dnn.ExportImport.Components.Common
         /// <param name="archivePath">Full path of the archived file.</param>
         public static void ZipFolder(string folderPath, string archivePath)
         {
+			Logger.LogDebug(">>> Entering ZipFolder(folderPath={FolderPath},archivePath={ArchivePath})", folderPath, archivePath);
             if (File.Exists(archivePath))
             {
                 File.Delete(archivePath);
             }
 
             ZipFile.CreateFromDirectory(folderPath, archivePath, CompressionLevel.Fastest, false);
+			Logger.LogDebug("<<< Exiting ZipFolder(folderPath={FolderPath},archivePath={ArchivePath})", folderPath, archivePath);
         }
 
         /// <summary>Unzip compressed file to a folder.</summary>
@@ -36,7 +38,9 @@ namespace Dnn.ExportImport.Components.Common
         /// <param name="overwrite">Overwrites the files on target if true.</param>
         public static void UnZipArchive(string archivePath, string extractFolder, bool overwrite = true)
         {
+			Logger.LogDebug(">>> Entering UnZipArchive(archivePath={ArchivePath},extractFolder={ExtractFolder},overwrite={Overwrite})", archivePath, extractFolder, overwrite);
             UnZipArchiveExcept(archivePath, extractFolder, overwrite);
+			Logger.LogDebug("<<< Exiting UnZipArchive(archivePath={ArchivePath},extractFolder={ExtractFolder},overwrite={Overwrite})", archivePath, extractFolder, overwrite);
         }
 
         /// <summary>Unzip compressed file to a folder.</summary>
@@ -58,6 +62,7 @@ namespace Dnn.ExportImport.Components.Common
             }
 
             using var archive = OpenCreate(archivePath);
+			Logger.LogDebug("UnZipArchiveExcept(archivePath={ArchivePath},extractFolder={ExtractFolder},overwrite={Overwrite},exceptionList={ExceptionList},deleteFromSoure={DeleteFromSoure}): archive → {Archive}", archivePath, extractFolder, overwrite, exceptionList, deleteFromSoure, archive);
             foreach (
                 var entry in
                 archive.Entries.Where(
@@ -67,6 +72,7 @@ namespace Dnn.ExportImport.Components.Common
             {
                 entry.CheckZipEntry();
                 var path = Path.GetDirectoryName(Path.Combine(extractFolder, entry.FullName));
+				Logger.LogDebug("UnZipArchiveExcept(archivePath={ArchivePath},extractFolder={ExtractFolder},overwrite={Overwrite},exceptionList={ExceptionList},deleteFromSoure={DeleteFromSoure}): path → {Path}", archivePath, extractFolder, overwrite, exceptionList, deleteFromSoure, path);
                 if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
@@ -97,19 +103,23 @@ namespace Dnn.ExportImport.Components.Common
             bool overwrite = true,
             bool deleteFromSoure = false)
         {
+			Logger.LogDebug(">>> Entering UnZipFileFromArchive(fileName={FileName},archivePath={ArchivePath},extractFolder={ExtractFolder},overwrite={Overwrite},deleteFromSoure={DeleteFromSoure})", fileName, archivePath, extractFolder, overwrite, deleteFromSoure);
             if (!File.Exists(archivePath))
             {
                 return;
             }
 
             using var archive = OpenCreate(archivePath);
+			Logger.LogDebug("UnZipFileFromArchive(fileName={FileName},archivePath={ArchivePath},extractFolder={ExtractFolder},overwrite={Overwrite},deleteFromSoure={DeleteFromSoure}): archive → {Archive}", fileName, archivePath, extractFolder, overwrite, deleteFromSoure, archive);
             var fileUnzipFullName = Path.Combine(extractFolder, fileName);
+			Logger.LogDebug("UnZipFileFromArchive(fileName={FileName},archivePath={ArchivePath},extractFolder={ExtractFolder},overwrite={Overwrite},deleteFromSoure={DeleteFromSoure}): fileUnzipFullName → {FileUnzipFullName}", fileName, archivePath, extractFolder, overwrite, deleteFromSoure, fileUnzipFullName);
             if (File.Exists(fileUnzipFullName) && !overwrite)
             {
                 return;
             }
 
             var fileEntry = archive.GetEntry(fileName);
+			Logger.LogDebug("UnZipFileFromArchive(fileName={FileName},archivePath={ArchivePath},extractFolder={ExtractFolder},overwrite={Overwrite},deleteFromSoure={DeleteFromSoure}): fileEntry → {FileEntry}", fileName, archivePath, extractFolder, overwrite, deleteFromSoure, fileEntry);
             if (fileEntry is null)
             {
                 return;
@@ -125,6 +135,7 @@ namespace Dnn.ExportImport.Components.Common
             {
                 fileEntry.Delete();
             }
+			Logger.LogDebug("<<< Exiting UnZipFileFromArchive(fileName={FileName},archivePath={ArchivePath},extractFolder={ExtractFolder},overwrite={Overwrite},deleteFromSoure={DeleteFromSoure})", fileName, archivePath, extractFolder, overwrite, deleteFromSoure);
         }
 
         /// <summary>Add files to an archive. If no archive exists, new one is created.</summary>
@@ -140,7 +151,9 @@ namespace Dnn.ExportImport.Components.Common
             int folderOffset,
             string folder = null)
         {
+			Logger.LogDebug(">>> Entering AddFilesToArchive(archive={Archive},files={Files},folderOffset={FolderOffset},folder={Folder})", archive, files, folderOffset, folder);
             var enumerable = files as IList<string> ?? files.ToList();
+			Logger.LogDebug("AddFilesToArchive(archive={Archive},files={Files},folderOffset={FolderOffset},folder={Folder}): enumerable → {Enumerable}", archive, files, folderOffset, folder, enumerable);
             if (!enumerable.Any())
             {
                 return;
@@ -150,6 +163,7 @@ namespace Dnn.ExportImport.Components.Common
             {
                 AddFileToArchive(archive, file, folderOffset, folder);
             }
+			Logger.LogDebug("<<< Exiting AddFilesToArchive(archive={Archive},files={Files},folderOffset={FolderOffset},folder={Folder})", archive, files, folderOffset, folder);
         }
 
         /// <summary>Add single file to an archive. If no archive exists, new one is created.</summary>
@@ -162,10 +176,14 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>A value indicating whether the operation succeeded.</returns>
         public static bool AddFileToArchive(string file, string archivePath, int folderOffset, string folder = null)
         {
+			Logger.LogDebug(">>> Entering AddFileToArchive(file={File},archivePath={ArchivePath},folderOffset={FolderOffset},folder={Folder})", file, archivePath, folderOffset, folder);
             using (var archive = OpenCreate(archivePath))
             {
                 if (File.Exists(file))
                 {
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CompressionUtil));
+					Logger.LogDebug(">>> Entering OpenCreate(archiveFileName={ArchiveFileName})", archiveFileName);
+					Logger.LogDebug("<<< Exiting OpenCreate(archiveFileName={ArchiveFileName})", archiveFileName);
                     return AddFileToArchive(archive, file, folderOffset, folder);
                 }
             }
@@ -227,6 +245,8 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>A <see cref="ZipArchive"/> instance.</returns>
         internal static ZipArchive OpenCreateUnsafe(string archiveFileName)
         {
+			Logger.LogDebug(">>> Entering OpenCreateUnsafe(archiveFileName={ArchiveFileName})", archiveFileName);
+			Logger.LogDebug("<<< Exiting OpenCreateUnsafe(archiveFileName={ArchiveFileName})", archiveFileName);
             return File.Exists(archiveFileName)
                 ? ZipFile.Open(archiveFileName, ZipArchiveMode.Update, Encoding.UTF8)
                 : new ZipArchive(new FileStream(archiveFileName, FileMode.Create), ZipArchiveMode.Update);

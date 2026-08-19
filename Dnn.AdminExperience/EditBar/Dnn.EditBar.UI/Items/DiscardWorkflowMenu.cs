@@ -23,7 +23,9 @@ namespace Dnn.EditBar.UI.Items
         public DiscardWorkflowMenu()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering DiscardWorkflowMenu()");
         }
+		eventLogger.LogDebug("<<< Exiting DiscardWorkflowMenu()");
 
         /// <inheritdoc />
         public override string Name => "DiscardWorkflow";

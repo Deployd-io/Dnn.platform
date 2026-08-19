@@ -9,6 +9,7 @@ import ProfilePropertyEditor from "./profilePropertyEditor";
 import "./style.less";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 import { Sortable, Collapsible, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 let tableFields = [];
@@ -17,12 +18,15 @@ let tableFields = [];
 class ProfilePropertiesPanel extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             openId: ""
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidUpdate() {
+		logger.debug('>>> Entering componentDidUpdate()');
         const {props} = this;
         if (props.profileProperties) {
             if (props.portalId === undefined || props.profileProperties.PortalId === props.portalId) {
@@ -32,13 +36,17 @@ class ProfilePropertiesPanel extends Component {
                 this.loadData();
             }
         }
+		logger.debug('<<< Exiting componentDidUpdate()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.loadData();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     loadData() {
+		logger.debug('>>> Entering loadData()');
         const {props} = this;
         props.dispatch(SiteBehaviorActions.getProfileProperties(props.portalId, (data) => {
             this.setState({
@@ -52,15 +60,18 @@ class ProfilePropertiesPanel extends Component {
         tableFields.push({ "name": resx.get("DefaultVisibility.Header"), "id": "DefaultVisibility" });
         tableFields.push({ "name": resx.get("Required.Header"), "id": "Required" });
         tableFields.push({ "name": resx.get("Visible.Header"), "id": "Visible" });
+		logger.debug('<<< Exiting loadData()');
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         let tableHeaders = tableFields.map((field) => {
             let className = "property-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.debug('<<< Exiting renderHeader()');
         return <div className="header-row">{tableHeaders}</div>;
     }
 
@@ -205,8 +216,10 @@ class ProfilePropertiesPanel extends Component {
 
      
     renderedProfileProperties() {
+		logger.debug('>>> Entering renderedProfileProperties()');
         let i = 0;
         if (this.props.profileProperties) {
+			logger.debug('<<< Exiting renderedProfileProperties()');
             return this.props.profileProperties.Properties.map((item, index) => {
                 let id = "row-" + i++;
                 return (
@@ -241,7 +254,9 @@ class ProfilePropertiesPanel extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let opened = (this.state.openId === "add");
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div className="property-items">
@@ -307,6 +322,8 @@ ProfilePropertiesPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         profileProperties: state.siteBehavior.profileProperties,
         tabIndex: state.pagination.tabIndex,

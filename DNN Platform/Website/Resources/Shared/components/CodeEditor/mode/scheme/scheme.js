@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -6,6 +7,7 @@
  */
 
 (function(mod) {
+logger.debug('>>> Entering function()');
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -16,31 +18,49 @@
 "use strict";
 
 CodeMirror.defineMode("scheme", function () {
+	logger.debug('>>> Entering defineMode()');
     var BUILTIN = "builtin", COMMENT = "comment", STRING = "string",
         ATOM = "atom", NUMBER = "number", BRACKET = "bracket";
+		logger.debug(`defineMode(): BUILTIN → ${BUILTIN}`);
     var INDENT_WORD_SKIP = 2;
 
     function makeKeywords(str) {
+		logger.debug('>>> Entering makeKeywords()');
         var obj = {}, words = str.split(" ");
         for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+		logger.debug(`makeKeywords(): obj → ${obj}`);
+		logger.debug('<<< Exiting makeKeywords()');
         return obj;
     }
+	const __log_start = Date.now();
 
     var keywords = makeKeywords("λ case-lambda call/cc class define-class exit-handler field import inherit init-field interface let*-values let-values let/ec mixin opt-lambda override protect provide public rename require require-for-syntax syntax syntax-case syntax-error unit/sig unless when with-syntax and begin call-with-current-continuation call-with-input-file call-with-output-file case cond define define-syntax delay do dynamic-wind else for-each if lambda let let* let-syntax letrec letrec-syntax map or syntax-rules abs acos angle append apply asin assoc assq assv atan boolean? caar cadr call-with-input-file call-with-output-file call-with-values car cdddar cddddr cdr ceiling char->integer char-alphabetic? char-ci<=? char-ci<? char-ci=? char-ci>=? char-ci>? char-downcase char-lower-case? char-numeric? char-ready? char-upcase char-upper-case? char-whitespace? char<=? char<? char=? char>=? char>? char? close-input-port close-output-port complex? cons cos current-input-port current-output-port denominator display eof-object? eq? equal? eqv? eval even? exact->inexact exact? exp expt #f floor force gcd imag-part inexact->exact inexact? input-port? integer->char integer? interaction-environment lcm length list list->string list->vector list-ref list-tail list? load log magnitude make-polar make-rectangular make-string make-vector max member memq memv min modulo negative? newline not null-environment null? number->string number? numerator odd? open-input-file open-output-file output-port? pair? peek-char port? positive? procedure? quasiquote quote quotient rational? rationalize read read-char real-part real? remainder reverse round scheme-report-environment set! set-car! set-cdr! sin sqrt string string->list string->number string->symbol string-append string-ci<=? string-ci<? string-ci=? string-ci>=? string-ci>? string-copy string-fill! string-length string-ref string-set! string<=? string<? string=? string>=? string>? string? substring symbol->string symbol? #t tan transcript-off transcript-on truncate values vector vector->list vector-fill! vector-length vector-ref vector-set! with-input-from-file with-output-to-file write write-char zero?");
+	logger.info(`defineMode()=: database operation took ${Date.now() - __log_start} ms`);
     var indentKeys = makeKeywords("define let letrec let* lambda");
 
     function stateStack(indent, type, prev) { // represents a state stack object
+		logger.debug('>>> Entering stateStack()');
         this.indent = indent;
+		logger.debug(`defineMode(): indentKeys → ${indentKeys}`);
+		logger.debug(`defineMode(): this.indent → ${this.indent}`);
         this.type = type;
         this.prev = prev;
+		logger.debug('<<< Exiting stateStack()');
+		logger.debug(`stateStack(): type → ${type}`);
     }
 
     function pushStack(state, indent, type) {
+		logger.debug('>>> Entering pushStack()');
         state.indentStack = new stateStack(indent, type, state.indentStack);
+		logger.debug(`defineMode(): this.prev → ${this.prev}`);
+		logger.debug('<<< Exiting pushStack()');
     }
 
     function popStack(state) {
+		logger.debug('>>> Entering popStack()');
         state.indentStack = state.indentStack.prev;
+		logger.debug(`popStack(): state.indentStack → ${state.indentStack}`);
+		logger.debug('<<< Exiting popStack()');
     }
 
     var binaryMatcher = new RegExp(/^(?:[-+]i|[-+][01]+#*(?:\/[01]+#*)?i|[-+]?[01]+#*(?:\/[01]+#*)?@[-+]?[01]+#*(?:\/[01]+#*)?|[-+]?[01]+#*(?:\/[01]+#*)?[-+](?:[01]+#*(?:\/[01]+#*)?)?i|[-+]?[01]+#*(?:\/[01]+#*)?)(?=[()\s;"]|$)/i);
@@ -49,35 +69,53 @@ CodeMirror.defineMode("scheme", function () {
     var decimalMatcher = new RegExp(/^(?:[-+]i|[-+](?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)i|[-+]?(?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)@[-+]?(?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)|[-+]?(?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)[-+](?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)?i|(?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*))(?=[()\s;"]|$)/i);
 
     function isBinaryNumber (stream) {
+		logger.debug('>>> Entering isBinaryNumber()');
+		logger.debug(`defineMode(): hexMatcher → ${hexMatcher}`);
+		logger.debug(`defineMode(): binaryMatcher → ${binaryMatcher}`);
+		logger.debug(`defineMode(): octalMatcher → ${octalMatcher}`);
+		logger.debug(`defineMode(): decimalMatcher → ${decimalMatcher}`);
+		logger.debug(`defineMode(): state.indentStack → ${state.indentStack}`);
+		logger.debug('<<< Exiting isBinaryNumber()');
         return stream.match(binaryMatcher);
     }
 
     function isOctalNumber (stream) {
+		logger.debug('>>> Entering isOctalNumber()');
+		logger.debug('<<< Exiting isOctalNumber()');
         return stream.match(octalMatcher);
     }
 
     function isDecimalNumber (stream, backup) {
+		logger.debug(`defineMode(): this.type → ${this.type}`);
         if (backup === true) {
             stream.backUp(1);
+			logger.debug('>>> Entering isDecimalNumber()');
         }
+		logger.debug('<<< Exiting isDecimalNumber()');
         return stream.match(decimalMatcher);
     }
 
     function isHexNumber (stream) {
+		logger.debug('>>> Entering isHexNumber()');
+		logger.debug('<<< Exiting isHexNumber()');
         return stream.match(hexMatcher);
     }
 
     return {
         startState: function () {
+			logger.debug('>>> Entering startState()');
+			logger.debug('<<< Exiting defineMode()');
             return {
                 indentStack: null,
                 indentation: 0,
                 mode: false,
                 sExprComment: false
             };
+			logger.debug('<<< Exiting startState()');
         },
 
         token: function (stream, state) {
+			logger.debug('>>> Entering token()');
             if (state.indentStack == null && stream.sol()) {
                 // update indentation, but only if indentStack is empty
                 state.indentation = stream.indentation();
@@ -96,6 +134,8 @@ CodeMirror.defineMode("scheme", function () {
                         if (next == "\"" && !escaped) {
 
                             state.mode = false;
+							logger.debug(`defineMode(): state.mode → ${state.mode}`);
+							logger.debug(`token(): state.mode → ${state.mode}`);
                             break;
                         }
                         escaped = !escaped && next == "\\";
@@ -120,6 +160,7 @@ CodeMirror.defineMode("scheme", function () {
                         // actually start scheme s-expr commenting mode
                         state.sExprComment = 0;
                     }else{
+						logger.debug(`token(): state.sExprComment → ${state.sExprComment}`);
                         // if not we just comment the entire of the next token
                         stream.eatWhile(/[^/s]/); // eat non spaces
                         returnType = COMMENT;
@@ -127,6 +168,7 @@ CodeMirror.defineMode("scheme", function () {
                     }
                 default: // default parsing mode
                     var ch = stream.next();
+					logger.debug(`token(): ch → ${ch}`);
 
                     if (ch == "\"") {
                         state.mode = "string";
@@ -181,6 +223,7 @@ CodeMirror.defineMode("scheme", function () {
                         returnType = COMMENT;
                     } else if (ch == "(" || ch == "[") {
                       var keyWord = ''; var indentTemp = stream.column(), letter;
+						logger.debug(`token(): keyWord → ${keyWord}`);
                         /**
                         Either
                         (indent-word ..
@@ -235,7 +278,9 @@ CodeMirror.defineMode("scheme", function () {
         },
 
         indent: function (state) {
+			logger.debug('>>> Entering indent()');
             if (state.indentStack == null) return state.indentation;
+			logger.debug('<<< Exiting indent()');
             return state.indentStack.indent;
         },
 

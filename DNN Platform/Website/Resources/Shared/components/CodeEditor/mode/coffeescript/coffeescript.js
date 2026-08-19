@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -6,19 +7,25 @@
  * https://github.com/pickhardt/coffeescript-codemirror-mode
  */
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
     define(["../../lib/codemirror"], mod);
   else // Plain browser env
     mod(CodeMirror);
+	logger.debug(`function(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
 })(function(CodeMirror) {
 "use strict";
 
 CodeMirror.defineMode("coffeescript", function(conf, parserConf) {
+logger.debug('>>> Entering defineMode()');
   var ERRORCLASS = "error";
+logger.debug(`defineMode(): ERRORCLASS → ${ERRORCLASS}`);
 
   function wordRegexp(words) {
+	logger.debug(`>>> Entering wordRegexp(words=${words})`);
+	logger.debug(`<<< Exiting wordRegexp(words=${words})`);
     return new RegExp("^((" + words.join(")|(") + "))\\b");
   }
 
@@ -316,6 +323,7 @@ CodeMirror.defineMode("coffeescript", function(conf, parserConf) {
       state.dedent = false;
     }
 
+	logger.debug(`<<< Exiting function(exports=${exports})`);
     return style;
   }
 

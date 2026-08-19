@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.Social.Notifications
     [Serializable]
     public class Notification : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Notification));
         private int notificationID = -1;
         private string displayDate;
 
@@ -27,7 +28,10 @@ namespace DotNetNuke.Services.Social.Notifications
         /// </summary>
         public Notification()
         {
+			Logger.LogDebug(">>> Entering Notification()");
             this.SendToast = true;
+			Logger.LogDebug("Notification(): this.SendToast → {Arg0}", this.SendToast);
+			Logger.LogDebug("<<< Exiting Notification()");
         }
 
         /// <summary>Gets a pretty printed string with the time since the message was created.</summary>
@@ -120,6 +124,7 @@ namespace DotNetNuke.Services.Social.Notifications
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.NotificationID = Convert.ToInt32(dr["MessageID"], CultureInfo.InvariantCulture);
             this.NotificationTypeID = Convert.ToInt32(dr["NotificationTypeID"], CultureInfo.InvariantCulture);
             this.To = Null.SetNullString(dr["To"]);
@@ -132,6 +137,7 @@ namespace DotNetNuke.Services.Social.Notifications
             this.IncludeDismissAction = Null.SetNullBoolean(dr["IncludeDismissAction"]);
 
             var schema = dr.GetSchemaTable();
+			Logger.LogDebug("Fill(dr={Dr}): schema → {Schema}", dr, schema);
             if (schema != null)
             {
                 if (schema.Select("ColumnName = 'SendToast'").Length > 0)
@@ -142,10 +148,12 @@ namespace DotNetNuke.Services.Social.Notifications
                 {
                     this.SendToast = false;
                 }
+				Logger.LogDebug("Fill(dr={Dr}): this.SendToast → {Arg1}", dr, this.SendToast);
             }
 
             // add audit column data
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

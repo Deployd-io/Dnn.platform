@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../../mode/css/css"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -15,9 +17,13 @@
                        "first-letter": 1, "first-line": 1, "first-child": 1,
                        before: 1, after: 1, lang: 1};
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
   CodeMirror.registerHelper("hint", "css", function(cm) {
+	logger.debug('>>> Entering registerHelper()');
     var cur = cm.getCursor(), token = cm.getTokenAt(cur);
     var inner = CodeMirror.innerMode(cm.getMode(), token.state);
+	logger.debug(`registerHelper(): cur → ${cur}`);
+	logger.debug(`registerHelper(): inner → ${inner}`);
     if (inner.mode.name != "css") return;
 
     if (token.type == "keyword" && "!important".indexOf(token.string) == 0)
@@ -31,11 +37,15 @@
 
     var spec = CodeMirror.resolveMode("text/css");
 
+	logger.debug(`registerHelper(): spec → ${spec}`);
     var result = [];
+	logger.debug('<<< Exiting registerHelper()');
+	logger.debug(`registerHelper(): result → ${result}`);
     function add(keywords) {
       for (var name in keywords)
         if (!word || name.lastIndexOf(word, 0) == 0)
           result.push(name);
+		logger.debug(`<<< Exiting add(keywords=${keywords})`);
     }
 
     var st = inner.state.state;

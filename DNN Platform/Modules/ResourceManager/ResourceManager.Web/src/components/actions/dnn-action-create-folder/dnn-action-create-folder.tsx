@@ -1,6 +1,7 @@
 import { Component, Host, h, Prop } from '@stencil/core';
 import { ItemsClient } from '../../../services/ItemsClient';
 import state from "../../../store/store";
+const logger = console;
 
 @Component({
   tag: 'dnn-action-create-folder',
@@ -15,10 +16,13 @@ export class DnnActionCreateFolder {
   private readonly itemsClient: ItemsClient;
 
   constructor(){
+	logger.debug('>>> Entering constructor()');
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   private async handleClick() {
+	logger.debug('>>> Entering handleClick()');
     if (this.parentFolderId != null){
       try {
         state.currentItems = await this.itemsClient.getFolderContent(this.parentFolderId, 0, 0);
@@ -27,19 +31,28 @@ export class DnnActionCreateFolder {
       }
     }
     await this.showModal();
+	logger.debug('<<< Exiting handleClick()');
   }
 
   private async showModal(){
+	logger.debug('>>> Entering showModal()');
     const modal = document.createElement("dnn-modal");
     modal.preventBackdropDismiss = true;
+	logger.debug(`showModal(): modal → ${modal}`);
+	logger.debug(`showModal(): modal.preventBackdropDismiss → ${modal.preventBackdropDismiss}`);
     modal.hideCloseButton = true;
+	logger.debug(`showModal(): modal.hideCloseButton → ${modal.hideCloseButton}`);
     const editor = document.createElement("dnn-rm-create-folder");
+	logger.debug(`showModal(): editor → ${editor}`);
     modal.appendChild(editor);
     document.body.appendChild(modal);
     await modal.show();
+	logger.debug('<<< Exiting showModal()');
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <button onClick={() => void this.handleClick()}>

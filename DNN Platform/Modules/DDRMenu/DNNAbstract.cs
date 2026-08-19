@@ -27,14 +27,17 @@ namespace DotNetNuke.Web.DDRMenu
         /// <returns>The url to login.</returns>
         public static string GetLoginUrl()
         {
+			eventLogger.LogDebug(">>> Entering GetLoginUrl()");
             var request = HttpContext.Current.Request;
             if (request.IsAuthenticated)
             {
                 var navigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
+				eventLogger.LogDebug("GetLoginUrl(): navigationManager → {NavigationManager}", navigationManager);
                 return navigationManager.NavigateURL(PortalSettings.Current.ActiveTab.TabID, "Logoff");
             }
 
             var returnUrl = HttpContext.Current.Request.RawUrl;
+			eventLogger.LogDebug("GetLoginUrl(): returnUrl → {ReturnUrl}", returnUrl);
             if (returnUrl.IndexOf("?returnurl=") != -1)
             {
                 returnUrl = returnUrl.Substring(0, returnUrl.IndexOf("?returnurl="));
@@ -42,6 +45,7 @@ namespace DotNetNuke.Web.DDRMenu
 
             returnUrl = HttpUtility.UrlEncode(returnUrl);
 
+			eventLogger.LogDebug("<<< Exiting GetLoginUrl()");
             return Globals.LoginURL(returnUrl, !string.IsNullOrEmpty(request.QueryString["override"]));
         }
 
@@ -49,6 +53,7 @@ namespace DotNetNuke.Web.DDRMenu
         /// <returns>If the user is logged in, returns the url to the user profile page, if not returns the url to the registration page.</returns>
         public static string GetUserUrl()
         {
+			eventLogger.LogDebug(">>> Entering GetUserUrl()");
             var request = HttpContext.Current.Request;
             var portalSettings = PortalSettings.Current;
             if (!request.IsAuthenticated)
@@ -56,18 +61,21 @@ namespace DotNetNuke.Web.DDRMenu
                 if (portalSettings.UserRegistration != (int)Globals.PortalRegistrationType.NoRegistration)
                 {
                     var navigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
+					eventLogger.LogDebug("GetUserUrl(): navigationManager → {NavigationManager}", navigationManager);
                     return Globals.RegisterURL(HttpUtility.UrlEncode(navigationManager.NavigateURL()), Null.NullString);
                 }
             }
             else
             {
                 var objUserInfo = UserController.Instance.GetCurrentUserInfo();
+				eventLogger.LogDebug("GetUserUrl(): objUserInfo → {ObjUserInfo}", objUserInfo);
                 if (objUserInfo.UserID != -1)
                 {
                     return Globals.UserProfileURL(objUserInfo.UserID);
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetUserUrl()");
             return string.Empty;
         }
 
@@ -75,6 +83,8 @@ namespace DotNetNuke.Web.DDRMenu
         /// <returns>The current culture code.</returns>
         public static string GetCurrentCulture()
         {
+			eventLogger.LogDebug(">>> Entering GetCurrentCulture()");
+			eventLogger.LogDebug("<<< Exiting GetCurrentCulture()");
             return DNNContext.Current.PortalSettings.CultureCode;
         }
 
@@ -89,6 +99,8 @@ namespace DotNetNuke.Web.DDRMenu
         /// <returns>An enumeration of all the available processors.</returns>
         public static IEnumerable<ITemplateProcessor> SupportedTemplateProcessors(IHostSettings hostSettings)
         {
+			eventLogger.LogDebug(">>> Entering SupportedTemplateProcessors()");
+			eventLogger.LogDebug("<<< Exiting SupportedTemplateProcessors()");
             return [new TokenTemplateProcessor(hostSettings), new RazorTemplateProcessor(hostSettings), new XsltTemplateProcessor(hostSettings),];
         }
 
@@ -97,6 +109,8 @@ namespace DotNetNuke.Web.DDRMenu
         /// <returns>An integer totaling the options values, <see cref="Navigation.NavNodeOptions"/> for the values.</returns>
         public static int GetNavNodeOptions(bool includeHidden)
         {
+			eventLogger.LogDebug(">>> Entering GetNavNodeOptions(includeHidden={IncludeHidden})", includeHidden);
+			eventLogger.LogDebug("<<< Exiting GetNavNodeOptions(includeHidden={IncludeHidden})", includeHidden);
             return (int)Navigation.NavNodeOptions.IncludeSiblings + (int)Navigation.NavNodeOptions.IncludeSelf +
                    (includeHidden ? (int)Navigation.NavNodeOptions.IncludeHiddenNodes : 0);
         }
@@ -105,6 +119,8 @@ namespace DotNetNuke.Web.DDRMenu
         /// <returns>Always true.</returns>
         public static bool IncludeHiddenSupported()
         {
+			eventLogger.LogDebug(">>> Entering IncludeHiddenSupported()");
+			eventLogger.LogDebug("<<< Exiting IncludeHiddenSupported()");
             return true;
         }
 
@@ -113,7 +129,10 @@ namespace DotNetNuke.Web.DDRMenu
         /// <param name="menuNode">The MenuNode to return.</param>
         public static void DNNNodeToMenuNode(DNNNode dnnNode, MenuNode menuNode)
         {
+			eventLogger.LogDebug(">>> Entering DNNNodeToMenuNode(dnnNode={DnnNode},menuNode={MenuNode})", dnnNode, menuNode);
+			eventLogger.LogDebug("DNNNodeToMenuNode(dnnNode={DnnNode},menuNode={MenuNode}): menuNode.LargeImage → {Arg2}", dnnNode, menuNode, menuNode.LargeImage);
             menuNode.LargeImage = dnnNode.LargeImage;
+			eventLogger.LogDebug("<<< Exiting DNNNodeToMenuNode(dnnNode={DnnNode},menuNode={MenuNode})", dnnNode, menuNode);
         }
     }
 }

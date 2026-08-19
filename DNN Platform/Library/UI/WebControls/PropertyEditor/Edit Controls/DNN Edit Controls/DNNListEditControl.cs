@@ -38,8 +38,10 @@ namespace DotNetNuke.UI.WebControls
         public DNNListEditControl()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering DNNListEditControl()");
         }
 
+		Logger.LogDebug("<<< Exiting DNNListEditControl()");
         /// <summary>Initializes a new instance of the <see cref="DNNListEditControl"/> class.</summary>
         /// <param name="listController">The list controller.</param>
         /// <param name="portalController">The portal controller.</param>
@@ -49,12 +51,18 @@ namespace DotNetNuke.UI.WebControls
         {
             this.listController = listController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("DNNListEditControl(listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalController → {PortalController1}", listController, portalController, appStatus, portalGroupController, portalController);
+			Logger.LogDebug("DNNListEditControl(listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalGroupController → {PortalGroupController1}", listController, portalController, appStatus, portalGroupController, portalGroupController);
+			Logger.LogDebug("DNNListEditControl(listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): listController → {ListController1}", listController, portalController, appStatus, portalGroupController, listController);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("DNNListEditControl(listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): appStatus → {AppStatus1}", listController, portalController, appStatus, portalGroupController, appStatus);
             this.portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
 
             this.ValueField = ListBoundField.Value;
+			Logger.LogDebug("DNNListEditControl(listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): this.ValueField → {Arg4}", listController, portalController, appStatus, portalGroupController, this.ValueField);
             this.TextField = ListBoundField.Text;
             this.ParentKey = string.Empty;
+			Logger.LogDebug("DNNListEditControl(listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): this.TextField → {Arg4}", listController, portalController, appStatus, portalGroupController, this.TextField);
             this.SortAlphabetically = false;
         }
 
@@ -200,15 +208,18 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         public void RaisePostBackEvent(string eventArgument)
         {
+			Logger.LogDebug(">>> Entering RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
             if (this.AutoPostBack)
             {
                 this.OnItemChanged(this.GetEventArgs());
             }
+			Logger.LogDebug("<<< Exiting RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
         }
 
         /// <summary>OnAttributesChanged runs when the CustomAttributes property has changed.</summary>
         protected override void OnAttributesChanged()
         {
+			Logger.LogDebug(">>> Entering OnAttributesChanged()");
             // Get the List settings out of the "Attributes"
             if (this.CustomAttributes != null)
             {
@@ -217,7 +228,12 @@ namespace DotNetNuke.UI.WebControls
                     if (attribute is ListAttribute)
                     {
                         var listAtt = (ListAttribute)attribute;
+						Logger.LogDebug("OnAttributesChanged(): listAtt → {ListAtt}", listAtt);
+						Logger.LogDebug("OnAttributesChanged(): this.ParentKey → {Arg0}", this.ParentKey);
+						Logger.LogDebug("OnAttributesChanged(): this.TextField → {Arg0}", this.TextField);
+						Logger.LogDebug("OnAttributesChanged(): this.ValueField → {Arg0}", this.ValueField);
                         this.ListName = listAtt.ListName;
+						Logger.LogDebug("OnAttributesChanged(): this.ListName → {Arg0}", this.ListName);
                         this.ParentKey = listAtt.ParentKey;
                         this.TextField = listAtt.TextField;
                         this.ValueField = listAtt.ValueField;
@@ -225,31 +241,39 @@ namespace DotNetNuke.UI.WebControls
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting OnAttributesChanged()");
         }
 
         /// <summary>OnDataChanged runs when the PostbackData has changed.  It raises the <see cref="EditControl.ValueChanged"/> Event.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnDataChanged(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnDataChanged(e={E})", e);
             this.OnValueChanged(this.GetEventArgs());
+			Logger.LogDebug("<<< Exiting OnDataChanged(e={E})", e);
         }
 
         /// <summary>OnItemChanged runs when the Item has changed. It raises the <see cref="ItemChanged"/> event.</summary>
         /// <param name="e">The event arguments.</param>
         protected virtual void OnItemChanged(PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnItemChanged(e={E})", e);
             if (this.ItemChanged != null)
             {
                 this.ItemChanged(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnItemChanged(e={E})", e);
         }
 
         /// <summary>RenderViewMode renders the View (readonly) mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderViewMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderViewMode(writer={Writer})", writer);
             ListEntryInfo entry = null;
             string entryText = Null.NullString;
+			Logger.LogDebug("RenderViewMode(writer={Writer}): entryText → {EntryText}", writer, entryText);
+			Logger.LogDebug("RenderViewMode(writer={Writer}): entry → {Entry}", writer, entry);
             switch (this.ValueField)
             {
                 case ListBoundField.Id:
@@ -287,12 +311,14 @@ namespace DotNetNuke.UI.WebControls
 
             // Close Select Tag
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderViewMode(writer={Writer})", writer);
         }
 
         /// <summary>RenderEditMode renders the Edit mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderEditMode(writer={Writer})", writer);
             // Render the Select Tag
             this.ControlStyle.AddAttributesToRender(writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Name, this.UniqueID);
@@ -325,6 +351,7 @@ namespace DotNetNuke.UI.WebControls
             }
 
             var defaultText = HttpUtility.HtmlEncode("<" + Localization.GetString("Not_Specified", Localization.SharedResourceFile) + ">");
+			Logger.LogDebug("RenderEditMode(writer={Writer}): defaultText → {DefaultText}", writer, defaultText);
             writer.RenderBeginTag(HtmlTextWriterTag.Option);
             writer.Write(defaultText);
             writer.RenderEndTag();
@@ -332,6 +359,7 @@ namespace DotNetNuke.UI.WebControls
             foreach (ListEntryInfo item in this.ListEntries)
             {
                 string itemValue = Null.NullString;
+				Logger.LogDebug("RenderEditMode(writer={Writer}): itemValue → {ItemValue}", writer, itemValue);
 
                 // Add the Value Attribute
                 switch (this.ValueField)
@@ -374,15 +402,19 @@ namespace DotNetNuke.UI.WebControls
 
             // Close Select Tag
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
 
         private PropertyEditorEventArgs GetEventArgs()
         {
+			Logger.LogDebug(">>> Entering GetEventArgs()");
             var args = new PropertyEditorEventArgs(this.Name);
             if (this.ValueField == ListBoundField.Id)
             {
                 // This is an Integer Value
                 args.Value = this.IntegerValue;
+				Logger.LogDebug("GetEventArgs(): args.Value → {Arg0}", args.Value);
+				Logger.LogDebug("GetEventArgs(): args.OldValue → {Arg0}", args.OldValue);
                 args.OldValue = this.OldIntegerValue;
             }
             else
@@ -393,6 +425,8 @@ namespace DotNetNuke.UI.WebControls
             }
 
             args.StringValue = this.StringValue;
+			Logger.LogDebug("GetEventArgs(): args.StringValue → {Arg0}", args.StringValue);
+			Logger.LogDebug("<<< Exiting GetEventArgs()");
             return args;
         }
     }

@@ -1,3 +1,4 @@
+const logger = console;
 'use strict';
 
 /**
@@ -34,31 +35,42 @@
  */
 
 var Typo = function (dictionary, affData, wordsData, settings) {
+	logger.debug(`>>> Entering Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings})`);
 	settings = settings || {};
 	
 	/** Determines the method used for auto-loading .aff and .dic files. **/
 	this.platform = settings.platform || "chrome";
 	
 	this.dictionary = null;
+	logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.platform → ${this.platform}`);
 	
 	this.rules = {};
+	logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.dictionary → ${this.dictionary}`);
 	this.dictionaryTable = {};
 	
 	this.compoundRules = [];
 	this.compoundRuleCodes = {};
+	logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.rules → ${this.rules}`);
 	
 	this.replacementTable = [];
+	logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.dictionaryTable → ${this.dictionaryTable}`);
 	
 	this.flags = settings.flags || {};
+	logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.compoundRules → ${this.compoundRules}`);
 	
 	if (dictionary) {
+		logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.compoundRuleCodes → ${this.compoundRuleCodes}`);
 		this.dictionary = dictionary;
 		
+		logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): dictionary → ${dictionary}`);
+		logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.replacementTable → ${this.replacementTable}`);
+		logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.flags → ${this.flags}`);
 		if (this.platform == "chrome") {
 			if (!affData) affData = this._readFile(chrome.extension.getURL("lib/typo/dictionaries/" + dictionary + "/" + dictionary + ".aff"));
 			if (!wordsData) wordsData = this._readFile(chrome.extension.getURL("lib/typo/dictionaries/" + dictionary + "/" + dictionary + ".dic"));
 		} else {
 			var path = settings.dictionaryPath || '';
+			logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): path → ${path}`);
 			
 			if (!affData) affData = this._readFile(path + "/" + dictionary + "/" + dictionary + ".aff");
 			if (!wordsData) wordsData = this._readFile(path + "/" + dictionary + "/" + dictionary + ".dic");
@@ -100,6 +112,7 @@ var Typo = function (dictionary, affData, wordsData, settings) {
 			var ruleText = this.compoundRules[i];
 			
 			var expressionText = "";
+			logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): expressionText → ${expressionText}`);
 			
 			for (var j = 0, _jlen = ruleText.length; j < _jlen; j++) {
 				var character = ruleText[j];
@@ -116,6 +129,7 @@ var Typo = function (dictionary, affData, wordsData, settings) {
 		}
 	}
 	
+	logger.debug(`<<< Exiting Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings})`);
 	return this;
 };
 
@@ -127,10 +141,12 @@ Typo.prototype = {
 	 */
 	
 	load : function (obj) {
+		logger.debug(`>>> Entering load(obj=${obj})`);
 		for (var i in obj) {
 			this[i] = obj[i];
 		}
 		
+		logger.debug(`<<< Exiting load(obj=${obj})`);
 		return this;
 	},
 	
@@ -143,9 +159,11 @@ Typo.prototype = {
 	 */
 	
 	_readFile : function (path, charset) {
+		logger.debug(`>>> Entering _readFile(path=${path},charset=${charset})`); const _start = Date.now();
 		if (!charset) charset = "ISO8859-1";
 		
 		var req = new XMLHttpRequest();
+		logger.debug(`_readFile(path=${path},charset=${charset}): req → ${req}`);
 		req.open("GET", path, false);
 		
 		if (req.overrideMimeType)
@@ -153,6 +171,8 @@ Typo.prototype = {
 		
 		req.send(null);
 		
+		logger.info(`_readFile(path=${path}, charset=${charset}): API call took ${Date.now() - _start} ms`);
+		logger.debug(`<<< Exiting _readFile(path=${path},charset=${charset})`);
 		return req.responseText;
 	},
 	
@@ -164,17 +184,21 @@ Typo.prototype = {
 	 */
 	
 	_parseAFF : function (data) {
+		logger.debug(`>>> Entering _parseAFF(data=${data})`);
 		var rules = {};
 		
 		// Remove comment lines
 		data = this._removeAffixComments(data);
 		
+		logger.debug(`_parseAFF(data=${data}): data → ${data}`);
 		var lines = data.split("\n");
+		logger.debug(`_parseAFF(data=${data}): lines → ${lines}`);
 		
 		for (var i = 0, _len = lines.length; i < _len; i++) {
 			var line = lines[i];
 			
 			var definitionParts = line.split(/\s+/);
+			logger.debug(`_parseAFF(data=${data}): definitionParts → ${definitionParts}`);
 			
 			var ruleType = definitionParts[0];
 			
@@ -182,6 +206,7 @@ Typo.prototype = {
 				var ruleCode = definitionParts[1];
 				var combineable = definitionParts[2];
 				var numEntries = parseInt(definitionParts[3], 10);
+				logger.debug(`_parseAFF(data=${data}): numEntries → ${numEntries}`);
 				
 				var entries = [];
 				
@@ -189,19 +214,23 @@ Typo.prototype = {
 					var line = lines[j];
 					
 					var lineParts = line.split(/\s+/);
+					logger.debug(`_parseAFF(data=${data}): lineParts → ${lineParts}`);
 					var charactersToRemove = lineParts[2];
 					
 					var additionParts = lineParts[3].split("/");
+					logger.debug(`_parseAFF(data=${data}): additionParts → ${additionParts}`);
 					
 					var charactersToAdd = additionParts[0];
 					if (charactersToAdd === "0") charactersToAdd = "";
 					
 					var continuationClasses = this.parseRuleCodes(additionParts[1]);
+					logger.debug(`_parseAFF(data=${data}): continuationClasses → ${continuationClasses}`);
 					
 					var regexToMatch = lineParts[4];
 					
 					var entry = {};
 					entry.add = charactersToAdd;
+					logger.debug(`_parseAFF(data=${data}): entry.add → ${entry.add}`);
 					
 					if (continuationClasses.length > 0) entry.continuationClasses = continuationClasses;
 					
@@ -220,6 +249,7 @@ Typo.prototype = {
 						}
 						else {
 							entry.remove = charactersToRemove;
+							logger.debug(`_parseAFF(data=${data}): entry.remove → ${entry.remove}`);
 						}
 					}
 					
@@ -229,6 +259,7 @@ Typo.prototype = {
 				rules[ruleCode] = { "type" : ruleType, "combineable" : (combineable == "Y"), "entries" : entries };
 				
 				i += numEntries;
+				logger.debug(`<<< Exiting _parseAFF(data=${data})`);
 			}
 			else if (ruleType === "COMPOUNDRULE") {
 				var numEntries = parseInt(definitionParts[1], 10);
@@ -271,6 +302,7 @@ Typo.prototype = {
 	 */
 	
 	_removeAffixComments : function (data) {
+		logger.debug(`>>> Entering _removeAffixComments(data=${data})`);
 		// Remove comments
 		data = data.replace(/#.*$/mg, "");
 		
@@ -283,6 +315,8 @@ Typo.prototype = {
 		// Trim the entire string
 		data = data.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 		
+		logger.debug(`_removeAffixComments(data=${data}): data → ${data}`);
+		logger.debug(`<<< Exiting _removeAffixComments(data=${data})`);
 		return data;
 	},
 	
@@ -295,18 +329,24 @@ Typo.prototype = {
 	 */
 	
 	_parseDIC : function (data) {
+		logger.debug(`>>> Entering _parseDIC(data=${data})`);
 		data = this._removeDicComments(data);
 		
+		logger.debug(`_parseDIC(data=${data}): data → ${data}`);
 		var lines = data.split("\n");
 		var dictionaryTable = {};
+		logger.debug(`_parseDIC(data=${data}): lines → ${lines}`);
 		
+		logger.debug(`<<< Exiting _parseDIC(data=${data})`);
 		function addWord(word, rules) {
+			logger.debug(`>>> Entering addWord(word=${word},rules=${rules})`);
 			// Some dictionaries will list the same word multiple times with different rule sets.
 			if (!(word in dictionaryTable) || typeof dictionaryTable[word] != 'object') {
 				dictionaryTable[word] = [];
 			}
 			
 			dictionaryTable[word].push(rules);
+			logger.debug(`<<< Exiting addWord(word=${word},rules=${rules})`);
 		}
 		
 		// The first line is the number of words in the dictionary.
@@ -382,6 +422,7 @@ Typo.prototype = {
 	 */
 	
 	_removeDicComments : function (data) {
+		logger.debug(`>>> Entering _removeDicComments(data=${data})`);
 		// I can't find any official documentation on it, but at least the de_DE
 		// dictionary uses tab-indented lines as comments.
 		
@@ -399,14 +440,18 @@ Typo.prototype = {
 		// Trim the entire string
 		data = data.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 		
+		logger.debug(`_removeDicComments(data=${data}): data → ${data}`);
+		logger.debug(`<<< Exiting _removeDicComments(data=${data})`);
 		return data;
 	},
 	
 	parseRuleCodes : function (textCodes) {
+		logger.debug(`>>> Entering parseRuleCodes(textCodes=${textCodes})`);
 		if (!textCodes) {
 			return [];
 		}
 		else if (!("FLAG" in this.flags)) {
+			logger.debug(`<<< Exiting parseRuleCodes(textCodes=${textCodes})`);
 			return textCodes.split("");
 		}
 		else if (this.flags.FLAG === "long") {
@@ -432,8 +477,10 @@ Typo.prototype = {
 	 */
 	
 	_applyRule : function (word, rule) {
+		logger.debug(`>>> Entering _applyRule(word=${word},rule=${rule})`);
 		var entries = rule.entries;
 		var newWords = [];
+		logger.debug(`_applyRule(word=${word},rule=${rule}): newWords → ${newWords}`);
 		
 		for (var i = 0, _len = entries.length; i < _len; i++) {
 			var entry = entries[i];
@@ -473,6 +520,7 @@ Typo.prototype = {
 			}
 		}
 		
+		logger.debug(`<<< Exiting _applyRule(word=${word},rule=${rule})`);
 		return newWords;
 	},
 	
@@ -573,6 +621,7 @@ Typo.prototype = {
 		if (flag in this.flags) {
 			if (typeof wordFlags === 'undefined') {
 				var wordFlags = Array.prototype.concat.apply([], this.dictionaryTable[word]);
+				logger.debug(`hasFlag(word=${word},flag=${flag},wordFlags=${wordFlags}): wordFlags → ${wordFlags}`);
 			}
 			
 			if (wordFlags && wordFlags.indexOf(this.flags[flag]) !== -1) {
@@ -580,6 +629,7 @@ Typo.prototype = {
 			}
 		}
 		
+		logger.debug(`<<< Exiting hasFlag(word=${word},flag=${flag},wordFlags=${wordFlags})`);
 		return false;
 	},
 	
@@ -597,6 +647,7 @@ Typo.prototype = {
 	alphabet : "",
 	
 	suggest : function (word, limit) {
+		logger.debug(`>>> Entering suggest(word=${word},limit=${limit})`);
 		if (!limit) limit = 5;
 		
 		if (this.check(word)) return [];
@@ -607,6 +658,7 @@ Typo.prototype = {
 			
 			if (word.indexOf(replacementEntry[0]) !== -1) {
 				var correctedWord = word.replace(replacementEntry[0], replacementEntry[1]);
+				logger.debug(`suggest(word=${word},limit=${limit}): correctedWord → ${correctedWord}`);
 				
 				if (this.check(correctedWord)) {
 					return [ correctedWord ];
@@ -616,6 +668,7 @@ Typo.prototype = {
 		
 		var self = this;
 		self.alphabet = "abcdefghijklmnopqrstuvwxyz";
+		logger.debug(`suggest(word=${word},limit=${limit}): self.alphabet → ${self.alphabet}`);
 		
 		/*
 		if (!self.alphabet) {
@@ -633,14 +686,18 @@ Typo.prototype = {
 			}
 			
 			var alphaArray = self.alphabet.split("");
+			logger.debug(`suggest(word=${word},limit=${limit}): alphaArray → ${alphaArray}`);
 			alphaArray.sort();
 			self.alphabet = alphaArray.join("");
+			logger.debug(`<<< Exiting suggest(word=${word},limit=${limit})`);
 		}
 		*/
 		
 		function edits1(words) {
+			logger.debug(`>>> Entering edits1(words=${words})`);
 			var rv = [];
 			
+			logger.debug(`edits1(words=${words}): rv → ${rv}`);
 			for (var ii = 0, _iilen = words.length; ii < _iilen; ii++) {
 				var word = words[ii];
 				
@@ -700,10 +757,12 @@ Typo.prototype = {
 				rv = rv.concat(inserts);
 			}
 			
+			logger.debug(`<<< Exiting edits1(words=${words})`);
 			return rv;
 		}
 		
 		function known(words) {
+			logger.debug(`>>> Entering known(words=${words})`);
 			var rv = [];
 			
 			for (var i = 0; i < words.length; i++) {
@@ -712,15 +771,20 @@ Typo.prototype = {
 				}
 			}
 			
+			logger.debug(`<<< Exiting known(words=${words})`);
 			return rv;
 		}
 		
 		function correct(word) {
+			logger.debug(`>>> Entering correct(word=${word})`);
 			// Get the edit-distance-1 and edit-distance-2 forms of this word.
 			var ed1 = edits1([word]);
+			logger.debug(`correct(word=${word}): ed1 → ${ed1}`);
 			var ed2 = edits1(ed1);
+			logger.debug(`correct(word=${word}): ed2 → ${ed2}`);
 			
 			var corrections = known(ed1).concat(known(ed2));
+			logger.debug(`correct(word=${word}): corrections → ${corrections}`);
 			
 			// Sort the edits based on how many different ways they were created.
 			var weighted_corrections = {};
@@ -741,7 +805,9 @@ Typo.prototype = {
 			}
 			
 			function sorter(a, b) {
+				logger.debug(`>>> Entering sorter(a=${a},b=${b})`);
 				if (a[1] < b[1]) {
+				logger.debug(`<<< Exiting sorter(a=${a},b=${b})`);
 					return -1;
 				}
 				
@@ -758,9 +824,11 @@ Typo.prototype = {
 				}
 			}
 			
+			logger.debug(`<<< Exiting correct(word=${word})`);
 			return rv;
 		}
 		
+	logger.debug(`<<< Exiting checkExact(word=${word})`);
 		return correct(word);
 	}
 };

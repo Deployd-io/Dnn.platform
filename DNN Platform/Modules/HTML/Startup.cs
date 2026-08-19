@@ -8,13 +8,17 @@ using DotNetNuke.DependencyInjection;
 using DotNetNuke.Modules.Html.Components;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 public class Startup : IDnnStartup
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <inheritdoc />
     public void ConfigureServices(IServiceCollection services)
     {
+		_logger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
         services.AddTransient<HtmlTextController>();
         services.AddTransient<HtmlModuleSettingsRepository>();
+		_logger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
     }
 }

@@ -71,9 +71,12 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>Initializes a new instance of the <see cref="CaptchaControl"/> class.</summary>
         public CaptchaControl()
         {
+			Logger.LogDebug(">>> Entering CaptchaControl()");
             this.ErrorMessage = Localization.GetString("InvalidCaptcha", Localization.SharedResourceFile);
             this.Text = Localization.GetString("CaptchaText.Text", Localization.SharedResourceFile);
             this.expiration = HostController.Instance.GetInteger("EXPIRATION_DEFAULT", EXPIRATIONDEFAULT);
+			Logger.LogDebug("CaptchaControl(): expiration → {Expiration}", expiration);
+			Logger.LogDebug("<<< Exiting CaptchaControl()");
         }
 
         /// <summary>
@@ -206,19 +209,24 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>Always <see langword="false"/>.</returns>
         public virtual bool LoadPostData(string postDataKey, NameValueCollection postCollection)
         {
+			Logger.LogDebug(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             this.userText = postCollection[postDataKey];
             this.Validate(this.userText);
+			Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): this.userText → {Arg2}", postDataKey, postCollection, this.userText);
             if (!this.isValid && !string.IsNullOrEmpty(this.userText))
             {
                 this.captchaText = this.GetNextCaptcha();
             }
 
+			Logger.LogDebug("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             return false;
         }
 
         /// <summary>RaisePostDataChangedEvent runs when the PostBackData has changed.</summary>
         public void RaisePostDataChangedEvent()
         {
+		Logger.LogDebug(">>> Entering RaisePostDataChangedEvent()");
+		Logger.LogDebug("<<< Exiting RaisePostDataChangedEvent()");
         }
 
         /// <summary>Validates the posted back data.</summary>
@@ -226,12 +234,16 @@ namespace DotNetNuke.UI.WebControls
         /// <returns><see langword="true"/> if the data is valid, otherwise <see langword="false"/>.</returns>
         public bool Validate(string userData)
         {
+			Logger.LogDebug(">>> Entering Validate(userData={UserData})", userData);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.CaptchaCacheKey, userData);
             var cacheObj = DataCache.GetCache(cacheKey);
+			Logger.LogDebug("Validate(userData={UserData}): cacheObj → {CacheObj}", userData, cacheObj);
+			Logger.LogDebug("Validate(userData={UserData}): cacheKey → {CacheKey}", userData, cacheKey);
 
             if (cacheObj == null)
             {
                 this.isValid = false;
+				Logger.LogDebug("Validate(userData={UserData}): this.isValid → {Arg1}", userData, this.isValid);
             }
             else
             {
@@ -240,6 +252,7 @@ namespace DotNetNuke.UI.WebControls
             }
 
             this.OnUserValidated(new ServerValidateEventArgs(this.captchaText, this.isValid));
+			Logger.LogDebug("<<< Exiting Validate(userData={UserData})", userData);
             return this.isValid;
         }
 
@@ -248,8 +261,10 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>A <see cref="Bitmap"/> instance.</returns>
         internal static Bitmap GenerateImage(string encryptedText)
         {
+			Logger.LogDebug(">>> Entering GenerateImage(encryptedText={EncryptedText})", encryptedText);
             string encodedText = Decrypt(encryptedText);
             Bitmap bmp = null;
+			Logger.LogDebug("GenerateImage(encryptedText={EncryptedText}): bmp → {Bmp}", encryptedText, bmp);
             string[] settings = Regex.Split(encodedText, separator);
             try
             {
@@ -262,7 +277,9 @@ namespace DotNetNuke.UI.WebControls
 
                     Graphics g;
                     Brush b = new SolidBrush(Color.LightGray);
+					Logger.LogDebug("GenerateImage(encryptedText={EncryptedText}): b → {B}", encryptedText, b);
                     Brush b1 = new SolidBrush(Color.Black);
+					Logger.LogDebug("GenerateImage(encryptedText={EncryptedText}): b1 → {B1}", encryptedText, b1);
                     if (string.IsNullOrEmpty(backgroundImage))
                     {
                         bmp = CreateImage(width, height);
@@ -273,7 +290,9 @@ namespace DotNetNuke.UI.WebControls
                     }
 
                     g = Graphics.FromImage(bmp);
+					Logger.LogDebug("GenerateImage(encryptedText={EncryptedText}): g → {G}", encryptedText, g);
                     GraphicsPath textPath = CreateText(text, width, height, g);
+					Logger.LogDebug("GenerateImage(encryptedText={EncryptedText}): textPath → {TextPath}", encryptedText, textPath);
                     if (string.IsNullOrEmpty(backgroundImage))
                     {
                         g.FillPath(b, textPath);
@@ -286,32 +305,42 @@ namespace DotNetNuke.UI.WebControls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in GenerateImage(encryptedText={EncryptedText}): {Arg1}", encryptedText, exc.getMessage());
                 Exceptions.LogException(exc);
             }
 
+			Logger.LogDebug("<<< Exiting GenerateImage(encryptedText={EncryptedText})", encryptedText);
             return bmp;
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			Logger.LogDebug(">>> Entering CreateChildControls()");
             base.CreateChildControls();
 
             if (this.CaptchaWidth.IsEmpty || this.CaptchaWidth.Type != UnitType.Pixel || this.CaptchaHeight.IsEmpty || this.CaptchaHeight.Type != UnitType.Pixel)
             {
+				Logger.LogWarning("Throwing InvalidOperationException from CreateChildControls()");
                 throw new InvalidOperationException("Must specify size of control in pixels.");
             }
 
             this.image = new Image { BorderColor = this.BorderColor, BorderStyle = this.BorderStyle, BorderWidth = this.BorderWidth, ToolTip = this.ToolTip, EnableViewState = false };
+			Logger.LogDebug("CreateChildControls(): image → {Image}", image);
+			Logger.LogDebug("CreateChildControls(): this.image → {Arg0}", this.image);
             this.Controls.Add(this.image);
+			Logger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <summary>Gets the next Captcha.</summary>
         /// <returns>The challenge string.</returns>
         protected virtual string GetNextCaptcha()
         {
+			Logger.LogDebug(">>> Entering GetNextCaptcha()");
             var sb = new StringBuilder();
             var rand = new Random();
+			Logger.LogDebug("GetNextCaptcha(): rand → {Rand}", rand);
+			Logger.LogDebug("GetNextCaptcha(): sb → {Sb}", sb);
             int n;
             var intMaxLength = this.CaptchaChars.Length;
 
@@ -321,12 +350,14 @@ namespace DotNetNuke.UI.WebControls
             }
 
             var challenge = sb.ToString();
+			Logger.LogDebug("GetNextCaptcha(): challenge → {Challenge}", challenge);
 
             // NOTE: this could be a problem in a web farm using in-memory caching where
             // the request might go to another server in the farm. Also, in a system
             // with a single server or web-farm, the cache might be cleared
             // which will cause a problem in such case unless sticky sessions are used.
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.CaptchaCacheKey, challenge);
+			Logger.LogDebug("GetNextCaptcha(): cacheKey → {CacheKey}", cacheKey);
             DataCache.SetCache(
                 cacheKey,
                 challenge,
@@ -335,16 +366,19 @@ namespace DotNetNuke.UI.WebControls
                 Cache.NoSlidingExpiration,
                 CacheItemPriority.AboveNormal,
                 null);
+			Logger.LogDebug("<<< Exiting GetNextCaptcha()");
             return challenge;
         }
 
         /// <inheritdoc />
         protected override void LoadViewState(object savedState)
         {
+			Logger.LogDebug(">>> Entering LoadViewState(savedState={SavedState})", savedState);
             if (savedState != null)
             {
                 // Load State from the array of objects that was saved at SaveViewState.
                 var myState = (object[])savedState;
+				Logger.LogDebug("LoadViewState(savedState={SavedState}): myState → {MyState}", savedState, myState);
 
                 // Load the ViewState of the Base Control
                 if (myState[0] != null)
@@ -361,11 +395,13 @@ namespace DotNetNuke.UI.WebControls
 
             ////var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.CaptchaCacheKey, masterPortalId);
             // _CaptchaText
+			Logger.LogDebug("<<< Exiting LoadViewState(savedState={SavedState})", savedState);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             // Generate Random Challenge Text
             this.captchaText = this.GetNextCaptcha();
 
@@ -374,6 +410,7 @@ namespace DotNetNuke.UI.WebControls
 
             // Call Base Class method
             base.OnPreRender(e);
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>
@@ -382,16 +419,19 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The <see cref="ServerValidateEventArgs"/> instance containing the event data.</param>
         protected virtual void OnUserValidated(ServerValidateEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnUserValidated(e={E})", e);
             ServerValidateEventHandler handler = this.UserValidated;
             if (handler != null)
             {
                 handler(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnUserValidated(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             this.ControlStyle.AddAttributesToRender(writer);
 
             // Render outer <div> Tag
@@ -465,13 +505,16 @@ namespace DotNetNuke.UI.WebControls
 
             // Render </div>
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
 
         /// <inheritdoc />
         protected override object SaveViewState()
         {
+			Logger.LogDebug(">>> Entering SaveViewState()");
             var baseState = base.SaveViewState();
             var allStates = new object[2];
+			Logger.LogDebug("SaveViewState(): baseState → {BaseState}", baseState);
             allStates[0] = baseState;
             if (string.IsNullOrEmpty(this.captchaText))
             {
@@ -480,6 +523,7 @@ namespace DotNetNuke.UI.WebControls
 
             allStates[1] = this.captchaText;
 
+			Logger.LogDebug("<<< Exiting SaveViewState()");
             return allStates;
         }
 
@@ -488,12 +532,17 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="height">The height of the image.</param>
         private static Bitmap CreateImage(int width, int height)
         {
+			Logger.LogDebug(">>> Entering CreateImage(width={Width},height={Height})", width, height);
             var bmp = new Bitmap(width, height);
             Graphics g;
+			Logger.LogDebug("CreateImage(width={Width},height={Height}): bmp → {Bmp}", width, height, bmp);
             var rect = new Rectangle(0, 0, width, height);
+			Logger.LogDebug("CreateImage(width={Width},height={Height}): rect → {Rect}", width, height, rect);
             var rectF = new RectangleF(0, 0, width, height);
+			Logger.LogDebug("CreateImage(width={Width},height={Height}): rectF → {RectF}", width, height, rectF);
 
             g = Graphics.FromImage(bmp);
+			Logger.LogDebug("CreateImage(width={Width},height={Height}): g → {G}", width, height, g);
 
             Brush b = new LinearGradientBrush(
                 rect,
@@ -514,13 +563,17 @@ namespace DotNetNuke.UI.WebControls
                 DistortImage(ref bmp, -Rand.Next(5, 20));
             }
 
+			Logger.LogDebug("<<< Exiting CreateImage(width={Width},height={Height})", width, height);
             return bmp;
         }
 
         private static void AddNoise(Graphics g, int width, int height)
         {
+			Logger.LogDebug(">>> Entering AddNoise(g={G},width={Width},height={Height})", g, width, height);
             Random rand = new Random();
             int numDots = rand.Next(width * height / 50, width * height / 25);
+			Logger.LogDebug("AddNoise(g={G},width={Width},height={Height}): numDots → {NumDots}", g, width, height, numDots);
+			Logger.LogDebug("AddNoise(g={G},width={Width},height={Height}): rand → {Rand}", g, width, height, rand);
 
             using (Pen pen = new Pen(Color.Black, 1))
             {
@@ -536,6 +589,7 @@ namespace DotNetNuke.UI.WebControls
                     g.DrawRectangle(pen, x, y, 1, 1); // Draw tiny noise dot
                 }
             }
+			Logger.LogDebug("<<< Exiting AddNoise(g={G},width={Width},height={Height})", g, width, height);
         }
 
         /// <summary>Creates the Text.</summary>
@@ -545,6 +599,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="g">Graphic draw context.</param>
         private static GraphicsPath CreateText(string text, int width, int height, Graphics g)
         {
+			Logger.LogDebug(">>> Entering CreateText(text={Text},width={Width},height={Height},g={G})", text, width, height, g);
             var textPath = new GraphicsPath();
             var maxFontSize = height * 1f;
             var minFontSize = height * 0.8f;
@@ -570,6 +625,7 @@ namespace DotNetNuke.UI.WebControls
                     {
                         f = new Font(ff, emSize, FontStyle.Bold);
                         charSize = g.MeasureString(c.ToString(), f);
+						Logger.LogDebug("CreateText(text={Text},width={Width},height={Height},g={G}): charSize → {CharSize}", text, width, height, g, charSize);
                         emSize -= 1;
                     }
                     while ((charSize.Width > charSpacing || charSize.Height > height) && emSize > minFontSize);
@@ -623,14 +679,17 @@ namespace DotNetNuke.UI.WebControls
                 Logger.Error(exc);
             }
 
+			Logger.LogDebug("<<< Exiting CreateText(text={Text},width={Width},height={Height},g={G})", text, width, height, g);
             return textPath;
         }
 
         private static void DrawRandomLines(Graphics g, int width, int height, Random rand)
         {
+			Logger.LogDebug(">>> Entering DrawRandomLines(g={G},width={Width},height={Height},rand={Rand})", g, width, height, rand);
             int numLines = rand.Next(3, 7);
             using (Pen pen = new Pen(Color.Empty))
             {
+			Logger.LogDebug("DrawRandomLines(g={G},width={Width},height={Height},rand={Rand}): numLines → {NumLines}", g, width, height, rand, numLines);
                 pen.DashStyle = (DashStyle)rand.Next(0, 4);
                 for (int i = 0; i < numLines; i++)
                 {
@@ -650,10 +709,13 @@ namespace DotNetNuke.UI.WebControls
                     g.DrawLine(pen, x1, y1, x2, y2);
                 }
             }
+			Logger.LogDebug("<<< Exiting DrawRandomLines(g={G},width={Width},height={Height},rand={Rand})", g, width, height, rand);
         }
 
         private static float RandomJitter(float min, float max, Random rand)
         {
+			Logger.LogDebug(">>> Entering RandomJitter(min={Min},max={Max},rand={Rand})", min, max, rand);
+			Logger.LogDebug("<<< Exiting RandomJitter(min={Min},max={Max},rand={Rand})", min, max, rand);
             return (float)((rand.NextDouble() * (max - min)) + min);
         }
 
@@ -661,10 +723,13 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="encryptedContent">The encrypted text.</param>
         private static string Decrypt(string encryptedContent)
         {
+			Logger.LogDebug(">>> Entering Decrypt(encryptedContent={EncryptedContent})", encryptedContent);
             string decryptedText = string.Empty;
             try
+			Logger.LogDebug("Decrypt(encryptedContent={EncryptedContent}): decryptedText → {DecryptedText}", encryptedContent, decryptedText);
             {
                 FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(encryptedContent);
+				Logger.LogDebug("Decrypt(encryptedContent={EncryptedContent}): ticket → {Ticket}", encryptedContent, ticket);
                 if (!ticket.Expired)
                 {
                     decryptedText = ticket.UserData;
@@ -675,6 +740,7 @@ namespace DotNetNuke.UI.WebControls
                 Logger.Debug(exc);
             }
 
+			Logger.LogDebug("<<< Exiting Decrypt(encryptedContent={EncryptedContent})", encryptedContent);
             return decryptedText;
         }
 
@@ -683,16 +749,20 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="distortion">Distortion.</param>
         private static void DistortImage(ref Bitmap b, double distortion)
         {
+			Logger.LogDebug(">>> Entering DistortImage(b={B},distortion={Distortion})", b, distortion);
             int width = b.Width;
             int height = b.Height;
 
             var copy = (Bitmap)b.Clone();
+			Logger.LogDebug("DistortImage(b={B},distortion={Distortion}): copy → {Copy}", b, distortion, copy);
             for (int y = 0; y <= height - 1; y++)
             {
                 for (int x = 0; x <= width - 1; x++)
                 {
                     int newX = Convert.ToInt32(x + (distortion * Math.Sin(Math.PI * y / 64.0)));
+					Logger.LogDebug("DistortImage(b={B},distortion={Distortion}): newX → {NewX}", b, distortion, newX);
                     int newY = Convert.ToInt32(y + (distortion * Math.Cos(Math.PI * x / 64.0)));
+					Logger.LogDebug("DistortImage(b={B},distortion={Distortion}): newY → {NewY}", b, distortion, newY);
                     if (newX < 0 || newX >= width)
                     {
                         newX = 0;
@@ -706,6 +776,7 @@ namespace DotNetNuke.UI.WebControls
                     b.SetPixel(x, y, copy.GetPixel(newX, newY));
                 }
             }
+			Logger.LogDebug("<<< Exiting DistortImage(b={B},distortion={Distortion})", b, distortion);
         }
 
         /// <summary>Encrypts the CAPTCHA Text.</summary>
@@ -713,13 +784,17 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="expiration">The time the ticket expires.</param>
         private static string Encrypt(string content, DateTime expiration)
         {
+			Logger.LogDebug(">>> Entering Encrypt(content={Content},expiration={Expiration})", content, expiration);
             var ticket = new FormsAuthenticationTicket(1, HttpContext.Current.Request.UserHostAddress, DateTime.Now, expiration, false, content);
+			Logger.LogDebug("Encrypt(content={Content},expiration={Expiration}): ticket → {Ticket}", content, expiration, ticket);
+			Logger.LogDebug("<<< Exiting Encrypt(content={Content},expiration={Expiration})", content, expiration);
             return FormsAuthentication.Encrypt(ticket);
         }
 
         /// <summary>GetFont gets a random font to use for the Captcha Text.</summary>
         private static FontFamily GetFont()
         {
+			Logger.LogDebug(">>> Entering GetFont()");
             FontFamily font = null;
             while (font == null)
             {
@@ -735,6 +810,7 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetFont()");
             return font;
         }
 
@@ -745,6 +821,8 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="ymax">The maximum y value.</param>
         private static PointF RandomPoint(int xmin, int xmax, int ymin, int ymax)
         {
+			Logger.LogDebug(">>> Entering RandomPoint(xmin={Xmin},xmax={Xmax},ymin={Ymin},ymax={Ymax})", xmin, xmax, ymin, ymax);
+			Logger.LogDebug("<<< Exiting RandomPoint(xmin={Xmin},xmax={Xmax},ymin={Ymin},ymax={Ymax})", xmin, xmax, ymin, ymax);
             return new PointF(Rand.Next(xmin, xmax), Rand.Next(ymin, ymax));
         }
 
@@ -753,48 +831,66 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="rect">a rectangle which defines the image.</param>
         private static void WarpText(ref GraphicsPath textPath, Rectangle rect)
         {
+			Logger.LogDebug(">>> Entering WarpText(textPath={TextPath},rect={Rect})", textPath, rect);
             int intWarpDivisor;
             var rectF = new RectangleF(0, 0, rect.Width, rect.Height);
+			Logger.LogDebug("WarpText(textPath={TextPath},rect={Rect}): rectF → {RectF}", textPath, rect, rectF);
 
             intWarpDivisor = Rand.Next(4, 6);
 
+			Logger.LogDebug("WarpText(textPath={TextPath},rect={Rect}): intWarpDivisor → {IntWarpDivisor}", textPath, rect, intWarpDivisor);
             int intHrange = Convert.ToInt32(rect.Height / intWarpDivisor);
+			Logger.LogDebug("WarpText(textPath={TextPath},rect={Rect}): intHrange → {IntHrange}", textPath, rect, intHrange);
             int intWrange = Convert.ToInt32(rect.Width / intWarpDivisor);
+			Logger.LogDebug("WarpText(textPath={TextPath},rect={Rect}): intWrange → {IntWrange}", textPath, rect, intWrange);
 
             PointF p1 = RandomPoint(0, intWrange, 0, intHrange);
+			Logger.LogDebug("WarpText(textPath={TextPath},rect={Rect}): p1 → {P1}", textPath, rect, p1);
             PointF p2 = RandomPoint(rect.Width - (intWrange - Convert.ToInt32(p1.X)), rect.Width, 0, intHrange);
+			Logger.LogDebug("WarpText(textPath={TextPath},rect={Rect}): p2 → {P2}", textPath, rect, p2);
             PointF p3 = RandomPoint(0, intWrange, rect.Height - (intHrange - Convert.ToInt32(p1.Y)), rect.Height);
+			Logger.LogDebug("WarpText(textPath={TextPath},rect={Rect}): p3 → {P3}", textPath, rect, p3);
             PointF p4 = RandomPoint(rect.Width - (intWrange - Convert.ToInt32(p3.X)), rect.Width, rect.Height - (intHrange - Convert.ToInt32(p2.Y)), rect.Height);
+			Logger.LogDebug("WarpText(textPath={TextPath},rect={Rect}): p4 → {P4}", textPath, rect, p4);
 
             var points = new[] { p1, p2, p3, p4 };
             var m = new Matrix();
+			Logger.LogDebug("WarpText(textPath={TextPath},rect={Rect}): m → {M}", textPath, rect, m);
             m.Translate(0, 0);
             textPath.Warp(points, rectF, m, WarpMode.Perspective, 0);
+			Logger.LogDebug("<<< Exiting WarpText(textPath={TextPath},rect={Rect})", textPath, rect);
         }
 
         /// <summary>Builds the URL for the Handler.</summary>
         private string GetUrl()
         {
+			Logger.LogDebug(">>> Entering GetUrl()");
             var url = this.ResolveUrl(this.RenderUrl);
             var encryptedTicket = Encrypt(this.EncodeTicket(), DateTime.Now.AddSeconds(this.Expiration));
+			Logger.LogDebug("GetUrl(): encryptedTicket → {EncryptedTicket}", encryptedTicket);
+			Logger.LogDebug("GetUrl(): url → {Url}", url);
             url += $"?{KEY}={encryptedTicket}";
 
             // Append the Alias to the url so that it doesn't lose track of the alias it's currently on
             var portalSettings = PortalSettings.Current;
             url += "&alias=" + ((IPortalAliasInfo)portalSettings.PortalAlias).HttpAlias;
+			Logger.LogDebug("<<< Exiting GetUrl()");
             return url;
         }
 
         /// <summary>Encodes the querystring to pass to the Handler.</summary>
         private string EncodeTicket()
         {
+			Logger.LogDebug(">>> Entering EncodeTicket()");
             var sb = new StringBuilder();
 
+			Logger.LogDebug("EncodeTicket(): sb → {Sb}", sb);
             sb.Append(this.CaptchaWidth.Value);
             sb.Append(separator + this.CaptchaHeight.Value);
             sb.Append(separator + this.captchaText);
             sb.Append(separator + this.BackGroundImage);
 
+			Logger.LogDebug("<<< Exiting EncodeTicket()");
             return sb.ToString();
         }
     }

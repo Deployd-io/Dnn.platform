@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Mvc.Routing
 
     public static class MvcRouteExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MvcRouteExtensions));
         private const string NamespaceKey = "namespaces";
         private const string NameKey = "name";
 
@@ -21,12 +22,16 @@ namespace DotNetNuke.Web.Mvc.Routing
         /// <returns>Route name.</returns>
         public static string GetName(this Route route)
         {
+			Logger.LogDebug(">>> Entering GetName(route={Route})", route);
+			Logger.LogDebug("<<< Exiting GetName(route={Route})", route);
             return (string)route.DataTokens[NameKey];
         }
 
         internal static void SetNameSpaces(this Route route, string[] namespaces)
         {
+			Logger.LogDebug(">>> Entering SetNameSpaces(route={Route},namespaces={Namespaces})", route, namespaces);
             route.DataTokens[NamespaceKey] = namespaces;
+			Logger.LogDebug("<<< Exiting SetNameSpaces(route={Route},namespaces={Namespaces})", route, namespaces);
         }
 
         /// <summary>Get Namespaces that are searched for controllers for this route.</summary>
@@ -34,12 +39,16 @@ namespace DotNetNuke.Web.Mvc.Routing
         /// <returns>Namespaces.</returns>
         internal static string[] GetNameSpaces(this Route route)
         {
+			Logger.LogDebug(">>> Entering GetNameSpaces(route={Route})", route);
+			Logger.LogDebug("<<< Exiting GetNameSpaces(route={Route})", route);
             return (string[])route.DataTokens[NamespaceKey];
         }
 
         internal static void SetName(this Route route, string name)
         {
+			Logger.LogDebug(">>> Entering SetName(route={Route},name={Name})", route, name);
             route.DataTokens[NameKey] = name;
+			Logger.LogDebug("<<< Exiting SetName(route={Route},name={Name})", route, name);
         }
     }
 }

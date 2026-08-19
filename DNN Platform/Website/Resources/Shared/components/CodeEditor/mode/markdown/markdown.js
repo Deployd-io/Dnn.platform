@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../xml/xml"), require("../meta"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,17 +13,26 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
+logger.debug('>>> Entering defineMode()');
 
   var htmlFound = CodeMirror.modes.hasOwnProperty("xml");
   var htmlMode = CodeMirror.getMode(cmCfg, htmlFound ? {name: "xml", htmlMode: true} : "text/plain");
+logger.debug(`defineMode(): htmlFound → ${htmlFound}`);
+logger.debug(`defineMode(): htmlMode → ${htmlMode}`);
 
+logger.debug('<<< Exiting defineMode()');
   function getMode(name) {
     if (CodeMirror.findModeByName) {
+	logger.debug(`>>> Entering getMode(name=${name})`);
       var found = CodeMirror.findModeByName(name);
+	logger.debug(`getMode(name=${name}): found → ${found}`);
       if (found) name = found.mime || found.mimes[0];
     }
     var mode = CodeMirror.getMode(cmCfg, name);
+	logger.debug(`getMode(name=${name}): mode → ${mode}`);
+	logger.debug(`<<< Exiting getMode(name=${name})`);
     return mode.name == "null" ? null : mode;
   }
 
@@ -77,12 +88,18 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
   ,   textRE = /^[^#!\[\]*_\\<>` "'(~]+/;
 
   function switchInline(stream, state, f) {
+	logger.debug(`>>> Entering switchInline(stream=${stream},state=${state},f=${f})`);
     state.f = state.inline = f;
+	logger.debug(`switchInline(stream=${stream},state=${state},f=${f}): state.f → ${state.f}`);
+	logger.debug(`<<< Exiting switchInline(stream=${stream},state=${state},f=${f})`);
     return f(stream, state);
   }
 
   function switchBlock(stream, state, f) {
+	logger.debug(`>>> Entering switchBlock(stream=${stream},state=${state},f=${f})`);
     state.f = state.block = f;
+	logger.debug(`switchBlock(stream=${stream},state=${state},f=${f}): state.f → ${state.f}`);
+	logger.debug(`<<< Exiting switchBlock(stream=${stream},state=${state},f=${f})`);
     return f(stream, state);
   }
 
@@ -90,38 +107,54 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
   // Blocks
 
   function blankLine(state) {
+	logger.debug(`>>> Entering blankLine(state=${state})`);
     // Reset linkTitle state
     state.linkTitle = false;
+	logger.debug(`blankLine(state=${state}): state.linkTitle → ${state.linkTitle}`);
     // Reset EM state
     state.em = false;
+	logger.debug(`blankLine(state=${state}): state.em → ${state.em}`);
     // Reset STRONG state
     state.strong = false;
+	logger.debug(`blankLine(state=${state}): state.strong → ${state.strong}`);
     // Reset strikethrough state
     state.strikethrough = false;
+	logger.debug(`blankLine(state=${state}): state.strikethrough → ${state.strikethrough}`);
     // Reset state.quote
     state.quote = 0;
+	logger.debug(`blankLine(state=${state}): state.quote → ${state.quote}`);
     // Reset state.indentedCode
     state.indentedCode = false;
+	logger.debug(`blankLine(state=${state}): state.indentedCode → ${state.indentedCode}`);
     if (!htmlFound && state.f == htmlBlock) {
       state.f = inlineNormal;
+	logger.debug(`blankLine(state=${state}): state.f → ${state.f}`);
       state.block = blockNormal;
+	logger.debug(`blankLine(state=${state}): state.block → ${state.block}`);
     }
     // Reset state.trailingSpace
     state.trailingSpace = 0;
+	logger.debug(`blankLine(state=${state}): state.trailingSpace → ${state.trailingSpace}`);
     state.trailingSpaceNewLine = false;
+	logger.debug(`blankLine(state=${state}): state.trailingSpaceNewLine → ${state.trailingSpaceNewLine}`);
     // Mark this line as blank
     state.thisLineHasContent = false;
+	logger.debug(`blankLine(state=${state}): state.thisLineHasContent → ${state.thisLineHasContent}`);
+	logger.debug(`<<< Exiting blankLine(state=${state})`);
     return null;
   }
 
   function blockNormal(stream, state) {
+logger.debug(`>>> Entering blockNormal(stream=${stream},state=${state})`);
 
     var sol = stream.sol();
+	logger.debug(`blockNormal(stream=${stream},state=${state}): sol → ${sol}`);
 
     var prevLineIsList = state.list !== false,
         prevLineIsIndentedCode = state.indentedCode;
 
     state.indentedCode = false;
+	logger.debug(`blockNormal(stream=${stream},state=${state}): state.indentedCode → ${state.indentedCode}`);
 
     if (prevLineIsList) {
       if (state.indentationDiff >= 0) { // Continued list
@@ -135,6 +168,7 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       } else { // No longer a list
         state.list = false;
         state.listDepth = 0;
+		logger.debug(`blockNormal(stream=${stream},state=${state}): state.listDepth → ${state.listDepth}`);
       }
     }
 
@@ -152,8 +186,10 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       return null;
     } else if ((match = stream.match(atxHeaderRE)) && match[1].length <= 6) {
       state.header = match[1].length;
+	logger.debug(`blockNormal(stream=${stream},state=${state}): state.header → ${state.header}`);
       if (modeCfg.highlightFormatting) state.formatting = "header";
       state.f = state.inline;
+	logger.debug(`blockNormal(stream=${stream},state=${state}): state.f → ${state.f}`);
       return getType(state);
     } else if (state.prevLineHasContent && !state.quote && !prevLineIsList && !prevLineIsIndentedCode && (match = stream.match(setextHeaderRE))) {
       state.header = match[0].charAt(0) == '=' ? 1 : 2;
@@ -162,6 +198,7 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       return getType(state);
     } else if (stream.eat('>')) {
       state.quote = sol ? 1 : state.quote + 1;
+	logger.debug(`blockNormal(stream=${stream},state=${state}): state.quote → ${state.quote}`);
       if (modeCfg.highlightFormatting) state.formatting = "quote";
       stream.eatSpace();
       return getType(state);
@@ -169,9 +206,11 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       return switchInline(stream, state, footnoteLink);
     } else if (stream.match(hrRE, true)) {
       state.hr = true;
+	logger.debug(`blockNormal(stream=${stream},state=${state}): state.hr → ${state.hr}`);
       return hr;
     } else if ((!state.prevLineHasContent || prevLineIsList) && (stream.match(ulRE, false) || stream.match(olRE, false))) {
       var listType = null;
+	logger.debug(`blockNormal(stream=${stream},state=${state}): listType → ${listType}`);
       if (stream.match(ulRE, true)) {
         listType = 'ul';
       } else {
@@ -183,6 +222,7 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       state.listDepth++;
       if (modeCfg.taskLists && stream.match(taskListRE, false)) {
         state.taskList = true;
+		logger.debug(`blockNormal(stream=${stream},state=${state}): state.taskList → ${state.taskList}`);
       }
       state.f = state.inline;
       if (modeCfg.highlightFormatting) state.formatting = ["list", "list-" + listType];
@@ -220,12 +260,16 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
     } else if (state.localMode) {
       return state.localMode.token(stream, state.localState);
     } else {
+	logger.debug(`local(stream=${stream},state=${state}): state.localMode → ${state.localMode}`);
+	logger.debug(`local(stream=${stream},state=${state}): state.f → ${state.f}`);
       stream.skipToEnd();
+	logger.debug(`<<< Exiting local(stream=${stream},state=${state})`);
       return code;
     }
   }
 
   function leavingLocal(stream, state) {
+	logger.debug(`>>> Entering leavingLocal(stream=${stream},state=${state})`);
     stream.match("```");
     state.block = blockNormal;
     state.f = inlineNormal;

@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../../mode/sql/sql"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -19,61 +21,83 @@
     ALIAS_KEYWORD: "AS"
   };
   var Pos = CodeMirror.Pos;
+logger.debug(`<<< Exiting function(exports=${exports})`);
 
   function getKeywords(editor) {
+	logger.debug(`>>> Entering getKeywords(editor=${editor})`);
     var mode = editor.doc.modeOption;
     if (mode === "sql") mode = "text/x-sql";
+	logger.debug(`<<< Exiting getKeywords(editor=${editor})`);
     return CodeMirror.resolveMode(mode).keywords;
   }
 
   function getText(item) {
+	logger.debug(`>>> Entering getText(item=${item})`);
+	logger.debug(`<<< Exiting getText(item=${item})`);
     return typeof item == "string" ? item : item.text;
   }
 
   function getItem(list, item) {
+	logger.debug(`>>> Entering getItem(list=${list},item=${item})`);
     if (!list.slice) return list[item];
     for (var i = list.length - 1; i >= 0; i--) if (getText(list[i]) == item)
       return list[i];
   }
 
   function shallowClone(object) {
+	logger.debug(`>>> Entering shallowClone(object=${object})`);
     var result = {};
     for (var key in object) if (object.hasOwnProperty(key))
       result[key] = object[key];
+	logger.debug(`<<< Exiting shallowClone(object=${object})`);
     return result;
   }
 
   function match(string, word) {
+	logger.debug(`>>> Entering match(string=${string},word=${word})`);
     var len = string.length;
     var sub = getText(word).substr(0, len);
+	logger.debug(`match(string=${string},word=${word}): sub → ${sub}`);
+	logger.debug(`<<< Exiting match(string=${string},word=${word})`);
     return string.toUpperCase() === sub.toUpperCase();
   }
 
   function addMatches(result, search, wordlist, formatter) {
+	logger.debug(`>>> Entering addMatches(result=${result},search=${search},wordlist=${wordlist},formatter=${formatter})`);
     for (var word in wordlist) {
       if (!wordlist.hasOwnProperty(word)) continue;
       if (wordlist.slice) word = wordlist[word];
 
       if (match(search, word)) result.push(formatter(word));
+	logger.debug(`<<< Exiting addMatches(result=${result},search=${search},wordlist=${wordlist},formatter=${formatter})`);
     }
+	logger.debug(`>>> Entering addMatches(result=${result},string=${string},defaultTable=${defaultTable})`);
   }
 
   function cleanName(name) {
+	logger.debug(`>>> Entering cleanName(name=${name})`);
     // Get rid name from backticks(`) and preceding dot(.)
     if (name.charAt(0) == ".") {
       name = name.substr(1);
     }
+	logger.debug(`cleanName(name=${name}): name → ${name}`);
+	logger.debug(`<<< Exiting cleanName(name=${name})`);
     return name.replace(/`/g, "");
   }
 
   function insertBackticks(name) {
+	logger.debug(`>>> Entering insertBackticks(name=${name})`);
     var nameParts = getText(name).split(".");
     for (var i = 0; i < nameParts.length; i++)
       nameParts[i] = "`" + nameParts[i] + "`";
     var escaped = nameParts.join(".");
+	logger.debug(`insertBackticks(name=${name}): escaped → ${escaped}`);
     if (typeof name == "string") return escaped;
     name = shallowClone(name);
     name.text = escaped;
+	logger.debug(`insertBackticks(name=${name}): name → ${name}`);
+	logger.debug(`insertBackticks(name=${name}): name.text → ${name.text}`);
+	logger.debug(`<<< Exiting insertBackticks(name=${name})`);
     return name;
   }
 
@@ -239,6 +263,7 @@
     } else {
       start = end = cur.ch;
       search = "";
+	logger.debug(`registerHelper(): token.end → ${token.end}`);
     }
     if (search.charAt(0) == "." || search.charAt(0) == "`") {
       start = nameCompletion(cur, token, result, editor);

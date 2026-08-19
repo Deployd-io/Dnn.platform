@@ -6,18 +6,22 @@ import { InputGroup, Dropdown, Switch, Label, Button, SingleLineInput, Tooltip }
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let canEdit = false;
 class BasicSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             basicLoginSettings: undefined
         };
         canEdit = util.settings.isHost || util.settings.isAdmin || util.settings.permissions.BASIC_LOGIN_SETTINGS_EDIT;
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         if (props.basicLoginSettings) {
             this.setState({
@@ -31,12 +35,15 @@ class BasicSettingsPanelBody extends Component {
                 basicLoginSettings
             });
         }));
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     getAuthProviderOptions() {
+		logger.debug('>>> Entering getAuthProviderOptions()');
         let options = [];
         if (this.props.authProviders !== undefined) {
             options = this.props.authProviders.map((item) => {
+		logger.debug('<<< Exiting getAuthProviderOptions()');
                 return { label: item.Name, value: item.Value };
             });
         }
@@ -45,9 +52,11 @@ class BasicSettingsPanelBody extends Component {
     }
 
     getAdminUserOptions() {
+		logger.debug('>>> Entering getAdminUserOptions()');
         let options = [];
         if (this.props.adminUsers !== undefined) {
             options = this.props.adminUsers.map((item) => {
+		logger.debug('<<< Exiting getAdminUserOptions()');
                 return { label: item.FullName, value: item.UserID };
             });
         }
@@ -56,9 +65,11 @@ class BasicSettingsPanelBody extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         const {props, state} = this;
 
         let basicLoginSettings = Object.assign({}, state.basicLoginSettings);
+		logger.debug(`onSettingChange(key=${key},event=${event}): basicLoginSettings → ${basicLoginSettings}`);
 
         if (key === "RedirectAfterLoginTabId" || key === "RedirectAfterLogoutTabId") {
             if (basicLoginSettings[key] !== parseInt(event)) {
@@ -78,9 +89,11 @@ class BasicSettingsPanelBody extends Component {
             basicLoginSettings: basicLoginSettings
         });
         props.dispatch(SecurityActions.basicLoginSettingsClientModified(basicLoginSettings));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
 
@@ -88,13 +101,16 @@ class BasicSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("BasicLoginSettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("BasicLoginSettingsError"));
+			logger.debug(`<<< Exiting onUpdate(event=${event})`);
         }));
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         util.utilities.confirm(resx.get("LoginSettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SecurityActions.getBasicLoginSettings(props.cultureCode, (data) => {
+				logger.debug('<<< Exiting onCancel()');
                 let basicLoginSettings = Object.assign({}, data.Results.Settings);
                 this.setState({
                     basicLoginSettings
@@ -105,9 +121,11 @@ class BasicSettingsPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {state} = this;
 
         if (state.basicLoginSettings) {
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.loginSettings}>
                     <InputGroup>
@@ -253,6 +271,8 @@ BasicSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         authProviders: state.security.authProviders,

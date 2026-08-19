@@ -1,12 +1,17 @@
 import {users as ActionTypes}  from "../actionTypes";
 import {CommonUsersService as UserService} from "../services";
 import utilities from "utils";
+const logger = console;
 
 function errorCallback(message) {
+	logger.debug(`>>> Entering errorCallback(message=${message})`);
     utilities.notifyError(JSON.parse(message.responseText).Message, 5000);
+	logger.debug(`<<< Exiting errorCallback(message=${message})`);
 }
 const userActions = {
     getUsers(searchParameters, callback) {
+		logger.debug(`>>> Entering getUsers(searchParameters=${searchParameters},callback=${callback})`);
+		logger.debug(`<<< Exiting getUsers(searchParameters=${searchParameters},callback=${callback})`);
         return (dispatch) => {
             UserService.getUsers(searchParameters, data => {
                 dispatch({
@@ -20,6 +25,8 @@ const userActions = {
         };
     },
     getUserDetails(userDetailsParameters, callback) {
+		logger.debug(`>>> Entering getUserDetails(userDetailsParameters=${userDetailsParameters},callback=${callback})`);
+		logger.debug(`<<< Exiting getUserDetails(userDetailsParameters=${userDetailsParameters},callback=${callback})`);
         return (dispatch) => {
             UserService.getUserDetails(userDetailsParameters, data => {
                 dispatch({
@@ -33,6 +40,8 @@ const userActions = {
         };
     },
     getUserFilters(callback) {
+		logger.debug(`>>> Entering getUserFilters(callback=${callback})`);
+		logger.debug(`<<< Exiting getUserFilters(callback=${callback})`);
         return () => {
             UserService.getUserFilters(data => {
                 if (callback) {
@@ -42,6 +51,8 @@ const userActions = {
         };
     },
     createUser(userDetails, filter, callback) {
+		logger.debug(`>>> Entering createUser(userDetails=${userDetails},filter=${filter},callback=${callback})`);
+		logger.debug(`<<< Exiting createUser(userDetails=${userDetails},filter=${filter},callback=${callback})`);
         return (dispatch) => {
             UserService.createUser(userDetails, data => {
                 dispatch({
@@ -56,6 +67,8 @@ const userActions = {
         };
     },
     updateUserBasicInfo(userDetails, callback) {
+		logger.debug(`>>> Entering updateUserBasicInfo(userDetails=${userDetails},callback=${callback})`);
+		logger.debug(`<<< Exiting updateUserBasicInfo(userDetails=${userDetails},callback=${callback})`);
         return (dispatch) => {
             UserService.updateUserBasicInfo(userDetails, data => {
                 dispatch({
@@ -69,6 +82,8 @@ const userActions = {
         };
     },
     changePassword(payload, callback) {
+		logger.debug(`>>> Entering changePassword(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting changePassword(payload=${payload},callback=${callback})`);
         return () => {
             UserService.changePassword(payload, data => {
                 if (callback) {
@@ -78,6 +93,8 @@ const userActions = {
         };
     },
     forceChangePassword(payload, callback) {
+		logger.debug(`>>> Entering forceChangePassword(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting forceChangePassword(payload=${payload},callback=${callback})`);
         return () => {
             UserService.forceChangePassword(payload, data => {
                 if (callback) {
@@ -87,6 +104,8 @@ const userActions = {
         };
     },
     sendPasswordResetLink(payload, callback) {
+		logger.debug(`>>> Entering sendPasswordResetLink(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting sendPasswordResetLink(payload=${payload},callback=${callback})`);
         return () => {
             UserService.sendPasswordResetLink(payload, data => {
                 if (callback) {
@@ -96,6 +115,8 @@ const userActions = {
         };
     },
     deleteUser(payload, filter, callback) {
+		logger.debug(`>>> Entering deleteUser(payload=${payload},filter=${filter},callback=${callback})`);
+		logger.debug(`<<< Exiting deleteUser(payload=${payload},filter=${filter},callback=${callback})`);
         return (dispatch) => {
             let deletedUser = Object.assign({}, payload.userDetails);
             deletedUser.isDeleted = true;
@@ -112,6 +133,8 @@ const userActions = {
         };
     },
     eraseUser(payload, callback) {
+		logger.debug(`>>> Entering eraseUser(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting eraseUser(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             UserService.hardDeleteUser(payload, data => {
                 dispatch({
@@ -125,6 +148,8 @@ const userActions = {
         };
     },
     removeDeletedUsers(callback) {
+		logger.debug(`>>> Entering removeDeletedUsers(callback=${callback})`);
+		logger.debug(`<<< Exiting removeDeletedUsers(callback=${callback})`);
         return (dispatch) => {
             UserService.removeDeletedUsers(data => {
                 if (callback) {
@@ -134,6 +159,8 @@ const userActions = {
         };
     },
     restoreUser(payload, filter, callback) {
+		logger.debug(`>>> Entering restoreUser(payload=${payload},filter=${filter},callback=${callback})`);
+		logger.debug(`<<< Exiting restoreUser(payload=${payload},filter=${filter},callback=${callback})`);
         return (dispatch) => {
             let restoredUser = Object.assign({}, payload.userDetails);
             restoredUser.isDeleted = false;
@@ -150,6 +177,8 @@ const userActions = {
         };
     },
     updateSuperUserStatus(payload, filter, callback) {
+		logger.debug(`>>> Entering updateSuperUserStatus(payload=${payload},filter=${filter},callback=${callback})`);
+		logger.debug(`<<< Exiting updateSuperUserStatus(payload=${payload},filter=${filter},callback=${callback})`);
         return (dispatch) => {
             UserService.updateSuperUserStatus(payload, data => {
                 dispatch({
@@ -164,6 +193,8 @@ const userActions = {
         };
     },
     updateAuthorizeStatus(payload, authorized, filter, callback) {
+		logger.debug(`>>> Entering updateAuthorizeStatus(payload=${payload},authorized=${authorized},filter=${filter},callback=${callback})`);
+		logger.debug(`<<< Exiting updateAuthorizeStatus(payload=${payload},authorized=${authorized},filter=${filter},callback=${callback})`);
         return (dispatch) => {
             let user = Object.assign({}, payload.userDetails);
             user.authorized = authorized;
@@ -180,6 +211,8 @@ const userActions = {
         };
     },
     unLockUser(payload, callback) {
+		logger.debug(`>>> Entering unLockUser(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting unLockUser(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             let user = Object.assign({}, payload.userDetails);
             UserService.unlockUser({ userId: payload.userDetails.userId }, data => {
@@ -194,6 +227,8 @@ const userActions = {
         };
     },
     getUserRoles(searchParameters, callback) {
+		logger.debug(`>>> Entering getUserRoles(searchParameters=${searchParameters},callback=${callback})`);
+		logger.debug(`<<< Exiting getUserRoles(searchParameters=${searchParameters},callback=${callback})`);
         return (dispatch) => {
             UserService.getUserRoles(searchParameters, data => {
                 dispatch({
@@ -207,6 +242,8 @@ const userActions = {
         };
     },
     passwordStrength() {
+		logger.debug('>>> Entering passwordStrength()');
+		logger.debug('<<< Exiting passwordStrength()');
         return (dispatch) => {
             UserService.passwordStrengthOptions(pStrength=>{
                 dispatch({
@@ -217,6 +254,8 @@ const userActions = {
         };
     },
     getSuggestRoles(searchParameters, callback) {
+		logger.debug(`>>> Entering getSuggestRoles(searchParameters=${searchParameters},callback=${callback})`);
+		logger.debug(`<<< Exiting getSuggestRoles(searchParameters=${searchParameters},callback=${callback})`);
         return (dispatch) => {
             UserService.getSuggestRoles(searchParameters, data => {
                 dispatch({
@@ -230,6 +269,8 @@ const userActions = {
         };
     },
     saveUserRole(payload, notifyUser, isOwner, callback) {
+		logger.debug(`>>> Entering saveUserRole(payload=${payload},notifyUser=${notifyUser},isOwner=${isOwner},callback=${callback})`);
+		logger.debug(`<<< Exiting saveUserRole(payload=${payload},notifyUser=${notifyUser},isOwner=${isOwner},callback=${callback})`);
         return (dispatch) => {
             UserService.saveUserRole(payload, notifyUser, isOwner, data => {
                 dispatch({
@@ -243,6 +284,8 @@ const userActions = {
         };
     },
     removeUserRole(payload, callback) {
+		logger.debug(`>>> Entering removeUserRole(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting removeUserRole(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             UserService.removeUserRole(payload, data => {
                 dispatch({

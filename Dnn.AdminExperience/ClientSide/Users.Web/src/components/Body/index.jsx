@@ -8,6 +8,7 @@ import "./style.less";
 import {CommonUsersActions } from "dnn-users-common-actions";
 import appSettings from "utils/applicationSettings";
 import utilities from "utils";
+const logger = console;
 import { Button, GridCell, PersonaBarPageHeader, PersonaBarPageBody, Pager } from "@dnnsoftware/dnn-react-common";
 
 const searchParameters = {
@@ -22,22 +23,27 @@ const searchParameters = {
 class Body extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.userTable = React.createRef();
+		logger.debug('<<< Exiting constructor()');
         this.state = {
             userFilters: [],
             searchParameters
         };
     }
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.props.dispatch(CommonUsersActions.getUserFilters((data) => {
             let userFilters = Object.assign([], JSON.parse(JSON.stringify(data)));
             this.setState({
                 userFilters
             });
+			logger.debug('<<< Exiting componentDidMount()');
         }));
     }
 
     onFilterChange(option, searchText) {
+		logger.debug(`>>> Entering onFilterChange(option=${option},searchText=${searchText})`);
         let {searchParameters} = this.state;
         searchParameters.searchText = searchText;
         searchParameters.filter = option.value;
@@ -49,25 +55,32 @@ class Body extends Component {
             searchParameters.resetIndex = false;
             this.setState({ searchParameters });
         });
+		logger.debug(`<<< Exiting onFilterChange(option=${option},searchText=${searchText})`);
     }
 
     onPageChanged(currentPage, pageSize) {
+		logger.debug(`>>> Entering onPageChanged(currentPage=${currentPage},pageSize=${pageSize})`);
         let {searchParameters} = this.state;
         searchParameters.pageIndex = currentPage;
         searchParameters.pageSize = pageSize;
         this.props.dispatch(CommonUsersActions.getUsers(searchParameters));
         this.setState({ searchParameters });
+		logger.debug(`<<< Exiting onPageChanged(currentPage=${currentPage},pageSize=${pageSize})`);
     }
 
     onSortChanged(columnName, ascending) {
+		logger.debug(`>>> Entering onSortChanged(columnName=${columnName},ascending=${ascending})`);
         let {searchParameters} = this.state;
         searchParameters.sortColumn = columnName;
         searchParameters.sortAscending = ascending;
         this.props.dispatch(CommonUsersActions.getUsers(searchParameters));
         this.setState({ searchParameters });
+		logger.debug(`<<< Exiting onSortChanged(columnName=${columnName},ascending=${ascending})`);
     }
 
     getWorkSpaceTray() {
+		logger.debug('>>> Entering getWorkSpaceTray()');
+		logger.debug('<<< Exiting getWorkSpaceTray()');
         return this.state.userFilters.length > 0 &&
             <GridCell className="users-workspace-tray">
                 <FiltersBar
@@ -78,6 +91,7 @@ class Body extends Component {
     }
 
     onRemoveDeletedUsers() {
+		logger.debug('>>> Entering onRemoveDeletedUsers()');
         utilities.confirm(
             Localization.get("RemoveDeleted.Confirm"),
             Localization.get("Yes"),
@@ -87,21 +101,26 @@ class Body extends Component {
                     let {searchParameters} = this.state;
                     this.props.dispatch(CommonUsersActions.getUsers(searchParameters));
                     utilities.notify(Localization.get("RemoveDeleted.Done"));
+					logger.debug('<<< Exiting onRemoveDeletedUsers()');
                 }));
             }
         );
     }
 
     toggleCreateBox() {
+		logger.debug('>>> Entering toggleCreateBox()');
         this.userTable.current.onAddUser();
+		logger.debug('<<< Exiting toggleCreateBox()');
     }
     canAddUser()
     {
         return appSettings.applicationSettings.settings.isAdmin || appSettings.applicationSettings.settings.permissions.ADD_USER;
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         const panelBodyMargin = state.createBoxVisible ? "without-margin" : "";
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell>
                 <PersonaBarPageHeader title={Localization.get("nav_Users") }>
@@ -148,6 +167,8 @@ Body.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         totalUsers: state.users.totalUsers
     };

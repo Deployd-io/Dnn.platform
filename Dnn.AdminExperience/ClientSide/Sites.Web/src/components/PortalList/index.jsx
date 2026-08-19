@@ -15,9 +15,11 @@ import {
     CommonPortalListActions
 } from "dnn-sites-common-actions";
 import styles from "./style.module.less";
+const logger = console;
 
 class PortalList extends Component {
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const { props } = this;
         props.dispatch(
             CommonPortalListActions.loadPortals({
@@ -27,11 +29,14 @@ class PortalList extends Component {
                 pageSize: props.pagination.pageSize
             })
         );
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     loadMore(event) {
+		logger.debug(`>>> Entering loadMore(event=${event})`);
         if (event) {
             event.preventDefault();
+			logger.debug(`<<< Exiting loadMore(event=${event})`);
         }
         const { props } = this;
         props.dispatch(
@@ -51,7 +56,9 @@ class PortalList extends Component {
         );
     }
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.sitesPortalList}>
                 <PersonaBarPageHeader title={Localization.get("Sites")}>
@@ -93,6 +100,8 @@ PortalList.propTypes = {
     totalCount: PropTypes.number,
 };
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         portals: state.portal.portals,
         totalCount: state.portal.totalCount,

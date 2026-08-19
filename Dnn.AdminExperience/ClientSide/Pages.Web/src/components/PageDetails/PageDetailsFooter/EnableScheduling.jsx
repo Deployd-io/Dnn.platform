@@ -2,11 +2,14 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Switch, Label, DatePicker } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../../localization";
+const logger = console;
 
 class EnableScheduling extends Component {
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return <div>
             <Label
                 labelType="inline"

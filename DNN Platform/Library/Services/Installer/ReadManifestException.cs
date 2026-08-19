@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class ReadManifestException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ReadManifestException));
     /// <inheritdoc />
     public ReadManifestException()
     {
+	Logger.LogDebug(">>> Entering ReadManifestException()");
+	Logger.LogDebug("<<< Exiting ReadManifestException()");
     }
 
     /// <inheritdoc />
     public ReadManifestException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering ReadManifestException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting ReadManifestException(message={Message})", message);
 
     /// <inheritdoc />
     public ReadManifestException(string message, Exception innerException)

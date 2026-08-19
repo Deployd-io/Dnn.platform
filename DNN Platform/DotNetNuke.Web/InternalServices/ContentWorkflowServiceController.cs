@@ -33,6 +33,7 @@ using Microsoft.Extensions.DependencyInjection;
 public partial class ContentWorkflowServiceController(IContentController contentController, IWorkflowEngine workflowEngine, ITabController tabController)
     : DnnApiController
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ContentWorkflowServiceController));
     private readonly IContentController contentController = contentController ?? ContentController.Instance;
     private readonly IWorkflowEngine workflowEngine = workflowEngine ?? WorkflowEngine.Instance;
     private readonly ITabController tabController = tabController ?? TabController.Instance;
@@ -42,6 +43,8 @@ public partial class ContentWorkflowServiceController(IContentController content
     public ContentWorkflowServiceController()
         : this(null, null, null)
     {
+	Logger.LogDebug(">>> Entering ContentWorkflowServiceController()");
+	Logger.LogDebug("<<< Exiting ContentWorkflowServiceController()");
     }
 
     /// <summary>Rejects a workflow.</summary>
@@ -60,9 +63,11 @@ public partial class ContentWorkflowServiceController(IContentController content
     [ValidateAntiForgeryToken]
     public HttpResponseMessage Reject(NotificationRequest requestBody)
     {
+		Logger.LogDebug(">>> Entering Reject(requestBody={RequestBody})", requestBody);
         try
         {
             var notification = NotificationsController.Instance.GetNotification(requestBody.NotificationId);
+			Logger.LogDebug("Reject(requestBody={RequestBody}): notification → {Notification}", requestBody, notification);
             if (notification != null)
             {
                 if (string.IsNullOrEmpty(notification.Context))
@@ -71,6 +76,7 @@ public partial class ContentWorkflowServiceController(IContentController content
                 }
 
                 var parameters = notification.Context.Split(':');
+				Logger.LogDebug("Reject(requestBody={RequestBody}): parameters → {Parameters}", requestBody, parameters);
 
                 var stateTransaction = new StateTransaction
                 {
@@ -86,9 +92,12 @@ public partial class ContentWorkflowServiceController(IContentController content
         }
         catch (Exception exc)
         {
+			Logger.LogError("Exception in Reject(postData={PostData}): {Arg1}", postData, exc.getMessage());
             Exceptions.LogException(exc);
+			Logger.LogError("Exception in Reject(requestBody={RequestBody}): {Arg1}", requestBody, exc.getMessage());
         }
 
+		Logger.LogDebug("<<< Exiting Reject(postData={PostData})", postData);
         return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
     }
 
@@ -108,9 +117,11 @@ public partial class ContentWorkflowServiceController(IContentController content
     [ValidateAntiForgeryToken]
     public HttpResponseMessage Approve(NotificationRequest requestBody)
     {
+		Logger.LogDebug(">>> Entering Approve(requestBody={RequestBody})", requestBody);
         try
         {
             var notification = NotificationsController.Instance.GetNotification(requestBody.NotificationId);
+			Logger.LogDebug("Approve(requestBody={RequestBody}): notification → {Notification}", requestBody, notification);
             if (notification != null)
             {
                 if (string.IsNullOrEmpty(notification.Context))
@@ -134,9 +145,12 @@ public partial class ContentWorkflowServiceController(IContentController content
         }
         catch (Exception exc)
         {
+			Logger.LogError("Exception in Approve(postData={PostData}): {Arg1}", postData, exc.getMessage());
             Exceptions.LogException(exc);
+			Logger.LogError("Exception in Approve(requestBody={RequestBody}): {Arg1}", requestBody, exc.getMessage());
         }
 
+		Logger.LogDebug("<<< Exiting Approve(postData={PostData})", postData);
         return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
     }
 
@@ -146,6 +160,7 @@ public partial class ContentWorkflowServiceController(IContentController content
     [ValidateAntiForgeryToken]
     public HttpResponseMessage CompleteState()
     {
+		Logger.LogDebug(">>> Entering CompleteState()");
         try
         {
             this.workflowEngine.CompleteState(this.BuildStateTransaction());
@@ -153,9 +168,11 @@ public partial class ContentWorkflowServiceController(IContentController content
         }
         catch (Exception exc)
         {
+			Logger.LogError("Exception in CompleteState(): {Arg0}", exc.getMessage());
             Exceptions.LogException(exc);
         }
 
+		Logger.LogDebug("<<< Exiting CompleteState()");
         return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
     }
 
@@ -165,6 +182,7 @@ public partial class ContentWorkflowServiceController(IContentController content
     [ValidateAntiForgeryToken]
     public HttpResponseMessage DiscardState()
     {
+		Logger.LogDebug(">>> Entering DiscardState()");
         try
         {
             this.workflowEngine.DiscardState(this.BuildStateTransaction());
@@ -172,9 +190,11 @@ public partial class ContentWorkflowServiceController(IContentController content
         }
         catch (Exception exc)
         {
+			Logger.LogError("Exception in DiscardState(): {Arg0}", exc.getMessage());
             Exceptions.LogException(exc);
         }
 
+		Logger.LogDebug("<<< Exiting DiscardState()");
         return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
     }
 
@@ -184,6 +204,7 @@ public partial class ContentWorkflowServiceController(IContentController content
     [ValidateAntiForgeryToken]
     public HttpResponseMessage CompleteWorkflow()
     {
+		Logger.LogDebug(">>> Entering CompleteWorkflow()");
         try
         {
             this.workflowEngine.CompleteWorkflow(this.BuildStateTransaction());
@@ -191,9 +212,11 @@ public partial class ContentWorkflowServiceController(IContentController content
         }
         catch (Exception exc)
         {
+			Logger.LogError("Exception in CompleteWorkflow(): {Arg0}", exc.getMessage());
             Exceptions.LogException(exc);
         }
 
+		Logger.LogDebug("<<< Exiting CompleteWorkflow()");
         return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
     }
 
@@ -203,6 +226,7 @@ public partial class ContentWorkflowServiceController(IContentController content
     [ValidateAntiForgeryToken]
     public HttpResponseMessage DiscardWorkflow()
     {
+		Logger.LogDebug(">>> Entering DiscardWorkflow()");
         try
         {
             this.workflowEngine.DiscardWorkflow(this.BuildStateTransaction());
@@ -210,19 +234,25 @@ public partial class ContentWorkflowServiceController(IContentController content
         }
         catch (Exception exc)
         {
+			Logger.LogError("Exception in DiscardWorkflow(): {Arg0}", exc.getMessage());
             Exceptions.LogException(exc);
         }
 
+		Logger.LogDebug("<<< Exiting DiscardWorkflow()");
         return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
     }
 
     private StateTransaction BuildStateTransaction()
     {
+		Logger.LogDebug(">>> Entering BuildStateTransaction()");
         var portalId = this.PortalSettings.PortalId;
         var tabId = this.Request.FindTabId();
+		Logger.LogDebug("BuildStateTransaction(): tabId → {TabId}", tabId);
         var currentPage = this.tabController.GetTab(tabId, portalId);
+		Logger.LogDebug("BuildStateTransaction(): currentPage → {CurrentPage}", currentPage);
         var contentItemId = currentPage.ContentItemId;
         var contentItem = this.contentController.GetContentItem(contentItemId);
+		Logger.LogDebug("BuildStateTransaction(): contentItem → {ContentItem}", contentItem);
         var stateTransaction = new StateTransaction
         {
             ContentItemId = contentItem.ContentItemId,
@@ -230,6 +260,7 @@ public partial class ContentWorkflowServiceController(IContentController content
             Message = new StateTransactionMessage(),
             UserId = this.UserInfo.UserID,
         };
+		Logger.LogDebug("<<< Exiting BuildStateTransaction()");
         return stateTransaction;
     }
 }

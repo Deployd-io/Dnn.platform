@@ -7,18 +7,27 @@ Imports System.Collections
 Imports System.Globalization
 Imports System.Reflection
 Imports System.Text
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     <DefaultMember("Item")> _
     Public NotInheritable Class TabStripTabCollection
         Implements IList, ICollection, IEnumerable
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Friend Sub New(ByVal owner As DNNTabStrip)
+			_logger.LogDebug(">>> Entering New(owner={Owner})", owner)
+			_logger.LogDebug("New(owner={Owner}): Me.owner → {Arg1}", owner, Me.owner)
             Me.owner = owner
+			_logger.LogDebug("<<< Exiting New(owner={Owner})", owner)
         End Sub
 
         Public Function Add(ByVal row As DNNTab) As Integer
+			_logger.LogDebug(">>> Entering Add(row={Row})", row)
             Me.AddAt(-1, row)
+			_logger.LogDebug(">>> Entering Add(o={O})", o)
+			_logger.LogDebug("<<< Exiting Add(row={Row})", row)
+			_logger.LogDebug("<<< Exiting Add(o={O})", o)
             Return (Me.owner.Controls.Count - 1)
         End Function
 
@@ -27,13 +36,16 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Sub AddAt(ByVal index As Integer, ByVal row As DNNTab)
+			_logger.LogDebug(">>> Entering AddAt(index={Index},row={Row})", index, row)
             Me.owner.Controls.AddAt(index, row)
             If (Strings.Len(row.ID) = 0) Then
                 row.ID = Me.owner.Controls.Count.ToString(CultureInfo.InvariantCulture)
             End If
+			_logger.LogDebug("<<< Exiting AddAt(index={Index},row={Row})", index, row)
         End Sub
 
         Public Sub AddRange(ByVal rows As DNNTab())
+			_logger.LogDebug(">>> Entering AddRange(rows={Rows})", rows)
             If (rows Is Nothing) Then
                 Throw New ArgumentNullException(NameOf(rows))
             End If
@@ -41,35 +53,45 @@ Namespace DotNetNuke.UI.WebControls
             For Each tab In rows
                 Me.Add(tab)
             Next
+			_logger.LogDebug("<<< Exiting AddRange(rows={Rows})", rows)
         End Sub
 
         Public Sub Clear() Implements IList.Clear
+			_logger.LogDebug(">>> Entering Clear()")
             If Me.owner.HasControls Then
                 Me.owner.Controls.Clear
             End If
+			_logger.LogDebug("<<< Exiting Clear()")
         End Sub
 
         Private Function Contains(ByVal o As Object) As Boolean Implements IList.Contains
+			_logger.LogDebug(">>> Entering Contains(o={O})", o)
+			_logger.LogDebug("<<< Exiting Contains(o={O})", o)
             Return Me.owner.Controls.Contains(DirectCast(o, DNNTab))
         End Function
 
         Public Sub CopyTo(ByVal array As Array, ByVal index As Integer) Implements ICollection.CopyTo
+			_logger.LogDebug(">>> Entering CopyTo(array={Array},index={Index})", array, index)
             Dim enumerator As IEnumerator = Me.GetEnumerator
             Do While enumerator.MoveNext
                 index += 1
                 array.SetValue(enumerator.Current, index)
             Loop
+			_logger.LogDebug("<<< Exiting CopyTo(array={Array},index={Index})", array, index)
         End Sub
 
         Public Function FindTab(ByVal strId As String) As DNNTab
+			_logger.LogDebug(">>> Entering FindTab(strId={StrId})", strId)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = Me.GetEnumerator
+				_logger.LogDebug("FindTab(strId={StrId}): enumerator → {Enumerator}", strId, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
                     End If
                     Dim current As DNNTab = DirectCast(enumerator.Current, DNNTab)
+					_logger.LogDebug("FindTab(strId={StrId}): current → {Current}", strId, current)
                     If (current.ID = strId) Then
                         Return current
                     End If
@@ -79,27 +101,40 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			_logger.LogDebug("<<< Exiting FindTab(strId={StrId})", strId)
             Return Nothing
         End Function
 
         Public Function GetEnumerator() As IEnumerator Implements IEnumerable.GetEnumerator
+			_logger.LogDebug(">>> Entering GetEnumerator()")
+			_logger.LogDebug("<<< Exiting GetEnumerator()")
             Return Me.owner.Controls.GetEnumerator
         End Function
 
         Public Function GetRowIndex(ByVal row As DNNTab) As Integer
+			_logger.LogDebug(">>> Entering GetRowIndex(row={Row})", row)
+			_logger.LogDebug("<<< Exiting GetRowIndex(row={Row})", row)
             Return If(Not Me.owner.HasControls, -1, Me.owner.Controls.IndexOf(row))
         End Function
 
         Private Function IndexOf(ByVal o As Object) As Integer Implements IList.IndexOf
+			_logger.LogDebug(">>> Entering IndexOf(o={O})", o)
+			_logger.LogDebug("<<< Exiting IndexOf(o={O})", o)
             Return Me.owner.Controls.IndexOf(DirectCast(o, DNNTab))
         End Function
 
         Private Sub Insert(ByVal index As Integer, ByVal o As Object) Implements IList.Insert
+			_logger.LogDebug(">>> Entering Insert(index={Index},o={O})", index, o)
             Me.AddAt(index, DirectCast(o, DNNTab))
+			_logger.LogDebug("<<< Exiting Insert(index={Index},o={O})", index, o)
         End Sub
 
         Public Sub Remove(ByVal row As DNNTab)
+			_logger.LogDebug(">>> Entering Remove(row={Row})", row)
             Me.owner.Controls.Remove(row)
+			_logger.LogDebug("<<< Exiting Remove(row={Row})", row)
+			_logger.LogDebug(">>> Entering Remove(o={O})", o)
+			_logger.LogDebug("<<< Exiting Remove(o={O})", o)
         End Sub
 
         Private Sub Remove(ByVal o As Object) Implements IList.Remove
@@ -107,10 +142,13 @@ Namespace DotNetNuke.UI.WebControls
         End Sub
 
         Public Sub RemoveAt(ByVal index As Integer) Implements IList.RemoveAt
+			_logger.LogDebug(">>> Entering RemoveAt(index={Index})", index)
             Me.owner.Controls.RemoveAt(index)
+			_logger.LogDebug("<<< Exiting RemoveAt(index={Index})", index)
         End Sub
 
         Public Function ToJSON() As String
+			_logger.LogDebug(">>> Entering ToJSON()")
             Dim flag As Boolean
             Dim enumerator As IEnumerator = Nothing
             Dim enumerator2 As IEnumerator = Nothing
@@ -118,15 +156,18 @@ Namespace DotNetNuke.UI.WebControls
             builder.Append("tabs:[")
             Try 
                 enumerator = Me.GetEnumerator
+				_logger.LogDebug("ToJSON(): enumerator → {Enumerator}", enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
                     End If
                     Dim current As DNNTab = DirectCast(enumerator.Current, DNNTab)
+					_logger.LogDebug("ToJSON(): current → {Current}", current)
                     If flag Then
                         builder.Append(","c)
                     End If
                     flag = True
+					_logger.LogDebug("ToJSON(): flag → {Flag}", flag)
                     builder.Append(ScriptGenerator.GetMarshalledPropertyJSON(current, current.MarshalledProperties))
                 Loop
             Finally
@@ -139,6 +180,7 @@ Namespace DotNetNuke.UI.WebControls
             builder.Append(",tablabels:[")
             Try 
                 enumerator2 = Me.GetEnumerator
+				_logger.LogDebug("ToJSON(): enumerator2 → {Enumerator2}", enumerator2)
                 Do While True
                     If Not enumerator2.MoveNext Then
                         Exit Do
@@ -156,6 +198,7 @@ Namespace DotNetNuke.UI.WebControls
                 End If
             End Try
             builder.Append("]"c)
+			_logger.LogDebug("<<< Exiting ToJSON()")
             Return builder.ToString
         End Function
 

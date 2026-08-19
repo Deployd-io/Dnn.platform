@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import "./style.less";
+const logger = console;
 
 const Button = ({children, className, size, type, onClick, style, disabled}) => { 
     return (

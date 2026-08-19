@@ -70,8 +70,10 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnFilePickerUploader()
             : this(null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering DnnFilePickerUploader()");
         }
 
+		eventLogger.LogDebug("<<< Exiting DnnFilePickerUploader()");
         /// <summary>Initializes a new instance of the <see cref="DnnFilePickerUploader"/> class.</summary>
         /// <param name="appStatus">The application status.</param>
         /// <param name="eventLogger">The event logger.</param>
@@ -80,7 +82,9 @@ namespace DotNetNuke.Web.UI.WebControls
         {
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("DnnFilePickerUploader(appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): eventLogger → {EventLogger1}", appStatus, eventLogger, servicesFramework, eventLogger);
             this.servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
+			eventLogger.LogDebug("DnnFilePickerUploader(appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", appStatus, eventLogger, servicesFramework, servicesFramework);
         }
 
         /// <summary>Gets or sets a value indicating whether to use the user's personal folder.</summary>
@@ -222,6 +226,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.FoldersComboBox.SelectItemDefaultText = (this.SupportHost && PortalSettings.Current.ActiveTab.IsSuperTab) ? DynamicSharedConstants.HostRootFolder : DynamicSharedConstants.RootFolder;
@@ -243,14 +248,17 @@ namespace DotNetNuke.Web.UI.WebControls
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, PortalSettings.Current, CommonJs.jQueryFileUpload);
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, PortalSettings.Current, CommonJs.DnnPlugins);
             this.servicesFramework.RequestAjaxAntiForgerySupport();
+			eventLogger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             if (this.FoldersComboBox.SelectedFolder != null && this.FoldersComboBox.SelectedFolder.FolderPath.StartsWith("Users/", StringComparison.InvariantCultureIgnoreCase))
             {
                 var userFolder = FolderManager.Instance.GetUserFolder(this.User ?? UserController.Instance.GetCurrentUserInfo());
+				eventLogger.LogDebug("OnPreRender(e={E}): userFolder → {UserFolder}", e, userFolder);
                 if (this.FoldersComboBox.SelectedFolder.FolderID == userFolder.FolderID)
                 {
                     this.FoldersComboBox.SelectedItem = new ListItem
@@ -288,14 +296,18 @@ namespace DotNetNuke.Web.UI.WebControls
             }
 
             base.OnPreRender(e);
+			eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private void LoadFolders()
         {
+			eventLogger.LogDebug(">>> Entering LoadFolders()");
             if (this.UsePersonalFolder)
             {
                 var user = this.User ?? UserController.Instance.GetCurrentUserInfo();
+				eventLogger.LogDebug("LoadFolders(): user → {User}", user);
                 var userFolder = FolderManager.Instance.GetUserFolder(user);
+				eventLogger.LogDebug("LoadFolders(): userFolder → {UserFolder}", userFolder);
                 this.FoldersComboBox.SelectedFolder = userFolder;
             }
             else
@@ -324,6 +336,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
             this.FoldersComboBox.Enabled = !this.UsePersonalFolder;
             this.FoldersLabel.Visible = this.UsePersonalFolder;
+			eventLogger.LogDebug("<<< Exiting LoadFolders()");
         }
     }
 }

@@ -14,16 +14,20 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class SslSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             sslSettings: undefined,
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const { props } = this;
         if (props.sslSettings) {
             this.setState({
@@ -32,19 +36,24 @@ class SslSettingsPanelBody extends Component {
             return;
         }
         this.getSslSettings();
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         const { state, props } = this;
         let sslSettings = Object.assign({}, state.sslSettings);
+		logger.debug(`onSettingChange(key=${key},event=${event}): sslSettings → ${sslSettings}`);
         sslSettings[key] = typeof event === "object" ? event.target.value : event;
         this.setState({
             sslSettings: sslSettings,
         });
         props.dispatch(SecurityActions.sslSettingsClientModified(sslSettings));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const { props, state } = this;
 
@@ -57,28 +66,33 @@ class SslSettingsPanelBody extends Component {
                 },
                 () => {
                     util.utilities.notifyError(resx.get("SslSettingsError"));
+					logger.debug(`<<< Exiting onUpdate(event=${event})`);
                 }
             )
         );
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         util.utilities.confirm(
             resx.get("SslSettingsRestoreWarning"),
             resx.get("Yes"),
             resx.get("No"),
             () => {
                 this.getSslSettings();
+				logger.debug('<<< Exiting onCancel()');
             }
         );
     }
 
     onSetAllPagesSecure() {
+		logger.debug('>>> Entering onSetAllPagesSecure()');
         util.utilities.confirm(
             resx.get("SslSetAllPagesSecure.Confirm"),
             resx.get("Yes"),
             resx.get("No"),
             function onSetAllPagesSecureConfirm() {
+				logger.debug('>>> Entering onSetAllPagesSecureConfirm()');
                 this.props.dispatch(
                     SecurityActions.updateSslSettings(
                         this.state.sslSettings,
@@ -92,6 +106,7 @@ class SslSettingsPanelBody extends Component {
                         },
                         () => {
                             util.utilities.notifyError(resx.get("SslSettingsError"));
+							logger.debug('<<< Exiting onSetAllPagesSecureConfirm()');
                         }
                     )
                 );
@@ -100,6 +115,7 @@ class SslSettingsPanelBody extends Component {
     }
 
     getSslSettings() {
+		logger.debug('>>> Entering getSslSettings()');
         const { props } = this;
         props.dispatch(
             SecurityActions.getSslSettings((data) => {
@@ -109,10 +125,12 @@ class SslSettingsPanelBody extends Component {
                 });
             })
         );
+		logger.debug('<<< Exiting getSslSettings()');
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const { state } = this;
         if (state.sslSettings) {
             let warningBox = <div />;
@@ -158,6 +176,7 @@ class SslSettingsPanelBody extends Component {
                     );
                     break;
             }
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.sslSettings}>
                     <InputGroup>
@@ -279,6 +298,8 @@ SslSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         sslSettings: state.security.sslSettings,

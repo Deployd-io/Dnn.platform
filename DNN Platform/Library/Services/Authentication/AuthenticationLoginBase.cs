@@ -18,12 +18,17 @@ namespace DotNetNuke.Services.Authentication
     /// </summary>
     public abstract partial class AuthenticationLoginBase : UserModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AuthenticationLoginBase));
         /// <summary>Initializes a new instance of the <see cref="AuthenticationLoginBase"/> class.</summary>
         protected AuthenticationLoginBase()
         {
+			Logger.LogDebug(">>> Entering AuthenticationLoginBase()");
             this.RedirectURL = Null.NullString;
             this.AuthenticationType = Null.NullString;
+			Logger.LogDebug("AuthenticationLoginBase(): this.RedirectURL → {Arg0}", this.RedirectURL);
+			Logger.LogDebug("AuthenticationLoginBase(): this.AuthenticationType → {Arg0}", this.AuthenticationType);
             this.Mode = AuthMode.Login;
+			Logger.LogDebug("<<< Exiting AuthenticationLoginBase()");
         }
 
         [SuppressMessage("Microsoft.Design", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "Breaking change")]
@@ -68,15 +73,19 @@ namespace DotNetNuke.Services.Authentication
         [DnnDeprecated(9, 2, 0, "Use UserRequestIPAddressController.Instance.GetUserRequestIPAddress")]
         public static partial string GetIPAddress()
         {
+			Logger.LogDebug(">>> Entering GetIPAddress()");
+			Logger.LogDebug("<<< Exiting GetIPAddress()");
             return UserRequestIPAddressController.Instance.GetUserRequestIPAddress(new HttpRequestWrapper(HttpContext.Current.Request));
         }
 
         protected virtual void OnUserAuthenticated(UserAuthenticatedEventArgs ea)
         {
+			Logger.LogDebug(">>> Entering OnUserAuthenticated(ea={Ea})", ea);
             if (this.UserAuthenticated != null)
             {
                 this.UserAuthenticated(null, ea);
             }
+			Logger.LogDebug("<<< Exiting OnUserAuthenticated(ea={Ea})", ea);
         }
     }
 }

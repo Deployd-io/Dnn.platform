@@ -16,9 +16,12 @@ namespace DotNetNuke.Security.Permissions
     [Serializable]
     public class DesktopModulePermissionCollection : GenericCollectionBase<DesktopModulePermissionInfo>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DesktopModulePermissionCollection));
         /// <summary>Initializes a new instance of the <see cref="DesktopModulePermissionCollection"/> class.</summary>
         public DesktopModulePermissionCollection()
         {
+		Logger.LogDebug(">>> Entering DesktopModulePermissionCollection()");
+		Logger.LogDebug("<<< Exiting DesktopModulePermissionCollection()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DesktopModulePermissionCollection"/> class.</summary>
@@ -26,6 +29,8 @@ namespace DotNetNuke.Security.Permissions
         public DesktopModulePermissionCollection(ArrayList desktopModulePermissions)
         {
             this.AddRange(desktopModulePermissions);
+			Logger.LogDebug(">>> Entering DesktopModulePermissionCollection(desktopModulePermissions={DesktopModulePermissions})", desktopModulePermissions);
+			Logger.LogDebug("<<< Exiting DesktopModulePermissionCollection(desktopModulePermissions={DesktopModulePermissions})", desktopModulePermissions);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DesktopModulePermissionCollection"/> class.</summary>
@@ -40,6 +45,7 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="desktopModulePermissionID">The ID of the desktop module by which to filter <paramref name="desktopModulePermissions"/>.</param>
         public DesktopModulePermissionCollection(ArrayList desktopModulePermissions, int desktopModulePermissionID)
         {
+			Logger.LogDebug(">>> Entering DesktopModulePermissionCollection(desktopModulePermissions={DesktopModulePermissions},desktopModulePermissionID={DesktopModulePermissionID})", desktopModulePermissions, desktopModulePermissionID);
             foreach (DesktopModulePermissionInfo permission in desktopModulePermissions)
             {
                 if (permission.DesktopModulePermissionID == desktopModulePermissionID)
@@ -47,10 +53,12 @@ namespace DotNetNuke.Security.Permissions
                     this.Add(permission);
                 }
             }
+			Logger.LogDebug("<<< Exiting DesktopModulePermissionCollection(desktopModulePermissions={DesktopModulePermissions},desktopModulePermissionID={DesktopModulePermissionID})", desktopModulePermissions, desktopModulePermissionID);
         }
 
         public int Add(DesktopModulePermissionInfo value, bool checkForDuplicates)
         {
+			Logger.LogDebug(">>> Entering Add(value={Value},checkForDuplicates={CheckForDuplicates})", value, checkForDuplicates);
             int id = Null.NullInteger;
             if (!checkForDuplicates)
             {
@@ -59,6 +67,7 @@ namespace DotNetNuke.Security.Permissions
             else
             {
                 bool isMatch = false;
+				Logger.LogDebug("Add(value={Value},checkForDuplicates={CheckForDuplicates}): isMatch → {IsMatch}", value, checkForDuplicates, isMatch);
                 foreach (IPermissionInfo permission in this.List)
                 {
                     if (permission.PermissionId == value.PermissionID && permission.UserId == value.UserID && permission.RoleId == value.RoleID)
@@ -74,6 +83,7 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			Logger.LogDebug("<<< Exiting Add(value={Value},checkForDuplicates={CheckForDuplicates})", value, checkForDuplicates);
             return id;
         }
 
@@ -83,6 +93,8 @@ namespace DotNetNuke.Security.Permissions
             {
                 this.Add(permission);
             }
+			Logger.LogDebug(">>> Entering AddRange(desktopModulePermissions={DesktopModulePermissions})", desktopModulePermissions);
+			Logger.LogDebug("<<< Exiting AddRange(desktopModulePermissions={DesktopModulePermissions})", desktopModulePermissions);
         }
 
         public void AddRange(DesktopModulePermissionCollection desktopModulePermissions)
@@ -95,6 +107,7 @@ namespace DotNetNuke.Security.Permissions
 
         public bool CompareTo(DesktopModulePermissionCollection objDesktopModulePermissionCollection)
         {
+			Logger.LogDebug(">>> Entering CompareTo(objDesktopModulePermissionCollection={ObjDesktopModulePermissionCollection})", objDesktopModulePermissionCollection);
             if (objDesktopModulePermissionCollection.Count != this.Count)
             {
                 return false;
@@ -110,11 +123,13 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CompareTo(objDesktopModulePermissionCollection={ObjDesktopModulePermissionCollection})", objDesktopModulePermissionCollection);
             return true;
         }
 
         public void Remove(int permissionID, int roleID, int userID)
         {
+			Logger.LogDebug(">>> Entering Remove(permissionID={PermissionID},roleID={RoleID},userID={UserID})", permissionID, roleID, userID);
             foreach (PermissionInfoBase permission in this.List)
             {
                 if (permission.PermissionID == permissionID && permission.UserID == userID && permission.RoleID == roleID)
@@ -123,15 +138,20 @@ namespace DotNetNuke.Security.Permissions
                     break;
                 }
             }
+			Logger.LogDebug("<<< Exiting Remove(permissionID={PermissionID},roleID={RoleID},userID={UserID})", permissionID, roleID, userID);
         }
 
         public List<PermissionInfoBase> ToList()
         {
+			Logger.LogDebug(">>> Entering ToList()");
+			Logger.LogDebug("<<< Exiting ToList()");
             return [..this.List.Cast<PermissionInfoBase>()];
         }
 
         public string ToString(string key)
         {
+			Logger.LogDebug(">>> Entering ToString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting ToString(key={Key})", key);
             return PermissionController.BuildPermissions(this.List, key);
         }
     }

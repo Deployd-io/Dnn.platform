@@ -51,8 +51,10 @@ namespace DotNetNuke.Modules.Admin.Users
         public EditUser()
             : this(null, null, null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering EditUser()");
         }
 
+		Logger.LogDebug("<<< Exiting EditUser()");
         /// <summary>Initializes a new instance of the <see cref="EditUser"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
         /// <param name="javaScript">The JavaScript library helper.</param>
@@ -62,6 +64,12 @@ namespace DotNetNuke.Modules.Admin.Users
         public EditUser(INavigationManager navigationManager, IJavaScriptLibraryHelper javaScript, IHostSettings hostSettings, IPortalController portalController)
             : this(navigationManager, javaScript, hostSettings, portalController, null, null, null)
         {
+		Logger.LogDebug(">>> Entering EditUser(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},portalController={PortalController})", navigationManager, javaScript, hostSettings, portalController);
+		Logger.LogDebug("<<< Exiting EditUser(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},portalController={PortalController})", navigationManager, javaScript, hostSettings, portalController);
+		Logger.LogDebug("EditUser(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},portalController={PortalController},hostSettingsService={HostSettingsService},eventLogger={EventLogger},listController={ListController}): javaScript → {JavaScript1}", navigationManager, javaScript, hostSettings, portalController, hostSettingsService, eventLogger, listController, javaScript);
+		Logger.LogDebug("EditUser(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},portalController={PortalController},hostSettingsService={HostSettingsService},eventLogger={EventLogger},listController={ListController}): portalController → {PortalController1}", navigationManager, javaScript, hostSettings, portalController, hostSettingsService, eventLogger, listController, portalController);
+		Logger.LogDebug("EditUser(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},portalController={PortalController},hostSettingsService={HostSettingsService},eventLogger={EventLogger},listController={ListController}): hostSettingsService → {HostSettingsService1}", navigationManager, javaScript, hostSettings, portalController, hostSettingsService, eventLogger, listController, hostSettingsService);
+		Logger.LogDebug("EditUser(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},portalController={PortalController},hostSettingsService={HostSettingsService},eventLogger={EventLogger},listController={ListController}): eventLogger → {EventLogger1}", navigationManager, javaScript, hostSettings, portalController, hostSettingsService, eventLogger, listController, eventLogger);
         }
 
         /// <summary>Initializes a new instance of the <see cref="EditUser"/> class.</summary>
@@ -212,6 +220,7 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <param name="e">The event arguments.</param>
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.cmdDelete.Click += this.cmdDelete_Click;
@@ -249,16 +258,19 @@ namespace DotNetNuke.Modules.Admin.Users
 
             // Define DisplayName filed Enabled Property:
             object setting = GetSetting(this.UserPortalID, "Security_DisplayNameFormat");
+			Logger.LogDebug("OnInit(e={E}): setting → {Setting}", e, setting);
             if ((setting != null) && (!string.IsNullOrEmpty(Convert.ToString(setting))))
             {
                 this.displayName.Enabled = false;
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>Page_Load runs when the control is loaded.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             try
@@ -268,8 +280,10 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -277,8 +291,10 @@ namespace DotNetNuke.Modules.Admin.Users
         // ReSharper disable once InconsistentNaming
         protected void cmdDelete_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering cmdDelete_Click(sender={Sender},e={E})", sender, e);
             UserInfo user = this.UserInfo;
             var success = false;
+			Logger.LogDebug("cmdDelete_Click(sender={Sender},e={E}): success → {Success}", sender, e, success);
             if (this.PortalSettings.DataConsentActive)
             {
                 switch (this.PortalSettings.DataConsentUserDeleteAction)
@@ -314,6 +330,7 @@ namespace DotNetNuke.Modules.Admin.Users
             // DNN-26777
             PortalSecurity.Instance.SignOut();
             this.Response.Redirect(this.navigationManager.NavigateURL(this.PortalSettings.HomeTabId));
+			Logger.LogDebug("<<< Exiting cmdDelete_Click(sender={Sender},e={E})", sender, e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -321,6 +338,7 @@ namespace DotNetNuke.Modules.Admin.Users
         // ReSharper disable once InconsistentNaming
         protected void cmdUpdate_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering cmdUpdate_Click(sender={Sender},e={E})", sender, e);
             if (this.userForm.IsValid && (this.UserInfo != null))
             {
                 if (this.UserInfo.UserID == this.PortalSettings.AdministratorId)
@@ -344,6 +362,7 @@ namespace DotNetNuke.Modules.Admin.Users
                         var usersWithSameDisplayName = (List<UserInfo>)MembershipProvider.Instance().GetUsersBasicSearch(this.PortalId, 0, 2, "DisplayName", true, "DisplayName", this.UserInfo.DisplayName);
                         if (usersWithSameDisplayName.Any(user => user.UserID != this.UserInfo.UserID))
                         {
+							Logger.LogWarning("Throwing Exception from cmdUpdate_Click(sender={Sender},e={E})", sender, e);
                             throw new Exception("Display Name must be unique");
                         }
                     }
@@ -388,10 +407,12 @@ namespace DotNetNuke.Modules.Admin.Users
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting cmdUpdate_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void BindData()
         {
+			Logger.LogDebug(">>> Entering BindData()");
             if (this.UserInfo != null)
             {
                 // If trying to add a SuperUser - check that user is a SuperUser
@@ -410,6 +431,7 @@ namespace DotNetNuke.Modules.Admin.Users
                     {
                         this.PageNo = 0;
                     }
+					Logger.LogDebug("BindData(): this.PageNo → {Arg0}", this.PageNo);
                 }
 
                 this.userForm.DataSource = this.UserInfo;
@@ -446,7 +468,9 @@ namespace DotNetNuke.Modules.Admin.Users
                 this.dnnServicesDetails.Visible = this.DisplayServices;
 
                 var urlSettings = new FriendlyUrlSettings(this.portalController, this.HostSettings, this.hostSettingsService, this.PortalSettings.PortalId);
+				Logger.LogDebug("BindData(): urlSettings → {UrlSettings}", urlSettings);
                 var showVanityUrl = (Config.GetFriendlyUrlProvider() == "advanced") && !this.UserInfo.IsSuperUser;
+				Logger.LogDebug("BindData(): showVanityUrl → {ShowVanityUrl}", showVanityUrl);
                 if (showVanityUrl)
                 {
                     this.VanityUrlRow.Visible = true;
@@ -454,12 +478,16 @@ namespace DotNetNuke.Modules.Admin.Users
                     {
                         // Clean Display Name
                         var options = UrlRewriterUtils.GetOptionsFromSettings(urlSettings);
+						Logger.LogDebug("BindData(): options → {Options}", options);
                         var cleanUrl = FriendlyUrlController.CleanNameForUrl(this.UserInfo.DisplayName, options, out _);
+						Logger.LogDebug("BindData(): cleanUrl → {CleanUrl}", cleanUrl);
                         var uniqueUrl = FriendlyUrlController.ValidateUrl(cleanUrl, -1, this.PortalSettings, out _).ToLowerInvariant();
+						Logger.LogDebug("BindData(): uniqueUrl → {UniqueUrl}", uniqueUrl);
 
                         this.VanityUrlAlias.Text = $"{this.CurrentPortalAlias.HttpAlias}/{urlSettings.VanityUrlPrefix}/";
                         this.VanityUrlTextBox.Text = uniqueUrl;
                         this.ShowVanityUrl = true;
+						Logger.LogDebug("BindData(): this.ShowVanityUrl → {Arg0}", this.ShowVanityUrl);
                     }
                     else
                     {
@@ -473,10 +501,12 @@ namespace DotNetNuke.Modules.Admin.Users
                 this.AddModuleMessage("NoUser", ModuleMessage.ModuleMessageType.YellowWarning, true);
                 this.DisableForm();
             }
+			Logger.LogDebug("<<< Exiting BindData()");
         }
 
         private bool VerifyUserPermissions()
         {
+			Logger.LogDebug(">>> Entering VerifyUserPermissions()");
             if (this.IsHostMenu && !this.UserInfo.IsSuperUser)
             {
                 this.AddModuleMessage("NoUser", ModuleMessage.ModuleMessageType.YellowWarning, true);
@@ -534,42 +564,52 @@ namespace DotNetNuke.Modules.Admin.Users
                 }
             }
 
+			Logger.LogDebug("<<< Exiting VerifyUserPermissions()");
             return true;
         }
 
         private void BindMembership()
         {
+			Logger.LogDebug(">>> Entering BindMembership()");
             this.ctlMembership.User = this.UserInfo;
             this.ctlMembership.DataBind();
             this.AddModuleMessage("UserLockedOut", ModuleMessage.ModuleMessageType.YellowWarning, this.ctlMembership.UserMembership.LockedOut && (!this.Page.IsPostBack));
+			Logger.LogDebug("<<< Exiting BindMembership()");
         }
 
         private void BindUser()
         {
+			Logger.LogDebug(">>> Entering BindUser()");
             this.BindMembership();
+			Logger.LogDebug("<<< Exiting BindUser()");
         }
 
         private void DisableForm()
         {
+			Logger.LogDebug(">>> Entering DisableForm()");
             this.adminTabNav.Visible = false;
             this.dnnProfileDetails.Visible = false;
             this.dnnServicesDetails.Visible = false;
             this.actionsRow.Visible = false;
             this.ctlMembership.Visible = false;
+			Logger.LogDebug("<<< Exiting DisableForm()");
         }
 
         private void UpdateDisplayName()
         {
+			Logger.LogDebug(">>> Entering UpdateDisplayName()");
             // Update DisplayName to conform to Format
             if (!string.IsNullOrEmpty(this.PortalSettings.Registration.DisplayNameFormat))
             {
                 this.UserInfo.UpdateDisplayName(this.PortalSettings.Registration.DisplayNameFormat);
             }
+			Logger.LogDebug("<<< Exiting UpdateDisplayName()");
         }
 
         /// <summary>PasswordQuestionAnswerUpdated runs when the Password Q and A have been updated.</summary>
         private void PasswordQuestionAnswerUpdated(object sender, Password.PasswordUpdatedEventArgs e)
         {
+			Logger.LogDebug(">>> Entering PasswordQuestionAnswerUpdated(sender={Sender},e={E})", sender, e);
             PasswordUpdateStatus status = e.UpdateStatus;
             if (status == PasswordUpdateStatus.Success)
             {
@@ -579,19 +619,23 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.AddModuleMessage(status.ToString(), ModuleMessage.ModuleMessageType.RedError, true);
             }
+			Logger.LogDebug("<<< Exiting PasswordQuestionAnswerUpdated(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>PasswordUpdated runs when the Password has been updated or reset.</summary>
         private void PasswordUpdated(object sender, Password.PasswordUpdatedEventArgs e)
         {
+			Logger.LogDebug(">>> Entering PasswordUpdated(sender={Sender},e={E})", sender, e);
             PasswordUpdateStatus status = e.UpdateStatus;
 
+			Logger.LogDebug("PasswordUpdated(sender={Sender},e={E}): status → {Status}", sender, e, status);
             if (status == PasswordUpdateStatus.Success)
             {
                 // Send Notification to User
                 try
                 {
                     var accessingUser = (UserInfo)HttpContext.Current.Items["UserInfo"];
+					Logger.LogDebug("PasswordUpdated(sender={Sender},e={E}): accessingUser → {AccessingUser}", sender, e, accessingUser);
                     if (accessingUser.UserID != this.UserInfo.UserID)
                     {
                         // The password was changed by someone else
@@ -608,6 +652,7 @@ namespace DotNetNuke.Modules.Admin.Users
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in PasswordUpdated(sender={Sender},e={E}): {Arg2}", sender, e, ex.getMessage());
                     this.AddModuleMessage("PasswordMailError", ModuleMessage.ModuleMessageType.YellowWarning, true);
                     Exceptions.LogException(ex);
                 }
@@ -616,15 +661,18 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.AddModuleMessage(status.ToString(), ModuleMessage.ModuleMessageType.RedError, true);
             }
+			Logger.LogDebug("<<< Exiting PasswordUpdated(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>ProfileUpdateCompleted runs when the Profile has been updated.</summary>
         private void ProfileUpdateCompleted(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering ProfileUpdateCompleted(sender={Sender},e={E})", sender, e);
             // Notify the user that his/her profile was updated
             Mail.SendMail(this.UserInfo, MessageType.ProfileUpdated, this.PortalSettings);
 
             ProfilePropertyDefinition localeProperty = this.UserInfo.Profile.GetProperty("PreferredLocale");
+			Logger.LogDebug("ProfileUpdateCompleted(sender={Sender},e={E}): localeProperty → {LocaleProperty}", sender, e, localeProperty);
             if (localeProperty.IsDirty)
             {
                 // store PreferredLocale in cookie, if none specified set to portal default.
@@ -641,10 +689,12 @@ namespace DotNetNuke.Modules.Admin.Users
             // Redirect to same page (this will update all controls for any changes to profile
             // and leave us at Page 0 (User Credentials)
             this.Response.Redirect(this.Request.RawUrl, true);
+			Logger.LogDebug("<<< Exiting ProfileUpdateCompleted(sender={Sender},e={E})", sender, e);
         }
 
         private void SubscriptionUpdated(object sender, MemberServices.SubscriptionUpdatedEventArgs e)
         {
+			Logger.LogDebug(">>> Entering SubscriptionUpdated(sender={Sender},e={E})", sender, e);
             string message;
             if (e.Cancel)
             {
@@ -656,6 +706,7 @@ namespace DotNetNuke.Modules.Admin.Users
             }
 
             this.AddLocalizedModuleMessage(message, ModuleMessage.ModuleMessageType.GreenSuccess, true);
+			Logger.LogDebug("<<< Exiting SubscriptionUpdated(sender={Sender},e={E})", sender, e);
         }
     }
 }

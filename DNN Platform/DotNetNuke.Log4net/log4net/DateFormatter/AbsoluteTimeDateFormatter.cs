@@ -52,6 +52,7 @@ namespace log4net.DateFormatter
         /// </remarks>
         protected virtual void FormatDateWithoutMillis(DateTime dateToFormat, StringBuilder buffer)
         {
+			value.LogDebug(">>> Entering FormatDateWithoutMillis(dateToFormat={DateToFormat},buffer={Buffer})", dateToFormat, buffer);
             int hour = dateToFormat.Hour;
             if (hour < 10) 
             {
@@ -74,6 +75,7 @@ namespace log4net.DateFormatter
                 buffer.Append('0');
             }
             buffer.Append(secs);
+			value.LogDebug("<<< Exiting FormatDateWithoutMillis(dateToFormat={DateToFormat},buffer={Buffer})", dateToFormat, buffer);
         }
 
         /// <summary>
@@ -96,12 +98,16 @@ namespace log4net.DateFormatter
         /// </remarks>
         public virtual void FormatDate(DateTime dateToFormat, TextWriter writer)
         {
+					value.LogDebug(">>> Entering FormatDate(dateToFormat={DateToFormat},writer={Writer})", dateToFormat, writer);
+					value.LogDebug("<<< Exiting FormatDate(dateToFormat={DateToFormat},writer={Writer})", dateToFormat, writer);
                     lock (s_lastTimeStrings)
             {
             // Calculate the current time precise only to the second
             long currentTimeToTheSecond = (dateToFormat.Ticks - (dateToFormat.Ticks % TimeSpan.TicksPerSecond));
+			value.LogDebug("FormatDate(dateToFormat={DateToFormat},writer={Writer}): currentTimeToTheSecond → {CurrentTimeToTheSecond}", dateToFormat, writer, currentTimeToTheSecond);
 
                         string timeString = null;
+						value.LogDebug("FormatDate(dateToFormat={DateToFormat},writer={Writer}): timeString → {TimeString}", dateToFormat, writer, timeString);
             // Compare this time with the stored last time
             // If we are in the same second then append
             // the previously calculated time string
@@ -128,6 +134,7 @@ namespace log4net.DateFormatter
                                         {
                         // We are in a new second.
                         s_lastTimeBuf.Length = 0;
+						value.LogDebug("FormatDate(dateToFormat={DateToFormat},writer={Writer}): s_lastTimeBuf.Length → {Arg2}", dateToFormat, writer, s_lastTimeBuf.Length);
 
                         // Calculate the new string for this second
                         this.FormatDateWithoutMillis(dateToFormat, s_lastTimeBuf);
@@ -143,6 +150,7 @@ namespace log4net.DateFormatter
                         // Store the time as a string (we only have to do this once per second)
                                                 s_lastTimeStrings[this.GetType()] = timeString;
                         s_lastTimeToTheSecond = currentTimeToTheSecond;
+						value.LogDebug("FormatDate(dateToFormat={DateToFormat},writer={Writer}): s_lastTimeToTheSecond → {S_lastTimeToTheSecond}", dateToFormat, writer, s_lastTimeToTheSecond);
                     }
                 }
             }

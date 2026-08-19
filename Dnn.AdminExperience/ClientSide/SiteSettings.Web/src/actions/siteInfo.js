@@ -1,8 +1,11 @@
 import { siteInfo as ActionTypes } from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
+const logger = console;
 
 const siteInfoActions = {
     updatePortalId(portalId) {
+		logger.debug(`>>> Entering updatePortalId(portalId=${portalId})`);
+		logger.debug(`<<< Exiting updatePortalId(portalId=${portalId})`);
         return {
             type: ActionTypes.CHANGED_PORTAL_ID,
             data: {
@@ -11,6 +14,8 @@ const siteInfoActions = {
         };
     },
     getPortals(callback) {
+		logger.debug(`>>> Entering getPortals(callback=${callback})`);
+		logger.debug(`<<< Exiting getPortals(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getPortals(data => {
                 dispatch({
@@ -26,6 +31,8 @@ const siteInfoActions = {
         };
     },
     getPortalSettings(portalId, cultureCode, callback) {
+		logger.debug(`>>> Entering getPortalSettings(portalId=${portalId},cultureCode=${cultureCode},callback=${callback})`);
+		logger.debug(`<<< Exiting getPortalSettings(portalId=${portalId},cultureCode=${cultureCode},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getPortalSettings(portalId, cultureCode, data => {
                 dispatch({
@@ -44,6 +51,8 @@ const siteInfoActions = {
         };
     },
     updatePortalSettings(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updatePortalSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updatePortalSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updatePortalSettings(payload, data => {
                 dispatch({
@@ -63,6 +72,8 @@ const siteInfoActions = {
         };
     },
     portalSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering portalSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting portalSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SITESETTINGS_PORTAL_SETTINS_CLIENT_MODIFIED,

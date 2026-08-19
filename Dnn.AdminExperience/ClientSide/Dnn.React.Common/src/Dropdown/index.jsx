@@ -5,12 +5,14 @@ import Scrollbars from "react-custom-scrollbars";
 import {ArrowDownIcon} from "../SvgIcons";
 import scroll from "scroll";
 import "./style.less";
+const logger = console;
 
 const DNN_DROPDOWN_MINHEIGHT = 100;
 
 class Dropdown extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             dropDownOpen: false,
             dropdownText: "",
@@ -18,10 +20,13 @@ class Dropdown extends Component {
             selectedOption: {}
         };
         this.handleClick = this.handleClick.bind(this);
+		logger.debug(`constructor(): this.state → ${this.state}`);
         this.uniqueId = Date.now() * Math.random();
+		logger.debug('<<< Exiting constructor()');
     }
 
     toggleDropdown() {
+		logger.debug('>>> Entering toggleDropdown()');
         const {props} = this;
         if (props.enabled) {
 
@@ -39,6 +44,7 @@ class Dropdown extends Component {
             });
         }
         else {
+			logger.debug('<<< Exiting toggleDropdown()');
             this.setState({
                 dropDownOpen: false
             });
@@ -46,26 +52,35 @@ class Dropdown extends Component {
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const { props } = this;
         if (props.isDropDownOpen !== prevProps.isDropDownOpen) {
             this.setState({dropDownOpen: !props.isDropDownOpen}, () => this.toggleDropdown(true));
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
         }
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {props} = this;
         if (props.closeOnClick) {
             document.addEventListener("mousedown", this.handleClick);
         }
         this._isMounted = true;
+		logger.debug(`componentDidMount(): this._isMounted → ${this._isMounted}`);
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         document.removeEventListener("mousedown", this.handleClick);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`);
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     handleClick(event) {
+		logger.debug(`>>> Entering handleClick(event=${event})`);
         const {props} = this;
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
@@ -80,6 +95,7 @@ class Dropdown extends Component {
                 dropdownText: ""
             });
         }
+		logger.debug(`<<< Exiting handleClick(event=${event})`);
     }
 
     onSelect(option) {
@@ -107,6 +123,7 @@ class Dropdown extends Component {
      * @returns {string}
      */
     getClassName() {
+		logger.debug('>>> Entering getClassName()');
         const {props, state} = this;
         let className = "dnn-dropdown";
 
@@ -122,10 +139,12 @@ class Dropdown extends Component {
         else {
             className += (state.dropDownOpen ? " open" : "");
         }
+		logger.debug('<<< Exiting getClassName()');
         return className;
     }
 
     getDropdownLabel() {
+		logger.debug('>>> Entering getDropdownLabel()');
         const {props} = this;
         let label = props.label;
         if (props.value !== undefined && props.options !== undefined && props.options.length > 0) {
@@ -136,6 +155,7 @@ class Dropdown extends Component {
                 label = selectedValue.label;
             }
         }
+		logger.debug('<<< Exiting getDropdownLabel()');
         return (props.prependWith ?
             <span className="dropdown-prepend"><strong>{props.prependWith}</strong> {label}</span> : label);
     }
@@ -286,7 +306,9 @@ class Dropdown extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={this.getClassName()} style={props.style} ref={node => this.node = node}>
                 <div className={"collapsible-label" + this.getIsMultiLineLabel()}
