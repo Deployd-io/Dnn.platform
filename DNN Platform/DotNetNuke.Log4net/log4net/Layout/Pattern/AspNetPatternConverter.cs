@@ -60,6 +60,7 @@ namespace log4net.Layout.Pattern
     {
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			value.LogError(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             if (HttpContext.Current == null)
             {
                 writer.Write(SystemInfo.NotAvailableText);
@@ -68,6 +69,7 @@ namespace log4net.Layout.Pattern
             {
                 this.Convert(writer, loggingEvent, HttpContext.Current);
             }
+			value.LogWarning("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
 
         /// <summary>

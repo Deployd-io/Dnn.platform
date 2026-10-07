@@ -17,13 +17,18 @@ namespace DotNetNuke.Web.UI.WebControls
         where TOwner : Control
         where TChildren : Control
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UniformControlCollection));
         private readonly TOwner owner;
 
         /// <summary>Initializes a new instance of the <see cref="UniformControlCollection{TOwner, TChildren}"/> class.</summary>
         /// <param name="owner">The owner control.</param>
         internal UniformControlCollection(TOwner owner)
         {
+			Logger.LogError(">>> Entering UniformControlCollection(owner={Owner})", owner);
             this.owner = owner;
+			Logger.LogDebug("UniformControlCollection(owner={Owner}): owner → {Owner1}", owner, owner);
+        Logger.LogDebug("UniformControlCollection(owner={Owner}): this.owner → {Arg1}", owner, this.owner);
+        Logger.LogWarning("<<< Exiting UniformControlCollection(owner={Owner})", owner);
         }
 
         /// <summary>Gets the number of elements contained in the <see cref="ICollection{T}" />.</summary>
@@ -81,7 +86,9 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <param name="childControl">The <typeparamref name="TChildren"/> to add to the collection.</param>
         public void AddAt(int index, TChildren childControl)
         {
+			Logger.LogError(">>> Entering AddAt(index={Index},childControl={ChildControl})", index, childControl);
             this.owner.Controls.AddAt(index, childControl);
+			Logger.LogWarning("<<< Exiting AddAt(index={Index},childControl={ChildControl})", index, childControl);
         }
 
         /// <summary>Determines the index of a specific item in the <see cref="IList{T}" />.</summary>
@@ -93,6 +100,8 @@ namespace DotNetNuke.Web.UI.WebControls
         /// </param>
         public int IndexOf(TChildren item)
         {
+			Logger.LogError(">>> Entering IndexOf(item={Item})", item);
+            Logger.LogWarning("<<< Exiting IndexOf(item={Item})", item);
             return this.owner.Controls.IndexOf(item);
         }
 
@@ -110,7 +119,9 @@ namespace DotNetNuke.Web.UI.WebControls
         /// </exception>
         public void Insert(int index, TChildren item)
         {
+			Logger.LogError(">>> Entering Insert(index={Index},item={Item})", index, item);
             this.owner.Controls.AddAt(index, item);
+			Logger.LogWarning("<<< Exiting Insert(index={Index},item={Item})", index, item);
         }
 
         /// <summary>Removes the <see cref="IList{T}" /> item at the specified index.</summary>
@@ -124,7 +135,9 @@ namespace DotNetNuke.Web.UI.WebControls
         /// </exception>
         public void RemoveAt(int index)
         {
+			Logger.LogError(">>> Entering RemoveAt(index={Index})", index);
             this.owner.Controls.RemoveAt(index);
+			Logger.LogWarning("<<< Exiting RemoveAt(index={Index})", index);
         }
 
         /// <summary>Removes the first occurrence of a specific object from the <see cref="ICollection{T}" />.</summary>
@@ -139,7 +152,9 @@ namespace DotNetNuke.Web.UI.WebControls
         /// </exception>
         public bool Remove(TChildren item)
         {
+			Logger.LogError(">>> Entering Remove(item={Item})", item);
             this.owner.Controls.Remove(item);
+			Logger.LogWarning("<<< Exiting Remove(item={Item})", item);
             return true;
         }
 
@@ -150,11 +165,14 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <filterpriority>1.</filterpriority>
         public IEnumerator<TChildren> GetEnumerator()
         {
+			Logger.LogError(">>> Entering GetEnumerator()");
             var enumerator = this.owner.Controls.GetEnumerator();
+			Logger.LogError("GetEnumerator(): enumerator → {Enumerator}", enumerator);
             while (enumerator.MoveNext())
             {
                 yield return enumerator.Current as TChildren;
             }
+			Logger.LogWarning("<<< Exiting GetEnumerator()");
         }
 
         /// <summary>Removes all items from the <see cref="ICollection{T}" />.</summary>
@@ -163,10 +181,12 @@ namespace DotNetNuke.Web.UI.WebControls
         /// </exception>
         public void Clear()
         {
+			Logger.LogError(">>> Entering Clear()");
             if (this.owner.HasControls())
             {
                 this.owner.Controls.Clear();
             }
+			Logger.LogWarning("<<< Exiting Clear()");
         }
 
         /// <summary>Adds an item to the <see cref="ICollection{T}" />.</summary>
@@ -178,7 +198,9 @@ namespace DotNetNuke.Web.UI.WebControls
         /// </exception>
         public void Add(TChildren item)
         {
+			Logger.LogError(">>> Entering Add(item={Item})", item);
             this.owner.Controls.Add(item);
+			Logger.LogWarning("<<< Exiting Add(item={Item})", item);
         }
 
         /// <summary>Copies the elements of the <see cref="ICollection{T}" /> to an <see cref="System.Array" />, starting at a particular <see cref="System.Array" /> index.</summary>
@@ -202,11 +224,14 @@ namespace DotNetNuke.Web.UI.WebControls
         /// </exception>
         public void CopyTo(TChildren[] array, int arrayIndex)
         {
+			Logger.LogError(">>> Entering CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
             var enumerator = this.GetEnumerator();
+			Logger.LogError("CopyTo(array={Array},arrayIndex={ArrayIndex}): enumerator → {Enumerator}", array, arrayIndex, enumerator);
             while (enumerator.MoveNext())
             {
                 array.SetValue(enumerator.Current, Math.Max(Interlocked.Increment(ref arrayIndex), arrayIndex - 1));
             }
+			Logger.LogWarning("<<< Exiting CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
         }
 
         /// <summary>Determines whether the <see cref="ICollection{T}" /> contains a specific value.</summary>
@@ -218,6 +243,8 @@ namespace DotNetNuke.Web.UI.WebControls
         /// </param>
         public bool Contains(TChildren item)
         {
+			Logger.LogError(">>> Entering Contains(item={Item})", item);
+            Logger.LogWarning("<<< Exiting Contains(item={Item})", item);
             return this.owner.Controls.Contains(item);
         }
 
@@ -234,6 +261,8 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <filterpriority>2.</filterpriority>
         private IEnumerator EnumerableGetEnumerator()
         {
+			Logger.LogError(">>> Entering EnumerableGetEnumerator()");
+            Logger.LogWarning("<<< Exiting EnumerableGetEnumerator()");
             return this.owner.Controls.GetEnumerator();
         }
     }

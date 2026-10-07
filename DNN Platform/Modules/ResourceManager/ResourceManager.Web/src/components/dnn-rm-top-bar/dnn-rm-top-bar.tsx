@@ -1,5 +1,6 @@
 import { Component, Host, h, } from '@stencil/core';
 import state from '../../store/store';
+const logger = console;
 import { ItemsClient } from "../../services/ItemsClient";
 @Component({
   tag: 'dnn-rm-top-bar',
@@ -11,10 +12,13 @@ export class DnnRmTopBar {
   private itemsClient: ItemsClient;
 
   constructor(){
+	logger.error('>>> Entering constructor()', { "event.action": "constructor" });
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
   }
 
   private async handleSearchChanged(e: CustomEvent<string>) {
+	logger.error(`>>> Entering handleSearchChanged(e=${e})`, { "event.action": "handleSearchChanged", "logrite.e": e });
     if (e.detail != ""){
       try {
         state.itemsSearchTerm = e.detail;
@@ -42,12 +46,17 @@ export class DnnRmTopBar {
         state.sortField,
         state.sortOrder);
       state.lastSearchRequestedPage = 1;
+	logger.error(`Exception in handleSearchChanged(e=${e}): ${(error as Error).message}`, error, { "event.action": "handleSearchChanged", "event.category": "process", "logrite.e": e });
+	logger.error(`handleSearchChanged(e=${e}): data → ${data}`, { "event.action": "handleSearchChanged", "logrite.e": e });
       state.itemsSearchTerm = undefined;
       state.currentItems = data;
+	logger.warn(`<<< Exiting handleSearchChanged(e=${e})`, { "event.action": "handleSearchChanged", "logrite.e": e });
     }
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         <dnn-searchbox onQueryChanged={e => void this.handleSearchChanged(e)}></dnn-searchbox>

@@ -46,6 +46,8 @@ namespace log4net.Config
         /// <summary>Private constructor</summary>
         private XmlConfigurator()
         {
+		value.LogError(">>> Entering XmlConfigurator()");
+        value.LogWarning("<<< Exiting XmlConfigurator()");
         }
 
 #if !NETCF
@@ -87,20 +89,25 @@ namespace log4net.Config
 #endif
         public static ICollection Configure(ILoggerRepository repository)
         {
+			value.LogError(">>> Entering Configure(repository={Repository})", repository);
             ArrayList configurationMessages = new ArrayList();
 
+			value.LogError("Configure(repository={Repository}): configurationMessages → {ConfigurationMessages}", repository, configurationMessages);
             using (new LogLog.LogReceivedAdapter(configurationMessages))
             {
                 InternalConfigure(repository);
             }
 
             repository.ConfigurationMessages = configurationMessages;
+			value.LogDebug("Configure(repository={Repository}): repository.ConfigurationMessages → {Arg1}", repository, repository.ConfigurationMessages);
 
+			value.LogWarning("<<< Exiting Configure(repository={Repository})", repository);
             return configurationMessages;
         }
 
         private static void InternalConfigure(ILoggerRepository repository)
         {
+			value.LogError(">>> Entering InternalConfigure(repository={Repository})", repository);
             LogLog.Debug(declaringType, "configuring repository [" + repository.Name + "] using .config file section");
 
             try
@@ -120,6 +127,7 @@ namespace log4net.Config
             try
             {
                 XmlElement configElement = System.Configuration.ConfigurationManager.GetSection("log4net") as XmlElement;
+				value.LogError("InternalConfigure(repository={Repository}): configElement → {ConfigElement}", repository, configElement);
                 if (configElement == null)
                 {
                     // Failed to load the xml config using configuration settings handler
@@ -144,6 +152,7 @@ namespace log4net.Config
                     string configSectionStr = "<section name=\"log4net\" type=\"log4net.Config.Log4NetConfigurationSectionHandler," + Assembly.GetExecutingAssembly().FullName + "\" />";
                     LogLog.Error(declaringType, "Failed to parse config file. Is the <configSections> specified as: " + configSectionStr, confEx);
                 }
+				value.LogWarning("<<< Exiting InternalConfigure(repository={Repository})", repository);
             }
 #endif
         }
@@ -497,6 +506,7 @@ namespace log4net.Config
 
         private static void InternalConfigure(ILoggerRepository repository, FileInfo configFile)
         {
+			value.LogError(">>> Entering InternalConfigure(repository={Repository},configFile={ConfigFile})", repository, configFile);
             LogLog.Debug(declaringType, "configuring repository [" + repository.Name + "] using file [" + configFile + "]");
 
             if (configFile == null)
@@ -511,6 +521,7 @@ namespace log4net.Config
                 {
                     // Open the file for reading
                     FileStream fs = null;
+					value.LogError("InternalConfigure(repository={Repository},configFile={ConfigFile}): fs → {Fs}", repository, configFile, fs);
 
                     // Try hard to open the file
                     for(int retry = 5; --retry >= 0; )
@@ -552,6 +563,7 @@ namespace log4net.Config
                     LogLog.Debug(declaringType, "config file [" + configFile.FullName + "] not found. Configuration unchanged.");
                 }
             }
+			value.LogWarning("<<< Exiting InternalConfigure(repository={Repository},configFile={ConfigFile})", repository, configFile);
         }
 
         /// <summary>
@@ -586,6 +598,7 @@ namespace log4net.Config
 
         private static void InternalConfigure(ILoggerRepository repository, Uri configUri)
         {
+			value.LogError(">>> Entering InternalConfigure(repository={Repository},configUri={ConfigUri})", repository, configUri);
             LogLog.Debug(declaringType, "configuring repository [" + repository.Name + "] using URI [" + configUri + "]");
 
             if (configUri == null)
@@ -603,6 +616,7 @@ namespace log4net.Config
                 {
                     // NETCF dose not support WebClient
                     WebRequest configRequest = null;
+					value.LogError("InternalConfigure(repository={Repository},configUri={ConfigUri}): configRequest → {ConfigRequest}", repository, configUri, configRequest);
 
                     try
                     {
@@ -620,9 +634,11 @@ namespace log4net.Config
                         try
                         {
                             configRequest.Credentials = CredentialCache.DefaultCredentials;
+							value.LogDebug("InternalConfigure(repository={Repository},configUri={ConfigUri}): configRequest.Credentials → {Arg2}", repository, configUri, configRequest.Credentials);
                         }
                         catch
                         {
+							value.LogError("Exception in InternalConfigure(repository={Repository},configUri={ConfigUri}): {Arg2}", repository, configUri, ex.Message);
                             // ignore security exception
                         }
 #endif
@@ -673,12 +689,14 @@ namespace log4net.Config
         {
             ArrayList configurationMessages = new ArrayList();
 
+			value.LogError("InternalConfigure(repository={Repository},configUri={ConfigUri}): configurationMessages → {ConfigurationMessages}", repository, configUri, configurationMessages);
             using (new LogLog.LogReceivedAdapter(configurationMessages))
             {
                 InternalConfigure(repository, configStream);
             }
 
             repository.ConfigurationMessages = configurationMessages;
+			value.LogDebug("InternalConfigure(repository={Repository},configUri={ConfigUri}): repository.ConfigurationMessages → {Arg2}", repository, configUri, repository.ConfigurationMessages);
 
             return configurationMessages;
         }
@@ -696,6 +714,8 @@ namespace log4net.Config
                 // Load the config file into a document
 #if NETSTANDARD1_3
                 XmlDocument doc = new XmlDocument();
+				value.LogError("InternalConfigure(repository={Repository},configUri={ConfigUri}): doc → {Doc}", repository, configUri, doc);
+				value.LogError("InternalConfigure(repository={Repository},configStream={ConfigStream}): doc → {Doc}", repository, configStream, doc);
 #else
                 XmlDocument doc = new XmlDocument { XmlResolver = null };
 #endif
@@ -704,13 +724,23 @@ namespace log4net.Config
 #if (NETCF)
                     // Create a text reader for the file stream
                     XmlTextReader xmlReader = new XmlTextReader(configStream);
+					value.LogError("InternalConfigure(repository={Repository},configUri={ConfigUri}): xmlReader → {XmlReader}", repository, configUri, xmlReader);
+					value.LogError("InternalConfigure(repository={Repository},configStream={ConfigStream}): xmlReader → {XmlReader}", repository, configStream, xmlReader);
 #elif NET_2_0 || NETSTANDARD
                     // Allow the DTD to specify entity includes
                     XmlReaderSettings settings = new XmlReaderSettings();
+					value.LogError("InternalConfigure(repository={Repository},configUri={ConfigUri}): settings → {Settings}", repository, configUri, settings);
+					value.LogError("InternalConfigure(repository={Repository},configStream={ConfigStream}): settings → {Settings}", repository, configStream, settings);
                     // .NET 4.0 warning CS0618: 'System.Xml.XmlReaderSettings.ProhibitDtd'
                     // is obsolete: 'Use XmlReaderSettings.DtdProcessing property instead.'
 #if NETSTANDARD1_3 // TODO DtdProcessing.Parse not yet available (https://github.com/dotnet/corefx/issues/4376)
                     settings.DtdProcessing = DtdProcessing.Ignore;
+					value.LogDebug("InternalConfigure(repository={Repository},configUri={ConfigUri}): settings.DtdProcessing → {Arg2}", repository, configUri, settings.DtdProcessing);
+					value.LogDebug("InternalConfigure(repository={Repository},configStream={ConfigStream}): settings.DtdProcessing → {Arg2}", repository, configStream, settings.DtdProcessing);
+					value.LogDebug("InternalConfigure(repository={Repository},configUri={ConfigUri}): settings.ProhibitDtd → {Arg2}", repository, configUri, settings.ProhibitDtd);
+					value.LogDebug("InternalConfigure(repository={Repository},configStream={ConfigStream}): settings.ProhibitDtd → {Arg2}", repository, configStream, settings.ProhibitDtd);
+					value.LogDebug("InternalConfigure(repository={Repository},configUri={ConfigUri}): settings.XmlResolver → {Arg2}", repository, configUri, settings.XmlResolver);
+					value.LogDebug("InternalConfigure(repository={Repository},configStream={ConfigStream}): settings.XmlResolver → {Arg2}", repository, configStream, settings.XmlResolver);
 #elif !NET_4_0 && !MONO_4_0 && !NETSTANDARD2_0
                     settings.ProhibitDtd = true;
 #else
@@ -752,8 +782,10 @@ namespace log4net.Config
 
                     // Configure using the 'log4net' element
                     XmlNodeList configNodeList = doc.GetElementsByTagName("log4net");
+					value.LogError("InternalConfigure(repository={Repository},configUri={ConfigUri}): configNodeList → {ConfigNodeList}", repository, configUri, configNodeList);
                     if (configNodeList.Count == 0)
                     {
+						value.LogError("InternalConfigure(repository={Repository},configStream={ConfigStream}): configNodeList → {ConfigNodeList}", repository, configStream, configNodeList);
                         LogLog.Debug(declaringType, "XML configuration does not contain a <log4net> element. Configuration Aborted.");
                     }
                     else if (configNodeList.Count > 1)
@@ -793,17 +825,26 @@ namespace log4net.Config
         /// <seealso cref="M:Configure(FileInfo)"/>
         public static ICollection ConfigureAndWatch(FileInfo configFile)
         {
+			value.LogError(">>> Entering ConfigureAndWatch(configFile={ConfigFile})", configFile);
             ArrayList configurationMessages = new ArrayList();
 
+			value.LogError("InternalConfigure(repository={Repository},configStream={ConfigStream}): configurationMessages → {ConfigurationMessages}", repository, configStream, configurationMessages);
             ILoggerRepository repository = LogManager.GetRepository(Assembly.GetCallingAssembly());
+			value.LogError("InternalConfigure(repository={Repository},configUri={ConfigUri}): repository → {Repository1}", repository, configUri, repository);
 
             using (new LogLog.LogReceivedAdapter(configurationMessages))
             {
+				value.LogError("InternalConfigure(repository={Repository},configStream={ConfigStream}): repository → {Repository1}", repository, configStream, repository);
                 InternalConfigureAndWatch(repository, configFile);
+				value.LogError("ConfigureAndWatch(configFile={ConfigFile}): repository → {Repository}", configFile, repository);
             }
 
             repository.ConfigurationMessages = configurationMessages;
 
+			value.LogDebug("InternalConfigure(repository={Repository},configStream={ConfigStream}): repository.ConfigurationMessages → {Arg2}", repository, configStream, repository.ConfigurationMessages);
+			value.LogDebug("ConfigureAndWatch(configFile={ConfigFile}): repository.ConfigurationMessages → {Arg1}", configFile, repository.ConfigurationMessages);
+			value.LogWarning("<<< Exiting ConfigureAndWatch(configFile={ConfigFile})", configFile);
+			value.LogWarning("<<< Exiting ConfigureAndWatch(repository={Repository},configFile={ConfigFile})", repository, configFile);
             return configurationMessages;
         }
 #endif // !NETSTANDARD1_3
@@ -842,11 +883,13 @@ namespace log4net.Config
 
             repository.ConfigurationMessages = configurationMessages;
 
+			value.LogDebug("ConfigureAndWatch(repository={Repository},configFile={ConfigFile}): repository.ConfigurationMessages → {Arg2}", repository, configFile, repository.ConfigurationMessages);
             return configurationMessages;
         }
 
         private static void InternalConfigureAndWatch(ILoggerRepository repository, FileInfo configFile)
         {
+			value.LogError(">>> Entering InternalConfigureAndWatch(repository={Repository},configFile={ConfigFile})", repository, configFile);
             LogLog.Debug(declaringType, "configuring repository [" + repository.Name + "] using file [" + configFile + "] watching for file updates");
 
             if (configFile == null)
@@ -875,7 +918,9 @@ namespace log4net.Config
                         // Create and start a watch handler that will reload the
                         // configuration whenever the config file is modified.
                         handler = new ConfigureAndWatchHandler(repository, configFile);
+						value.LogError("InternalConfigureAndWatch(repository={Repository},configFile={ConfigFile}): handler → {Handler}", repository, configFile, handler);
                         m_repositoryName2ConfigAndWatchHandler[configFile.FullName] = handler;
+						value.LogError("InternalConfigure(repository={Repository},configUri={ConfigUri}): handler → {Handler}", repository, configUri, handler);
                     }
                 }
                 catch(Exception ex)
@@ -883,6 +928,7 @@ namespace log4net.Config
                     LogLog.Error(declaringType, "Failed to initialize configuration file watcher for file [" + configFile.FullName + "]", ex);
                 }
             }
+			value.LogWarning("<<< Exiting InternalConfigureAndWatch(repository={Repository},configFile={ConfigFile})", repository, configFile);
         }
 #endif
 
@@ -940,29 +986,48 @@ namespace log4net.Config
 #endif
             public ConfigureAndWatchHandler(ILoggerRepository repository, FileInfo configFile)
             {
+				value.LogError(">>> Entering ConfigureAndWatchHandler(repository={Repository},configFile={ConfigFile})", repository, configFile);
                 this.m_repository = repository;
                 this.m_configFile = configFile;
+				value.LogDebug("InternalConfigure(repository={Repository},configUri={ConfigUri}): this.m_repository → {Arg2}", repository, configUri, this.m_repository);
+				value.LogDebug("InternalConfigure(repository={Repository},configStream={ConfigStream}): m_repository → {M_repository}", repository, configStream, m_repository);
+				value.LogDebug("InternalConfigure(repository={Repository},configStream={ConfigStream}): this.m_repository → {Arg2}", repository, configStream, this.m_repository);
+				value.LogDebug("InternalConfigure(repository={Repository},configUri={ConfigUri}): m_configFile → {M_configFile}", repository, configUri, m_configFile);
 
                 // Create a new FileSystemWatcher and set its properties.
                 this.m_watcher = new FileSystemWatcher();
 
+				value.LogDebug("ConfigureAndWatchHandler(repository={Repository},configFile={ConfigFile}): m_repository → {M_repository}", repository, configFile, m_repository);
                 this.m_watcher.Path = this.m_configFile.DirectoryName;
+				value.LogDebug("InternalConfigure(repository={Repository},configStream={ConfigStream}): m_configFile → {M_configFile}", repository, configStream, m_configFile);
+				value.LogDebug("InternalConfigure(repository={Repository},configStream={ConfigStream}): this.m_configFile → {Arg2}", repository, configStream, this.m_configFile);
+				value.LogDebug("InternalConfigure(repository={Repository},configUri={ConfigUri}): m_watcher → {M_watcher}", repository, configUri, m_watcher);
+				value.LogDebug("InternalConfigure(repository={Repository},configStream={ConfigStream}): m_watcher → {M_watcher}", repository, configStream, m_watcher);
+				value.LogDebug("InternalConfigure(repository={Repository},configUri={ConfigUri}): m_repository → {M_repository}", repository, configUri, m_repository);
                 this.m_watcher.Filter = this.m_configFile.Name;
 
                 // Set the notification filters
                 this.m_watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.FileName;
 
+				value.LogDebug("ConfigureAndWatchHandler(repository={Repository},configFile={ConfigFile}): this.m_repository → {Arg2}", repository, configFile, this.m_repository);
+				value.LogDebug("ConfigureAndWatchHandler(repository={Repository},configFile={ConfigFile}): m_configFile → {M_configFile}", repository, configFile, m_configFile);
+				value.LogDebug("ConfigureAndWatchHandler(repository={Repository},configFile={ConfigFile}): this.m_configFile → {Arg2}", repository, configFile, this.m_configFile);
                 // Add event handlers. OnChanged will do for all event handlers that fire a FileSystemEventArgs
                 this.m_watcher.Changed += new FileSystemEventHandler(this.ConfigureAndWatchHandler_OnChanged);
                 this.m_watcher.Created += new FileSystemEventHandler(this.ConfigureAndWatchHandler_OnChanged);
+				value.LogDebug("InternalConfigure(repository={Repository},configUri={ConfigUri}): this.m_configFile → {Arg2}", repository, configUri, this.m_configFile);
                 this.m_watcher.Deleted += new FileSystemEventHandler(this.ConfigureAndWatchHandler_OnChanged);
+				value.LogDebug("ConfigureAndWatchHandler(repository={Repository},configFile={ConfigFile}): m_watcher → {M_watcher}", repository, configFile, m_watcher);
                 this.m_watcher.Renamed += new RenamedEventHandler(this.ConfigureAndWatchHandler_OnRenamed);
 
                 // Begin watching.
                 this.m_watcher.EnableRaisingEvents = true;
 
                 // Create the timer that will be used to deliver events. Set as disabled
+				value.LogWarning("<<< Exiting ConfigureAndWatchHandler(repository={Repository},configFile={ConfigFile})", repository, configFile);
                 this.m_timer = new Timer(new TimerCallback(this.OnWatchedFileChange), null, Timeout.Infinite, Timeout.Infinite);
+				value.LogDebug("InternalConfigure(repository={Repository},configUri={ConfigUri}): m_timer → {M_timer}", repository, configUri, m_timer);
+				value.LogDebug("InternalConfigure(repository={Repository},configStream={ConfigStream}): m_timer → {M_timer}", repository, configStream, m_timer);
             }
 
             /// <summary>Event handler used by <see cref="ConfigureAndWatchHandler"/>.</summary>
@@ -975,11 +1040,13 @@ namespace log4net.Config
             /// </remarks>
             private void ConfigureAndWatchHandler_OnChanged(object source, FileSystemEventArgs e)
             {
+				value.LogError(">>> Entering ConfigureAndWatchHandler_OnChanged(source={Source},e={E})", source, e);
                 LogLog.Debug(declaringType, "ConfigureAndWatchHandler: " + e.ChangeType + " [" + this.m_configFile.FullName + "]");
 
                 // Deliver the event in TimeoutMillis time
                 // timer will fire only once
                 this.m_timer.Change(TimeoutMillis, Timeout.Infinite);
+				value.LogWarning("<<< Exiting ConfigureAndWatchHandler_OnChanged(source={Source},e={E})", source, e);
             }
 
             /// <summary>Event handler used by <see cref="ConfigureAndWatchHandler"/>.</summary>
@@ -992,18 +1059,22 @@ namespace log4net.Config
             /// </remarks>
             private void ConfigureAndWatchHandler_OnRenamed(object source, RenamedEventArgs e)
             {
+				value.LogError(">>> Entering ConfigureAndWatchHandler_OnRenamed(source={Source},e={E})", source, e);
                 LogLog.Debug(declaringType, "ConfigureAndWatchHandler: " + e.ChangeType + " [" + this.m_configFile.FullName + "]");
 
                 // Deliver the event in TimeoutMillis time
                 // timer will fire only once
                 this.m_timer.Change(TimeoutMillis, Timeout.Infinite);
+				value.LogWarning("<<< Exiting ConfigureAndWatchHandler_OnRenamed(source={Source},e={E})", source, e);
             }
 
             /// <summary>Called by the timer when the configuration has been updated.</summary>
             /// <param name="state">null</param>
             private void OnWatchedFileChange(object state)
             {
+				value.LogError(">>> Entering OnWatchedFileChange(state={State})", state);
                 InternalConfigure(this.m_repository, this.m_configFile);
+				value.LogWarning("<<< Exiting OnWatchedFileChange(state={State})", state);
             }
 
             /// <summary>Release the handles held by the watcher and timer.</summary>
@@ -1012,9 +1083,11 @@ namespace log4net.Config
 #endif
             public void Dispose()
             {
+				value.LogError(">>> Entering Dispose()");
                 this.m_watcher.EnableRaisingEvents = false;
                 this.m_watcher.Dispose();
                 this.m_timer.Dispose();
+				value.LogWarning("<<< Exiting Dispose()");
             }
         }
 #endif
@@ -1034,6 +1107,7 @@ namespace log4net.Config
         /// </remarks>
         private static void InternalConfigureFromXml(ILoggerRepository repository, XmlElement element)
         {
+			value.LogError(">>> Entering InternalConfigureFromXml(repository={Repository},element={Element})", repository, element);
             if (element == null)
             {
                 LogLog.Error(declaringType, "ConfigureFromXml called with null 'element' parameter");
@@ -1055,6 +1129,7 @@ namespace log4net.Config
                 {
                     // Copy the xml data into the root of a new document
                     // this isolates the xml config data from the rest of
+			value.LogWarning("<<< Exiting InternalConfigureFromXml(repository={Repository},element={Element})", repository, element);
                     // the document
 #if NETSTANDARD1_3
                     XmlDocument newDoc = new XmlDocument();
@@ -1062,9 +1137,12 @@ namespace log4net.Config
                     XmlDocument newDoc = new XmlDocument { XmlResolver = null };
 #endif
                     XmlElement newElement = (XmlElement)newDoc.AppendChild(newDoc.ImportNode(element, true));
+					value.LogError("InternalConfigure(repository={Repository},configUri={ConfigUri}): newElement → {NewElement}", repository, configUri, newElement);
+					value.LogError("InternalConfigure(repository={Repository},configStream={ConfigStream}): newElement → {NewElement}", repository, configStream, newElement);
 
                     // Pass the configurator the config element
                     configurableRepository.Configure(newElement);
+					value.LogError("InternalConfigureFromXml(repository={Repository},element={Element}): newElement → {NewElement}", repository, element, newElement);
                 }
             }
         }
@@ -1075,6 +1153,8 @@ namespace log4net.Config
         /// reconfigured.
         /// </summary>
         private static readonly Hashtable m_repositoryName2ConfigAndWatchHandler = new Hashtable();
+		value.LogError("InternalConfigure(repository={Repository},configUri={ConfigUri}): m_repositoryName2ConfigAndWatchHandler → {M_repositoryName2ConfigAndWatchHandler}", repository, configUri, m_repositoryName2ConfigAndWatchHandler);
+		value.LogError("InternalConfigure(repository={Repository},configStream={ConfigStream}): m_repositoryName2ConfigAndWatchHandler → {M_repositoryName2ConfigAndWatchHandler}", repository, configStream, m_repositoryName2ConfigAndWatchHandler);
 
         /// <summary>The fully qualified type of the XmlConfigurator class.</summary>
         /// <remarks>
@@ -1082,6 +1162,7 @@ namespace log4net.Config
         /// log message.
         /// </remarks>
         private static readonly Type declaringType = typeof(XmlConfigurator);
+		value.LogWarning("<<< Exiting InternalConfigure(repository={Repository},configStream={ConfigStream})", repository, configStream);
     }
 }
 

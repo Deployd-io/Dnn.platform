@@ -1,7 +1,10 @@
-﻿(function ($) {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+(function ($) {
     $.fn.dnnModuleDragDrop = function (options) {
+	logger.error(`>>> Entering dnnModuleDragDrop(options=${options})`, { "event.action": "dnnModuleDragDrop", "logrite.options": options });
 
         var isEditMode = $('body').hasClass('dnnEditState');
+		logger.error(`dnnModuleDragDrop(options=${options}): isEditMode → ${isEditMode}`, { "event.action": "dnnModuleDragDrop", "logrite.options": options });
         if (!isEditMode) {
             $(function () {
                 $('.DNNEmptyPane').each(function () {
@@ -13,6 +16,7 @@
                 });
             });
 
+			logger.debug(`dnnModuleDragDrop(options=${options}): this.className → ${this.className}`, { "event.action": "dnnModuleDragDrop", "logrite.options": options });
             return this;
         }
 
@@ -28,6 +32,7 @@
         };
 
         settings = $.extend(settings, options || {});
+		logger.error(`dnnModuleDragDrop(options=${options}): settings → ${settings}`, { "event.action": "dnnModuleDragDrop", "logrite.options": options });
         var $self = this;
         var paneModuleIndex;
         var modulePaneName;
@@ -38,11 +43,14 @@
         var $module;
 
         var getModuleId = function ($mod) {
+			logger.error(`>>> Entering getModuleId($mod=${$mod})`, { "event.action": "getModuleId", "logrite.$mod": $mod });
             var result = $mod.attr("class").match(/\bDnnModule-([0-9]+)\b/);
+			logger.error(`getModuleId($mod=${$mod}): result → ${result}`, { "event.action": "getModuleId", "logrite.$mod": $mod });
             return (result && result.length === 2) ? result[1] : null;
         };
 
         var getModuleIndex = function (moduleId, $pane) {
+			logger.error(`>>> Entering getModuleIndex(moduleId=${moduleId},$pane=${$pane})`, { "event.action": "getModuleIndex", "logrite.moduleId": moduleId, "logrite.$pane": $pane });
             var index = -1;
             var modules = $pane.children(".DnnModule");
             for (var i = 0; i < modules.length; i++) {
@@ -54,12 +62,15 @@
                     break;
                 }
             }
+			logger.error(`getModuleIndex(moduleId=${moduleId},$pane=${$pane}): modules → ${modules}`, { "event.action": "getModuleIndex", "logrite.moduleId": moduleId, "logrite.$pane": $pane });
             return index;
         };
 
         var updateServer = function (moduleId, $pane, callback) {
+			logger.error(`>>> Entering updateServer(moduleId=${moduleId},$pane=${$pane},callback=${callback})`, { "event.action": "updateServer", "logrite.moduleId": moduleId, "logrite.$pane": $pane, "logrite.callback": callback });
             var order;
             var paneName = $pane.attr("id").substring(4);
+			logger.error(`updateServer(moduleId=${moduleId},$pane=${$pane},callback=${callback}): paneName → ${paneName}`, { "event.action": "updateServer", "logrite.moduleId": moduleId, "logrite.$pane": $pane, "logrite.callback": callback });
             var index = getModuleIndex(moduleId, $pane);
 
             if (paneName !== modulePaneName) {
@@ -83,7 +94,9 @@
                 ModuleOrder: order
             };
 
+			logger.error(`updateServer(moduleId=${moduleId},$pane=${$pane},callback=${callback}): dataVar → ${dataVar}`, { "event.action": "updateServer", "logrite.moduleId": moduleId, "logrite.$pane": $pane, "logrite.callback": callback });
             var service = $.dnnSF();
+			logger.warn(`<<< Exiting updateServer(moduleId=${moduleId},$pane=${$pane},callback=${callback})`, { "event.action": "updateServer", "logrite.moduleId": moduleId, "logrite.$pane": $pane, "logrite.callback": callback });
             var serviceUrl = $.dnnSF().getServiceRoot("InternalServices") + "ModuleService/";
             $.ajax({
                 url: serviceUrl + 'MoveModule',
@@ -91,13 +104,16 @@
                 data: dataVar,
                 beforeSend: service.setModuleHeaders,
                 success: function () {
+					logger.error('>>> Entering success()', { "event.action": "success" });
                     if (typeof callback === "function") {
                         callback.call($pane);
                     } else {
                         window.location.reload();
+						logger.warn('<<< Exiting success()', { "event.action": "success" });
                     }
                 },
                 error: function () {
+				logger.error('>>> Entering error()', { "event.action": "error" });
                 }
             });
         };
@@ -148,17 +164,24 @@
                 tolerance: "pointer",
                 /*hoverClass: 'dnnDropTarget',*/
                 over: function (event, ui) {
+					logger.error(`>>> Entering over(event=${event},ui=${ui})`, { "event.action": "over", "logrite.event": event, "logrite.ui": ui });
                     $(this).append("<div class='dnnDropTarget'><p>" + settings.dropTargetText + "(" + $(this).attr("id").substring(4) + ")" + "</p></div>");
+					logger.warn(`<<< Exiting over(event=${event},ui=${ui})`, { "event.action": "over", "logrite.event": event, "logrite.ui": ui });
                 },
                 out: function (event, ui) {
+					logger.error(`>>> Entering out(event=${event},ui=${ui})`, { "event.action": "out", "logrite.event": event, "logrite.ui": ui });
                     $(this).empty();
+					logger.warn(`<<< Exiting out(event=${event},ui=${ui})`, { "event.action": "out", "logrite.event": event, "logrite.ui": ui });
                 },
                 drop: function (event, ui) {
+					logger.error(`>>> Entering drop(event=${event},ui=${ui})`, { "event.action": "drop", "logrite.event": event, "logrite.ui": ui });
                     // add module
                     var dropItem = ui.draggable;
                     var pane = $(this).empty();
+					logger.error(`drop(event=${event},ui=${ui}): pane → ${pane}`, { "event.action": "drop", "logrite.event": event, "logrite.ui": ui });
                     var order = 0;
                     var paneName = pane.attr("id").substring(4);
+					logger.error(`drop(event=${event},ui=${ui}): paneName → ${paneName}`, { "event.action": "drop", "logrite.event": event, "logrite.ui": ui });
                     dropItem.remove();
                     if (dnn.controlBar) {
                         dnn.controlBar.addModule(dnn.controlBar.dragdropModule + '',
@@ -169,6 +192,7 @@
                             dnn.controlBar.dragdropVisibility + '',
                             dnn.controlBar.dragdropAddExistingModule + '',
                             dnn.controlBar.dragdropCopyModule + '');
+							logger.warn(`<<< Exiting drop(event=${event},ui=${ui})`, { "event.action": "drop", "logrite.event": event, "logrite.ui": ui });
                     }
                 }
             });
@@ -203,22 +227,28 @@
             placeholder: "dnnDropTarget",
             tolerance: "pointer",
             helper: function (event, ui) {
+			logger.error(`>>> Entering helper(event=${event},ui=${ui})`, { "event.action": "helper", "logrite.event": event, "logrite.ui": ui });
 
                 var dragTip = $('<div class="dnnDragdropTip ControlBar_DragdropModule"></div>');
+				logger.error(`helper(event=${event},ui=${ui}): dragTip → ${dragTip}`, { "event.action": "helper", "logrite.event": event, "logrite.ui": ui });
                 var title = $('span.Head', ui).html();
+				logger.error(`helper(event=${event},ui=${ui}): title → ${title}`, { "event.action": "helper", "logrite.event": event, "logrite.ui": ui });
                 if (!title)
                     title = "The Dragging Module";
 
                 dragTip.html(title);
                 $('body').append(dragTip);
+				logger.warn(`<<< Exiting helper(event=${event},ui=${ui})`, { "event.action": "helper", "logrite.event": event, "logrite.ui": ui });
                 return dragTip;
             },
 
             start: function (event, ui) {
+				logger.error(`>>> Entering start(event=${event},ui=${ui})`, { "event.action": "start", "logrite.event": event, "logrite.ui": ui });
                 var $pane = ui.item.parent();
                 originalPane = $pane;
 
                 modulePaneName = $pane.attr("id").substring(4);
+				logger.debug(`dnnModuleDragDrop(options=${options}): modulePaneName → ${modulePaneName}`, { "event.action": "dnnModuleDragDrop", "logrite.options": options });
                 mid = getModuleId(ui.item);
                 paneModuleIndex = getModuleIndex(mid, $pane);
 
@@ -227,6 +257,7 @@
                 $dropTarget.append("<p>" + settings.dropTargetText + "(" + modulePaneName + ")" + "</p>");
 
                 $(settings.actionMenu).hide();
+				logger.warn(`<<< Exiting start(event=${event},ui=${ui})`, { "event.action": "start", "logrite.event": event, "logrite.ui": ui });
             },
 
             over: function (event, ui) {
@@ -236,16 +267,22 @@
             },
 
             stop: function (event, ui, callback) {
+				logger.error(`>>> Entering stop(event=${event},ui=${ui},callback=${callback})`, { "event.action": "stop", "logrite.event": event, "logrite.ui": ui, "logrite.callback": callback });
                 var dropItem = ui.item;
+				logger.debug(`dnnModuleDragDrop(options=${options}): mid → ${mid}`, { "event.action": "dnnModuleDragDrop", "logrite.options": options });
                 if (dnn.controlBar && dropItem.hasClass('ControlBar_ModuleDiv')) {
                     // add module
                 	var pane = ui.item.parent();
+					logger.error(`stop(event=${event},ui=${ui},callback=${callback}): pane → ${pane}`, { "event.action": "stop", "logrite.event": event, "logrite.ui": ui, "logrite.callback": callback });
                     var order = -1;
                     var paneName = pane.attr("id").substring(4);
+					logger.error(`stop(event=${event},ui=${ui},callback=${callback}): paneName → ${paneName}`, { "event.action": "stop", "logrite.event": event, "logrite.ui": ui, "logrite.callback": callback });
 	                if ($('div.DnnModule', pane).length > 0) {
 		                var modules = $('div.DnnModule, div.ControlBar_ModuleDiv', pane);
+						logger.error(`stop(event=${event},ui=${ui},callback=${callback}): modules → ${modules}`, { "event.action": "stop", "logrite.event": event, "logrite.ui": ui, "logrite.callback": callback });
 		                for (var i = 0; i < modules.length; i++) {
 			                var module = modules.get(i);
+							logger.error(`stop(event=${event},ui=${ui},callback=${callback}): module → ${module}`, { "event.action": "stop", "logrite.event": event, "logrite.ui": ui, "logrite.callback": callback });
 			                if ($(module).hasClass('ControlBar_ModuleDiv')) {
 				                order = i;
 			                }
@@ -274,6 +311,7 @@
                         originalPane.addClass('dnnDropEmptyPanes');
 
                     if (!callback) {
+						logger.warn(`<<< Exiting stop(event=${event},ui=${ui},callback=${callback})`, { "event.action": "stop", "logrite.event": event, "logrite.ui": ui, "logrite.callback": callback });
                         // show animation
                         dropItem.css('background-color', '#fffacd');
                         setTimeout(function() {

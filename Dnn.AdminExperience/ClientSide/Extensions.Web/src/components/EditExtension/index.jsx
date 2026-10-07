@@ -11,11 +11,13 @@ import EditSettings from "./EditSettings";
 import Localization from "localization";
 import utilities from "utils";
 import styles from "./style.module.less";
+const logger = console;
 
 
 class EditExtension extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             extensionBeingEdited: {
                 type: "",
@@ -30,25 +32,32 @@ class EditExtension extends Component {
             },
             selectedTabIndex: 0
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const { props } = this;
         this.isHost = utilities.settings.isHost;
         if ((!props.moduleCategories || props.moduleCategories.length === 0) && this.isHost) {
+			logger.debug(`UNSAFE_componentWillMount(): this.isHost → ${this.isHost}`, { "event.action": "UNSAFE_componentWillMount" });
             props.dispatch(ExtensionActions.getModuleCategories());
+			logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         }
     }
 
     onVersionChange(index, option) {
+		logger.error(`>>> Entering onVersionChange(index=${index},option=${option})`, { "event.action": "onVersionChange", "logrite.index": index, "logrite.option": option });
         const { props } = this;
         let _extensionBeingEdited = JSON.parse(JSON.stringify(props.extensionBeingEdited));
         if (_extensionBeingEdited.version && _extensionBeingEdited.version.value) {
             let versionArray = _extensionBeingEdited.version.value.split(".");
+			logger.error(`onVersionChange(index=${index},option=${option}): versionArray → ${versionArray}`, { "event.action": "onVersionChange", "logrite.index": index, "logrite.option": option });
             versionArray[index] = option.value;
             _extensionBeingEdited.version.value = versionArray.join(".");
         }
         this.updateExtensionBeingEdited(_extensionBeingEdited);
+		logger.error(`onVersionChange(index=${index},option=${option}): _extensionBeingEdited → ${_extensionBeingEdited}`, { "event.action": "onVersionChange", "logrite.index": index, "logrite.option": option });
     }
 
     onChange(key, event) {
@@ -68,18 +77,24 @@ class EditExtension extends Component {
     }
 
     onAssignedPortalsChange(key, value, callback) {
+		logger.error(`>>> Entering onAssignedPortalsChange(key=${key},value=${value},callback=${callback})`, { "event.action": "onAssignedPortalsChange", "logrite.key": key, "logrite.value": value, "logrite.callback": callback });
         const { props } = this;
         let _extensionBeingEdited = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+		logger.error(`onAssignedPortalsChange(key=${key},value=${value},callback=${callback}): _extensionBeingEdited → ${_extensionBeingEdited}`, { "event.action": "onAssignedPortalsChange", "logrite.key": key, "logrite.value": value, "logrite.callback": callback });
         _extensionBeingEdited[key].value = value;
         this.updateExtensionBeingEdited(_extensionBeingEdited, callback);
+		logger.warn(`<<< Exiting onAssignedPortalsChange(key=${key},value=${value},callback=${callback})`, { "event.action": "onAssignedPortalsChange", "logrite.key": key, "logrite.value": value, "logrite.callback": callback });
     }
 
     updateExtensionBeingEdited(extensionBeingEdited, callback) {
+		logger.error(`>>> Entering updateExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited},callback=${callback})`, { "event.action": "updateExtensionBeingEdited", "logrite.extensionBeingEdited": extensionBeingEdited, "logrite.callback": callback });
         const { props } = this;
         props.dispatch(ExtensionActions.updateExtensionBeingEdited(extensionBeingEdited, callback));
+		logger.warn(`<<< Exiting updateExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited},callback=${callback})`, { "event.action": "updateExtensionBeingEdited", "logrite.extensionBeingEdited": extensionBeingEdited, "logrite.callback": callback });
     }
 
     getAuthSystemCustomSettings(extension) {
+		logger.error(`>>> Entering getAuthSystemCustomSettings(extension=${extension})`, { "event.action": "getAuthSystemCustomSettings", "logrite.extension": extension });
         let payload = {
             loginControlSource: extension.loginControlSource.value,
             logoffControlSource: extension.logoffControlSource.value,
@@ -97,10 +112,12 @@ class EditExtension extends Component {
             delete payload.appEnabled;
         }
 
+		logger.warn(`<<< Exiting getAuthSystemCustomSettings(extension=${extension})`, { "event.action": "getAuthSystemCustomSettings", "logrite.extension": extension });
         return payload;
     }
 
     parseEditorActions(extension) {
+		logger.error(`>>> Entering parseEditorActions(extension=${extension})`, { "event.action": "parseEditorActions", "logrite.extension": extension });
         switch (extension.packageType.value.toLowerCase()) {
             case "module":
                 return extension.desktopModuleId ? {
@@ -141,11 +158,13 @@ class EditExtension extends Component {
                     dependentPackageId: extension.dependentPackageId.value
                 };
             default:
+				logger.warn(`<<< Exiting parseEditorActions(extension=${extension})`, { "event.action": "parseEditorActions", "logrite.extension": extension });
                 return {};
         }
     }
 
     onSaveExtension(close) {
+		logger.error(`>>> Entering onSaveExtension(close=${close})`, { "event.action": "onSaveExtension", "logrite.close": close });
         const {props} = this;
 
         let editorActions = this.parseEditorActions(props.extensionBeingEdited);
@@ -153,26 +172,34 @@ class EditExtension extends Component {
             if (close) {
                 this.selectPanel(0);
                 props.dispatch(ExtensionActions.selectEditingTab(0));
+				logger.warn(`<<< Exiting onSaveExtension(close=${close})`, { "event.action": "onSaveExtension", "logrite.close": close });
             }
         }));
     }
 
     toggleTriedToSave() {
+		logger.error('>>> Entering toggleTriedToSave()', { "event.action": "toggleTriedToSave" });
         const {props} = this;
         props.dispatch(ExtensionActions.toggleTriedToSave());
+		logger.warn('<<< Exiting toggleTriedToSave()', { "event.action": "toggleTriedToSave" });
     }
 
     toggleTabError(tabWithError, action) {
+		logger.error(`>>> Entering toggleTabError(tabWithError=${tabWithError},action=${action})`, { "event.action": "toggleTabError", "logrite.tabWithError": tabWithError, "logrite.action": action });
         const { props } = this;
         props.dispatch(ExtensionActions.toggleTabError(tabWithError, action));
+		logger.warn(`<<< Exiting toggleTabError(tabWithError=${tabWithError},action=${action})`, { "event.action": "toggleTabError", "logrite.tabWithError": tabWithError, "logrite.action": action });
     }
 
     validateFields() {
+		logger.error('>>> Entering validateFields()', { "event.action": "validateFields" });
         const { props } = this;
         let errorCount = 0;
         let _extensionBeingEdited = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+		logger.error(`validateFields(): _extensionBeingEdited → ${_extensionBeingEdited}`, { "event.action": "validateFields" });
         Object.keys(_extensionBeingEdited).forEach((key) => {
             let field = _extensionBeingEdited[key];
+			logger.debug(`validateFields(): field.error → ${field.error}`, { "event.action": "validateFields" });
             if (field.validateRequired && field.value === "") {
                 field.error = true;
                 errorCount++;
@@ -183,24 +210,29 @@ class EditExtension extends Component {
             this.toggleTriedToSave();
         }
         this.updateExtensionBeingEdited(_extensionBeingEdited);
+		logger.warn('<<< Exiting validateFields()', { "event.action": "validateFields" });
         return errorCount === 0;
     }
 
     selectPanel(panel, event) {
+		logger.error(`>>> Entering selectPanel(panel=${panel},event=${event})`, { "event.action": "selectPanel", "logrite.panel": panel, "logrite.event": event });
         if (event) {
             event.preventDefault();
         }
         const {props} = this;
         props.dispatch(VisiblePanelActions.selectPanel(panel));
+		logger.warn(`<<< Exiting selectPanel(panel=${panel},event=${event})`, { "event.action": "selectPanel", "logrite.panel": panel, "logrite.event": event });
     }
 
     _getTabHeaders() {
+		logger.error('>>> Entering _getTabHeaders()', { "event.action": "_getTabHeaders" });
         let tabHeaders = [Localization.get("EditExtension_PackageInformation.TabHeader"),
             Localization.get("EditExtension_ExtensionSettings.TabHeader"),
             Localization.get("EditExtension_SiteSettings.TabHeader"),
             Localization.get("EditExtension_License.TabHeader"),
             Localization.get("EditExtension_ReleaseNotes.TabHeader")];
 
+		logger.error(`_getTabHeaders(): tabHeaders → ${tabHeaders}`, { "event.action": "_getTabHeaders" });
         let siteSettingIndex = 2;
         if (!this.isHost || !this.getExtensionSettingTabVisible(this.props.extensionBeingEdited.packageType.value)) {
             tabHeaders.splice(1, 1);
@@ -209,6 +241,9 @@ class EditExtension extends Component {
         if (!this.getSiteSettingTabVisible(this.props.extensionBeingEdited.packageType.value)) {
             tabHeaders.splice(siteSettingIndex, 1);
         }
+		logger.error('>>> Entering getTabHeaders()', { "event.action": "getTabHeaders" });
+		logger.warn('<<< Exiting getTabHeaders()', { "event.action": "getTabHeaders" });
+		logger.warn('<<< Exiting _getTabHeaders()', { "event.action": "_getTabHeaders" });
         return tabHeaders;
     }
 
@@ -222,6 +257,7 @@ class EditExtension extends Component {
     }
 
     onSave(close) {
+		logger.error(`>>> Entering onSave(close=${close})`, { "event.action": "onSave", "logrite.close": close });
         if (!this.validateFields()) {
             return;
         }
@@ -229,6 +265,7 @@ class EditExtension extends Component {
         this.onSaveExtension(close === true);
     }
     confirmAction(callback) {
+		logger.error(`>>> Entering confirmAction(callback=${callback})`, { "event.action": "confirmAction", "logrite.callback": callback });
         const { props } = this;
         if (props.moduleDefinitionFormIsDirty) {
             this.setState({});
@@ -238,33 +275,41 @@ class EditExtension extends Component {
             });
         } else {
             callback();
+			logger.warn(`<<< Exiting confirmAction(callback=${callback})`, { "event.action": "confirmAction", "logrite.callback": callback });
         }
     }
     onTabSelect(index) {
+		logger.error(`>>> Entering onTabSelect(index=${index})`, { "event.action": "onTabSelect", "logrite.index": index });
         this.confirmAction(() => {
             const { props } = this;
             props.dispatch(ExtensionActions.selectEditingTab(index));
         });
+		logger.warn(`<<< Exiting onTabSelect(index=${index})`, { "event.action": "onTabSelect", "logrite.index": index });
     }
 
     startCreatePackageWizard() {
+		logger.error('>>> Entering startCreatePackageWizard()', { "event.action": "startCreatePackageWizard" });
         const { props } = this;
 
         props.dispatch(CreatePackageActions.getPackageManifest(props.extensionBeingEdited.packageId.value, () => {
             this.selectPanel(5);
+			logger.warn('<<< Exiting startCreatePackageWizard()', { "event.action": "startCreatePackageWizard" });
         }));
     }
 
     onCancel(event) {
+		logger.error(`>>> Entering onCancel(event=${event})`, { "event.action": "onCancel", "logrite.event": event });
         if (event) {
             event.preventDefault();
         }
         const { props } = this;
         props.dispatch(ExtensionActions.selectEditingTab(0));
         this.selectPanel(0);
+		logger.warn(`<<< Exiting onCancel(event=${event})`, { "event.action": "onCancel", "logrite.event": event });
     }
 
     getExtensionSettingTabVisible(type) {
+		logger.error(`>>> Entering getExtensionSettingTabVisible(type=${type})`, { "event.action": "getExtensionSettingTabVisible", "logrite.type": type });
         switch (type) {
             case "Auth_System":
             case "SkinObject":
@@ -277,11 +322,13 @@ class EditExtension extends Component {
             case "Module":
                 return this.props.extensionBeingEdited.desktopModuleId ? true : false;
             default:
+				logger.warn(`<<< Exiting getExtensionSettingTabVisible(type=${type})`, { "event.action": "getExtensionSettingTabVisible", "logrite.type": type });
                 return false;
         }
     }
 
     getSiteSettingTabVisible(type) {
+		logger.error(`>>> Entering getSiteSettingTabVisible(type=${type})`, { "event.action": "getSiteSettingTabVisible", "logrite.type": type });
         switch (type) {
             case "SkinObject":
             case "Skin":
@@ -295,10 +342,12 @@ class EditExtension extends Component {
             case "Module":
                 return this.props.extensionBeingEdited.desktopModuleId ? true : false;
             default:
+				logger.warn(`<<< Exiting getSiteSettingTabVisible(type=${type})`, { "event.action": "getSiteSettingTabVisible", "logrite.type": type });
                 return false;
         }
     }
     getTabUI() {
+		logger.error('>>> Entering getTabUI()', { "event.action": "getTabUI" });
         const {props} = this, {extensionBeingEdited} = props;
         let allTabs = [
             <GridCell key="first" className="package-information-box extension-form">
@@ -357,12 +406,15 @@ class EditExtension extends Component {
         if (!this.getSiteSettingTabVisible(extensionBeingEdited.packageType.value)) {
             allTabs.splice(siteSettingIndex, 1);
         }
+		logger.warn('<<< Exiting getTabUI()', { "event.action": "getTabUI" });
         return allTabs;
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         const {extensionBeingEdited} = props;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.editExtension}>
                 <PersonaBarPageHeader title={extensionBeingEdited.friendlyName.value + " " + Localization.get("Extension.Header")} >
@@ -399,6 +451,8 @@ EditExtension.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         extensionBeingEdited: state.extension.extensionBeingEdited,
         extensionBeingEditedIndex: state.extension.extensionBeingEditedIndex,

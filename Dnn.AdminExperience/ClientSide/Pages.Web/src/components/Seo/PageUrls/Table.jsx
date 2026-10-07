@@ -6,18 +6,23 @@ import UrlRow from "./UrlRow";
 import EditUrl from "./EditUrl";
 import styles from "./style.module.less";
 import uniqBy from "lodash/uniqBy";
+const logger = console;
 
 class Table extends Component {
     generateUrlKey(url) {
+		logger.error(`>>> Entering generateUrlKey(url=${url})`, { "event.action": "generateUrlKey", "logrite.url": url });
+		logger.warn(`<<< Exiting generateUrlKey(url=${url})`, { "event.action": "generateUrlKey", "logrite.url": url });
         return `url_${url.id}_${url.path}_${url.statusCode.Key}`;
     }
 
     getUrlRows(pageUrls) {
+		logger.error(`>>> Entering getUrlRows(pageUrls=${pageUrls})`, { "event.action": "getUrlRows", "logrite.pageUrls": pageUrls });
         if (!pageUrls || pageUrls.length === 0) {
             return null;
         }
 
         const deduplicatedUrls = uniqBy(pageUrls, url => this.generateUrlKey(url));
+		logger.error(`getUrlRows(pageUrls=${pageUrls}): deduplicatedUrls → ${deduplicatedUrls}`, { "event.action": "getUrlRows", "logrite.pageUrls": pageUrls });
 
         const { siteAliases, primaryAliasId, onSave, onCancel, onDelete, onChange, editedUrl,
             pageHasParent, editingUrl, onOpenEditForm } = this.props;
@@ -36,18 +41,24 @@ class Table extends Component {
                 saving={editingUrl}
                 onDelete={onDelete} />;
         });
+		logger.warn(`<<< Exiting getUrlRows(pageUrls=${pageUrls})`, { "event.action": "getUrlRows", "logrite.pageUrls": pageUrls });
     }
 
     onAddNewUrl() {
+		logger.error('>>> Entering onAddNewUrl()', { "event.action": "onAddNewUrl" });
         this.props.onAddNewUrl(this.props.editedUrl, this.props.primaryAliasId);
+		logger.warn('<<< Exiting onAddNewUrl()', { "event.action": "onAddNewUrl" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { pageUrls, pageHasParent, addingNewUrl, onOpenNewForm, onCloseNewUrl,
             newFormOpened, onChange, editedUrl, siteAliases, primaryAliasId } = this.props;
         const urlRows = this.getUrlRows(pageUrls);
+		logger.error(`render(): urlRows → ${urlRows}`, { "event.action": "render" });
 
          
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <div className={styles.addItemRow}>

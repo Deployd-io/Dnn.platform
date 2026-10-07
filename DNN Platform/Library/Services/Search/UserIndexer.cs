@@ -53,6 +53,8 @@ namespace DotNetNuke.Services.Search
         public UserIndexer()
             : this(null, null, null, null, null, null, null, null)
         {
+		eventLogger.LogError(">>> Entering UserIndexer()");
+        eventLogger.LogWarning("<<< Exiting UserIndexer()");
         }
 
         /// <summary>Searches for and indexes modified users for the given portal.</summary>
@@ -63,21 +65,28 @@ namespace DotNetNuke.Services.Search
         /// <returns>Count of indexed records.</returns>
         public override int IndexSearchDocuments(int portalId, ScheduleHistoryItem schedule, DateTime startDateLocal, Action<IEnumerable<SearchDocument>> indexer)
         {
+			eventLogger.LogError(">>> Entering IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer})", portalId, schedule, startDateLocal, indexer);
             Requires.NotNull("indexer", indexer);
             const int saveThreshold = BatchSize;
             var totalIndexed = 0;
             var checkpointModified = false;
+			eventLogger.LogError("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): checkpointModified → {CheckpointModified}", portalId, schedule, startDateLocal, indexer, checkpointModified);
             startDateLocal = this.GetLocalTimeOfLastIndexedItem(portalId, schedule.ScheduleID, startDateLocal);
+			eventLogger.LogError("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): startDateLocal → {StartDateLocal1}", portalId, schedule, startDateLocal, indexer, startDateLocal);
             var searchDocuments = new Dictionary<string, SearchDocument>();
+			eventLogger.LogError("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): searchDocuments → {SearchDocuments}", portalId, schedule, startDateLocal, indexer, searchDocuments);
 
             var needReindex = PortalController.GetPortalSettingAsBoolean(this.portalController, UserIndexResetFlag, portalId, false);
+			eventLogger.LogError("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): needReindex → {NeedReindex}", portalId, schedule, startDateLocal, indexer, needReindex);
             if (needReindex)
             {
                 startDateLocal = SqlDateTime.MinValue.Value.AddDays(1);
             }
 
             var textDataType = this.listController.GetListEntryInfo("DataType", "Text");
+			eventLogger.LogError("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): textDataType → {TextDataType}", portalId, schedule, startDateLocal, indexer, textDataType);
             var richTextDataType = this.listController.GetListEntryInfo("DataType", "RichText");
+			eventLogger.LogError("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): richTextDataType → {RichTextDataType}", portalId, schedule, startDateLocal, indexer, richTextDataType);
 
             var profileDefinitions = ProfileController.GetPropertyDefinitionsByPortal(this.hostSettings, this.portalController, this.appStatus, this.portalGroupController, portalId, false, false)
                 .Where(d =>
@@ -87,9 +96,11 @@ namespace DotNetNuke.Services.Search
             try
             {
                 var checkpointData = this.GetLastCheckpointData(portalId, schedule.ScheduleID);
+				eventLogger.LogError("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): checkpointData → {CheckpointData}", portalId, schedule, startDateLocal, indexer, checkpointData);
                 if (string.IsNullOrEmpty(checkpointData) || !int.TryParse(checkpointData, out var startUserId))
                 {
                     startUserId = Null.NullInteger;
+					eventLogger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): startUserId → {StartUserId}", portalId, schedule, startDateLocal, indexer, startUserId);
                 }
 
                 int rowsAffected;
@@ -97,6 +108,8 @@ namespace DotNetNuke.Services.Search
                 do
                 {
                     rowsAffected = FindModifiedUsers(portalId, startDateLocal, searchDocuments, profileDefinitions, out indexedUsers, ref startUserId);
+					eventLogger.LogError("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): rowsAffected → {RowsAffected}", portalId, schedule, startDateLocal, indexer, rowsAffected);
+					eventLogger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): rowsAffected → {RowsAffected}", portalId, schedule, startDateLocal, indexer, rowsAffected);
 
                     if (rowsAffected > 0 && searchDocuments.Count >= saveThreshold)
                     {
@@ -128,6 +141,7 @@ namespace DotNetNuke.Services.Search
             }
             catch (Exception ex)
             {
+				eventLogger.LogError("Exception in IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): {Arg4}", portalId, schedule, startDateLocal, indexer, ex.Message);
                 checkpointModified = false;
                 Exceptions.Exceptions.LogException(ex);
             }
@@ -139,17 +153,23 @@ namespace DotNetNuke.Services.Search
                 this.SetLocalTimeOfLastIndexedItem(portalId, schedule.ScheduleID, DateTime.Now);
             }
 
+			eventLogger.LogWarning("<<< Exiting IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer})", portalId, schedule, startDateLocal, indexer);
             return totalIndexed;
         }
 
         private static int FindModifiedUsers(int portalId, DateTime startDateLocal, Dictionary<string, SearchDocument> searchDocuments, IList<ProfilePropertyDefinition> profileDefinitions, out IList<int> indexedUsers, ref int startUserId)
         {
+			eventLogger.LogError(">>> Entering FindModifiedUsers(portalId={PortalId},startDateLocal={StartDateLocal},searchDocuments={SearchDocuments},profileDefinitions={ProfileDefinitions},startUserId={StartUserId})", portalId, startDateLocal, searchDocuments, profileDefinitions, startUserId);
             var rowsAffected = 0;
             indexedUsers = new List<int>();
+			eventLogger.LogError("FindModifiedUsers(portalId={PortalId},startDateLocal={StartDateLocal},searchDocuments={SearchDocuments},profileDefinitions={ProfileDefinitions},startUserId={StartUserId}): indexedUsers → {IndexedUsers}", portalId, startDateLocal, searchDocuments, profileDefinitions, startUserId, indexedUsers);
+			eventLogger.LogDebug("FindModifiedUsers(portalId={PortalId},startDateLocal={StartDateLocal},searchDocuments={SearchDocuments},profileDefinitions={ProfileDefinitions},startUserId={StartUserId}): indexedUsers → {IndexedUsers}", portalId, startDateLocal, searchDocuments, profileDefinitions, startUserId, indexedUsers);
             using var reader = DataProvider.Instance().GetAvailableUsersForIndex(portalId, startDateLocal, startUserId, BatchSize);
             while (reader.Read())
             {
+				eventLogger.LogError("FindModifiedUsers(portalId={PortalId},startDateLocal={StartDateLocal},searchDocuments={SearchDocuments},profileDefinitions={ProfileDefinitions},startUserId={StartUserId}): reader → {Reader}", portalId, startDateLocal, searchDocuments, profileDefinitions, startUserId, reader);
                 var userSearch = GetUserSearch(reader);
+				eventLogger.LogError("FindModifiedUsers(portalId={PortalId},startDateLocal={StartDateLocal},searchDocuments={SearchDocuments},profileDefinitions={ProfileDefinitions},startUserId={StartUserId}): userSearch → {UserSearch}", portalId, startDateLocal, searchDocuments, profileDefinitions, startUserId, userSearch);
                 if (userSearch == null)
                 {
                     continue;
@@ -173,6 +193,7 @@ namespace DotNetNuke.Services.Search
                     }
 
                     var propertyValue = reader[propertyName].ToString();
+					eventLogger.LogError("FindModifiedUsers(portalId={PortalId},startDateLocal={StartDateLocal},searchDocuments={SearchDocuments},profileDefinitions={ProfileDefinitions},startUserId={StartUserId}): propertyValue → {PropertyValue}", portalId, startDateLocal, searchDocuments, profileDefinitions, startUserId, propertyValue);
 
                     if (string.IsNullOrEmpty(propertyValue) || !propertyValue.Contains(ValueSplitFlag))
                     {
@@ -180,11 +201,14 @@ namespace DotNetNuke.Services.Search
                     }
 
                     var splitValues = Regex.Split(propertyValue, Regex.Escape(ValueSplitFlag));
+					eventLogger.LogError("FindModifiedUsers(portalId={PortalId},startDateLocal={StartDateLocal},searchDocuments={SearchDocuments},profileDefinitions={ProfileDefinitions},startUserId={StartUserId}): splitValues → {SplitValues}", portalId, startDateLocal, searchDocuments, profileDefinitions, startUserId, splitValues);
 
                     propertyValue = splitValues[0];
                     var visibilityMode = (UserVisibilityMode)Convert.ToInt32(splitValues[1], CultureInfo.InvariantCulture);
+					eventLogger.LogError("FindModifiedUsers(portalId={PortalId},startDateLocal={StartDateLocal},searchDocuments={SearchDocuments},profileDefinitions={ProfileDefinitions},startUserId={StartUserId}): visibilityMode → {VisibilityMode}", portalId, startDateLocal, searchDocuments, profileDefinitions, startUserId, visibilityMode);
                     var extendedVisibility = splitValues[2];
                     var modifiedTime = Convert.ToDateTime(splitValues[3], CultureInfo.InvariantCulture).ToUniversalTime();
+					eventLogger.LogError("FindModifiedUsers(portalId={PortalId},startDateLocal={StartDateLocal},searchDocuments={SearchDocuments},profileDefinitions={ProfileDefinitions},startUserId={StartUserId}): modifiedTime → {ModifiedTime}", portalId, startDateLocal, searchDocuments, profileDefinitions, startUserId, modifiedTime);
 
                     if (string.IsNullOrEmpty(propertyValue))
                     {
@@ -194,6 +218,7 @@ namespace DotNetNuke.Services.Search
                     // DNN-5740 / DNN-9040: replace split flag if it included in property value.
                     propertyValue = propertyValue.Replace("[$]", "$");
                     var uniqueKey = $"{userSearch.UserId}_{visibilityMode}".ToLowerInvariant();
+					eventLogger.LogError("FindModifiedUsers(portalId={PortalId},startDateLocal={StartDateLocal},searchDocuments={SearchDocuments},profileDefinitions={ProfileDefinitions},startUserId={StartUserId}): uniqueKey → {UniqueKey}", portalId, startDateLocal, searchDocuments, profileDefinitions, startUserId, uniqueKey);
                     if (visibilityMode == UserVisibilityMode.FriendsAndGroups)
                     {
                         uniqueKey = $"{uniqueKey}_{extendedVisibility}";
@@ -206,6 +231,7 @@ namespace DotNetNuke.Services.Search
                         if (modifiedTime > document.ModifiedTimeUtc)
                         {
                             document.ModifiedTimeUtc = modifiedTime;
+							eventLogger.LogDebug("FindModifiedUsers(portalId={PortalId},startDateLocal={StartDateLocal},searchDocuments={SearchDocuments},profileDefinitions={ProfileDefinitions},startUserId={StartUserId}): document.ModifiedTimeUtc → {Arg5}", portalId, startDateLocal, searchDocuments, profileDefinitions, startUserId, document.ModifiedTimeUtc);
                         }
                     }
                     else
@@ -237,11 +263,13 @@ namespace DotNetNuke.Services.Search
                 rowsAffected++;
             }
 
+			eventLogger.LogWarning("<<< Exiting FindModifiedUsers(portalId={PortalId},startDateLocal={StartDateLocal},searchDocuments={SearchDocuments},profileDefinitions={ProfileDefinitions},startUserId={StartUserId})", portalId, startDateLocal, searchDocuments, profileDefinitions, startUserId);
             return rowsAffected;
         }
 
         private static void AddBasicInformation(Dictionary<string, SearchDocument> searchDocuments, ICollection<int> indexedUsers, UserSearch userSearch, int portalId)
         {
+			eventLogger.LogError(">>> Entering AddBasicInformation(searchDocuments={SearchDocuments},indexedUsers={IndexedUsers},userSearch={UserSearch},portalId={PortalId})", searchDocuments, indexedUsers, userSearch, portalId);
             if (!searchDocuments.ContainsKey($"{userSearch.UserId}_{UserVisibilityMode.AllUsers}".ToLowerInvariant()))
             {
                 if (!indexedUsers.Contains(userSearch.UserId))
@@ -291,14 +319,18 @@ namespace DotNetNuke.Services.Search
                 searchDoc.Keywords.Add("createdondate", userSearch.CreatedOnDate.ToString(Constants.DateTimeFormat, CultureInfo.InvariantCulture));
                 searchDocuments.Add(searchDoc.UniqueKey, searchDoc);
             }
+			eventLogger.LogWarning("<<< Exiting AddBasicInformation(searchDocuments={SearchDocuments},indexedUsers={IndexedUsers},userSearch={UserSearch},portalId={PortalId})", searchDocuments, indexedUsers, userSearch, portalId);
         }
 
         private static UserSearch GetUserSearch(IDataRecord reader)
         {
+			eventLogger.LogError(">>> Entering GetUserSearch(reader={Reader})", reader);
             try
             {
                 var createdOn = reader["CreatedOnDate"] as DateTime?;
+				eventLogger.LogError("GetUserSearch(reader={Reader}): createdOn → {CreatedOn}", reader, createdOn);
                 var modifiedOn = reader["LastModifiedOnDate"] as DateTime? ?? createdOn;
+				eventLogger.LogError("GetUserSearch(reader={Reader}): modifiedOn → {ModifiedOn}", reader, modifiedOn);
                 var userSearch = new UserSearch
                 {
                     UserId = Convert.ToInt32(reader["UserId"], CultureInfo.InvariantCulture),
@@ -319,27 +351,34 @@ namespace DotNetNuke.Services.Search
             }
             catch (Exception ex)
             {
+				eventLogger.LogError("Exception in GetUserSearch(reader={Reader}): {Arg1}", reader, ex.Message);
                 Exceptions.Exceptions.LogException(ex);
+				eventLogger.LogWarning("<<< Exiting GetUserSearch(reader={Reader})", reader);
                 return null;
             }
         }
 
         private static void DeleteDocuments(int portalId, ICollection<int> usersList)
         {
+			eventLogger.LogError(">>> Entering DeleteDocuments(portalId={PortalId},usersList={UsersList})", portalId, usersList);
             if (usersList == null || usersList.Count == 0)
             {
                 return;
             }
 
             var values = Enum.GetValues(typeof(UserVisibilityMode));
+			eventLogger.LogError("DeleteDocuments(portalId={PortalId},usersList={UsersList}): values → {Values}", portalId, usersList, values);
 
             var clauseCount = 0;
+			eventLogger.LogError("DeleteDocuments(portalId={PortalId},usersList={UsersList}): clauseCount → {ClauseCount}", portalId, usersList, clauseCount);
             foreach (var item in values)
             {
                 var keyword = new StringBuilder("(");
+				eventLogger.LogError("DeleteDocuments(portalId={PortalId},usersList={UsersList}): keyword → {Keyword}", portalId, usersList, keyword);
                 foreach (var userId in usersList)
                 {
                     var mode = Enum.GetName(typeof(UserVisibilityMode), item);
+					eventLogger.LogError("DeleteDocuments(portalId={PortalId},usersList={UsersList}): mode → {Mode}", portalId, usersList, mode);
                     keyword.AppendFormat(
                         CultureInfo.InvariantCulture,
                         "{2} {0}_{1} OR {0}_{1}* ",
@@ -363,10 +402,12 @@ namespace DotNetNuke.Services.Search
                     PerformDelete(portalId, keyword.ToString().ToLowerInvariant());
                 }
             }
+			eventLogger.LogWarning("<<< Exiting DeleteDocuments(portalId={PortalId},usersList={UsersList})", portalId, usersList);
         }
 
         private static void PerformDelete(int portalId, string keyword)
         {
+			eventLogger.LogError(">>> Entering PerformDelete(portalId={PortalId},keyword={Keyword})", portalId, keyword);
             var query = new BooleanQuery
             {
                 { NumericRangeQuery.NewIntRange(Constants.PortalIdTag, portalId, portalId, true, true), Occur.MUST },
@@ -381,21 +422,29 @@ namespace DotNetNuke.Services.Search
                 Constants.UniqueKeyTag,
                 new SearchQueryAnalyzer(true));
             var parsedQueryContent = parserContent.Parse(keyword.ToLowerInvariant());
+			eventLogger.LogError("PerformDelete(portalId={PortalId},keyword={Keyword}): parsedQueryContent → {ParsedQueryContent}", portalId, keyword, parsedQueryContent);
             query.Add(parsedQueryContent, Occur.MUST);
 
             LuceneController.Instance.Delete(query);
+			eventLogger.LogWarning("<<< Exiting PerformDelete(portalId={PortalId},keyword={Keyword})", portalId, keyword);
         }
 
         private static bool ContainsColumn(string col, IDataReader reader)
         {
+			eventLogger.LogError(">>> Entering ContainsColumn(col={Col},reader={Reader})", col, reader);
             var schema = reader.GetSchemaTable();
+			eventLogger.LogError("ContainsColumn(col={Col},reader={Reader}): schema → {Schema}", col, reader, schema);
+			eventLogger.LogWarning("<<< Exiting ContainsColumn(col={Col},reader={Reader})", col, reader);
             return schema != null && schema.Select("ColumnName = '" + col + "'").Length > 0;
         }
 
         private static int IndexCollectedDocs(Action<IEnumerable<SearchDocument>> indexer, ICollection<SearchDocument> searchDocuments)
         {
+			eventLogger.LogError(">>> Entering IndexCollectedDocs(indexer={Indexer},searchDocuments={SearchDocuments})", indexer, searchDocuments);
             indexer.Invoke(searchDocuments);
             var total = searchDocuments.Select(d => d.UniqueKey.Substring(0, d.UniqueKey.IndexOf("_", StringComparison.Ordinal))).Distinct().Count();
+			eventLogger.LogError("IndexCollectedDocs(indexer={Indexer},searchDocuments={SearchDocuments}): total → {Total}", indexer, searchDocuments, total);
+			eventLogger.LogWarning("<<< Exiting IndexCollectedDocs(indexer={Indexer},searchDocuments={SearchDocuments})", indexer, searchDocuments);
             return total;
         }
     }

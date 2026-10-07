@@ -3,6 +3,7 @@ import { IStylesResx } from '../../window.dnn';
 import StylesClient, { IPortalStyles } from '../../clients/styles-client';
 import { DnnColorInfo } from '@dnncommunity/dnn-elements/dist/types/components';
 import ColorNames from './color-names';
+const logger = console;
 @Component({
   tag: 'dnn-styles-module',
   styleUrl: 'dnn-styles-module.scss',
@@ -21,10 +22,13 @@ export class DnnStylesModule {
   private componentWidth: number;
 
   constructor() {
+	logger.error('>>> Entering constructor()', { "event.action": "constructor" });
     this.stylesClient = new StylesClient();
+	logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
   }
 
   connectedCallback() {
+	logger.error('>>> Entering connectedCallback()', { "event.action": "connectedCallback" });
     this.resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
         const newWidth = entry.contentRect.width;
@@ -43,16 +47,21 @@ export class DnnStylesModule {
       }
     });
     this.resizeObserver.observe(this.el);
+	logger.debug(`connectedCallback(): this.componentWidth → ${this.componentWidth}`, { "event.action": "connectedCallback" });
   }
 
   disconnectedCallback() {
+	logger.error('>>> Entering disconnectedCallback()', { "event.action": "disconnectedCallback" });
     this.resizeObserver.unobserve(this.el);
+	logger.warn('<<< Exiting disconnectedCallback()', { "event.action": "disconnectedCallback" });
   }
 
   componentWillLoad() {
+	logger.error('>>> Entering componentWillLoad()', { "event.action": "componentWillLoad" });
     const dnnStyles = window.dnn as unknown as IDnnWrapper;
     this.resx = dnnStyles.initStyles().utility?.resx?.Styles;
     const header = document.querySelector("#dnnStylesHeader h3");
+	logger.error(`componentWillLoad(): header → ${header}`, { "event.action": "componentWillLoad" });
     if (header) {
       header.textContent = this.resx.nav_Styles;
     }
@@ -66,9 +75,11 @@ export class DnnStylesModule {
         console.error(error);
       });
     this.isHost = this.stylesClient.isHostUser;
+	logger.debug(`componentWillLoad(): header.textContent → ${header.textContent}`, { "event.action": "componentWillLoad" });
   }
 
   private handleColorChange(colorName: ColorNames, detail: DnnColorInfo): void {
+	logger.error(`>>> Entering handleColorChange(colorName=${colorName},detail=${detail})`, { "event.action": "handleColorChange", "logrite.colorName": colorName, "logrite.detail": detail });
     this.styles = {
       ...this.styles,
       [`Color${colorName}`]: detail.color,
@@ -76,9 +87,11 @@ export class DnnStylesModule {
       [`Color${colorName}Light`]: detail.lightColor,
       [`Color${colorName}Dark`]: detail.darkColor,
     }
+	logger.warn(`<<< Exiting handleColorChange(colorName=${colorName},detail=${detail})`, { "event.action": "handleColorChange", "logrite.colorName": colorName, "logrite.detail": detail });
   }
 
   private handleSave(): void {
+	logger.error('>>> Entering handleSave()', { "event.action": "handleSave" });
     this.stylesClient.saveStyles(this.styles)
       .then(() => {
         this.originalStyles = this.styles;
@@ -88,9 +101,11 @@ export class DnnStylesModule {
         this.stylesClient.notifyError(this.resx?.SaveError);
         console.error(error);
       });
+	logger.warn('<<< Exiting handleSave()', { "event.action": "handleSave" });
   }
 
   private handleRestoreDefault(): void {
+	logger.error('>>> Entering handleRestoreDefault()', { "event.action": "handleRestoreDefault" });
     this.stylesClient.restoreStyles()
     .then(response => {
       this.originalStyles = response;
@@ -100,9 +115,12 @@ export class DnnStylesModule {
       this.stylesClient.notifyError(this.resx?.SaveError);
       console.error(error);
     });
+	logger.warn('<<< Exiting handleRestoreDefault()', { "event.action": "handleRestoreDefault" });
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         <form

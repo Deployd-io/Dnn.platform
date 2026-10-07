@@ -49,7 +49,9 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state) 
         {
+			value.LogError(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             writer.Write(SystemInfo.ApplicationFriendlyName);
+			value.LogWarning("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
     }
 }

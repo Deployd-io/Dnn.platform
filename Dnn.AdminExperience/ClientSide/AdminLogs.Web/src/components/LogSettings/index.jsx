@@ -11,6 +11,7 @@ import "./style.less";
 import { GridCell, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import util from "../../utils";
 import Localization from "localization";
+const logger = console;
 import {
     createPortalOptions,
     createLogTypeOptions
@@ -21,13 +22,16 @@ let canEdit = false;
 class LogSettingsPanel extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             openId: ""
         };
         canEdit = util.settings.isHost || util.settings.permissions.LOG_SETTINGS_EDIT;
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
         props.dispatch(LogSettingActions.getLogSettings());
         if (canEdit) {
@@ -38,10 +42,12 @@ class LogSettingsPanel extends Component {
                 props.dispatch(LogActions.getPortalList(util.settings.isHost));
             props.dispatch(LogSettingActions.getKeepMostRecentOptions());
             props.dispatch(LogSettingActions.getOccurrenceOptions());
+			logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         }
     }
 
     renderHeader() {
+		logger.error('>>> Entering renderHeader()', { "event.action": "renderHeader" });
         const tableFields = [
             { "name": Localization.get("LogType.Header"), "width": 40 },
             { "name": Localization.get("Portal.Header"), "width": 20 },
@@ -54,6 +60,7 @@ class LogSettingsPanel extends Component {
                 <span>{field.name}&nbsp; </span>
             </GridCell>;
         });
+		logger.warn('<<< Exiting renderHeader()', { "event.action": "renderHeader" });
         return <div id="header-row" className="header-row">{tableHeaders}</div>;
     }
     uncollapse(id) {
@@ -80,8 +87,10 @@ class LogSettingsPanel extends Component {
 
      
     renderedLogSettingList(logTypeOptions, portalOptions) {
+		logger.error(`>>> Entering renderedLogSettingList(logTypeOptions=${logTypeOptions},portalOptions=${portalOptions})`, { "event.action": "renderedLogSettingList", "logrite.logTypeOptions": logTypeOptions, "logrite.portalOptions": portalOptions });
         let validLogSettingList = this.props.logSettingList.filter(logSetting => !!logSetting);
         let i = 0;
+		logger.warn(`<<< Exiting renderedLogSettingList(logTypeOptions=${logTypeOptions},portalOptions=${portalOptions})`, { "event.action": "renderedLogSettingList", "logrite.logTypeOptions": logTypeOptions, "logrite.portalOptions": portalOptions });
         return validLogSettingList.map((logSetting, index) => {
             let id = "row-" + i++;
             return (
@@ -113,9 +122,13 @@ class LogSettingsPanel extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let opened = (this.state.openId === "add");
         let logTypeOptions = createLogTypeOptions(this.props.logTypeList);
+		logger.error(`render(): opened → ${opened}`, { "event.action": "render" });
+		logger.error(`render(): logTypeOptions → ${logTypeOptions}`, { "event.action": "render" });
         let portalOptions = createPortalOptions(this.props.portalList);
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <div className="log-settings">
@@ -177,6 +190,8 @@ LogSettingsPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         logSettingList: state.logSettings.logSettingList,
         logTypeList: state.log.logTypeList,

@@ -41,6 +41,7 @@ namespace Dnn.PersonaBar.Security.Components
         /// <summary>delete unneeded installwizard files.</summary>
         public static void CleanUpInstallerFiles()
         {
+			eventLogger.LogError(">>> Entering CleanUpInstallerFiles()");
             var files = new List<string>
             {
                 "DotNetNuke.install.config",
@@ -64,9 +65,11 @@ namespace Dnn.PersonaBar.Security.Components
                 }
                 catch (Exception)
                 {
+					eventLogger.LogError("Exception in CleanUpInstallerFiles(): {Arg0}", Exception.Message);
                     // do nothing.
                 }
             }
+			eventLogger.LogWarning("<<< Exiting CleanUpInstallerFiles()");
         }
 
         /// <summary>search all files in the website for matching text.</summary>
@@ -74,9 +77,11 @@ namespace Dnn.PersonaBar.Security.Components
         /// <returns>A sequence of new <see cref="SearchFileInfo"/> instances.</returns>
         public static IEnumerable<object> SearchFiles(string searchText)
         {
+			eventLogger.LogError(">>> Entering SearchFiles(searchText={SearchText})", searchText);
             try
             {
                 var fileList = GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.*", SearchOption.AllDirectories);
+				eventLogger.LogError("SearchFiles(searchText={SearchText}): fileList → {FileList}", searchText, fileList);
                 return
                     from file in fileList
                     where FileContainsText(file, searchText)
@@ -89,9 +94,11 @@ namespace Dnn.PersonaBar.Security.Components
             }
             catch
             {
+				eventLogger.LogError("Exception in SearchFiles(searchText={SearchText}): {Arg1}", searchText, Exception.Message);
                 // suppress any unexpected error
             }
 
+			eventLogger.LogWarning("<<< Exiting SearchFiles(searchText={SearchText})", searchText);
             return null;
         }
 
@@ -100,8 +107,10 @@ namespace Dnn.PersonaBar.Security.Components
         /// <returns>A sequence of file paths.</returns>
         public static IEnumerable<string> FindUnexpectedExtensions(IList<string> invalidFolders)
         {
+			eventLogger.LogError(">>> Entering FindUnexpectedExtensions(invalidFolders={InvalidFolders})", invalidFolders);
             var files = GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.*", SearchOption.AllDirectories, invalidFolders)
             .Where(s => s.EndsWith(".asp", StringComparison.OrdinalIgnoreCase) || s.EndsWith(".php", StringComparison.OrdinalIgnoreCase));
+			eventLogger.LogWarning("<<< Exiting FindUnexpectedExtensions(invalidFolders={InvalidFolders})", invalidFolders);
             return files;
         }
 
@@ -109,6 +118,7 @@ namespace Dnn.PersonaBar.Security.Components
         /// <returns>A sequence of file paths.</returns>
         public static IEnumerable<string> FineHiddenSystemFiles()
         {
+			eventLogger.LogError(">>> Entering FineHiddenSystemFiles()");
             var files = GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.*", SearchOption.AllDirectories)
             .Where(f =>
             {
@@ -118,18 +128,24 @@ namespace Dnn.PersonaBar.Security.Components
                 }
 
                 var attributes = File.GetAttributes(f);
+				eventLogger.LogError("FineHiddenSystemFiles(): attributes → {Attributes}", attributes);
                 return attributes.HasFlag(FileAttributes.Hidden) || attributes.HasFlag(FileAttributes.System);
             });
+			eventLogger.LogWarning("<<< Exiting FineHiddenSystemFiles()");
             return files;
         }
 
         public static List<object> SearchDatabase(string searchText)
         {
+			eventLogger.LogError(">>> Entering SearchDatabase(searchText={SearchText})", searchText);
             List<object> results = new List<object>();
             var dataProvider = DataProvider.Instance();
+			eventLogger.LogError("SearchDatabase(searchText={SearchText}): dataProvider → {DataProvider}", searchText, dataProvider);
+			eventLogger.LogError("SearchDatabase(searchText={SearchText}): results → {Results}", searchText, results);
 
             try
             {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 using (var dr = dataProvider.ExecuteReader("SecurityAnalyzer_SearchAllTables", searchText))
                 {
                     while (dr.Read())
@@ -141,17 +157,21 @@ namespace Dnn.PersonaBar.Security.Components
                         });
                     }
                 }
+				eventLogger.LogError("SearchDatabase(searchText)={SearchText}: database query executed in {Arg1} ms", searchText, __logStart.ElapsedMilliseconds);
             }
             catch
             {
+				eventLogger.LogError("Exception in SearchDatabase(searchText={SearchText}): {Arg1}", searchText, Exception.Message);
                 // ignore
             }
 
+			eventLogger.LogWarning("<<< Exiting SearchDatabase(searchText={SearchText})", searchText);
             return results;
         }
 
         public static XmlDocument LoadFileSumData()
         {
+			eventLogger.LogError(">>> Entering LoadFileSumData()");
             using (
                 var stream =
                     Assembly.GetExecutingAssembly()
@@ -161,12 +181,14 @@ namespace Dnn.PersonaBar.Security.Components
                 {
                     var xmlDocument = new XmlDocument { XmlResolver = null };
                     using var xmlReader = XmlReader.Create(stream, new XmlReaderSettings { XmlResolver = null, });
+					eventLogger.LogError("LoadFileSumData(): xmlReader → {XmlReader}", xmlReader);
                     xmlDocument.Load(xmlReader);
 
                     return xmlDocument;
                 }
                 else
                 {
+					eventLogger.LogWarning("<<< Exiting LoadFileSumData()");
                     return null;
                 }
             }
@@ -174,10 +196,14 @@ namespace Dnn.PersonaBar.Security.Components
 
         public static string GetFileCheckSum(string fileName)
         {
+			eventLogger.LogError(">>> Entering GetFileCheckSum(fileName={FileName})", fileName);
+            var __logStart = System.Diagnostics.Stopwatch.StartNew();
             using (var cryptographyProvider = SHA256.Create(CryptoConfig.AllowOnlyFipsAlgorithms ? "System.Security.Cryptography.SHA256CryptoServiceProvider" : "System.Security.Cryptography.SHA256Cng"))
             {
                 using (var stream = File.OpenRead(fileName))
                 {
+					eventLogger.LogError("GetFileCheckSum(fileName)={FileName}: external service call took {Arg1} ms", fileName, __logStart.ElapsedMilliseconds);
+					eventLogger.LogWarning("<<< Exiting GetFileCheckSum(fileName={FileName})", fileName);
                     return BitConverter.ToString(cryptographyProvider.ComputeHash(stream)).Replace("-", string.Empty).ToLowerInvariant();
                 }
             }
@@ -185,11 +211,14 @@ namespace Dnn.PersonaBar.Security.Components
 
         public static string GetApplicationVersion()
         {
+			eventLogger.LogError(">>> Entering GetApplicationVersion()");
+            eventLogger.LogWarning("<<< Exiting GetApplicationVersion()");
             return DotNetNukeContext.Current.Application.Version.ToString(3);
         }
 
         public static string GetApplicationType()
         {
+			eventLogger.LogError(">>> Entering GetApplicationType()");
             switch (DotNetNukeContext.Current.Application.Name)
             {
                 case "DNNCORP.CE":
@@ -200,39 +229,47 @@ namespace Dnn.PersonaBar.Security.Components
                 case "DNNCORP.SOCIAL":
                     return "Social";
                 default:
+					eventLogger.LogWarning("<<< Exiting GetApplicationType()");
                     return "Platform";
             }
         }
 
         public static IList<FileInfo> GetLastModifiedFiles()
         {
+			eventLogger.LogError(">>> Entering GetLastModifiedFiles()");
             var files = GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.*", SearchOption.AllDirectories)
                 .Where(f => !ExcludedFilePathRegexList.Any(r => r.IsMatch(f)))
                 .Select(f => new FileInfo(f))
                 .OrderByDescending(f => f.LastWriteTime)
                 .Take(ModifiedFilesCount).ToList();
 
+			eventLogger.LogWarning("<<< Exiting GetLastModifiedFiles()");
             return files;
         }
 
         public static IList<FileInfo> GetLastModifiedExecutableFiles()
         {
+			eventLogger.LogError(">>> Entering GetLastModifiedExecutableFiles()");
             var executableExtensions = new List<string>() { ".asp", ".aspx", ".php" };
             var files = GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.*", SearchOption.AllDirectories)
                 .Where(f =>
                 {
+					eventLogger.LogError("GetLastModifiedExecutableFiles(): executableExtensions → {ExecutableExtensions}", executableExtensions);
                     var extension = Path.GetExtension(f);
+					eventLogger.LogError("GetLastModifiedExecutableFiles(): extension → {Extension}", extension);
                     return extension != null && executableExtensions.Contains(extension.ToLowerInvariant());
                 }).ToList();
             files.Add(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Default.aspx.cs"));
             files.Add(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "web.config"));
 
             var defaultPage = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Default.aspx");
+			eventLogger.LogError("GetLastModifiedExecutableFiles(): defaultPage → {DefaultPage}", defaultPage);
             if (!files.Contains(defaultPage))
             {
                 files.Add(defaultPage);
             }
 
+			eventLogger.LogWarning("<<< Exiting GetLastModifiedExecutableFiles()");
             return files
             .Select(f => new FileInfo(f))
             .OrderByDescending(f => f.LastWriteTime)
@@ -241,6 +278,7 @@ namespace Dnn.PersonaBar.Security.Components
 
         private static bool FileContainsText(string name, string searchText)
         {
+			eventLogger.LogError(">>> Entering FileContainsText(name={Name},searchText={SearchText})", name, searchText);
             try
             {
                 // If the file has been deleted since we took
@@ -252,26 +290,31 @@ namespace Dnn.PersonaBar.Security.Components
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in FileContainsText(name={Name},searchText={SearchText}): {Arg2}", name, searchText, Exception.Message);
                 // might be a locking issue
             }
 
+			eventLogger.LogWarning("<<< Exiting FileContainsText(name={Name},searchText={SearchText})", name, searchText);
             return false;
         }
 
         private static bool IsReadable(string name)
         {
+			eventLogger.LogError(">>> Entering IsReadable(name={Name})", name);
             if (!File.Exists(name))
             {
                 return false;
             }
 
             var file = new FileInfo(name);
+			eventLogger.LogError("IsReadable(name={Name}): file → {File}", name, file);
             if (file.Length > MaxFileSize)
             {
                 // when file large than 10M, then don't read it.
                 return false;
             }
 
+			eventLogger.LogWarning("<<< Exiting IsReadable(name={Name})", name);
             return true;
         }
 
@@ -332,6 +375,7 @@ namespace Dnn.PersonaBar.Security.Components
                     }
                 }
             }
+			eventLogger.LogWarning("<<< Exiting GetFiles(path={Path},searchPattern={SearchPattern},searchOption={SearchOption})", path, searchPattern, searchOption);
         }
 
         // This will reduce serialization thrown exceptions of anonymous type

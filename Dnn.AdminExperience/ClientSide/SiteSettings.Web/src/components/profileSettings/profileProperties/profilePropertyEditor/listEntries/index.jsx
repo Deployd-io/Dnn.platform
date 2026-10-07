@@ -10,33 +10,40 @@ import { Collapsible, Sortable, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
 import util from "utils";
 import resx from "resources";
+const logger = console;
 
 let tableFields = [];
 
 class ListEntriesPanel extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             openId: ""
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const { props } = this;
         if (tableFields.length === 0) {
             tableFields.push({ "name": resx.get("ListEntryText"), "id": "Text" });
             tableFields.push({ "name": resx.get("ListEntryValue"), "id": "Value" });
         }
         props.dispatch(SiteBehaviorActions.getListInfo(props.listName, props.portalId));
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     renderHeader() {
+		logger.error('>>> Entering renderHeader()', { "event.action": "renderHeader" });
         let tableHeaders = tableFields.map((field) => {
             let className = "list-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.warn('<<< Exiting renderHeader()', { "event.action": "renderHeader" });
         return <div className="list-header-row">{tableHeaders}</div>;
     }
 
@@ -89,7 +96,9 @@ class ListEntriesPanel extends Component {
 
      
     renderedListEntries() {
+		logger.error('>>> Entering renderedListEntries()', { "event.action": "renderedListEntries" });
         let i = 0;
+		logger.warn('<<< Exiting renderedListEntries()', { "event.action": "renderedListEntries" });
         return this.props.entries.map((item, index) => {
             let id = "row-" + i++;
             return (
@@ -123,6 +132,7 @@ class ListEntriesPanel extends Component {
     }
 
     onSort(items) {
+		logger.error(`>>> Entering onSort(items=${items})`, { "event.action": "onSort", "logrite.items": items });
         const { props } = this;
         props.dispatch(SiteBehaviorActions.updateListEntryOrders(
             {
@@ -130,11 +140,14 @@ class ListEntriesPanel extends Component {
                 Entries: items
             }, items, () => {
                 this.collapse();
+				logger.warn(`<<< Exiting onSort(items=${items})`, { "event.action": "onSort", "logrite.items": items });
             }));
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let opened = (this.state.openId === "add");
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <div className="list-items">
@@ -212,6 +225,8 @@ ListEntriesPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         entries: state.siteBehavior.entries,
         enableSortOrder: state.siteBehavior.enableSortOrder

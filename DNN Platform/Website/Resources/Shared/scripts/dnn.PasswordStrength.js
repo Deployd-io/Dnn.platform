@@ -1,4 +1,5 @@
-﻿; if (typeof dnn === "undefined" || dnn === null) { dnn = {}; }; //var dnn = dnn || {};
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+; if (typeof dnn === "undefined" || dnn === null) { dnn = {}; }; //var dnn = dnn || {};
 
 // the semi-colon before function invocation is a safety net against concatenated 
 // scripts and/or other plugins which may not be closed properly.
@@ -18,8 +19,12 @@
 
     // The actual plugin constructor
     var PasswordStrength = this.PasswordStrength = function (element, options) {
+		logger.error(`>>> Entering PasswordStrength(element=${element},options=${options})`, { "event.action": "PasswordStrength", "logrite.element": element, "logrite.options": options });
         this.element = element;
         this.options = options; 
+		logger.debug(`PasswordStrength(element=${element},options=${options}): element → ${element}`, { "event.action": "PasswordStrength", "logrite.element": element, "logrite.options": options });
+		logger.debug(`PasswordStrength(element=${element},options=${options}): this.element → ${this.element}`, { "event.action": "PasswordStrength", "logrite.element": element, "logrite.options": options });
+		logger.debug(`PasswordStrength(element=${element},options=${options}): options → ${options}`, { "event.action": "PasswordStrength", "logrite.element": element, "logrite.options": options });
 
         this.init();
     };
@@ -29,6 +34,7 @@
         constructor: PasswordStrength,
 
         init: function () {
+			logger.error('>>> Entering init()', { "event.action": "init" });
             // Place initialization logic here
             // You already have access to the DOM element and the options via the instance, 
             // e.g., this.element and this.options
@@ -40,6 +46,7 @@
 
             //$("<span/>").addClass(this.options.labelCss).text(this.options.minLength + this.options.minLengthText).appendTo(this._$container);
             this._$meter = $("<div/>").addClass(this.options.meterCss).appendTo(this._$container).width(this.$element.outerWidth());
+			logger.warn('<<< Exiting init()', { "event.action": "init" });
 	        var handler = this;
 	        setInterval(function () {
 	            handler._$meter.width(handler.$element.outerWidth());
@@ -61,11 +68,15 @@
 
             var meterHover = {
                 over: function () {
+					logger.error('>>> Entering over()', { "event.action": "over" });
                     handler._forceTooltipVisible();
+					logger.warn('<<< Exiting over()', { "event.action": "over" });
                 },
                 timeout: 200,
                 out: function () {
+					logger.error('>>> Entering out()', { "event.action": "out" });
                     handler._updateTooltipVisible();
+					logger.warn('<<< Exiting out()', { "event.action": "out" });
                 }
             };
             this._$meter.hoverIntent(meterHover);
@@ -89,11 +100,13 @@
         },
 
         _initializeTooltip: function() {
+			logger.error('>>> Entering _initializeTooltip()', { "event.action": "_initializeTooltip" });
         	this._$tooltipContent = $("<div/>").addClass("password-strength-tooltip-content").appendTo(this._$tooltipContainer);
 			this._$tooltipContent.width(this.$element.outerWidth() - 20);
 			$('<h2 />').html(this.options.passwordRulesHeadText).appendTo(this._$tooltipContent);
 
 			var list = $("<ul/>").appendTo(this._$tooltipContent);
+			logger.error(`_initializeTooltip(): list → ${list}`, { "event.action": "_initializeTooltip" });
             this._$labelAtLeastNChars = $("<label/>").text(this.options.criteriaAtLeastNChars).appendTo($("<li/>").appendTo(list));
             this._$labelAtLeastNSpecialChars = $("<label/>").text(this.options.criteriaAtLeastNSpecialChars).appendTo($("<li/>").appendTo(list));
             this._$labelValidationExpression = $("<label/>").text(this.options.criteriaValidationExpression).appendTo($("<li/>").appendTo(list));
@@ -112,9 +125,11 @@
                 this._strength = this._getStrength(this.$element.val(), this.options);
             }
             this._updateTooltipState(this._strength);
+			logger.warn('<<< Exiting _initializeTooltip()', { "event.action": "_initializeTooltip" });
         },
 
         _onInput: function (e) {
+			logger.error(`>>> Entering _onInput(e=${e})`, { "event.action": "_onInput", "logrite.e": e });
 	        if (e.type === 'propertychange' && e.originalEvent.propertyName.toLowerCase() !== 'value') {
 		        return;
 	        }
@@ -124,14 +139,17 @@
             }
 
             this._updateState();
+			logger.warn(`<<< Exiting _onInput(e=${e})`, { "event.action": "_onInput", "logrite.e": e });
         },
 
         _updateState: function() {
+			logger.error('>>> Entering _updateState()', { "event.action": "_updateState" });
             var password = this.$element.val();
             this._strength = this._getStrength(password, this.options);
             this._updateMeterState(this._strength);
             this._updateTooltipState(this._strength);
 	        this._updateFieldState(this._strength);
+			logger.warn('<<< Exiting _updateState()', { "event.action": "_updateState" });
         },
 
         _updateMeterState: function (strength) {
@@ -164,6 +182,7 @@
 	        });
 
             rating === 0 ? this._$meterText.hide() : this._$meterText.show();
+			logger.warn(`<<< Exiting _updateMeterState(strength=${strength})`, { "event.action": "_updateMeterState", "logrite.strength": strength });
         },
 
         _updateTooltipState: function (strength) {
@@ -174,34 +193,43 @@
             this._updateCriteriaLabel(this._$labelAtLeastNChars, strength.hasLengthOfNChars);
             this._updateCriteriaLabel(this._$labelAtLeastNSpecialChars, strength.hasMinNumberOfSpecialChars);
             this._updateCriteriaLabel(this._$labelValidationExpression, strength.matchValidationExpression);
+			logger.warn(`<<< Exiting _updateTooltipState(strength=${strength})`, { "event.action": "_updateTooltipState", "logrite.strength": strength });
         },
 
         _updateTooltipVisible: function () {
+			logger.error('>>> Entering _updateTooltipVisible()', { "event.action": "_updateTooltipVisible" });
             var password = this.$element.val();
             var strength = this._strength = this._getStrength(password, this.options);
+			logger.error(`_updateTooltipVisible(): strength → ${strength}`, { "event.action": "_updateTooltipVisible" });
 
             var matchedPasswordPolicy = this._matchedPasswordPolicy(strength);
             if (matchedPasswordPolicy || this.$element.val() === '') {
                 this._$tooltipContainer.fadeOut('fast');
             } else {
                 this._$tooltipContainer.fadeIn('fast');
+				logger.warn('<<< Exiting _updateTooltipVisible()', { "event.action": "_updateTooltipVisible" });
             }
         },
 
         _forceTooltipVisible: function() {
+			logger.error('>>> Entering _forceTooltipVisible()', { "event.action": "_forceTooltipVisible" });
             this._$tooltipContainer.fadeIn('fast');
+			logger.warn('<<< Exiting _forceTooltipVisible()', { "event.action": "_forceTooltipVisible" });
         },
 
         _updateCriteriaLabel: function($label, satisfied) {
+			logger.error(`>>> Entering _updateCriteriaLabel($label=${$label},satisfied=${satisfied})`, { "event.action": "_updateCriteriaLabel", "logrite.$label": $label, "logrite.satisfied": satisfied });
             if (satisfied) {
                 $label.addClass("satisfied");
             }
             else {
                 $label.removeClass("satisfied");
+				logger.warn(`<<< Exiting _updateCriteriaLabel($label=${$label},satisfied=${satisfied})`, { "event.action": "_updateCriteriaLabel", "logrite.$label": $label, "logrite.satisfied": satisfied });
             }
         },
 
 		_updateFieldState: function(strength) {
+			logger.error(`>>> Entering _updateFieldState(strength=${strength})`, { "event.action": "_updateFieldState", "logrite.strength": strength });
 			if (this.$element.val().length > 0) {
 			    var matchedPasswordPolicy = this._matchedPasswordPolicy(strength);
 				if (matchedPasswordPolicy) {
@@ -211,13 +239,16 @@
 				}
 			} else {
 				this.$element.removeClass('validate-success validate-fail');
+				logger.warn(`<<< Exiting _updateFieldState(strength=${strength})`, { "event.action": "_updateFieldState", "logrite.strength": strength });
 			}
 		},
 
         _matchedPasswordPolicy: function(strength) {
+			logger.error(`>>> Entering _matchedPasswordPolicy(strength=${strength})`, { "event.action": "_matchedPasswordPolicy", "logrite.strength": strength });
             return strength.hasLengthOfNChars
                         && (this.options.minNumberOfSpecialChars === 0 || strength.hasMinNumberOfSpecialChars)
                         && (this.options.validationExpression === '' || strength.matchValidationExpression);
+						logger.warn(`<<< Exiting _matchedPasswordPolicy(strength=${strength})`, { "event.action": "_matchedPasswordPolicy", "logrite.strength": strength });
         },
 
         _getStrength: function(password, options) {
@@ -288,9 +319,11 @@
     };
 
     PasswordStrength.defaults = function (settings) {
+		logger.error(`>>> Entering defaults(settings=${settings})`, { "event.action": "defaults", "logrite.settings": settings });
         if (typeof settings !== "undefined") {
         	$.extend(PasswordStrength._defaults, settings);
         }
+		logger.warn(`<<< Exiting defaults(settings=${settings})`, { "event.action": "defaults", "logrite.settings": settings });
         return PasswordStrength._defaults;
     };
 
@@ -318,5 +351,7 @@
 
 
 dnn.initializePasswordStrength = function (selector, options) {
+	logger.error(`>>> Entering initializePasswordStrength(selector=${selector},options=${options})`, { "event.action": "initializePasswordStrength", "logrite.selector": selector, "logrite.options": options });
     $(document).ready(function() { $(selector).passwordStrength(options); });
+	logger.warn(`<<< Exiting initializePasswordStrength(selector=${selector},options=${options})`, { "event.action": "initializePasswordStrength", "logrite.selector": selector, "logrite.options": options });
 };

@@ -33,6 +33,7 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class UserInfo : BaseEntityInfo, IPropertyAccess, IUserInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserInfo));
         private readonly ConcurrentDictionary<int, UserSocial> social = new ConcurrentDictionary<int, UserSocial>();
         private readonly ConcurrentDictionary<int, string[]> roles = new ConcurrentDictionary<int, string[]>();
         private string administratorRoleName;
@@ -42,9 +43,12 @@ namespace DotNetNuke.Entities.Users
         /// <summary>Initializes a new instance of the <see cref="UserInfo"/> class.</summary>
         public UserInfo()
         {
+			Logger.LogError(">>> Entering UserInfo()");
             this.IsDeleted = Null.NullBoolean;
+			Logger.LogDebug("UserInfo(): this.IsDeleted → {Arg0}", this.IsDeleted);
             this.UserID = Null.NullInteger;
             this.PortalID = Null.NullInteger;
+			Logger.LogDebug("UserInfo(): this.UserID → {Arg0}", this.UserID);
             this.IsSuperUser = Null.NullBoolean;
             this.AffiliateID = Null.NullInteger;
         }
@@ -257,10 +261,12 @@ namespace DotNetNuke.Entities.Users
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope currentScope, ref bool propertyNotFound)
         {
+			Logger.LogError(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
             Scope internScope;
             if (this.UserID == -1 && currentScope > Scope.Configuration)
             {
                 internScope = Scope.Configuration; // anonymous users only get access to display name
+				Logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): internScope → {InternScope}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, internScope);
             }
             else if (this.UserID != accessingUser.UserID && !this.IsAdminUser(ref accessingUser) && currentScope > Scope.DefaultSettings)
             {
@@ -278,11 +284,14 @@ namespace DotNetNuke.Entities.Users
                     if (internScope < Scope.SystemMessages)
                     {
                         propertyNotFound = true;
+						Logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): propertyNotFound → {PropertyNotFound1}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, propertyNotFound);
                         return PropertyAccess.ContentLocked;
                     }
 
                     var cryptographyProvider = Globals.GetCurrentServiceProvider().GetRequiredService<ICryptographyProvider>();
+					Logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): cryptographyProvider → {CryptographyProvider}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, cryptographyProvider);
                     var code = cryptographyProvider.EncryptParameter($"{this.PortalID}-{this.GetMembershipUserId()}", Config.GetDecryptionkey()).EncryptedMessage;
+					Logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): code → {Code}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, code);
                     return code.Replace("+", ".").Replace("/", "-").Replace("=", "_");
                 case "affiliateid":
                     if (internScope < Scope.SystemMessages)
@@ -356,7 +365,9 @@ namespace DotNetNuke.Entities.Users
                     }
 
                     var settings = PortalController.Instance.GetPortalSettings(this.PortalID);
+					Logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): settings → {Settings}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, settings);
                     var regSettings = new RegistrationSettings(settings);
+					Logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): regSettings → {RegSettings}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, regSettings);
 
                     return regSettings.UseEmailAsUserName ?
                         PropertyAccess.FormatString(this.Email, format) :
@@ -380,6 +391,7 @@ namespace DotNetNuke.Entities.Users
             }
 
             propertyNotFound = true;
+			Logger.LogWarning("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
             return string.Empty;
         }
 
@@ -388,6 +400,7 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A Boolean indicating success or failure.</returns>
         public bool IsInRole(string role)
         {
+			Logger.LogError(">>> Entering IsInRole(role={Role})", role);
             // super users should always be verified.
             if (this.IsSuperUser)
             {
@@ -415,6 +428,7 @@ namespace DotNetNuke.Entities.Users
                 return roles.Any(s => s == role);
             }
 
+			Logger.LogWarning("<<< Exiting IsInRole(role={Role})", role);
             return false;
         }
 
@@ -422,6 +436,9 @@ namespace DotNetNuke.Entities.Users
         /// <returns>The time in the user's (or portal's) preferred time zone.</returns>
         public DateTime LocalTime()
         {
+			Logger.LogError(">>> Entering LocalTime()");
+			Logger.LogWarning("<<< Exiting LocalTime()");
+			Logger.LogWarning("<<< Exiting LocalTime(utcTime={UtcTime})", utcTime);
             return this.LocalTime(DateUtils.GetDatabaseUtcTime());
         }
 
@@ -442,6 +459,8 @@ namespace DotNetNuke.Entities.Users
         /// <param name="format">The format to use.</param>
         public void UpdateDisplayName(string format)
         {
+			Logger.LogError(">>> Entering UpdateDisplayName(format={Format})", format);
+			Logger.LogError("UpdateDisplayName(format={Format}): format → {Format1}", format, format);
             // Replace Tokens
             format = format.Replace("[USERID]", this.UserID.ToString(CultureInfo.InvariantCulture));
             format = format.Replace("[FIRSTNAME]", this.FirstName);
@@ -455,6 +474,7 @@ namespace DotNetNuke.Entities.Users
         /// <returns>true, if user is portal administrator or superuser.</returns>
         private bool IsAdminUser(ref UserInfo accessingUser)
         {
+			Logger.LogError(">>> Entering IsAdminUser(accessingUser={AccessingUser})", accessingUser);
             if (accessingUser == null || accessingUser.UserID == -1)
             {
                 return false;
@@ -463,14 +483,19 @@ namespace DotNetNuke.Entities.Users
             if (string.IsNullOrEmpty(this.administratorRoleName))
             {
                 PortalInfo ps = PortalController.Instance.GetPortal(accessingUser.PortalID);
+				Logger.LogError("IsAdminUser(accessingUser={AccessingUser}): ps → {Ps}", accessingUser, ps);
                 this.administratorRoleName = ps.AdministratorRoleName;
+				Logger.LogDebug("IsAdminUser(accessingUser={AccessingUser}): this.administratorRoleName → {Arg1}", accessingUser, this.administratorRoleName);
             }
 
+			Logger.LogWarning("<<< Exiting IsAdminUser(accessingUser={AccessingUser})", accessingUser);
             return accessingUser.IsInRole(this.administratorRoleName) || accessingUser.IsSuperUser;
         }
 
         private string GetMembershipUserId()
         {
+			Logger.LogError(">>> Entering GetMembershipUserId()");
+            Logger.LogWarning("<<< Exiting GetMembershipUserId()");
             return MembershipProvider.Instance().GetProviderUserKey(this)?.Replace("-", string.Empty) ?? string.Empty;
         }
     }

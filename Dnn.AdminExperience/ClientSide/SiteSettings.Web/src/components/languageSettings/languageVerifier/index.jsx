@@ -8,13 +8,17 @@ import LanguageVerifierGrid from "./languageVerifierGrid";
 import { PersonaBarPageBody } from "@dnnsoftware/dnn-react-common";
 import resx from "../../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class LanguageVerifierPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         const { props } = this;
         if (prevProps.selectedPage !== props.selectedPage && props.selectedPage === 2) {
             if (props.verificationResults) {
@@ -29,10 +33,13 @@ class LanguageVerifierPanelBody extends Component {
                 });
             }));
         }
+		logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
     }
 
     renderedResults() {
+		logger.error('>>> Entering renderedResults()', { "event.action": "renderedResults" });
         if (this.props.verificationResults) {
+			logger.warn('<<< Exiting renderedResults()', { "event.action": "renderedResults" });
             return this.props.verificationResults.map((item, i) => {
                 return (
                     <LanguageVerifierGrid
@@ -54,6 +61,8 @@ class LanguageVerifierPanelBody extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.languageVerifier}>                
                 <PersonaBarPageBody backToLinkProps={{
@@ -77,6 +86,8 @@ LanguageVerifierPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         selectedPage: state.visiblePanel.selectedPage,

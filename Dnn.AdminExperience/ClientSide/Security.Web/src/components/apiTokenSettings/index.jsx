@@ -14,6 +14,7 @@ import "./style.less";
 import util from "../../utils";
 import resx from "../../resources";
 import "./style.less";
+const logger = console;
 
 let timespanSiteOptions = [];
 let timespanUserOptions = [];
@@ -21,18 +22,22 @@ let timespanUserOptions = [];
 class ApiTokenSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             apiTokenSettings: undefined,
         };
         timespanSiteOptions.push({ "value": 0, "label": resx.get("Days30") });
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
         timespanSiteOptions.push({ "value": 1, "label": resx.get("Days60") });
         timespanSiteOptions.push({ "value": 2, "label": resx.get("Days90") });
         timespanSiteOptions.push({ "value": 3, "label": resx.get("Days180") });
         timespanSiteOptions.push({ "value": 4, "label": resx.get("Years1") });
         timespanSiteOptions.push({ "value": 5, "label": resx.get("Years2") });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const { props } = this;
         if (props.apiTokenSettings) {
             this.setState({
@@ -41,19 +46,23 @@ class ApiTokenSettingsPanelBody extends Component {
             return;
         }
         this.getSettings();
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     getUserTimespanOptions() {
+		logger.error('>>> Entering getUserTimespanOptions()', { "event.action": "getUserTimespanOptions" });
         if (timespanUserOptions.length === 0) {
             const max = this.state.apiTokenSettings.MaximumSiteTimespan;
             timespanUserOptions = timespanSiteOptions.filter((item) => {
                 return item.value <= max;
             });
         }
+		logger.warn('<<< Exiting getUserTimespanOptions()', { "event.action": "getUserTimespanOptions" });
         return timespanUserOptions;
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         const { state, props } = this;
         let apiTokenSettings = Object.assign({}, state.apiTokenSettings);
         apiTokenSettings[key] = typeof event === "object" ? event.target.value : event;
@@ -63,9 +72,11 @@ class ApiTokenSettingsPanelBody extends Component {
             timespanUserOptions = [];
         });
         props.dispatch(SecurityActions.apiTokenSettingsClientModified(apiTokenSettings));
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const { props, state } = this;
 
@@ -78,23 +89,27 @@ class ApiTokenSettingsPanelBody extends Component {
                 },
                 () => {
                     util.utilities.notifyError(resx.get("ApiTokenSettingsError"));
+					logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
                 }
             )
         );
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         util.utilities.confirm(
             resx.get("ApiTokenSettingsRestoreWarning"),
             resx.get("Yes"),
             resx.get("No"),
             () => {
                 this.getSettings();
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
             }
         );
     }
 
     getSettings() {
+		logger.error('>>> Entering getSettings()', { "event.action": "getSettings" });
         const { props } = this;
         props.dispatch(
             SecurityActions.getApiTokenSettings((data) => {
@@ -104,14 +119,18 @@ class ApiTokenSettingsPanelBody extends Component {
                 });
             })
         );
+		logger.warn('<<< Exiting getSettings()', { "event.action": "getSettings" });
     }
 
     testPositiveInt(value) {
+		logger.error(`>>> Entering testPositiveInt(value=${value})`, { "event.action": "testPositiveInt", "logrite.value": value });
+		logger.warn(`<<< Exiting testPositiveInt(value=${value})`, { "event.action": "testPositiveInt", "logrite.value": value });
         return /^([0-9]+)$/.test(value);
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { state } = this;
         const isHost = util.settings.isHost;
 
@@ -208,6 +227,8 @@ ApiTokenSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         apiTokenSettings: state.security.apiTokenSettings,

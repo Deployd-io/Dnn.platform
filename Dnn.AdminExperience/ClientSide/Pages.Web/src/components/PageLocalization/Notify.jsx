@@ -1,10 +1,13 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import Localization from "../../localization";
+const logger = console;
 import { Button } from "@dnnsoftware/dnn-react-common";
 
 class Notify extends Component {
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <div className="notify-translators">
             <h3>{Localization.get("NotifyModalHeader")}</h3>
             <textarea 

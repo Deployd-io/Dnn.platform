@@ -18,6 +18,7 @@ namespace DotNetNuke.Security.Roles
     [Serializable]
     public class RoleGroupInfo : BaseEntityInfo, IHydratable, IXmlSerializable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RoleGroupInfo));
         private string description;
         private int portalID = Null.NullInteger;
         private int roleGroupID = Null.NullInteger;
@@ -27,6 +28,8 @@ namespace DotNetNuke.Security.Roles
         /// <summary>Initializes a new instance of the <see cref="RoleGroupInfo"/> class.</summary>
         public RoleGroupInfo()
         {
+		Logger.LogError(">>> Entering RoleGroupInfo()");
+		Logger.LogWarning("<<< Exiting RoleGroupInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="RoleGroupInfo"/> class.</summary>
@@ -35,10 +38,17 @@ namespace DotNetNuke.Security.Roles
         /// <param name="loadRoles">Whether to eagerly load the group's roles.</param>
         public RoleGroupInfo(int roleGroupID, int portalID, bool loadRoles)
         {
+			Logger.LogError(">>> Entering RoleGroupInfo(roleGroupID={RoleGroupID},portalID={PortalID},loadRoles={LoadRoles})", roleGroupID, portalID, loadRoles);
             this.portalID = portalID;
+			Logger.LogWarning("<<< Exiting RoleGroupInfo()");
+			Logger.LogDebug("RoleGroupInfo(roleGroupID={RoleGroupID},portalID={PortalID},loadRoles={LoadRoles}): this.portalID → {Arg3}", roleGroupID, portalID, loadRoles, this.portalID);
             this.roleGroupID = roleGroupID;
             if (loadRoles)
             {
+				Logger.LogDebug("RoleGroupInfo(roleGroupID={RoleGroupID},portalID={PortalID},loadRoles={LoadRoles}): roleGroupID → {RoleGroupID1}", roleGroupID, portalID, loadRoles, roleGroupID);
+				Logger.LogDebug("RoleGroupInfo(roleGroupID={RoleGroupID},portalID={PortalID},loadRoles={LoadRoles}): this.roleGroupID → {Arg3}", roleGroupID, portalID, loadRoles, this.roleGroupID);
+				Logger.LogDebug("RoleGroupInfo(roleGroupID={RoleGroupID},portalID={PortalID},loadRoles={LoadRoles}): portalID → {PortalID1}", roleGroupID, portalID, loadRoles, portalID);
+        Logger.LogWarning("<<< Exiting RoleGroupInfo(roleGroupID={RoleGroupID},portalID={PortalID},loadRoles={LoadRoles})", roleGroupID, portalID, loadRoles);
                 this.GetRoles();
             }
         }
@@ -130,6 +140,7 @@ namespace DotNetNuke.Security.Roles
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.RoleGroupID = Null.SetNullInteger(dr["RoleGroupId"]);
             this.PortalID = Null.SetNullInteger(dr["PortalID"]);
             this.RoleGroupName = Null.SetNullString(dr["RoleGroupName"]);
@@ -137,11 +148,14 @@ namespace DotNetNuke.Security.Roles
 
             // Fill base class fields
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <inheritdoc />
         public XmlSchema GetSchema()
         {
+			Logger.LogError(">>> Entering GetSchema()");
+			Logger.LogWarning("<<< Exiting GetSchema()");
             return null;
         }
 
@@ -149,6 +163,7 @@ namespace DotNetNuke.Security.Roles
         /// <inheritdoc />
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogError(">>> Entering ReadXml(reader={Reader})", reader);
             while (reader.Read())
             {
                 if (reader.NodeType == XmlNodeType.EndElement)
@@ -190,12 +205,14 @@ namespace DotNetNuke.Security.Roles
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting ReadXml(reader={Reader})", reader);
         }
 
         /// <summary>Writes a RoleGroupInfo to an XmlWriter.</summary>
         /// <inheritdoc />
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteXml(writer={Writer})", writer);
             // Write start of main elements
             writer.WriteStartElement("rolegroup");
 
@@ -220,31 +237,39 @@ namespace DotNetNuke.Security.Roles
 
             // Write end of main element
             writer.WriteEndElement();
+			Logger.LogWarning("<<< Exiting WriteXml(writer={Writer})", writer);
         }
 
         private void GetRoles()
         {
+			Logger.LogError(">>> Entering GetRoles()");
             this.roles = new Dictionary<string, RoleInfo>();
+			Logger.LogDebug("GetRoles(): roles → {Roles}", roles);
             foreach (var role in RoleController.Instance.GetRoles(this.PortalID, r => r.RoleGroupID == this.RoleGroupID))
             {
                 this.roles[role.RoleName] = role;
             }
+			Logger.LogWarning("<<< Exiting GetRoles()");
         }
 
         /// <summary>Reads a Roles from an XmlReader.</summary>
         /// <param name="reader">The XmlReader to use.</param>
         private void ReadRoles(XmlReader reader)
         {
+			Logger.LogError(">>> Entering ReadRoles(reader={Reader})", reader);
             reader.ReadStartElement("roles");
             this.roles = new Dictionary<string, RoleInfo>();
+			Logger.LogDebug("ReadRoles(reader={Reader}): roles → {Roles}", reader, roles);
             do
             {
                 reader.ReadStartElement("role");
                 var role = new RoleInfo();
+				Logger.LogError("ReadRoles(reader={Reader}): role → {Role}", reader, role);
                 role.ReadXml(reader);
                 this.roles.Add(role.RoleName, role);
             }
             while (reader.ReadToNextSibling("role"));
+			Logger.LogWarning("<<< Exiting ReadRoles(reader={Reader})", reader);
         }
     }
 }

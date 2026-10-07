@@ -42,7 +42,11 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
             ISecurityService securityService,
             IContentVerifier contentVerifier)
         {
+			eventLogger.LogError(">>> Entering GetPage(tabController={TabController},securityService={SecurityService},contentVerifier={ContentVerifier})", tabController, securityService, contentVerifier);
+			eventLogger.LogDebug("GetPage(tabController={TabController},securityService={SecurityService},contentVerifier={ContentVerifier}): securityService → {SecurityService1}", tabController, securityService, contentVerifier, securityService);
             this.tabController = tabController;
+			eventLogger.LogWarning("<<< Exiting GetPage(tabController={TabController},securityService={SecurityService},contentVerifier={ContentVerifier})", tabController, securityService, contentVerifier);
+			eventLogger.LogDebug("GetPage(tabController={TabController},securityService={SecurityService},contentVerifier={ContentVerifier}): this.tabController → {Arg3}", tabController, securityService, contentVerifier, this.tabController);
             this.securityService = securityService;
             this.contentVerifier = contentVerifier;
         }
@@ -59,6 +63,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.PageId = this.GetFlagValue(FlagId, "Page Id", -1, false, true);
             this.PageName = this.GetFlagValue(FlagName, "Page Name", string.Empty);
             this.ParentId = this.GetFlagValue(FlagParentId, "Parent Id", -1);
@@ -66,17 +71,20 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
             {
                 this.AddMessage(this.LocalizeString("Prompt_ParameterRequired"));
             }
+			eventLogger.LogWarning("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             var lst = new List<PageModel>();
             var tab = this.PageId != -1
                 ? this.tabController.GetTab(this.PageId, this.PortalId)
                 : (this.ParentId > 0
                     ? this.tabController.GetTabByName(this.PageName, this.PortalId, this.ParentId)
                     : this.tabController.GetTabByName(this.PageName, this.PortalId));
+					eventLogger.LogError("Run(): lst → {Lst}", lst);
 
             if (tab != null)
             {
@@ -92,6 +100,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting Run()");
             return new ConsoleErrorResultModel(this.LocalizeString("Prompt_PageNotFound"));
         }
     }

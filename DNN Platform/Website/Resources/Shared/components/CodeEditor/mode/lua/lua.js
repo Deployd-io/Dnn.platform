@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -19,9 +20,13 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
   var indentUnit = config.indentUnit;
 
   function prefixRE(words) {
+	logger.error(`>>> Entering prefixRE(words=${words})`, { "event.action": "prefixRE", "logrite.words": words });
+	logger.warn(`<<< Exiting prefixRE(words=${words})`, { "event.action": "prefixRE", "logrite.words": words });
     return new RegExp("^(?:" + words.join("|") + ")", "i");
   }
   function wordRE(words) {
+	logger.error(`>>> Entering wordRE(words=${words})`, { "event.action": "wordRE", "logrite.words": words });
+	logger.warn(`<<< Exiting wordRE(words=${words})`, { "event.action": "wordRE", "logrite.words": words });
     return new RegExp("^(?:" + words.join("|") + ")$", "i");
   }
   var specials = wordRE(parserConfig.specials || []);
@@ -68,15 +73,19 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
   var dedentPartial = prefixRE(["end", "until", "\\)", "}", "else", "elseif"]);
 
   function readBracket(stream) {
+	logger.error(`>>> Entering readBracket(stream=${stream})`, { "event.action": "readBracket", "logrite.stream": stream });
     var level = 0;
     while (stream.eat("=")) ++level;
     stream.eat("[");
+	logger.warn(`<<< Exiting readBracket(stream=${stream})`, { "event.action": "readBracket", "logrite.stream": stream });
     return level;
   }
 
   function normal(stream, state) {
+	logger.error(`>>> Entering normal(stream=${stream},state=${state})`, { "event.action": "normal", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.next();
     if (ch == "-" && stream.eat("-")) {
+	logger.error(`normal(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "normal", "logrite.stream": stream, "logrite.state": state });
       if (stream.eat("[") && stream.eat("["))
         return (state.cur = bracketed(readBracket(stream), "comment"))(stream, state);
       stream.skipToEnd();
@@ -94,10 +103,12 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
       stream.eatWhile(/[\w\\\-_.]/);
       return "variable";
     }
+	logger.warn(`<<< Exiting normal(stream=${stream},state=${state})`, { "event.action": "normal", "logrite.stream": stream, "logrite.state": state });
     return null;
   }
 
   function bracketed(level, style) {
+	logger.error(`>>> Entering bracketed(level=${level},style=${style})`, { "event.action": "bracketed", "logrite.level": level, "logrite.style": style });
     return function(stream, state) {
       var curlev = null, ch;
       while ((ch = stream.next()) != null) {
@@ -111,6 +122,7 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
   }
 
   function string(quote) {
+	logger.error(`>>> Entering string(quote=${quote})`, { "event.action": "string", "logrite.quote": quote });
     return function(stream, state) {
       var escaped = false, ch;
       while ((ch = stream.next()) != null) {
@@ -124,13 +136,18 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
 
   return {
     startState: function(basecol) {
+	logger.error(`>>> Entering startState(basecol=${basecol})`, { "event.action": "startState", "logrite.basecol": basecol });
+	logger.warn(`<<< Exiting startState(basecol=${basecol})`, { "event.action": "startState", "logrite.basecol": basecol });
       return {basecol: basecol || 0, indentDepth: 0, cur: normal};
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.eatSpace()) return null;
       var style = state.cur(stream, state);
+	logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       var word = stream.current();
+	logger.error(`token(stream=${stream},state=${state}): word → ${word}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (style == "variable") {
         if (keywords.test(word)) style = "keyword";
         else if (builtins.test(word)) style = "builtin";
@@ -139,12 +156,15 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
       if ((style != "comment") && (style != "string")){
         if (indentTokens.test(word)) ++state.indentDepth;
         else if (dedentTokens.test(word)) --state.indentDepth;
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       }
       return style;
     },
 
     indent: function(state, textAfter) {
+	logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       var closing = dedentPartial.test(textAfter);
+	logger.error(`indent(state=${state},textAfter=${textAfter}): closing → ${closing}`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       return state.basecol + indentUnit * (state.indentDepth - (closing ? 1 : 0));
     },
 

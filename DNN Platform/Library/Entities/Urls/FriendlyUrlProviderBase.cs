@@ -10,16 +10,19 @@ namespace DotNetNuke.Entities.Urls
 
     public abstract class FriendlyUrlProviderBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FriendlyUrlProviderBase));
         /// <summary>Initializes a new instance of the <see cref="FriendlyUrlProviderBase"/> class.</summary>
         /// <param name="attributes">The provider attributes.</param>
         internal FriendlyUrlProviderBase(NameValueCollection attributes)
         {
+			Logger.LogError(">>> Entering FriendlyUrlProviderBase(attributes={Attributes})", attributes);
             if (!string.IsNullOrEmpty(attributes["urlFormat"]))
             {
                 switch (attributes["urlFormat"].ToLowerInvariant())
                 {
                     case "searchfriendly":
                         this.UrlFormat = UrlFormatType.SearchFriendly;
+						Logger.LogDebug("FriendlyUrlProviderBase(attributes={Attributes}): this.UrlFormat → {Arg1}", attributes, this.UrlFormat);
                         break;
                     case "humanfriendly":
                         this.UrlFormat = UrlFormatType.HumanFriendly;
@@ -33,6 +36,7 @@ namespace DotNetNuke.Entities.Urls
                         break;
                 }
             }
+			Logger.LogWarning("<<< Exiting FriendlyUrlProviderBase(attributes={Attributes})", attributes);
         }
 
         protected UrlFormatType UrlFormat { get; private set; }

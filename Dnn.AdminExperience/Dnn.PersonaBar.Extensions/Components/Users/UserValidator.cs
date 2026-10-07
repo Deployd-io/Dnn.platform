@@ -32,7 +32,11 @@ namespace Dnn.PersonaBar.Users.Components
         /// <param name="contentVerifier">The content verifier.</param>
         public UserValidator(IPortalController portalController, IUserControllerWrapper userControllerWrapper, IContentVerifier contentVerifier)
         {
+			eventLogger.LogError(">>> Entering UserValidator(portalController={PortalController},userControllerWrapper={UserControllerWrapper},contentVerifier={ContentVerifier})", portalController, userControllerWrapper, contentVerifier);
+			eventLogger.LogDebug("UserValidator(portalController={PortalController},userControllerWrapper={UserControllerWrapper},contentVerifier={ContentVerifier}): userControllerWrapper → {UserControllerWrapper1}", portalController, userControllerWrapper, contentVerifier, userControllerWrapper);
             this.portalController = portalController;
+			eventLogger.LogWarning("<<< Exiting UserValidator(portalController={PortalController},userControllerWrapper={UserControllerWrapper},contentVerifier={ContentVerifier})", portalController, userControllerWrapper, contentVerifier);
+			eventLogger.LogDebug("UserValidator(portalController={PortalController},userControllerWrapper={UserControllerWrapper},contentVerifier={ContentVerifier}): this.portalController → {Arg3}", portalController, userControllerWrapper, contentVerifier, this.portalController);
             this.userControllerWrapper = userControllerWrapper;
             this.contentVerifier = contentVerifier;
         }
@@ -41,7 +45,9 @@ namespace Dnn.PersonaBar.Users.Components
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public ConsoleErrorResultModel ValidateUser(int? userId, PortalSettings portalSettings, UserInfo currentUserInfo, out UserInfo userInfo)
         {
+			eventLogger.LogError(">>> Entering ValidateUser(userId={UserId},portalSettings={PortalSettings},currentUserInfo={CurrentUserInfo})", userId, portalSettings, currentUserInfo);
             userInfo = null;
+			eventLogger.LogError("ValidateUser(userId={UserId},portalSettings={PortalSettings},currentUserInfo={CurrentUserInfo}): userInfo → {UserInfo}", userId, portalSettings, currentUserInfo, userInfo);
             if (!userId.HasValue)
             {
                 return new ConsoleErrorResultModel(Localization.GetString("Prompt_NoUserId", Constants.LocalResourcesFile));
@@ -52,6 +58,7 @@ namespace Dnn.PersonaBar.Users.Components
             if (userInfo == null)
             {
                 var portals = this.portalController.GetPortals();
+				eventLogger.LogError("ValidateUser(userId={UserId},portalSettings={PortalSettings},currentUserInfo={CurrentUserInfo}): portals → {Portals}", userId, portalSettings, currentUserInfo, portals);
 
                 foreach (var portal in portals)
                 {
@@ -74,6 +81,7 @@ namespace Dnn.PersonaBar.Users.Components
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting ValidateUser(userId={UserId},portalSettings={PortalSettings},currentUserInfo={CurrentUserInfo})", userId, portalSettings, currentUserInfo);
             return userInfo == null ? new ConsoleErrorResultModel(response.Value) : null;
         }
     }

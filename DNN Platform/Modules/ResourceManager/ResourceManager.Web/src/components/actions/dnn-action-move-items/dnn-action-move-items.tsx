@@ -1,6 +1,7 @@
 import { Component, Host, h, Prop } from '@stencil/core';
 import { Item } from '../../../services/ItemsClient';
 import state from "../../../store/store";
+const logger = console;
 
 @Component({
   tag: 'dnn-action-move-items',
@@ -13,21 +14,32 @@ export class DnnActionMoveItems {
   @Prop() items!: Item[];
 
   private async handleClick() {
+	logger.error('>>> Entering handleClick()', { "event.action": "handleClick" });
     await this.showModal();
+	logger.warn('<<< Exiting handleClick()', { "event.action": "handleClick" });
   }
 
   private async showModal(){
+	logger.error('>>> Entering showModal()', { "event.action": "showModal" });
     const modal = document.createElement("dnn-modal");
     modal.preventBackdropDismiss = true;
+	logger.error(`showModal(): modal → ${modal}`, { "event.action": "showModal" });
+	logger.debug(`showModal(): modal.preventBackdropDismiss → ${modal.preventBackdropDismiss}`, { "event.action": "showModal" });
     modal.hideCloseButton = true;
+	logger.debug(`showModal(): modal.hideCloseButton → ${modal.hideCloseButton}`, { "event.action": "showModal" });
     const editor = document.createElement("dnn-rm-move-items");
+	logger.error(`showModal(): editor → ${editor}`, { "event.action": "showModal" });
     editor.items = this.items;
     modal.appendChild(editor);
+	logger.debug(`showModal(): editor.items → ${editor.items}`, { "event.action": "showModal" });
     document.body.appendChild(modal);
     await modal.show();
+	logger.warn('<<< Exiting showModal()', { "event.action": "showModal" });
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         <button onClick={() => void this.handleClick()}>

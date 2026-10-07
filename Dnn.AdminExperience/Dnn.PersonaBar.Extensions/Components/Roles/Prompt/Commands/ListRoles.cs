@@ -37,6 +37,7 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.Page = this.GetFlagValue(FlagPage, "Page", 1);
             this.Max = this.GetFlagValue(FlagMax, "Max", 10);
         }
@@ -44,9 +45,12 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogError(">>> Entering Run()");
             var max = this.Max <= 0 ? 10 : (this.Max > 500 ? 500 : this.Max);
 
+			Logger.LogError("Run(): max → {Max}", max);
             var roles = new List<RoleModelBase>();
+			Logger.LogError("Run(): roles → {Roles}", roles);
             try
             {
                 int total;
@@ -59,6 +63,7 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
                     max);
                 roles.AddRange(results.Select(role => new RoleModelBase(role)));
                 var totalPages = (total / max) + (total % max == 0 ? 0 : 1);
+				Logger.LogError("Run(): totalPages → {TotalPages}", totalPages);
                 var pageNo = this.Page > 0 ? this.Page : 1;
                 return new ConsoleResultModel
                 {
@@ -76,6 +81,7 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(this.LocalizeString("Prompt_ListRolesFailed"));
             }
         }

@@ -17,6 +17,7 @@ namespace DotNetNuke.UI.Containers
     /// </summary>
     public partial class Icon : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Icon.ascx));
         /// <summary>Gets or sets the border width of the icon.</summary>
         public string BorderWidth { get; set; }
 
@@ -26,6 +27,7 @@ namespace DotNetNuke.UI.Containers
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -43,10 +45,12 @@ namespace DotNetNuke.UI.Containers
                 this.Visible = false;
                 if (this.ModuleControl?.ModuleContext.Configuration == null)
                 {
+					Logger.LogDebug("OnLoad(e={E}): this.Visible → {Arg1}", e, this.Visible);
                     return;
                 }
 
                 var iconFile = this.GetIconFileUrl();
+				Logger.LogError("OnLoad(e={E}): iconFile → {IconFile}", e, iconFile);
                 if (string.IsNullOrEmpty(iconFile))
                 {
                     return;
@@ -63,12 +67,15 @@ namespace DotNetNuke.UI.Containers
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         private string GetIconFileUrl()
         {
+			Logger.LogError(">>> Entering GetIconFileUrl()");
             var iconFile = this.ModuleControl.ModuleContext.Configuration.IconFile;
             if (string.IsNullOrEmpty(iconFile) || iconFile.StartsWith("~", StringComparison.Ordinal))
             {
@@ -79,13 +86,17 @@ namespace DotNetNuke.UI.Containers
             if (iconFile.StartsWith("FileID=", StringComparison.InvariantCultureIgnoreCase))
             {
                 var fileId = Convert.ToInt32(iconFile.Substring(7));
+				Logger.LogError("GetIconFileUrl(): fileId → {FileId}", fileId);
                 fileInfo = FileManager.Instance.GetFile(fileId);
+				Logger.LogError("GetIconFileUrl(): fileInfo → {FileInfo}", fileInfo);
             }
             else
             {
                 fileInfo = FileManager.Instance.GetFile(this.PortalSettings.PortalId, iconFile);
+				Logger.LogDebug("GetIconFileUrl(): fileInfo → {FileInfo}", fileInfo);
             }
 
+			Logger.LogWarning("<<< Exiting GetIconFileUrl()");
             return fileInfo != null ? FileManager.Instance.GetUrl(fileInfo) : iconFile;
         }
     }

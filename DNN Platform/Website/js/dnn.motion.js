@@ -1,4 +1,5 @@
-﻿
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+
 dnn.extend(dnn.dom,{tweens:[],animate:function(ctl,type,dir,easingType,easingDir,length,interval,onStartFunc,onFinishFunc)
 {var dims=new dnn.dom.positioning.dims(ctl);var anims=[];var vertical=(dir==dnn.motion.animationDir.Down||dir==dnn.motion.animationDir.Up);var expand=(dir==dnn.motion.animationDir.Down||dir==dnn.motion.animationDir.Right);var coord=vertical?'t':'l';var size=coord=='t'?'h':'w';var prop=coord=='t'?'top':'left';var easingFunc=dnn.getEnumByValue(dnn.motion.easingDir,easingDir)+dnn.getEnumByValue(dnn.motion.easingType,easingType);if(type==dnn.motion.animationType.Slide)
 {anims.push({prop:'clip'+prop,begin:dims[size],finish:0});anims.push({prop:prop,begin:dims[coord]-dims[size],finish:dims[coord]});}
@@ -22,6 +23,7 @@ tween.addEventHandler('onMotionFinished',onFinishFunc);tween.start();return twee
 {dnn.dom.tweens[arg.id]=null;arg.dispose();},onMotionStarted:function(arg)
 {}});Type.registerNamespace('dnn.motion');dnn.motion=function(id,obj,prop,begin,duration)
 {this.id=id;this._obj=obj;this._prop=prop;this._begin=begin;this._duration=duration;this._interval=10;this._finish=0;this._pos=0;this._prevPos=0;this._time=0;this._position=0;this._startTime=0;this._looping=false;this._suffix='px';this._listeners=[];this._events=new Sys.EventHandlerList();}
+logger.error(`animate(): tween → ${tween}`, { "event.action": "animate" });
 dnn.motion.prototype={get_Position:function()
 {},set_Position:function(val)
 {this._prevPos=val;var newVal=Math.round(val)+this._suffix;if(this._prop.indexOf('clip')==0)
@@ -62,16 +64,24 @@ o.push('cliptop');if(prop.indexOf('left')>-1)
 o.push('clipleft');if(prop.indexOf('bottom')>-1)
 o.push('clipbottom');if(prop.indexOf('right')>-1)
 o.push('clipright');return o;}}
+logger.error(`get_Position(): handler → ${handler}`, { "event.action": "get_Position" });
 dnn.motion.registerClass('dnn.motion',null,Sys.IDisposable);dnn.motion.animationType=function(){};dnn.motion.animationType.prototype={None:0,Slide:1,Expand:2,Diagonal:3,ReverseDiagonal:4}
+logger.error('>>> Entering animationType()', { "event.action": "animationType" });
 dnn.motion.animationType.registerEnum("dnn.motion.animationType");dnn.motion.animationDir=function(){};dnn.motion.animationDir.prototype={Up:0,Down:1,Left:2,Right:3}
+logger.warn('<<< Exiting animationType()', { "event.action": "animationType" });
 dnn.motion.animationDir.registerEnum("dnn.motion.animationDir");dnn.motion.easingType=function(){};dnn.motion.easingType.prototype={Bounce:0,Circ:1,Cubic:2,Expo:3,Quad:4,Quint:5,Quart:6,Sine:7}
+logger.error('>>> Entering animationDir()', { "event.action": "animationDir" });
 dnn.motion.easingType.registerEnum("dnn.motion.easingType");dnn.motion.easingDir=function(){};dnn.motion.easingDir.prototype={easeIn:0,easeOut:1,easeInOut:2}
+logger.warn('<<< Exiting animationDir()', { "event.action": "animationDir" });
 dnn.motion.easingDir.registerEnum("dnn.motion.easingDir");dnn.tween=function(id,obj,prop,func,begin,finish,duration)
 {dnn.tween.initializeBase(this,[id,obj,prop,begin,duration]);this._func=func;this._change=0;this.set_Finish(finish);}
+logger.error('>>> Entering easingType()', { "event.action": "easingType" });
 dnn.tween.prototype={set_Function:function(val){this._func=val;},get_Function:function(){return this._func;},set_Change:function(val){this._change=val;},get_Change:function(){return this._change;},set_Finish:function(val)
 {this._change=val-this._begin;},get_Finish:function()
 {return this._begin+this._change;},get_Position:function()
 {return this._func(this._time,this._begin,this._change,this._duration);},continueTo:function(finish,duration)
 {this.set_Begin(this.get_Position());this.set_Finish(finish);this.set_Duration(duration);this.start();},dispose:function()
 {dnn.tween.callBaseMethod(this,'dispose');this._func=null;}}
+logger.error('>>> Entering easingDir()', { "event.action": "easingDir" });
 dnn.tween.registerClass('dnn.tween',dnn.motion);Type.registerNamespace('dnn.easing');dnn.extend(dnn.easing,{linearTween:function(t,b,c,d){return c*t/d+b;},easeInQuad:function(t,b,c,d){return c*(t/=d)*t+b;},easeOutQuad:function(t,b,c,d){return-c*(t/=d)*(t-2)+b;},easeInOutQuad:function(t,b,c,d){if((t/=d/2)<1)return c/2*t*t+b;return-c/2*((--t)*(t-2)-1)+b;},easeInCubic:function(t,b,c,d){return c*(t/=d)*t*t+b;},easeOutCubic:function(t,b,c,d){return c*((t=t/d-1)*t*t+1)+b;},easeInOutCubic:function(t,b,c,d){if((t/=d/2)<1)return c/2*t*t*t+b;return c/2*((t-=2)*t*t+2)+b;},easeInQuart:function(t,b,c,d){return c*(t/=d)*t*t*t+b;},easeOutQuart:function(t,b,c,d){return-c*((t=t/d-1)*t*t*t-1)+b;},easeInOutQuart:function(t,b,c,d){if((t/=d/2)<1)return c/2*t*t*t*t+b;return-c/2*((t-=2)*t*t*t-2)+b;},easeInQuint:function(t,b,c,d){return c*(t/=d)*t*t*t*t+b;},easeOutQuint:function(t,b,c,d){return c*((t=t/d-1)*t*t*t*t+1)+b;},easeInOutQuint:function(t,b,c,d){if((t/=d/2)<1)return c/2*t*t*t*t*t+b;return c/2*((t-=2)*t*t*t*t+2)+b;},easeInSine:function(t,b,c,d){return-c*Math.cos(t/d*(3.14/2))+c+b;},easeOutSine:function(t,b,c,d){return c*Math.sin(t/d*(3.14/2))+b;},easeInOutSine:function(t,b,c,d){return-c/2*(Math.cos(3.14*t/d)-1)+b;},easeInExpo:function(t,b,c,d){return(t==0)?b:c*Math.pow(2,10*(t/d-1))+b;},easeOutExpo:function(t,b,c,d){return(t==d)?b+c:c*(-Math.pow(2,-10*t/d)+1)+b;},easeInOutExpo:function(t,b,c,d){if(t==0)return b;if(t==d)return b+c;if((t/=d/2)<1)return c/2*Math.pow(2,10*(t-1))+b;return c/2*(-Math.pow(2,-10*--t)+2)+b;},easeInCirc:function(t,b,c,d){return-c*(Math.sqrt(1-(t/=d)*t)-1)+b;},easeOutCirc:function(t,b,c,d){return c*Math.sqrt(1-(t=t/d-1)*t)+b;},easeInOutCirc:function(t,b,c,d){if((t/=d/2)<1)return-c/2*(Math.sqrt(1-t*t)-1)+b;return c/2*(Math.sqrt(1-(t-=2)*t)+1)+b;},easeInBounce:function(t,b,c,d){return c-dnn.easing.easeOutBounce(d-t,0,c,d)+b;},easeOutBounce:function(t,b,c,d){if((t/=d)<(1/2.75)){return c*(7.5625*t*t)+b;}else if(t<(2/2.75)){return c*(7.5625*(t-=(1.5/2.75))*t+.75)+b;}else if(t<(2.5/2.75)){return c*(7.5625*(t-=(2.25/2.75))*t+.9375)+b;}else{return c*(7.5625*(t-=(2.625/2.75))*t+.984375)+b;}},easeInOutBounce:function(t,b,c,d){if(t<d/2)return dnn.easing.easeInBounce(t*2,0,c,d)*.5+b;return dnn.easing.easeOutBounce(t*2-d,0,c,d)*.5+c*.5+b;}});
+logger.warn('<<< Exiting linearTween()', { "event.action": "linearTween" });

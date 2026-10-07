@@ -54,6 +54,8 @@ namespace DotNetNuke.Modules.Admin.Users
         public Password(IEventLogger eventLogger, IHostSettings hostSettings, IJavaScriptLibraryHelper javaScript, IClientResourceController clientResourceController)
             : this(eventLogger, hostSettings, javaScript, clientResourceController, null, null)
         {
+		Logger.LogError(">>> Entering Password(eventLogger={EventLogger},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController})", eventLogger, hostSettings, javaScript, clientResourceController);
+        Logger.LogWarning("<<< Exiting Password(eventLogger={EventLogger},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController})", eventLogger, hostSettings, javaScript, clientResourceController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Password"/> class.</summary>
@@ -66,6 +68,9 @@ namespace DotNetNuke.Modules.Admin.Users
         public Password(IEventLogger eventLogger, IHostSettings hostSettings, IJavaScriptLibraryHelper javaScript, IClientResourceController clientResourceController, ListController listController, DataProvider dataProvider)
             : base(listController, hostSettings)
         {
+			Logger.LogDebug("Password(eventLogger={EventLogger},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},listController={ListController},dataProvider={DataProvider}): javaScript → {JavaScript1}", eventLogger, hostSettings, javaScript, clientResourceController, listController, dataProvider, javaScript);
+			Logger.LogDebug("Password(eventLogger={EventLogger},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},listController={ListController},dataProvider={DataProvider}): clientResourceController → {ClientResourceController1}", eventLogger, hostSettings, javaScript, clientResourceController, listController, dataProvider, clientResourceController);
+			Logger.LogDebug("Password(eventLogger={EventLogger},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},listController={ListController},dataProvider={DataProvider}): dataProvider → {DataProvider1}", eventLogger, hostSettings, javaScript, clientResourceController, listController, dataProvider, dataProvider);
             this.eventLogger = eventLogger ?? Common.Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.javaScript = javaScript ?? Common.Globals.GetCurrentServiceProvider().GetRequiredService<IJavaScriptLibraryHelper>();
             this.clientResourceController = clientResourceController ?? Common.Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
@@ -104,25 +109,30 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <param name="e">The event arguments.</param>
         public void OnPasswordUpdated(PasswordUpdatedEventArgs e)
         {
+			Logger.LogError(">>> Entering OnPasswordUpdated(e={E})", e);
             if (this.IsUserOrAdmin)
             {
                 this.PasswordUpdated?.Invoke(this, e);
             }
+			Logger.LogWarning("<<< Exiting OnPasswordUpdated(e={E})", e);
         }
 
         /// <summary>Raises the PasswordQuestionAnswerUpdated Event.</summary>
         /// <param name="e">The event arguments.</param>
         public void OnPasswordQuestionAnswerUpdated(PasswordUpdatedEventArgs e)
         {
+			Logger.LogError(">>> Entering OnPasswordQuestionAnswerUpdated(e={E})", e);
             if (this.IsUserOrAdmin)
             {
                 this.PasswordQuestionAnswerUpdated?.Invoke(this, e);
             }
+			Logger.LogWarning("<<< Exiting OnPasswordQuestionAnswerUpdated(e={E})", e);
         }
 
         /// <summary>DataBind binds the data to the controls.</summary>
         public override void DataBind()
         {
+			Logger.LogError(">>> Entering DataBind()");
             this.lblLastChanged.Text = this.User.Membership.LastPasswordChangeDate.ToLongDateString();
 
             // Set Password Expiry Label
@@ -227,11 +237,13 @@ namespace DotNetNuke.Modules.Admin.Users
                 this.pnlQA.Visible = false;
                 this.cmdUpdateQA.Visible = false;
             }
+			Logger.LogWarning("<<< Exiting DataBind()");
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             this.cmdReset.Click += this.CmdReset_Click;
             this.cmdUserReset.Click += this.CmdUserReset_Click;
@@ -251,11 +263,13 @@ namespace DotNetNuke.Modules.Admin.Users
                 this.ctlCaptcha.ErrorMessage = Localization.GetString("InvalidCaptcha", this.LocalResourceFile);
                 this.ctlCaptcha.Text = Localization.GetString("CaptchaText", this.LocalResourceFile);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             this.clientResourceController.RegisterScript("~/Resources/Shared/scripts/dnn.jquery.extensions.js");
             this.clientResourceController.RegisterScript("~/Resources/Shared/scripts/dnn.jquery.tooltip.js");
             this.clientResourceController.RegisterScript("~/Resources/Shared/scripts/dnn.PasswordStrength.js");
@@ -273,8 +287,11 @@ namespace DotNetNuke.Modules.Admin.Users
                 this.txtNewPassword.CssClass = "password-strength";
 
                 var options = new DnnPaswordStrengthOptions();
+				Logger.LogError("OnPreRender(e={E}): options → {Options}", e, options);
                 var optionsAsJsonString = Json.Serialize(options);
+				Logger.LogError("OnPreRender(e={E}): optionsAsJsonString → {OptionsAsJsonString}", e, optionsAsJsonString);
                 var script = $"dnn.initializePasswordStrength('.password-strength', {optionsAsJsonString});{Environment.NewLine}";
+				Logger.LogError("OnPreRender(e={E}): script → {Script}", e, script);
 
                 if (ScriptManager.GetCurrent(this.Page) != null)
                 {
@@ -297,7 +314,9 @@ namespace DotNetNuke.Modules.Admin.Users
             };
 
             var confirmOptionsAsJsonString = Json.Serialize(confirmPasswordOptions);
+			Logger.LogError("OnPreRender(e={E}): confirmOptionsAsJsonString → {ConfirmOptionsAsJsonString}", e, confirmOptionsAsJsonString);
             var confirmScript = $"dnn.initializePasswordComparer({confirmOptionsAsJsonString});{Environment.NewLine}";
+			Logger.LogError("OnPreRender(e={E}): confirmScript → {ConfirmScript}", e, confirmScript);
 
             if (ScriptManager.GetCurrent(this.Page) != null)
             {
@@ -308,10 +327,12 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.Page.ClientScript.RegisterStartupScript(this.GetType(), "ConfirmPassword", confirmScript, true);
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private void CmdReset_Click(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering CmdReset_Click(sender={Sender},e={E})", sender, e);
             if (!this.IsUserOrAdmin)
             {
                 return;
@@ -337,6 +358,7 @@ namespace DotNetNuke.Modules.Admin.Users
                 if (canSend)
                 {
                     message = Localization.GetString("PasswordSent", this.LocalResourceFile);
+					Logger.LogDebug("CmdReset_Click(sender={Sender},e={E}): message → {Message}", sender, e, message);
                     this.LogSuccess();
                 }
                 else
@@ -358,10 +380,12 @@ namespace DotNetNuke.Modules.Admin.Users
                 Logger.Error(exc);
                 this.OnPasswordUpdated(new PasswordUpdatedEventArgs(PasswordUpdateStatus.PasswordResetFailed));
             }
+			Logger.LogWarning("<<< Exiting CmdReset_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdUserReset_Click(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering CmdUserReset_Click(sender={Sender},e={E})", sender, e);
             try
             {
                 // send fresh reset token copy
@@ -372,6 +396,7 @@ namespace DotNetNuke.Modules.Admin.Users
                 if (canSend)
                 {
                     message = Localization.GetString("PasswordSent", this.LocalResourceFile);
+					Logger.LogDebug("CmdUserReset_Click(sender={Sender},e={E}): message → {Message}", sender, e, message);
                     this.LogSuccess();
                 }
                 else
@@ -393,31 +418,40 @@ namespace DotNetNuke.Modules.Admin.Users
                 Logger.Error(exc);
                 this.OnPasswordUpdated(new PasswordUpdatedEventArgs(PasswordUpdateStatus.PasswordResetFailed));
             }
+			Logger.LogWarning("<<< Exiting CmdUserReset_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void LogSuccess()
         {
+			Logger.LogError(">>> Entering LogSuccess()");
             this.LogResult(string.Empty);
+			Logger.LogWarning("<<< Exiting LogSuccess()");
         }
 
         private void LogFailure(string reason)
         {
+			Logger.LogError(">>> Entering LogFailure(reason={Reason})", reason);
             this.LogResult(reason);
+			Logger.LogWarning("<<< Exiting LogFailure(reason={Reason})", reason);
         }
 
         private void LogResult(string message)
         {
+			Logger.LogError(">>> Entering LogResult(message={Message})", message);
             ILogInfo log = new LogInfo
             {
                 LogPortalName = this.PortalSettings.PortalName,
                 LogUserName = this.User.Username,
             };
             log.LogUserId = this.UserId;
+			Logger.LogDebug("LogResult(message={Message}): log.LogUserId → {Arg1}", message, log.LogUserId);
             log.LogPortalId = this.PortalSettings.PortalId;
+			Logger.LogDebug("LogResult(message={Message}): log.LogPortalId → {Arg1}", message, log.LogPortalId);
 
             if (string.IsNullOrEmpty(message))
             {
                 log.LogTypeKey = "PASSWORD_SENT_SUCCESS";
+				Logger.LogDebug("LogResult(message={Message}): log.LogTypeKey → {Arg1}", message, log.LogTypeKey);
             }
             else
             {
@@ -426,10 +460,12 @@ namespace DotNetNuke.Modules.Admin.Users
             }
 
             this.eventLogger.AddLog(log);
+			Logger.LogWarning("<<< Exiting LogResult(message={Message})", message);
         }
 
         private void CmdUpdate_Click(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering CmdUpdate_Click(sender={Sender},e={E})", sender, e);
             if ((this.UseCaptcha && this.ctlCaptcha.IsValid) || !this.UseCaptcha)
             {
                 if (!this.IsUserOrAdmin)
@@ -546,11 +582,13 @@ namespace DotNetNuke.Modules.Admin.Users
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting CmdUpdate_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>cmdUpdate_Click runs when the Update Question and Answer  Button is clicked.</summary>
         private void CmdUpdateQA_Click(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering CmdUpdateQA_Click(sender={Sender},e={E})", sender, e);
             if (!this.IsUserOrAdmin)
             {
                 return;
@@ -576,9 +614,11 @@ namespace DotNetNuke.Modules.Admin.Users
 
             // Try and set password Q and A
             UserInfo objUser = UserController.GetUserById(this.HostSettings, this.PortalId, this.UserId);
+			Logger.LogError("CmdUpdateQA_Click(sender={Sender},e={E}): objUser → {ObjUser}", sender, e, objUser);
             this.OnPasswordQuestionAnswerUpdated(UserController.ChangePasswordQuestionAndAnswer(this.eventLogger, objUser, this.txtQAPassword.Text, this.txtEditQuestion.Text, this.txtEditAnswer.Text)
                                                 ? new PasswordUpdatedEventArgs(PasswordUpdateStatus.Success)
                                                 : new PasswordUpdatedEventArgs(PasswordUpdateStatus.PasswordResetFailed));
+												Logger.LogWarning("<<< Exiting CmdUpdateQA_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Provides a customised EventArgs class for the <see cref="Password.PasswordUpdated"/> event.</summary>
@@ -588,6 +628,7 @@ namespace DotNetNuke.Modules.Admin.Users
             /// <param name="status">The Password Update Status.</param>
             public PasswordUpdatedEventArgs(PasswordUpdateStatus status)
             {
+				Logger.LogError(">>> Entering PasswordUpdatedEventArgs(status={Status})", status);
                 this.UpdateStatus = status;
             }
 

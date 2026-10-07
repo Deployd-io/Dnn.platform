@@ -9,6 +9,7 @@ import "./style.less";
 import { Pager } from "@dnnsoftware/dnn-react-common";
 import resx from "../../resources";
 import HistoryIcon from "./../svg/history.svg";
+const logger = console;
 
 let pageSizeOptions = [];
 let tableFields = [];
@@ -16,6 +17,7 @@ let tableFields = [];
 class HistoryPanelBody extends Component {
     constructor(props) {
         super();
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             taskHistoryList: [],
             scheduleId: -1,
@@ -23,9 +25,11 @@ class HistoryPanelBody extends Component {
             pageSize: props.pageSize ? props.pageSize : 10,
             totalCount: 0
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props, state} = this;
         props.dispatch(TaskActions.getScheduleItemHistory({ scheduleId: props.scheduleId, pageIndex: state.pageIndex, pageSize: state.pageSize }));
 
@@ -42,17 +46,23 @@ class HistoryPanelBody extends Component {
         pageSizeOptions.push({ "value": "50", "label": "50 entries per page" });
         pageSizeOptions.push({ "value": "100", "label": "100 entries per page" });
         pageSizeOptions.push({ "value": "250", "label": "250 entries per page" });
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     onEnter(key) {
+		logger.error(`>>> Entering onEnter(key=${key})`, { "event.action": "onEnter", "logrite.key": key });
         const { state } = this;
         alert("You pressed enter! My value is: " + state[key]);
+		logger.warn(`<<< Exiting onEnter(key=${key})`, { "event.action": "onEnter", "logrite.key": key });
     }
 
     onPageChange(currentPage, pageSize) {
+		logger.error(`>>> Entering onPageChange(currentPage=${currentPage},pageSize=${pageSize})`, { "event.action": "onPageChange", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
         let {state, props} = this;
         if (pageSize !== undefined && state.pageSize !== pageSize) {
+			logger.debug(`onPageChange(currentPage=${currentPage},pageSize=${pageSize}): state.pageIndex → ${state.pageIndex}`, { "event.action": "onPageChange", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
             state.pageSize = pageSize;
+			logger.debug(`onPageChange(currentPage=${currentPage},pageSize=${pageSize}): state.pageSize → ${state.pageSize}`, { "event.action": "onPageChange", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
         }
         state.pageIndex = currentPage;
         this.setState({
@@ -60,9 +70,11 @@ class HistoryPanelBody extends Component {
         }, () => {
             props.dispatch(TaskActions.getScheduleItemHistory({ scheduleId: props.scheduleId, pageIndex: state.pageIndex, pageSize: state.pageSize }));
         });
+		logger.warn(`<<< Exiting onPageChange(currentPage=${currentPage},pageSize=${pageSize})`, { "event.action": "onPageChange", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
     }
 
     renderedHistoryListHeader() {
+		logger.error('>>> Entering renderedHistoryListHeader()', { "event.action": "renderedHistoryListHeader" });
         let tableHeaders = tableFields.map((field, index) => {
             let className = "historyHeader historyHeader-" + field.id;
             return <div className={className} key={"historyHeader-" + index}>
@@ -70,11 +82,15 @@ class HistoryPanelBody extends Component {
             </div>;
         });
 
+		logger.error(`renderedHistoryListHeader(): tableHeaders → ${tableHeaders}`, { "event.action": "renderedHistoryListHeader" });
+		logger.warn('<<< Exiting renderedHistoryListHeader()', { "event.action": "renderedHistoryListHeader" });
         return <div className="historyHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderPager() {
+		logger.error('>>> Entering renderPager()', { "event.action": "renderPager" });
         const {props, state} = this;
+		logger.warn('<<< Exiting renderPager()', { "event.action": "renderPager" });
         return (
             <div className="taskHistoryList-pager">
                 <Pager
@@ -95,8 +111,10 @@ class HistoryPanelBody extends Component {
 
 
     renderedHistoryList() {
+		logger.error('>>> Entering renderedHistoryList()', { "event.action": "renderedHistoryList" });
         const {props} = this;
         if (props.taskHistoryList) {
+			logger.warn('<<< Exiting renderedHistoryList()', { "event.action": "renderedHistoryList" });
             return props.taskHistoryList.map((term, index) => {
                 return (
                     <TaskHistoryItemRow
@@ -118,7 +136,9 @@ class HistoryPanelBody extends Component {
 
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <div className="historyIcon"><HistoryIcon /></div>
@@ -144,6 +164,8 @@ HistoryPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         taskHistoryList: state.task.taskHistoryList,
         tabIndex: state.pagination.tabIndex,

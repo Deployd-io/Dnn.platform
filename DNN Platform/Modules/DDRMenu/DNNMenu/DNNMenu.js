@@ -1,17 +1,23 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 if (!DDR.Menu.Providers.DNNMenu) {
     DDRjQuery(function ($) {
         DDR.Menu.Providers.DNNMenu = function (jqContainer, dnnNavParams) {
+			logger.error(`>>> Entering DNNMenu(jqContainer=${jqContainer},dnnNavParams=${dnnNavParams})`, { "event.action": "DNNMenu", "logrite.jqContainer": jqContainer, "logrite.dnnNavParams": dnnNavParams });
             var me = this;
 
             me.baseConstructor(jqContainer, dnnNavParams);
+			logger.warn(`<<< Exiting DNNMenu(jqContainer=${jqContainer},dnnNavParams=${dnnNavParams})`, { "event.action": "DNNMenu", "logrite.jqContainer": jqContainer, "logrite.dnnNavParams": dnnNavParams });
         }
         DDR.Menu.Providers.DNNMenu.prototype = new DDR.Menu.Providers.BaseRenderer();
 
         DDR.Menu.Providers.DNNMenu.prototype.createRootMenu = function () {
+			logger.error('>>> Entering createRootMenu()', { "event.action": "createRootMenu" });
             var me = this;
 
             var outerContainer = $("<span />");
+			logger.error(`createRootMenu(): outerContainer → ${outerContainer}`, { "event.action": "createRootMenu" });
             var dnnNavContainer = me.createRenderedMenu(me.rootMenu);
+			logger.error(`createRootMenu(): dnnNavContainer → ${dnnNavContainer}`, { "event.action": "createRootMenu" });
             dnnNavContainer.addClass(me.dnnNavParams.CSSControl);
             outerContainer.append(dnnNavContainer);
 
@@ -28,9 +34,11 @@ if (!DDR.Menu.Providers.DNNMenu) {
 
                 $(this).dequeue();
             });
+			logger.warn('<<< Exiting createRootMenu()', { "event.action": "createRootMenu" });
         }
 
         DDR.Menu.Providers.DNNMenu.prototype.createRenderedMenu = function (menu) {
+			logger.error(`>>> Entering createRenderedMenu(menu=${menu})`, { "event.action": "createRenderedMenu", "logrite.menu": menu });
             var me = this;
 
             var level = menu.level;
@@ -38,7 +46,9 @@ if (!DDR.Menu.Providers.DNNMenu) {
 
             if (level == 0) {
                 menu.flyout = false;
+				logger.debug(`createRenderedMenu(menu=${menu}): menu.flyout → ${menu.flyout}`, { "event.action": "createRenderedMenu", "logrite.menu": menu });
                 menu.layout = me.orientHorizontal ? "horizontal" : "vertical";
+				logger.debug(`createRenderedMenu(menu=${menu}): menu.layout → ${menu.layout}`, { "event.action": "createRenderedMenu", "logrite.menu": menu });
                 var result = $("<span />");
                 childItems.each(function (i) {
                     result.append(me.createRenderedItem(i));
@@ -48,11 +58,14 @@ if (!DDR.Menu.Providers.DNNMenu) {
                 menu.flyout = true;
                 menu.layout = "vertical";
                 var parentItem = menu.parentItem;
+				logger.warn(`<<< Exiting createRenderedMenu(menu=${menu})`, { "event.action": "createRenderedMenu", "logrite.menu": menu });
                 var parentMenu = parentItem.parentMenu;
 
 //                var result = $("<table cellspacing='0' cellpadding='0' border='0' />").css({ "position": "absolute", "left": "-1000px" });
                 var result = $("<div><table cellspacing='0' cellpadding='0' border='0' /></div>").css({ "position": "absolute", "left": "-1000px" });
+				logger.error(`createRenderedMenu(menu=${menu}): result → ${result}`, { "event.action": "createRenderedMenu", "logrite.menu": menu });
                 var table = result.children("table");
+				logger.error(`createRenderedMenu(menu=${menu}): table → ${table}`, { "event.action": "createRenderedMenu", "logrite.menu": menu });
                 table.addClass(this.dnnNavParams.CSSContainerSub);
                 table.addClass("m");
                 table.addClass("m" + (menu.level - 1));
@@ -63,11 +76,13 @@ if (!DDR.Menu.Providers.DNNMenu) {
             }
 
             menu.rendered = result;
+			logger.debug(`createRenderedMenu(menu=${menu}): menu.rendered → ${menu.rendered}`, { "event.action": "createRenderedMenu", "logrite.menu": menu });
 
             return result;
         };
 
         DDR.Menu.Providers.DNNMenu.prototype.createRenderedItem = function (item) {
+			logger.error(`>>> Entering createRenderedItem(item=${item})`, { "event.action": "createRenderedItem", "logrite.item": item });
             var me = this;
 
             var level = item.level;
@@ -87,6 +102,7 @@ if (!DDR.Menu.Providers.DNNMenu) {
 
                 if (href && !item.isSeparator) {
                     item.coveringHere = function () { return item.rendered; };
+					logger.error('>>> Entering coveringHere()', { "event.action": "coveringHere" });
                 }
 
                 spanImg.addClass("icn");
@@ -144,10 +160,15 @@ if (!DDR.Menu.Providers.DNNMenu) {
             else {
                 result = $("<tr><td style='position:relative'><span /></td><td style='position:relative'><span /></td><td style='position:relative'/></tr>");
                 var tdImg = result.find("td:eq(0)");
+				logger.error(`createRenderedItem(item=${item}): result → ${result}`, { "event.action": "createRenderedItem", "logrite.item": item });
+				logger.error(`createRenderedItem(item=${item}): spanText → ${spanText}`, { "event.action": "createRenderedItem", "logrite.item": item });
+				logger.error(`createRenderedItem(item=${item}): tdImg → ${tdImg}`, { "event.action": "createRenderedItem", "logrite.item": item });
                 var spanImg = result.find("span:eq(0)");
+				logger.error(`createRenderedItem(item=${item}): spanImg → ${spanImg}`, { "event.action": "createRenderedItem", "logrite.item": item });
                 var spanText = result.find("span:eq(1)");
                 var tdArrow = result.find("td:eq(2)");
 
+				logger.error(`createRenderedItem(item=${item}): tdArrow → ${tdArrow}`, { "event.action": "createRenderedItem", "logrite.item": item });
                 if (href) {
                     item.coveringHere = function () { return item.rendered.find("td"); };
                 }
@@ -173,6 +194,7 @@ if (!DDR.Menu.Providers.DNNMenu) {
                 var nodeLeftHTML = me.dnnNavParams.NodeLeftHTMLSub || "";
                 var nodeRightHTML = me.dnnNavParams.NodeRightHTMLSub || "";
                 var cssClass = me.dnnNavParams.CSSNode;
+				logger.error(`createRenderedItem(item=${item}): cssClass → ${cssClass}`, { "event.action": "createRenderedItem", "logrite.item": item });
 
                 if (item.isBreadcrumb) {
                     if ((me.dnnNavParams.CSSBreadCrumbSub || "") != "")
@@ -221,11 +243,13 @@ if (!DDR.Menu.Providers.DNNMenu) {
             }
 
             item.rendered = result;
+			logger.debug(`createRenderedItem(item=${item}): item.rendered → ${item.rendered}`, { "event.action": "createRenderedItem", "logrite.item": item });
 
             return result;
         };
 
         DDR.Menu.Providers.DNNMenu.prototype.menuItemHover = function (item) {
+			logger.error(`>>> Entering menuItemHover(item=${item})`, { "event.action": "menuItemHover", "logrite.item": item });
             var me = this;
 
             if (item.level == 0) {
@@ -233,6 +257,7 @@ if (!DDR.Menu.Providers.DNNMenu) {
             }
             else {
                 item.rendered.setHoverClass("hov " + (me.dnnNavParams.CSSNodeHoverSub || (me.dnnNavParams.CSSNodeHover || "")));
+				logger.warn(`<<< Exiting menuItemHover(item=${item})`, { "event.action": "menuItemHover", "logrite.item": item });
             }
         };
     });

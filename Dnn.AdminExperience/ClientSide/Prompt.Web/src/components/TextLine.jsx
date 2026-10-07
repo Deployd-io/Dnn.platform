@@ -2,8 +2,10 @@ import React from "react";
 import PropTypes from "prop-types";
 import Html from "./Html";
 import DomKey from "../services/DomKey";
+const logger = console;
 
 const TextLine = ({txt, css, isHtml}) => {
+	logger.error(`>>> Entering TextLine(txt=${txt},css=${css},isHtml=${isHtml})`, { "event.action": "TextLine", "logrite.txt": txt, "logrite.css": css, "logrite.isHtml": isHtml });
     if (!txt) {
         return null;
     }
@@ -13,6 +15,7 @@ const TextLine = ({txt, css, isHtml}) => {
             if (current !== "" && current !== null && current !== undefined) {
                 return [...prev,current];
             }
+	logger.warn(`<<< Exiting TextLine(txt=${txt},css=${css},isHtml=${isHtml})`, { "event.action": "TextLine", "logrite.txt": txt, "logrite.css": css, "logrite.isHtml": isHtml });
             return [...prev,<br key={DomKey.get("textline")} />,<br key={DomKey.get("textline")} />];
         }, []);
     return <div key={DomKey.get("textline")}>{rows}</div>;

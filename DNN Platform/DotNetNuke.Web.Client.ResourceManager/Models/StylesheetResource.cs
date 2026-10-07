@@ -12,13 +12,16 @@ using DotNetNuke.Abstractions.ClientResources;
 /// <summary>Represents a stylesheet resource that can be registered and rendered in the client resources controller.</summary>
 public class StylesheetResource : LinkResource, IStylesheetResource
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(StylesheetResource));
     private readonly IClientResourceController clientResourceController;
 
     /// <summary>Initializes a new instance of the <see cref="StylesheetResource"/> class.</summary>
     /// <param name="clientResourceController">The client resources controller used to register the stylesheet.</param>
     public StylesheetResource(IClientResourceController clientResourceController)
     {
+		Logger.LogError(">>> Entering StylesheetResource(clientResourceController={ClientResourceController})", clientResourceController);
         this.clientResourceController = clientResourceController;
+		Logger.LogDebug("StylesheetResource(clientResourceController={ClientResourceController}): this.clientResourceController → {Arg1}", clientResourceController, this.clientResourceController);
         this.Provider = ClientResourceProviders.DefaultCssProvider;
         this.Priority = (int)FileOrder.Css.DefaultPriority;
     }
@@ -29,14 +32,18 @@ public class StylesheetResource : LinkResource, IStylesheetResource
     /// <inheritdoc />
     public override void Register()
     {
+		Logger.LogError(">>> Entering Register()");
         this.clientResourceController.AddStylesheet(this);
+		Logger.LogWarning("<<< Exiting Register()");
     }
 
     /// <inheritdoc />
     public override string Render(int crmVersion, bool useCdn, string applicationPath)
     {
+		Logger.LogError(">>> Entering Render(crmVersion={CrmVersion},useCdn={UseCdn},applicationPath={ApplicationPath})", crmVersion, useCdn, applicationPath);
         var htmlString = new StringBuilder("<link");
         htmlString.Append($" href=\"{this.GetVersionedPath(crmVersion, useCdn, applicationPath)}\"");
+		Logger.LogError("Render(crmVersion={CrmVersion},useCdn={UseCdn},applicationPath={ApplicationPath}): htmlString → {HtmlString}", crmVersion, useCdn, applicationPath, htmlString);
         if (this.Preload && !this.Attributes.ContainsKey("rel") && !this.Attributes.ContainsKey("as"))
         {
             htmlString.Append($" rel=\"preload\" as=\"style\"");
@@ -60,6 +67,7 @@ public class StylesheetResource : LinkResource, IStylesheetResource
         this.RenderReferrerPolicy(htmlString);
         this.RenderAttributes(htmlString);
         htmlString.Append(" />");
+		Logger.LogWarning("<<< Exiting Render(crmVersion={CrmVersion},useCdn={UseCdn},applicationPath={ApplicationPath})", crmVersion, useCdn, applicationPath);
         return htmlString.ToString();
     }
 }

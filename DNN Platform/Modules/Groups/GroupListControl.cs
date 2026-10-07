@@ -87,13 +87,17 @@ namespace DotNetNuke.Modules.Groups.Controls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
+			eventLogger.LogWarning("<<< Exiting OnInit(e={E})", e);
             this.currentUser = UserController.Instance.GetCurrentUserInfo();
+			eventLogger.LogDebug("OnInit(e={E}): currentUser → {CurrentUser}", e, currentUser);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter output)
         {
+			eventLogger.LogError(">>> Entering Render(output={Output})", output);
             var whereCls = new List<Func<RoleInfo, bool>>
             {
                 grp => grp.SecurityMode != SecurityMode.SecurityRole && grp.Status == RoleStatus.Approved,
@@ -119,6 +123,7 @@ namespace DotNetNuke.Modules.Groups.Controls
             }
 
             var roles = RoleController.Instance.GetRoles(this.PortalSettings.PortalId, grp => TestPredicateGroup(whereCls, grp));
+			eventLogger.LogError("Render(output={Output}): roles → {Roles}", output, roles);
 
             if (this.SortDirection.ToLowerInvariant() == "asc")
             {
@@ -153,9 +158,12 @@ namespace DotNetNuke.Modules.Groups.Controls
                 this.CurrentIndex = Convert.ToInt32(HttpContext.Current.Request.QueryString["page"].ToString());
                 this.CurrentIndex = this.CurrentIndex - 1;
             }
+			eventLogger.LogDebug("Render(output={Output}): this.CurrentIndex → {Arg1}", output, this.CurrentIndex);
 
             int rowItem = 0;
+			eventLogger.LogError("Render(output={Output}): rowItem → {RowItem}", output, rowItem);
             int recordStart = this.CurrentIndex * this.PageSize;
+			eventLogger.LogError("Render(output={Output}): recordStart → {RecordStart}", output, recordStart);
 
             if (this.CurrentIndex == 0)
             {
@@ -179,6 +187,7 @@ namespace DotNetNuke.Modules.Groups.Controls
                 }
 
                 var groupParser = new GroupViewParser(this.PortalSettings, role, this.currentUser, rowTemplate, this.GroupViewTabId);
+				eventLogger.LogError("Render(output={Output}): groupParser → {GroupParser}", output, groupParser);
                 output.Write(groupParser.ParseView());
 
                 rowItem += 1;
@@ -198,6 +207,7 @@ namespace DotNetNuke.Modules.Groups.Controls
             output.Write(this.FooterTemplate);
 
             int totalPages = Convert.ToInt32(System.Math.Ceiling(pages));
+			eventLogger.LogError("Render(output={Output}): totalPages → {TotalPages}", output, totalPages);
 
             if (totalPages == 0)
             {
@@ -208,6 +218,7 @@ namespace DotNetNuke.Modules.Groups.Controls
             string[] currParams = new string[] { };
 
             StringBuilder sb = new StringBuilder();
+			eventLogger.LogError("Render(output={Output}): sb → {Sb}", output, sb);
 
             if (totalPages > 1)
             {
@@ -231,6 +242,7 @@ namespace DotNetNuke.Modules.Groups.Controls
                     string sUrl = Utilities.NavigateUrl(this.TabId, @params);
 
                     string cssClass = "pagerItem";
+					eventLogger.LogError("Render(output={Output}): cssClass → {CssClass}", output, cssClass);
 
                     if (x - 1 == this.CurrentIndex)
                     {
@@ -244,16 +256,22 @@ namespace DotNetNuke.Modules.Groups.Controls
             output.Write("<div class=\"dnnClear groupPager\">");
             output.Write(sb.ToString());
             output.Write("</div>");
+			eventLogger.LogWarning("<<< Exiting Render(output={Output})", output);
         }
 
         private static bool TestPredicateGroup(IEnumerable<Func<RoleInfo, bool>> predicates, RoleInfo ri)
         {
+			eventLogger.LogError(">>> Entering TestPredicateGroup(predicates={Predicates},ri={Ri})", predicates, ri);
+			eventLogger.LogWarning("<<< Exiting TestPredicateGroup(predicates={Predicates},ri={Ri})", predicates, ri);
             return predicates.All(p => p(ri));
         }
 
         private static object GetOrderByProperty(object obj, string property)
         {
+			eventLogger.LogError(">>> Entering GetOrderByProperty(obj={Obj},property={Property})", obj, property);
             var propertyInfo = obj.GetType().GetProperty(property, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+			eventLogger.LogError("GetOrderByProperty(obj={Obj},property={Property}): propertyInfo → {PropertyInfo}", obj, property, propertyInfo);
+			eventLogger.LogWarning("<<< Exiting GetOrderByProperty(obj={Obj},property={Property})", obj, property);
             return propertyInfo == null ? null : propertyInfo.GetValue(obj, null);
         }
     }

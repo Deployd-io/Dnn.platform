@@ -8,10 +8,12 @@ import {
 } from "../../../actions";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 
 class IgnoreWordsEditor extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
 
         this.state = {
             words: {
@@ -26,8 +28,10 @@ class IgnoreWordsEditor extends Component {
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const {props} = this;
         let words = Object.assign({}, props.words);
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
         words.CultureCode = props.culture;
         this.setState({
             words: Object.assign({}, props.words)
@@ -35,13 +39,16 @@ class IgnoreWordsEditor extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {state, props} = this;
         let words = Object.assign({}, state.words);
+		logger.error(`onSettingChange(key=${key},event=${event}): words → ${words}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         
         words[key] = event.join();
 
         if (words[key] === "" && key === "StopWords") {
             state.error["tags"] = true;
+			logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         }
         else if (words[key] !== "" && key === "StopWords") {
             state.error["tags"] = false;
@@ -59,6 +66,7 @@ class IgnoreWordsEditor extends Component {
     }
 
     onSave() {
+		logger.error('>>> Entering onSave()', { "event.action": "onSave" });
         const {props, state} = this;
         this.setState({
             triedToSubmit: true
@@ -68,9 +76,11 @@ class IgnoreWordsEditor extends Component {
         }
 
         props.onUpdate(state.words, state.culture);
+		logger.warn('<<< Exiting onSave()', { "event.action": "onSave" });
     }
     
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         if (props.ignoreWordsClientModified) {
             util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
@@ -80,11 +90,13 @@ class IgnoreWordsEditor extends Component {
         }
         else {
             props.Collapse();
+			logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
         }
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
          
         if (this.state.words !== undefined || this.props.id === "add") {  
             return (
@@ -128,6 +140,8 @@ IgnoreWordsEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {              
         ignoreWordsClientModified: state.search.ignoreWordsClientModified
     };

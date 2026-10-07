@@ -1,6 +1,7 @@
 import { Component, Host, h, Prop } from '@stencil/core';
 import { Item } from '../../../services/ItemsClient';
 import state from "../../../store/store";
+const logger = console;
 
 @Component({
   tag: 'dnn-action-edit-item',
@@ -13,29 +14,41 @@ export class DnnActionEditItem {
   @Prop() item!: Item;
 
   private async handleClick() {
+	logger.error('>>> Entering handleClick()', { "event.action": "handleClick" });
     await this.showModal();
+	logger.warn('<<< Exiting handleClick()', { "event.action": "handleClick" });
   }
 
   private async showModal(){
+	logger.error('>>> Entering showModal()', { "event.action": "showModal" });
     const modal = document.createElement("dnn-modal");
     modal.preventBackdropDismiss = true;
+	logger.error(`showModal(): modal → ${modal}`, { "event.action": "showModal" });
+	logger.debug(`showModal(): modal.preventBackdropDismiss → ${modal.preventBackdropDismiss}`, { "event.action": "showModal" });
     modal.hideCloseButton = true;
     // We also need to show a different model depending if we have a file or folder
     if (this.item.isFolder){
+	logger.debug(`showModal(): modal.hideCloseButton → ${modal.hideCloseButton}`, { "event.action": "showModal" });
       const editor = document.createElement("dnn-rm-edit-folder");
       editor.folderId = this.item.itemId;
       modal.appendChild(editor);
     }
     else {
       const editor = document.createElement("dnn-rm-edit-file");
+	logger.error(`showModal(): editor → ${editor}`, { "event.action": "showModal" });
+	logger.debug(`showModal(): editor.folderId → ${editor.folderId}`, { "event.action": "showModal" });
       editor.fileId = this.item.itemId;
+	logger.debug(`showModal(): editor.fileId → ${editor.fileId}`, { "event.action": "showModal" });
       modal.appendChild(editor);
     }
     document.body.appendChild(modal);
     await modal.show();
+	logger.warn('<<< Exiting showModal()', { "event.action": "showModal" });
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         <button onClick={() => void this.handleClick()}>

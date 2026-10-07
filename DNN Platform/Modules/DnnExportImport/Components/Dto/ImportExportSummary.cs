@@ -15,9 +15,11 @@ namespace Dnn.ExportImport.Components.Dto
     [JsonObject]
     public class ImportExportSummary : IDateTimeConverter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImportExportSummary));
         /// <summary>Initializes a new instance of the <see cref="ImportExportSummary"/> class.</summary>
         public ImportExportSummary()
         {
+			Logger.LogError(">>> Entering ImportExportSummary()");
             this.SummaryItems = new SummaryList();
         }
 
@@ -60,6 +62,7 @@ namespace Dnn.ExportImport.Components.Dto
         /// <inheritdoc />
         public void ConvertToLocal(UserInfo userInfo)
         {
+			Logger.LogError(">>> Entering ConvertToLocal(userInfo={UserInfo})", userInfo);
             if (userInfo == null)
             {
                 return;
@@ -79,6 +82,7 @@ namespace Dnn.ExportImport.Components.Dto
             }
 
             var tempSummaryItems = new SummaryList();
+			Logger.LogError("ConvertToLocal(userInfo={UserInfo}): tempSummaryItems → {TempSummaryItems}", userInfo, tempSummaryItems);
             foreach (var summaryItem in this.SummaryItems)
             {
                 summaryItem.ConvertToLocal(userInfo);
@@ -86,6 +90,8 @@ namespace Dnn.ExportImport.Components.Dto
             }
 
             this.SummaryItems = tempSummaryItems;
+			Logger.LogDebug("ConvertToLocal(userInfo={UserInfo}): this.SummaryItems → {Arg1}", userInfo, this.SummaryItems);
+			Logger.LogWarning("<<< Exiting ConvertToLocal(userInfo={UserInfo})", userInfo);
         }
     }
 }

@@ -19,6 +19,7 @@ namespace DotNetNuke.Common
     /// <summary>The default <see cref="INavigationManager"/> implementation.</summary>
     internal class NavigationManager : INavigationManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NavigationManager));
         private readonly IPortalController portalController;
         private readonly IHostSettings hostSettings;
 
@@ -34,7 +35,10 @@ namespace DotNetNuke.Common
         /// <param name="hostSettings">An <see cref="IHostSettings"/> instance.</param>
         public NavigationManager(IPortalController portalController, IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering NavigationManager(portalController={PortalController},hostSettings={HostSettings})", portalController, hostSettings);
             this.portalController = portalController;
+			Logger.LogWarning("<<< Exiting NavigationManager(portalController={PortalController},hostSettings={HostSettings})", portalController, hostSettings);
+			Logger.LogDebug("NavigationManager(portalController={PortalController},hostSettings={HostSettings}): this.portalController → {Arg2}", portalController, hostSettings, this.portalController);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
         }
 
@@ -42,6 +46,13 @@ namespace DotNetNuke.Common
         /// <returns>Formatted URL.</returns>
         public string NavigateURL()
         {
+			Logger.LogError(">>> Entering NavigateURL()");
+            Logger.LogWarning("<<< Exiting NavigateURL()");
+			Logger.LogWarning("<<< Exiting NavigateURL(tabID={TabID},isSuperTab={IsSuperTab})", tabID, isSuperTab);
+			Logger.LogWarning("<<< Exiting NavigateURL(controlKey={ControlKey})", controlKey);
+			Logger.LogWarning("<<< Exiting NavigateURL(tabID={TabID},settings={Settings},controlKey={ControlKey},additionalParameters={AdditionalParameters})", tabID, settings, controlKey, additionalParameters);
+			Logger.LogWarning("<<< Exiting NavigateURL(tabID={TabID},isSuperTab={IsSuperTab},settings={Settings},controlKey={ControlKey},additionalParameters={AdditionalParameters})", tabID, isSuperTab, settings, controlKey, additionalParameters);
+			Logger.LogWarning("<<< Exiting NavigateURL(tabID={TabID},isSuperTab={IsSuperTab},settings={Settings},controlKey={ControlKey},language={Language},pageName={PageName},additionalParameters={AdditionalParameters})", tabID, isSuperTab, settings, controlKey, language, pageName, additionalParameters);
             return this.NavigateURL(TabController.CurrentPage.TabID, Null.NullString);
         }
 
@@ -61,6 +72,7 @@ namespace DotNetNuke.Common
         {
             var portalSettings = this.portalController.GetCurrentSettings();
             var cultureCode = Globals.GetCultureCode(tabID, isSuperTab, portalSettings);
+			Logger.LogError("NavigateURL(tabID={TabID},isSuperTab={IsSuperTab}): portalSettings → {PortalSettings}", tabID, isSuperTab, portalSettings);
             return this.NavigateURL(tabID, isSuperTab, portalSettings, Null.NullString, cultureCode);
         }
 
@@ -114,6 +126,7 @@ namespace DotNetNuke.Common
         public string NavigateURL(int tabID, IPortalSettings settings, string controlKey, params string[] additionalParameters)
         {
             var isSuperTab = Globals.IsHostTab(tabID);
+			Logger.LogError("NavigateURL(tabID={TabID},settings={Settings},controlKey={ControlKey},additionalParameters={AdditionalParameters}): isSuperTab → {IsSuperTab}", tabID, settings, controlKey, additionalParameters, isSuperTab);
             return this.NavigateURL(tabID, isSuperTab, settings, controlKey, additionalParameters);
         }
 
@@ -127,6 +140,7 @@ namespace DotNetNuke.Common
         public string NavigateURL(int tabID, bool isSuperTab, IPortalSettings settings, string controlKey, params string[] additionalParameters)
         {
             var cultureCode = Globals.GetCultureCode(tabID, isSuperTab, settings);
+			Logger.LogError("NavigateURL(tabID={TabID},isSuperTab={IsSuperTab},settings={Settings},controlKey={ControlKey},additionalParameters={AdditionalParameters}): cultureCode → {CultureCode}", tabID, isSuperTab, settings, controlKey, additionalParameters, cultureCode);
             return this.NavigateURL(tabID, isSuperTab, settings, controlKey, cultureCode, additionalParameters);
         }
 

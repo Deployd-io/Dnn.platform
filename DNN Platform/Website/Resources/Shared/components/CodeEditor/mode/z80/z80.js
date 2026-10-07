@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -29,11 +30,14 @@ CodeMirror.defineMode('z80', function(_config, parserConfig) {
 
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         context: 0
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (!stream.column())
         state.context = 0;
 
@@ -48,6 +52,7 @@ CodeMirror.defineMode('z80', function(_config, parserConfig) {
         }
         w = stream.current();
 
+		logger.error(`token(stream=${stream},state=${state}): w → ${w}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if (stream.indentation()) {
           if ((state.context == 1 || state.context == 4) && variables1.test(w)) {
             state.context = 4;
@@ -104,6 +109,7 @@ CodeMirror.defineMode('z80', function(_config, parserConfig) {
           return 'number';
       } else {
         stream.next();
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       }
       return null;
     }

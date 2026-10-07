@@ -17,12 +17,16 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
         public PortalModel(PortalInfo portal)
             : base(portal)
         {
+			eventLogger.LogError(">>> Entering PortalModel(portal={Portal})", portal);
             // get portal settings for specified portal
             var ps = new PortalSettings(portal);
+			eventLogger.LogError("PortalModel(portal={Portal}): ps → {Ps}", portal, ps);
             this.CdfVersion = ps.CdfVersion;
+			eventLogger.LogDebug("PortalModel(portal={Portal}): this.CdfVersion → {Arg1}", portal, this.CdfVersion);
             this.SiteTheme = Utilities.FormatSkinName(ps.DefaultPortalSkin);
             this.AdminTheme = Utilities.FormatSkinName(ps.DefaultAdminSkin);
             this.Container = Utilities.FormatContainerName(ps.DefaultPortalContainer);
+			eventLogger.LogWarning("<<< Exiting PortalModel()");
             this.AdminContainer = Utilities.FormatContainerName(ps.DefaultAdminContainer);
         }
 

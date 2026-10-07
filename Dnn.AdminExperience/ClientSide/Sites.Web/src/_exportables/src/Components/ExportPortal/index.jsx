@@ -21,6 +21,7 @@ import utilities from "utils";
 import stringUtils from "utils/string";
 import Localization from "localization";
 import "./style.less";
+const logger = console;
 
 const emptyExport = {
     fileName: "",
@@ -48,6 +49,7 @@ const keysToValidate = ["fileName", "description"];
 class ExportPortal extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             localData: {
                 locales: [],
@@ -59,15 +61,20 @@ class ExportPortal extends Component {
             portalBeingExported: emptyExport,
             reloadPages: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const { props } = this;
         props.dispatch(
             CommonExportPortalActions.getPortalLocales(
                 props.portalBeingExported.PortalID,
                 data => {
                     const { portalBeingExported } = this.state;
+					logger.debug(`UNSAFE_componentWillMount(): portalBeingExported.portalId → ${portalBeingExported.portalId}`, { "event.action": "UNSAFE_componentWillMount" });
+					logger.debug(`UNSAFE_componentWillMount(): portalBeingExported.portalName → ${portalBeingExported.portalName}`, { "event.action": "UNSAFE_componentWillMount" });
+					logger.debug(`UNSAFE_componentWillMount(): localData.locales → ${localData.locales}`, { "event.action": "UNSAFE_componentWillMount" });
                     const { localData } = this.state;
                     portalBeingExported.portalId = props.portalBeingExported.PortalID;
                     portalBeingExported.portalName = props.portalBeingExported.PortalName;
@@ -79,6 +86,7 @@ class ExportPortal extends Component {
             props.portalBeingExported.contentLocalizable;
                     portalBeingExported.localizationCulture =
             props.portalBeingExported.DefaultLanguage;
+					logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
                     this.setState({
                         portalBeingExported,
                         localData
@@ -109,6 +117,7 @@ class ExportPortal extends Component {
     }
 
     onExportPortal() {
+		logger.error('>>> Entering onExportPortal()', { "event.action": "onExportPortal" });
         const { props, state } = this;
         if (this.Validate()) {
             props.dispatch(
@@ -117,11 +126,14 @@ class ExportPortal extends Component {
                     data => {
                         utilities.notify(data.Message);
                         let { portalBeingExported } = state;
+						logger.debug(`onExportPortal(): portalBeingExported.description → ${portalBeingExported.description}`, { "event.action": "onExportPortal" });
                         portalBeingExported.fileName = "";
+						logger.debug(`onExportPortal(): portalBeingExported.fileName → ${portalBeingExported.fileName}`, { "event.action": "onExportPortal" });
                         portalBeingExported.description = "";
                         this.setState({ portalBeingExported }, () => {
                             props.onCancel();
                         });
+						logger.warn('<<< Exiting onExportPortal()', { "event.action": "onExportPortal" });
                     }
                 )
             );
@@ -137,6 +149,7 @@ class ExportPortal extends Component {
         return success;
     }
     ValidateTexts(key) {
+		logger.error(`>>> Entering ValidateTexts(key=${key})`, { "event.action": "ValidateTexts", "logrite.key": key });
         let success = true;
         const { portalBeingExported } = this.state;
         const { localData } = this.state;
@@ -152,19 +165,25 @@ class ExportPortal extends Component {
             this.setState({});
         });
 
+		logger.warn(`<<< Exiting ValidateTexts(key=${key})`, { "event.action": "ValidateTexts", "logrite.key": key });
         return success;
     }
     onLanguageSelectionChange(option) {
+		logger.error(`>>> Entering onLanguageSelectionChange(option=${option})`, { "event.action": "onLanguageSelectionChange", "logrite.option": option });
         let { portalBeingExported } = this.state;
         const reloadPages = true;
         portalBeingExported.localizationCulture = option.value;
+		logger.debug(`onLanguageSelectionChange(option=${option}): portalBeingExported.localizationCulture → ${portalBeingExported.localizationCulture}`, { "event.action": "onLanguageSelectionChange", "logrite.option": option });
         this.setState({ portalBeingExported, reloadPages }, () => {
+			logger.warn(`<<< Exiting onLanguageSelectionChange(option=${option})`, { "event.action": "onLanguageSelectionChange", "logrite.option": option });
             this.setState({
                 reloadPages: false
             });
         });
     }
     createLocaleOptions(native) {
+		logger.error(`>>> Entering createLocaleOptions(native=${native})`, { "event.action": "createLocaleOptions", "logrite.native": native });
+		logger.warn(`<<< Exiting createLocaleOptions(native=${native})`, { "event.action": "createLocaleOptions", "logrite.native": native });
         return this.state.localData.locales.map(locale => {
             if (native)
             //There is need of mechanism to get native name
@@ -173,6 +192,7 @@ class ExportPortal extends Component {
         });
     }
     onLanguageCheckBoxChange(Code, event) {
+		logger.error(`>>> Entering onLanguageCheckBoxChange(Code=${Code},event=${event})`, { "event.action": "onLanguageCheckBoxChange", "logrite.Code": Code, "logrite.event": event });
         let { portalBeingExported } = this.state;
         if (event && !portalBeingExported.locales.some(sl => sl === Code)) {
             portalBeingExported.locales = portalBeingExported.locales.concat([Code]);
@@ -182,9 +202,12 @@ class ExportPortal extends Component {
             );
         }
         this.setState({ portalBeingExported });
+		logger.warn(`<<< Exiting onLanguageCheckBoxChange(Code=${Code},event=${event})`, { "event.action": "onLanguageCheckBoxChange", "logrite.Code": Code, "logrite.event": event });
     }
     createLanguageDropDownOptions() {
+		logger.error('>>> Entering createLanguageDropDownOptions()', { "event.action": "createLanguageDropDownOptions" });
         let { state } = this;
+		logger.warn('<<< Exiting createLanguageDropDownOptions()', { "event.action": "createLanguageDropDownOptions" });
         return state.localData.locales.map(locale => {
             return {
                 label: (
@@ -216,14 +239,19 @@ class ExportPortal extends Component {
         });
     }
     updatePagesToExport(selectedPages) {
+		logger.error(`>>> Entering updatePagesToExport(selectedPages=${selectedPages})`, { "event.action": "updatePagesToExport", "logrite.selectedPages": selectedPages });
         let { portalBeingExported } = this.state;
         portalBeingExported.pages = selectedPages;
+		logger.debug(`updatePagesToExport(selectedPages=${selectedPages}): portalBeingExported.pages → ${portalBeingExported.pages}`, { "event.action": "updatePagesToExport", "logrite.selectedPages": selectedPages });
         this.setState({ portalBeingExported });
+		logger.warn(`<<< Exiting updatePagesToExport(selectedPages=${selectedPages})`, { "event.action": "updatePagesToExport", "logrite.selectedPages": selectedPages });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props, state } = this;
         const localeOptions = this.createLocaleOptions();
+		logger.error(`render(): localeOptions → ${localeOptions}`, { "event.action": "render" });
         const dropdownOptions = this.createLanguageDropDownOptions();
         const PortalTabsParameters = {
             portalId: props.portalBeingExported.PortalID,
@@ -234,6 +262,7 @@ class ExportPortal extends Component {
             roles: "",
             sortOrder: 0
         };
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className="export-portal-container">
                 <PersonaBarPageHeader
@@ -402,6 +431,8 @@ ExportPortal.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         portalBeingExported: state.exportPortal.portalBeingExported
     };

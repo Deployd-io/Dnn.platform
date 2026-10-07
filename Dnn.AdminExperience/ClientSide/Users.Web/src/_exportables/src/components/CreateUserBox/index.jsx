@@ -7,6 +7,7 @@ import {validateEmail} from "../../helpers";
 import utilities from "utils";
 import styles from "./style.module.less";
 import Password from "../common/Password";
+const logger = console;
 import { GridCell, GridSystem, SingleLineInputWithError, Button, Switch, Checkbox } from "@dnnsoftware/dnn-react-common";
 
 
@@ -27,6 +28,7 @@ const newUserRegistrationDetails = {
 class CreateUserBox extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             UserDetails: Object.assign({}, newUserRegistrationDetails),
             confirmPassword: "",
@@ -43,13 +45,16 @@ class CreateUserBox extends Component {
             }
         };
         this.submitted = false;
+		logger.debug(`constructor(props=${props}): this.submitted → ${this.submitted}`, { "event.action": "constructor", "logrite.props": props });
     }
 
     onChangePassword(event) {
+		logger.error(`>>> Entering onChangePassword(event=${event})`, { "event.action": "onChangePassword", "logrite.event": event });
         this.setState({
             UserDetails: Object.assign(this.state.UserDetails, {password : event.target.value}),
             errors: Object.assign(this.state.errors, {password:false})
         });
+		logger.warn(`<<< Exiting onChangePassword(event=${event})`, { "event.action": "onChangePassword", "logrite.event": event });
     }
 
     onChange(key, item) {
@@ -69,18 +74,32 @@ class CreateUserBox extends Component {
         });
     }
     save() {
+		logger.error('>>> Entering save()', { "event.action": "save" });
         this.submitted = true;
         if (this.validateForm()) {
             this.props.save(CommonUsersActions.createUser(this.state.UserDetails, this.props.filter, () => {
                 this.cancel();
                 utilities.notify(Localization.get("UserCreated"), 3000);
+				logger.warn('<<< Exiting save()', { "event.action": "save" });
             }));
         }
     }
     
     clearForm(callback) {
+		logger.error(`>>> Entering clearForm(callback=${callback})`, { "event.action": "clearForm", "logrite.callback": callback });
         let {UserDetails} = this.state;
         UserDetails = Object.assign({}, newUserRegistrationDetails);
+		logger.error(`clearForm(callback=${callback}): UserDetails → ${UserDetails}`, { "event.action": "clearForm", "logrite.callback": callback });
+		logger.debug(`clearForm(callback=${callback}): UserDetails → ${UserDetails}`, { "event.action": "clearForm", "logrite.callback": callback });
+		logger.debug(`clearForm(callback=${callback}): errors.firstName → ${errors.firstName}`, { "event.action": "clearForm", "logrite.callback": callback });
+		logger.debug(`clearForm(callback=${callback}): errors.lastName → ${errors.lastName}`, { "event.action": "clearForm", "logrite.callback": callback });
+		logger.debug(`clearForm(callback=${callback}): errors.userName → ${errors.userName}`, { "event.action": "clearForm", "logrite.callback": callback });
+		logger.debug(`clearForm(callback=${callback}): errors.email → ${errors.email}`, { "event.action": "clearForm", "logrite.callback": callback });
+		logger.debug(`clearForm(callback=${callback}): errors.password → ${errors.password}`, { "event.action": "clearForm", "logrite.callback": callback });
+		logger.debug(`clearForm(callback=${callback}): errors.confirmPassword → ${errors.confirmPassword}`, { "event.action": "clearForm", "logrite.callback": callback });
+		logger.debug(`clearForm(callback=${callback}): errors.passwordsMatch → ${errors.passwordsMatch}`, { "event.action": "clearForm", "logrite.callback": callback });
+		logger.debug(`clearForm(callback=${callback}): errors.question → ${errors.question}`, { "event.action": "clearForm", "logrite.callback": callback });
+		logger.debug(`clearForm(callback=${callback}): errors.answer → ${errors.answer}`, { "event.action": "clearForm", "logrite.callback": callback });
         let {errors} = this.state;
         errors.firstName = false;
         errors.lastName = false;
@@ -98,14 +117,18 @@ class CreateUserBox extends Component {
             confirmPassword: ""
         }, () => {
             if (typeof callback === "function") {
+				logger.debug(`clearForm(callback=${callback}): this.submitted → ${this.submitted}`, { "event.action": "clearForm", "logrite.callback": callback });
                 callback();
+				logger.warn(`<<< Exiting clearForm(callback=${callback})`, { "event.action": "clearForm", "logrite.callback": callback });
             }
         });
     }
     cancel() {
+		logger.error('>>> Entering cancel()', { "event.action": "cancel" });
         this.clearForm(() => {
             this.props.onCancel();
         });
+		logger.warn('<<< Exiting cancel()', { "event.action": "cancel" });
     }
     validateForm() {
         const {props } = this;
@@ -170,8 +193,10 @@ class CreateUserBox extends Component {
         return valid;
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state } = this;
         let requiresQuestionAndAnswer = props.appSettings.applicationSettings.settings.requiresQuestionAndAnswer;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.newExtensionModal} style={props.style}>
                 <GridCell className="new-user-box">
@@ -298,6 +323,8 @@ CreateUserBox.propTypes = {
 };
 
 const mapDispatchToProps = (dispatch) => {
+	logger.error(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
+	logger.warn(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
     return {
         save : (callback) =>{
             dispatch(callback);

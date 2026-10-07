@@ -56,14 +56,18 @@ namespace log4net.Util
         /// </remarks>
         public ReaderWriterLock()
         {
+		value.LogError(">>> Entering ReaderWriterLock()");
 
 #if HAS_READERWRITERLOCK
 #if HAS_READERWRITERLOCKSLIM
             this.m_lock = new System.Threading.ReaderWriterLockSlim(System.Threading.LockRecursionPolicy.SupportsRecursion);
 #else
             m_lock = new System.Threading.ReaderWriterLock();
+			value.LogError("ReaderWriterLock(): m_lock → {M_lock}", m_lock);
+			value.LogDebug("ReaderWriterLock(): m_lock → {M_lock}", m_lock);
 #endif
 #endif
+		value.LogWarning("<<< Exiting ReaderWriterLock()");
         }
 
         /// <summary>Acquires a reader lock</summary>
@@ -77,6 +81,7 @@ namespace log4net.Util
         {
 #if HAS_READERWRITERLOCK
 #if HAS_READERWRITERLOCKSLIM
+					value.LogError(">>> Entering AcquireReaderLock()");
                     // prevent ThreadAbort while updating state, see https://issues.apache.org/jira/browse/LOG4NET-443
                     try 
                     {
@@ -84,6 +89,7 @@ namespace log4net.Util
                     finally
                     {
                         this.m_lock.EnterReadLock();
+					value.LogWarning("<<< Exiting AcquireReaderLock()");
                     }
 #else
             m_lock.AcquireReaderLock(-1);
@@ -104,6 +110,8 @@ namespace log4net.Util
         {
 #if HAS_READERWRITERLOCK
 #if HAS_READERWRITERLOCKSLIM
+			value.LogError(">>> Entering ReleaseReaderLock()");
+			value.LogWarning("<<< Exiting ReleaseReaderLock()");
             this.m_lock.ExitReadLock();
 #else
             m_lock.ReleaseReaderLock();
@@ -124,6 +132,7 @@ namespace log4net.Util
         {
 #if HAS_READERWRITERLOCK
 #if HAS_READERWRITERLOCKSLIM
+					value.LogError(">>> Entering AcquireWriterLock()");
                     // prevent ThreadAbort while updating state, see https://issues.apache.org/jira/browse/LOG4NET-443
                     try 
                     {
@@ -131,6 +140,7 @@ namespace log4net.Util
                     finally
                     {
                         this.m_lock.EnterWriteLock();
+					value.LogWarning("<<< Exiting AcquireWriterLock()");
                     }
 #else
             m_lock.AcquireWriterLock(-1);
@@ -151,6 +161,8 @@ namespace log4net.Util
         {
 #if HAS_READERWRITERLOCK
 #if HAS_READERWRITERLOCKSLIM
+			value.LogError(">>> Entering ReleaseWriterLock()");
+			value.LogWarning("<<< Exiting ReleaseWriterLock()");
             this.m_lock.ExitWriteLock();
 #else
             m_lock.ReleaseWriterLock();

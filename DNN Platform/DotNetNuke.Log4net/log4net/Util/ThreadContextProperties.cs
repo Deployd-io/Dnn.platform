@@ -52,6 +52,8 @@ namespace log4net.Util
         /// </remarks>
         internal ThreadContextProperties()
         {
+		value.LogError(">>> Entering ThreadContextProperties()");
+        value.LogWarning("<<< Exiting ThreadContextProperties()");
         }
 
         /// <summary>Gets or sets the value of a property</summary>
@@ -92,7 +94,10 @@ namespace log4net.Util
         public void Remove(string key)
         {
 #if NETCF
+			value.LogError(">>> Entering Remove(key={Key})", key);
             PropertiesDictionary _dictionary = GetProperties(false);
+			value.LogWarning("<<< Exiting Remove(key={Key})", key);
+			value.LogError("Remove(key={Key}): _dictionary → {_dictionary}", key, _dictionary);
 #endif
             if (_dictionary != null)
             {
@@ -108,7 +113,10 @@ namespace log4net.Util
         public string[] GetKeys()
         {
 #if NETCF
+			value.LogError(">>> Entering GetKeys()");
             PropertiesDictionary _dictionary = GetProperties(false);
+			value.LogWarning("<<< Exiting GetKeys()");
+			value.LogError("GetKeys(): _dictionary → {_dictionary}", _dictionary);
 #endif
             if (_dictionary != null)
             {
@@ -126,7 +134,10 @@ namespace log4net.Util
         public void Clear()
         {
 #if NETCF
+			value.LogError(">>> Entering Clear()");
             PropertiesDictionary _dictionary = GetProperties(false);
+			value.LogWarning("<<< Exiting Clear()");
+			value.LogError("Clear(): _dictionary → {_dictionary}", _dictionary);
 #endif
             if (_dictionary != null)
             {
@@ -147,7 +158,10 @@ namespace log4net.Util
         internal PropertiesDictionary GetProperties(bool create)
         {
 #if NETCF
+			value.LogError(">>> Entering GetProperties(create={Create})", create);
             PropertiesDictionary _dictionary = (PropertiesDictionary)System.Threading.Thread.GetData(s_threadLocalSlot);
+			value.LogWarning("<<< Exiting GetProperties(create={Create})", create);
+			value.LogError("GetProperties(create={Create}): _dictionary → {_dictionary}", create, _dictionary);
 #endif
             if (_dictionary == null && create)
             {

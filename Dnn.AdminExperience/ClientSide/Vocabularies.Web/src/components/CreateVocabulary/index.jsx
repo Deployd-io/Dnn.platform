@@ -17,10 +17,12 @@ import {
 import LocalizedResources from "../../resources";
 import util from "../../utils";
 import styles from "./style.module.less";
+const logger = console;
 
 class CreateVocabulary extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             term: {
                 Name: "",
@@ -33,9 +35,11 @@ class CreateVocabulary extends Component {
             },
             triedToSubmit: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.setState({
             term: {
                 Name: "",
@@ -44,17 +48,23 @@ class CreateVocabulary extends Component {
                 ScopeTypeId: 2
             }
         });
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     onCloseVocabulary() {
+		logger.error('>>> Entering onCloseVocabulary()', { "event.action": "onCloseVocabulary" });
         const {props} = this;
         props.onCloseVocabulary();
+		logger.warn('<<< Exiting onCloseVocabulary()', { "event.action": "onCloseVocabulary" });
     }
 
 
     onTermValueChange(key, event) {
+		logger.error(`>>> Entering onTermValueChange(key=${key},event=${event})`, { "event.action": "onTermValueChange", "logrite.key": key, "logrite.event": event });
         const value = typeof event === "object" ? event.target.value : parseInt(event); //event is value
 
+		logger.error(`onTermValueChange(key=${key},event=${event}): value → ${value}`, { "event.action": "onTermValueChange", "logrite.key": key, "logrite.event": event });
+		logger.debug(`onTermValueChange(key=${key},event=${event}): state.triedToSubmit → ${state.triedToSubmit}`, { "event.action": "onTermValueChange", "logrite.key": key, "logrite.event": event });
         let {state} = this;
         let {term} = this.state;
         term[key] = value;
@@ -63,6 +73,7 @@ class CreateVocabulary extends Component {
             state.error["name"] = true;
         } else if (value !== "" && key === "Name") {
             state.error["name"] = false;
+			logger.warn(`<<< Exiting onTermValueChange(key=${key},event=${event})`, { "event.action": "onTermValueChange", "logrite.key": key, "logrite.event": event });
         }
         this.setState({
             state,
@@ -71,6 +82,8 @@ class CreateVocabulary extends Component {
     }
 
     getNextPage(pageIndex, pageSize, scopeTypeId) {
+		logger.error(`>>> Entering getNextPage(pageIndex=${pageIndex},pageSize=${pageSize},scopeTypeId=${scopeTypeId})`, { "event.action": "getNextPage", "logrite.pageIndex": pageIndex, "logrite.pageSize": pageSize, "logrite.scopeTypeId": scopeTypeId });
+		logger.warn(`<<< Exiting getNextPage(pageIndex=${pageIndex},pageSize=${pageSize},scopeTypeId=${scopeTypeId})`, { "event.action": "getNextPage", "logrite.pageIndex": pageIndex, "logrite.pageSize": pageSize, "logrite.scopeTypeId": scopeTypeId });
         return {
             pageIndex: pageIndex || 0,
             pageSize: pageSize,
@@ -79,6 +92,7 @@ class CreateVocabulary extends Component {
     }
 
     onAddNewVocabulary(event) {
+		logger.error(`>>> Entering onAddNewVocabulary(event=${event})`, { "event.action": "onAddNewVocabulary", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -93,9 +107,11 @@ class CreateVocabulary extends Component {
             this.onCloseVocabulary();
             props.dispatch(PaginationActions.loadTab(this.getNextPage(0, 10000, state.term.ScopeTypeId)));   //index acts as scopeTypeId 
         }));
+		logger.warn(`<<< Exiting onAddNewVocabulary(event=${event})`, { "event.action": "onAddNewVocabulary", "logrite.event": event });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         const typeOptions = [
             {
@@ -118,6 +134,7 @@ class CreateVocabulary extends Component {
                 value: 1
             }
         ];
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             //inline style for height to allow proper calculating
             <PersonaBarPageBody backToLinkProps={{
@@ -180,6 +197,8 @@ CreateVocabulary.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         totalCount: state.vocabulary.totalCount,
         vocabularyAddedIsValid: state.vocabulary.vocabularyAddedIsValid,

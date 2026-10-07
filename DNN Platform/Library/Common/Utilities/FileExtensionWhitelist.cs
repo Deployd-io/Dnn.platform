@@ -13,6 +13,7 @@ namespace DotNetNuke.Common.Utilities
     /// <summary>The default <see cref="IFileExtensionAllowList"/> implementation.</summary>
     public class FileExtensionWhitelist : IFileExtensionAllowList
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FileExtensionWhitelist));
         private readonly List<string> extensions;
 
         /// <summary>Initializes a new instance of the <see cref="FileExtensionWhitelist"/> class.</summary>
@@ -21,7 +22,10 @@ namespace DotNetNuke.Common.Utilities
         /// should not have an '.' in the extensions (e.g. txt,jpg,png,doc).</remarks>
         public FileExtensionWhitelist(string extensionList)
         {
+			Logger.LogError(">>> Entering FileExtensionWhitelist(extensionList={ExtensionList})", extensionList);
             this.extensions = EscapedString.Seperate(extensionList.ToLowerInvariant(), true).Select(item => "." + item).ToList();
+			Logger.LogDebug("FileExtensionWhitelist(extensionList={ExtensionList}): extensions → {Extensions}", extensionList, extensions);
+        Logger.LogWarning("<<< Exiting FileExtensionWhitelist(extensionList={ExtensionList})", extensionList);
         }
 
         /// <inheritdoc />
@@ -30,6 +34,9 @@ namespace DotNetNuke.Common.Utilities
         /// <inheritdoc />
         public string ToDisplayString()
         {
+			Logger.LogError(">>> Entering ToDisplayString()");
+            Logger.LogWarning("<<< Exiting ToDisplayString()");
+			Logger.LogWarning("<<< Exiting ToDisplayString(additionalExtensions={AdditionalExtensions})", additionalExtensions);
             return this.ToDisplayString(null);
         }
 
@@ -37,12 +44,16 @@ namespace DotNetNuke.Common.Utilities
         public string ToDisplayString(IEnumerable<string> additionalExtensions)
         {
             var allExtensions = this.CombineLists(additionalExtensions);
+			Logger.LogError("ToDisplayString(additionalExtensions={AdditionalExtensions}): allExtensions → {AllExtensions}", additionalExtensions, allExtensions);
             return "*" + string.Join(", *", allExtensions.ToArray());
         }
 
         /// <inheritdoc />
         public bool IsAllowedExtension(string extension)
         {
+			Logger.LogError(">>> Entering IsAllowedExtension(extension={Extension})", extension);
+			Logger.LogWarning("<<< Exiting IsAllowedExtension(extension={Extension})", extension);
+			Logger.LogWarning("<<< Exiting IsAllowedExtension(extension={Extension},additionalExtensions={AdditionalExtensions})", extension, additionalExtensions);
             return this.IsAllowedExtension(extension, null);
         }
 
@@ -66,12 +77,17 @@ namespace DotNetNuke.Common.Utilities
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogError(">>> Entering ToString()");
+            Logger.LogWarning("<<< Exiting ToString()");
             return this.ToDisplayString();
         }
 
         /// <inheritdoc />
         public string ToStorageString()
         {
+			Logger.LogError(">>> Entering ToStorageString()");
+            Logger.LogWarning("<<< Exiting ToStorageString()");
+			Logger.LogWarning("<<< Exiting ToStorageString(additionalExtensions={AdditionalExtensions})", additionalExtensions);
             return this.ToStorageString(null);
         }
 
@@ -80,6 +96,7 @@ namespace DotNetNuke.Common.Utilities
         {
             IEnumerable<string> allExtensions = this.CombineLists(additionalExtensions);
             var leadingDotRemoved = allExtensions.Select(ext => ext.Substring(1));
+			Logger.LogError("ToStorageString(additionalExtensions={AdditionalExtensions}): allExtensions → {AllExtensions}", additionalExtensions, allExtensions);
             return EscapedString.Combine(leadingDotRemoved);
         }
 
@@ -87,6 +104,7 @@ namespace DotNetNuke.Common.Utilities
         public FileExtensionWhitelist RestrictBy(FileExtensionWhitelist parentList)
         {
             var filter = parentList.extensions;
+			Logger.LogWarning("<<< Exiting RestrictBy(parentList={ParentList})", parentList);
             return new FileExtensionWhitelist(string.Join(",", this.extensions.Where(x => filter.Contains(x)).Select(s => s.Substring(1))));
         }
 
@@ -99,11 +117,14 @@ namespace DotNetNuke.Common.Utilities
 
         private static IEnumerable<string> NormalizeExtensions(IEnumerable<string> additionalExtensions)
         {
+			Logger.LogError(">>> Entering NormalizeExtensions(additionalExtensions={AdditionalExtensions})", additionalExtensions);
+			Logger.LogWarning("<<< Exiting NormalizeExtensions(additionalExtensions={AdditionalExtensions})", additionalExtensions);
             return additionalExtensions.Select(ext => (ext.StartsWith(".", StringComparison.Ordinal) ? ext : "." + ext).ToLowerInvariant());
         }
 
         private IEnumerable<string> CombineLists(IEnumerable<string> additionalExtensions)
         {
+			Logger.LogError(">>> Entering CombineLists(additionalExtensions={AdditionalExtensions})", additionalExtensions);
             if (additionalExtensions == null)
             {
                 return this.extensions;
@@ -111,12 +132,15 @@ namespace DotNetNuke.Common.Utilities
 
             // toList required to ensure that multiple enumerations of the list are possible
             var additionalExtensionsList = additionalExtensions.ToList();
+			Logger.LogError("CombineLists(additionalExtensions={AdditionalExtensions}): additionalExtensionsList → {AdditionalExtensionsList}", additionalExtensions, additionalExtensionsList);
             if (additionalExtensionsList.Count == 0)
             {
                 return this.extensions;
             }
 
             var normalizedExtensions = NormalizeExtensions(additionalExtensionsList);
+			Logger.LogError("CombineLists(additionalExtensions={AdditionalExtensions}): normalizedExtensions → {NormalizedExtensions}", additionalExtensions, normalizedExtensions);
+			Logger.LogWarning("<<< Exiting CombineLists(additionalExtensions={AdditionalExtensions})", additionalExtensions);
             return this.extensions.Union(normalizedExtensions);
         }
     }

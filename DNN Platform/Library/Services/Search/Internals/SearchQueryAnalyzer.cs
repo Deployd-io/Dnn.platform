@@ -11,20 +11,24 @@ namespace DotNetNuke.Services.Search.Internals
     /// <summary>This is responsible for the filters chain that analyzes search documents/queries.</summary>
     internal class SearchQueryAnalyzer : Analyzer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchQueryAnalyzer));
         private readonly bool useStemmingFilter;
 
         /// <summary>Initializes a new instance of the <see cref="SearchQueryAnalyzer"/> class.</summary>
         /// <param name="useStemmingFilter">Whether to use the stemming filter.</param>
         public SearchQueryAnalyzer(bool useStemmingFilter)
         {
+			Logger.LogError(">>> Entering SearchQueryAnalyzer(useStemmingFilter={UseStemmingFilter})", useStemmingFilter);
             this.useStemmingFilter = useStemmingFilter;
         }
 
         /// <inheritdoc />
         public override TokenStream TokenStream(string fieldName, TextReader reader)
         {
+			Logger.LogError(">>> Entering TokenStream(fieldName={FieldName},reader={Reader})", fieldName, reader);
             var wordLengthMinMax = SearchHelper.Instance.GetSearchMinMaxLength();
 
+			Logger.LogError("TokenStream(fieldName={FieldName},reader={Reader}): wordLengthMinMax → {WordLengthMinMax}", fieldName, reader, wordLengthMinMax);
             // Note: the order of filtering is important for both operation and performance, so we try to make it work faster
             // Also, note that filters are applied from the innermost outwards.
             var filter =
@@ -41,6 +45,7 @@ namespace DotNetNuke.Services.Search.Internals
                 return filter;
             }
 
+			Logger.LogWarning("<<< Exiting TokenStream(fieldName={FieldName},reader={Reader})", fieldName, reader);
             return new PorterStemFilter(filter);
         }
     }

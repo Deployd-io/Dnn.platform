@@ -19,6 +19,7 @@ namespace DotNetNuke.Web.Api.Auth
     /// <summary>Basic authentication message handler.</summary>
     public class BasicAuthMessageHandler : AuthMessageHandlerBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(BasicAuthMessageHandler));
         private static readonly char[] CredentialSeparator = [':',];
         private readonly Encoding encoding = Encoding.GetEncoding("iso-8859-1");
 
@@ -28,6 +29,8 @@ namespace DotNetNuke.Web.Api.Auth
         public BasicAuthMessageHandler(bool includeByDefault, bool forceSsl)
             : base(includeByDefault, forceSsl)
         {
+		Logger.LogError(">>> Entering BasicAuthMessageHandler(includeByDefault={IncludeByDefault},forceSsl={ForceSsl})", includeByDefault, forceSsl);
+        Logger.LogWarning("<<< Exiting BasicAuthMessageHandler(includeByDefault={IncludeByDefault},forceSsl={ForceSsl})", includeByDefault, forceSsl);
         }
 
         /// <summary>Gets the name of the authentication scheme.</summary>
@@ -36,44 +39,54 @@ namespace DotNetNuke.Web.Api.Auth
         /// <inheritdoc />
         public override HttpResponseMessage OnInboundRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+			Logger.LogError(">>> Entering OnInboundRequest(request={Request},cancellationToken=<redacted>)", request);
             if (this.NeedsAuthentication(request))
             {
                 var portalSettings = PortalController.Instance.GetCurrentSettings();
+				Logger.LogError("OnInboundRequest(request={Request},cancellationToken=<redacted>): portalSettings → {PortalSettings}", request, portalSettings);
                 if (portalSettings != null)
                 {
                     this.TryToAuthenticate(request, portalSettings.PortalId);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting OnInboundRequest(request={Request},cancellationToken=<redacted>)", request);
             return base.OnInboundRequest(request, cancellationToken);
         }
 
         /// <inheritdoc />
         public override HttpResponseMessage OnOutboundResponse(HttpResponseMessage response, CancellationToken cancellationToken)
         {
+			Logger.LogError(">>> Entering OnOutboundResponse(response={Response},cancellationToken=<redacted>)", response);
             if (response.StatusCode == HttpStatusCode.Unauthorized && SupportsBasicAuth(response.RequestMessage))
             {
                 response.Headers.WwwAuthenticate.Add(new AuthenticationHeaderValue(this.AuthScheme, "realm=\"DNNAPI\""));
             }
 
+			Logger.LogWarning("<<< Exiting OnOutboundResponse(response={Response},cancellationToken=<redacted>)", response);
             return base.OnOutboundResponse(response, cancellationToken);
         }
 
         private static bool SupportsBasicAuth(HttpRequestMessage request)
         {
+			Logger.LogError(">>> Entering SupportsBasicAuth(request={Request})", request);
+            Logger.LogWarning("<<< Exiting SupportsBasicAuth(request={Request})", request);
             return !IsXmlHttpRequest(request);
         }
 
         private void TryToAuthenticate(HttpRequestMessage request, int portalId)
         {
+			Logger.LogError(">>> Entering TryToAuthenticate(request={Request},portalId={PortalId})", request, portalId);
             UserCredentials credentials = this.GetCredentials(request);
 
+			Logger.LogError("TryToAuthenticate(request={Request},portalId={PortalId}): credentials → {Credentials}", request, portalId, credentials);
             if (credentials == null)
             {
                 return;
             }
 
             var status = UserLoginStatus.LOGIN_FAILURE;
+			Logger.LogError("TryToAuthenticate(request={Request},portalId={PortalId}): status → {Status}", request, portalId, status);
             string ipAddress = request.GetIPAddress();
 
             UserInfo user = UserController.ValidateUser(
@@ -90,10 +103,12 @@ namespace DotNetNuke.Web.Api.Auth
             {
                 SetCurrentPrincipal(new GenericPrincipal(new GenericIdentity(credentials.UserName, this.AuthScheme), null), request);
             }
+			Logger.LogWarning("<<< Exiting TryToAuthenticate(request={Request},portalId={PortalId})", request, portalId);
         }
 
         private UserCredentials GetCredentials(HttpRequestMessage request)
         {
+			Logger.LogError(">>> Entering GetCredentials(request={Request})", request);
             if (request?.Headers.Authorization == null)
             {
                 return null;
@@ -118,6 +133,7 @@ namespace DotNetNuke.Web.Api.Auth
                 return null;
             }
 
+			Logger.LogWarning("<<< Exiting GetCredentials(request={Request})", request);
             return new UserCredentials(parts[0], parts[1]);
         }
 
@@ -129,7 +145,10 @@ namespace DotNetNuke.Web.Api.Auth
             /// <param name="password">The user password.</param>
             public UserCredentials(string userName, string password)
             {
+				Logger.LogError(">>> Entering UserCredentials(userName={UserName},password=<redacted>)", userName);
                 this.UserName = userName;
+				Logger.LogDebug("UserCredentials(userName={UserName},password=<redacted>): this.UserName → {Arg2}", userName, this.UserName);
+            Logger.LogWarning("<<< Exiting UserCredentials(userName={UserName},password=<redacted>)", userName);
                 this.Password = password;
             }
 

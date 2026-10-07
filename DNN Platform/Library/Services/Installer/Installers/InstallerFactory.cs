@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The InstallerFactory is a factory class that is used to instantiate the appropriate Component Installer.</summary>
     public partial class InstallerFactory
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InstallerFactory));
         /// <summary>The GetInstaller method instantiates the relevant Component Installer.</summary>
         /// <param name="installerType">The type of Installer.</param>
         /// <returns>A <see cref="ComponentInstallerBase"/> instance or <see langword="null"/>.</returns>
@@ -31,11 +32,14 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <returns>A <see cref="ComponentInstallerBase"/> instance or <see langword="null"/>.</returns>
         public static ComponentInstallerBase GetInstaller(IServiceProvider serviceProvider, string installerType)
         {
+			Logger.LogError(">>> Entering GetInstaller(installerType={InstallerType})", installerType);
             ComponentInstallerBase installer = null;
+			Logger.LogError(">>> Entering GetInstaller(serviceProvider={ServiceProvider},installerType={InstallerType})", serviceProvider, installerType);
             switch (installerType)
             {
                 case "File":
                     installer = new FileInstaller();
+					Logger.LogError("GetInstaller(serviceProvider={ServiceProvider},installerType={InstallerType}): installer → {Installer}", serviceProvider, installerType, installer);
                     break;
                 case "Assembly":
                     installer = new AssemblyInstaller();
@@ -92,10 +96,14 @@ namespace DotNetNuke.Services.Installer.Installers
                 default:
                     // Installer type is defined in the List
                     var listController = ActivatorUtilities.GetServiceOrCreateInstance<ListController>(serviceProvider);
+					Logger.LogError("GetInstaller(installerType={InstallerType}): listController → {ListController}", installerType, listController);
+					Logger.LogError("GetInstaller(serviceProvider={ServiceProvider},installerType={InstallerType}): listController → {ListController}", serviceProvider, installerType, listController);
                     ListEntryInfo entry = listController.GetListEntryInfo("Installer", installerType);
 
+					Logger.LogError("GetInstaller(installerType={InstallerType}): entry → {Entry}", installerType, entry);
                     if (entry != null && !string.IsNullOrEmpty(entry.Text))
                     {
+						Logger.LogError("GetInstaller(serviceProvider={ServiceProvider},installerType={InstallerType}): entry → {Entry}", serviceProvider, installerType, entry);
                         // The class for the Installer is specified in the Text property
                         installer = (ComponentInstallerBase)Reflection.CreateObject(serviceProvider, entry.Text, $"Installer_{entry.Value}");
                     }
@@ -103,6 +111,7 @@ namespace DotNetNuke.Services.Installer.Installers
                     break;
             }
 
+			Logger.LogWarning("<<< Exiting GetInstaller(serviceProvider={ServiceProvider},installerType={InstallerType})", serviceProvider, installerType);
             return installer;
         }
 
@@ -149,6 +158,7 @@ namespace DotNetNuke.Services.Installer.Installers
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetInstaller(serviceProvider={ServiceProvider},manifestNav={ManifestNav},package={Package})", serviceProvider, manifestNav, package);
             return installer;
         }
     }

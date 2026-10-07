@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { action } from "storybook/actions";
 import Sortable from "./index";
 import Label from "../Label";
+const logger = console;
 
 export default {
     component: Sortable,
@@ -46,7 +47,9 @@ const testProperties =
     ];
 
 function renderedProperties() {
+	logger.error('>>> Entering renderedProperties()', { "event.action": "renderedProperties" });
     let i = 0;
+	logger.warn('<<< Exiting renderedProperties()', { "event.action": "renderedProperties" });
     return testProperties.map((item, index) => {
         let id = "row-" + i++;
         return (
@@ -59,7 +62,9 @@ function renderedProperties() {
 }
 
 function renderRows() {
+	logger.error('>>> Entering renderRows()', { "event.action": "renderRows" });
     let i=0;
+	logger.warn('<<< Exiting renderRows()', { "event.action": "renderRows" });
     return testProperties.map((item, index) => {
         return (
             <MyComponent

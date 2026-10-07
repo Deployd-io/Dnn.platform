@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -16,8 +17,10 @@ CodeMirror.registerHelper("fold", "brace", function(cm, start) {
   var startCh, tokenType;
 
   function findOpening(openCh) {
+	logger.error(`>>> Entering findOpening(openCh=${openCh})`, { "event.action": "findOpening", "logrite.openCh": openCh });
     for (var at = start.ch, pass = 0;;) {
       var found = at <= 0 ? -1 : lineText.lastIndexOf(openCh, at - 1);
+	logger.error(`findOpening(openCh=${openCh}): found → ${found}`, { "event.action": "findOpening", "logrite.openCh": openCh });
       if (found == -1) {
         if (pass == 1) break;
         pass = 1;
@@ -27,6 +30,7 @@ CodeMirror.registerHelper("fold", "brace", function(cm, start) {
       if (pass == 1 && found < start.ch) break;
       tokenType = cm.getTokenTypeAt(CodeMirror.Pos(line, found + 1));
       if (!/^(comment|string)/.test(tokenType)) return found + 1;
+	logger.warn(`<<< Exiting findOpening(openCh=${openCh})`, { "event.action": "findOpening", "logrite.openCh": openCh });
       at = found - 1;
     }
   }
@@ -61,6 +65,7 @@ CodeMirror.registerHelper("fold", "brace", function(cm, start) {
 
 CodeMirror.registerHelper("fold", "import", function(cm, start) {
   function hasImport(line) {
+	logger.error(`>>> Entering hasImport(line=${line})`, { "event.action": "hasImport", "logrite.line": line });
     if (line < cm.firstLine() || line > cm.lastLine()) return null;
     var start = cm.getTokenAt(CodeMirror.Pos(line, 1));
     if (!/\S/.test(start.string)) start = cm.getTokenAt(CodeMirror.Pos(line, start.end + 1));
@@ -69,6 +74,7 @@ CodeMirror.registerHelper("fold", "import", function(cm, start) {
     for (var i = line, e = Math.min(cm.lastLine(), line + 10); i <= e; ++i) {
       var text = cm.getLine(i), semi = text.indexOf(";");
       if (semi != -1) return {startCh: start.end, end: CodeMirror.Pos(i, semi)};
+	logger.error(`hasImport(line=${line}): text → ${text}`, { "event.action": "hasImport", "logrite.line": line });
     }
   }
 
@@ -85,10 +91,12 @@ CodeMirror.registerHelper("fold", "import", function(cm, start) {
 
 CodeMirror.registerHelper("fold", "include", function(cm, start) {
   function hasInclude(line) {
+	logger.error(`>>> Entering hasInclude(line=${line})`, { "event.action": "hasInclude", "logrite.line": line });
     if (line < cm.firstLine() || line > cm.lastLine()) return null;
     var start = cm.getTokenAt(CodeMirror.Pos(line, 1));
     if (!/\S/.test(start.string)) start = cm.getTokenAt(CodeMirror.Pos(line, start.end + 1));
     if (start.type == "meta" && start.string.slice(0, 8) == "#include") return start.start + 8;
+	logger.warn(`<<< Exiting hasInclude(line=${line})`, { "event.action": "hasInclude", "logrite.line": line });
   }
 
   var start = start.line, has = hasInclude(start);

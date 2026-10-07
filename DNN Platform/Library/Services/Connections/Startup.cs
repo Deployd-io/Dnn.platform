@@ -15,13 +15,16 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 /// <summary>Register <see cref="IConnector"/> types in the dependency injection container.</summary>
 public sealed class Startup : IDnnStartup
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Startup));
     /// <inheritdoc />
     public void ConfigureServices(IServiceCollection services)
     {
+		Logger.LogError(">>> Entering ConfigureServices(services={Services})", services);
         services.AddTransient<IConnectionsManager, ConnectionsManager>();
         services.AddTransient<IConnectionsController, ConnectionsController>();
 
         var connectorTypes = new TypeLocator().GetAllMatchingTypes(IsValidConnector);
+		Logger.LogError("ConfigureServices(services={Services}): connectorTypes → {ConnectorTypes}", services, connectorTypes);
         services.TryAddEnumerable(
             connectorTypes
                 .Select(
@@ -29,10 +32,13 @@ public sealed class Startup : IDnnStartup
                         typeof(IConnector),
                         connectorType,
                         ServiceLifetime.Transient)));
+						Logger.LogWarning("<<< Exiting ConfigureServices(services={Services})", services);
     }
 
     private static bool IsValidConnector(Type type)
     {
+		Logger.LogError(">>> Entering IsValidConnector(type={Type})", type);
+        Logger.LogWarning("<<< Exiting IsValidConnector(type={Type})", type);
         return type is { IsClass: true, IsAbstract: false, IsVisible: true } && typeof(IConnector).IsAssignableFrom(type);
     }
 }

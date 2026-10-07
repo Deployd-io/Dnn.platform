@@ -11,6 +11,7 @@ namespace Dnn.Modules.ResourceManager.Components.Common
     /// <summary>General utilities for the Resource Manager.</summary>
     public class Utils
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Utils));
         /// <summary>
         /// Obtains a human friendly description from an enum value using the
         /// <see cref="System.ComponentModel.DescriptionAttribute" /> attribute to get a proper name.
@@ -19,14 +20,18 @@ namespace Dnn.Modules.ResourceManager.Components.Common
         /// <returns>The specified description attribute name or the value of the enum as a string.</returns>
         public static string GetEnumDescription(Enum enumValue)
         {
+			Logger.LogError(">>> Entering GetEnumDescription(enumValue={EnumValue})", enumValue);
             var fi = enumValue.GetType().GetField(enumValue.ToString());
             var descriptionAttributes = (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+			Logger.LogError("GetEnumDescription(enumValue={EnumValue}): descriptionAttributes → {DescriptionAttributes}", enumValue, descriptionAttributes);
+			Logger.LogError("GetEnumDescription(enumValue={EnumValue}): fi → {Fi}", enumValue, fi);
 
             if (descriptionAttributes.Length > 0)
             {
                 return descriptionAttributes[0].Description;
             }
 
+			Logger.LogWarning("<<< Exiting GetEnumDescription(enumValue={EnumValue})", enumValue);
             return enumValue.ToString();
         }
 
@@ -35,7 +40,9 @@ namespace Dnn.Modules.ResourceManager.Components.Common
         /// <returns>An integer representing the root folder id for the group.</returns>
         public static int GetFolderGroupId(int folderId)
         {
+			Logger.LogError(">>> Entering GetFolderGroupId(folderId={FolderId})", folderId);
             var folder = FolderManager.Instance.GetFolder(folderId);
+			Logger.LogError("GetFolderGroupId(folderId={FolderId}): folder → {Folder}", folderId, folder);
             if (folder is null)
             {
                 return -1;
@@ -51,12 +58,14 @@ namespace Dnn.Modules.ResourceManager.Components.Common
             var prefixLength = Constants.GroupFolderPathStart.Length;
             var folderGroupIdString = folderPath.Substring(prefixLength - 1);
             folderGroupIdString = folderGroupIdString.Substring(0, folderGroupIdString.IndexOf("/", StringComparison.Ordinal));
+			Logger.LogError("GetFolderGroupId(folderId={FolderId}): folderGroupIdString → {FolderGroupIdString}", folderId, folderGroupIdString);
 
             if (!int.TryParse(folderGroupIdString, out var folderGroupId))
             {
                 return -1;
             }
 
+			Logger.LogWarning("<<< Exiting GetFolderGroupId(folderId={FolderId})", folderId);
             return folderGroupId;
         }
     }

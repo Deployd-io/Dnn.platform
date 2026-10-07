@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -22,27 +23,34 @@
                  "Unclosed string", "Stopping, unable to continue" ];
 
   function validator(text, options) {
+	logger.error(`>>> Entering validator(text=${text},options=${options})`, { "event.action": "validator", "logrite.text": text, "logrite.options": options });
     if (!window.JSHINT) return [];
     JSHINT(text, options, options.globals);
     var errors = JSHINT.data().errors, result = [];
+	logger.error(`validator(text=${text},options=${options}): errors → ${errors}`, { "event.action": "validator", "logrite.text": text, "logrite.options": options });
     if (errors) parseErrors(errors, result);
+	logger.warn(`<<< Exiting validator(text=${text},options=${options})`, { "event.action": "validator", "logrite.text": text, "logrite.options": options });
     return result;
   }
 
   CodeMirror.registerHelper("lint", "javascript", validator);
 
   function cleanup(error) {
+	logger.error(`>>> Entering cleanup(error=${error})`, { "event.action": "cleanup", "logrite.error": error });
     // All problems are warnings by default
     fixWith(error, warnings, "warning", true);
     fixWith(error, errors, "error");
 
+	logger.warn(`<<< Exiting cleanup(error=${error})`, { "event.action": "cleanup", "logrite.error": error });
     return isBogus(error) ? null : error;
   }
 
   function fixWith(error, fixes, severity, force) {
+	logger.error(`>>> Entering fixWith(error=${error},fixes=${fixes},severity=${severity},force=${force})`, { "event.action": "fixWith", "logrite.error": error, "logrite.fixes": fixes, "logrite.severity": severity, "logrite.force": force });
     var description, fix, find, replace, found;
 
     description = error.description;
+	logger.debug(`fixWith(error=${error},fixes=${fixes},severity=${severity},force=${force}): description → ${description}`, { "event.action": "fixWith", "logrite.error": error, "logrite.fixes": fixes, "logrite.severity": severity, "logrite.force": force });
 
     for ( var i = 0; i < fixes.length; i++) {
       fix = fixes[i];
@@ -52,30 +60,40 @@
 
       if (force || found) {
         error.severity = severity;
+		logger.debug(`fixWith(error=${error},fixes=${fixes},severity=${severity},force=${force}): error.severity → ${error.severity}`, { "event.action": "fixWith", "logrite.error": error, "logrite.fixes": fixes, "logrite.severity": severity, "logrite.force": force });
       }
       if (found && replace) {
         error.description = replace;
+		logger.warn(`<<< Exiting fixWith(error=${error},fixes=${fixes},severity=${severity},force=${force})`, { "event.action": "fixWith", "logrite.error": error, "logrite.fixes": fixes, "logrite.severity": severity, "logrite.force": force });
       }
     }
   }
 
   function isBogus(error) {
+	logger.error(`>>> Entering isBogus(error=${error})`, { "event.action": "isBogus", "logrite.error": error });
     var description = error.description;
     for ( var i = 0; i < bogus.length; i++) {
       if (description.indexOf(bogus[i]) !== -1) {
         return true;
       }
     }
+	logger.warn(`<<< Exiting isBogus(error=${error})`, { "event.action": "isBogus", "logrite.error": error });
     return false;
   }
 
   function parseErrors(errors, output) {
+	logger.error(`>>> Entering parseErrors(errors=${errors},output=${output})`, { "event.action": "parseErrors", "logrite.errors": errors, "logrite.output": output });
     for ( var i = 0; i < errors.length; i++) {
       var error = errors[i];
+	logger.error(`parseErrors(errors=${errors},output=${output}): error → ${error}`, { "event.action": "parseErrors", "logrite.errors": errors, "logrite.output": output });
+	logger.debug(`parseErrors(errors=${errors},output=${output}): error.character → ${error.character}`, { "event.action": "parseErrors", "logrite.errors": errors, "logrite.output": output });
       if (error) {
         var linetabpositions, index;
 
+		logger.debug(`parseErrors(errors=${errors},output=${output}): error.start → ${error.start}`, { "event.action": "parseErrors", "logrite.errors": errors, "logrite.output": output });
+		logger.debug(`parseErrors(errors=${errors},output=${output}): error.end → ${error.end}`, { "event.action": "parseErrors", "logrite.errors": errors, "logrite.output": output });
         linetabpositions = [];
+		logger.debug(`parseErrors(errors=${errors},output=${output}): linetabpositions → ${linetabpositions}`, { "event.action": "parseErrors", "logrite.errors": errors, "logrite.output": output });
 
         // This next block is to fix a problem in jshint. Jshint
         // replaces
@@ -130,6 +148,7 @@
                        severity: error.severity,
                        from: CodeMirror.Pos(error.line - 1, start),
                        to: CodeMirror.Pos(error.line - 1, end)});
+					logger.warn(`<<< Exiting parseErrors(errors=${errors},output=${output})`, { "event.action": "parseErrors", "logrite.errors": errors, "logrite.output": output });
       }
     }
   }

@@ -17,6 +17,7 @@ namespace Dnn.PersonaBar.Security.Attributes
         /// <inheritdoc />
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+			eventLogger.LogError(">>> Entering IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             var propertyName = validationContext.DisplayName;
 
             if (string.IsNullOrWhiteSpace(value.ToString()))
@@ -30,12 +31,14 @@ namespace Dnn.PersonaBar.Security.Attributes
             }
 
             var allOptions = Helper.RegistrationSettingsHelper.GetUserRegistrationOptions();
+			eventLogger.LogError("IsValid(value={Value},validationContext={ValidationContext}): allOptions → {AllOptions}", value, validationContext, allOptions);
 
             if (!allOptions.Select(o => o.Value).Contains(userRegistrationOptionId))
             {
                 return new ValidationResult(string.Format(CultureInfo.CurrentCulture, Localization.GetString(Components.Constants.NotValid, Components.Constants.LocalResourcesFile), propertyName, value.ToString()));
             }
 
+			eventLogger.LogWarning("<<< Exiting IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             return ValidationResult.Success;
         }
     }

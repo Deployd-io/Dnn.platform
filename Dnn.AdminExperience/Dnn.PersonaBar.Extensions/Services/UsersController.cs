@@ -42,6 +42,7 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.AddUser)]
         public HttpResponseMessage CreateUser(CreateUserContract contract)
         {
+			Logger.LogError(">>> Entering CreateUser(contract={Contract})", contract);
             try
             {
                 var settings = new RegisterationDetails
@@ -61,10 +62,13 @@ namespace Dnn.PersonaBar.Users.Services
                 };
 
                 var userInfo = RegisterController.Instance.Register(settings);
+				Logger.LogError("CreateUser(contract={Contract}): userInfo → {UserInfo}", contract, userInfo);
                 UserBasicDto response = null;
+				Logger.LogError("CreateUser(contract={Contract}): response → {Response}", contract, response);
                 if (userInfo != null)
                 {
                     var userDetail = Components.UsersController.Instance.GetUserDetail(this.PortalId, userInfo.UserId);
+					Logger.LogError("CreateUser(contract={Contract}): userDetail → {UserDetail}", contract, userDetail);
                     response = UserBasicDto.FromUserDetails(userDetail);
                 }
 
@@ -79,6 +83,7 @@ namespace Dnn.PersonaBar.Users.Services
                 }
                 else
                 {
+					Logger.LogWarning("<<< Exiting CreateUser(contract={Contract})", contract);
                     return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
                 }
             }
@@ -95,6 +100,7 @@ namespace Dnn.PersonaBar.Users.Services
         [HttpGet]
         public HttpResponseMessage GetUsers(string searchText, UserFilters filter, int pageIndex, int pageSize, string sortColumn, bool sortAscending)
         {
+			Logger.LogError(">>> Entering GetUsers(searchText={SearchText},filter={Filter},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending})", searchText, filter, pageIndex, pageSize, sortColumn, sortAscending);
             try
             {
                 int totalRecords;
@@ -110,6 +116,7 @@ namespace Dnn.PersonaBar.Users.Services
                 };
 
                 var results = Components.UsersController.Instance.GetUsers(getUsersContract, this.UserInfo.IsSuperUser, out totalRecords);
+				Logger.LogError("GetUsers(searchText={SearchText},filter={Filter},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending}): results → {Results}", searchText, filter, pageIndex, pageSize, sortColumn, sortAscending, results);
                 var response = new
                 {
                     Results = results,
@@ -121,6 +128,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting GetUsers(searchText={SearchText},filter={Filter},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending})", searchText, filter, pageIndex, pageSize, sortColumn, sortAscending);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -128,6 +136,7 @@ namespace Dnn.PersonaBar.Users.Services
         [HttpGet]
         public HttpResponseMessage GetUserFilters()
         {
+			Logger.LogError(">>> Entering GetUserFilters()");
             try
             {
                 return this.Request.CreateResponse(
@@ -137,6 +146,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetUserFilters()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -147,9 +157,11 @@ namespace Dnn.PersonaBar.Users.Services
         [HttpGet]
         public HttpResponseMessage GetUserDetail(int userId)
         {
+			Logger.LogError(">>> Entering GetUserDetail(userId={UserId})", userId);
             try
             {
                 var userDetail = Components.UsersController.Instance.GetUserDetail(this.PortalId, userId);
+				Logger.LogError("GetUserDetail(userId={UserId}): userDetail → {UserDetail}", userId, userDetail);
                 if (userDetail == null)
                 {
                     return this.Request.CreateErrorResponse(
@@ -174,6 +186,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting GetUserDetail(userId={UserId})", userId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -183,12 +196,15 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManagePassword)]
         public HttpResponseMessage ChangePassword(ChangePasswordDto changePasswordDto)
         {
+			Logger.LogError(">>> Entering ChangePassword(changePasswordDto=<redacted>)");
             try
             {
                 var userId = changePasswordDto.UserId;
+				Logger.LogError("ChangePassword(changePasswordDto=<redacted>): userId → {UserId}", userId);
                 var password = changePasswordDto.Password;
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("ChangePassword(changePasswordDto=<redacted>): user → {User}", user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
@@ -207,6 +223,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting ChangePassword(changePasswordDto=<redacted>)");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -216,10 +233,12 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManagePassword)]
         public HttpResponseMessage ForceChangePassword([FromUri] int userId)
         {
+			Logger.LogError(">>> Entering ForceChangePassword(userId={UserId})", userId);
             try
             {
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("ForceChangePassword(userId={UserId}): user → {User}", userId, user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
@@ -240,6 +259,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting ForceChangePassword(userId={UserId})", userId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -249,16 +269,19 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManagePassword)]
         public HttpResponseMessage SendPasswordResetLink([FromUri] int userId)
         {
+			Logger.LogError(">>> Entering SendPasswordResetLink(userId={UserId})", userId);
             try
             {
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("SendPasswordResetLink(userId={UserId}): user → {User}", userId, user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
                 }
 
                 var errorMessage = string.Empty;
+				Logger.LogError("SendPasswordResetLink(userId={UserId}): errorMessage → {ErrorMessage}", userId, errorMessage);
                 if (MembershipProviderConfig.RequiresQuestionAndAnswer)
                 {
                     errorMessage = Localization.GetString("OptionUnavailable", Components.Constants.LocalResourcesFile);
@@ -271,6 +294,7 @@ namespace Dnn.PersonaBar.Users.Services
                         UserController.ResetPasswordToken(user, Host.AdminMembershipResetLinkValidity);
 
                         var canSend = Mail.SendMail(user, MessageType.PasswordReminder, this.PortalSettings) == string.Empty;
+						Logger.LogError("SendPasswordResetLink(userId={UserId}): canSend → {CanSend}", userId, canSend);
                         if (!canSend)
                         {
                             errorMessage = Localization.GetString("OptionUnavailable", Components.Constants.LocalResourcesFile);
@@ -297,6 +321,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting SendPasswordResetLink(userId={UserId})", userId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -306,10 +331,12 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.AuthorizeUnAuthorizeUser)]
         public HttpResponseMessage UpdateAuthorizeStatus([FromUri] int userId, [FromUri] bool authorized)
         {
+			Logger.LogError(">>> Entering UpdateAuthorizeStatus(userId={UserId},authorized={Authorized})", userId, authorized);
             try
             {
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("UpdateAuthorizeStatus(userId={UserId},authorized={Authorized}): user → {User}", userId, authorized, user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
@@ -333,6 +360,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting UpdateAuthorizeStatus(userId={UserId},authorized={Authorized})", userId, authorized);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -342,16 +370,19 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.DeleteUser)]
         public HttpResponseMessage SoftDeleteUser([FromUri] int userId)
         {
+			Logger.LogError(">>> Entering SoftDeleteUser(userId={UserId})", userId);
             try
             {
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("SoftDeleteUser(userId={UserId}): user → {User}", userId, user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
                 }
 
                 var deleted = !user.IsDeleted && UserController.DeleteUser(ref user, true, false);
+				Logger.LogError("SoftDeleteUser(userId={UserId}): deleted → {Deleted}", userId, deleted);
 
                 return !deleted
                     ? this.Request.CreateErrorResponse(
@@ -362,6 +393,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting SoftDeleteUser(userId={UserId})", userId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -371,16 +403,19 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.DeleteUser)]
         public HttpResponseMessage HardDeleteUser([FromUri] int userId)
         {
+			Logger.LogError(">>> Entering HardDeleteUser(userId={UserId})", userId);
             try
             {
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("HardDeleteUser(userId={UserId}): user → {User}", userId, user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
                 }
 
                 var deleted = user.IsDeleted && UserController.RemoveUser(user);
+				Logger.LogError("HardDeleteUser(userId={UserId}): deleted → {Deleted}", userId, deleted);
                 return !deleted
                     ? this.Request.CreateErrorResponse(
                         HttpStatusCode.InternalServerError,
@@ -390,6 +425,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting HardDeleteUser(userId={UserId})", userId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -398,6 +434,7 @@ namespace Dnn.PersonaBar.Users.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage RemoveDeletedUsers()
         {
+			Logger.LogError(">>> Entering RemoveDeletedUsers()");
             if (!this.UserInfo.IsSuperUser)
             {
                 if (!this.UserInfo.IsInRole(this.PortalSettings.AdministratorRoleName))
@@ -408,11 +445,13 @@ namespace Dnn.PersonaBar.Users.Services
 
             UserController.RemoveDeletedUsers(this.PortalSettings.PortalId);
             var remaining = UserController.GetDeletedUsers(this.PortalSettings.PortalId);
+			Logger.LogError("RemoveDeletedUsers(): remaining → {Remaining}", remaining);
             if (remaining.Count > 0)
             {
                 return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, Localization.GetString("CouldNotRemoveAll", Components.Constants.LocalResourcesFile));
             }
 
+			Logger.LogWarning("<<< Exiting RemoveDeletedUsers()");
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, });
         }
 
@@ -421,16 +460,19 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.DeleteUser)]
         public HttpResponseMessage RestoreDeletedUser([FromUri] int userId)
         {
+			Logger.LogError(">>> Entering RestoreDeletedUser(userId={UserId})", userId);
             try
             {
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("RestoreDeletedUser(userId={UserId}): user → {User}", userId, user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
                 }
 
                 var restored = user.IsDeleted && UserController.RestoreUser(ref user);
+				Logger.LogError("RestoreDeletedUser(userId={UserId}): restored → {Restored}", userId, restored);
                 return !restored
                     ? this.Request.CreateErrorResponse(
                         HttpStatusCode.InternalServerError,
@@ -440,6 +482,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting RestoreDeletedUser(userId={UserId})", userId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -449,16 +492,19 @@ namespace Dnn.PersonaBar.Users.Services
         [RequireHost]
         public HttpResponseMessage UpdateSuperUserStatus([FromUri] int userId, [FromUri] bool setSuperUser)
         {
+			Logger.LogError(">>> Entering UpdateSuperUserStatus(userId={UserId},setSuperUser={SetSuperUser})", userId, setSuperUser);
             try
             {
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("UpdateSuperUserStatus(userId={UserId},setSuperUser={SetSuperUser}): user → {User}", userId, setSuperUser, user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
                 }
 
                 user.IsSuperUser = setSuperUser;
+				Logger.LogDebug("UpdateSuperUserStatus(userId={UserId},setSuperUser={SetSuperUser}): user.IsSuperUser → {Arg2}", userId, setSuperUser, user.IsSuperUser);
 
                 // Update User
                 UserController.UpdateUser(this.PortalId, user);
@@ -469,6 +515,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting UpdateSuperUserStatus(userId={UserId},setSuperUser={SetSuperUser})", userId, setSuperUser);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -478,17 +525,20 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.EditSettings)]
         public HttpResponseMessage UpdateUserBasicInfo(UserBasicDto userBasicDto)
         {
+			Logger.LogError(">>> Entering UpdateUserBasicInfo(userBasicDto={UserBasicDto})", userBasicDto);
             try
             {
                 Validate(userBasicDto);
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userBasicDto.UserId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("UpdateUserBasicInfo(userBasicDto={UserBasicDto}): user → {User}", userBasicDto, user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
                 }
 
                 var upadtedUser = Components.UsersController.Instance.UpdateUserBasicInfo(userBasicDto);
+				Logger.LogError("UpdateUserBasicInfo(userBasicDto={UserBasicDto}): upadtedUser → {UpadtedUser}", userBasicDto, upadtedUser);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, upadtedUser);
             }
@@ -502,6 +552,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting UpdateUserBasicInfo(userBasicDto={UserBasicDto})", userBasicDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -511,10 +562,12 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.AuthorizeUnAuthorizeUser)]
         public HttpResponseMessage UnlockUser([FromUri] int userId)
         {
+			Logger.LogError(">>> Entering UnlockUser(userId={UserId})", userId);
             try
             {
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("UnlockUser(userId={UserId}): user → {User}", userId, user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
@@ -527,6 +580,7 @@ namespace Dnn.PersonaBar.Users.Services
                 }
 
                 var unlocked = user.Membership.LockedOut && UserController.UnLockUser(user);
+				Logger.LogError("UnlockUser(userId={UserId}): unlocked → {Unlocked}", userId, unlocked);
                 return !unlocked
                     ? this.Request.CreateErrorResponse(
                         HttpStatusCode.InternalServerError,
@@ -536,6 +590,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting UnlockUser(userId={UserId})", userId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -544,6 +599,7 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManageRoles)]
         public HttpResponseMessage GetSuggestRoles(string keyword, int count)
         {
+			Logger.LogError(">>> Entering GetSuggestRoles(keyword={Keyword},count={Count})", keyword, count);
             try
             {
                 if (string.IsNullOrEmpty(keyword))
@@ -552,6 +608,7 @@ namespace Dnn.PersonaBar.Users.Services
                 }
 
                 var isAdmin = Components.UsersController.IsAdmin(this.PortalSettings);
+				Logger.LogError("GetSuggestRoles(keyword={Keyword},count={Count}): isAdmin → {IsAdmin}", keyword, count, isAdmin);
 
                 var roles = RoleController.Instance.GetRoles(
                     this.PortalId,
@@ -575,6 +632,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting GetSuggestRoles(keyword={Keyword},count={Count})", keyword, count);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -583,10 +641,12 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManageRoles)]
         public HttpResponseMessage GetUserRoles(string keyword, int userId, int pageIndex, int pageSize)
         {
+			Logger.LogError(">>> Entering GetUserRoles(keyword={Keyword},userId={UserId},pageIndex={PageIndex},pageSize={PageSize})", keyword, userId, pageIndex, pageSize);
             try
             {
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("GetUserRoles(keyword={Keyword},userId={UserId},pageIndex={PageIndex},pageSize={PageSize}): user → {User}", keyword, userId, pageIndex, pageSize, user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
@@ -601,6 +661,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting GetUserRoles(keyword={Keyword},userId={UserId},pageIndex={PageIndex},pageSize={PageSize})", keyword, userId, pageIndex, pageSize);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -610,11 +671,13 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManageRoles)]
         public HttpResponseMessage SaveUserRole(UserRoleDto userRoleDto, [FromUri] bool notifyUser, [FromUri] bool isOwner)
         {
+			Logger.LogError(">>> Entering SaveUserRole(userRoleDto={UserRoleDto},notifyUser={NotifyUser},isOwner={IsOwner})", userRoleDto, notifyUser, isOwner);
             try
             {
                 Validate(userRoleDto);
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userRoleDto.UserId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("SaveUserRole(userRoleDto={UserRoleDto},notifyUser={NotifyUser},isOwner={IsOwner}): user → {User}", userRoleDto, notifyUser, isOwner, user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
@@ -632,6 +695,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting SaveUserRole(userRoleDto={UserRoleDto},notifyUser={NotifyUser},isOwner={IsOwner})", userRoleDto, notifyUser, isOwner);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -641,11 +705,13 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManageRoles)]
         public HttpResponseMessage RemoveUserRole(UserRoleDto userRoleDto)
         {
+			Logger.LogError(">>> Entering RemoveUserRole(userRoleDto={UserRoleDto})", userRoleDto);
             try
             {
                 Validate(userRoleDto);
                 KeyValuePair<HttpStatusCode, string> response;
                 var user = Components.UsersController.GetUser(userRoleDto.UserId, this.PortalSettings, this.UserInfo, out response);
+				Logger.LogError("RemoveUserRole(userRoleDto={UserRoleDto}): user → {User}", userRoleDto, user);
                 if (user == null)
                 {
                     return this.Request.CreateErrorResponse(response.Key, response.Value);
@@ -664,6 +730,7 @@ namespace Dnn.PersonaBar.Users.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting RemoveUserRole(userRoleDto={UserRoleDto})", userRoleDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -691,8 +758,10 @@ namespace Dnn.PersonaBar.Users.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManageRoles)]
         public HttpResponseMessage PasswordStrengthOptions()
         {
+			Logger.LogError(">>> Entering PasswordStrengthOptions()");
             var settings = new MembershipPasswordSettings(this.PortalId);
 
+			Logger.LogError("PasswordStrengthOptions(): settings → {Settings}", settings);
             var passwordSettings = new PasswordSettingsDto
             {
                 MinLength = settings.MinPasswordLength,
@@ -700,31 +769,40 @@ namespace Dnn.PersonaBar.Users.Services
                 ValidationExpression = settings.ValidationExpression,
             };
 
+			Logger.LogWarning("<<< Exiting PasswordStrengthOptions()");
             return this.Request.CreateResponse(HttpStatusCode.OK, passwordSettings);
         }
 
         private static void Validate(UserRoleDto userRoleDto)
         {
+			Logger.LogError(">>> Entering Validate(userRoleDto={UserRoleDto})", userRoleDto);
             Requires.NotNegative("UserId", userRoleDto.UserId);
             Requires.NotNegative("RoleId", userRoleDto.RoleId);
+			Logger.LogWarning("<<< Exiting Validate(userRoleDto={UserRoleDto})", userRoleDto);
         }
 
         private static void Validate(UserBasicDto userBasicDto)
         {
+			Logger.LogError(">>> Entering Validate(userBasicDto={UserBasicDto})", userBasicDto);
             Requires.NotNegative("UserId", userBasicDto.UserId);
+			Logger.LogWarning("<<< Exiting Validate(userBasicDto={UserBasicDto})", userBasicDto);
         }
 
         private bool IsCurrentUser(int userId, out HttpResponseMessage response)
         {
+			Logger.LogError(">>> Entering IsCurrentUser(userId={UserId})", userId);
             response = null;
+			Logger.LogDebug("IsCurrentUser(userId={UserId}): response → {Response}", userId, response);
             if (userId == this.UserInfo.UserID)
             {
                 response = this.Request.CreateErrorResponse(
+				Logger.LogError("IsCurrentUser(userId={UserId}): response → {Response}", userId, response);
                     HttpStatusCode.Unauthorized,
                     Localization.GetString("InSufficientPermissions", Components.Constants.LocalResourcesFile));
                 return true;
             }
 
+			Logger.LogWarning("<<< Exiting IsCurrentUser(userId={UserId})", userId);
             return false;
         }
     }

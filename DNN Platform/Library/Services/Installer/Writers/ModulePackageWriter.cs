@@ -29,6 +29,7 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="installer">The installer info.</param>
         public ModulePackageWriter(XPathNavigator manifestNav, InstallerInfo installer)
         {
+			Logger.LogError(">>> Entering ModulePackageWriter(manifestNav={ManifestNav},installer={Installer})", manifestNav, installer);
             this.DesktopModule = new DesktopModuleInfo();
 
             // Create a Package
@@ -49,6 +50,7 @@ namespace DotNetNuke.Services.Installer.Writers
             LegacyUtil.ParsePackageName(this.Package);
 
             this.Initialize(this.DesktopModule.FolderName);
+			Logger.LogWarning("<<< Exiting ModulePackageWriter(manifestNav={ManifestNav},installer={Installer})", manifestNav, installer);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModulePackageWriter"/> class.</summary>
@@ -58,11 +60,14 @@ namespace DotNetNuke.Services.Installer.Writers
         public ModulePackageWriter(DesktopModuleInfo desktopModule, XPathNavigator manifestNav, PackageInfo package)
             : base(package)
         {
+			Logger.LogError(">>> Entering ModulePackageWriter(desktopModule={DesktopModule},manifestNav={ManifestNav},package={Package})", desktopModule, manifestNav, package);
             this.DesktopModule = desktopModule;
 
+			Logger.LogDebug("ModulePackageWriter(desktopModule={DesktopModule},manifestNav={ManifestNav},package={Package}): this.DesktopModule → {Arg3}", desktopModule, manifestNav, package, this.DesktopModule);
             this.Initialize(desktopModule.FolderName);
             if (manifestNav != null)
             {
+				Logger.LogWarning("<<< Exiting ModulePackageWriter(manifestNav={ManifestNav},installer={Installer})", manifestNav, installer);
                 this.ReadLegacyManifest(manifestNav.SelectSingleNode("folders/folder"), false);
             }
 
@@ -77,6 +82,7 @@ namespace DotNetNuke.Services.Installer.Writers
         {
             this.DesktopModule = DesktopModuleController.GetDesktopModuleByPackageID(package.PackageID);
             this.Initialize(this.DesktopModule.FolderName);
+			Logger.LogDebug("ModulePackageWriter(desktopModule={DesktopModule},package={Package}): this.DesktopModule → {Arg2}", desktopModule, package, this.DesktopModule);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModulePackageWriter"/> class.</summary>
@@ -116,19 +122,24 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <inheritdoc />
         protected override void WriteManifestComponent(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteManifestComponent(writer={Writer})", writer);
             // Write Module Component
             this.WriteModuleComponent(writer);
+			Logger.LogWarning("<<< Exiting WriteManifestComponent(writer={Writer})", writer);
         }
 
         private static void ProcessControls(XPathNavigator controlNav, string moduleFolder, ModuleDefinitionInfo definition)
         {
+			Logger.LogError(">>> Entering ProcessControls(controlNav={ControlNav},moduleFolder={ModuleFolder},definition={Definition})", controlNav, moduleFolder, definition);
             var moduleControl = new ModuleControlInfo();
 
+			Logger.LogError("ProcessControls(controlNav={ControlNav},moduleFolder={ModuleFolder},definition={Definition}): moduleControl → {ModuleControl}", controlNav, moduleFolder, definition, moduleControl);
             moduleControl.ControlKey = Util.ReadElement(controlNav, "key");
             moduleControl.ControlTitle = Util.ReadElement(controlNav, "title");
 
             // Write controlSrc
             string controlSrc = Util.ReadElement(controlNav, "src");
+			Logger.LogError("ProcessControls(controlNav={ControlNav},moduleFolder={ModuleFolder},definition={Definition}): controlSrc → {ControlSrc}", controlNav, moduleFolder, definition, controlSrc);
             if (!(controlSrc.StartsWith("desktopmodules", StringComparison.InvariantCultureIgnoreCase) || !controlSrc.EndsWith(".ascx", StringComparison.InvariantCultureIgnoreCase)))
             {
                 // this code allows a developer to reference an ASCX file in a different folder than the module folder ( good for ASCX files shared between modules where you want only a single copy )
@@ -138,6 +149,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
             controlSrc = controlSrc.Replace('\\', '/');
             moduleControl.ControlSrc = controlSrc;
+			Logger.LogDebug("ProcessControls(controlNav={ControlNav},moduleFolder={ModuleFolder},definition={Definition}): moduleControl.ControlSrc → {Arg3}", controlNav, moduleFolder, definition, moduleControl.ControlSrc);
 
             moduleControl.IconFile = Util.ReadElement(controlNav, "iconfile");
 
@@ -176,6 +188,7 @@ namespace DotNetNuke.Services.Installer.Writers
             }
 
             definition.ModuleControls[moduleControl.ControlKey] = moduleControl;
+			Logger.LogWarning("<<< Exiting ProcessControls(controlNav={ControlNav},moduleFolder={ModuleFolder},definition={Definition})", controlNav, moduleFolder, definition);
         }
 
         private void Initialize(string folder)
@@ -187,9 +200,11 @@ namespace DotNetNuke.Services.Installer.Writers
 
         private void ProcessModuleFiles(string folder, string basePath)
         {
+			Logger.LogError(">>> Entering ProcessModuleFiles(folder={Folder},basePath={BasePath})", folder, basePath);
             // we are going to drill down through the folders to add the files
             foreach (string fileName in Directory.GetFiles(folder))
             {
+				Logger.LogWarning("<<< Exiting ProcessModuleFiles(folder={Folder},basePath={BasePath})", folder, basePath);
                 string name = fileName.Replace(basePath + @"\", string.Empty);
                 this.AddFile(name, name);
             }
@@ -197,6 +212,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
         private void ProcessModuleFolders(string folder, string basePath)
         {
+			Logger.LogError(">>> Entering ProcessModuleFolders(folder={Folder},basePath={BasePath})", folder, basePath);
             // Process Folders recursively
             foreach (string directoryName in Directory.GetDirectories(folder))
             {
@@ -205,12 +221,15 @@ namespace DotNetNuke.Services.Installer.Writers
 
             // process files
             this.ProcessModuleFiles(folder, basePath);
+			Logger.LogWarning("<<< Exiting ProcessModuleFolders(folder={Folder},basePath={BasePath})", folder, basePath);
         }
 
         private void ProcessModules(XPathNavigator moduleNav, string moduleFolder)
         {
+			Logger.LogError(">>> Entering ProcessModules(moduleNav={ModuleNav},moduleFolder={ModuleFolder})", moduleNav, moduleFolder);
             var definition = new ModuleDefinitionInfo();
 
+			Logger.LogError("ProcessModules(moduleNav={ModuleNav},moduleFolder={ModuleFolder}): definition → {Definition}", moduleNav, moduleFolder, definition);
             definition.FriendlyName = Util.ReadElement(moduleNav, "friendlyname");
             string cacheTime = Util.ReadElement(moduleNav, "cachetime");
             if (!string.IsNullOrEmpty(cacheTime))
@@ -225,10 +244,12 @@ namespace DotNetNuke.Services.Installer.Writers
             }
 
             this.DesktopModule.ModuleDefinitions[definition.FriendlyName] = definition;
+			Logger.LogWarning("<<< Exiting ProcessModules(moduleNav={ModuleNav},moduleFolder={ModuleFolder})", moduleNav, moduleFolder);
         }
 
         private void ReadLegacyManifest(XPathNavigator folderNav, bool processModule)
         {
+			Logger.LogError(">>> Entering ReadLegacyManifest(folderNav={FolderNav},processModule={ProcessModule})", folderNav, processModule);
             if (processModule)
             {
                 // Version 2 of legacy manifest
@@ -273,6 +294,7 @@ namespace DotNetNuke.Services.Installer.Writers
                 }
 
                 string dependencies = Util.ReadElement(folderNav, "dependencies");
+				Logger.LogError("ReadLegacyManifest(folderNav={FolderNav},processModule={ProcessModule}): dependencies → {Dependencies}", folderNav, processModule, dependencies);
                 if (!string.IsNullOrEmpty(dependencies))
                 {
                     this.DesktopModule.Dependencies = dependencies;
@@ -302,10 +324,12 @@ namespace DotNetNuke.Services.Installer.Writers
                 {
                     // Special case for App_code - files can be in App_Code\ModuleName or root
                     sourceFileName = Path.Combine(filePath, fileName).Replace("[app_code]", "App_Code\\" + this.DesktopModule.FolderName);
+					Logger.LogError("ReadLegacyManifest(folderNav={FolderNav},processModule={ProcessModule}): sourceFileName → {SourceFileName}", folderNav, processModule, sourceFileName);
                 }
                 else
                 {
                     sourceFileName = Path.Combine(filePath, fileName);
+					Logger.LogDebug("ReadLegacyManifest(folderNav={FolderNav},processModule={ProcessModule}): sourceFileName → {SourceFileName}", folderNav, processModule, sourceFileName);
                 }
 
                 string tempFolder = this.Package.InstallerInfo.TempInstallFolder;
@@ -330,10 +354,12 @@ namespace DotNetNuke.Services.Installer.Writers
             {
                 this.AddResourceFile(new InstallFile(Util.ReadElement(folderNav, "resourcefile"), this.Package.InstallerInfo));
             }
+			Logger.LogWarning("<<< Exiting ReadLegacyManifest(folderNav={FolderNav},processModule={ProcessModule})", folderNav, processModule);
         }
 
         private void WriteEventMessage(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteEventMessage(writer={Writer})", writer);
             // Start Start eventMessage
             writer.WriteStartElement("eventMessage");
 
@@ -354,6 +380,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
             // Write upgradeVersionsList Attribute
             string upgradeVersions = Null.NullString;
+			Logger.LogError("WriteEventMessage(writer={Writer}): upgradeVersions → {UpgradeVersions}", writer, upgradeVersions);
             this.Versions.Sort();
             foreach (string version in this.Versions)
             {
@@ -372,10 +399,12 @@ namespace DotNetNuke.Services.Installer.Writers
 
             // End component Element
             writer.WriteEndElement();
+			Logger.LogWarning("<<< Exiting WriteEventMessage(writer={Writer})", writer);
         }
 
         private void WriteModuleComponent(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteModuleComponent(writer={Writer})", writer);
             // Start component Element
             writer.WriteStartElement("component");
             writer.WriteAttributeString("type", "Module");
@@ -396,6 +425,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
             // End component Element
             writer.WriteEndElement();
+			Logger.LogWarning("<<< Exiting WriteModuleComponent(writer={Writer})", writer);
         }
     }
 }

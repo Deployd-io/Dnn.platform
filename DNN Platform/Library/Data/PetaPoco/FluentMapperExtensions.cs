@@ -12,9 +12,11 @@ namespace DotNetNuke.Data.PetaPoco
 
     public static class FluentMapperExtensions
     {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FluentMapperExtensions));
 #pragma warning disable CS3002 // Return type is not CLS-compliant
         public static FluentMapper<TModel> AddFluentMapper<TModel>(this IDataContext dataContext)
         {
+			Logger.LogError(">>> Entering AddFluentMapper(dataContext={DataContext})", dataContext);
             var petaPocoDataContext = dataContext as PetaPocoDataContext;
             FluentMapper<TModel> mapper = null;
 
@@ -22,9 +24,11 @@ namespace DotNetNuke.Data.PetaPoco
             if (petaPocoDataContext != null)
             {
                 mapper = new FluentMapper<TModel>(petaPocoDataContext.TablePrefix);
+				Logger.LogError("AddFluentMapper(dataContext={DataContext}): mapper → {Mapper}", dataContext, mapper);
                 petaPocoDataContext.FluentMappers.Add(typeof(TModel), mapper);
             }
 
+			Logger.LogWarning("<<< Exiting AddFluentMapper(dataContext={DataContext})", dataContext);
             return mapper;
         }
 

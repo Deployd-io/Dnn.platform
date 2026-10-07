@@ -14,6 +14,7 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
 
     public class DnnAuthorizeAttribute : AuthorizeAttributeBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnAuthorizeAttribute));
         private string staticRoles;
         private string[] staticRolesSplit = [];
 
@@ -52,17 +53,22 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
 
         protected virtual bool IsAuthenticated()
         {
+			Logger.LogError(">>> Entering IsAuthenticated()");
+            Logger.LogWarning("<<< Exiting IsAuthenticated()");
             return Thread.CurrentPrincipal.Identity.IsAuthenticated;
         }
 
         protected virtual UserInfo GetCurrentUser()
         {
+			Logger.LogError(">>> Entering GetCurrentUser()");
+            Logger.LogWarning("<<< Exiting GetCurrentUser()");
             return UserController.Instance.GetCurrentUserInfo();
         }
 
         /// <inheritdoc />
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
+			Logger.LogError(">>> Entering AuthorizeCore(httpContext={HttpContext})", httpContext);
             if (!this.IsAuthenticated())
             {
                 return false;
@@ -71,6 +77,7 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
             if (this.denyRolesSplit.Length != 0)
             {
                 var currentUser = this.GetCurrentUser();
+				Logger.LogError("AuthorizeCore(httpContext={HttpContext}): currentUser → {CurrentUser}", httpContext, currentUser);
                 if (!currentUser.IsSuperUser && this.denyRolesSplit.Any(currentUser.IsInRole))
                 {
                     return false;
@@ -86,11 +93,13 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
                 }
             }
 
+			Logger.LogWarning("<<< Exiting AuthorizeCore(httpContext={HttpContext})", httpContext);
             return true;
         }
 
         private static string[] SplitString(string original)
         {
+			Logger.LogError(">>> Entering SplitString(original={Original})", original);
             if (string.IsNullOrEmpty(original))
             {
                 return [];
@@ -100,6 +109,7 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
                                         let trimmed = piece.Trim()
                                         where !string.IsNullOrEmpty(trimmed)
                                         select trimmed;
+			Logger.LogWarning("<<< Exiting SplitString(original={Original})", original);
             return split.ToArray();
         }
     }

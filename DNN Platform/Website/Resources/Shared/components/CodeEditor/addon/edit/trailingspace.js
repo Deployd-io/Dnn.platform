@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -16,9 +17,12 @@
     else if (!prev && val)
       cm.addOverlay({
         token: function(stream) {
+		logger.error(`>>> Entering token(stream=${stream})`, { "event.action": "token", "logrite.stream": stream });
           for (var l = stream.string.length, i = l; i && /\s/.test(stream.string.charAt(i - 1)); --i) {}
           if (i > stream.pos) { stream.pos = i; return null; }
+		logger.error(`token(stream=${stream}): l → ${l}`, { "event.action": "token", "logrite.stream": stream });
           stream.pos = l;
+		logger.warn(`<<< Exiting token(stream=${stream})`, { "event.action": "token", "logrite.stream": stream });
           return "trailingspace";
         },
         name: "trailingspace"

@@ -2,6 +2,7 @@ import React from "react";
 import Upload from "./img/upload.svg";
 import Checkmark from "./img/checkmark.svg";
 import ErrorIcon from "./img/x.svg";
+const logger = console;
 
 interface UploadBarProps {
     errorText?: string;
@@ -24,9 +25,12 @@ const UploadBar: React.FC<UploadBarProps> = ({
     onTryAgain,
     tryAgainText
 }) => {
+	logger.error(`>>> Entering UploadBar(errorInPackage=${errorInPackage})`, { "event.action": "UploadBar", "logrite.errorInPackage": errorInPackage });
     const displayPercent = errorText ? 0 : percent;
     const text = errorText ? errorText : (percent === 100 ? uploadCompleteText : uploadingText);
+	logger.error(`UploadBar(errorInPackage=${errorInPackage}): text → ${text}`, { "event.action": "UploadBar", "logrite.errorInPackage": errorInPackage });
     const UploadIcon = errorText ? ErrorIcon : (percent === 100 ? Checkmark : Upload);
+	logger.error(`UploadBar(errorInPackage=${errorInPackage}): UploadIcon → ${UploadIcon}`, { "event.action": "UploadBar", "logrite.errorInPackage": errorInPackage });
     const className = "file-upload-container dnn-upload-bar" +
         (percent === 100 ? " complete" : "") +
         (errorText ? " upload-error" : "");
@@ -49,6 +53,7 @@ const UploadBar: React.FC<UploadBarProps> = ({
             </div>
         </div>
     );
+	logger.warn(`<<< Exiting UploadBar(errorInPackage=${errorInPackage})`, { "event.action": "UploadBar", "logrite.errorInPackage": errorInPackage });
 };
 
 export default UploadBar;

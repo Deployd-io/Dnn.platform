@@ -14,6 +14,7 @@ namespace Dnn.PersonaBar.Pages.Components.Exceptions
         public BulkPagesException(string field, string message)
             : base(message)
         {
+			eventLogger.LogError(">>> Entering BulkPagesException(field={Field},message={Message})", field, message);
             this.Field = field;
         }
 

@@ -9,15 +9,20 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A time zone combobox control.</summary>
     public class DnnTimeZoneComboBox : DropDownList
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnTimeZoneComboBox));
         /// <inheritdoc />
         protected override void OnInit(System.EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             // Utilities.ApplySkin(this);
             base.OnInit(e);
 
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
             this.DataTextField = "DisplayName";
+			Logger.LogDebug("OnInit(e={E}): this.DataTextField → {Arg1}", e, this.DataTextField);
             this.DataValueField = "Id";
 
+			Logger.LogDebug("OnInit(e={E}): this.DataValueField → {Arg1}", e, this.DataValueField);
             this.DataSource = TimeZoneInfo.GetSystemTimeZones();
             this.DataBind();
         }

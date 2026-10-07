@@ -39,15 +39,20 @@ namespace DotNetNuke.Services.FileSystem
         public FileLinkClickController()
             : this(null, null, null)
         {
+		logger.LogError(">>> Entering FileLinkClickController()");
+        logger.LogWarning("<<< Exiting FileLinkClickController()");
         }
 
         /// <inheritdoc />
         public string GetFileLinkClick(IFileInfo file)
         {
+			logger.LogError(">>> Entering GetFileLinkClick(file={File})", file);
             Requires.NotNull("file", file);
             var portalId = file.PortalId;
             var linkClickPortalSettings = this.GetPortalSettingsForLinkClick(portalId);
+			logger.LogError("GetFileLinkClick(file={File}): linkClickPortalSettings → {LinkClickPortalSettings}", file, linkClickPortalSettings);
 
+			logger.LogWarning("<<< Exiting GetFileLinkClick(file={File})", file);
             return TestableGlobals.Instance.LinkClick(
                 $"fileid={file.FileId.ToString(CultureInfo.InvariantCulture)}",
                 Null.NullInteger,
@@ -62,14 +67,19 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public int GetFileIdFromLinkClick(NameValueCollection queryParams)
         {
+			logger.LogError(">>> Entering GetFileIdFromLinkClick(queryParams={QueryParams})", queryParams);
             var linkClickPortalSettings = this.GetPortalSettingsForLinkClick(GetPortalIdFromLinkClick(queryParams));
             var fileTicket = queryParams["fileticket"];
+			logger.LogError("GetFileIdFromLinkClick(queryParams={QueryParams}): fileTicket → {FileTicket}", queryParams, fileTicket);
+			logger.LogError("GetFileIdFromLinkClick(queryParams={QueryParams}): linkClickPortalSettings → {LinkClickPortalSettings}", queryParams, linkClickPortalSettings);
             var encryptionKey = linkClickPortalSettings.PortalGUID;
             var strFileId = UrlUtils.DecryptParameter(this.cryptographyProvider, fileTicket, encryptionKey);
+			logger.LogError("GetFileIdFromLinkClick(queryParams={QueryParams}): strFileId → {StrFileId}", queryParams, strFileId);
             if (string.IsNullOrEmpty(strFileId))
             {
 #pragma warning disable CS0618 // Type or member is obsolete
                 string obsoleteFileId = null;
+				logger.LogError("GetFileIdFromLinkClick(queryParams={QueryParams}): obsoleteFileId → {ObsoleteFileId}", queryParams, obsoleteFileId);
                 if (this.cryptographyProvider is DeprecatedCryptographyProvider deprecatedCryptographyProvider)
                 {
                     obsoleteFileId = UrlUtils.DecryptParameter(deprecatedCryptographyProvider.DecryptParameter, fileTicket, encryptionKey);
@@ -97,11 +107,14 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         protected override Func<IFileLinkClickController> GetFactory()
         {
+			logger.LogError(">>> Entering GetFactory()");
+			logger.LogWarning("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<IFileLinkClickController>();
         }
 
         private static int GetPortalIdFromLinkClick(NameValueCollection queryParams)
         {
+			logger.LogError(">>> Entering GetPortalIdFromLinkClick(queryParams={QueryParams})", queryParams);
             if (queryParams["hf"] != null && queryParams["hf"] == "1")
             {
                 return Null.NullInteger;
@@ -115,11 +128,13 @@ namespace DotNetNuke.Services.FileSystem
                 }
             }
 
+			logger.LogWarning("<<< Exiting GetPortalIdFromLinkClick(queryParams={QueryParams})", queryParams);
             return PortalSettings.Current.PortalId;
         }
 
         private LinkClickPortalSettings GetPortalSettingsForLinkClick(int portalId)
         {
+			logger.LogError(">>> Entering GetPortalSettingsForLinkClick(portalId={PortalId})", portalId);
             if (portalId == Null.NullInteger)
             {
                 return new LinkClickPortalSettings
@@ -130,6 +145,8 @@ namespace DotNetNuke.Services.FileSystem
             }
 
             var portalSettings = new PortalSettings(portalId);
+			logger.LogError("GetPortalSettingsForLinkClick(portalId={PortalId}): portalSettings → {PortalSettings}", portalId, portalSettings);
+			logger.LogWarning("<<< Exiting GetPortalSettingsForLinkClick(portalId={PortalId})", portalId);
             return new LinkClickPortalSettings
             {
                 PortalGUID = portalSettings.GUID.ToString(),

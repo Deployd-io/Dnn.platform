@@ -18,6 +18,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A property edit item control.</summary>
     public class DnnFormEditControlItem : DnnFormItemBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFormEditControlItem));
         private readonly IServiceProvider serviceProvider;
         private EditControl control;
 
@@ -26,6 +27,8 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnFormEditControlItem()
             : this(null, null, null)
         {
+		Logger.LogError(">>> Entering DnnFormEditControlItem()");
+        Logger.LogWarning("<<< Exiting DnnFormEditControlItem()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormEditControlItem"/> class.</summary>
@@ -44,6 +47,8 @@ namespace DotNetNuke.Web.UI.WebControls
             : base(appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>(), eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>())
         {
             this.serviceProvider = serviceProvider ?? Globals.GetCurrentServiceProvider();
+			Logger.LogDebug("DnnFormEditControlItem(appStatus={AppStatus},eventLogger={EventLogger},serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", appStatus, eventLogger, serviceProvider, serviceProvider);
+        Logger.LogWarning("<<< Exiting DnnFormEditControlItem(appStatus={AppStatus},eventLogger={EventLogger},serviceProvider={ServiceProvider})", appStatus, eventLogger, serviceProvider);
         }
 
         /// <summary>Gets or sets the control type.</summary>
@@ -52,7 +57,9 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override WebControl CreateControlInternal(Control container)
         {
+			Logger.LogError(">>> Entering CreateControlInternal(container={Container})", container);
             this.control = ActivatorUtilities.CreateInstance(this.serviceProvider, Reflection.CreateType(this.ControlType)) as EditControl;
+			Logger.LogDebug("CreateControlInternal(container={Container}): control → {Control}", container, control);
             if (this.control != null)
             {
                 this.control.ID = this.ID + "_Control";
@@ -69,12 +76,15 @@ namespace DotNetNuke.Web.UI.WebControls
                 container.Controls.Add(this.control);
             }
 
+			Logger.LogWarning("<<< Exiting CreateControlInternal(container={Container})", container);
             return this.control;
         }
 
         private void ValueChanged(object sender, PropertyEditorEventArgs e)
         {
+			Logger.LogError(">>> Entering ValueChanged(sender={Sender},e={E})", sender, e);
             this.UpdateDataSource(this.Value, e.Value, this.DataField);
+			Logger.LogWarning("<<< Exiting ValueChanged(sender={Sender},e={E})", sender, e);
         }
     }
 }

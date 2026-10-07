@@ -10,9 +10,11 @@ namespace DotNetNuke.Services.Search.Entities
     [Serializable]
     public class SearchResults
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchResults));
         /// <summary>Initializes a new instance of the <see cref="SearchResults"/> class.</summary>
         public SearchResults()
         {
+			Logger.LogError(">>> Entering SearchResults()");
             this.Results = new List<SearchResult>();
         }
 

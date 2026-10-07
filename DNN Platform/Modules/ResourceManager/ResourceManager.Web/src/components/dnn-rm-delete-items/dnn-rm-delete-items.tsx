@@ -1,6 +1,7 @@
 import { Component, Element, Event, EventEmitter, Host, h, Prop, State } from '@stencil/core';
 import { Item, ItemsClient } from '../../services/ItemsClient';
 import state from '../../store/store';
+const logger = console;
 
 @Component({
   tag: 'dnn-rm-delete-items',
@@ -27,18 +28,23 @@ export class DnnRmDeleteItems {
   private itemsClient: ItemsClient;
 
   constructor() {
+	logger.error('>>> Entering constructor()', { "event.action": "constructor" });
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
   }
 
   private async closeModal() {
+	logger.error('>>> Entering closeModal()', { "event.action": "closeModal" });
     const modal = this.el.parentElement as HTMLDnnModalElement;
     await modal.hide();
     setTimeout(() => {
       document.body.removeChild(modal);
     }, 300);
+	logger.warn('<<< Exiting closeModal()', { "event.action": "closeModal" });
   }
 
   private async handleDelete() {
+	logger.error('>>> Entering handleDelete()', { "event.action": "handleDelete" });
     this.deleting = true;
     try {
       for (const item of this.items){
@@ -58,20 +64,26 @@ export class DnnRmDeleteItems {
       }
     } catch (error) {
       alert(error);
+	logger.warn('<<< Exiting handleDelete()', { "event.action": "handleDelete" });
     }
   }
   
   private async handleItemDeleted(item: Item) {
+	logger.error(`>>> Entering handleItemDeleted(item=${item})`, { "event.action": "handleItemDeleted", "logrite.item": item });
     this.deletedCount++;
     this.currentItemName = item.itemName;
     if (this.deletedCount == this.items.length) {
+	logger.debug(`handleItemDeleted(item=${item}): this.currentItemName → ${this.currentItemName}`, { "event.action": "handleItemDeleted", "logrite.item": item });
       this.deleting = false;
       this.dnnRmFoldersChanged.emit();
       await this.closeModal();
+	logger.warn(`<<< Exiting handleItemDeleted(item=${item})`, { "event.action": "handleItemDeleted", "logrite.item": item });
     }
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         <h2>{state.localization?.DeleteItems}</h2>

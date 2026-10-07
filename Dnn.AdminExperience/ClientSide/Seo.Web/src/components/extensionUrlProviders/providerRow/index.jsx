@@ -2,34 +2,44 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Collapsible as Collapse, Checkbox, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
+const logger = console;
 
 class ProviderRow extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         let opened = (this.props.openId !== "" && this.props.name === this.props.openId);
         this.setState({
             opened
         });
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     toggle() {
+		logger.error('>>> Entering toggle()', { "event.action": "toggle" });
         if ((this.props.openId !== "" && this.props.name === this.props.openId)) {
             this.props.Collapse();
         } else {
             this.props.OpenCollapse(this.props.name);
+			logger.warn('<<< Exiting toggle()', { "event.action": "toggle" });
         }
     }
 
     updateStatus(event) {
+		logger.error(`>>> Entering updateStatus(event=${event})`, { "event.action": "updateStatus", "logrite.event": event });
         const {props} = this;
         this.props.onUpdateStatus(props.providerId, event);
+		logger.warn(`<<< Exiting updateStatus(event=${event})`, { "event.action": "updateStatus", "logrite.event": event });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         let opened = (this.props.openId !== "" && this.props.name === this.props.openId);
         if (props.visible) {
@@ -53,6 +63,7 @@ class ProviderRow extends Component {
             );
         }
         else {
+			logger.warn('<<< Exiting render()', { "event.action": "render" });
             return <div />;
         }
     }

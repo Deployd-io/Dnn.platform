@@ -10,11 +10,13 @@ import Localization from "localization";
 import JobRow from "./JobRow";
 import FiltersBar from "./FiltersBar";
 import JobDetails from "./JobDetails";
+const logger = console;
 import { Dropdown, Pager, Button, Label, GridCell } from "@dnnsoftware/dnn-react-common";
 
 class DashboardPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             jobs: [],
             pageIndex: 0,
@@ -23,9 +25,11 @@ class DashboardPanelBody extends Component {
             keyword: "",
             currentJobId: null
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const { props } = this;
         props.dispatch(ImportExportActions.getPortals((data) => {
             if (data.TotalResults === 1) {
@@ -47,6 +51,7 @@ class DashboardPanelBody extends Component {
                     }
                     else {
                         clearInterval(this.jobListTimeout);
+						logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
                     }
                 }));
             }
@@ -54,8 +59,10 @@ class DashboardPanelBody extends Component {
     }
 
     componentDidUpdate() {
+		logger.error('>>> Entering componentDidUpdate()', { "event.action": "componentDidUpdate" });
         const { props } = this;
         if (this.state.currentJobId !== props.currentJobId) {
+			logger.warn('<<< Exiting componentDidUpdate()', { "event.action": "componentDidUpdate" });
             this.setState({
                 currentJobId: props.currentJobId
             });
@@ -63,10 +70,13 @@ class DashboardPanelBody extends Component {
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         clearInterval(this.jobListTimeout);
+		logger.warn('<<< Exiting componentWillUnmount()', { "event.action": "componentWillUnmount" });
     }
 
     addInterval(props) {
+		logger.error(`>>> Entering addInterval(props=${props})`, { "event.action": "addInterval", "logrite.props": props });
         clearInterval(this.jobListTimeout);
         const persistedSettings = util.utilities.persistent.load();
         this.jobListTimeout = setInterval(() => {
@@ -84,28 +94,36 @@ class DashboardPanelBody extends Component {
                 }));
             }
         }, 5000);
+		logger.warn(`<<< Exiting addInterval(props=${props})`, { "event.action": "addInterval", "logrite.props": props });
     }
 
     uncollapse(id) {
+		logger.error(`>>> Entering uncollapse(id=${id})`, { "event.action": "uncollapse", "logrite.id": id });
         this.props.dispatch(ImportExportActions.jobSelected(id));
+		logger.warn(`<<< Exiting uncollapse(id=${id})`, { "event.action": "uncollapse", "logrite.id": id });
     }
 
     collapse() {
+		logger.error('>>> Entering collapse()', { "event.action": "collapse" });
         if (this.props.currentJobId !== "") {
             this.props.dispatch(ImportExportActions.jobSelected());
+			logger.warn('<<< Exiting collapse()', { "event.action": "collapse" });
         }
     }
 
     toggle(id) {
+		logger.error(`>>> Entering toggle(id=${id})`, { "event.action": "toggle", "logrite.id": id });
         if (id !== "") {
             this.uncollapse(id);
         }
         else {
             this.collapse();
+			logger.warn(`<<< Exiting toggle(id=${id})`, { "event.action": "toggle", "logrite.id": id });
         }
     }
 
     isLastPageOnlyJob(jobId) {
+		logger.error(`>>> Entering isLastPageOnlyJob(jobId=${jobId})`, { "event.action": "isLastPageOnlyJob", "logrite.jobId": jobId });
         const { props, state } = this;
         let total = Math.ceil(props.totalJobs / state.pageSize);
         let current = state.pageIndex * state.pageSize / state.pageSize + 1;
@@ -117,6 +135,7 @@ class DashboardPanelBody extends Component {
     }
 
     getNextPage(portalId) {
+		logger.error(`>>> Entering getNextPage(portalId=${portalId})`, { "event.action": "getNextPage", "logrite.portalId": portalId });
         const { state, props } = this;
         return {
             portal: portalId === undefined ? props.portalId : portalId,
@@ -125,9 +144,11 @@ class DashboardPanelBody extends Component {
             jobType: state.filter === -1 ? null : state.filter,
             keywords: state.keyword
         };
+		logger.warn(`<<< Exiting getNextPage(portalId=${portalId})`, { "event.action": "getNextPage", "logrite.portalId": portalId });
     }
 
     getPortalOptions() {
+		logger.error('>>> Entering getPortalOptions()', { "event.action": "getPortalOptions" });
         const { props } = this;
         let options = [];
         if (props.portals) {
@@ -141,10 +162,12 @@ class DashboardPanelBody extends Component {
                 options.unshift({ "label": Localization.get("AllSites"), "value": -1 });
             }
         }
+		logger.warn('<<< Exiting getPortalOptions()', { "event.action": "getPortalOptions" });
         return options;
     }
 
     onPortalChange(option) {
+		logger.error(`>>> Entering onPortalChange(option=${option})`, { "event.action": "onPortalChange", "logrite.option": option });
         const { props } = this;
         if (option.value !== props.portalId) {
             this.setState({
@@ -157,6 +180,7 @@ class DashboardPanelBody extends Component {
                     }
                     else {
                         clearInterval(this.jobListTimeout);
+						logger.warn(`<<< Exiting onPortalChange(option=${option})`, { "event.action": "onPortalChange", "logrite.option": option });
                     }
                 }));
             });
@@ -164,19 +188,26 @@ class DashboardPanelBody extends Component {
     }
 
     onImportData() {
+		logger.error('>>> Entering onImportData()', { "event.action": "onImportData" });
         const { props } = this;
         props.selectPanel(2);
+		logger.warn('<<< Exiting onImportData()', { "event.action": "onImportData" });
     }
 
     onExportData() {
+		logger.error('>>> Entering onExportData()', { "event.action": "onExportData" });
         const { props } = this;
         props.selectPanel(1);
+		logger.warn('<<< Exiting onExportData()', { "event.action": "onExportData" });
     }
 
     onPageChange(currentPage, pageSize) {
+		logger.error(`>>> Entering onPageChange(currentPage=${currentPage},pageSize=${pageSize})`, { "event.action": "onPageChange", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
         let { state, props } = this;
         if (pageSize !== undefined && state.pageSize !== pageSize) {
+			logger.debug(`onPageChange(currentPage=${currentPage},pageSize=${pageSize}): state.pageIndex → ${state.pageIndex}`, { "event.action": "onPageChange", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
             state.pageSize = pageSize;
+			logger.debug(`onPageChange(currentPage=${currentPage},pageSize=${pageSize}): state.pageSize → ${state.pageSize}`, { "event.action": "onPageChange", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
         }
         state.pageIndex = currentPage;
         this.setState({
@@ -189,6 +220,7 @@ class DashboardPanelBody extends Component {
                     }
                     else {
                         clearInterval(this.jobListTimeout);
+						logger.warn(`<<< Exiting onPageChange(currentPage=${currentPage},pageSize=${pageSize})`, { "event.action": "onPageChange", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
                     }
                 }));
             }));
@@ -196,6 +228,7 @@ class DashboardPanelBody extends Component {
     }
 
     onFilterChanged(filter) {
+		logger.error(`>>> Entering onFilterChanged(filter=${filter})`, { "event.action": "onFilterChanged", "logrite.filter": filter });
         const { props } = this;
         this.setState({
             pageIndex: 0,
@@ -208,6 +241,7 @@ class DashboardPanelBody extends Component {
                     }
                     else {
                         clearInterval(this.jobListTimeout);
+						logger.warn(`<<< Exiting onFilterChanged(filter=${filter})`, { "event.action": "onFilterChanged", "logrite.filter": filter });
                     }
                 }));
             }));
@@ -215,6 +249,7 @@ class DashboardPanelBody extends Component {
     }
 
     onKeywordChanged(keyword) {
+		logger.error(`>>> Entering onKeywordChanged(keyword=${keyword})`, { "event.action": "onKeywordChanged", "logrite.keyword": keyword });
         const { props } = this;
         this.setState({
             pageIndex: 0,
@@ -227,6 +262,7 @@ class DashboardPanelBody extends Component {
                     }
                     else {
                         clearInterval(this.jobListTimeout);
+						logger.warn(`<<< Exiting onKeywordChanged(keyword=${keyword})`, { "event.action": "onKeywordChanged", "logrite.keyword": keyword });
                     }
                 }));
             }));
@@ -234,6 +270,7 @@ class DashboardPanelBody extends Component {
     }
 
     cancelJob(jobId) {
+		logger.error(`>>> Entering cancelJob(jobId=${jobId})`, { "event.action": "cancelJob", "logrite.jobId": jobId });
         const { props } = this;
         util.utilities.confirm(Localization.get("CancelJobMessage"),
             Localization.get("ConfirmCancel"),
@@ -251,12 +288,14 @@ class DashboardPanelBody extends Component {
                     }));
                 }, () => {
                     util.utilities.notifyError(Localization.get("JobCancel.ErrorMessage"));
+					logger.warn(`<<< Exiting cancelJob(jobId=${jobId})`, { "event.action": "cancelJob", "logrite.jobId": jobId });
                 }));
             }
         );
     }
 
     deleteJob(jobId) {
+		logger.error(`>>> Entering deleteJob(jobId=${jobId})`, { "event.action": "deleteJob", "logrite.jobId": jobId });
         const { props, state } = this;
         util.utilities.confirm(Localization.get("DeleteJobMessage"),
             Localization.get("ConfirmDelete"),
@@ -296,6 +335,7 @@ class DashboardPanelBody extends Component {
                         }));
                     }, () => {
                         util.utilities.notifyError(Localization.get("JobDelete.ErrorMessage"));
+						logger.warn(`<<< Exiting deleteJob(jobId=${jobId})`, { "event.action": "deleteJob", "logrite.jobId": jobId });
                     }));
                 }
             }
@@ -303,7 +343,9 @@ class DashboardPanelBody extends Component {
     }
 
     renderTopPane() {
+		logger.error('>>> Entering renderTopPane()', { "event.action": "renderTopPane" });
         const { props } = this;
+		logger.warn('<<< Exiting renderTopPane()', { "event.action": "renderTopPane" });
         return <div className="top-panel">
             <GridCell columnSize={100} >
                 <div className="site-selection">
@@ -351,6 +393,7 @@ class DashboardPanelBody extends Component {
     }
 
     renderJobListHeader() {
+		logger.error('>>> Entering renderJobListHeader()', { "event.action": "renderJobListHeader" });
         const tableFields = [
             { "name": "", "id": "Indicator" },
             { "name": Localization.get("JobDate.Header"), "id": "JobDate" },
@@ -367,6 +410,7 @@ class DashboardPanelBody extends Component {
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.warn('<<< Exiting renderJobListHeader()', { "event.action": "renderJobListHeader" });
         return <div className="jobHeader-wrapper">{tableHeaders}</div>;
     }
 
@@ -404,7 +448,9 @@ class DashboardPanelBody extends Component {
     }
 
     renderPager() {
+		logger.error('>>> Entering renderPager()', { "event.action": "renderPager" });
         const { props, state } = this;
+		logger.warn('<<< Exiting renderPager()', { "event.action": "renderPager" });
         return (
             <div className="logPager">
                 {props.jobs && <Pager
@@ -425,6 +471,7 @@ class DashboardPanelBody extends Component {
     }
 
     renderedLegend() {
+		logger.error('>>> Entering renderedLegend()', { "event.action": "renderedLegend" });
         const legendItems = [
             { "name": Localization.get("LegendExport"), "id": "legend-export" },
             { "name": Localization.get("LegendImport"), "id": "legend-import" }
@@ -440,11 +487,15 @@ class DashboardPanelBody extends Component {
             </div>;
         });
 
+		logger.error(`renderedLegend(): legend → ${legend}`, { "event.action": "renderedLegend" });
+		logger.warn('<<< Exiting renderedLegend()', { "event.action": "renderedLegend" });
         return <div className="logLegend-wrapper">{legend}</div>;
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 {props.portals.length > 0 && <div>
@@ -486,6 +537,8 @@ DashboardPanelBody.defaultProps = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         jobs: state.importExport.jobs,
         portalId: state.importExport.portalId,

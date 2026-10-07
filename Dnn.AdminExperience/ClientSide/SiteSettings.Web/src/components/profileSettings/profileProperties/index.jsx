@@ -9,6 +9,7 @@ import ProfilePropertyEditor from "./profilePropertyEditor";
 import "./style.less";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 import { Sortable, Collapsible, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 let tableFields = [];
@@ -17,12 +18,15 @@ let tableFields = [];
 class ProfilePropertiesPanel extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             openId: ""
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidUpdate() {
+		logger.error('>>> Entering componentDidUpdate()', { "event.action": "componentDidUpdate" });
         const {props} = this;
         if (props.profileProperties) {
             if (props.portalId === undefined || props.profileProperties.PortalId === props.portalId) {
@@ -32,13 +36,17 @@ class ProfilePropertiesPanel extends Component {
                 this.loadData();
             }
         }
+		logger.warn('<<< Exiting componentDidUpdate()', { "event.action": "componentDidUpdate" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.loadData();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     loadData() {
+		logger.error('>>> Entering loadData()', { "event.action": "loadData" });
         const {props} = this;
         props.dispatch(SiteBehaviorActions.getProfileProperties(props.portalId, (data) => {
             this.setState({
@@ -52,15 +60,18 @@ class ProfilePropertiesPanel extends Component {
         tableFields.push({ "name": resx.get("DefaultVisibility.Header"), "id": "DefaultVisibility" });
         tableFields.push({ "name": resx.get("Required.Header"), "id": "Required" });
         tableFields.push({ "name": resx.get("Visible.Header"), "id": "Visible" });
+		logger.warn('<<< Exiting loadData()', { "event.action": "loadData" });
     }
 
     renderHeader() {
+		logger.error('>>> Entering renderHeader()', { "event.action": "renderHeader" });
         let tableHeaders = tableFields.map((field) => {
             let className = "property-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.warn('<<< Exiting renderHeader()', { "event.action": "renderHeader" });
         return <div className="header-row">{tableHeaders}</div>;
     }
 
@@ -205,8 +216,10 @@ class ProfilePropertiesPanel extends Component {
 
      
     renderedProfileProperties() {
+		logger.error('>>> Entering renderedProfileProperties()', { "event.action": "renderedProfileProperties" });
         let i = 0;
         if (this.props.profileProperties) {
+			logger.warn('<<< Exiting renderedProfileProperties()', { "event.action": "renderedProfileProperties" });
             return this.props.profileProperties.Properties.map((item, index) => {
                 let id = "row-" + i++;
                 return (
@@ -241,7 +254,9 @@ class ProfilePropertiesPanel extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let opened = (this.state.openId === "add");
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <div className="property-items">
@@ -307,6 +322,8 @@ ProfilePropertiesPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         profileProperties: state.siteBehavior.profileProperties,
         tabIndex: state.pagination.tabIndex,

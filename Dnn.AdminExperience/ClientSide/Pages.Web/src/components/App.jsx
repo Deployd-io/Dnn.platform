@@ -31,8 +31,10 @@ import "./style.less";
 
 import {PersonaBarPageTreeviewInteractor} from "./dnn-persona-bar-page-treeview";
 import SearchResult from "./SearchPage/SearchResult";
+const logger = console;
 
 function getSelectedTabBeingViewed(viewTab) {
+	logger.error(`>>> Entering getSelectedTabBeingViewed(viewTab=${viewTab})`, { "event.action": "getSelectedTabBeingViewed", "logrite.viewTab": viewTab });
     switch (viewTab) {
         case "details":
             return 0;
@@ -41,6 +43,7 @@ function getSelectedTabBeingViewed(viewTab) {
         case "localization":
             return 2;
         case "advanced":
+			logger.warn(`<<< Exiting getSelectedTabBeingViewed(viewTab=${viewTab})`, { "event.action": "getSelectedTabBeingViewed", "logrite.viewTab": viewTab });
             return 3;
     }
 }
@@ -49,7 +52,9 @@ function getSelectedTabBeingViewed(viewTab) {
 class App extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         const date = new Date();
+		logger.error(`constructor(): date → ${date}`, { "event.action": "constructor" });
         this.state = {
             referral: "",
             referralText: "",
@@ -78,22 +83,29 @@ class App extends Component {
             inDuplicateMode: false
         };
         this.lastActivePageId = null;
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
+		logger.debug(`constructor(): this.lastActivePageId → ${this.lastActivePageId}`, { "event.action": "constructor" });
+		logger.debug(`constructor(): this.noPermissionSelectionPageId → ${this.noPermissionSelectionPageId}`, { "event.action": "constructor" });
         this.shouldRunRecursive = true;
         this.noPermissionSelectionPageId = null;
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         let { selectedPage } = this.props;
         if (securityService.userHasPermission(permissionTypes.MANAGE_PAGE, selectedPage)) {
             this.props.getContentLocalizationEnabled();
         }
 
         const viewName = utils.getViewName();
+		logger.error(`componentDidMount(): viewName → ${viewName}`, { "event.action": "componentDidMount" });
         const viewParams = utils.getViewParams();
+		logger.error(`componentDidMount(): viewParams → ${viewParams}`, { "event.action": "componentDidMount" });
         window.dnn.utility.setConfirmationDialogPosition();
         window.dnn.utility.closeSocialTasks();
         this.props.getPageList().then(() => {
             const selectedPageId = utils.getSelectedPageId() || utils.getCurrentPageId();
+			logger.error(`componentDidMount(): selectedPageId → ${selectedPageId}`, { "event.action": "componentDidMount" });
             selectedPageId && !utils.getIsAdminHostSystemPage() && this.onLoadPage(selectedPageId);
         
             if (viewName === "edit") {
@@ -107,32 +119,40 @@ class App extends Component {
             //Listen to event fired to view page settings (from site settings)
             document.addEventListener("viewPageSettings", this.resolveTabBeingViewed.bind(this), false);
         });
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     //Update referral text if coming from a referral. (ex: "SiteSettings", resx.get("BackToLanguages"))
     updateReferral(referral, referralText) {
+		logger.error(`>>> Entering updateReferral(referral=${referral},referralText=${referralText})`, { "event.action": "updateReferral", "logrite.referral": referral, "logrite.referralText": referralText });
         this.setState({
             referral,
             referralText
         });
+		logger.warn(`<<< Exiting updateReferral(referral=${referral},referralText=${referralText})`, { "event.action": "updateReferral", "logrite.referral": referral, "logrite.referralText": referralText });
     }
 
     //Method to go back to referral panel.
     goToReferralPanel(referral) {
+		logger.error(`>>> Entering goToReferralPanel(referral=${referral})`, { "event.action": "goToReferralPanel", "logrite.referral": referral });
         let personaBar = window.parent.dnn ? window.parent.dnn.PersonaBar : null;
         if (personaBar) {
             personaBar.openPanel(referral, {}); //Open, panel should already be rendered, so no need to pass params.
             this.updateReferral("", "");
+			logger.warn(`<<< Exiting goToReferralPanel(referral=${referral})`, { "event.action": "goToReferralPanel", "logrite.referral": referral });
         }
     }
 
     //Call method to go back to referral panel
     backToReferral(referral) {
+		logger.error(`>>> Entering backToReferral(referral=${referral})`, { "event.action": "backToReferral", "logrite.referral": referral });
         this.goToReferralPanel(referral);
+		logger.warn(`<<< Exiting backToReferral(referral=${referral})`, { "event.action": "backToReferral", "logrite.referral": referral });
     }
 
     //Resolves tab being viewed if view params are present.
     resolveTabBeingViewed(viewParams) {
+	logger.error(`>>> Entering resolveTabBeingViewed(viewParams=${viewParams})`, { "event.action": "resolveTabBeingViewed", "logrite.viewParams": viewParams });
 
         if (!viewParams) {
             return;
@@ -147,15 +167,20 @@ class App extends Component {
         if (viewParams.referral) {
             this.updateReferral(viewParams.referral, viewParams.referralText);
         }
+		logger.warn(`<<< Exiting resolveTabBeingViewed(viewParams=${viewParams})`, { "event.action": "resolveTabBeingViewed", "logrite.viewParams": viewParams });
     }
     
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         document.removeEventListener("viewPageSettings", this.resolveTabBeingViewed);
+		logger.warn('<<< Exiting componentWillUnmount()', { "event.action": "componentWillUnmount" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         if (this.props.error && this.props.error && this.props.error !== prevProps.error) {
             const errorMessage = (this.props.error && this.props.error.message) || Localization.get("AnErrorOccurred");
+			logger.error(`componentDidUpdate(prevProps=${prevProps}): errorMessage → ${errorMessage}`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
             utils.notifyError(errorMessage);
         }
         window.dnn.utility.closeSocialTasks();
@@ -167,16 +192,22 @@ class App extends Component {
         if (selectedPage && selectedPage.tabId > 0 && this.shouldRunRecursive) {
             this.shouldRunRecursive = false;
             this.buildTree(selectedPage.tabId);
+			logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         }
     }
 
     buildTree(selectedId) {
+		logger.error(`>>> Entering buildTree(selectedId=${selectedId})`, { "event.action": "buildTree", "logrite.selectedId": selectedId });
         const buildTreeInternal = (hierarchy) => {
+			logger.error(`>>> Entering buildTreeInternal(hierarchy=${hierarchy})`, { "event.action": "buildTreeInternal", "logrite.hierarchy": hierarchy });
             const callAPI = () => {
+				logger.error('>>> Entering callAPI()', { "event.action": "callAPI" });
                 const parentId = hierarchy.shift();
                 parentId && setTimeout(() => execute(), 100);
+				logger.error(`callAPI(): parentId → ${parentId}`, { "event.action": "callAPI" });
                 const execute = () => {
                     if (parentId !== selectedId) {
+						logger.error('>>> Entering execute()', { "event.action": "execute" });
                         let page = null;
                         this._traverse((item, list, update) => {
                             if (item.id === parentId) {
@@ -192,34 +223,47 @@ class App extends Component {
                                 .then(data => {
                                     this._traverse((item, list, update) => {
                                         const left = () => {
+											logger.error('>>> Entering left()', { "event.action": "left" });
                                             item.childListItems = data;
                                             item.isOpen = true;
                                             item.hasChildren = true;
                                             update(list);
                                             callAPI();
+											logger.warn('<<< Exiting left()', { "event.action": "left" });
                                         };
-                                        const right = () => { update(list); };
+                                        const right = () => {
+                                            logger.error(`>>> Entering right(list=${list})`, { "event.action": "right" });
+                                            logger.warn(`<<< Exiting right(list=${list})`, { "event.action": "right" });
+                                            update(list);
+                                        };
                                         (data.length > 0 && item.id === data[0].parentId) ? left() : right();
                                     });
                                 });
                         } else {
                             callAPI();
+						logger.warn('<<< Exiting execute()', { "event.action": "execute" });
                         }
                     } else {
                         this.buildBreadCrumbPath(selectedId);
                     }
                 };
+				logger.warn('<<< Exiting callAPI()', { "event.action": "callAPI" });
             };
             callAPI();
+			logger.warn(`<<< Exiting buildTreeInternal(hierarchy=${hierarchy})`, { "event.action": "buildTreeInternal", "logrite.hierarchy": hierarchy });
         };
         this.props.getPageHierarchy(selectedId).then(buildTreeInternal);
+		logger.warn(`<<< Exiting buildTree(selectedId=${selectedId})`, { "event.action": "buildTree", "logrite.selectedId": selectedId });
     }
 
     onPageSettings(pageId) {
+		logger.error(`>>> Entering onPageSettings(pageId=${pageId})`, { "event.action": "onPageSettings", "logrite.pageId": pageId });
         this.onLoadPage(pageId);
+		logger.warn(`<<< Exiting onPageSettings(pageId=${pageId})`, { "event.action": "onPageSettings", "logrite.pageId": pageId });
     }
 
     onCreatePage() {
+		logger.error('>>> Entering onCreatePage()', { "event.action": "onCreatePage" });
         this.props.onCreatePage((page) => {
             if (page && page.canAddContentToPage || page && page.pageType !== "normal" || utils.getIsSuperUser()) {
                 page.selected = true;
@@ -295,12 +339,16 @@ class App extends Component {
             else {
                 let self = this;
                 self.setEmptyStateMessage();
+				logger.error(`onCreatePage(): self → ${self}`, { "event.action": "onCreatePage" });
             }
         });
     }
 
     onUpdatePage(input) {
+		logger.error(`>>> Entering onUpdatePage(input=${input})`, { "event.action": "onUpdatePage", "logrite.input": input });
         this.shouldRunRecursive = false;
+		logger.warn(`<<< Exiting onUpdatePage(input=${input})`, { "event.action": "onUpdatePage", "logrite.input": input });
+		logger.error(`onUpdatePage(input=${input}): update → ${update}`, { "event.action": "onUpdatePage", "logrite.input": input });
         return new Promise((resolve) => {
             const update = (input && input.tabId) ? input : this.props.selectedPage;
             let cachedItem = null;
@@ -336,6 +384,7 @@ class App extends Component {
                             });
                         }
                     });
+					logger.error('>>> Entering right()', { "event.action": "right" });
                 };
 
                 (update.oldParentId === -1 || update.parentId === -1) ? left() : right();
@@ -411,6 +460,7 @@ class App extends Component {
 
     
     onLoadPage(pageId, callback) {
+		logger.error(`>>> Entering onLoadPage(pageId=${pageId},callback=${callback})`, { "event.action": "onLoadPage", "logrite.pageId": pageId, "logrite.callback": callback });
         const self = this;
         this.props.onLoadPage(pageId).then((data) => {
             self.buildBreadCrumbPath(data.tabId);
@@ -420,6 +470,7 @@ class App extends Component {
     }
 
     _addPageToTree(parentId) {
+		logger.error(`>>> Entering _addPageToTree(parentId=${parentId})`, { "event.action": "_addPageToTree", "logrite.parentId": parentId });
         let runUpdateStore = null;
         let pageList = null;
         
@@ -430,6 +481,7 @@ class App extends Component {
                     item.hasChildren = true;
                     item.childCount++;
                     const newPageChildItems = item.childListItems.concat(this.props.selectedPage);
+					logger.error(`_addPageToTree(parentId=${parentId}): newPageChildItems → ${newPageChildItems}`, { "event.action": "_addPageToTree", "logrite.parentId": parentId });
                     item.childListItems = newPageChildItems;
                     updateStore(list);        
                 }
@@ -443,10 +495,12 @@ class App extends Component {
             });
             const newPageList = pageList.concat(this.props.selectedPage);    
             runUpdateStore(newPageList);
+			logger.error(`_addPageToTree(parentId=${parentId}): newPageList → ${newPageList}`, { "event.action": "_addPageToTree", "logrite.parentId": parentId });
         }
     }
 
     _removePageFromTree(parentId) {
+		logger.error(`>>> Entering _removePageFromTree(parentId=${parentId})`, { "event.action": "_removePageFromTree", "logrite.parentId": parentId });
         this._traverse((item, list, updateStore) => {
             if (item.id === parentId && parentId !== undefined) {
                 let itemIndex = null;
@@ -459,31 +513,40 @@ class App extends Component {
                     }
                 });
                 const arr1 = item.childListItems.slice(0, itemIndex);
+				logger.error(`_removePageFromTree(parentId=${parentId}): arr1 → ${arr1}`, { "event.action": "_removePageFromTree", "logrite.parentId": parentId });
                 const arr2 = item.childListItems.slice(itemIndex + 1);
+				logger.error(`_removePageFromTree(parentId=${parentId}): arr2 → ${arr2}`, { "event.action": "_removePageFromTree", "logrite.parentId": parentId });
                 item.childListItems = [...arr1, ...arr2];
                 updateStore(list);
             }
             if ((parentId === undefined || parentId === -1) && item.tabId !== undefined) {
                 const newPageList = list.slice(0,list.length-1);
+				logger.error(`_removePageFromTree(parentId=${parentId}): newPageList → ${newPageList}`, { "event.action": "_removePageFromTree", "logrite.parentId": parentId });
                 updateStore(newPageList);
             }
+		logger.warn(`<<< Exiting _removePageFromTree(parentId=${parentId})`, { "event.action": "_removePageFromTree", "logrite.parentId": parentId });
         });
 
 
     }
 
     onCancelPage(parentPageId) {
+		logger.error(`>>> Entering onCancelPage(parentPageId=${parentPageId})`, { "event.action": "onCancelPage", "logrite.parentPageId": parentPageId });
         this._removePageFromTree(parentPageId);
         this.props.changeSelectedPagePath([]);
         (parentPageId !== -1) ? this.props.onCancelPage(parentPageId) : this.props.onCancelPage();
         this.setState({inDuplicateMode: false});
+		logger.warn(`<<< Exiting onCancelPage(parentPageId=${parentPageId})`, { "event.action": "onCancelPage", "logrite.parentPageId": parentPageId });
     }
 
     onChangeParentId() {
+		logger.error('>>> Entering onChangeParentId()', { "event.action": "onChangeParentId" });
         this.onChangePageField("oldParentId", this.props.selectedPage.parentId);
+		logger.warn('<<< Exiting onChangeParentId()', { "event.action": "onChangeParentId" });
     }
 
     onAddMultiplePage() {
+		logger.error('>>> Entering onAddMultiplePage()', { "event.action": "onAddMultiplePage" });
         this._testDirtyPage(()=>{
             this.clearEmptyStateMessage();
             this.selectPageSettingTab(0);
@@ -492,13 +555,16 @@ class App extends Component {
             this.props.onLoadAddMultiplePages();
         });  
         
+		logger.warn('<<< Exiting onAddMultiplePage()', { "event.action": "onAddMultiplePage" });
     }
     
     /**
      * When on edit mode
      */
     onEditMode() {
+		logger.error('>>> Entering onEditMode()', { "event.action": "onEditMode" });
         const {selectedPage, selectedView, selectedPageDirty} = this.props;
+		logger.warn('<<< Exiting onEditMode()', { "event.action": "onEditMode" });
         return ((selectedPage && selectedPage.tabId === 0) || selectedPageDirty
             || selectedView === panels.SAVE_AS_TEMPLATE_PANEL
             || selectedView === panels.ADD_MULTIPLE_PAGES_PANEL 
@@ -506,10 +572,12 @@ class App extends Component {
     }
 
     onAddPage(parentPage) {
+		logger.error(`>>> Entering onAddPage(parentPage=${parentPage})`, { "event.action": "onAddPage", "logrite.parentPage": parentPage });
         this.clearEmptyStateMessage();
         this.selectPageSettingTab(0);
         
         const addPage = () => {
+			logger.error('>>> Entering addPage()', { "event.action": "addPage" });
             const { props } = this;
             const { selectedPage } = props;
             let runUpdateStore = null;
@@ -523,6 +591,7 @@ class App extends Component {
             runUpdateStore(pageList);
 
             const onConfirm = () => {
+				logger.error('>>> Entering onConfirm()', { "event.action": "onConfirm" });
                 this.props.changeSelectedPagePath([]);
                 
                 this.props.getNewPage(parentPage).then(()=>{
@@ -531,11 +600,14 @@ class App extends Component {
                             .then(pageChildItems => {
                                 this._traverse((item, list, update) => {
                                     const updateChildItems = () => {
+										logger.error('>>> Entering updateChildItems()', { "event.action": "updateChildItems" });
                                         const newPageChildItems = pageChildItems.concat(this.props.selectedPage);
                                         item.childListItems = newPageChildItems;
+										logger.error(`updateChildItems(): newPageChildItems → ${newPageChildItems}`, { "event.action": "updateChildItems" });
                                         item.isOpen = true;
                                         item.hasChildren = true;
                                         update(list);
+										logger.warn('<<< Exiting updateChildItems()', { "event.action": "updateChildItems" });
                                     };
                                     (item.id === parentPage.id) ? updateChildItems() : null;
                                 });
@@ -551,6 +623,7 @@ class App extends Component {
 
                     this.setState({inDuplicateMode: false});
                 }); 
+				logger.warn('<<< Exiting onConfirm()', { "event.action": "onConfirm" });
             };
        
 
@@ -570,13 +643,16 @@ class App extends Component {
                     this.node.querySelector("#name").focus();
                 }    
             },100);
+			logger.warn('<<< Exiting addPage()', { "event.action": "addPage" });
         };
 
         const noPermission = () => this.setEmptyStateMessage("You do not have permission to add a child page to this parent");
         parentPage.canAddPage === undefined || parentPage.canAddPage ? addPage() : noPermission();
+		logger.warn(`<<< Exiting onAddPage(parentPage=${parentPage})`, { "event.action": "onAddPage", "logrite.parentPage": parentPage });
     }
 
     onCancelSettings() {
+		logger.error('>>> Entering onCancelSettings()', { "event.action": "onCancelSettings" });
         const { props } = this;
         if (props.selectedPageDirty) {
             
@@ -585,6 +661,7 @@ class App extends Component {
         else {
             if (props.selectedPage.tabId === 0 && props.selectedPage.isCopy && props.selectedPage.templateTabId) {
                 this.onCancelPage(props.selectedPage.parentId);
+				logger.warn('<<< Exiting onCancelSettings()', { "event.action": "onCancelSettings" });
             }
             else if (props.selectedPage.tabId === 0 && props.selectedPage.referralTabId) {
                 this.onCancelPage(props.selectedPage.referralTabId);
@@ -596,6 +673,7 @@ class App extends Component {
     }
 
     onDeleteSettings() {
+		logger.error('>>> Entering onDeleteSettings()', { "event.action": "onDeleteSettings" });
         const { props } = this;
         const { selectedPage } = props;
 
@@ -624,6 +702,7 @@ class App extends Component {
         };
 
         const right = () => {
+			logger.error('>>> Entering right()', { "event.action": "right" });
             return () => {
                 let itemIndex;
                 const pageList = JSON.parse(JSON.stringify(this.props.pageList));
@@ -642,6 +721,7 @@ class App extends Component {
             };
         };
 
+		logger.warn('<<< Exiting onDeleteSettings()', { "event.action": "onDeleteSettings" });
         const onDelete = (selectedPage.parentId !== -1) ? left() : right();
 
         utils.confirm(
@@ -652,15 +732,19 @@ class App extends Component {
     }
 
     onClearCache() {
+		logger.error('>>> Entering onClearCache()', { "event.action": "onClearCache" });
         const { props } = this;
         props.onClearCache();
+		logger.warn('<<< Exiting onClearCache()', { "event.action": "onClearCache" });
     }
 
     showCancelWithoutSavingDialog() {
+		logger.error('>>> Entering showCancelWithoutSavingDialog()', { "event.action": "showCancelWithoutSavingDialog" });
         const { props } = this;
         const onConfirm = () => {
             if (props.selectedPage.tabId === 0 && props.selectedPage.isCopy && props.selectedPage.templateTabId) {
                 this.onCancelPage(props.selectedPage.parentId);
+				logger.warn('<<< Exiting showCancelWithoutSavingDialog()', { "event.action": "showCancelWithoutSavingDialog" });
             }
             else if (props.selectedPage.tabId === 0 && props.selectedPage.referralTabId) {
                 this.onCancelPage(props.selectedPage.referralTabId);
@@ -679,6 +763,7 @@ class App extends Component {
 
 
     showCancelWithoutSavingDialogInEditMode(input) {
+		logger.error(`>>> Entering showCancelWithoutSavingDialogInEditMode(input=${input})`, { "event.action": "showCancelWithoutSavingDialogInEditMode", "logrite.input": input });
         const id = (typeof input === "object") ? this.props.selectedPage.tabId : input;
         if (this.props.selectedPageDirty) {
             const onConfirm = () => {
@@ -705,22 +790,28 @@ class App extends Component {
             this.onCancelPage();
             this.props.changeSelectedPagePath([]);
 
+		logger.warn(`<<< Exiting showCancelWithoutSavingDialogInEditMode(input=${input})`, { "event.action": "showCancelWithoutSavingDialogInEditMode", "logrite.input": input });
         }
     }
 
     isNewPage() {
+		logger.error('>>> Entering isNewPage()', { "event.action": "isNewPage" });
         const { selectedPage } = this.props;
+		logger.warn('<<< Exiting isNewPage()', { "event.action": "isNewPage" });
         return selectedPage.tabId === 0;
     }
 
     getPageTitle() {
+		logger.error('>>> Entering getPageTitle()', { "event.action": "getPageTitle" });
         const { selectedPage } = this.props;
+		logger.warn('<<< Exiting getPageTitle()', { "event.action": "getPageTitle" });
         return this.isNewPage() ?
             Localization.get("AddPage") :
             selectedPage.name;
     }
     
     _testDirtyPage(callback) {
+		logger.error(`>>> Entering _testDirtyPage(callback=${callback})`, { "event.action": "_testDirtyPage", "logrite.callback": callback });
         const {selectedPage, selectedPageDirty} = this.props;
         const onConfirm = () => {
             callback();
@@ -736,6 +827,7 @@ class App extends Component {
             });
         };
 
+		logger.debug(`_testDirtyPage(callback=${callback}): this.lastActivePageId → ${this.lastActivePageId}`, { "event.action": "_testDirtyPage", "logrite.callback": callback });
         if (selectedPage && selectedPage.tabId !== 0 && selectedPageDirty) {
             utils.confirm(
                 Localization.get("CancelWithoutSaving"),
@@ -744,18 +836,23 @@ class App extends Component {
                 onConfirm);
 
         } else {
+			logger.warn(`<<< Exiting _testDirtyPage(callback=${callback})`, { "event.action": "_testDirtyPage", "logrite.callback": callback });
             return onConfirm();
         }
     }
 
     onLoadSavePageAsTemplate() {
+		logger.error('>>> Entering onLoadSavePageAsTemplate()', { "event.action": "onLoadSavePageAsTemplate" });
         this._testDirtyPage(this.props.onLoadSavePageAsTemplate.bind(this));
+		logger.warn('<<< Exiting onLoadSavePageAsTemplate()', { "event.action": "onLoadSavePageAsTemplate" });
     }
 
     getSettingsButtons() {
+		logger.error('>>> Entering getSettingsButtons()', { "event.action": "getSettingsButtons" });
         const { selectedPage, settingsButtonComponents, onLoadSavePageAsTemplate, onShowPageSettings, onHidePageSettings } = this.props;
         const SaveAsTemplateButton = settingsButtonComponents.SaveAsTemplateButton || Button;
         
+		logger.warn('<<< Exiting getSettingsButtons()', { "event.action": "getSettingsButtons" });
         return (
             <div className="heading-buttons">
                 <Sec permission={permissionTypes.EXPORT_PAGE} selectedPage={selectedPage}>
@@ -776,22 +873,29 @@ class App extends Component {
     }
 
     selectPageSettingTab(index) {
+		logger.error(`>>> Entering selectPageSettingTab(index=${index})`, { "event.action": "selectPageSettingTab", "logrite.index": index });
         this.props.selectPageSettingTab(index);
+		logger.warn(`<<< Exiting selectPageSettingTab(index=${index})`, { "event.action": "selectPageSettingTab", "logrite.index": index });
     }
 
     onSaveMultiplePages() {    
+		logger.error('>>> Entering onSaveMultiplePages()', { "event.action": "onSaveMultiplePages" });
+		logger.warn('<<< Exiting onSaveMultiplePages()', { "event.action": "onSaveMultiplePages" });
         return this.props.onSaveMultiplePages(()=>{
             this.props.getPageList();
         });
     }
     
     onValidateMultiplePages() {    
+		logger.error('>>> Entering onValidateMultiplePages()', { "event.action": "onValidateMultiplePages" });
+		logger.warn('<<< Exiting onValidateMultiplePages()', { "event.action": "onValidateMultiplePages" });
         return this.props.onValidateMultiplePages(()=>{
             // stay on same page
         });
     }
     
     onCancelAddMultiplePages() {
+		logger.error('>>> Entering onCancelAddMultiplePages()', { "event.action": "onCancelAddMultiplePages" });
         const { props } = this;
         
         if (props.dirtyBulkPage) {
@@ -806,11 +910,14 @@ class App extends Component {
                 onConfirm);
         } else {
             props.onCancelAddMultiplePages();
+			logger.warn('<<< Exiting onCancelAddMultiplePages()', { "event.action": "onCancelAddMultiplePages" });
         }    
     }
 
     getAddPages() {
+		logger.error('>>> Entering getAddPages()', { "event.action": "getAddPages" });
         const { props } = this;
+		logger.warn('<<< Exiting getAddPages()', { "event.action": "getAddPages" });
         return (
             <AddPages
                 bulkPage={props.bulkPage}
@@ -822,6 +929,8 @@ class App extends Component {
     }
 
     onCancelSaveCustomDetail(onCancelSave) {
+		logger.error(`>>> Entering onCancelSaveCustomDetail(onCancelSave=${onCancelSave})`, { "event.action": "onCancelSaveCustomDetail", "logrite.onCancelSave": onCancelSave });
+		logger.warn(`<<< Exiting onCancelSaveCustomDetail(onCancelSave=${onCancelSave})`, { "event.action": "onCancelSaveCustomDetail", "logrite.onCancelSave": onCancelSave });
         return ((isDirty) =>{
             if (isDirty) {
                 const onConfirm = () => {
@@ -840,10 +949,13 @@ class App extends Component {
     }
 
     onChangeCustomDetail() {
+	logger.error('>>> Entering onChangeCustomDetail()', { "event.action": "onChangeCustomDetail" });
 
+	logger.warn('<<< Exiting onChangeCustomDetail()', { "event.action": "onChangeCustomDetail" });
     }
     
     onCancelSavePageAsTemplate() {
+		logger.error('>>> Entering onCancelSavePageAsTemplate()', { "event.action": "onCancelSavePageAsTemplate" });
         const { props } = this;
         
         if (props.dirtyTemplate) {
@@ -858,11 +970,14 @@ class App extends Component {
                 onConfirm);
         } else {
             props.onCancelSavePageAsTemplate();
+			logger.warn('<<< Exiting onCancelSavePageAsTemplate()', { "event.action": "onCancelSavePageAsTemplate" });
         }
     }
 
     getSaveAsTemplatePage() {
+		logger.error('>>> Entering getSaveAsTemplatePage()', { "event.action": "getSaveAsTemplatePage" });
         
+		logger.warn('<<< Exiting getSaveAsTemplatePage()', { "event.action": "getSaveAsTemplatePage" });
         return (
             <SaveAsTemplate
                 onCancel={this.onCancelSavePageAsTemplate.bind(this)} />);
@@ -870,13 +985,17 @@ class App extends Component {
 
 
     _traverse(comparator, pageListCopy) {
+		logger.error(`>>> Entering _traverse(comparator=${comparator},pageListCopy=${pageListCopy})`, { "event.action": "_traverse", "logrite.comparator": comparator, "logrite.pageListCopy": pageListCopy });
         let listItems = pageListCopy || JSON.parse(JSON.stringify(this.props.pageList));
         const cachedChildListItems = [];
+		logger.error(`_traverse(comparator=${comparator},pageListCopy=${pageListCopy}): listItems → ${listItems}`, { "event.action": "_traverse", "logrite.comparator": comparator, "logrite.pageListCopy": pageListCopy });
         cachedChildListItems.push(listItems);
         const condition = cachedChildListItems.length > 0;
 
         const loop = () => {
+			logger.error('>>> Entering loop()', { "event.action": "loop" });
             const childItem = cachedChildListItems.length ? cachedChildListItems.shift() : null;
+			logger.error(`loop(): childItem → ${childItem}`, { "event.action": "loop" });
             const left = () => childItem.forEach(item => {
                 comparator(item, listItems, (pageList) => this.props.updatePageListStore(pageList));
                 Array.isArray(item.childListItems) ? cachedChildListItems.push(item.childListItems) : null;
@@ -884,15 +1003,19 @@ class App extends Component {
             });
             const right = () => null;
             childItem ? left() : right();
+			logger.warn('<<< Exiting loop()', { "event.action": "loop" });
         };
 
         const exit = () => null;
 
         loop();
+		logger.warn(`<<< Exiting _traverse(comparator=${comparator},pageListCopy=${pageListCopy})`, { "event.action": "_traverse", "logrite.comparator": comparator, "logrite.pageListCopy": pageListCopy });
         return;
     }
 
     setActivePage(pageInfo) {
+		logger.error(`>>> Entering setActivePage(pageInfo=${pageInfo})`, { "event.action": "setActivePage", "logrite.pageInfo": pageInfo });
+		logger.warn(`<<< Exiting setActivePage(pageInfo=${pageInfo})`, { "event.action": "setActivePage", "logrite.pageInfo": pageInfo });
         return new Promise((resolve) => {
             this.selectPageSettingTab(0);
             pageInfo.id = pageInfo.id || pageInfo.tabId;
@@ -903,10 +1026,12 @@ class App extends Component {
     }
 
     onSelection(pageId) {
+		logger.error(`>>> Entering onSelection(pageId=${pageId})`, { "event.action": "onSelection", "logrite.pageId": pageId });
         const { selectedPage, selectedPageDirty } = this.props;
         this.selectPageSettingTab(0);
         this.shouldRunRecursive = false;
         const left = () => {
+			logger.debug(`onSelection(pageId=${pageId}): this.shouldRunRecursive → ${this.shouldRunRecursive}`, { "event.action": "onSelection", "logrite.pageId": pageId });
             if (!selectedPage || selectedPage.tabId !== pageId) {
                 this.onLoadPage(pageId);
                 this.selectPageSettingTab(0);
@@ -914,16 +1039,21 @@ class App extends Component {
         };
         const right = () => (!selectedPage || pageId !== selectedPage.tabId) ? this.showCancelWithoutSavingDialogInEditMode(pageId) : null;
         (!selectedPageDirty) ? left() : right();
+		logger.warn(`<<< Exiting onSelection(pageId=${pageId})`, { "event.action": "onSelection", "logrite.pageId": pageId });
     }
 
     onNoPermissionSelection(pageId) {
+		logger.error(`>>> Entering onNoPermissionSelection(pageId=${pageId})`, { "event.action": "onNoPermissionSelection", "logrite.pageId": pageId });
         const setNoPermissionState = () => {
+			logger.error('>>> Entering setNoPermissionState()', { "event.action": "setNoPermissionState" });
             this.onCancelPage();
             this.buildBreadCrumbPath(pageId);
             this.noPermissionSelectionPageId = pageId;
             this.setEmptyStateMessage(Localization.get("NoPermissionEditPage"));
+			logger.warn('<<< Exiting setNoPermissionState()', { "event.action": "setNoPermissionState" });
         };
         if (this.props.selectedPageDirty) {
+			logger.debug(`onNoPermissionSelection(pageId=${pageId}): this.noPermissionSelectionPageId → ${this.noPermissionSelectionPageId}`, { "event.action": "onNoPermissionSelection", "logrite.pageId": pageId });
             utils.confirm(
                 Localization.get("CancelWithoutSaving"),
                 Localization.get("Continue"),
@@ -932,34 +1062,43 @@ class App extends Component {
         }
         else {
             setNoPermissionState();
+			logger.warn(`<<< Exiting onNoPermissionSelection(pageId=${pageId})`, { "event.action": "onNoPermissionSelection", "logrite.pageId": pageId });
         }
     }
 
     onChangePageField(key, value) {
+		logger.error(`>>> Entering onChangePageField(key=${key},value=${value})`, { "event.action": "onChangePageField", "logrite.key": key, "logrite.value": value });
         if (this.props.selectedPage[key] !== value) {
             this.props.onChangePageField(key, value);
         }
         this.updatePageNameOnList(key, value);
+		logger.warn(`<<< Exiting onChangePageField(key=${key},value=${value})`, { "event.action": "onChangePageField", "logrite.key": key, "logrite.value": value });
     }
 
     updatePageNameOnList(key, value) {
+		logger.error(`>>> Entering updatePageNameOnList(key=${key},value=${value})`, { "event.action": "updatePageNameOnList", "logrite.key": key, "logrite.value": value });
         this._traverse((item, list, updateStore) => {
             if ((item.tabId === 0 || item.id === this.props.selectedPage.tabId) && key === "name") {
                 item.name = value;
                 item.selected = true;
                 item.isOpen = true;
                 updateStore(list);
+				logger.warn(`<<< Exiting updatePageNameOnList(key=${key},value=${value})`, { "event.action": "updatePageNameOnList", "logrite.key": key, "logrite.value": value });
             } 
         });
     }
 
     onMovePage({ Action, PageId, ParentId, RelatedPageId }) {
+		logger.error(`>>> Entering onMovePage(Action=${Action},PageId=${PageId},ParentId=${ParentId},RelatedPageId=${RelatedPageId})`, { "event.action": "onMovePage", "logrite.Action": Action, "logrite.PageId": PageId, "logrite.ParentId": ParentId, "logrite.RelatedPageId": RelatedPageId });
+		logger.warn(`<<< Exiting onMovePage(Action=${Action},PageId=${PageId},ParentId=${ParentId},RelatedPageId=${RelatedPageId})`, { "event.action": "onMovePage", "logrite.Action": Action, "logrite.PageId": PageId, "logrite.ParentId": ParentId, "logrite.RelatedPageId": RelatedPageId });
         return PageActions.movePage({ Action, PageId, ParentId, RelatedPageId });
     }
 
     CallCustomAction(action) {
+		logger.error(`>>> Entering CallCustomAction(action=${action})`, { "event.action": "CallCustomAction", "logrite.action": action });
         const { selectedPage, selectedPageDirty } = this.props;
         const callAction = () => {
+			logger.error('>>> Entering callAction()', { "event.action": "callAction" });
             if (selectedPage && selectedPage.tabId !== 0 && selectedPageDirty) {
                 const onConfirm = () => {
                     action();
@@ -973,14 +1112,19 @@ class App extends Component {
             } else {
                 action();
             }
+			logger.warn('<<< Exiting callAction()', { "event.action": "callAction" });
         };
         callAction();
+		logger.warn(`<<< Exiting CallCustomAction(action=${action})`, { "event.action": "CallCustomAction", "logrite.action": action });
     }
 
     onDuplicatePage(item) {
+		logger.error(`>>> Entering onDuplicatePage(item=${item})`, { "event.action": "onDuplicatePage", "logrite.item": item });
         const { selectedPage, selectedPageDirty } = this.props;
         const message = Localization.get("NoPermissionCopyPage");
+		logger.error(`onDuplicatePage(item=${item}): message → ${message}`, { "event.action": "onDuplicatePage", "logrite.item": item });
         const duplicate = () => {
+			logger.error('>>> Entering duplicate()', { "event.action": "duplicate" });
             if (selectedPage && selectedPage.tabId !== 0 && selectedPageDirty) {
                 const onConfirm = () => {
                     this.props.onDuplicatePage(true);
@@ -998,39 +1142,49 @@ class App extends Component {
                 });
             }
             this.setState({inDuplicateMode: true});
+			logger.warn('<<< Exiting duplicate()', { "event.action": "duplicate" });
         };
         const noPermission = () => this.setEmptyStateMessage(message);
         item.canCopyPage ? duplicate() : noPermission();
+		logger.warn(`<<< Exiting onDuplicatePage(item=${item})`, { "event.action": "onDuplicatePage", "logrite.item": item });
     }
 
     onViewEditPage(item) {
+		logger.error(`>>> Entering onViewEditPage(item=${item})`, { "event.action": "onViewEditPage", "logrite.item": item });
         const { selectedPageDirty } = this.props;
         const viewPage = () => PageActions.viewPage(item.id, item.url);
 
         const showConfirmationDialog = () => {
+			logger.error('>>> Entering showConfirmationDialog()', { "event.action": "showConfirmationDialog" });
             utils.confirm(
                 Localization.get("CancelWithoutSaving"),
                 Localization.get("Close"),
                 Localization.get("Cancel"),
                 viewPage);
+				logger.warn('<<< Exiting showConfirmationDialog()', { "event.action": "showConfirmationDialog" });
         };
 
         const proceed = () => selectedPageDirty ? showConfirmationDialog() : viewPage();
 
         this.clearEmptyStateMessage();
         const message = Localization.get("NoPermissionEditPage");
+		logger.error(`onViewEditPage(item=${item}): message → ${message}`, { "event.action": "onViewEditPage", "logrite.item": item });
         const noPermission = () => this.setEmptyStateMessage(message);
+		logger.warn(`<<< Exiting onViewEditPage(item=${item})`, { "event.action": "onViewEditPage", "logrite.item": item });
         item.canAddContentToPage ? proceed() : noPermission();
 
     }
 
     onViewPage(item) {
+		logger.error(`>>> Entering onViewPage(item=${item})`, { "event.action": "onViewPage", "logrite.item": item });
         const { selectedPageDirty } = this.props;
         const view = () => {
+			logger.error('>>> Entering view()', { "event.action": "view" });
             //this.onLoadPage(item.id);
             utils.getUtilities().closePersonaBar(function () {
                 window.parent.location = item.url;
             });
+			logger.warn('<<< Exiting view()', { "event.action": "view" });
         };
 
         const left = () => {
@@ -1046,36 +1200,47 @@ class App extends Component {
 
         this.clearEmptyStateMessage();
         const message = Localization.get("NoPermissionViewPage");
+		logger.error(`onViewPage(item=${item}): message → ${message}`, { "event.action": "onViewPage", "logrite.item": item });
         const noPermission = () => this.setEmptyStateMessage(message);
+		logger.warn(`<<< Exiting onViewPage(item=${item})`, { "event.action": "onViewPage", "logrite.item": item });
         item.canViewPage ? proceed() : noPermission();
 
     }
 
     setEmptyStateMessage(emptyStateMessage) {
+		logger.error(`>>> Entering setEmptyStateMessage(emptyStateMessage=${emptyStateMessage})`, { "event.action": "setEmptyStateMessage", "logrite.emptyStateMessage": emptyStateMessage });
         this.setState({ emptyStateMessage });
         this.props.clearSelectedPage();
+		logger.warn(`<<< Exiting setEmptyStateMessage(emptyStateMessage=${emptyStateMessage})`, { "event.action": "setEmptyStateMessage", "logrite.emptyStateMessage": emptyStateMessage });
     }
 
     clearEmptyStateMessage() {
+		logger.error('>>> Entering clearEmptyStateMessage()', { "event.action": "clearEmptyStateMessage" });
         this.noPermissionSelectionPageId = null;
         this.setState({ emptyStateMessage: null });
+		logger.warn('<<< Exiting clearEmptyStateMessage()', { "event.action": "clearEmptyStateMessage" });
     }
     
     onDayClick(newDay, isEndDate) {
+		logger.error(`>>> Entering onDayClick(newDay=${newDay},isEndDate=${isEndDate})`, { "event.action": "onDayClick", "logrite.newDay": newDay, "logrite.isEndDate": isEndDate });
         this.setState({ startAndEndDateDirty: true });
         const right = () => {
             const condition = newDay.getTime() < this.state.endDate.getTime();
             condition ? this.setState({ startDate: newDay, filtersUpdated: true }) : this.setState({ startDate: newDay, endDate: newDay, filtersUpdated: true });
+			logger.error(`right(): condition → ${condition}`, { "event.action": "right" });
         };
 
         const left = () => {
             const condition = newDay.getTime() >= this.state.startDate.getTime();
             condition ? this.setState({ endDate: newDay, filtersUpdated: true }) : null;
+			logger.error(`left(): condition → ${condition}`, { "event.action": "left" });
         };
         isEndDate ? left() : right();
+		logger.warn(`<<< Exiting onDayClick(newDay=${newDay},isEndDate=${isEndDate})`, { "event.action": "onDayClick", "logrite.newDay": newDay, "logrite.isEndDate": isEndDate });
     }
 
     generateFilters() {
+		logger.error('>>> Entering generateFilters()', { "event.action": "generateFilters" });
         const { filterByPageType, filterByPublishStatus, filterByWorkflow, filterByWorkflowName, startDate, endDate, startAndEndDateDirty } = this.state;
         const filters = this.state.tags.split(",")
             .filter(e => !!e)
@@ -1089,21 +1254,28 @@ class App extends Component {
         
         if (startAndEndDateDirty) {
             let dateRangeText = Localization.get("PublishedDateRange");
+			logger.error(`generateFilters(): dateRangeText → ${dateRangeText}`, { "event.action": "generateFilters" });
             const fullStartDate = utils.formatDate(startDate);
+			logger.error(`generateFilters(): fullStartDate → ${fullStartDate}`, { "event.action": "generateFilters" });
             const fullEndDate = utils.formatDate(endDate);
+			logger.error(`generateFilters(): fullEndDate → ${fullEndDate}`, { "event.action": "generateFilters" });
             const dateInterval = () => filters.push({ ref: "startAndEndDateDirty", tag: `${dateRangeText}: ${fullStartDate} - ${fullEndDate} ` });
             const justOneDate = () => filters.push({ ref: "startAndEndDateDirty", tag: `${dateRangeText}: ${fullStartDate}` });
 
             fullStartDate !== fullEndDate ? dateInterval() : justOneDate();
+			logger.warn('<<< Exiting generateFilters()', { "event.action": "generateFilters" });
         }
     }
 
     saveSearchFilters(searchFields) {
+		logger.error(`>>> Entering saveSearchFilters(searchFields=${searchFields})`, { "event.action": "saveSearchFilters", "logrite.searchFields": searchFields });
+		logger.warn(`<<< Exiting saveSearchFilters(searchFields=${searchFields})`, { "event.action": "saveSearchFilters", "logrite.searchFields": searchFields });
         return new Promise((resolve) => this.setState({ searchFields }, () => resolve()));
     }
 
     
     onSearch(term) {
+		logger.error(`>>> Entering onSearch(term=${term})`, { "event.action": "onSearch", "logrite.term": term });
         let newTerm = (term !== undefined) ? term : this.state.searchTerm;
         this.setState({
             searchTerm: newTerm,
@@ -1131,9 +1303,11 @@ class App extends Component {
             }
             this.setState({ DropdownCalendarIsActive: null});
         });
+		logger.warn(`<<< Exiting onSearch(term=${term})`, { "event.action": "onSearch", "logrite.term": term });
     }
 
     doSearch() {
+		logger.error('>>> Entering doSearch()', { "event.action": "doSearch" });
         const { selectedPage } = this.props;
         if (selectedPage && this.props.selectedPageDirty) {
             this.onCancelPage(selectedPage.tabId);
@@ -1141,12 +1315,15 @@ class App extends Component {
 
         let { searchTerm, filterByPageType, filterByPublishStatus, filterByWorkflow, startDate, endDate, startAndEndDateDirty, tags } = this.state;
         const fullStartDate = `${startDate.getDate() < 10 ? "0" + startDate.getDate() : startDate.getDate()}/${((startDate.getMonth() + 1) < 10 ? "0" + (startDate.getMonth() + 1) : (startDate.getMonth() + 1))}/${startDate.getFullYear()} 00:00:00`;
+		logger.error(`doSearch(): fullStartDate → ${fullStartDate}`, { "event.action": "doSearch" });
         const fullEndDate = `${endDate.getDate() < 10 ? "0" + endDate.getDate() : endDate.getDate()}/${((endDate.getMonth() + 1) < 10 ? "0" + (endDate.getMonth() + 1) : (endDate.getMonth() + 1))}/${endDate.getFullYear()} 23:59:59`;
+		logger.error(`doSearch(): fullEndDate → ${fullEndDate}`, { "event.action": "doSearch" });
         const searchDateRange = startAndEndDateDirty ? { publishDateStart: fullStartDate, publishDateEnd: fullEndDate } : {};
 
         if (tags) {
             tags = tags[0] === "," ? tags.replace(",", "") : tags;
             tags = tags[tags.length - 1] === "," ? tags.split(",").filter(t => !!t).join() : tags;
+			logger.error(`doSearch(): tags → ${tags}`, { "event.action": "doSearch" });
         }
 
         let search = { 
@@ -1159,6 +1336,7 @@ class App extends Component {
         };
         
         search = Object.assign({}, search, searchDateRange);
+		logger.error(`doSearch(): search → ${search}`, { "event.action": "doSearch" });
         for (let prop in search) {
             if (!search[prop]) {
                 delete search[prop];
@@ -1174,6 +1352,7 @@ class App extends Component {
         this.saveSearchFilters(search).then(() => {
             this.props.searchAndFilterPagedPageList(search,filterUp,filterPage);
         });        
+		logger.warn('<<< Exiting doSearch()', { "event.action": "doSearch" });
         this.setState({ 
             inSearch: true, 
             filtersUpdated: false 
@@ -1181,14 +1360,17 @@ class App extends Component {
     }
 
     onSearchScroll(page) {
+		logger.error(`>>> Entering onSearchScroll(page=${page})`, { "event.action": "onSearchScroll", "logrite.page": page });
         this.setState({
             pageIndex: page
         },()=>{
             this.doSearch();
         });
+		logger.warn(`<<< Exiting onSearchScroll(page=${page})`, { "event.action": "onSearchScroll", "logrite.page": page });
     }
     
     clearAdvancedSearch() {
+		logger.error('>>> Entering clearAdvancedSearch()', { "event.action": "clearAdvancedSearch" });
         let date = new Date();
         this.setState({
             startDate: date,
@@ -1205,18 +1387,22 @@ class App extends Component {
             filtersUpdated: true,
             pageIndex:0
         },()=>this.onSearch(this.state.searchTerm));
+		logger.warn('<<< Exiting clearAdvancedSearch()', { "event.action": "clearAdvancedSearch" });
     }
 
     clearAdvancedSearchDateInterval() {
+		logger.error('>>> Entering clearAdvancedSearchDateInterval()', { "event.action": "clearAdvancedSearchDateInterval" });
         let date = new Date();
         this.setState({
             startDate:date,
             endDate: date,
             startAndEndDateDirty:false
         });
+		logger.warn('<<< Exiting clearAdvancedSearchDateInterval()', { "event.action": "clearAdvancedSearchDateInterval" });
     }
     
     clearSearch(callback) {
+		logger.error(`>>> Entering clearSearch(callback=${callback})`, { "event.action": "clearSearch", "logrite.callback": callback });
         let date = new Date();
         this.setState({
             filtersUpdated: true,
@@ -1241,10 +1427,12 @@ class App extends Component {
             else {
                 const { selectedPage } = this.props;
                 !selectedPage && this.lastActivePageId && this.onLoadPage(this.lastActivePageId);
+				logger.warn(`<<< Exiting clearSearch(callback=${callback})`, { "event.action": "clearSearch", "logrite.callback": callback });
             }
         });
     }
     showCancelWithoutSavingDialogAndRun(callback, cancelCallback) {
+	logger.error(`>>> Entering showCancelWithoutSavingDialogAndRun(callback=${callback},cancelCallback=${cancelCallback})`, { "event.action": "showCancelWithoutSavingDialogAndRun", "logrite.callback": callback, "logrite.cancelCallback": cancelCallback });
 
         const onConfirm = () => {
             if (typeof callback === "function") {
@@ -1252,6 +1440,7 @@ class App extends Component {
             }
         };
         const onCancel = () => {
+			logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
             if (typeof cancelCallback === "function") {
                 cancelCallback();
             }
@@ -1262,12 +1451,16 @@ class App extends Component {
             Localization.get("Cancel"),
             onConfirm,
             onCancel);
+			logger.warn(`<<< Exiting showCancelWithoutSavingDialogAndRun(callback=${callback},cancelCallback=${cancelCallback})`, { "event.action": "showCancelWithoutSavingDialogAndRun", "logrite.callback": callback, "logrite.cancelCallback": cancelCallback });
     }
     buildBreadCrumbPath(pageId) {
+		logger.error(`>>> Entering buildBreadCrumbPath(pageId=${pageId})`, { "event.action": "buildBreadCrumbPath", "logrite.pageId": pageId });
         let page = {};
         let selectedPath = [];
         const buildBreadCrumbPathInternal = () => {
+			logger.error('>>> Entering buildBreadCrumbPathInternal()', { "event.action": "buildBreadCrumbPathInternal" });
             const addNode = (tabId) => {
+				logger.error(`>>> Entering addNode(tabId=${tabId})`, { "event.action": "addNode", "logrite.tabId": tabId });
                 this._traverse((item) => {
                     if (item.id === tabId) {
                         page = item;
@@ -1284,15 +1477,20 @@ class App extends Component {
                     this.props.changeSelectedPagePath(selectedPath);
                 };
                 page.parentId > 0 ? left() : right();
+				logger.warn(`<<< Exiting addNode(tabId=${tabId})`, { "event.action": "addNode", "logrite.tabId": tabId });
             };
             addNode(pageId);
+			logger.warn('<<< Exiting buildBreadCrumbPathInternal()', { "event.action": "buildBreadCrumbPathInternal" });
         };
         buildBreadCrumbPathInternal();
+		logger.warn(`<<< Exiting buildBreadCrumbPath(pageId=${pageId})`, { "event.action": "buildBreadCrumbPath", "logrite.pageId": pageId });
     }
 
     render_PagesDetailEditor() {
+	logger.error('>>> Entering render_PagesDetailEditor()', { "event.action": "render_PagesDetailEditor" });
 
         const render_emptyState = () => {
+			logger.error('>>> Entering render_emptyState()', { "event.action": "render_emptyState" });
             const DefaultMessage = Localization.get("NoPageSelected");
             return (
                 <div className="empty-page-state">
@@ -1306,6 +1504,7 @@ class App extends Component {
 
 
         const render_pageDetails = () => {
+			logger.error('>>> Entering render_pageDetails()', { "event.action": "render_pageDetails" });
             const { props } = this;
             const { isContentLocalizationEnabled } = props;
             return (
@@ -1339,6 +1538,7 @@ class App extends Component {
             );
         };
         const { selectedPage } = this.props;
+		logger.warn('<<< Exiting render_PagesDetailEditor()', { "event.action": "render_PagesDetailEditor" });
         return (
             <GridCell columnSize={100} className="treeview-page-details" >
                 {(selectedPage && selectedPage.tabId) ? render_pageDetails() : render_emptyState()}
@@ -1347,10 +1547,14 @@ class App extends Component {
     }
 
     render_addPageEditor() {
+		logger.error('>>> Entering render_addPageEditor()', { "event.action": "render_addPageEditor" });
         const { props } = this;
         const cancelAction = this.onCancelSettings.bind(this);
+		logger.error(`render_addPageEditor(): cancelAction → ${cancelAction}`, { "event.action": "render_addPageEditor" });
         const deleteAction = this.onDeleteSettings.bind(this);
+		logger.error(`render_addPageEditor(): deleteAction → ${deleteAction}`, { "event.action": "render_addPageEditor" });
         const AllowContentLocalization = !!props.isContentLocalizationEnabled;
+		logger.warn('<<< Exiting render_addPageEditor()', { "event.action": "render_addPageEditor" });
         return (
             <GridCell columnSize={100} className="treeview-page-details" >
                 <PageSettings key="newPageSettings" selectedPage={props.selectedPage}
@@ -1383,12 +1587,16 @@ class App extends Component {
 
 
     render_pageList() {
+		logger.error('>>> Entering render_pageList()', { "event.action": "render_pageList" });
+		logger.warn('<<< Exiting render_pageList()', { "event.action": "render_pageList" });
         return (
             <PageList onPageSettings={this.onPageSettings.bind(this)} />
         );
     }
     
     getFilterByPageTypeOptions() {
+		logger.error('>>> Entering getFilterByPageTypeOptions()', { "event.action": "getFilterByPageTypeOptions" });
+		logger.warn('<<< Exiting getFilterByPageTypeOptions()', { "event.action": "getFilterByPageTypeOptions" });
         return [
             { value: "", label: Localization.get("lblNone") },
             { value: "normal", label: Localization.get("lblNormal") },
@@ -1399,61 +1607,84 @@ class App extends Component {
     }
 
     getFilterByPageStatusOptions() {
+		logger.error('>>> Entering getFilterByPageStatusOptions()', { "event.action": "getFilterByPageStatusOptions" });
         let filterByPageStatusOptions = [
             { value: "published", label: Localization.get("lblPublished") }
         ];
+		logger.warn('<<< Exiting getFilterByPageStatusOptions()', { "event.action": "getFilterByPageStatusOptions" });
         return ([{ value: "", label: Localization.get("lblNone") }]).concat(filterByPageStatusOptions.concat([{ value: "draft", label: Localization.get("lblDraft") }]));
     }
     getFilterByWorkflowOptions() {
+		logger.error('>>> Entering getFilterByWorkflowOptions()', { "event.action": "getFilterByWorkflowOptions" });
         let workflowList = [];
         if (this.props.workflowList.length <= 0) {
             this.props.getWorkflowsList();
         }
         this.props.workflowList.length ? workflowList = this.props.workflowList.map((item => { return { value: item.workflowId, label: item.workflowName }; })) : null;
+		logger.warn('<<< Exiting getFilterByWorkflowOptions()', { "event.action": "getFilterByWorkflowOptions" });
         return [{ value: "", label: Localization.get("lblNone") }].concat(workflowList);
     }
     getPageTypeLabel(pageType) {
+		logger.error(`>>> Entering getPageTypeLabel(pageType=${pageType})`, { "event.action": "getPageTypeLabel", "logrite.pageType": pageType });
         const filterByPageTypeOptions = this.getFilterByPageTypeOptions();
+		logger.error(`getPageTypeLabel(pageType=${pageType}): filterByPageTypeOptions → ${filterByPageTypeOptions}`, { "event.action": "getPageTypeLabel", "logrite.pageType": pageType });
         return filterByPageTypeOptions.find(x => x.value === pageType.toLowerCase()) && filterByPageTypeOptions.find(x => x.value === pageType.toLowerCase()).label;
     }
     getPublishStatusLabel(publishStatus) {
+		logger.error(`>>> Entering getPublishStatusLabel(publishStatus=${publishStatus})`, { "event.action": "getPublishStatusLabel", "logrite.publishStatus": publishStatus });
         const filterByPublishStatusOptions = this.getFilterByPageStatusOptions();
+		logger.error(`getPublishStatusLabel(publishStatus=${publishStatus}): filterByPublishStatusOptions → ${filterByPublishStatusOptions}`, { "event.action": "getPublishStatusLabel", "logrite.publishStatus": publishStatus });
         return filterByPublishStatusOptions.find(x => x.value === publishStatus.toLowerCase()) && filterByPublishStatusOptions.find(x => x.value === publishStatus.toLowerCase()).label || publishStatus;
     }
 
     updateSearchAdvancedTags(tags) {
+		logger.error(`>>> Entering updateSearchAdvancedTags(tags=${tags})`, { "event.action": "updateSearchAdvancedTags", "logrite.tags": tags });
         this.setState({tags:tags,filtersUpdated:true, pageIndex:0});
+		logger.warn(`<<< Exiting updateSearchAdvancedTags(tags=${tags})`, { "event.action": "updateSearchAdvancedTags", "logrite.tags": tags });
     }
 
     onApplyChangesDropdownDayPicker() {
+		logger.error('>>> Entering onApplyChangesDropdownDayPicker()', { "event.action": "onApplyChangesDropdownDayPicker" });
         const { startAndEndDateDirty, startDate, endDate } = this.state;
         const fullStartDate = startDate.getDate() + startDate.getMonth() + startDate.getFullYear();
         const fullEndDate = endDate.getDate() + endDate.getMonth() + endDate.getFullYear();
+		logger.error(`onApplyChangesDropdownDayPicker(): fullEndDate → ${fullEndDate}`, { "event.action": "onApplyChangesDropdownDayPicker" });
         const condition = !startAndEndDateDirty && fullStartDate === fullEndDate;
         condition ? this.setState({ startAndEndDateDirty: true, DropdownCalendarIsActive: null }) : this.setState({ DropdownCalendarIsActive: null });
+		logger.error(`onApplyChangesDropdownDayPicker(): fullStartDate → ${fullStartDate}`, { "event.action": "onApplyChangesDropdownDayPicker" });
     }
     
     updateFilterByPageTypeOptions(data) { 
+		logger.error(`>>> Entering updateFilterByPageTypeOptions(data=${data})`, { "event.action": "updateFilterByPageTypeOptions", "logrite.data": data });
         this.setState({ filterByPageType: data.value, filtersUpdated: true,pageIndex:0 }); 
+		logger.warn(`<<< Exiting updateFilterByPageTypeOptions(data=${data})`, { "event.action": "updateFilterByPageTypeOptions", "logrite.data": data });
     }
     
     updateFilterByPageStatusOptions(data) {
+		logger.error(`>>> Entering updateFilterByPageStatusOptions(data=${data})`, { "event.action": "updateFilterByPageStatusOptions", "logrite.data": data });
         this.setState({ filterByPublishStatus: data.value, filtersUpdated: true, pageIndex:0 });
+		logger.warn(`<<< Exiting updateFilterByPageStatusOptions(data=${data})`, { "event.action": "updateFilterByPageStatusOptions", "logrite.data": data });
     } 
     updateFilterByWorkflowOptions(data) {
+		logger.error(`>>> Entering updateFilterByWorkflowOptions(data=${data})`, { "event.action": "updateFilterByWorkflowOptions", "logrite.data": data });
         this.setState({ filterByWorkflow: data.value, filterByWorkflowName: data.label, filtersUpdated: true, pageIndex:0});
+		logger.warn(`<<< Exiting updateFilterByWorkflowOptions(data=${data})`, { "event.action": "updateFilterByWorkflowOptions", "logrite.data": data });
     }
 
     updateFilterStartEndDate(startDate, endDate) {
+		logger.error(`>>> Entering updateFilterStartEndDate(startDate=${startDate},endDate=${endDate})`, { "event.action": "updateFilterStartEndDate", "logrite.startDate": startDate, "logrite.endDate": endDate });
         this.setState({
             startDate,endDate,
             startAndEndDateDirty:true,
             filtersUpdated:true,
             pageIndex:0
         });
+		logger.warn(`<<< Exiting updateFilterStartEndDate(startDate=${startDate},endDate=${endDate})`, { "event.action": "updateFilterStartEndDate", "logrite.startDate": startDate, "logrite.endDate": endDate });
     }
 
     render_searchResults() {
+		logger.error('>>> Entering render_searchResults()', { "event.action": "render_searchResults" });
+		logger.warn('<<< Exiting render_searchResults()', { "event.action": "render_searchResults" });
         return (
             <SearchResult 
                 filters={this.state.filters} 
@@ -1496,6 +1727,7 @@ class App extends Component {
     }
     
     getAdditionalPageSettings() {
+		logger.error('>>> Entering getAdditionalPageSettings()', { "event.action": "getAdditionalPageSettings" });
         const additionalPageSettings = [];
 
         const { props } = this;
@@ -1517,10 +1749,12 @@ class App extends Component {
             }
         }
 
+		logger.warn('<<< Exiting getAdditionalPageSettings()', { "event.action": "getAdditionalPageSettings" });
         return additionalPageSettings;
     }
     
     render_details() {
+		logger.error('>>> Entering render_details()', { "event.action": "render_details" });
         const {selectedPage} = this.props;
         const {inSearch} = this.state;
         const {selectedView} = this.props;
@@ -1538,17 +1772,22 @@ class App extends Component {
                 return this.getAdditionalPageSettings();
             case !selectedPage:
             default:
+				logger.warn('<<< Exiting render_details()', { "event.action": "render_details" });
                 return this.render_PagesDetailEditor();
         }
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
         const { selectedPage } = props;
         const { inSearch } = this.state;
         const isListPagesAllowed = securityService.canSeePagesList();
+		logger.error(`render(): isListPagesAllowed → ${isListPagesAllowed}`, { "event.action": "render" });
        
          
+		logger.debug(`render(): inSearch → ${inSearch}`, { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
 
             <div ref={node => this.node = node} className="pages-app personaBar-mainContainer">
@@ -1684,6 +1923,8 @@ App.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         pageList: state.pageList.pageList,
         selectedView: state.visiblePanel.selectedPage,
@@ -1714,6 +1955,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.error(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
+	logger.warn(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
     return bindActionCreators({
         getNewPage: PageActions.getNewPage,
         getPageList: PageActions.getPageList,

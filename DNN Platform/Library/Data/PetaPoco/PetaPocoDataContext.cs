@@ -18,6 +18,7 @@ namespace DotNetNuke.Data.PetaPoco
     [CLSCompliant(false)]
     public class PetaPocoDataContext : IDataContext
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PetaPocoDataContext));
         private readonly IHostSettings hostSettings;
         private readonly Database database;
         private readonly IMapper mapper;
@@ -34,6 +35,8 @@ namespace DotNetNuke.Data.PetaPoco
         public PetaPocoDataContext(IHostSettings hostSettings)
             : this(hostSettings, ConfigurationManager.ConnectionStrings[0].Name, string.Empty)
         {
+		Logger.LogError(">>> Entering PetaPocoDataContext(hostSettings={HostSettings})", hostSettings);
+        Logger.LogWarning("<<< Exiting PetaPocoDataContext(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PetaPocoDataContext"/> class.</summary>
@@ -42,6 +45,8 @@ namespace DotNetNuke.Data.PetaPoco
         public PetaPocoDataContext(string connectionStringName)
             : this(connectionStringName, string.Empty, new Dictionary<Type, IMapper>())
         {
+		Logger.LogError(">>> Entering PetaPocoDataContext(connectionStringName={ConnectionStringName})", connectionStringName);
+        Logger.LogWarning("<<< Exiting PetaPocoDataContext(connectionStringName={ConnectionStringName})", connectionStringName);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PetaPocoDataContext"/> class.</summary>
@@ -50,6 +55,8 @@ namespace DotNetNuke.Data.PetaPoco
         public PetaPocoDataContext(IHostSettings hostSettings, string connectionStringName)
             : this(hostSettings, connectionStringName, string.Empty, new Dictionary<Type, IMapper>())
         {
+		Logger.LogError(">>> Entering PetaPocoDataContext(hostSettings={HostSettings},connectionStringName={ConnectionStringName})", hostSettings, connectionStringName);
+        Logger.LogWarning("<<< Exiting PetaPocoDataContext(hostSettings={HostSettings},connectionStringName={ConnectionStringName})", hostSettings, connectionStringName);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PetaPocoDataContext"/> class.</summary>
@@ -59,6 +66,8 @@ namespace DotNetNuke.Data.PetaPoco
         public PetaPocoDataContext(string connectionStringName, string tablePrefix)
             : this(connectionStringName, tablePrefix, new Dictionary<Type, IMapper>())
         {
+		Logger.LogError(">>> Entering PetaPocoDataContext(connectionStringName={ConnectionStringName},tablePrefix={TablePrefix})", connectionStringName, tablePrefix);
+        Logger.LogWarning("<<< Exiting PetaPocoDataContext(connectionStringName={ConnectionStringName},tablePrefix={TablePrefix})", connectionStringName, tablePrefix);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PetaPocoDataContext"/> class.</summary>
@@ -90,10 +99,14 @@ namespace DotNetNuke.Data.PetaPoco
             Requires.NotNullOrEmpty("connectionStringName", connectionStringName);
 
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("PetaPocoDataContext(hostSettings={HostSettings},connectionStringName={ConnectionStringName},tablePrefix={TablePrefix},mappers={Mappers}): hostSettings → {HostSettings1}", hostSettings, connectionStringName, tablePrefix, mappers, hostSettings);
 
             this.database = new Database(connectionStringName);
+			Logger.LogDebug("PetaPocoDataContext(hostSettings={HostSettings},connectionStringName={ConnectionStringName},tablePrefix={TablePrefix},mappers={Mappers}): database → {Database}", hostSettings, connectionStringName, tablePrefix, mappers, database);
             this.mapper = new PetaPocoMapper(tablePrefix);
+			Logger.LogDebug("PetaPocoDataContext(hostSettings={HostSettings},connectionStringName={ConnectionStringName},tablePrefix={TablePrefix},mappers={Mappers}): mapper → {Mapper}", hostSettings, connectionStringName, tablePrefix, mappers, mapper);
             this.TablePrefix = tablePrefix;
+			Logger.LogDebug("PetaPocoDataContext(hostSettings={HostSettings},connectionStringName={ConnectionStringName},tablePrefix={TablePrefix},mappers={Mappers}): this.TablePrefix → {Arg4}", hostSettings, connectionStringName, tablePrefix, mappers, this.TablePrefix);
             this.FluentMappers = mappers;
         }
 
@@ -110,58 +123,76 @@ namespace DotNetNuke.Data.PetaPoco
         /// <inheritdoc />
         public void BeginTransaction()
         {
+			Logger.LogError(">>> Entering BeginTransaction()");
             this.database.BeginTransaction();
+			Logger.LogWarning("<<< Exiting BeginTransaction()");
         }
 
         /// <inheritdoc />
         public void Commit()
         {
+			Logger.LogError(">>> Entering Commit()");
             this.database.CompleteTransaction();
+			Logger.LogWarning("<<< Exiting Commit()");
         }
 
         /// <inheritdoc />
         public void Execute(CommandType type, string sql, params object[] args)
         {
+			Logger.LogError(">>> Entering Execute(type={Type},sql={Sql},args={Args})", type, sql, args);
             if (type == CommandType.StoredProcedure)
             {
                 sql = DataUtil.GenerateExecuteStoredProcedureSql(sql, args);
+				Logger.LogError("Execute(type={Type},sql={Sql},args={Args}): sql → {Sql1}", type, sql, args, sql);
             }
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			Logger.LogError("Execute(type,args)={Type},{Args}: database query executed in {Arg2} ms", type, args, __logStart.ElapsedMilliseconds);
+        Logger.LogWarning("<<< Exiting Execute(type={Type},sql={Sql},args={Args})", type, sql, args);
             this.database.Execute(DataUtil.ReplaceTokens(sql), args);
         }
 
         /// <inheritdoc />
         public IEnumerable<T> ExecuteQuery<T>(CommandType type, string sql, params object[] args)
         {
+			Logger.LogError(">>> Entering ExecuteQuery(type={Type},sql={Sql},args={Args})", type, sql, args);
             PetaPocoMapper.SetMapper<T>(this.mapper);
             if (type == CommandType.StoredProcedure)
             {
                 sql = DataUtil.GenerateExecuteStoredProcedureSql(sql, args);
+				Logger.LogError("ExecuteQuery(type={Type},sql={Sql},args={Args}): sql → {Sql1}", type, sql, args, sql);
             }
 
+			Logger.LogWarning("<<< Exiting ExecuteQuery(type={Type},sql={Sql},args={Args})", type, sql, args);
             return this.database.Fetch<T>(DataUtil.ReplaceTokens(sql), args);
         }
 
         /// <inheritdoc />
         public T ExecuteScalar<T>(CommandType type, string sql, params object[] args)
         {
+			Logger.LogError(">>> Entering ExecuteScalar(type={Type},sql={Sql},args={Args})", type, sql, args);
             if (type == CommandType.StoredProcedure)
             {
                 sql = DataUtil.GenerateExecuteStoredProcedureSql(sql, args);
+				Logger.LogError("ExecuteScalar(type={Type},sql={Sql},args={Args}): sql → {Sql1}", type, sql, args, sql);
             }
 
+			Logger.LogWarning("<<< Exiting ExecuteScalar(type={Type},sql={Sql},args={Args})", type, sql, args);
             return this.database.ExecuteScalar<T>(DataUtil.ReplaceTokens(sql), args);
         }
 
         /// <inheritdoc />
         public T ExecuteSingleOrDefault<T>(CommandType type, string sql, params object[] args)
         {
+			Logger.LogError(">>> Entering ExecuteSingleOrDefault(type={Type},sql={Sql},args={Args})", type, sql, args);
             PetaPocoMapper.SetMapper<T>(this.mapper);
             if (type == CommandType.StoredProcedure)
             {
                 sql = DataUtil.GenerateExecuteStoredProcedureSql(sql, args);
+				Logger.LogError("ExecuteSingleOrDefault(type={Type},sql={Sql},args={Args}): sql → {Sql1}", type, sql, args, sql);
             }
 
+			Logger.LogWarning("<<< Exiting ExecuteSingleOrDefault(type={Type},sql={Sql},args={Args})", type, sql, args);
             return this.database.SingleOrDefault<T>(DataUtil.ReplaceTokens(sql), args);
         }
 
@@ -169,6 +200,7 @@ namespace DotNetNuke.Data.PetaPoco
         public IRepository<T> GetRepository<T>()
             where T : class
         {
+			Logger.LogError(">>> Entering GetRepository()");
             PetaPocoRepository<T> rep = null;
 
             // Determine whether to use a Fluent Mapper
@@ -177,6 +209,7 @@ namespace DotNetNuke.Data.PetaPoco
                 if (this.FluentMappers[typeof(T)] is FluentMapper<T> fluentMapper)
                 {
                     rep = new PetaPocoRepository<T>(this.hostSettings, this.database, fluentMapper);
+					Logger.LogError("GetRepository(): rep → {Rep}", rep);
                     rep.Initialize(fluentMapper.CacheKey, fluentMapper.CacheTimeOut, fluentMapper.CachePriority, fluentMapper.Scope);
                 }
             }
@@ -185,28 +218,35 @@ namespace DotNetNuke.Data.PetaPoco
                 rep = new PetaPocoRepository<T>(this.hostSettings, this.database, this.mapper);
             }
 
+			Logger.LogWarning("<<< Exiting GetRepository()");
             return rep;
         }
 
         /// <inheritdoc />
         public void RollbackTransaction()
         {
+			Logger.LogError(">>> Entering RollbackTransaction()");
             this.database.AbortTransaction();
+			Logger.LogWarning("<<< Exiting RollbackTransaction()");
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogError(">>> Entering Dispose()");
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			Logger.LogWarning("<<< Exiting Dispose()");
         }
 
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogError(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (disposing)
             {
                 this.database.Dispose();
             }
+			Logger.LogWarning("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
     }
 }

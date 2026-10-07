@@ -11,9 +11,11 @@ namespace DotNetNuke.Data.PetaPoco
     [CLSCompliant(false)]
     public class FluentColumnMap
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FluentColumnMap));
         /// <summary>Initializes a new instance of the <see cref="FluentColumnMap"/> class.</summary>
         public FluentColumnMap()
         {
+		Logger.LogWarning("<<< Exiting FluentColumnMap(columnInfo={ColumnInfo},fromDbConverter={FromDbConverter},toDbConverter={ToDbConverter})", columnInfo, fromDbConverter, toDbConverter);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FluentColumnMap"/> class.</summary>
@@ -21,6 +23,8 @@ namespace DotNetNuke.Data.PetaPoco
         public FluentColumnMap(ColumnInfo columnInfo)
             : this(columnInfo, null)
         {
+		Logger.LogError(">>> Entering FluentColumnMap(columnInfo={ColumnInfo})", columnInfo);
+        Logger.LogWarning("<<< Exiting FluentColumnMap(columnInfo={ColumnInfo})", columnInfo);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FluentColumnMap"/> class.</summary>
@@ -29,6 +33,8 @@ namespace DotNetNuke.Data.PetaPoco
         public FluentColumnMap(ColumnInfo columnInfo, Func<object, object> fromDbConverter)
             : this(columnInfo, fromDbConverter, null)
         {
+		Logger.LogError(">>> Entering FluentColumnMap(columnInfo={ColumnInfo},fromDbConverter={FromDbConverter})", columnInfo, fromDbConverter);
+        Logger.LogWarning("<<< Exiting FluentColumnMap(columnInfo={ColumnInfo},fromDbConverter={FromDbConverter})", columnInfo, fromDbConverter);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FluentColumnMap"/> class.</summary>
@@ -37,7 +43,9 @@ namespace DotNetNuke.Data.PetaPoco
         /// <param name="toDbConverter">A function to convert the class value to the database value.</param>
         public FluentColumnMap(ColumnInfo columnInfo, Func<object, object> fromDbConverter, Func<object, object> toDbConverter)
         {
+			Logger.LogError(">>> Entering FluentColumnMap(columnInfo={ColumnInfo},fromDbConverter={FromDbConverter},toDbConverter={ToDbConverter})", columnInfo, fromDbConverter, toDbConverter);
             this.ColumnInfo = columnInfo;
+			Logger.LogDebug("FluentColumnMap(columnInfo={ColumnInfo},fromDbConverter={FromDbConverter},toDbConverter={ToDbConverter}): this.ColumnInfo → {Arg3}", columnInfo, fromDbConverter, toDbConverter, this.ColumnInfo);
             this.FromDbConverter = fromDbConverter;
             this.ToDbConverter = toDbConverter;
         }

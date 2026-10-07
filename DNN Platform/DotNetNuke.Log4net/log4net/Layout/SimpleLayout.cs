@@ -44,6 +44,7 @@ namespace log4net.Layout
         /// <summary>Constructs a SimpleLayout</summary>
         public SimpleLayout()
         {
+			value.LogError(">>> Entering SimpleLayout()");
             this.IgnoresException = true;
         }
 
@@ -63,7 +64,9 @@ namespace log4net.Layout
         /// </remarks>
         public override void ActivateOptions() 
         {
+			value.LogError(">>> Entering ActivateOptions()");
             // nothing to do.
+			value.LogWarning("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>Produces a simple formatted output.</summary>
@@ -78,8 +81,10 @@ namespace log4net.Layout
         /// </remarks>
         public override void Format(TextWriter writer, LoggingEvent loggingEvent) 
         {
+			value.LogError(">>> Entering Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             if (loggingEvent == null)
             {
+				value.LogError("Throwing ArgumentNullException from Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
             }
 
@@ -87,6 +92,7 @@ namespace log4net.Layout
             writer.Write(" - ");
             loggingEvent.WriteRenderedMessage(writer);
             writer.WriteLine();
+			value.LogWarning("<<< Exiting Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
     }
 }

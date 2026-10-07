@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.Syndication
         /// <summary>Initializes a new instance of the <see cref="Opml"/> class.</summary>
         public Opml()
         {
+			Logger.LogError(">>> Entering Opml()");
             this.Outlines = new OpmlOutlines();
         }
 
@@ -71,6 +72,8 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>The OPML feed, or an empty OPML feed if there's an error loading it.</returns>
         public static Opml LoadFromUrl(Uri uri)
         {
+			Logger.LogError(">>> Entering LoadFromUrl(uri={Uri})", uri);
+            Logger.LogWarning("<<< Exiting LoadFromUrl(uri={Uri})", uri);
             return OpmlDownloadManager.GetOpmlFeed(uri);
         }
 
@@ -79,6 +82,7 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>The OPML feed, or an empty OPML feed if there's an error loading it.</returns>
         public static Opml LoadFromFile(string path)
         {
+			Logger.LogError(">>> Entering LoadFromFile(path={Path})", path);
             try
             {
                 var opmlDoc = new XmlDocument { XmlResolver = null };
@@ -91,6 +95,8 @@ namespace DotNetNuke.Services.Syndication
             }
             catch
             {
+				Logger.LogError("Exception in LoadFromFile(path={Path}): {Arg1}", path, ex.Message);
+				Logger.LogWarning("<<< Exiting LoadFromFile(path={Path})", path);
                 return new Opml();
             }
         }
@@ -100,24 +106,39 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>The OPML feed, or an empty OPML feed if there's an error loading it.</returns>
         public static Opml LoadFromXml(XmlDocument doc)
         {
+			Logger.LogError(">>> Entering LoadFromXml(doc={Doc})", doc);
             var @out = new Opml();
             try
             {
                 // Parse head
                 XmlNode head = doc.GetElementsByTagName("head")[0];
+				Logger.LogError("LoadFromXml(doc={Doc}): head → {Head}", doc, head);
                 XmlNode title = head.SelectSingleNode("./title");
+				Logger.LogError("LoadFromXml(doc={Doc}): title → {Title}", doc, title);
                 XmlNode dateCreated = head.SelectSingleNode("./dateCreated");
+				Logger.LogError("LoadFromXml(doc={Doc}): dateCreated → {DateCreated}", doc, dateCreated);
                 XmlNode dateModified = head.SelectSingleNode("./dateModified");
+				Logger.LogError("LoadFromXml(doc={Doc}): dateModified → {DateModified}", doc, dateModified);
                 XmlNode ownerName = head.SelectSingleNode("./ownerName");
+				Logger.LogError("LoadFromXml(doc={Doc}): ownerName → {OwnerName}", doc, ownerName);
                 XmlNode ownerEmail = head.SelectSingleNode("./ownerEmail");
+				Logger.LogError("LoadFromXml(doc={Doc}): ownerEmail → {OwnerEmail}", doc, ownerEmail);
                 XmlNode ownerId = head.SelectSingleNode("./ownerId");
+				Logger.LogError("LoadFromXml(doc={Doc}): ownerId → {OwnerId}", doc, ownerId);
                 XmlNode docs = head.SelectSingleNode("./docs");
+				Logger.LogError("LoadFromXml(doc={Doc}): docs → {Docs}", doc, docs);
                 XmlNode expansionState = head.SelectSingleNode("./expansionState");
+				Logger.LogError("LoadFromXml(doc={Doc}): expansionState → {ExpansionState}", doc, expansionState);
                 XmlNode vertScrollState = head.SelectSingleNode("./vertScrollState");
+				Logger.LogError("LoadFromXml(doc={Doc}): vertScrollState → {VertScrollState}", doc, vertScrollState);
                 XmlNode windowTop = head.SelectSingleNode("./windowTop");
+				Logger.LogError("LoadFromXml(doc={Doc}): windowTop → {WindowTop}", doc, windowTop);
                 XmlNode windowLeft = head.SelectSingleNode("./windowLeft");
+				Logger.LogError("LoadFromXml(doc={Doc}): windowLeft → {WindowLeft}", doc, windowLeft);
                 XmlNode windowBottom = head.SelectSingleNode("./windowBottom");
+				Logger.LogError("LoadFromXml(doc={Doc}): windowBottom → {WindowBottom}", doc, windowBottom);
                 XmlNode windowRight = head.SelectSingleNode("./windowRight");
+				Logger.LogError("LoadFromXml(doc={Doc}): windowRight → {WindowRight}", doc, windowRight);
 
                 if (title != null)
                 {
@@ -186,7 +207,9 @@ namespace DotNetNuke.Services.Syndication
 
                 // Parse body
                 XmlNode body = doc.GetElementsByTagName("body")[0];
+				Logger.LogError("LoadFromXml(doc={Doc}): body → {Body}", doc, body);
                 XmlNodeList outlineList = body.SelectNodes("./outline");
+				Logger.LogError("LoadFromXml(doc={Doc}): outlineList → {OutlineList}", doc, outlineList);
                 foreach (XmlElement outline in outlineList)
                 {
                     @out.Outlines.Add(ParseXml(outline));
@@ -196,6 +219,8 @@ namespace DotNetNuke.Services.Syndication
             }
             catch
             {
+				Logger.LogError("Exception in LoadFromXml(doc={Doc}): {Arg1}", doc, ex.Message);
+				Logger.LogWarning("<<< Exiting LoadFromXml(doc={Doc})", doc);
                 return new Opml();
             }
         }
@@ -204,7 +229,9 @@ namespace DotNetNuke.Services.Syndication
         /// <param name="item">The outline item.</param>
         public void AddOutline(OpmlOutline item)
         {
+			Logger.LogError(">>> Entering AddOutline(item={Item})", item);
             this.Outlines.Add(item);
+			Logger.LogWarning("<<< Exiting AddOutline(item={Item})", item);
         }
 
         /// <summary>Adds an item to the <see cref="Outlines"/>.</summary>
@@ -214,7 +241,9 @@ namespace DotNetNuke.Services.Syndication
         /// <param name="category">The item's category.</param>
         public void AddOutline(string text, string type, Uri xmlUrl, string category)
         {
+			Logger.LogError(">>> Entering AddOutline(text={Text},type={Type},xmlUrl={XmlUrl},category={Category})", text, type, xmlUrl, category);
             this.AddOutline(text, type, xmlUrl, category, null);
+			Logger.LogWarning("<<< Exiting AddOutline(text={Text},type={Type},xmlUrl={XmlUrl},category={Category})", text, type, xmlUrl, category);
         }
 
         /// <summary>Adds an item to the <see cref="Outlines"/>.</summary>
@@ -225,19 +254,29 @@ namespace DotNetNuke.Services.Syndication
         /// <param name="outlines">The item's outlines.</param>
         public void AddOutline(string text, string type, Uri xmlUrl, string category, OpmlOutlines outlines)
         {
+			Logger.LogError(">>> Entering AddOutline(text={Text},type={Type},xmlUrl={XmlUrl},category={Category},outlines={Outlines})", text, type, xmlUrl, category, outlines);
+			Logger.LogDebug("AddOutline(text={Text},type={Type},xmlUrl={XmlUrl},category={Category},outlines={Outlines}): item.Text → {Arg5}", text, type, xmlUrl, category, outlines, item.Text);
+			Logger.LogDebug("AddOutline(text={Text},type={Type},xmlUrl={XmlUrl},category={Category},outlines={Outlines}): item.Type → {Arg5}", text, type, xmlUrl, category, outlines, item.Type);
+			Logger.LogDebug("AddOutline(text={Text},type={Type},xmlUrl={XmlUrl},category={Category},outlines={Outlines}): item.XmlUrl → {Arg5}", text, type, xmlUrl, category, outlines, item.XmlUrl);
+			Logger.LogDebug("AddOutline(text={Text},type={Type},xmlUrl={XmlUrl},category={Category},outlines={Outlines}): item.Category → {Arg5}", text, type, xmlUrl, category, outlines, item.Category);
+			Logger.LogDebug("AddOutline(text={Text},type={Type},xmlUrl={XmlUrl},category={Category},outlines={Outlines}): item.Outlines → {Arg5}", text, type, xmlUrl, category, outlines, item.Outlines);
             var item = new OpmlOutline();
+			Logger.LogWarning("<<< Exiting AddOutline(text={Text},type={Type},xmlUrl={XmlUrl},category={Category},outlines={Outlines})", text, type, xmlUrl, category, outlines);
             item.Text = text;
             item.Type = type;
             item.XmlUrl = xmlUrl;
             item.Category = category;
             item.Outlines = outlines;
             this.Outlines.Add(item);
+			Logger.LogError("AddOutline(text={Text},type={Type},xmlUrl={XmlUrl},category={Category},outlines={Outlines}): item → {Item}", text, type, xmlUrl, category, outlines, item);
         }
 
         /// <summary>Get the OPML doc as XML.</summary>
         /// <returns>The XML markup for this OPML feed.</returns>
         public string GetXml()
         {
+			Logger.LogError(">>> Entering GetXml()");
+            Logger.LogWarning("<<< Exiting GetXml()");
             return this.opmlDoc.OuterXml;
         }
 
@@ -245,82 +284,112 @@ namespace DotNetNuke.Services.Syndication
         /// <param name="fileName">The file path.</param>
         public void Save(string fileName)
         {
+			Logger.LogError(">>> Entering Save(fileName={FileName})", fileName);
             this.opmlDoc = new XmlDocument { XmlResolver = null };
             XmlElement opml = this.opmlDoc.CreateElement("opml");
+			Logger.LogError("Save(fileName={FileName}): opml → {Opml}", fileName, opml);
+			Logger.LogDebug("Save(fileName={FileName}): this.opmlDoc → {Arg1}", fileName, this.opmlDoc);
+			Logger.LogDebug("Save(fileName={FileName}): opmlDoc → {OpmlDoc}", fileName, opmlDoc);
             opml.SetAttribute("version", "2.0");
             this.opmlDoc.AppendChild(opml);
 
             // create head
             XmlElement head = this.opmlDoc.CreateElement("head");
+			Logger.LogError("Save(fileName={FileName}): head → {Head}", fileName, head);
             opml.AppendChild(head);
 
             // set Title
             XmlElement title = this.opmlDoc.CreateElement("title");
+			Logger.LogError("Save(fileName={FileName}): title → {Title}", fileName, title);
             title.InnerText = this.Title;
+			Logger.LogDebug("Save(fileName={FileName}): title.InnerText → {Arg1}", fileName, title.InnerText);
             head.AppendChild(title);
 
             // set date created
             XmlElement dateCreated = this.opmlDoc.CreateElement("dateCreated");
+			Logger.LogError("Save(fileName={FileName}): dateCreated → {DateCreated}", fileName, dateCreated);
             dateCreated.InnerText = this.DateCreated != DateTime.MinValue ? this.DateCreated.ToString("r", null) : DateTime.Now.ToString("r", null);
             head.AppendChild(dateCreated);
 
             // set date modified
             XmlElement dateModified = this.opmlDoc.CreateElement("dateModified");
+			Logger.LogError("Save(fileName={FileName}): dateModified → {DateModified}", fileName, dateModified);
             dateCreated.InnerText = this.DateModified != DateTime.MinValue ? this.DateModified.ToString("r", null) : DateTime.Now.ToString("r", null);
             head.AppendChild(dateModified);
 
             // set owner email
             XmlElement ownerEmail = this.opmlDoc.CreateElement("ownerEmail");
+			Logger.LogError("Save(fileName={FileName}): ownerEmail → {OwnerEmail}", fileName, ownerEmail);
             ownerEmail.InnerText = this.OwnerEmail;
+			Logger.LogDebug("Save(fileName={FileName}): ownerEmail.InnerText → {Arg1}", fileName, ownerEmail.InnerText);
             head.AppendChild(ownerEmail);
 
             // set owner name
             XmlElement ownerName = this.opmlDoc.CreateElement("ownerName");
+			Logger.LogError("Save(fileName={FileName}): ownerName → {OwnerName}", fileName, ownerName);
             ownerName.InnerText = this.OwnerName;
+			Logger.LogDebug("Save(fileName={FileName}): ownerName.InnerText → {Arg1}", fileName, ownerName.InnerText);
             head.AppendChild(ownerName);
 
             // set owner id
             XmlElement ownerId = this.opmlDoc.CreateElement("ownerId");
+			Logger.LogError("Save(fileName={FileName}): ownerId → {OwnerId}", fileName, ownerId);
             ownerId.InnerText = this.OwnerId;
+			Logger.LogDebug("Save(fileName={FileName}): ownerId.InnerText → {Arg1}", fileName, ownerId.InnerText);
             head.AppendChild(ownerId);
 
             // set docs
             XmlElement docs = this.opmlDoc.CreateElement("docs");
+			Logger.LogError("Save(fileName={FileName}): docs → {Docs}", fileName, docs);
             docs.InnerText = this.Docs;
+			Logger.LogDebug("Save(fileName={FileName}): docs.InnerText → {Arg1}", fileName, docs.InnerText);
             head.AppendChild(docs);
 
             // set expansionState
             XmlElement expansionState = this.opmlDoc.CreateElement("expansionState");
+			Logger.LogError("Save(fileName={FileName}): expansionState → {ExpansionState}", fileName, expansionState);
             expansionState.InnerText = this.ExpansionState;
+			Logger.LogDebug("Save(fileName={FileName}): expansionState.InnerText → {Arg1}", fileName, expansionState.InnerText);
             head.AppendChild(expansionState);
 
             // set vertScrollState
             XmlElement vertScrollState = this.opmlDoc.CreateElement("vertScrollState");
+			Logger.LogError("Save(fileName={FileName}): vertScrollState → {VertScrollState}", fileName, vertScrollState);
             vertScrollState.InnerText = this.VertScrollState;
+			Logger.LogDebug("Save(fileName={FileName}): vertScrollState.InnerText → {Arg1}", fileName, vertScrollState.InnerText);
             head.AppendChild(vertScrollState);
 
             // set windowTop
             XmlElement windowTop = this.opmlDoc.CreateElement("windowTop");
+			Logger.LogError("Save(fileName={FileName}): windowTop → {WindowTop}", fileName, windowTop);
             windowTop.InnerText = this.WindowTop;
+			Logger.LogDebug("Save(fileName={FileName}): windowTop.InnerText → {Arg1}", fileName, windowTop.InnerText);
             head.AppendChild(windowTop);
 
             // set windowLeft
             XmlElement windowLeft = this.opmlDoc.CreateElement("windowLeft");
+			Logger.LogError("Save(fileName={FileName}): windowLeft → {WindowLeft}", fileName, windowLeft);
             windowLeft.InnerText = this.WindowLeft;
+			Logger.LogDebug("Save(fileName={FileName}): windowLeft.InnerText → {Arg1}", fileName, windowLeft.InnerText);
             head.AppendChild(windowLeft);
 
             // set windowBottom
             XmlElement windowBottom = this.opmlDoc.CreateElement("windowBottom");
+			Logger.LogError("Save(fileName={FileName}): windowBottom → {WindowBottom}", fileName, windowBottom);
             windowBottom.InnerText = this.WindowBottom;
+			Logger.LogDebug("Save(fileName={FileName}): windowBottom.InnerText → {Arg1}", fileName, windowBottom.InnerText);
             head.AppendChild(windowBottom);
 
             // set windowRight
             XmlElement windowRight = this.opmlDoc.CreateElement("windowRight");
+			Logger.LogError("Save(fileName={FileName}): windowRight → {WindowRight}", fileName, windowRight);
             windowRight.InnerText = this.WindowRight;
+			Logger.LogDebug("Save(fileName={FileName}): windowRight.InnerText → {Arg1}", fileName, windowRight.InnerText);
             head.AppendChild(windowRight);
 
             // create body
             XmlElement opmlBody = this.opmlDoc.CreateElement("body");
+			Logger.LogError("Save(fileName={FileName}): opmlBody → {OpmlBody}", fileName, opmlBody);
             opml.AppendChild(opmlBody);
 
             foreach (OpmlOutline outline in this.Outlines)
@@ -329,6 +398,7 @@ namespace DotNetNuke.Services.Syndication
             }
 
             this.opmlDoc.Save(fileName);
+			Logger.LogWarning("<<< Exiting Save(fileName={FileName})", fileName);
         }
 
         /// <summary>Parses a <paramref name="node"/> into an <see cref="OpmlOutline"/>.</summary>
@@ -336,8 +406,10 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>A new <see cref="OpmlOutline"/> instance.</returns>
         internal static OpmlOutline ParseXml(XmlElement node)
         {
+			Logger.LogError(">>> Entering ParseXml(node={Node})", node);
             var newOutline = new OpmlOutline();
 
+			Logger.LogError("ParseXml(node={Node}): newOutline → {NewOutline}", node, newOutline);
             newOutline.Text = ParseElement(node, "text");
             newOutline.Type = ParseElement(node, "type");
             newOutline.IsComment = ParseElement(node, "isComment") == "true" ? true : false;
@@ -392,12 +464,15 @@ namespace DotNetNuke.Services.Syndication
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ParseXml(node={Node})", node);
             return newOutline;
         }
 
         private static string ParseElement(XmlElement node, string attribute)
         {
+			Logger.LogError(">>> Entering ParseElement(node={Node},attribute={Attribute})", node, attribute);
             string attrValue = node.GetAttribute(attribute);
+			Logger.LogWarning("<<< Exiting ParseElement(node={Node},attribute={Attribute})", node, attribute);
             return !string.IsNullOrEmpty(attrValue) ? attrValue : string.Empty;
         }
     }

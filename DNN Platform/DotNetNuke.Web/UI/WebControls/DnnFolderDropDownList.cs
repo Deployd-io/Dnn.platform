@@ -26,11 +26,14 @@ namespace DotNetNuke.Web.UI.WebControls
     [ToolboxData("<{0}:DnnFolderDropDownList runat='server'></{0}:DnnFolderDropDownList>")]
     public class DnnFolderDropDownList : DnnDropDownList
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFolderDropDownList));
         /// <summary>Initializes a new instance of the <see cref="DnnFolderDropDownList"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IClientResourceController. Scheduled removal in v12.0.0.")]
         public DnnFolderDropDownList()
             : this(Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>(), Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>())
         {
+		Logger.LogError(">>> Entering DnnFolderDropDownList()");
+        Logger.LogWarning("<<< Exiting DnnFolderDropDownList()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnFolderDropDownList"/> class.</summary>
@@ -67,6 +70,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.SelectItemDefaultText = Localization.GetString("DropDownList.SelectFolderDefaultText", Localization.SharedResourceFile);
@@ -78,11 +82,13 @@ namespace DotNetNuke.Web.UI.WebControls
             this.Services.ServiceRoot = "InternalServices";
 
             this.Options.ItemList.DisableUnspecifiedOrder = true;
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             this.AddCssClass("folder");
             base.OnPreRender(e);
 
@@ -91,7 +97,9 @@ namespace DotNetNuke.Web.UI.WebControls
             if (selectedFolder != null && selectedFolder.ParentID > Null.NullInteger)
             {
                 var folderLevel = string.Empty;
+				Logger.LogError("OnPreRender(e={E}): folderLevel → {FolderLevel}", e, folderLevel);
                 var parentFolder = FolderManager.Instance.GetFolder(selectedFolder.ParentID);
+				Logger.LogError("OnPreRender(e={E}): parentFolder → {ParentFolder}", e, parentFolder);
                 while (parentFolder != null)
                 {
                     folderLevel = $"{parentFolder.FolderID},{folderLevel}";
@@ -100,6 +108,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
                 this.ExpandPath = folderLevel.TrimEnd(',');
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

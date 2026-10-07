@@ -12,6 +12,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin/theme object which allows displaying localized text with token replacement.</summary>
     public partial class Text : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Text.ascx));
         public string ShowText { get; set; }
 
         public string CssClass { get; set; }
@@ -23,8 +24,10 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             string strText = this.ShowText;
+			Logger.LogError("OnLoad(e={E}): strText → {StrText}", e, strText);
 
             // load resources
             if (!string.IsNullOrEmpty(this.ResourceKey))
@@ -32,6 +35,7 @@ namespace DotNetNuke.UI.Skins.Controls
                 // localization
                 string strFile = Path.GetFileName(this.Server.MapPath(this.PortalSettings.ActiveTab.SkinSrc));
                 strFile = this.PortalSettings.ActiveTab.SkinPath + Localization.LocalResourceDirectory + "/" + strFile;
+				Logger.LogError("OnLoad(e={E}): strFile → {StrFile}", e, strFile);
                 string strLocalization = Localization.GetString(this.ResourceKey, strFile);
                 if (!string.IsNullOrEmpty(strLocalization))
                 {
@@ -49,7 +53,9 @@ namespace DotNetNuke.UI.Skins.Controls
             if (this.ReplaceTokens)
             {
                 var tr = new TokenReplace();
+				Logger.LogError("OnLoad(e={E}): tr → {Tr}", e, tr);
                 tr.AccessingUser = this.PortalSettings.UserInfo;
+				Logger.LogDebug("OnLoad(e={E}): tr.AccessingUser → {Arg1}", e, tr.AccessingUser);
                 strText = tr.ReplaceEnvironmentTokens(strText);
             }
 
@@ -58,6 +64,7 @@ namespace DotNetNuke.UI.Skins.Controls
             {
                 this.lblText.CssClass = this.CssClass;
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

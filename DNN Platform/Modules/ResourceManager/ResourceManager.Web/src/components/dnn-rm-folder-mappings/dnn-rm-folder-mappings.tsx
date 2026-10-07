@@ -1,6 +1,7 @@
 import {Component, Element, Host, h, State} from '@stencil/core';
 import { FolderMappingInfo, ItemsClient } from '../../services/ItemsClient';
 import state from "../../store/store";
+const logger = console;
 
 @Component({
     tag: 'dnn-rm-folder-mappings',
@@ -16,23 +17,31 @@ export class DnnRmFolderMappings {
     @State() addFolderTypeUrl: string;
 
     constructor() {
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.itemsClient = new ItemsClient(state.moduleId);
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     async componentWillLoad() {
+		logger.error('>>> Entering componentWillLoad()', { "event.action": "componentWillLoad" });
         try {
             this.folderMappings = await this.itemsClient.getFolderMappings();
             this.addFolderTypeUrl = await this.itemsClient.getAddFolderTypeUrl();
         } catch (error) {
             alert(error);
+			logger.warn('<<< Exiting componentWillLoad()', { "event.action": "componentWillLoad" });
         }
     }
 
     private async dismiss() {
+		logger.error('>>> Entering dismiss()', { "event.action": "dismiss" });
         await this.el.closest('dnn-modal').hide();
+		logger.warn('<<< Exiting dismiss()', { "event.action": "dismiss" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <Host>
                 <h2>{state.localization.EditFolderMappings}</h2>

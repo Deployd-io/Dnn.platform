@@ -15,6 +15,7 @@ namespace DotNetNuke.HttpModules.RequestFilter
     /// <summary>An <see cref="IHttpModule"/> to implement request filtering.</summary>
     public class RequestFilterModule : IHttpModule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RequestFilterModule));
         private const string InstalledKey = "httprequestfilter.attemptedinstall";
         private readonly IHostSettings hostSettings;
         private readonly IApplicationStatusInfo appStatus;
@@ -31,7 +32,10 @@ namespace DotNetNuke.HttpModules.RequestFilter
         /// <param name="appStatus">The application status.</param>
         public RequestFilterModule(IHostSettings hostSettings, IApplicationStatusInfo appStatus)
         {
+			Logger.LogError(">>> Entering RequestFilterModule(hostSettings={HostSettings},appStatus={AppStatus})", hostSettings, appStatus);
+			Logger.LogDebug("RequestFilterModule(hostSettings={HostSettings},appStatus={AppStatus}): appStatus → {AppStatus1}", hostSettings, appStatus, appStatus);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogWarning("<<< Exiting RequestFilterModule(hostSettings={HostSettings},appStatus={AppStatus})", hostSettings, appStatus);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
         }
 
@@ -41,17 +45,23 @@ namespace DotNetNuke.HttpModules.RequestFilter
         /// </remarks>
         public void Dispose()
         {
+		Logger.LogError(">>> Entering Dispose()");
+        Logger.LogWarning("<<< Exiting Dispose()");
         }
 
         /// <inheritdoc />
         public void Init(HttpApplication context)
         {
+			Logger.LogError(">>> Entering Init(context={Context})", context);
             context.BeginRequest += this.FilterRequest;
+			Logger.LogWarning("<<< Exiting Init(context={Context})", context);
         }
 
         private void FilterRequest(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering FilterRequest(sender={Sender},e={E})", sender, e);
             var app = (HttpApplication)sender;
+			Logger.LogError("FilterRequest(sender={Sender},e={E}): app → {App}", sender, e, app);
             if (app?.Context?.Items == null)
             {
                 return;
@@ -82,6 +92,7 @@ namespace DotNetNuke.HttpModules.RequestFilter
             // below skip full processing of this method
             app.Context.Items.Add(InstalledKey, true);
             var settings = RequestFilterSettings.GetSettings(this.hostSettings, this.appStatus);
+			Logger.LogError("FilterRequest(sender={Sender},e={E}): settings → {Settings}", sender, e, settings);
             if (settings == null || settings.Rules.Count == 0 || !settings.Enabled)
             {
                 return;
@@ -93,6 +104,7 @@ namespace DotNetNuke.HttpModules.RequestFilter
                 // this check was necessary so that your rule could deal with IPv4 or IPv6
                 // To use this mode, add ":IPv4" or ":IPv6" to your servervariable name.
                 var varArray = rule.ServerVariable.Split(':');
+				Logger.LogError("FilterRequest(sender={Sender},e={E}): varArray → {VarArray}", sender, e, varArray);
                 var varVal = request.ServerVariables[varArray[0]];
                 if (varArray[0].EndsWith("_ADDR", StringComparison.InvariantCultureIgnoreCase) && varArray.Length > 1)
                 {
@@ -112,6 +124,7 @@ namespace DotNetNuke.HttpModules.RequestFilter
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting FilterRequest(sender={Sender},e={E})", sender, e);
         }
     }
 }

@@ -17,8 +17,10 @@ namespace DotNetNuke.ComponentModel
 
         public static void InstallComponents(params IComponentInstaller[] installers)
         {
+			Logger.LogError(">>> Entering InstallComponents(installers={Installers})", installers);
             if (installers == null)
             {
+				Logger.LogError("Throwing ArgumentNullException from InstallComponents(installers={Installers})", installers);
                 throw new ArgumentNullException(nameof(installers));
             }
 
@@ -32,11 +34,15 @@ namespace DotNetNuke.ComponentModel
 
                 installer.InstallComponents(Container);
             }
+			Logger.LogWarning("<<< Exiting InstallComponents(installers={Installers})", installers);
         }
 
         public static object GetComponent(string name)
         {
             VerifyContainer();
+			Logger.LogWarning("<<< Exiting GetComponent()");
+			Logger.LogWarning("<<< Exiting GetComponent(name={Name})", name);
+            Logger.LogWarning("<<< Exiting GetComponent(name={Name},contractType={ContractType})", name, contractType);
             return Container.GetComponent(name);
         }
 
@@ -49,6 +55,7 @@ namespace DotNetNuke.ComponentModel
         public static object GetComponent(Type contractType)
         {
             VerifyContainer();
+			Logger.LogWarning("<<< Exiting GetComponent(contractType={ContractType})", contractType);
             return Container.GetComponent(contractType);
         }
 
@@ -66,7 +73,9 @@ namespace DotNetNuke.ComponentModel
 
         public static string[] GetComponentList(Type contractType)
         {
+			Logger.LogError(">>> Entering GetComponentList(contractType={ContractType})", contractType);
             VerifyContainer();
+			Logger.LogWarning("<<< Exiting GetComponentList(contractType={ContractType})", contractType);
             return Container.GetComponentList(contractType);
         }
 
@@ -90,7 +99,11 @@ namespace DotNetNuke.ComponentModel
 
         public static IDictionary GetComponentSettings(string name)
         {
+			Logger.LogError(">>> Entering GetComponentSettings(name={Name})", name);
             VerifyContainer();
+			Logger.LogWarning("<<< Exiting GetComponentSettings(name={Name})", name);
+			Logger.LogWarning("<<< Exiting GetComponentSettings(component={Component})", component);
+            Logger.LogWarning("<<< Exiting GetComponentSettings()");
             return Container.GetComponentSettings(name);
         }
 
@@ -116,20 +129,26 @@ namespace DotNetNuke.ComponentModel
         public static void RegisterComponent<TContract, TComponent>()
             where TComponent : class
         {
+			Logger.LogError(">>> Entering RegisterComponent()");
             VerifyContainer();
             Container.RegisterComponent<TContract, TComponent>();
+			Logger.LogWarning("<<< Exiting RegisterComponent()");
         }
 
         public static void RegisterComponent(Type componentType)
         {
+			Logger.LogError(">>> Entering RegisterComponent(componentType={ComponentType})", componentType);
             VerifyContainer();
             Container.RegisterComponent(componentType);
+			Logger.LogWarning("<<< Exiting RegisterComponent(componentType={ComponentType})", componentType);
         }
 
         public static void RegisterComponent(Type contractType, Type componentType)
         {
+			Logger.LogError(">>> Entering RegisterComponent(contractType={ContractType},componentType={ComponentType})", contractType, componentType);
             VerifyContainer();
             Container.RegisterComponent(contractType, componentType);
+			Logger.LogWarning("<<< Exiting RegisterComponent(contractType={ContractType},componentType={ComponentType})", contractType, componentType);
         }
 
         public static void RegisterComponent<TComponent>(string name)
@@ -142,8 +161,10 @@ namespace DotNetNuke.ComponentModel
         public static void RegisterComponent<TContract, TComponent>(string name)
             where TComponent : class
         {
+			Logger.LogError(">>> Entering RegisterComponent(name={Name})", name);
             VerifyContainer();
             Container.RegisterComponent<TContract, TComponent>(name);
+			Logger.LogWarning("<<< Exiting RegisterComponent(name={Name})", name);
         }
 
         public static void RegisterComponent(string name, Type componentType)
@@ -160,14 +181,18 @@ namespace DotNetNuke.ComponentModel
 
         public static void RegisterComponentInstance(string name, Type contractType, object instance)
         {
+			Logger.LogError(">>> Entering RegisterComponentInstance(name={Name},contractType={ContractType},instance={Instance})", name, contractType, instance);
             VerifyContainer();
             Container.RegisterComponentInstance(name, contractType, instance);
+			Logger.LogWarning("<<< Exiting RegisterComponentInstance(name={Name},contractType={ContractType},instance={Instance})", name, contractType, instance);
         }
 
         public static void RegisterComponentInstance(string name, object instance)
         {
             VerifyContainer();
             Container.RegisterComponentInstance(name, instance);
+			Logger.LogError(">>> Entering RegisterComponentInstance(name={Name},instance={Instance})", name, instance);
+			Logger.LogWarning("<<< Exiting RegisterComponentInstance(name={Name},instance={Instance})", name, instance);
         }
 
         public static void RegisterComponentInstance<TContract>(string name, object instance)
@@ -184,14 +209,18 @@ namespace DotNetNuke.ComponentModel
 
         public static void RegisterComponentSettings(string name, IDictionary dependencies)
         {
+			Logger.LogError(">>> Entering RegisterComponentSettings(name={Name},dependencies={Dependencies})", name, dependencies);
             VerifyContainer();
             Container.RegisterComponentSettings(name, dependencies);
+			Logger.LogWarning("<<< Exiting RegisterComponentSettings(name={Name},dependencies={Dependencies})", name, dependencies);
         }
 
         public static void RegisterComponentSettings(Type component, IDictionary dependencies)
         {
+			Logger.LogError(">>> Entering RegisterComponentSettings(component={Component},dependencies={Dependencies})", component, dependencies);
             VerifyContainer();
             Container.RegisterComponentSettings(component, dependencies);
+			Logger.LogWarning("<<< Exiting RegisterComponentSettings(component={Component},dependencies={Dependencies})", component, dependencies);
         }
 
         public static void RegisterComponentSettings<TComponent>(IDictionary dependencies)
@@ -202,10 +231,14 @@ namespace DotNetNuke.ComponentModel
 
         private static void VerifyContainer()
         {
+			Logger.LogError(">>> Entering VerifyContainer()");
             if (Container == null)
             {
                 Logger.Warn("Container was null, instantiating SimpleContainer");
+				Logger.LogWarning("<<< Exiting VerifyContainer()");
                 Container = new SimpleContainer();
+				Logger.LogError("VerifyContainer(): Container → {Container}", Container);
+				Logger.LogDebug("VerifyContainer(): Container → {Container}", Container);
             }
         }
     }

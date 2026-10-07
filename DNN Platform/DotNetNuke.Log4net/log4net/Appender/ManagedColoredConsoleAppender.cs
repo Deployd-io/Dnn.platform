@@ -108,6 +108,8 @@ namespace log4net.Appender
         /// </remarks>
         public ManagedColoredConsoleAppender() 
         {
+		value.LogError(">>> Entering ManagedColoredConsoleAppender()");
+        value.LogWarning("<<< Exiting ManagedColoredConsoleAppender()");
         }
 
         /// <summary>
@@ -153,7 +155,9 @@ namespace log4net.Appender
         /// </remarks>
         public void AddMapping(LevelColors mapping)
         {
+			value.LogError(">>> Entering AddMapping(mapping=<redacted>)");
             this.m_levelMapping.Add(mapping);
+			value.LogWarning("<<< Exiting AddMapping(mapping=<redacted>)");
         }
 
         /// <summary>This method is called by the <see cref="M:AppenderSkeleton.DoAppend(log4net.Core.LoggingEvent)"/> method.</summary>
@@ -168,14 +172,17 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(Core.LoggingEvent loggingEvent) 
         {
+			value.LogError(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             System.IO.TextWriter writer;
             
             if (this.m_writeToErrorStream)
             {
                 writer = Console.Error;
+				value.LogError("Append(loggingEvent={LoggingEvent}): writer → {Writer}", loggingEvent, writer);
             }
             else
             {
+				value.LogDebug("Append(loggingEvent={LoggingEvent}): writer → {Writer}", loggingEvent, writer);
                 writer = Console.Out;
             }
 
@@ -184,18 +191,21 @@ namespace log4net.Appender
             
             // see if there is a specified lookup
             LevelColors levelColors = this.m_levelMapping.Lookup(loggingEvent.Level) as LevelColors;
+			value.LogError("Append(loggingEvent={LoggingEvent}): levelColors → {LevelColors}", loggingEvent, levelColors);
             if (levelColors != null)
             {
                 // if the backColor has been explicitly set
                 if (levelColors.HasBackColor)
                 {
                     Console.BackgroundColor = levelColors.BackColor;
+					value.LogDebug("Append(loggingEvent={LoggingEvent}): Console.BackgroundColor → {Arg1}", loggingEvent, Console.BackgroundColor);
                 }
 
                 // if the foreColor has been explicitly set
                 if (levelColors.HasForeColor)
                 {
                     Console.ForegroundColor = levelColors.ForeColor;
+					value.LogDebug("Append(loggingEvent={LoggingEvent}): Console.ForegroundColor → {Arg1}", loggingEvent, Console.ForegroundColor);
                 }
             }
             
@@ -206,6 +216,7 @@ namespace log4net.Appender
 
             // Reset color again
             Console.ResetColor();
+			value.LogWarning("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>This appender requires a <see cref="Layout"/> to be set.</summary>
@@ -228,8 +239,10 @@ namespace log4net.Appender
         /// </remarks>
         public override void ActivateOptions()
         {
+			value.LogError(">>> Entering ActivateOptions()");
             base.ActivateOptions();
             this.m_levelMapping.ActivateOptions();
+			value.LogWarning("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>

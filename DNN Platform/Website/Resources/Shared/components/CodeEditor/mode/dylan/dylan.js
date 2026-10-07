@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -150,13 +151,17 @@ CodeMirror.defineMode("dylan", function(_config) {
 
 
   function chain(stream, state, f) {
+	logger.error(`>>> Entering chain(stream=${stream},state=${state},f=${f})`, { "event.action": "chain", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
     state.tokenize = f;
+	logger.warn(`<<< Exiting chain(stream=${stream},state=${state},f=${f})`, { "event.action": "chain", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
     return f(stream, state);
   }
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     // String
     var ch = stream.peek();
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     if (ch == "'" || ch == '"') {
       stream.next();
       return chain(stream, state, tokenString(ch, "string"));
@@ -240,19 +245,23 @@ CodeMirror.defineMode("dylan", function(_config) {
   }
 
   function tokenComment(stream, state) {
+	logger.error(`>>> Entering tokenComment(stream=${stream},state=${state})`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
     var maybeEnd = false,
     ch;
     while ((ch = stream.next())) {
       if (ch == "/" && maybeEnd) {
         state.tokenize = tokenBase;
+		logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       maybeEnd = (ch == "*");
     }
+	logger.error(`tokenComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
     return "comment";
   }
 
   function tokenString(quote, style) {
+	logger.error(`>>> Entering tokenString(quote=${quote},style=${style})`, { "event.action": "tokenString", "logrite.quote": quote, "logrite.style": style });
     return function(stream, state) {
       var next, end = false;
       while ((next = stream.next()) != null) {
@@ -270,15 +279,19 @@ CodeMirror.defineMode("dylan", function(_config) {
   // Interface
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         tokenize: tokenBase,
         currentIndent: 0
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.eatSpace())
         return null;
       var style = state.tokenize(stream, state);
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return style;
     },
     blockCommentStart: "/*",

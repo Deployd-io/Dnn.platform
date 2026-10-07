@@ -4,12 +4,17 @@ import { Scrollbars } from "react-custom-scrollbars";
 import { GridCell, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import Resx from "localization";
 import styles from "./AssignedSelector.module.less";
+const logger = console;
 class AssignedSelector extends React.Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     getPortalList(list, type) {
+		logger.error(`>>> Entering getPortalList(list=${list},type=${type})`, { "event.action": "getPortalList", "logrite.list": list, "logrite.type": type });
+		logger.warn(`<<< Exiting getPortalList(list=${list},type=${type})`, { "event.action": "getPortalList", "logrite.list": list, "logrite.type": type });
         return list.map((portal, index) => {
             return (
                 <li
@@ -25,6 +30,7 @@ class AssignedSelector extends React.Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const assignedPortals = this.getPortalList(
             this.props.assignedPortals,
             "assignedPortals"
@@ -34,7 +40,9 @@ class AssignedSelector extends React.Component {
             "unassignedPortals"
         );
         let leftSelected = this.props.unassignedPortals.find(p => p.selected) !== null;
+		logger.error(`render(): leftSelected → ${leftSelected}`, { "event.action": "render" });
         let rightSelected = this.props.assignedPortals.find(p => p.selected) !== null;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.assignedSelector}>
                 <GridCell columnSize={45} className="selector-box">

@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Installer
     [Serializable]
     public partial class InstallFile
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InstallFile));
         private static readonly Regex FileTypeMatchRegex = new Regex(Util.REGEX_Version + ".txt", RegexOptions.Compiled);
 
         /// <summary>
@@ -29,9 +30,12 @@ namespace DotNetNuke.Services.Installer
         /// <param name="info">An <see cref="InstallerInfo"/> instance.</param>
         public InstallFile(ZipArchiveEntry entry, InstallerInfo info)
         {
+			Logger.LogError(">>> Entering InstallFile(entry={Entry},info={Info})", entry, info);
             this.Encoding = TextEncoding.UTF8;
+			Logger.LogDebug("InstallFile(entry={Entry},info={Info}): this.Encoding → {Arg2}", entry, info, this.Encoding);
             this.InstallerInfo = info;
             this.ReadZip(entry);
+			Logger.LogWarning("<<< Exiting InstallFile(fileName={FileName})", fileName);
         }
 
         /// <summary>
@@ -41,7 +45,9 @@ namespace DotNetNuke.Services.Installer
         /// <param name="fileName">The fileName of the File.</param>
         public InstallFile(string fileName)
         {
+			Logger.LogError(">>> Entering InstallFile(fileName={FileName})", fileName);
             this.Encoding = TextEncoding.UTF8;
+			Logger.LogDebug("InstallFile(fileName={FileName}): this.Encoding → {Arg1}", fileName, this.Encoding);
             this.ParseFileName(fileName);
         }
 
@@ -53,7 +59,10 @@ namespace DotNetNuke.Services.Installer
         /// <param name="info">An <see cref="InstallerInfo"/> instance.</param>
         public InstallFile(string fileName, InstallerInfo info)
         {
+			Logger.LogError(">>> Entering InstallFile(fileName={FileName},info={Info})", fileName, info);
             this.Encoding = TextEncoding.UTF8;
+			Logger.LogWarning("<<< Exiting InstallFile(fileName={FileName},info={Info})", fileName, info);
+			Logger.LogDebug("InstallFile(fileName={FileName},info={Info}): this.Encoding → {Arg2}", fileName, info, this.Encoding);
             this.ParseFileName(fileName);
             this.InstallerInfo = info;
         }
@@ -67,7 +76,9 @@ namespace DotNetNuke.Services.Installer
         /// <param name="info">An <see cref="InstallerInfo"/> instance.</param>
         public InstallFile(string fileName, string sourceFileName, InstallerInfo info)
         {
+			Logger.LogError(">>> Entering InstallFile(fileName={FileName},sourceFileName={SourceFileName},info={Info})", fileName, sourceFileName, info);
             this.Encoding = TextEncoding.UTF8;
+			Logger.LogDebug("InstallFile(fileName={FileName},sourceFileName={SourceFileName},info={Info}): this.Encoding → {Arg3}", fileName, sourceFileName, info, this.Encoding);
             this.ParseFileName(fileName);
             this.SourceFileName = sourceFileName;
             this.InstallerInfo = info;
@@ -81,7 +92,10 @@ namespace DotNetNuke.Services.Installer
         /// <param name="filePath">The file path of the file.</param>
         public InstallFile(string fileName, string filePath)
         {
+			Logger.LogError(">>> Entering InstallFile(fileName={FileName},filePath={FilePath})", fileName, filePath);
             this.Encoding = TextEncoding.UTF8;
+			Logger.LogWarning("<<< Exiting InstallFile(fileName={FileName},filePath={FilePath})", fileName, filePath);
+			Logger.LogDebug("InstallFile(fileName={FileName},filePath={FilePath}): this.Encoding → {Arg2}", fileName, filePath, this.Encoding);
             this.Name = fileName;
             this.Path = filePath;
         }
@@ -92,7 +106,11 @@ namespace DotNetNuke.Services.Installer
 #pragma warning restore CS3001
         {
             this.Encoding = TextEncoding.UTF8;
+			Logger.LogDebug("InstallFile(zip={Zip},entry={Entry},info={Info}): this.Encoding → {Arg3}", zip, entry, info, this.Encoding);
+        Logger.LogDebug("InstallFile(zip={Zip},entry={Entry},info={Info}): InstallerInfo → {InstallerInfo}", zip, entry, info, InstallerInfo);
+        Logger.LogWarning("<<< Exiting InstallFile(zip={Zip},entry={Entry},info={Info})", zip, entry, info);
             this.InstallerInfo = info;
+			Logger.LogWarning("<<< Exiting InstallFile(fileName={FileName},sourceFileName={SourceFileName},info={Info})", fileName, sourceFileName, info);
             this.ReadZip(zip, entry);
         }
 
@@ -175,6 +193,7 @@ namespace DotNetNuke.Services.Installer
         /// <param name="version">The version of the file.</param>
         public void SetVersion(Version version)
         {
+			Logger.LogError(">>> Entering SetVersion(version={Version})", version);
             this.Version = version;
         }
 
@@ -182,6 +201,7 @@ namespace DotNetNuke.Services.Installer
         /// <param name="fileName">A String representing the file name.</param>
         private void ParseFileName(string fileName)
         {
+			Logger.LogError(">>> Entering ParseFileName(fileName={FileName})", fileName);
             int i = fileName.Replace(@"\", "/").LastIndexOf("/", StringComparison.Ordinal);
             if (i < 0)
             {
@@ -190,6 +210,7 @@ namespace DotNetNuke.Services.Installer
             }
             else
             {
+				Logger.LogDebug("ParseFileName(fileName={FileName}): this.Path → {Arg1}", fileName, this.Path);
                 this.Name = fileName.Substring(i + 1);
                 this.Path = fileName.Substring(0, i);
             }
@@ -206,6 +227,7 @@ namespace DotNetNuke.Services.Installer
             }
             else
             {
+				Logger.LogDebug("ParseFileName(fileName={FileName}): this.Type → {Arg1}", fileName, this.Type);
                 switch (this.Extension.ToLowerInvariant())
                 {
                     case "ascx":
@@ -259,17 +281,21 @@ namespace DotNetNuke.Services.Installer
         /// <param name="entry">A ZipEntry containing the file metadata.</param>
         private void ReadZip(ZipArchiveEntry entry)
         {
+			Logger.LogError(">>> Entering ReadZip(entry={Entry})", entry);
             this.ParseFileName(entry.FullName);
             Util.WriteStream(entry.Open(), this.TempFileName);
             File.SetLastWriteTime(this.TempFileName, entry.LastWriteTime.LocalDateTime);
+			Logger.LogWarning("<<< Exiting ReadZip(entry={Entry})", entry);
         }
 
         [DnnDeprecated(9, 11, 0, "No replacement")]
         private partial void ReadZip(ZipInputStream unzip, ZipEntry entry)
         {
+			Logger.LogError(">>> Entering ReadZip(unzip={Unzip},entry={Entry})", unzip, entry);
             this.ParseFileName(entry.Name);
             Util.WriteStream(unzip, this.TempFileName);
             File.SetLastWriteTime(this.TempFileName, entry.DateTime);
+			Logger.LogWarning("<<< Exiting ReadZip(unzip={Unzip},entry={Entry})", unzip, entry);
         }
     }
 }

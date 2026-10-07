@@ -5,6 +5,7 @@ import "./style.less";
 import { SingleLineInputWithError, GridSystem, Label, InputGroup, Button, RadioButtons, Dropdown, MultiLineInput } from "@dnnsoftware/dnn-react-common";
 import { security as SecurityActions } from "../../../actions";
 import resx from "../../../resources";
+const logger = console;
 
 let specificityOptions = [];
 let typeOptions = [];
@@ -15,6 +16,7 @@ const IP_RANGE = "IPRange";
 class IpFilterEditor extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             ipFilter: {RuleType: 1},
             error: {
@@ -26,6 +28,7 @@ class IpFilterEditor extends Component {
             ruleSpecificity: SINGLE_IP
         };
 
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
         specificityOptions = [];
         specificityOptions.push({ label: resx.get(SINGLE_IP), value: SINGLE_IP });
         specificityOptions.push({ label: resx.get(IP_RANGE), value: IP_RANGE });
@@ -33,11 +36,14 @@ class IpFilterEditor extends Component {
         typeOptions = [];
         typeOptions.push({ label: resx.get("AllowIP"), value: 1 });
         typeOptions.push({ label: resx.get("DenyIP"), value: 2 });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const {props} = this;
         if (props.ipFilterId) {
+			logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
             props.dispatch(SecurityActions.getIpFilter({
                 filterId: props.ipFilterId
             }, (data) => {
@@ -55,14 +61,17 @@ class IpFilterEditor extends Component {
     }
 
     onRuleSpecificityChange(event) {
+		logger.error(`>>> Entering onRuleSpecificityChange(event=${event})`, { "event.action": "onRuleSpecificityChange", "logrite.event": event });
         this.setState({
             ruleSpecificity: event,
             formModified: true,
             triedToSubmit: false
         });
+		logger.warn(`<<< Exiting onRuleSpecificityChange(event=${event})`, { "event.action": "onRuleSpecificityChange", "logrite.event": event });
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {ipFilter} = this.state;
 
         if (key === "RuleType") {
@@ -70,6 +79,7 @@ class IpFilterEditor extends Component {
         }
         else {
             ipFilter[key] = typeof (event) === "object" ? event.target.value : event;
+			logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         }
 
         this.setState({
@@ -80,6 +90,7 @@ class IpFilterEditor extends Component {
     }
 
     onUpdateItem(event) {
+		logger.error(`>>> Entering onUpdateItem(event=${event})`, { "event.action": "onUpdateItem", "logrite.event": event });
         event.preventDefault();
         const {state} = this;
 
@@ -96,9 +107,11 @@ class IpFilterEditor extends Component {
         }
 
         this.props.onUpdate(this.state.ipFilter);
+		logger.warn(`<<< Exiting onUpdateItem(event=${event})`, { "event.action": "onUpdateItem", "logrite.event": event });
     }
 
     validateIPAddressContainsError() {
+		logger.error('>>> Entering validateIPAddressContainsError()', { "event.action": "validateIPAddressContainsError" });
         const {state} = this;
 
         state.error["ip"] = !this.isValidIpAddress(state.ipFilter["IPAddress"]);
@@ -113,6 +126,7 @@ class IpFilterEditor extends Component {
             error: state.error
         });
 
+		logger.warn('<<< Exiting validateIPAddressContainsError()', { "event.action": "validateIPAddressContainsError" });
         return (state.error.ip || state.error.mask);
     }
 
@@ -122,6 +136,7 @@ class IpFilterEditor extends Component {
 
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const columnOne = <div className="container" key="ip-filter-editor-column">
             <InputGroup>
                 <Label
@@ -181,6 +196,7 @@ class IpFilterEditor extends Component {
             </InputGroup>
         </div>;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="ip-filter-setting-editor">
                 <GridSystem
@@ -214,6 +230,8 @@ IpFilterEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         ipFilter: state.security.ipFilter
     };

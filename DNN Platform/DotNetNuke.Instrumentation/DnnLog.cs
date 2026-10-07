@@ -65,12 +65,14 @@ namespace DotNetNuke.Instrumentation
             {
                 Logger.TraceFormat(CultureInfo.InvariantCulture, "Entering Method [{0}]", CallingFrame.GetMethod().Name);
             }
+			Logger.LogWarning("<<< Exiting MethodEntry()");
         }
 
         /// <summary>Standard method to use on method exit.</summary>
         /// <param name="returnObject">The return value of the method.</param>
         public static void MethodExit(object returnObject)
         {
+			Logger.LogError(">>> Entering MethodExit(returnObject={ReturnObject})", returnObject);
             EnsureConfig();
 
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelTrace))
@@ -82,6 +84,9 @@ namespace DotNetNuke.Instrumentation
 
                 Logger.TraceFormat(CultureInfo.InvariantCulture, "Method [{0}] Returned [{1}]", CallingFrame.GetMethod().Name, returnObject);
             }
+			Logger.LogWarning("<<< Exiting MethodExit(returnObject={ReturnObject})", returnObject);
+			Logger.LogError(">>> Entering MethodExit()");
+			Logger.LogWarning("<<< Exiting MethodExit()");
         }
 
         /// <summary>  Standard method to use on method exit.</summary>
@@ -99,12 +104,14 @@ namespace DotNetNuke.Instrumentation
         /// <param name="message">The message to log.</param>
         public static void Trace(string message)
         {
+			Logger.LogError(">>> Entering Trace(message={Message})", message);
             EnsureConfig();
 
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelTrace))
             {
                 Logger.Trace(message);
             }
+			Logger.LogWarning("<<< Exiting Trace(message={Message})", message);
         }
 
         /// <summary>Log a message at the Trace log level.</summary>
@@ -119,24 +126,28 @@ namespace DotNetNuke.Instrumentation
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         public static void Trace(IFormatProvider provider, string format, params object[] args)
         {
+			Logger.LogError(">>> Entering Trace(format={Format},args={Args})", format, args);
             EnsureConfig();
 
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelTrace))
             {
                 Logger.TraceFormat(provider, format, args);
             }
+			Logger.LogWarning("<<< Exiting Trace(provider={Provider},format={Format},args={Args})", provider, format, args);
         }
 
         /// <summary>Logs a message at the Debug log level.</summary>
         /// <param name="message">The message to log.</param>
         public static void Debug(object message)
         {
+			Logger.LogError(">>> Entering Debug(message={Message})", message);
             EnsureConfig();
 
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelDebug))
             {
                 Logger.Debug(message);
             }
+			Logger.LogWarning("<<< Exiting Debug(message={Message})", message);
         }
 
         /// <summary>Log a message at the Debug log level.</summary>
@@ -144,6 +155,7 @@ namespace DotNetNuke.Instrumentation
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         public static void Debug(string format, params object[] args)
         {
+			Logger.LogError(">>> Entering Debug(format={Format},args={Args})", format, args);
             EnsureConfig();
 
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelDebug))
@@ -157,6 +169,7 @@ namespace DotNetNuke.Instrumentation
                     Logger.DebugFormat(CultureInfo.InvariantCulture, format, args);
                 }
             }
+			Logger.LogWarning("<<< Exiting Debug(format={Format},args={Args})", format, args);
         }
 
         /// <summary>Log a message at the Debug log level.</summary>
@@ -165,23 +178,27 @@ namespace DotNetNuke.Instrumentation
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         public static void Debug(IFormatProvider provider, string format, params object[] args)
         {
+			Logger.LogError(">>> Entering Debug(provider={Provider},format={Format},args={Args})", provider, format, args);
             EnsureConfig();
 
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelDebug))
             {
                 Logger.DebugFormat(provider, format, args);
             }
+			Logger.LogWarning("<<< Exiting Debug(provider={Provider},format={Format},args={Args})", provider, format, args);
         }
 
         /// <summary>Logs a message at the Info log level.</summary>
         /// <param name="message">The message to log.</param>
         public static void Info(object message)
         {
+			Logger.LogError(">>> Entering Info(message={Message})", message);
             EnsureConfig();
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelInfo))
             {
                 Logger.Info(message);
             }
+			Logger.LogWarning("<<< Exiting Info(message={Message})", message);
         }
 
         /// <summary>Log a message at the Info log level.</summary>
@@ -190,11 +207,15 @@ namespace DotNetNuke.Instrumentation
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         public static void Info(IFormatProvider provider, string format, params object[] args)
         {
+			Logger.LogError(">>> Entering Info(provider={Provider},format={Format},args={Args})", provider, format, args);
             EnsureConfig();
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelInfo))
             {
                 Logger.InfoFormat(provider, format, args);
             }
+			Logger.LogError(">>> Entering Info(format={Format},args={Args})", format, args);
+			Logger.LogWarning("<<< Exiting Info(provider={Provider},format={Format},args={Args})", provider, format, args);
+			Logger.LogWarning("<<< Exiting Info(format={Format},args={Args})", format, args);
         }
 
         /// <summary>Log a message at the Info log level.</summary>
@@ -221,11 +242,15 @@ namespace DotNetNuke.Instrumentation
         /// <param name="exception">An exception to include in the log.</param>
         public static void Warn(string message, Exception exception)
         {
+			Logger.LogError(">>> Entering Warn(message={Message},exception={Exception})", message, exception);
             EnsureConfig();
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelWarn))
             {
                 Logger.Warn(message, exception);
             }
+			Logger.LogWarning("<<< Exiting Warn(message={Message},exception={Exception})", message, exception);
+			Logger.LogError(">>> Entering Warn(message={Message})", message);
+			Logger.LogWarning("<<< Exiting Warn(message={Message})", message);
         }
 
         /// <summary>Logs a message at the Warn log level.</summary>
@@ -245,11 +270,15 @@ namespace DotNetNuke.Instrumentation
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         public static void Warn(IFormatProvider provider, string format, params object[] args)
         {
+			Logger.LogError(">>> Entering Warn(provider={Provider},format={Format},args={Args})", provider, format, args);
             EnsureConfig();
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelWarn))
             {
                 Logger.WarnFormat(provider, format, args);
             }
+			Logger.LogError(">>> Entering Warn(format={Format},args={Args})", format, args);
+			Logger.LogWarning("<<< Exiting Warn(provider={Provider},format={Format},args={Args})", provider, format, args);
+			Logger.LogWarning("<<< Exiting Warn(format={Format},args={Args})", format, args);
         }
 
         /// <summary>Log a message at the Warn log level.</summary>
@@ -276,12 +305,16 @@ namespace DotNetNuke.Instrumentation
         /// <param name="exception">An exception to include in the log.</param>
         public static void Error(string message, Exception exception)
         {
+			Logger.LogError(">>> Entering Error(message={Message},exception={Exception})", message, exception);
             EnsureConfig();
 
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelError))
             {
                 Logger.Error(message, exception);
             }
+			Logger.LogWarning("<<< Exiting Error(message={Message},exception={Exception})", message, exception);
+			Logger.LogError(">>> Entering Error(message={Message})", message);
+			Logger.LogWarning("<<< Exiting Error(message={Message})", message);
         }
 
         /// <summary>Logs a message at the Error log level.</summary>
@@ -299,11 +332,13 @@ namespace DotNetNuke.Instrumentation
         /// <param name="exception">An exception to include in the log.</param>
         public static void Error(Exception exception)
         {
+			Logger.LogError(">>> Entering Error(exception={Exception})", exception);
             EnsureConfig();
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelError))
             {
                 Logger.Error(exception.Message, exception);
             }
+			Logger.LogWarning("<<< Exiting Error(exception={Exception})", exception);
         }
 
         /// <summary>Log a message at the Error log level.</summary>
@@ -312,11 +347,15 @@ namespace DotNetNuke.Instrumentation
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         public static void Error(IFormatProvider provider, string format, params object[] args)
         {
+			Logger.LogError(">>> Entering Error(provider={Provider},format={Format},args={Args})", provider, format, args);
             EnsureConfig();
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelError))
             {
                 Logger.ErrorFormat(provider, format, args);
             }
+			Logger.LogError(">>> Entering Error(format={Format},args={Args})", format, args);
+			Logger.LogWarning("<<< Exiting Error(provider={Provider},format={Format},args={Args})", provider, format, args);
+			Logger.LogWarning("<<< Exiting Error(format={Format},args={Args})", format, args);
         }
 
         /// <summary>Log a message at the Error log level.</summary>
@@ -343,11 +382,15 @@ namespace DotNetNuke.Instrumentation
         /// <param name="exception">An exception to include in the log.</param>
         public static void Fatal(string message, Exception exception)
         {
+			Logger.LogError(">>> Entering Fatal(message={Message},exception={Exception})", message, exception);
             EnsureConfig();
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelFatal))
             {
                 Logger.Fatal(message, exception);
             }
+			Logger.LogWarning("<<< Exiting Fatal(message={Message},exception={Exception})", message, exception);
+			Logger.LogError(">>> Entering Fatal(message={Message})", message);
+			Logger.LogWarning("<<< Exiting Fatal(message={Message})", message);
         }
 
         /// <summary>Logs a message at the Fatal log level.</summary>
@@ -367,11 +410,15 @@ namespace DotNetNuke.Instrumentation
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         public static void Fatal(IFormatProvider provider, string format, params object[] args)
         {
+			Logger.LogError(">>> Entering Fatal(provider={Provider},format={Format},args={Args})", provider, format, args);
             EnsureConfig();
             if (Logger.Logger.IsEnabledFor(DnnLogger.LevelFatal))
             {
                 Logger.FatalFormat(provider, format, args);
             }
+			Logger.LogError(">>> Entering Fatal(format={Format},args={Args})", format, args);
+			Logger.LogWarning("<<< Exiting Fatal(provider={Provider},format={Format},args={Args})", provider, format, args);
+			Logger.LogWarning("<<< Exiting Fatal(format={Format},args={Args})", format, args);
         }
 
         /// <summary>Log a message at the Fatal log level.</summary>
@@ -395,6 +442,7 @@ namespace DotNetNuke.Instrumentation
 
         private static void EnsureConfig()
         {
+			Logger.LogError(">>> Entering EnsureConfig()");
             if (!isConfigured)
             {
                 lock (ConfigLock)
@@ -402,7 +450,9 @@ namespace DotNetNuke.Instrumentation
                     if (!isConfigured)
                     {
                         var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigFile);
+						Logger.LogError("EnsureConfig(): configPath → {ConfigPath}", configPath);
                         var originalPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config\\" + ConfigFile);
+						Logger.LogError("EnsureConfig(): originalPath → {OriginalPath}", originalPath);
                         if (!File.Exists(configPath) && File.Exists(originalPath))
                         {
                             File.Copy(originalPath, configPath);
@@ -414,9 +464,11 @@ namespace DotNetNuke.Instrumentation
                         }
 
                         isConfigured = true;
+						Logger.LogDebug("EnsureConfig(): isConfigured → {IsConfigured}", isConfigured);
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting EnsureConfig()");
         }
     }
 }

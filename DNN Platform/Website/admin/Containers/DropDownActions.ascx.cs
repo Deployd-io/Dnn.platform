@@ -20,6 +20,7 @@ namespace DotNetNuke.UI.Containers
     /// <summary>A control which renders module actions as a drop-down list.</summary>
     public partial class DropDownActions : ActionBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DropDownActions.ascx));
         private readonly IServiceProvider serviceProvider;
         private string strProviderName = "DNNDropDownNavigationProvider";
 
@@ -36,6 +37,10 @@ namespace DotNetNuke.UI.Containers
         public DropDownActions(IServiceProvider serviceProvider)
             : this(serviceProvider, null)
         {
+		Logger.LogError(">>> Entering DropDownActions(serviceProvider={ServiceProvider})", serviceProvider);
+        Logger.LogWarning("<<< Exiting DropDownActions(serviceProvider={ServiceProvider})", serviceProvider);
+		Logger.LogDebug("DropDownActions(serviceProvider={ServiceProvider},eventLogger={EventLogger}): serviceProvider → {ServiceProvider1}", serviceProvider, eventLogger, serviceProvider);
+        Logger.LogWarning("<<< Exiting DropDownActions(serviceProvider={ServiceProvider},eventLogger={EventLogger})", serviceProvider, eventLogger);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DropDownActions"/> class.</summary>
@@ -57,7 +62,9 @@ namespace DotNetNuke.UI.Containers
 
         public void BindDropDown()
         {
+			Logger.LogError(">>> Entering BindDropDown()");
             var objNodes = Navigation.GetActionNodes(this.ActionRoot, this);
+			Logger.LogError("BindDropDown(): objNodes → {ObjNodes}", objNodes);
             foreach (DNNNode objNode in objNodes)
             {
                 this.ProcessNodes(objNode);
@@ -65,12 +72,14 @@ namespace DotNetNuke.UI.Containers
 
             this.Control.Bind(objNodes);
 
+			Logger.LogWarning("<<< Exiting BindDropDown()");
             this.Visible = this.DisplayControl(objNodes);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdGo.Click += this.CmdGo_Click;
@@ -81,30 +90,38 @@ namespace DotNetNuke.UI.Containers
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.Control = NavigationProvider.Instance(this.serviceProvider, this.ProviderName);
             this.Control.ControlID = "ctl" + this.ID;
             this.Control.Initialize();
             this.spActions.Controls.Add(this.Control.NavigationControl);
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         private void Page_Load(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
             this.cmdGo.Attributes.Add("onclick", "if (cmdGo_OnClick(dnn.dom.getById('" + this.Control.NavigationControl.ClientID + "')) == false) return false;");
+			Logger.LogWarning("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdGo_Click(object sender, ImageClickEventArgs e)
         {
+			Logger.LogError(">>> Entering CmdGo_Click(sender={Sender},e={E})", sender, e);
             try
             {
                 var cboActions = (DropDownList)this.Control.NavigationControl;
+				Logger.LogError("CmdGo_Click(sender={Sender},e={E}): cboActions → {CboActions}", sender, e, cboActions);
                 if (cboActions.SelectedIndex != -1)
                 {
                     this.ProcessAction(cboActions.SelectedItem.Value);
@@ -112,23 +129,28 @@ namespace DotNetNuke.UI.Containers
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in CmdGo_Click(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting CmdGo_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void ProcessNodes(DNNNode objParent)
         {
+			Logger.LogError(">>> Entering ProcessNodes(objParent={ObjParent})", objParent);
             if (!string.IsNullOrEmpty(objParent.JSFunction))
             {
                 ClientAPI.RegisterClientVariable(this.Page, "__dnn_CSAction_" + this.Control.NavigationControl.ClientID + "_" + objParent.ID, objParent.JSFunction, true);
             }
 
             objParent.ClickAction = eClickAction.None; // since GO button is handling actions don't allow selected index change fire postback
+			Logger.LogDebug("ProcessNodes(objParent={ObjParent}): objParent.ClickAction → {Arg1}", objParent, objParent.ClickAction);
 
             foreach (DNNNode objNode in objParent.DNNNodes)
             {
                 this.ProcessNodes(objNode);
             }
+			Logger.LogWarning("<<< Exiting ProcessNodes(objParent={ObjParent})", objParent);
         }
     }
 }

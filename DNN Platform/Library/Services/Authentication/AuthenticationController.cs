@@ -44,7 +44,9 @@ namespace DotNetNuke.Services.Authentication
         /// <returns>The authentication system ID.</returns>
         public static int AddAuthentication(IEventLogger eventLogger, AuthenticationInfo authSystem)
         {
+			Logger.LogError(">>> Entering AddAuthentication(authSystem={AuthSystem})", authSystem);
             eventLogger.AddLog(authSystem, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.AUTHENTICATION_CREATED);
+			Logger.LogWarning("<<< Exiting AddAuthentication(eventLogger={EventLogger},authSystem={AuthSystem})", eventLogger, authSystem);
             return Provider.AddAuthentication(
                 authSystem.PackageID,
                 authSystem.AuthenticationType,
@@ -72,10 +74,13 @@ namespace DotNetNuke.Services.Authentication
         /// <returns>The user authentication ID.</returns>
         public static int AddUserAuthentication(IEventLogger eventLogger, int userId, string authenticationType, string authenticationToken)
         {
+			Logger.LogError(">>> Entering AddUserAuthentication(userID={UserID},authenticationType={AuthenticationType},authenticationToken=<redacted>)", userID, authenticationType);
             UserAuthenticationInfo userAuth = GetUserAuthentication(userId);
+			Logger.LogError("AddUserAuthentication(eventLogger={EventLogger},userId={UserId},authenticationType={AuthenticationType},authenticationToken=<redacted>): userAuth → {UserAuth}", eventLogger, userId, authenticationType, userAuth);
 
             if (userAuth == null || string.IsNullOrEmpty(userAuth.AuthenticationType))
             {
+				Logger.LogError("AddUserAuthentication(userID={UserID},authenticationType={AuthenticationType},authenticationToken=<redacted>): userAuth → {UserAuth}", userID, authenticationType, userAuth);
                 eventLogger.AddLog(
                     "userID/authenticationType",
                     $"{userId}/{authenticationType}",
@@ -92,6 +97,7 @@ namespace DotNetNuke.Services.Authentication
                     PortalController.Instance.GetCurrentSettings(),
                     UserController.Instance.GetCurrentUserInfo().UserID,
                     EventLogType.AUTHENTICATION_USER_UPDATED);
+				Logger.LogWarning("<<< Exiting AddUserAuthentication(eventLogger={EventLogger},userId={UserId},authenticationType={AuthenticationType},authenticationToken=<redacted>)", eventLogger, userId, authenticationType);
                 return userAuth.UserAuthenticationID;
             }
         }
@@ -101,7 +107,9 @@ namespace DotNetNuke.Services.Authentication
         /// <returns>A <see cref="UserAuthenticationInfo"/> instance or <see langword="null"/>.</returns>
         public static UserAuthenticationInfo GetUserAuthentication(int userID)
         {
+			Logger.LogError(">>> Entering GetUserAuthentication(userID={UserID})", userID);
             // Go to database
+			Logger.LogWarning("<<< Exiting GetUserAuthentication(userID={UserID})", userID);
             return CBO.FillObject<UserAuthenticationInfo>(Provider.GetUserAuthentication(userID));
         }
 
@@ -116,8 +124,10 @@ namespace DotNetNuke.Services.Authentication
         /// <param name="authSystem">The auth system.</param>
         public static void DeleteAuthentication(IEventLogger eventLogger, AuthenticationInfo authSystem)
         {
+			Logger.LogError(">>> Entering DeleteAuthentication(authSystem={AuthSystem})", authSystem);
             Provider.DeleteAuthentication(authSystem.AuthenticationID);
             eventLogger.AddLog(authSystem, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.AUTHENTICATION_DELETED);
+			Logger.LogWarning("<<< Exiting DeleteAuthentication(eventLogger={EventLogger},authSystem={AuthSystem})", eventLogger, authSystem);
         }
 
         /// <summary>GetAuthenticationService fetches a single Authentication Systems.</summary>
@@ -125,7 +135,9 @@ namespace DotNetNuke.Services.Authentication
         /// <returns>An AuthenticationInfo object.</returns>
         public static AuthenticationInfo GetAuthenticationService(int authenticationID)
         {
+			Logger.LogError(">>> Entering GetAuthenticationService(authenticationID={AuthenticationID})", authenticationID);
             AuthenticationInfo authInfo = null;
+			Logger.LogError("GetAuthenticationService(authenticationID={AuthenticationID}): authInfo → {AuthInfo}", authenticationID, authInfo);
             foreach (AuthenticationInfo authService in GetAuthenticationServices())
             {
                 if (authService.AuthenticationID == authenticationID)
@@ -141,6 +153,7 @@ namespace DotNetNuke.Services.Authentication
                 return CBO.FillObject<AuthenticationInfo>(Provider.GetAuthenticationService(authenticationID));
             }
 
+			Logger.LogWarning("<<< Exiting GetAuthenticationService(authenticationID={AuthenticationID})", authenticationID);
             return authInfo;
         }
 
@@ -149,7 +162,9 @@ namespace DotNetNuke.Services.Authentication
         /// <returns>An AuthenticationInfo object.</returns>
         public static AuthenticationInfo GetAuthenticationServiceByPackageID(int packageID)
         {
+			Logger.LogError(">>> Entering GetAuthenticationServiceByPackageID(packageID={PackageID})", packageID);
             AuthenticationInfo authInfo = null;
+			Logger.LogError("GetAuthenticationServiceByPackageID(packageID={PackageID}): authInfo → {AuthInfo}", packageID, authInfo);
             foreach (AuthenticationInfo authService in GetAuthenticationServices())
             {
                 if (authService.PackageID == packageID)
@@ -165,6 +180,7 @@ namespace DotNetNuke.Services.Authentication
                 return CBO.FillObject<AuthenticationInfo>(Provider.GetAuthenticationServiceByPackageID(packageID));
             }
 
+			Logger.LogWarning("<<< Exiting GetAuthenticationServiceByPackageID(packageID={PackageID})", packageID);
             return authInfo;
         }
 
@@ -173,7 +189,9 @@ namespace DotNetNuke.Services.Authentication
         /// <returns>An AuthenticationInfo object.</returns>
         public static AuthenticationInfo GetAuthenticationServiceByType(string authenticationType)
         {
+			Logger.LogError(">>> Entering GetAuthenticationServiceByType(authenticationType={AuthenticationType})", authenticationType);
             AuthenticationInfo authInfo = null;
+			Logger.LogError("GetAuthenticationServiceByType(authenticationType={AuthenticationType}): authInfo → {AuthInfo}", authenticationType, authInfo);
             foreach (AuthenticationInfo authService in GetAuthenticationServices())
             {
                 if (authService.AuthenticationType == authenticationType)
@@ -181,6 +199,7 @@ namespace DotNetNuke.Services.Authentication
                     authInfo = authService;
                     break;
                 }
+				Logger.LogError(">>> Entering GetAuthenticationServices()");
             }
 
             if (authInfo == null)
@@ -189,6 +208,7 @@ namespace DotNetNuke.Services.Authentication
                 return CBO.FillObject<AuthenticationInfo>(Provider.GetAuthenticationServiceByType(authenticationType));
             }
 
+			Logger.LogWarning("<<< Exiting GetAuthenticationServiceByType(authenticationType={AuthenticationType})", authenticationType);
             return authInfo;
         }
 
@@ -203,18 +223,23 @@ namespace DotNetNuke.Services.Authentication
         /// <returns>A List of AuthenticationInfo objects.</returns>
         public static List<AuthenticationInfo> GetAuthenticationServices(IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering GetAuthenticationServices()");
             return
                 CBO.GetCachedObject<List<AuthenticationInfo>>(
                     hostSettings,
                     new CacheItemArgs(DataCache.AuthenticationServicesCacheKey, DataCache.AuthenticationServicesCacheTimeOut, DataCache.AuthenticationServicesCachePriority),
                     GetAuthenticationServicesCallBack);
+					Logger.LogError(">>> Entering GetAuthenticationServices(hostSettings={HostSettings})", hostSettings);
+        Logger.LogWarning("<<< Exiting GetAuthenticationServices(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>GetAuthenticationType fetches the authentication method used by the currently logged on user.</summary>
         /// <returns>An AuthenticationInfo object.</returns>
         public static AuthenticationInfo GetAuthenticationType()
         {
+			Logger.LogError(">>> Entering GetAuthenticationType()");
             AuthenticationInfo objAuthentication = null;
+			Logger.LogError("GetAuthenticationType(): objAuthentication → {ObjAuthentication}", objAuthentication);
             if (HttpContext.Current?.Request != null)
             {
                 try
@@ -227,6 +252,7 @@ namespace DotNetNuke.Services.Authentication
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetAuthenticationType()");
             return objAuthentication;
         }
 
@@ -241,15 +267,19 @@ namespace DotNetNuke.Services.Authentication
         /// <returns>A List of AuthenticationInfo objects.</returns>
         public static List<AuthenticationInfo> GetEnabledAuthenticationServices(IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering GetEnabledAuthenticationServices()");
             var enabled = new List<AuthenticationInfo>();
             foreach (AuthenticationInfo authService in GetAuthenticationServices(hostSettings))
             {
+				Logger.LogError("GetEnabledAuthenticationServices(): enabled → {Enabled}", enabled);
                 if (authService.IsEnabled)
                 {
+					Logger.LogError("GetEnabledAuthenticationServices(hostSettings={HostSettings}): enabled → {Enabled}", hostSettings, enabled);
                     enabled.Add(authService);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetEnabledAuthenticationServices(hostSettings={HostSettings})", hostSettings);
             return enabled;
         }
 
@@ -258,6 +288,8 @@ namespace DotNetNuke.Services.Authentication
         /// <returns><see langword="true"/> if the portal has any Non-DNN authentication enabled, Otherwise <see langword="false"/>.</returns>
         public static bool HasSocialAuthenticationEnabled(UserControl control = null)
         {
+			Logger.LogError(">>> Entering HasSocialAuthenticationEnabled(control={Control})", control);
+			Logger.LogWarning("<<< Exiting HasSocialAuthenticationEnabled(control={Control})", control);
             return (from a in GetEnabledAuthenticationServices()
                     let enabled = (a.AuthenticationType.Equals("Facebook", StringComparison.Ordinal)
                                      || a.AuthenticationType.Equals("Google", StringComparison.Ordinal)
@@ -275,6 +307,8 @@ namespace DotNetNuke.Services.Authentication
         /// <returns><see langword="true"/> if OAuth Provider and it is enabled for the portal, Otherwise <see langword="false"/>.</returns>
         public static bool IsEnabledForPortal(AuthenticationInfo authentication, int portalId)
         {
+			Logger.LogError(">>> Entering IsEnabledForPortal(authentication={Authentication},portalId={PortalId})", authentication, portalId);
+            Logger.LogWarning("<<< Exiting IsEnabledForPortal(authentication={Authentication},portalId={PortalId})", authentication, portalId);
             return !string.IsNullOrEmpty(PortalController.GetPortalSetting(authentication.AuthenticationType + "_Enabled", portalId, string.Empty))
                 ? PortalController.GetPortalSettingAsBoolean(authentication.AuthenticationType + "_Enabled", portalId, false)
                 : HostController.Instance.GetBoolean(authentication.AuthenticationType + "_Enabled", false);
@@ -286,7 +320,9 @@ namespace DotNetNuke.Services.Authentication
         /// <returns>The URL.</returns>
         public static string GetLogoffRedirectURL(PortalSettings settings, HttpRequest request)
         {
+			Logger.LogError(">>> Entering GetLogoffRedirectURL(settings={Settings},request={Request})", settings, request);
             string redirectURL = string.Empty;
+			Logger.LogError("GetLogoffRedirectURL(settings={Settings},request={Request}): redirectURL → {RedirectURL}", settings, request, redirectURL);
             if (settings.Registration.RedirectAfterLogout == Null.NullInteger)
             {
                 if (TabPermissionController.CanViewPage())
@@ -318,6 +354,7 @@ namespace DotNetNuke.Services.Authentication
                 redirectURL = TestableGlobals.Instance.NavigateURL(settings.Registration.RedirectAfterLogout);
             }
 
+			Logger.LogWarning("<<< Exiting GetLogoffRedirectURL(settings={Settings},request={Request})", settings, request);
             return redirectURL;
         }
 
@@ -325,15 +362,21 @@ namespace DotNetNuke.Services.Authentication
         /// <param name="value">The Authentication type.</param>
         public static void SetAuthenticationType(string value)
         {
+			Logger.LogError(">>> Entering SetAuthenticationType(value={Value})", value);
             SetAuthenticationType(value, false);
+			Logger.LogWarning("<<< Exiting SetAuthenticationType(value={Value})", value);
         }
 
         public static void SetAuthenticationType(string value, bool createPersistentCookie)
         {
+			Logger.LogError(">>> Entering SetAuthenticationType(value={Value},createPersistentCookie=<redacted>)", value);
             try
             {
+				Logger.LogWarning("<<< Exiting SetAuthenticationType(value={Value})", value);
                 int persistentCookieTimeout = Config.GetPersistentCookieTimeout();
+				Logger.LogError("SetAuthenticationType(value={Value},createPersistentCookie=<redacted>): persistentCookieTimeout → {PersistentCookieTimeout}", value, persistentCookieTimeout);
                 HttpResponse response = HttpContext.Current.Response;
+				Logger.LogError("SetAuthenticationType(value={Value},createPersistentCookie=<redacted>): response → {Response}", value, response);
                 if (response == null)
                 {
                     return;
@@ -342,6 +385,7 @@ namespace DotNetNuke.Services.Authentication
                 // save the authenticationmethod as a cookie
                 HttpCookie cookie = null;
                 cookie = response.Cookies.Get("authentication");
+				Logger.LogError("SetAuthenticationType(value={Value},createPersistentCookie=<redacted>): cookie → {Cookie}", value, cookie);
                 if (cookie == null)
                 {
                     if (!string.IsNullOrEmpty(value))
@@ -358,6 +402,7 @@ namespace DotNetNuke.Services.Authentication
                 else
                 {
                     cookie.Value = value;
+					Logger.LogDebug("SetAuthenticationType(value={Value},createPersistentCookie=<redacted>): cookie.Value → {Arg2}", value, cookie.Value);
                     if (!string.IsNullOrEmpty(value))
                     {
                         if (createPersistentCookie)
@@ -375,6 +420,7 @@ namespace DotNetNuke.Services.Authentication
             }
             catch
             {
+				Logger.LogError("Exception in SetAuthenticationType(value={Value},createPersistentCookie=<redacted>): {Arg2}", value, ex.Message);
                 return;
             }
         }
@@ -390,6 +436,7 @@ namespace DotNetNuke.Services.Authentication
         /// <param name="authSystem">The new Authentication System to update.</param>
         public static void UpdateAuthentication(IEventLogger eventLogger, AuthenticationInfo authSystem)
         {
+			Logger.LogError(">>> Entering UpdateAuthentication(authSystem={AuthSystem})", authSystem);
             Provider.UpdateAuthentication(
                 authSystem.AuthenticationID,
                 authSystem.PackageID,
@@ -400,10 +447,13 @@ namespace DotNetNuke.Services.Authentication
                 authSystem.LogoffControlSrc,
                 UserController.Instance.GetCurrentUserInfo().UserID);
             eventLogger.AddLog(authSystem, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.AUTHENTICATION_UPDATED);
+			Logger.LogWarning("<<< Exiting UpdateAuthentication(eventLogger={EventLogger},authSystem={AuthSystem})", eventLogger, authSystem);
         }
 
         private static object GetAuthenticationServicesCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogError(">>> Entering GetAuthenticationServicesCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
+            Logger.LogWarning("<<< Exiting GetAuthenticationServicesCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return CBO.FillCollection<AuthenticationInfo>(Provider.GetAuthenticationServices());
         }
     }

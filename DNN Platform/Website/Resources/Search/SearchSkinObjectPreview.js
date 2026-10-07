@@ -1,7 +1,9 @@
-﻿(function ($) {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+(function ($) {
     if (typeof dnn == 'undefined') window.dnn = {};
     if (typeof dnn.searchSkinObject == 'undefined') {
         dnn.searchSkinObject = function (options) {
+			logger.error(`>>> Entering searchSkinObject(options=${options})`, { "event.action": "searchSkinObject", "logrite.options": options });
             var settings = {
                 delayTriggerAutoSearch: 100,
                 minCharRequiredTriggerAutoSearch: 2,
@@ -10,14 +12,18 @@
                 cultureCode: 'en-US'
             };
             this.settings = $.extend({}, settings, options);
+			logger.warn(`<<< Exiting searchSkinObject(options=${options})`, { "event.action": "searchSkinObject", "logrite.options": options });
         };
         dnn.searchSkinObject.prototype = {
             _ignoreKeyCodes: [9, 13, 16, 17, 18, 19, 20, 27, 33, 34, 35, 36, 37, 38, 39, 40, 45],
             init: function () {
+				logger.error('>>> Entering init()', { "event.action": "init" });
                 var throttle = null, self = this;
                 var makeUrl = function (val, service) {
+					logger.error(`>>> Entering makeUrl(val=${val},service=${service})`, { "event.action": "makeUrl", "logrite.val": val, "logrite.service": service });
                     var url = service ? service.getServiceRoot('internalservices') + 'searchService/preview' : null;
                     if (!url) return null;
+					logger.error(`makeUrl(val=${val},service=${service}): url → ${url}`, { "event.action": "makeUrl", "logrite.val": val, "logrite.service": service });
                     var params = {};
                     params['keywords'] = val.replace(/^\s+|\s+$/g, '');
                     if (!self.settings.enableWildSearch) params["forceWild"] = "0";
@@ -37,6 +43,7 @@
                 };
 
                 var generatePreviewTemplate = function (data, $wrap) {
+					logger.error(`>>> Entering generatePreviewTemplate(data=${data},$wrap=${$wrap})`, { "event.action": "generatePreviewTemplate", "logrite.data": data, "logrite.$wrap": $wrap });
                     var preview = $('.searchSkinObjectPreview', $wrap);
                     if (preview.length)
                         preview.remove();
@@ -71,11 +78,13 @@
                         } // end for group
 
                         var moreResults = $wrap.attr('data-moreresults');
+						logger.error(`generatePreviewTemplate(data=${data},$wrap=${$wrap}): moreResults → ${moreResults}`, { "event.action": "generatePreviewTemplate", "logrite.data": data, "logrite.$wrap": $wrap });
                         var $moreResultsItem = $('<li></li>').append($('<a></a>', { href: "javascript:void(0)", class: "searchSkinObjectPreview_more", text: moreResults })); 
                         $markup.append($moreResultsItem);
                     }
                     else {
                         var noResult = $wrap.attr('data-noresult');
+						logger.error(`generatePreviewTemplate(data=${data},$wrap=${$wrap}): noResult → ${noResult}`, { "event.action": "generatePreviewTemplate", "logrite.data": data, "logrite.$wrap": $wrap });
                         $markup.append($('<li></li>', { text: noResult }));
                     }
 
@@ -98,6 +107,7 @@
                             $searchButton = $wrap.parent().next();
                         }
                         $searchButton[0].click();
+					logger.warn(`<<< Exiting generatePreviewTemplate(data=${data},$wrap=${$wrap})`, { "event.action": "generatePreviewTemplate", "logrite.data": data, "logrite.$wrap": $wrap });
                         return false;
                     });
                 };
@@ -152,10 +162,13 @@
                                     url: url,
                                     beforeSend: service ? service.setModuleHeaders : null,
                                     success: function(result) {
+										logger.error(`>>> Entering success(result=${result})`, { "event.action": "success", "logrite.result": result });
                                         if (result)
                                             generatePreviewTemplate(result, container);
+											logger.warn(`<<< Exiting success(result=${result})`, { "event.action": "success", "logrite.result": result });
                                     },
                                     error: function() {
+									logger.error('>>> Entering error()', { "event.action": "error" });
                                     },
                                     type: 'GET',
                                     dataType: 'json',
@@ -183,6 +196,7 @@
                             e.preventDefault();
                         } else {
                             e.preventDefault();
+							logger.warn('<<< Exiting init()', { "event.action": "init" });
                         }
                     }
                 });

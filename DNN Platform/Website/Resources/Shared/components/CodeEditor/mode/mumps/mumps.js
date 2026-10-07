@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -17,6 +18,8 @@
 
   CodeMirror.defineMode("mumps", function() {
     function wordRegexp(words) {
+	logger.error(`>>> Entering wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
+	logger.warn(`<<< Exiting wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
       return new RegExp("^((" + words.join(")|(") + "))\\b", "i");
     }
 
@@ -32,9 +35,12 @@
     var command = wordRegexp(commandKeywords);
 
     function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       if (stream.sol()) {
         state.label = true;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.label → ${state.label}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         state.commandMode = 0;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.commandMode → ${state.commandMode}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       }
 
       // The <space> character has meaning in MUMPS. Ignoring consecutive
@@ -44,6 +50,7 @@
       // Examine each character and update a mode variable whose interpretation is:
       //   >0 => command    0 => argument    <0 => command post-conditional
       var ch = stream.peek();
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
 
       if (ch == " " || ch == "\t") { // Pre-process <space>
         state.label = false;
@@ -125,20 +132,26 @@
 
       // Handle non-detected items
       stream.next();
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return "error";
     }
 
     return {
       startState: function() {
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
         return {
           label: false,
           commandMode: 0
         };
+		logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       },
 
       token: function(stream, state) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         var style = tokenBase(stream, state);
         if (state.label) return "tag";
+		logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return style;
       }
     };

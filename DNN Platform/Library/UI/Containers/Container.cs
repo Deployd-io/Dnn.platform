@@ -44,13 +44,18 @@ namespace DotNetNuke.UI.Containers
         public Container()
             : this(null)
         {
+		tracelLogger.LogError(">>> Entering Container()");
+        tracelLogger.LogWarning("<<< Exiting Container()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         /// <param name="clientResourceController">The client resources controller.</param>
         public Container(IClientResourceController clientResourceController)
         {
+			tracelLogger.LogError(">>> Entering Container(clientResourceController={ClientResourceController})", clientResourceController);
             this.clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
+			tracelLogger.LogDebug("Container(clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", clientResourceController, clientResourceController);
+        tracelLogger.LogWarning("<<< Exiting Container(clientResourceController={ClientResourceController})", clientResourceController);
         }
 
         /// <summary>Gets the ModuleControl object that this container is displaying.</summary>
@@ -105,7 +110,11 @@ namespace DotNetNuke.UI.Containers
 
         public void SetModuleConfiguration(ModuleInfo configuration)
         {
+			tracelLogger.LogError(">>> Entering SetModuleConfiguration(configuration={Configuration})", configuration);
             this.moduleConfiguration = configuration;
+			tracelLogger.LogDebug("SetModuleConfiguration(configuration={Configuration}): this.moduleConfiguration → {Arg1}", configuration, this.moduleConfiguration);
+			tracelLogger.LogDebug("SetModuleConfiguration(configuration={Configuration}): moduleConfiguration → {ModuleConfiguration}", configuration, moduleConfiguration);
+        tracelLogger.LogWarning("<<< Exiting SetModuleConfiguration(configuration={Configuration})", configuration);
             this.ProcessModule();
         }
 
@@ -113,41 +122,51 @@ namespace DotNetNuke.UI.Containers
         /// <param name="e">The event arguments.</param>
         protected override void OnInit(EventArgs e)
         {
+			tracelLogger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.InvokeContainerEvents(ContainerEventType.OnContainerInit);
+			tracelLogger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>OnLoad runs when the Container is loaded.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			tracelLogger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.InvokeContainerEvents(ContainerEventType.OnContainerLoad);
+			tracelLogger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>OnLoad runs just before the Container is rendered.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			tracelLogger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             this.InvokeContainerEvents(ContainerEventType.OnContainerPreRender);
+			tracelLogger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>OnUnLoad runs when the Container is unloaded.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnUnload(EventArgs e)
         {
+			tracelLogger.LogError(">>> Entering OnUnload(e={E})", e);
             base.OnUnload(e);
 
             this.InvokeContainerEvents(ContainerEventType.OnContainerUnLoad);
+			tracelLogger.LogWarning("<<< Exiting OnUnload(e={E})", e);
         }
 
         private void AddAdministratorOnlyHighlighting(string message)
         {
+			tracelLogger.LogError(">>> Entering AddAdministratorOnlyHighlighting(message={Message})", message);
             this.ContentPane.Controls.Add(new LiteralControl($"<div class=\"dnnFormMessage dnnFormInfo dnnFormInfoAdminErrMssg\">{message}</div>"));
+			tracelLogger.LogWarning("<<< Exiting AddAdministratorOnlyHighlighting(message={Message})", message);
         }
 
         /// <summary>
@@ -158,12 +177,14 @@ namespace DotNetNuke.UI.Containers
         /// </summary>
         private void ProcessChildControls(Control control)
         {
+			tracelLogger.LogError(">>> Entering ProcessChildControls(control={Control})", control);
             foreach (Control childControl in control.Controls)
             {
                 // check if control is an action control
                 if (childControl is IActionControl actions)
                 {
                     actions.ModuleControl = this.ModuleControl;
+					tracelLogger.LogDebug("ProcessChildControls(control={Control}): actions.ModuleControl → {Arg1}", control, actions.ModuleControl);
                     actions.Action += this.ModuleActionClick;
                 }
 
@@ -171,12 +192,14 @@ namespace DotNetNuke.UI.Containers
                 if (childControl is ActionLink actionLink)
                 {
                     actionLink.ModuleControl = this.ModuleControl;
+					tracelLogger.LogDebug("ProcessChildControls(control={Control}): actionLink.ModuleControl → {Arg1}", control, actionLink.ModuleControl);
                 }
 
                 // check if control is a skin control
                 if (childControl is ISkinControl skinControl)
                 {
                     skinControl.ModuleControl = this.ModuleControl;
+					tracelLogger.LogDebug("ProcessChildControls(control={Control}): skinControl.ModuleControl → {Arg1}", control, skinControl.ModuleControl);
                 }
 
                 if (childControl.HasControls())
@@ -185,11 +208,13 @@ namespace DotNetNuke.UI.Containers
                     this.ProcessChildControls(childControl);
                 }
             }
+			tracelLogger.LogWarning("<<< Exiting ProcessChildControls(control={Control})", control);
         }
 
         /// <summary>ProcessContentPane processes the ContentPane, setting its style and other attributes.</summary>
         private void ProcessContentPane()
         {
+			tracelLogger.LogError(">>> Entering ProcessContentPane()");
             this.SetAlignment();
 
             this.SetBackground();
@@ -202,14 +227,19 @@ namespace DotNetNuke.UI.Containers
                                    : this.ModuleConfiguration.ModulePermissions.ToString("VIEW");
 
             string pageEditRoles = TabPermissionController.GetTabPermissions(this.ModuleConfiguration.TabID, this.ModuleConfiguration.PortalID).ToString("EDIT");
+			tracelLogger.LogError("ProcessContentPane(): pageEditRoles → {PageEditRoles}", pageEditRoles);
             string moduleEditRoles = this.ModuleConfiguration.ModulePermissions.ToString("EDIT");
+			tracelLogger.LogError("ProcessContentPane(): moduleEditRoles → {ModuleEditRoles}", moduleEditRoles);
 
             viewRoles = viewRoles.Replace(";", string.Empty).Trim().ToLowerInvariant();
+			tracelLogger.LogError("ProcessContentPane(): viewRoles → {ViewRoles}", viewRoles);
             pageEditRoles = pageEditRoles.Replace(";", string.Empty).Trim().ToLowerInvariant();
             moduleEditRoles = moduleEditRoles.Replace(";", string.Empty).Trim().ToLowerInvariant();
 
             var showMessage = false;
+			tracelLogger.LogError("ProcessContentPane(): showMessage → {ShowMessage}", showMessage);
             var adminMessage = Null.NullString;
+			tracelLogger.LogError("ProcessContentPane(): adminMessage → {AdminMessage}", adminMessage);
             if (viewRoles.Equals(this.PortalSettings.AdministratorRoleName, StringComparison.OrdinalIgnoreCase)
                             && (moduleEditRoles.Equals(this.PortalSettings.AdministratorRoleName, StringComparison.OrdinalIgnoreCase)
                                     || string.IsNullOrEmpty(moduleEditRoles))
@@ -235,11 +265,13 @@ namespace DotNetNuke.UI.Containers
             {
                 this.AddAdministratorOnlyHighlighting(adminMessage);
             }
+			tracelLogger.LogWarning("<<< Exiting ProcessContentPane()");
         }
 
         /// <summary>ProcessFooter adds an optional footer (and an End_Module comment)..</summary>
         private void ProcessFooter()
         {
+			tracelLogger.LogError(">>> Entering ProcessFooter()");
             // inject the footer
             if (!string.IsNullOrEmpty(this.ModuleConfiguration.Footer))
             {
@@ -252,11 +284,13 @@ namespace DotNetNuke.UI.Containers
             {
                 this.ContentPane.Controls.Add(new LiteralControl("<!-- End_Module_" + this.ModuleConfiguration.ModuleID + " -->"));
             }
+			tracelLogger.LogWarning("<<< Exiting ProcessFooter()");
         }
 
         /// <summary>ProcessHeader adds an optional header (and a Start_Module_ comment)..</summary>
         private void ProcessHeader()
         {
+			tracelLogger.LogError(">>> Entering ProcessHeader()");
             if (!Globals.IsAdminControl())
             {
                 // inject a start comment around the module content
@@ -269,11 +303,13 @@ namespace DotNetNuke.UI.Containers
                 var header = new Literal { Text = this.ModuleConfiguration.Header };
                 this.ContentPane.Controls.Add(header);
             }
+			tracelLogger.LogWarning("<<< Exiting ProcessHeader()");
         }
 
         /// <summary>ProcessModule processes the module which is attached to this container.</summary>
         private void ProcessModule()
         {
+			tracelLogger.LogError(">>> Entering ProcessModule()");
             if (this.tracelLogger.IsDebugEnabled)
             {
                 this.tracelLogger.Debug($"Container.ProcessModule Start (TabId:{this.PortalSettings.ActiveTab.TabID},ModuleID: {this.ModuleConfiguration.ModuleDefinition.DesktopModuleID}): Module FriendlyName: '{this.ModuleConfiguration.ModuleDefinition.FriendlyName}')");
@@ -299,6 +335,7 @@ namespace DotNetNuke.UI.Containers
 
                 // Try to load the module control
                 this.moduleHost = new ModuleHost(this.ModuleConfiguration, this.ParentSkin, this);
+				tracelLogger.LogDebug("ProcessModule(): moduleHost → {ModuleHost}", moduleHost);
                 if (this.tracelLogger.IsDebugEnabled)
                 {
                     this.tracelLogger.Debug($"Container.ProcessModule Info (TabId:{this.PortalSettings.ActiveTab.TabID},ModuleID: {this.ModuleConfiguration.ModuleDefinition.DesktopModuleID}): ControlPane.Controls.Add(ModuleHost:{this.moduleHost.ID})");
@@ -323,6 +360,7 @@ namespace DotNetNuke.UI.Containers
             {
                 this.tracelLogger.Debug($"Container.ProcessModule End (TabId:{this.PortalSettings.ActiveTab.TabID},ModuleID: {this.ModuleConfiguration.ModuleDefinition.DesktopModuleID}): Module FriendlyName: '{this.ModuleConfiguration.ModuleDefinition.FriendlyName}')");
             }
+			tracelLogger.LogWarning("<<< Exiting ProcessModule()");
         }
 
         /// <summary>
@@ -331,6 +369,7 @@ namespace DotNetNuke.UI.Containers
         /// </summary>
         private void ProcessStylesheets(bool includeModuleCss)
         {
+			tracelLogger.LogError(">>> Entering ProcessStylesheets(includeModuleCss={IncludeModuleCss})", includeModuleCss);
             this.clientResourceController.RegisterStylesheet(this.ContainerPath + "container.css", FileOrder.Css.ContainerCss, true);
             this.clientResourceController.RegisterStylesheet(this.ContainerSrc.Replace(".ascx", ".css"), FileOrder.Css.SpecificContainerCss, true);
 
@@ -341,6 +380,7 @@ namespace DotNetNuke.UI.Containers
                 string folderName = this.ModuleConfiguration.DesktopModule.FolderName;
 
                 string stylesheet = string.Empty;
+				tracelLogger.LogError("ProcessStylesheets(includeModuleCss={IncludeModuleCss}): stylesheet → {Stylesheet}", includeModuleCss, stylesheet);
                 if (!string.IsNullOrEmpty(folderName))
                 {
                     if (controlSrc.EndsWith(".mvc", StringComparison.OrdinalIgnoreCase))
@@ -356,16 +396,19 @@ namespace DotNetNuke.UI.Containers
                 }
 
                 var ix = controlSrc.LastIndexOf("/", StringComparison.Ordinal);
+				tracelLogger.LogError("ProcessStylesheets(includeModuleCss={IncludeModuleCss}): ix → {Ix}", includeModuleCss, ix);
                 if (ix >= 0)
                 {
                     stylesheet = $"{Globals.ApplicationPath}/{controlSrc.Substring(0, ix + 1)}module.css";
                     this.clientResourceController.RegisterStylesheet(stylesheet, FileOrder.Css.ModuleCss, true);
                 }
             }
+			tracelLogger.LogWarning("<<< Exiting ProcessStylesheets(includeModuleCss={IncludeModuleCss})", includeModuleCss);
         }
 
         private void SetAlignment()
         {
+			tracelLogger.LogError(">>> Entering SetAlignment()");
             if (!string.IsNullOrEmpty(this.ModuleConfiguration.Alignment))
             {
                 if (this.ContentPane.Attributes["class"] != null)
@@ -377,18 +420,22 @@ namespace DotNetNuke.UI.Containers
                     this.ContentPane.Attributes["class"] = "DNNAlign" + this.ModuleConfiguration.Alignment.ToLowerInvariant();
                 }
             }
+			tracelLogger.LogWarning("<<< Exiting SetAlignment()");
         }
 
         private void SetBackground()
         {
+			tracelLogger.LogError(">>> Entering SetBackground()");
             if (!string.IsNullOrEmpty(this.ModuleConfiguration.Color))
             {
                 this.ContentPane.Style["background-color"] = this.ModuleConfiguration.Color;
             }
+			tracelLogger.LogWarning("<<< Exiting SetBackground()");
         }
 
         private void SetBorder()
         {
+			tracelLogger.LogError(">>> Entering SetBorder()");
             if (!string.IsNullOrEmpty(this.ModuleConfiguration.Border))
             {
                 this.ContentPane.Style["border-top"] = string.Format(CultureInfo.InvariantCulture, "{0}px #000000 solid", this.ModuleConfiguration.Border);
@@ -396,12 +443,15 @@ namespace DotNetNuke.UI.Containers
                 this.ContentPane.Style["border-right"] = string.Format(CultureInfo.InvariantCulture, "{0}px #000000 solid", this.ModuleConfiguration.Border);
                 this.ContentPane.Style["border-left"] = string.Format(CultureInfo.InvariantCulture, "{0}px #000000 solid", this.ModuleConfiguration.Border);
             }
+			tracelLogger.LogWarning("<<< Exiting SetBorder()");
         }
 
         private void InvokeContainerEvents(ContainerEventType containerEventType)
         {
+			tracelLogger.LogError(">>> Entering InvokeContainerEvents(containerEventType={ContainerEventType})", containerEventType);
             SharedList<ContainerEventListener> list = ((NaiveLockingList<ContainerEventListener>)DotNetNukeContext.Current.ContainerEventListeners).SharedList;
 
+			tracelLogger.LogError("InvokeContainerEvents(containerEventType={ContainerEventType}): list → {List}", containerEventType, list);
             using (list.GetReadLock())
             {
                 foreach (var listener in list.Where(x => x.EventType == containerEventType))
@@ -409,6 +459,7 @@ namespace DotNetNuke.UI.Containers
                     listener.ContainerEvent.Invoke(this, new ContainerEventArgs(this));
                 }
             }
+			tracelLogger.LogWarning("<<< Exiting InvokeContainerEvents(containerEventType={ContainerEventType})", containerEventType);
         }
 
         /// <summary>ModuleAction_Click runs when a ModuleAction is clicked.</summary>
@@ -421,6 +472,7 @@ namespace DotNetNuke.UI.Containers
         /// listeners on the Container directly, rather than through the helper method in PortalModuleBase.</remarks>
         private void ModuleActionClick(object sender, ActionEventArgs e)
         {
+			tracelLogger.LogError(">>> Entering ModuleActionClick(sender={Sender},e={E})", sender, e);
             // Search through the listeners
             foreach (ModuleActionEventListener listener in this.ParentSkin.ActionEventListeners)
             {
@@ -431,6 +483,7 @@ namespace DotNetNuke.UI.Containers
                     listener.ActionEvent.Invoke(sender, e);
                 }
             }
+			tracelLogger.LogWarning("<<< Exiting ModuleActionClick(sender={Sender},e={E})", sender, e);
         }
     }
 }

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -15,6 +16,7 @@ CodeMirror.defineMode("cmake", function () {
   var variable_regex = /({)?[a-zA-Z0-9_]+(})?/;
 
   function tokenString(stream, state) {
+	logger.error(`>>> Entering tokenString(stream=${stream},state=${state})`, { "event.action": "tokenString", "logrite.stream": stream, "logrite.state": state });
     var current, prev, found_var = false;
     while (!stream.eol() && (current = stream.next()) != state.pending) {
       if (current === '$' && prev != '\\' && state.pending == '"') {
@@ -31,12 +33,15 @@ CodeMirror.defineMode("cmake", function () {
     } else {
       state.continueString = true;
     }
+	logger.warn(`<<< Exiting tokenString(stream=${stream},state=${state})`, { "event.action": "tokenString", "logrite.stream": stream, "logrite.state": state });
     return "string";
   }
 
   function tokenize(stream, state) {
+	logger.error(`>>> Entering tokenize(stream=${stream},state=${state})`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.next();
 
+	logger.error(`tokenize(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
     // Have we found a variable?
     if (ch === '$') {
       if (stream.match(variable_regex)) {
@@ -64,6 +69,7 @@ CodeMirror.defineMode("cmake", function () {
     if (ch == "'" || ch == '"') {
       // Store the type (single or double)
       state.pending = ch;
+	logger.debug(`tokenize(stream=${stream},state=${state}): state.pending → ${state.pending}`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
       // Perform the looping function to find the end
       return tokenString(stream, state);
     }
@@ -74,19 +80,27 @@ CodeMirror.defineMode("cmake", function () {
       return 'number';
     }
     stream.eatWhile(/[\w-]/);
+	logger.warn(`<<< Exiting tokenize(stream=${stream},state=${state})`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
     return null;
   }
   return {
     startState: function () {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       var state = {};
       state.inDefinition = false;
       state.inInclude = false;
+	logger.debug(`startState(): state.inDefinition → ${state.inDefinition}`, { "event.action": "startState" });
+	logger.debug(`startState(): state.inInclude → ${state.inInclude}`, { "event.action": "startState" });
+	logger.debug(`startState(): state.pending → ${state.pending}`, { "event.action": "startState" });
       state.continueString = false;
       state.pending = false;
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       return state;
     },
     token: function (stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.eatSpace()) return null;
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return tokenize(stream, state);
     }
   };

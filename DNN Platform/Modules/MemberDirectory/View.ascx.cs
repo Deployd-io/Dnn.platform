@@ -25,6 +25,7 @@ namespace DotNetNuke.Modules.MemberDirectory
     /// <summary>Display member directory.</summary>
     public partial class View : ProfileModuleUserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(View.ascx));
         private readonly IClientResourceController clientResourceController;
         private readonly IApplicationStatusInfo appStatus;
         private readonly IEventLogger eventLogger;
@@ -43,10 +44,15 @@ namespace DotNetNuke.Modules.MemberDirectory
         /// <param name="servicesFramework">The web API service framework.</param>
         public View(IClientResourceController clientResourceController, IApplicationStatusInfo appStatus, IEventLogger eventLogger, IServicesFramework servicesFramework)
         {
+			Logger.LogError(">>> Entering View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework})", clientResourceController, appStatus, eventLogger, servicesFramework);
+			Logger.LogDebug("View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): appStatus → {AppStatus1}", clientResourceController, appStatus, eventLogger, servicesFramework, appStatus);
             this.clientResourceController = clientResourceController;
+			Logger.LogWarning("<<< Exiting View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework})", clientResourceController, appStatus, eventLogger, servicesFramework);
+			Logger.LogDebug("View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): this.clientResourceController → {Arg4}", clientResourceController, appStatus, eventLogger, servicesFramework, this.clientResourceController);
             this.appStatus = appStatus;
             this.eventLogger = eventLogger;
             this.servicesFramework = servicesFramework;
+			Logger.LogDebug("View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): this.appStatus → {Arg4}", clientResourceController, appStatus, eventLogger, servicesFramework, this.appStatus);
         }
 
         /// <inheritdoc />
@@ -130,6 +136,7 @@ namespace DotNetNuke.Modules.MemberDirectory
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             this.servicesFramework.RequestAjaxAntiForgerySupport();
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.PortalSettings, CommonJs.DnnPlugins);
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.PortalSettings, CommonJs.jQueryFileUpload);
@@ -144,38 +151,47 @@ namespace DotNetNuke.Modules.MemberDirectory
             this.loadMore.Visible = !this.DisablePaging;
 
             base.OnInit(e);
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         private static string GetSetting(Hashtable settings, string key, string defaultValue)
         {
+			Logger.LogError(">>> Entering GetSetting(settings={Settings},key={Key},defaultValue={DefaultValue})", settings, key, defaultValue);
             string setting = defaultValue;
+			Logger.LogError("GetSetting(settings={Settings},key={Key},defaultValue={DefaultValue}): setting → {Setting}", settings, key, defaultValue, setting);
             if (settings[key] != null)
             {
                 setting = Convert.ToString(settings[key]);
             }
 
+			Logger.LogWarning("<<< Exiting GetSetting(settings={Settings},key={Key},defaultValue={DefaultValue})", settings, key, defaultValue);
             return setting;
         }
 
         private static int GetSettingAsInt32(Hashtable settings, string key, int defaultValue)
         {
+			Logger.LogError(">>> Entering GetSettingAsInt32(settings={Settings},key={Key},defaultValue={DefaultValue})", settings, key, defaultValue);
             int setting = defaultValue;
+			Logger.LogError("GetSettingAsInt32(settings={Settings},key={Key},defaultValue={DefaultValue}): setting → {Setting}", settings, key, defaultValue, setting);
             if (settings[key] != null)
             {
                 setting = Convert.ToInt32(settings[key]);
             }
 
+			Logger.LogWarning("<<< Exiting GetSettingAsInt32(settings={Settings},key={Key},defaultValue={DefaultValue})", settings, key, defaultValue);
             return setting;
         }
 
         private void AddIe7StyleSheet()
         {
+			Logger.LogError(">>> Entering AddIe7StyleSheet()");
             var browser = this.Request.Browser;
             if (browser.Type == "IE" || browser.MajorVersion < 8)
             {
                 const string cssLink = """<link href="/DesktopModules/MemberDirectory/ie-member-directory.css" rel="stylesheet" type="text/css" />""";
                 this.Page.Header.Controls.Add(new LiteralControl(cssLink));
             }
+			Logger.LogWarning("<<< Exiting AddIe7StyleSheet()");
         }
     }
 }

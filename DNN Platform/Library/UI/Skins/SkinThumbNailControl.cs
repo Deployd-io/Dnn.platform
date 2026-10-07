@@ -149,13 +149,16 @@ namespace DotNetNuke.UI.Skins
         /// <summary>Clear clears the radio button list.</summary>
         public void Clear()
         {
+			Logger.LogError(">>> Entering Clear()");
             this.OptSkin.Items.Clear();
+			Logger.LogWarning("<<< Exiting Clear()");
         }
 
         /// <summary>LoadAllSkins loads all the available skins (Host and Site) to the radio button list.</summary>
         /// <param name="includeNotSpecified">Optionally include the "Not Specified" option.</param>
         public void LoadAllSkins(bool includeNotSpecified)
         {
+			Logger.LogError(">>> Entering LoadAllSkins(includeNotSpecified={IncludeNotSpecified})", includeNotSpecified);
             // default value
             if (includeNotSpecified)
             {
@@ -167,12 +170,14 @@ namespace DotNetNuke.UI.Skins
 
             // load portal skins (includeNotSpecified = false as we have already added it)
             this.LoadPortalSkins(false);
+			Logger.LogWarning("<<< Exiting LoadAllSkins(includeNotSpecified={IncludeNotSpecified})", includeNotSpecified);
         }
 
         /// <summary>LoadHostSkins loads all the available Host skins to the radio button list.</summary>
         /// <param name="includeNotSpecified">Optionally include the "Not Specified" option.</param>
         public void LoadHostSkins(bool includeNotSpecified)
         {
+			Logger.LogError(">>> Entering LoadHostSkins(includeNotSpecified={IncludeNotSpecified})", includeNotSpecified);
             // default value
             if (includeNotSpecified)
             {
@@ -184,6 +189,7 @@ namespace DotNetNuke.UI.Skins
             if (Directory.Exists(strRoot))
             {
                 var arrFolders = Directory.GetDirectories(strRoot);
+				Logger.LogError("LoadHostSkins(includeNotSpecified={IncludeNotSpecified}): arrFolders → {ArrFolders}", includeNotSpecified, arrFolders);
                 foreach (var strFolder in arrFolders)
                 {
                     if (!strFolder.EndsWith(Globals.glbHostSkinFolder, StringComparison.OrdinalIgnoreCase))
@@ -192,12 +198,14 @@ namespace DotNetNuke.UI.Skins
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting LoadHostSkins(includeNotSpecified={IncludeNotSpecified})", includeNotSpecified);
         }
 
         /// <summary>LoadHostSkins loads all the available Site/Portal skins to the radio button list.</summary>
         /// <param name="includeNotSpecified">Optionally include the "Not Specified" option.</param>
         public void LoadPortalSkins(bool includeNotSpecified)
         {
+			Logger.LogError(">>> Entering LoadPortalSkins(includeNotSpecified={IncludeNotSpecified})", includeNotSpecified);
             // default value
             if (includeNotSpecified)
             {
@@ -209,11 +217,13 @@ namespace DotNetNuke.UI.Skins
             if (Directory.Exists(strRoot))
             {
                 var arrFolders = Directory.GetDirectories(strRoot);
+				Logger.LogError("LoadPortalSkins(includeNotSpecified={IncludeNotSpecified}): arrFolders → {ArrFolders}", includeNotSpecified, arrFolders);
                 foreach (var strFolder in arrFolders)
                 {
                     this.LoadSkins(strFolder, "[L]", false);
                 }
             }
+			Logger.LogWarning("<<< Exiting LoadPortalSkins(includeNotSpecified={IncludeNotSpecified})", includeNotSpecified);
         }
 
         /// <summary>LoadSkins loads all the available skins in a specific folder to the radio button list.</summary>
@@ -222,6 +232,7 @@ namespace DotNetNuke.UI.Skins
         /// <param name="includeNotSpecified">Optionally include the "Not Specified" option.</param>
         public void LoadSkins(string strFolder, string skinType, bool includeNotSpecified)
         {
+			Logger.LogError(">>> Entering LoadSkins(strFolder={StrFolder},skinType={SkinType},includeNotSpecified={IncludeNotSpecified})", strFolder, skinType, includeNotSpecified);
             // default value
             if (includeNotSpecified)
             {
@@ -231,11 +242,14 @@ namespace DotNetNuke.UI.Skins
             if (Directory.Exists(strFolder))
             {
                 var arrFiles = Directory.GetFiles(strFolder, "*.ascx");
+				Logger.LogError("LoadSkins(strFolder={StrFolder},skinType={SkinType},includeNotSpecified={IncludeNotSpecified}): arrFiles → {ArrFiles}", strFolder, skinType, includeNotSpecified, arrFiles);
                 strFolder = strFolder.Substring(strFolder.LastIndexOf(@"\", StringComparison.Ordinal) + 1);
 
                 foreach (var strFile in arrFiles)
                 {
+					Logger.LogError("LoadSkins(strFolder={StrFolder},skinType={SkinType},includeNotSpecified={IncludeNotSpecified}): strFolder → {StrFolder1}", strFolder, skinType, includeNotSpecified, strFolder);
                     this.AddSkin(skinType + this.SkinRoot, strFolder, strFile);
+					Logger.LogWarning("<<< Exiting LoadSkins(strFolder={StrFolder},skinType={SkinType},includeNotSpecified={IncludeNotSpecified})", strFolder, skinType, includeNotSpecified);
                 }
             }
         }
@@ -245,6 +259,7 @@ namespace DotNetNuke.UI.Skins
         /// <param name="strSkinFile">The File Name without extension.</param>
         private static string FormatSkinName(string strSkinFolder, string strSkinFile)
         {
+			Logger.LogError(">>> Entering FormatSkinName(strSkinFolder={StrSkinFolder},strSkinFile={StrSkinFile})", strSkinFolder, strSkinFile);
             if (strSkinFolder.Equals("_default", StringComparison.OrdinalIgnoreCase))
             {
                 // host folder
@@ -259,6 +274,7 @@ namespace DotNetNuke.UI.Skins
                 case "default":
                     return strSkinFolder;
                 default:
+					Logger.LogWarning("<<< Exiting FormatSkinName(strSkinFolder={StrSkinFolder},strSkinFile={StrSkinFile})", strSkinFolder, strSkinFile);
                     return $"<span class=\"NormalBold\">{strSkinFolder} - {strSkinFile}</span>";
             }
         }
@@ -267,9 +283,12 @@ namespace DotNetNuke.UI.Skins
         /// <param name="strImage">The Image File Name.</param>
         private static string CreateThumbnail(string strImage)
         {
+			Logger.LogError(">>> Entering CreateThumbnail(strImage={StrImage})", strImage);
             var blnCreate = true;
 
+			Logger.LogError("CreateThumbnail(strImage={StrImage}): blnCreate → {BlnCreate}", strImage, blnCreate);
             var strThumbnail = strImage.Replace(Path.GetFileName(strImage), "thumbnail_" + Path.GetFileName(strImage));
+			Logger.LogError("CreateThumbnail(strImage={StrImage}): strThumbnail → {StrThumbnail}", strImage, strThumbnail);
 
             // check if image has changed
             if (File.Exists(strThumbnail))
@@ -289,6 +308,8 @@ namespace DotNetNuke.UI.Skins
                 try
                 {
                     objImage = Image.FromFile(strImage);
+					Logger.LogError("CreateThumbnail(strImage={StrImage}): objImage → {ObjImage}", strImage, objImage);
+					Logger.LogDebug("CreateThumbnail(strImage={StrImage}): objImage → {ObjImage}", strImage, objImage);
 
                     // scale the image to prevent distortion
                     int intWidth;
@@ -298,11 +319,17 @@ namespace DotNetNuke.UI.Skins
                     {
                         // The height was larger, so scale the width
                         dblScale = (double)intSize / objImage.Height;
+						Logger.LogError("CreateThumbnail(strImage={StrImage}): dblScale → {DblScale}", strImage, dblScale);
                         intHeight = intSize;
+						Logger.LogError("CreateThumbnail(strImage={StrImage}): intHeight → {IntHeight}", strImage, intHeight);
+						Logger.LogDebug("CreateThumbnail(strImage={StrImage}): intHeight → {IntHeight}", strImage, intHeight);
                         intWidth = Convert.ToInt32(objImage.Width * dblScale);
                     }
                     else
                     {
+						Logger.LogError("CreateThumbnail(strImage={StrImage}): intWidth → {IntWidth}", strImage, intWidth);
+						Logger.LogDebug("CreateThumbnail(strImage={StrImage}): dblScale → {DblScale}", strImage, dblScale);
+						Logger.LogDebug("CreateThumbnail(strImage={StrImage}): intWidth → {IntWidth}", strImage, intWidth);
                         // The width was larger, so scale the height
                         dblScale = (double)intSize / objImage.Width;
                         intWidth = intSize;
@@ -312,6 +339,7 @@ namespace DotNetNuke.UI.Skins
                     // create the thumbnail image
                     var objThumbnail = objImage.GetThumbnailImage(intWidth, intHeight, null, IntPtr.Zero);
 
+					Logger.LogError("CreateThumbnail(strImage={StrImage}): objThumbnail → {ObjThumbnail}", strImage, objThumbnail);
                     // delete the old file ( if it exists )
                     if (File.Exists(strThumbnail))
                     {
@@ -336,13 +364,18 @@ namespace DotNetNuke.UI.Skins
             }
 
             strThumbnail = Globals.ApplicationPath + @"\" + strThumbnail.Substring(strThumbnail.IndexOf("portals\\", StringComparison.InvariantCultureIgnoreCase));
+			Logger.LogWarning("<<< Exiting CreateThumbnail(strImage={StrImage})", strImage);
             return strThumbnail;
         }
 
         /// <summary>AddDefaultSkin adds the not-specified skin to the radio button list.</summary>
         private void AddDefaultSkin()
         {
+			Logger.LogError(">>> Entering AddDefaultSkin()");
             var strDefault = Localization.GetString("Not_Specified") + "<br />";
+			Logger.LogError("AddDefaultSkin(): strDefault → {StrDefault}", strDefault);
+            Logger.LogError("AddDefaultSkin(): src → {Src}", src);
+            Logger.LogWarning("<<< Exiting AddDefaultSkin()");
             strDefault += "<img src=\"" + Globals.ApplicationPath.Replace(@"\", "/") + "/images/spacer.gif\" width=\"140\" height=\"135\" border=\"0\">";
             this.OptSkin.Items.Insert(0, new ListItem(strDefault, string.Empty));
         }
@@ -353,6 +386,7 @@ namespace DotNetNuke.UI.Skins
         /// <param name="strFile">The Skin File.</param>
         private void AddSkin(string root, string strFolder, string strFile)
         {
+			Logger.LogError(">>> Entering AddSkin(root={Root},strFolder={StrFolder},strFile={StrFile})", root, strFolder, strFile);
             var strImage = string.Empty;
             if (File.Exists(strFile.Replace(".ascx", ".jpg")))
             {
@@ -365,6 +399,7 @@ namespace DotNetNuke.UI.Skins
             }
 
             this.OptSkin.Items.Add(new ListItem(FormatSkinName(strFolder, Path.GetFileNameWithoutExtension(strFile)) + "<br />" + strImage, root + "/" + strFolder + "/" + Path.GetFileName(strFile)));
+			Logger.LogWarning("<<< Exiting AddSkin(root={Root},strFolder={StrFolder},strFile={StrFile})", root, strFolder, strFile);
         }
     }
 }

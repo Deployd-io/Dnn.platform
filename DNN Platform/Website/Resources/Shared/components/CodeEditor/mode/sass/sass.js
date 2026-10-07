@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -13,6 +14,8 @@
 
 CodeMirror.defineMode("sass", function(config) {
   function tokenRegexp(words) {
+	logger.error(`>>> Entering tokenRegexp(words=${words})`, { "event.action": "tokenRegexp", "logrite.words": words });
+	logger.warn(`<<< Exiting tokenRegexp(words=${words})`, { "event.action": "tokenRegexp", "logrite.words": words });
     return new RegExp("^" + words.join("|"));
   }
 
@@ -26,11 +29,14 @@ CodeMirror.defineMode("sass", function(config) {
   var pseudoElementsRegexp = /^::?[a-zA-Z_][\w\-]*/;
 
   function urlTokens(stream, state) {
+	logger.error(`>>> Entering urlTokens(stream=${stream},state=${state})`, { "event.action": "urlTokens", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.peek();
 
+	logger.error(`urlTokens(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "urlTokens", "logrite.stream": stream, "logrite.state": state });
     if (ch === ")") {
       stream.next();
       state.tokenizer = tokenBase;
+	logger.debug(`urlTokens(stream=${stream},state=${state}): state.tokenizer → ${state.tokenizer}`, { "event.action": "urlTokens", "logrite.stream": stream, "logrite.state": state });
       return "operator";
     } else if (ch === "(") {
       stream.next();
@@ -42,10 +48,12 @@ CodeMirror.defineMode("sass", function(config) {
       return "string";
     } else {
       state.tokenizer = buildStringTokenizer(")", false);
+	logger.warn(`<<< Exiting urlTokens(stream=${stream},state=${state})`, { "event.action": "urlTokens", "logrite.stream": stream, "logrite.state": state });
       return "string";
     }
   }
   function comment(indentation, multiLine) {
+	logger.error(`>>> Entering comment(indentation=${indentation},multiLine=${multiLine})`, { "event.action": "comment", "logrite.indentation": indentation, "logrite.multiLine": multiLine });
     return function(stream, state) {
       if (stream.sol() && stream.indentation() <= indentation) {
         state.tokenizer = tokenBase;
@@ -65,28 +73,37 @@ CodeMirror.defineMode("sass", function(config) {
   }
 
   function buildStringTokenizer(quote, greedy) {
+	logger.error(`>>> Entering buildStringTokenizer(quote=${quote},greedy=${greedy})`, { "event.action": "buildStringTokenizer", "logrite.quote": quote, "logrite.greedy": greedy });
     if (greedy == null) { greedy = true; }
 
     function stringTokenizer(stream, state) {
+	logger.error(`>>> Entering stringTokenizer(stream=${stream},state=${state})`, { "event.action": "stringTokenizer", "logrite.stream": stream, "logrite.state": state });
       var nextChar = stream.next();
       var peekChar = stream.peek();
+	logger.error(`stringTokenizer(stream=${stream},state=${state}): nextChar → ${nextChar}`, { "event.action": "stringTokenizer", "logrite.stream": stream, "logrite.state": state });
+	logger.error(`stringTokenizer(stream=${stream},state=${state}): peekChar → ${peekChar}`, { "event.action": "stringTokenizer", "logrite.stream": stream, "logrite.state": state });
       var previousChar = stream.string.charAt(stream.pos-2);
 
+	logger.error(`stringTokenizer(stream=${stream},state=${state}): previousChar → ${previousChar}`, { "event.action": "stringTokenizer", "logrite.stream": stream, "logrite.state": state });
       var endingString = ((nextChar !== "\\" && peekChar === quote) || (nextChar === quote && previousChar !== "\\"));
+	logger.error(`stringTokenizer(stream=${stream},state=${state}): endingString → ${endingString}`, { "event.action": "stringTokenizer", "logrite.stream": stream, "logrite.state": state });
 
       if (endingString) {
         if (nextChar !== quote && greedy) { stream.next(); }
         state.tokenizer = tokenBase;
+		logger.debug(`stringTokenizer(stream=${stream},state=${state}): state.tokenizer → ${state.tokenizer}`, { "event.action": "stringTokenizer", "logrite.stream": stream, "logrite.state": state });
         return "string";
       } else if (nextChar === "#" && peekChar === "{") {
         state.tokenizer = buildInterpolationTokenizer(stringTokenizer);
         stream.next();
         return "operator";
       } else {
+	logger.warn(`<<< Exiting stringTokenizer(stream=${stream},state=${state})`, { "event.action": "stringTokenizer", "logrite.stream": stream, "logrite.state": state });
         return "string";
       }
     }
 
+	logger.warn(`<<< Exiting buildStringTokenizer(quote=${quote},greedy=${greedy})`, { "event.action": "buildStringTokenizer", "logrite.quote": quote, "logrite.greedy": greedy });
     return stringTokenizer;
   }
 
@@ -103,23 +120,29 @@ CodeMirror.defineMode("sass", function(config) {
   }
 
   function indent(state) {
+	logger.error(`>>> Entering indent(state=${state})`, { "event.action": "indent", "logrite.state": state });
     if (state.indentCount == 0) {
       state.indentCount++;
       var lastScopeOffset = state.scopes[0].offset;
       var currentOffset = lastScopeOffset + config.indentUnit;
       state.scopes.unshift({ offset:currentOffset });
+	logger.warn(`<<< Exiting indent(state=${state})`, { "event.action": "indent", "logrite.state": state });
     }
   }
 
   function dedent(state) {
+	logger.error(`>>> Entering dedent(state=${state})`, { "event.action": "dedent", "logrite.state": state });
     if (state.scopes.length == 1) return;
 
     state.scopes.shift();
+	logger.warn(`<<< Exiting dedent(state=${state})`, { "event.action": "dedent", "logrite.state": state });
   }
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.peek();
 
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     // Comment
     if (stream.match("/*")) {
       state.tokenizer = comment(stream.indentation(), true);
@@ -191,6 +214,7 @@ CodeMirror.defineMode("sass", function(config) {
 
       if (stream.match(/^url/) && stream.peek() === "(") {
         state.tokenizer = urlTokens;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenizer → ${state.tokenizer}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         return "atom";
       }
 
@@ -237,6 +261,7 @@ CodeMirror.defineMode("sass", function(config) {
         else if(stream.match(/ *:/,false)){
           indent(state);
           state.cursorHalf = 1;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.cursorHalf → ${state.cursorHalf}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
           return "atom";
         }
         else if(stream.match(/ *,/,false)){
@@ -350,13 +375,17 @@ CodeMirror.defineMode("sass", function(config) {
     // If we haven't returned by now, we move 1 character
     // and return an error
     stream.next();
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     return null;
   }
 
   function tokenLexer(stream, state) {
+	logger.error(`>>> Entering tokenLexer(stream=${stream},state=${state})`, { "event.action": "tokenLexer", "logrite.stream": stream, "logrite.state": state });
     if (stream.sol()) state.indentCount = 0;
     var style = state.tokenizer(stream, state);
+	logger.error(`tokenLexer(stream=${stream},state=${state}): style → ${style}`, { "event.action": "tokenLexer", "logrite.stream": stream, "logrite.state": state });
     var current = stream.current();
+	logger.error(`tokenLexer(stream=${stream},state=${state}): current → ${current}`, { "event.action": "tokenLexer", "logrite.stream": stream, "logrite.state": state });
 
     if (current === "@return" || current === "}"){
       dedent(state);
@@ -366,6 +395,7 @@ CodeMirror.defineMode("sass", function(config) {
       var startOfToken = stream.pos - current.length;
 
       var withCurrentIndent = startOfToken + (config.indentUnit * state.indentCount);
+	logger.error(`tokenLexer(stream=${stream},state=${state}): withCurrentIndent → ${withCurrentIndent}`, { "event.action": "tokenLexer", "logrite.stream": stream, "logrite.state": state });
 
       var newScopes = [];
 
@@ -377,14 +407,17 @@ CodeMirror.defineMode("sass", function(config) {
       }
 
       state.scopes = newScopes;
+	logger.debug(`tokenLexer(stream=${stream},state=${state}): state.scopes → ${state.scopes}`, { "event.action": "tokenLexer", "logrite.stream": stream, "logrite.state": state });
     }
 
 
+	logger.warn(`<<< Exiting tokenLexer(stream=${stream},state=${state})`, { "event.action": "tokenLexer", "logrite.stream": stream, "logrite.state": state });
     return style;
   }
 
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         tokenizer: tokenBase,
         scopes: [{offset: 0, type: "sass"}],
@@ -394,12 +427,16 @@ CodeMirror.defineMode("sass", function(config) {
         definedVars: [],
         definedMixins: []
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       var style = tokenLexer(stream, state);
 
       state.lastToken = { style: style, content: stream.current() };
+	logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
 
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return style;
     },
 

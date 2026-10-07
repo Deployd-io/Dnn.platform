@@ -14,11 +14,16 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
 
     internal class WorkflowActionRepository : ServiceLocator<IWorkflowActionRepository, WorkflowActionRepository>, IWorkflowActionRepository
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WorkflowActionRepository));
         /// <inheritdoc />
         public WorkflowAction GetWorkflowAction(int contentTypeId, string type)
         {
+			Logger.LogError(">>> Entering GetWorkflowAction(contentTypeId={ContentTypeId},type={Type})", contentTypeId, type);
             using var context = DataContext.Instance();
             var rep = context.GetRepository<WorkflowAction>();
+			Logger.LogError("GetWorkflowAction(contentTypeId={ContentTypeId},type={Type}): rep → {Rep}", contentTypeId, type, rep);
+			Logger.LogError("GetWorkflowAction(contentTypeId={ContentTypeId},type={Type}): context → {Context}", contentTypeId, type, context);
+			Logger.LogWarning("<<< Exiting GetWorkflowAction(contentTypeId={ContentTypeId},type={Type})", contentTypeId, type);
             return rep.Find("WHERE ContentTypeId = @0 AND ActionType = @1", contentTypeId, type).SingleOrDefault()
                 ?? GetWorkflowActionsDefaultsOrNull(contentTypeId, type); // fallback to default action (not in db)
         }
@@ -26,19 +31,26 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
         /// <inheritdoc />
         public void AddWorkflowAction(WorkflowAction action)
         {
+			Logger.LogError(">>> Entering AddWorkflowAction(action={Action})", action);
             using var context = DataContext.Instance();
+			Logger.LogWarning("<<< Exiting AddWorkflowAction(action={Action})", action);
             var rep = context.GetRepository<WorkflowAction>();
+			Logger.LogError("AddWorkflowAction(action={Action}): rep → {Rep}", action, rep);
+			Logger.LogError("AddWorkflowAction(action={Action}): context → {Context}", action, context);
             rep.Insert(action);
         }
 
         /// <inheritdoc />
         protected override Func<IWorkflowActionRepository> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new WorkflowActionRepository();
         }
 
         private static WorkflowAction GetWorkflowActionsDefaultsOrNull(int contentTypeId, string type)
         {
+			Logger.LogError(">>> Entering GetWorkflowActionsDefaultsOrNull(contentTypeId={ContentTypeId},type={Type})", contentTypeId, type);
             // only "Tab" ContentType is supported
             if (contentTypeId != ContentType.Tab.ContentTypeId)
             {
@@ -67,6 +79,7 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
                 ContentTypeId = contentTypeId,
                 ActionType = type,
                 ActionSource = actionSource,
+			Logger.LogWarning("<<< Exiting GetWorkflowActionsDefaultsOrNull(contentTypeId={ContentTypeId},type={Type})", contentTypeId, type);
             };
         }
     }

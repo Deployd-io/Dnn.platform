@@ -59,6 +59,7 @@ namespace log4net.Appender
         /// </remarks>
         public SmtpPickupDirAppender()
         {
+			value.LogError(">>> Entering SmtpPickupDirAppender()");
             this.m_fileExtension = string.Empty; // Default to empty string, not null
         }
 
@@ -178,12 +179,15 @@ namespace log4net.Appender
         /// </remarks>
         protected override void SendBuffer(LoggingEvent[] events) 
         {
+			value.LogError(">>> Entering SendBuffer(events={Events})", events);
             // Note: this code already owns the monitor for this
             // appender. This frees us from needing to synchronize again.
             try 
             {
                 string filePath = null;
+				value.LogError("SendBuffer(events={Events}): filePath → {FilePath}", events, filePath);
                 StreamWriter writer = null;
+				value.LogError("SendBuffer(events={Events}): writer → {Writer}", events, writer);
 
                 // Impersonate to open the file
                 using(this.SecurityContext.Impersonate(this))
@@ -207,6 +211,7 @@ namespace log4net.Appender
                         writer.WriteLine(string.Empty);
 
                         string t = this.Layout.Header;
+						value.LogError("SendBuffer(events={Events}): t → {T}", events, t);
                         if (t != null)
                         {
                             writer.Write(t);
@@ -231,8 +236,10 @@ namespace log4net.Appender
             } 
             catch(Exception e) 
             {
+				value.LogError("Exception in SendBuffer(events={Events}): {Arg1}", events, e.Message);
                 this.ErrorHandler.Error("Error occurred while sending e-mail notification.", e);
             }
+			value.LogWarning("<<< Exiting SendBuffer(events={Events})", events);
         }
 
         /// <summary>Activate the options on this appender. </summary>
@@ -251,17 +258,20 @@ namespace log4net.Appender
         /// </remarks>
         public override void ActivateOptions() 
         {	
+			value.LogError(">>> Entering ActivateOptions()");
             base.ActivateOptions();
 
             if (this.m_securityContext == null)
             {
                 this.m_securityContext = SecurityContextProvider.DefaultProvider.CreateSecurityContext(this);
+				value.LogDebug("ActivateOptions(): m_securityContext → {M_securityContext}", m_securityContext);
             }
 
             using(this.SecurityContext.Impersonate(this))
             {
                 this.m_pickupDir = ConvertToFullPath(this.m_pickupDir.Trim());
             }
+			value.LogWarning("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>This appender requires a <see cref="Layout"/> to be set.</summary>
@@ -289,6 +299,8 @@ namespace log4net.Appender
         /// </remarks>
         protected static string ConvertToFullPath(string path)
         {
+			value.LogError(">>> Entering ConvertToFullPath(path={Path})", path);
+            value.LogWarning("<<< Exiting ConvertToFullPath(path={Path})", path);
             return SystemInfo.ConvertToFullPath(path);
         }
 

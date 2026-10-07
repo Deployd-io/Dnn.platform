@@ -6,10 +6,13 @@ import PageHierarchy from "../PageHierarchy/PageHierarchy";
 import {pageHierarchyActions as PageHierarchyActions} from "../../actions";
 import styles from "./PageList.module.less";
 import Localization from "../../localization";
+const logger = console;
 import { bindActionCreators } from "redux";
 
 class PageList extends Component {
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.pageListBody + " dnn-persona-bar-page-body"}>
                 <div className="search-container">      
@@ -51,6 +54,8 @@ PageList.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         searchKeyword: state.pageHierarchy.searchKeyword,
         itemTemplate: state.pageHierarchy.itemTemplate,
@@ -62,6 +67,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.error(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
+	logger.warn(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
     return bindActionCreators({
         onSelectedPagePathChanged: PageHierarchyActions.changeSelectedPagePath,
         onSearchKeywordChanged: PageHierarchyActions.setSearchKeyword

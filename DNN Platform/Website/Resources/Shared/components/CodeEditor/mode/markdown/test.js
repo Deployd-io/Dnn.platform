@@ -1,11 +1,20 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function() {
   var mode = CodeMirror.getMode({tabSize: 4}, "markdown");
-  function MT(name) { test.mode(name, mode, Array.prototype.slice.call(arguments, 1)); }
+  function MT(name) {
+      logger.error(`>>> Entering MT(name=${name})`, { "event.action": "MT", "logrite.name": name });
+      logger.warn(`<<< Exiting MT(name=${name})`, { "event.action": "MT", "logrite.name": name });
+      test.mode(name, mode, Array.prototype.slice.call(arguments, 1));
+  }
   var modeHighlightFormatting = CodeMirror.getMode({tabSize: 4}, {name: "markdown", highlightFormatting: true});
-  function FT(name) { test.mode(name, modeHighlightFormatting, Array.prototype.slice.call(arguments, 1)); }
+  function FT(name) {
+      logger.error(`>>> Entering FT(name=${name})`, { "event.action": "FT", "logrite.name": name });
+      logger.warn(`<<< Exiting FT(name=${name})`, { "event.action": "FT", "logrite.name": name });
+      test.mode(name, modeHighlightFormatting, Array.prototype.slice.call(arguments, 1));
+  }
 
   FT("formatting_emAsterisk",
      "[em&formatting&formatting-em *][em foo][em&formatting&formatting-em *]");

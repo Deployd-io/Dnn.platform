@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -31,14 +32,21 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
       allowNested = parserConfig.allowNested;
 
   var type, override;
-  function ret(style, tp) { type = tp; return style; }
+  function ret(style, tp) {
+      logger.error(`>>> Entering ret(style=${style},tp=${tp})`, { "event.action": "ret", "logrite.style": style, "logrite.tp": tp });
+      logger.warn(`<<< Exiting ret(style=${style},tp=${tp})`, { "event.action": "ret", "logrite.style": style, "logrite.tp": tp });
+      type = tp; return style;
+  }
 
   // Tokenizers
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.next();
     if (tokenHooks[ch]) {
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       var result = tokenHooks[ch](stream, state);
+	logger.error(`tokenBase(stream=${stream},state=${state}): result → ${result}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       if (result !== false) return result;
     }
     if (ch == "@") {
@@ -81,16 +89,19 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
                (ch == "r" && stream.match("egexp("))) {
       stream.backUp(1);
       state.tokenize = tokenParenthesized;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return ret("property", "word");
     } else if (/[\w\\\-]/.test(ch)) {
       stream.eatWhile(/[\w\\\-]/);
       return ret("property", "word");
     } else {
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return ret(null, null);
     }
   }
 
   function tokenString(quote) {
+	logger.error(`>>> Entering tokenString(quote=${quote})`, { "event.action": "tokenString", "logrite.quote": quote });
     return function(stream, state) {
       var escaped = false, ch;
       while ((ch = stream.next()) != null) {
@@ -106,44 +117,58 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
   }
 
   function tokenParenthesized(stream, state) {
+	logger.error(`>>> Entering tokenParenthesized(stream=${stream},state=${state})`, { "event.action": "tokenParenthesized", "logrite.stream": stream, "logrite.state": state });
     stream.next(); // Must be '('
     if (!stream.match(/\s*[\"\')]/, false))
       state.tokenize = tokenString(")");
     else
       state.tokenize = null;
+	logger.warn(`<<< Exiting tokenParenthesized(stream=${stream},state=${state})`, { "event.action": "tokenParenthesized", "logrite.stream": stream, "logrite.state": state });
     return ret(null, "(");
   }
 
   // Context management
 
   function Context(type, indent, prev) {
+	logger.error(`>>> Entering Context(type=${type},indent=${indent},prev=${prev})`, { "event.action": "Context", "logrite.type": type, "logrite.indent": indent, "logrite.prev": prev });
     this.type = type;
     this.indent = indent;
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev}): type → ${type}`, { "event.action": "Context", "logrite.type": type, "logrite.indent": indent, "logrite.prev": prev });
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev}): this.type → ${this.type}`, { "event.action": "Context", "logrite.type": type, "logrite.indent": indent, "logrite.prev": prev });
     this.prev = prev;
   }
 
   function pushContext(state, stream, type) {
+	logger.error(`>>> Entering pushContext(state=${state},stream=${stream},type=${type})`, { "event.action": "pushContext", "logrite.state": state, "logrite.stream": stream, "logrite.type": type });
     state.context = new Context(type, stream.indentation() + indentUnit, state.context);
+	logger.warn(`<<< Exiting pushContext(state=${state},stream=${stream},type=${type})`, { "event.action": "pushContext", "logrite.state": state, "logrite.stream": stream, "logrite.type": type });
     return type;
   }
 
   function popContext(state) {
+	logger.error(`>>> Entering popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
     state.context = state.context.prev;
+	logger.warn(`<<< Exiting popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
     return state.context.type;
   }
 
   function pass(type, stream, state) {
+	logger.error(`>>> Entering pass(type=${type},stream=${stream},state=${state})`, { "event.action": "pass", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
+	logger.warn(`<<< Exiting pass(type=${type},stream=${stream},state=${state})`, { "event.action": "pass", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return states[state.context.type](type, stream, state);
   }
   function popAndPass(type, stream, state, n) {
+	logger.error(`>>> Entering popAndPass(type=${type},stream=${stream},state=${state},n=${n})`, { "event.action": "popAndPass", "logrite.type": type, "logrite.stream": stream, "logrite.state": state, "logrite.n": n });
     for (var i = n || 1; i > 0; i--)
       state.context = state.context.prev;
+	logger.warn(`<<< Exiting popAndPass(type=${type},stream=${stream},state=${state},n=${n})`, { "event.action": "popAndPass", "logrite.type": type, "logrite.stream": stream, "logrite.state": state, "logrite.n": n });
     return pass(type, stream, state);
   }
 
   // Parser
 
   function wordAsValue(stream) {
+	logger.error(`>>> Entering wordAsValue(stream=${stream})`, { "event.action": "wordAsValue", "logrite.stream": stream });
     var word = stream.current().toLowerCase();
     if (valueKeywords.hasOwnProperty(word))
       override = "atom";
@@ -156,6 +181,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
   var states = {};
 
   states.top = function(type, stream, state) {
+	logger.error(`>>> Entering top(type=${type},stream=${stream},state=${state})`, { "event.action": "top", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "{") {
       return pushContext(state, stream, "block");
     } else if (type == "}" && state.context.prev) {
@@ -164,6 +190,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
       return pushContext(state, stream, "atBlock");
     } else if (/@(font-face|counter-style)/.test(type)) {
       state.stateArg = type;
+	logger.debug(`top(type=${type},stream=${stream},state=${state}): state.stateArg → ${state.stateArg}`, { "event.action": "top", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
       return "restricted_atBlock_before";
     } else if (/^@(-(moz|ms|o|webkit)-)?keyframes$/.test(type)) {
       return "keyframes";
@@ -182,12 +209,15 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
     } else if (allowNested && type == "(") {
       return pushContext(state, stream, "parens");
     }
+	logger.warn(`<<< Exiting top(type=${type},stream=${stream},state=${state})`, { "event.action": "top", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return state.context.type;
   };
 
   states.block = function(type, stream, state) {
+	logger.error(`>>> Entering block(type=${type},stream=${stream},state=${state})`, { "event.action": "block", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "word") {
       var word = stream.current().toLowerCase();
+	logger.error(`block(type=${type},stream=${stream},state=${state}): word → ${word}`, { "event.action": "block", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
       if (propertyKeywords.hasOwnProperty(word)) {
         override = "property";
         return "maybeprop";
@@ -207,12 +237,17 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
       override = "error";
       return "block";
     } else {
+	logger.warn(`<<< Exiting block(type=${type},stream=${stream},state=${state})`, { "event.action": "block", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
       return states.top(type, stream, state);
     }
   };
 
   states.maybeprop = function(type, stream, state) {
+	logger.error(`>>> Entering maybeprop(type=${type},stream=${stream},state=${state})`, { "event.action": "maybeprop", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == ":") return pushContext(state, stream, "prop");
+	logger.error(`>>> Entering prop(type=${type},stream=${stream},state=${state})`, { "event.action": "prop", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
+	logger.warn(`<<< Exiting prop(type=${type},stream=${stream},state=${state})`, { "event.action": "prop", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
+	logger.warn(`<<< Exiting maybeprop(type=${type},stream=${stream},state=${state})`, { "event.action": "maybeprop", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return pass(type, stream, state);
   };
 
@@ -233,35 +268,43 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
   };
 
   states.propBlock = function(type, _stream, state) {
+	logger.error(`>>> Entering propBlock(type=${type},_stream=${_stream},state=${state})`, { "event.action": "propBlock", "logrite.type": type, "logrite._stream": _stream, "logrite.state": state });
     if (type == "}") return popContext(state);
     if (type == "word") { override = "property"; return "maybeprop"; }
+	logger.warn(`<<< Exiting propBlock(type=${type},_stream=${_stream},state=${state})`, { "event.action": "propBlock", "logrite.type": type, "logrite._stream": _stream, "logrite.state": state });
     return state.context.type;
   };
 
   states.parens = function(type, stream, state) {
+	logger.error(`>>> Entering parens(type=${type},stream=${stream},state=${state})`, { "event.action": "parens", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "{" || type == "}") return popAndPass(type, stream, state);
     if (type == ")") return popContext(state);
     if (type == "(") return pushContext(state, stream, "parens");
     if (type == "interpolation") return pushContext(state, stream, "interpolation");
     if (type == "word") wordAsValue(stream);
+	logger.warn(`<<< Exiting parens(type=${type},stream=${stream},state=${state})`, { "event.action": "parens", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return "parens";
   };
 
   states.pseudo = function(type, stream, state) {
+	logger.error(`>>> Entering pseudo(type=${type},stream=${stream},state=${state})`, { "event.action": "pseudo", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "word") {
       override = "variable-3";
       return state.context.type;
     }
+	logger.warn(`<<< Exiting pseudo(type=${type},stream=${stream},state=${state})`, { "event.action": "pseudo", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return pass(type, stream, state);
   };
 
   states.atBlock = function(type, stream, state) {
+	logger.error(`>>> Entering atBlock(type=${type},stream=${stream},state=${state})`, { "event.action": "atBlock", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "(") return pushContext(state, stream, "atBlock_parens");
     if (type == "}") return popAndPass(type, stream, state);
     if (type == "{") return popContext(state) && pushContext(state, stream, allowNested ? "block" : "top");
 
     if (type == "word") {
       var word = stream.current().toLowerCase();
+	logger.error(`atBlock(type=${type},stream=${stream},state=${state}): word → ${word}`, { "event.action": "atBlock", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
       if (word == "only" || word == "not" || word == "and" || word == "or")
         override = "keyword";
       else if (documentTypes.hasOwnProperty(word))
@@ -283,28 +326,36 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
       else
         override = "error";
     }
+	logger.warn(`<<< Exiting atBlock(type=${type},stream=${stream},state=${state})`, { "event.action": "atBlock", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return state.context.type;
   };
 
   states.atBlock_parens = function(type, stream, state) {
+	logger.error(`>>> Entering atBlock_parens(type=${type},stream=${stream},state=${state})`, { "event.action": "atBlock_parens", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == ")") return popContext(state);
     if (type == "{" || type == "}") return popAndPass(type, stream, state, 2);
+	logger.warn(`<<< Exiting atBlock_parens(type=${type},stream=${stream},state=${state})`, { "event.action": "atBlock_parens", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return states.atBlock(type, stream, state);
   };
 
   states.restricted_atBlock_before = function(type, stream, state) {
+	logger.error(`>>> Entering restricted_atBlock_before(type=${type},stream=${stream},state=${state})`, { "event.action": "restricted_atBlock_before", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "{")
       return pushContext(state, stream, "restricted_atBlock");
     if (type == "word" && state.stateArg == "@counter-style") {
       override = "variable";
       return "restricted_atBlock_before";
     }
+	logger.warn(`<<< Exiting restricted_atBlock_before(type=${type},stream=${stream},state=${state})`, { "event.action": "restricted_atBlock_before", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return pass(type, stream, state);
   };
 
   states.restricted_atBlock = function(type, stream, state) {
+	logger.error(`>>> Entering restricted_atBlock(type=${type},stream=${stream},state=${state})`, { "event.action": "restricted_atBlock", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "}") {
       state.stateArg = null;
+	logger.debug(`restricted_atBlock(type=${type},stream=${stream},state=${state}): state.stateArg → ${state.stateArg}`, { "event.action": "restricted_atBlock", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
+	logger.warn(`<<< Exiting restricted_atBlock(type=${type},stream=${stream},state=${state})`, { "event.action": "restricted_atBlock", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
       return popContext(state);
     }
     if (type == "word") {
@@ -319,8 +370,10 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
   };
 
   states.keyframes = function(type, stream, state) {
+	logger.error(`>>> Entering keyframes(type=${type},stream=${stream},state=${state})`, { "event.action": "keyframes", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "word") { override = "variable"; return "keyframes"; }
     if (type == "{") return pushContext(state, stream, "top");
+	logger.warn(`<<< Exiting keyframes(type=${type},stream=${stream},state=${state})`, { "event.action": "keyframes", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return pass(type, stream, state);
   };
 
@@ -333,22 +386,27 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
   };
 
   states.interpolation = function(type, stream, state) {
+	logger.error(`>>> Entering interpolation(type=${type},stream=${stream},state=${state})`, { "event.action": "interpolation", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "}") return popContext(state);
     if (type == "{" || type == ";") return popAndPass(type, stream, state);
     if (type == "word") override = "variable";
     else if (type != "variable" && type != "(" && type != ")") override = "error";
+	logger.warn(`<<< Exiting interpolation(type=${type},stream=${stream},state=${state})`, { "event.action": "interpolation", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return "interpolation";
   };
 
   return {
     startState: function(base) {
+	logger.error(`>>> Entering startState(base=${base})`, { "event.action": "startState", "logrite.base": base });
       return {tokenize: null,
               state: parserConfig.inline ? "block" : "top",
               stateArg: null,
               context: new Context(parserConfig.inline ? "block" : "top", base || 0, null)};
+			logger.warn(`<<< Exiting startState(base=${base})`, { "event.action": "startState", "logrite.base": base });
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (!state.tokenize && stream.eatSpace()) return null;
       var style = (state.tokenize || tokenBase)(stream, state);
       if (style && typeof style == "object") {
@@ -357,10 +415,12 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
       }
       override = style;
       state.state = states[state.state](type, stream, state);
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return override;
     },
 
     indent: function(state, textAfter) {
+	logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       var cx = state.context, ch = textAfter && textAfter.charAt(0);
       var indent = cx.indent;
       if (cx.type == "prop" && (ch == "}" || ch == ")")) cx = cx.prev;
@@ -370,6 +430,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
            ch == "{" && (cx.type == "at" || cx.type == "atBlock"))) {
         indent = cx.indent - indentUnit;
         cx = cx.prev;
+		logger.warn(`<<< Exiting indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       }
       return indent;
     },
@@ -382,10 +443,12 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
 });
 
   function keySet(array) {
+	logger.error(`>>> Entering keySet(array=${array})`, { "event.action": "keySet", "logrite.array": array });
     var keys = {};
     for (var i = 0; i < array.length; ++i) {
       keys[array[i]] = true;
     }
+	logger.warn(`<<< Exiting keySet(array=${array})`, { "event.action": "keySet", "logrite.array": array });
     return keys;
   }
 
@@ -657,14 +720,17 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
   CodeMirror.registerHelper("hintWords", "css", allWords);
 
   function tokenCComment(stream, state) {
+	logger.error(`>>> Entering tokenCComment(stream=${stream},state=${state})`, { "event.action": "tokenCComment", "logrite.stream": stream, "logrite.state": state });
     var maybeEnd = false, ch;
     while ((ch = stream.next()) != null) {
       if (maybeEnd && ch == "/") {
         state.tokenize = null;
+		logger.debug(`tokenCComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenCComment", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       maybeEnd = (ch == "*");
     }
+	logger.error(`tokenCComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "tokenCComment", "logrite.stream": stream, "logrite.state": state });
     return ["comment", "comment"];
   }
 

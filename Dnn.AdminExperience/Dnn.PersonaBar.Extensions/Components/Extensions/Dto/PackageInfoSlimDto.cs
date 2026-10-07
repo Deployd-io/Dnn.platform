@@ -24,6 +24,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
         public PackageInfoSlimDto(int portalId, PackageInfo package)
             : this(null, null, null, portalId, package)
         {
+		eventLogger.LogError(">>> Entering PackageInfoSlimDto(portalId={PortalId},package={Package})", portalId, package);
+        eventLogger.LogWarning("<<< Exiting PackageInfoSlimDto(portalId={PortalId},package={Package})", portalId, package);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PackageInfoSlimDto"/> class.</summary>
@@ -34,13 +36,19 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
         /// <param name="package">The package info.</param>
         public PackageInfoSlimDto(IHostSettings hostSettings, IHostSettingsService hostSettingsService, IPortalController portalController, int portalId, PackageInfo package)
         {
+			eventLogger.LogError(">>> Entering PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package})", hostSettings, hostSettingsService, portalController, portalId, package);
             this.PackageId = package.PackageID;
+			eventLogger.LogDebug("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.PackageId → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.PackageId);
             this.FriendlyName = package.FriendlyName;
             this.Name = package.Name;
+			eventLogger.LogDebug("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.FriendlyName → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.FriendlyName);
+			eventLogger.LogDebug("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.Name → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.Name);
             this.FileName = package.FileName;
             this.Description = package.Description;
             this.Version = package.Version.ToString(3);
             this.IsInUse = ExtensionsController.IsPackageInUse(package, portalId);
+			eventLogger.LogDebug("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.FileName → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.FileName);
+			eventLogger.LogDebug("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.Description → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.Description);
             this.UpgradeUrl = ExtensionsController.UpgradeRedirect(package.Version, package.PackageType, package.Name);
             this.UpgradeIndicator = ExtensionsController.UpgradeIndicator(hostSettings, hostSettingsService, portalController, package.Version, package.PackageType, package.Name);
             this.PackageIcon = ExtensionsController.GetPackageIcon(package);
@@ -50,6 +58,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
             if (package.PackageID != Null.NullInteger)
             {
                 var authService = AuthenticationController.GetAuthenticationServiceByPackageID(this.PackageId);
+				eventLogger.LogError("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): authService → {AuthService}", hostSettings, hostSettingsService, portalController, portalId, package, authService);
                 this.ReadOnly = authService != null && authService.AuthenticationType == Constants.DnnAuthTypeName;
             }
         }

@@ -12,27 +12,34 @@ namespace Dnn.Modules.ResourceManager.Components
     /// <summary>Manages groups.</summary>
     public class GroupManager : ServiceLocator<IGroupManager, GroupManager>, IGroupManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(GroupManager));
         /// <inheritdoc />
         public IFolderInfo FindOrCreateGroupFolder(int portalId, int groupId)
         {
+			Logger.LogError(">>> Entering FindOrCreateGroupFolder(portalId={PortalId},groupId={GroupId})", portalId, groupId);
             Requires.NotNegative("portalId", portalId);
             Requires.NotNegative("groupId", groupId);
 
+			Logger.LogWarning("<<< Exiting FindOrCreateGroupFolder(portalId={PortalId},groupId={GroupId})", portalId, groupId);
             return this.GetGroupFolder(portalId, groupId) ?? FolderManager.Instance.AddFolder(portalId, "Groups/" + groupId);
         }
 
         /// <inheritdoc />
         public IFolderInfo GetGroupFolder(int portalId, int groupId)
         {
+			Logger.LogError(">>> Entering GetGroupFolder(portalId={PortalId},groupId={GroupId})", portalId, groupId);
             Requires.NotNegative("portalId", portalId);
             Requires.NotNegative("groupId", groupId);
 
+			Logger.LogWarning("<<< Exiting GetGroupFolder(portalId={PortalId},groupId={GroupId})", portalId, groupId);
             return FolderManager.Instance.GetFolder(portalId, "Groups/" + groupId);
         }
 
         /// <inheritdoc />
         protected override Func<IGroupManager> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new GroupManager();
         }
     }

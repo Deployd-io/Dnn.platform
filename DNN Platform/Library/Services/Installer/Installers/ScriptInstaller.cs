@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The ScriptInstaller installs Script Components to a DotNetNuke site.</summary>
     public class ScriptInstaller : FileInstaller
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ScriptInstaller));
         private readonly SortedList<Version, InstallFile> installScripts = new SortedList<Version, InstallFile>();
         private readonly SortedList<Version, InstallFile> unInstallScripts = new SortedList<Version, InstallFile>();
         private readonly List<InstallFile> preUpgradeScripts = new List<InstallFile>();
@@ -64,16 +65,20 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <inheritdoc />
         public override void Commit()
         {
+			Logger.LogError(">>> Entering Commit()");
             base.Commit();
+			Logger.LogWarning("<<< Exiting Commit()");
         }
 
         /// <inheritdoc />
         public override void Install()
         {
+			Logger.LogError(">>> Entering Install()");
             this.Log.AddInfo(Util.SQL_Begin);
             try
             {
                 bool bSuccess = true;
+				Logger.LogError("Install(): bSuccess → {BSuccess}", bSuccess);
                 Version installedVersion = this.Package.InstalledVersion;
 
                 // First process InstallScript
@@ -146,48 +151,60 @@ namespace DotNetNuke.Services.Installer.Installers
             }
             catch (Exception ex)
             {
+				Logger.LogDebug("Install(): this.Completed → {Arg0}", this.Completed);
                 this.Log.AddFailure(ex);
             }
 
             this.Log.AddInfo(Util.SQL_End);
+			Logger.LogWarning("<<< Exiting Install()");
         }
 
         /// <inheritdoc />
         public override void Rollback()
         {
+			Logger.LogError(">>> Entering Rollback()");
             base.Rollback();
+			Logger.LogWarning("<<< Exiting Rollback()");
         }
 
         /// <inheritdoc />
         public override void UnInstall()
         {
+			Logger.LogError(">>> Entering UnInstall()");
             this.Log.AddInfo(Util.SQL_BeginUnInstall);
 
             // Call the base method
             base.UnInstall();
 
             this.Log.AddInfo(Util.SQL_EndUnInstall);
+			Logger.LogWarning("<<< Exiting UnInstall()");
         }
 
         /// <inheritdoc />
         protected override bool IsCorrectType(InstallFileType type)
         {
+			Logger.LogError(">>> Entering IsCorrectType(type={Type})", type);
+            Logger.LogWarning("<<< Exiting IsCorrectType(type={Type})", type);
             return type == InstallFileType.Script;
         }
 
         /// <inheritdoc />
         protected override void ProcessFile(InstallFile file, XPathNavigator nav)
         {
+			Logger.LogError(">>> Entering ProcessFile(file={File},nav={Nav})", file, nav);
             string type = nav.GetAttribute("type", string.Empty);
+			Logger.LogError("ProcessFile(file={File},nav={Nav}): type → {Type}", file, nav, type);
             if (file != null && this.IsCorrectType(file.Type) && this.IsValidScript(file.Name))
             {
                 if (file.Name.StartsWith("install.", StringComparison.InvariantCultureIgnoreCase))
                 {
                     // This is the initial script when installing
                     this.installScript = file;
+					Logger.LogDebug("ProcessFile(file={File},nav={Nav}): installScript → {InstallScript}", file, nav, installScript);
                 }
                 else if (type.Equals("preupgrade", StringComparison.OrdinalIgnoreCase))
                 {
+					Logger.LogDebug("ProcessFile(file={File},nav={Nav}): this.installScript → {Arg2}", file, nav, this.installScript);
                     this.preUpgradeScripts.Add(file);
                 }
                 else if (file.Name.StartsWith("upgrade.", StringComparison.InvariantCultureIgnoreCase)
@@ -222,12 +239,14 @@ namespace DotNetNuke.Services.Installer.Installers
 
             // Call base method to set up for file processing
             base.ProcessFile(file, nav);
+			Logger.LogWarning("<<< Exiting ProcessFile(file={File},nav={Nav})", file, nav);
         }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         protected override void UnInstallFile(InstallFile scriptFile)
         {
+			Logger.LogError(">>> Entering UnInstallFile(scriptFile={ScriptFile})", scriptFile);
             // Process the file if it is an UnInstall Script
             if (this.UnInstallScripts.ContainsValue(scriptFile))
             {
@@ -241,16 +260,20 @@ namespace DotNetNuke.Services.Installer.Installers
 
             // Call base method to delete file
             base.UnInstallFile(scriptFile);
+			Logger.LogWarning("<<< Exiting UnInstallFile(scriptFile={ScriptFile})", scriptFile);
         }
 
         private bool ExecuteSql(InstallFile scriptFile)
         {
+			Logger.LogError(">>> Entering ExecuteSql(scriptFile={ScriptFile})", scriptFile);
             bool bSuccess = true;
 
+			Logger.LogError("ExecuteSql(scriptFile={ScriptFile}): bSuccess → {BSuccess}", scriptFile, bSuccess);
             this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.SQL_BeginFile, scriptFile.Name));
 
             // read script file for installation
             string strScript = FileSystemUtils.ReadFile(this.PhysicalBasePath + scriptFile.FullName);
+			Logger.LogError("ExecuteSql(scriptFile={ScriptFile}): strScript → {StrScript}", scriptFile, strScript);
 
             // This check needs to be included because the Unicode Byte Order mark results in an extra character at the start of the file
             // The extra character - '?' - causes an error with the database.
@@ -274,12 +297,15 @@ namespace DotNetNuke.Services.Installer.Installers
             }
 
             this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.SQL_EndFile, scriptFile.Name));
+			Logger.LogWarning("<<< Exiting ExecuteSql(scriptFile={ScriptFile})", scriptFile);
             return bSuccess;
         }
 
         private bool IsValidScript(string fileName)
         {
+			Logger.LogError(">>> Entering IsValidScript(fileName={FileName})", fileName);
             var fileExtension = Path.GetExtension(fileName.ToLowerInvariant());
+			Logger.LogError("IsValidScript(fileName={FileName}): fileExtension → {FileExtension}", fileName, fileExtension);
             if (fileExtension != null)
             {
                 fileExtension = fileExtension.Substring(1);
@@ -287,20 +313,24 @@ namespace DotNetNuke.Services.Installer.Installers
             }
             else
             {
+				Logger.LogWarning("<<< Exiting IsValidScript(fileName={FileName})", fileName);
                 return false;
             }
         }
 
         private bool InstallScriptFile(InstallFile scriptFile)
         {
+			Logger.LogError(">>> Entering InstallScriptFile(scriptFile={ScriptFile})", scriptFile);
             // Call base InstallFile method to copy file
             bool bSuccess = this.InstallFile(scriptFile);
+			Logger.LogError("InstallScriptFile(scriptFile={ScriptFile}): bSuccess → {BSuccess}", scriptFile, bSuccess);
             if (bSuccess)
             {
                 this.Log.AddInfo(Util.SQL_Executing + scriptFile.Name);
                 bSuccess = this.ExecuteSql(scriptFile);
             }
 
+			Logger.LogWarning("<<< Exiting InstallScriptFile(scriptFile={ScriptFile})", scriptFile);
             return bSuccess;
         }
     }

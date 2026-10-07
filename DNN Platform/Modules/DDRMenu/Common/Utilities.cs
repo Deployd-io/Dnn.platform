@@ -23,14 +23,17 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>A cached version of the file contents in a string.</returns>
         internal static string CachedFileContent(string filename)
         {
+			eventLogger.LogError(">>> Entering CachedFileContent(filename={Filename})", filename);
             var cache = HttpContext.Current.Cache;
             var result = cache[filename] as string;
+			eventLogger.LogError("CachedFileContent(filename={Filename}): result → {Result}", filename, result);
             if (result == null)
             {
                 result = File.ReadAllText(filename);
                 cache.Insert(filename, result, new CacheDependency(filename));
             }
 
+			eventLogger.LogWarning("<<< Exiting CachedFileContent(filename={Filename})", filename);
             return result;
         }
 
@@ -39,8 +42,10 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>A <see cref="XmlDocument"/> representing the cached file contents.</returns>
         internal static XmlDocument CachedXml(string filename)
         {
+			eventLogger.LogError(">>> Entering CachedXml(filename={Filename})", filename);
             var cache = HttpContext.Current.Cache;
             var result = cache[filename] as XmlDocument;
+			eventLogger.LogError("CachedXml(filename={Filename}): result → {Result}", filename, result);
             if (result == null)
             {
                 result = new XmlDocument { XmlResolver = null };
@@ -52,6 +57,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 cache.Insert(filename, result, new CacheDependency(filename));
             }
 
+			eventLogger.LogWarning("<<< Exiting CachedXml(filename={Filename})", filename);
             return result;
         }
 
@@ -60,8 +66,10 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>An <see cref="XslCompiledTransform"/> object with the content of cached content of the file.</returns>
         internal static XslCompiledTransform CachedXslt(string filename)
         {
+			eventLogger.LogError(">>> Entering CachedXslt(filename={Filename})", filename);
             var cache = HttpContext.Current.Cache;
             var result = cache[filename] as XslCompiledTransform;
+			eventLogger.LogError("CachedXslt(filename={Filename}): result → {Result}", filename, result);
             if (result == null)
             {
                 result = new XslCompiledTransform();
@@ -73,6 +81,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 cache.Insert(filename, result, new CacheDependency(filename));
             }
 
+			eventLogger.LogWarning("<<< Exiting CachedXslt(filename={Filename})", filename);
             return result;
         }
 
@@ -81,6 +90,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>An <see cref="XmlSerializer"/>.</returns>
         internal static XmlSerializer SerialiserFor(Type t)
         {
+			eventLogger.LogError(">>> Entering SerialiserFor(t={T})", t);
             XmlSerializer result;
             if (!Serialisers.TryGetValue(t, out result))
             {
@@ -96,6 +106,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting SerialiserFor(t={T})", t);
             return result;
         }
 
@@ -104,6 +115,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>A string representation of the object.</returns>
         internal static string ConvertToJs(object obj)
         {
+			eventLogger.LogError(">>> Entering ConvertToJs(obj={Obj})", obj);
             string result;
 
             if (obj == null)
@@ -112,9 +124,11 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
             }
 
             var objType = obj.GetType();
+			eventLogger.LogError("ConvertToJs(obj={Obj}): objType → {ObjType}", obj, objType);
             if (objType == typeof(bool))
             {
                 result = (bool)obj ? "true" : "false";
+				eventLogger.LogError("ConvertToJs(obj={Obj}): result → {Result}", obj, result);
             }
             else if (objType == typeof(int) || objType == typeof(decimal) || objType == typeof(double))
             {
@@ -125,6 +139,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 result = $"'{HttpUtility.JavaScriptStringEncode(obj.ToString())}'";
             }
 
+			eventLogger.LogWarning("<<< Exiting ConvertToJs(obj={Obj})", obj);
             return result;
         }
     }

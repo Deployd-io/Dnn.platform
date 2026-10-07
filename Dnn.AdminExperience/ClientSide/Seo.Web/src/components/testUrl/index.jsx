@@ -16,10 +16,12 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class TestUrlPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             test: {
                 PageToTest: "",
@@ -28,16 +30,20 @@ class TestUrlPanelBody extends Component {
                 UrlToTest: ""
             }
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {state, props} = this;
         let test = Object.assign({}, state.test);
+		logger.error(`onSettingChange(key=${key},event=${event}): test → ${test}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
 
         if (key === "PageToTest") {
             test[key] = event;
             if (test[key] === "-1") {
                 props.dispatch(SeoActions.clearUrlTestResults());
+				logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
             }
         }
         else if (key === "UrlToTest") {
@@ -56,29 +62,37 @@ class TestUrlPanelBody extends Component {
     }
 
     keyValuePairsToOptions(keyValuePairs) {
+		logger.error(`>>> Entering keyValuePairsToOptions(keyValuePairs=${keyValuePairs})`, { "event.action": "keyValuePairsToOptions", "logrite.keyValuePairs": keyValuePairs });
         let options = [];
         if (keyValuePairs !== undefined) {
             options = keyValuePairs.map((item) => {
                 return { label: item.Key, value: item.Value };
             });
         }
+		logger.warn(`<<< Exiting keyValuePairsToOptions(keyValuePairs=${keyValuePairs})`, { "event.action": "keyValuePairsToOptions", "logrite.keyValuePairs": keyValuePairs });
         return options;
     }
 
     onTestPage() {
+		logger.error('>>> Entering onTestPage()', { "event.action": "onTestPage" });
         let {state, props} = this;
         props.dispatch(SeoActions.testUrl(state.test.PageToTest, state.test.QueryString, state.test.CustomPageName));
+		logger.warn('<<< Exiting onTestPage()', { "event.action": "onTestPage" });
     }
 
     onTestUrl() {
+		logger.error('>>> Entering onTestUrl()', { "event.action": "onTestUrl" });
         let {state, props} = this;
         props.dispatch(SeoActions.testUrlRewrite(state.test.UrlToTest));
+		logger.warn('<<< Exiting onTestUrl()', { "event.action": "onTestUrl" });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         const noneSpecifiedText = "<" + resx.get("NoneSpecified") + ">";
+		logger.error(`render(): noneSpecifiedText → ${noneSpecifiedText}`, { "event.action": "render" });
         const PageToTestParameters = {
             portalId: -2,
             cultureCode: "",
@@ -236,6 +250,7 @@ class TestUrlPanelBody extends Component {
             </InputGroup>
         </div>;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.testUrl}>
                 <div className="columnTitleOne">{resx.get("TestPageUrl")}</div>
@@ -261,6 +276,8 @@ TestUrlPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         urls: state.seo.urls,

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -18,9 +19,12 @@
 
   CodeMirror.defineMode('livescript', function(){
     var tokenBase = function(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       var next_rule = state.next || "start";
       if (next_rule) {
+		logger.error(`tokenBase(stream=${stream},state=${state}): next_rule → ${next_rule}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         state.next = state.next;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.next → ${state.next}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         var nr = Rules[next_rule];
         if (nr.splice) {
           for (var i$ = 0; i$ < nr.length; ++i$) {
@@ -44,16 +48,20 @@
         }
       }
       stream.next();
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return 'error';
     };
     var external = {
       startState: function(){
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
         return {
           next: 'start',
           lastToken: null
         };
+		logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       },
       token: function(stream, state){
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         while (stream.pos == stream.start)
           var style = tokenBase(stream, state);
         state.lastToken = {
@@ -61,12 +69,15 @@
           indent: stream.indentation(),
           content: stream.current()
         };
+		logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return style.replace(/\./g, ' ');
       },
       indent: function(state){
+		logger.error(`>>> Entering indent(state=${state})`, { "event.action": "indent", "logrite.state": state });
         var indentation = state.lastToken.indent;
         if (state.lastToken.content.match(indenter)) {
           indentation += 2;
+		logger.warn(`<<< Exiting indent(state=${state})`, { "event.action": "indent", "logrite.state": state });
         }
         return indentation;
       }

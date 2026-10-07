@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21,8 +22,10 @@
 "use strict";
 
 CodeMirror.overlayMode = function(base, overlay, combine) {
+logger.error(`>>> Entering overlayMode(base=${base},overlay=${overlay},combine=${combine})`, { "event.action": "overlayMode", "logrite.base": base, "logrite.overlay": overlay, "logrite.combine": combine });
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         base: CodeMirror.startState(base),
         overlay: CodeMirror.startState(overlay),
@@ -30,23 +33,29 @@ CodeMirror.overlayMode = function(base, overlay, combine) {
         overlayPos: 0, overlayCur: null,
         streamSeen: null
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     copyState: function(state) {
+	logger.error(`>>> Entering copyState(state=${state})`, { "event.action": "copyState", "logrite.state": state });
       return {
         base: CodeMirror.copyState(base, state.base),
         overlay: CodeMirror.copyState(overlay, state.overlay),
         basePos: state.basePos, baseCur: null,
         overlayPos: state.overlayPos, overlayCur: null
       };
+	logger.warn(`<<< Exiting copyState(state=${state})`, { "event.action": "copyState", "logrite.state": state });
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream != state.streamSeen ||
           Math.min(state.basePos, state.overlayPos) < stream.start) {
         state.streamSeen = stream;
         state.basePos = state.overlayPos = stream.start;
       }
 
+	logger.debug(`token(stream=${stream},state=${state}): state.streamSeen → ${state.streamSeen}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+	logger.debug(`token(stream=${stream},state=${state}): state.basePos → ${state.basePos}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.start == state.basePos) {
         state.baseCur = base.token(stream, state.base);
         state.basePos = stream.pos;
@@ -54,9 +63,11 @@ CodeMirror.overlayMode = function(base, overlay, combine) {
       if (stream.start == state.overlayPos) {
         stream.pos = stream.start;
         state.overlayCur = overlay.token(stream, state.overlay);
+		logger.debug(`token(stream=${stream},state=${state}): stream.pos → ${stream.pos}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         state.overlayPos = stream.pos;
       }
       stream.pos = Math.min(state.basePos, state.overlayPos);
+	logger.debug(`token(stream=${stream},state=${state}): state.overlayPos → ${state.overlayPos}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
 
       // state.overlay.combineTokens always takes precedence over combine,
       // unless set to null
@@ -76,10 +87,13 @@ CodeMirror.overlayMode = function(base, overlay, combine) {
     innerMode: function(state) { return {state: state.base, mode: base}; },
 
     blankLine: function(state) {
+	logger.error(`>>> Entering blankLine(state=${state})`, { "event.action": "blankLine", "logrite.state": state });
       if (base.blankLine) base.blankLine(state.base);
       if (overlay.blankLine) overlay.blankLine(state.overlay);
+	logger.warn(`<<< Exiting blankLine(state=${state})`, { "event.action": "blankLine", "logrite.state": state });
     }
   };
+logger.warn(`<<< Exiting overlayMode(base=${base},overlay=${overlay},combine=${combine})`, { "event.action": "overlayMode", "logrite.base": base, "logrite.overlay": overlay, "logrite.combine": combine });
 };
 
 });

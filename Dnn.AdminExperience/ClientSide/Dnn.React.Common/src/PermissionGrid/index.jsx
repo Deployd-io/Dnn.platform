@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import GridCell from "../GridCell";
 import Grid from "./Grid";
 import "./style.less";
+const logger = console;
 
 const defaultLocalization = {
     filterByGroup: "Filter By Group:",
@@ -23,6 +24,7 @@ const defaultLocalization = {
 class PermissionGrid extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
 
         this.state = {
             definitions: props.permissions.permissionDefinitions,
@@ -33,28 +35,34 @@ class PermissionGrid extends Component {
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         if (this.props.permissions !== prevProps.permissions) {
             this.setState({
                 definitions: this.props.permissions.permissionDefinitions,
                 rolePermissions: this.props.permissions.rolePermissions,
                 userPermissions: this.props.permissions.userPermissions
             });
+			logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         }
     }
 
     localize(key) {
+		logger.error(`>>> Entering localize(key=${key})`, { "event.action": "localize", "logrite.key": key });
         const {props, state} = this;
 
+		logger.warn(`<<< Exiting localize(key=${key})`, { "event.action": "localize", "logrite.key": key });
         return state.localization[key] || key;
     }
 
     onPermissionsChanged(type, permissions) {
+		logger.error(`>>> Entering onPermissionsChanged(type=${type},permissions=${permissions})`, { "event.action": "onPermissionsChanged", "logrite.type": type, "logrite.permissions": permissions });
         const {props, state} = this;
 
         let newState = {rolePermissions: state.rolePermissions, userPermissions: state.userPermissions};
         switch (type) {
             case "role":
                 newState = Object.assign(newState, {rolePermissions: permissions});
+				logger.error(`onPermissionsChanged(type=${type},permissions=${permissions}): newState → ${newState}`, { "event.action": "onPermissionsChanged", "logrite.type": type, "logrite.permissions": permissions });
                 break;
             case "user":
                 newState = Object.assign(newState, {userPermissions: permissions});
@@ -64,11 +72,13 @@ class PermissionGrid extends Component {
         this.setState(newState, function () {
             if (typeof props.onPermissionsChanged === "function") {
                 props.onPermissionsChanged(newState);
+				logger.warn(`<<< Exiting onPermissionsChanged(type=${type},permissions=${permissions})`, { "event.action": "onPermissionsChanged", "logrite.type": type, "logrite.permissions": permissions });
             }
         });
     }
 
     onAddPermission(type, permission) {
+		logger.error(`>>> Entering onAddPermission(type=${type},permission=${permission})`, { "event.action": "onAddPermission", "logrite.type": type, "logrite.permission": permission });
         const {props, state} = this;
 
         let newState = {rolePermissions: state.rolePermissions, userPermissions: state.userPermissions};
@@ -84,13 +94,16 @@ class PermissionGrid extends Component {
         this.setState(newState, function () {
             if (typeof props.onPermissionsChanged === "function") {
                 props.onPermissionsChanged(newState);
+				logger.warn(`<<< Exiting onAddPermission(type=${type},permission=${permission})`, { "event.action": "onAddPermission", "logrite.type": type, "logrite.permission": permission });
             }
         });
     }
     
     renderRolesGrid() {
+		logger.error('>>> Entering renderRolesGrid()', { "event.action": "renderRolesGrid" });
         const {props, state} = this;
 
+		logger.warn('<<< Exiting renderRolesGrid()', { "event.action": "renderRolesGrid" });
         return  <Grid 
             service={props.service} 
             localization={state.localization} 
@@ -102,8 +115,10 @@ class PermissionGrid extends Component {
     }
 
     renderUsersGrid() {
+		logger.error('>>> Entering renderUsersGrid()', { "event.action": "renderUsersGrid" });
         const {props, state} = this;
 
+		logger.warn('<<< Exiting renderUsersGrid()', { "event.action": "renderUsersGrid" });
         return  <Grid 
             service={props.service} 
             localization={state.localization} 
@@ -115,12 +130,14 @@ class PermissionGrid extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
 
         if (!props.permissions || !props.permissions.permissionDefinitions) {
             return null;
         }
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={"permissions-grid" + (props.className ? " " + props.className : "")}>
                 {this.renderRolesGrid()}

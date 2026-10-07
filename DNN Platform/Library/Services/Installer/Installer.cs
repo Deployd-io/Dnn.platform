@@ -42,6 +42,7 @@ namespace DotNetNuke.Services.Installer
         /// <param name="loadManifest">Flag that determines whether the manifest will be loaded.</param>
         public Installer(string tempFolder, string manifest, string physicalSitePath, bool loadManifest)
         {
+			Logger.LogError(">>> Entering Installer(tempFolder={TempFolder},manifest={Manifest},physicalSitePath={PhysicalSitePath},loadManifest={LoadManifest})", tempFolder, manifest, physicalSitePath, loadManifest);
             this.Packages = new SortedList<int, PackageInstaller>();
 
             // Called from Interactive installer - default IgnoreWhiteList to false
@@ -51,6 +52,7 @@ namespace DotNetNuke.Services.Installer
             {
                 this.ReadManifest(true);
             }
+			Logger.LogWarning("<<< Exiting Installer(tempFolder={TempFolder},manifest={Manifest},physicalSitePath={PhysicalSitePath},loadManifest={LoadManifest})", tempFolder, manifest, physicalSitePath, loadManifest);
         }
 
         /// <summary>
@@ -64,6 +66,8 @@ namespace DotNetNuke.Services.Installer
         public Installer(Stream inputStream, string physicalSitePath, bool loadManifest)
             : this(inputStream, physicalSitePath, loadManifest, true)
         {
+		Logger.LogError(">>> Entering Installer(inputStream={InputStream},physicalSitePath={PhysicalSitePath},loadManifest={LoadManifest})", inputStream, physicalSitePath, loadManifest);
+        Logger.LogWarning("<<< Exiting Installer(inputStream={InputStream},physicalSitePath={PhysicalSitePath},loadManifest={LoadManifest})", inputStream, physicalSitePath, loadManifest);
         }
 
         /// <summary>
@@ -77,9 +81,11 @@ namespace DotNetNuke.Services.Installer
         /// <param name="deleteTemp">Whether delete the temp folder.</param>
         public Installer(Stream inputStream, string physicalSitePath, bool loadManifest, bool deleteTemp)
         {
+			Logger.LogError(">>> Entering Installer(inputStream={InputStream},physicalSitePath={PhysicalSitePath},loadManifest={LoadManifest},deleteTemp={DeleteTemp})", inputStream, physicalSitePath, loadManifest, deleteTemp);
             this.Packages = new SortedList<int, PackageInstaller>();
 
             this.inputStream = new MemoryStream();
+			Logger.LogDebug("Installer(inputStream={InputStream},physicalSitePath={PhysicalSitePath},loadManifest={LoadManifest},deleteTemp={DeleteTemp}): inputStream → {InputStream1}", inputStream, physicalSitePath, loadManifest, deleteTemp, inputStream);
             inputStream.CopyTo(this.inputStream);
 
             // Called from Batch installer - default IgnoreWhiteList to true
@@ -99,10 +105,13 @@ namespace DotNetNuke.Services.Installer
         /// <param name="physicalSitePath">The physical path to the root of the site.</param>
         public Installer(PackageInfo package, string physicalSitePath)
         {
+			Logger.LogError(">>> Entering Installer(package={Package},physicalSitePath={PhysicalSitePath})", package, physicalSitePath);
             this.Packages = new SortedList<int, PackageInstaller>();
             this.InstallerInfo = new InstallerInfo(package, physicalSitePath);
 
             this.Packages.Add(this.Packages.Count, new PackageInstaller(package));
+			Logger.LogWarning("<<< Exiting Installer(inputStream={InputStream},physicalSitePath={PhysicalSitePath},loadManifest={LoadManifest},deleteTemp={DeleteTemp})", inputStream, physicalSitePath, loadManifest, deleteTemp);
+			Logger.LogWarning("<<< Exiting Installer(package={Package},physicalSitePath={PhysicalSitePath})", package, physicalSitePath);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Installer"/> class.</summary>
@@ -116,8 +125,10 @@ namespace DotNetNuke.Services.Installer
             if (loadManifest)
             {
                 using var fileStream = new FileStream(manifest, FileMode.Open, FileAccess.Read);
+				Logger.LogError("Installer(manifest={Manifest},physicalSitePath={PhysicalSitePath},loadManifest={LoadManifest}): fileStream → {FileStream}", manifest, physicalSitePath, loadManifest, fileStream);
                 using var xmlReader = XmlReader.Create(fileStream);
                 this.ReadManifest(xmlReader);
+				Logger.LogError("Installer(manifest={Manifest},physicalSitePath={PhysicalSitePath},loadManifest={LoadManifest}): xmlReader → {XmlReader}", manifest, physicalSitePath, loadManifest, xmlReader);
             }
         }
 
@@ -155,9 +166,12 @@ namespace DotNetNuke.Services.Installer
         /// <returns>A new converted <see cref="XPathNavigator"/> that works with current manifest schema.</returns>
         public static XPathNavigator ConvertLegacyNavigator(XPathNavigator rootNav, InstallerInfo info)
         {
+			Logger.LogError(">>> Entering ConvertLegacyNavigator(rootNav={RootNav},info={Info})", rootNav, info);
             XPathNavigator nav = null;
 
+			Logger.LogError("ConvertLegacyNavigator(rootNav={RootNav},info={Info}): nav → {Nav}", rootNav, info, nav);
             var packageType = Null.NullString;
+			Logger.LogError("ConvertLegacyNavigator(rootNav={RootNav},info={Info}): packageType → {PackageType}", rootNav, info, packageType);
             if (rootNav.Name == "dotnetnuke")
             {
                 packageType = Util.ReadAttribute(rootNav, "type");
@@ -174,6 +188,7 @@ namespace DotNetNuke.Services.Installer
             {
                 case "module":
                     var sb = new StringBuilder();
+					Logger.LogError("ConvertLegacyNavigator(rootNav={RootNav},info={Info}): sb → {Sb}", rootNav, info, sb);
                     using (var writer = XmlWriter.Create(sb, XmlUtils.GetXmlWriterSettings(ConformanceLevel.Fragment)))
                     {
                         // Write manifest start element
@@ -183,6 +198,7 @@ namespace DotNetNuke.Services.Installer
                         foreach (XPathNavigator folderNav in rootNav.Select("folders/folder"))
                         {
                             var modulewriter = new ModulePackageWriter(folderNav, info);
+							Logger.LogError("ConvertLegacyNavigator(rootNav={RootNav},info={Info}): modulewriter → {Modulewriter}", rootNav, info, modulewriter);
                             modulewriter.WriteManifest(writer, true);
                         }
 
@@ -205,12 +221,16 @@ namespace DotNetNuke.Services.Installer
                 case "languagepack":
                     // Legacy Language Pack
                     var languageWriter = new LanguagePackWriter(rootNav, info);
+					Logger.LogError("ConvertLegacyNavigator(rootNav={RootNav},info={Info}): languageWriter → {LanguageWriter}", rootNav, info, languageWriter);
                     info.LegacyError = languageWriter.LegacyError;
+					Logger.LogDebug("ConvertLegacyNavigator(rootNav={RootNav},info={Info}): info.LegacyError → {Arg2}", rootNav, info, info.LegacyError);
                     if (string.IsNullOrEmpty(info.LegacyError))
                     {
                         legacyManifest = languageWriter.WriteManifest(false);
+						Logger.LogDebug("ConvertLegacyNavigator(rootNav={RootNav},info={Info}): legacyManifest → {LegacyManifest}", rootNav, info, legacyManifest);
                         using (legacyManifestReader = XmlReader.Create(new StringReader(legacyManifest)))
                         {
+							Logger.LogError("ConvertLegacyNavigator(rootNav={RootNav},info={Info}): legacyManifest → {LegacyManifest}", rootNav, info, legacyManifest);
                             legacyDoc = new XPathDocument(legacyManifestReader);
                         }
 
@@ -222,6 +242,7 @@ namespace DotNetNuke.Services.Installer
                 case "skinobject":
                     // Legacy Skin Object
                     var skinControlwriter = new SkinControlPackageWriter(rootNav, info);
+					Logger.LogError("ConvertLegacyNavigator(rootNav={RootNav},info={Info}): skinControlwriter → {SkinControlwriter}", rootNav, info, skinControlwriter);
                     legacyManifest = skinControlwriter.WriteManifest(false);
                     using (legacyManifestReader = XmlReader.Create(new StringReader(legacyManifest)))
                     {
@@ -233,12 +254,14 @@ namespace DotNetNuke.Services.Installer
                     break;
             }
 
+			Logger.LogWarning("<<< Exiting ConvertLegacyNavigator(rootNav={RootNav},info={Info})", rootNav, info);
             return nav;
         }
 
         /// <summary>Deletes the package temporary folder.</summary>
         public void DeleteTempFolder()
         {
+			Logger.LogError(">>> Entering DeleteTempFolder()");
             try
             {
                 if (!string.IsNullOrEmpty(this.TempInstallFolder))
@@ -251,14 +274,17 @@ namespace DotNetNuke.Services.Installer
                 Logger.Error("Exception deleting folder " + this.TempInstallFolder + " while installing " + this.InstallerInfo.ManifestFile.Name, ex);
                 Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogWarning("<<< Exiting DeleteTempFolder()");
         }
 
         /// <summary>The Install method installs the feature.</summary>
         /// <returns>A value indicating whether the install succeeded.</returns>
         public bool Install()
         {
+			Logger.LogError(">>> Entering Install()");
             this.InstallerInfo.Log.StartJob(Util.INSTALL_Start);
             bool succeeded = true;
+			Logger.LogError("Install(): succeeded → {Succeeded}", succeeded);
             try
             {
                 bool clearClientCache = false;
@@ -316,6 +342,7 @@ namespace DotNetNuke.Services.Installer
                 Config.Touch();
             }
 
+			Logger.LogWarning("<<< Exiting Install()");
             return succeeded;
         }
 
@@ -323,11 +350,14 @@ namespace DotNetNuke.Services.Installer
         /// <param name="deleteTemp">A value indicating whether to delete the temporary folder.</param>
         public void ReadManifest(bool deleteTemp)
         {
+			Logger.LogError(">>> Entering ReadManifest(deleteTemp={DeleteTemp})", deleteTemp);
             this.InstallerInfo.Log.StartJob(Util.DNN_Reading);
             if (this.InstallerInfo.ManifestFile != null)
             {
                 using var fileStream = new FileStream(this.InstallerInfo.ManifestFile.TempFileName, FileMode.Open, FileAccess.Read);
+				Logger.LogError("ReadManifest(deleteTemp={DeleteTemp}): fileStream → {FileStream}", deleteTemp, fileStream);
                 using var xmlReader = XmlReader.Create(fileStream);
+				Logger.LogError("ReadManifest(deleteTemp={DeleteTemp}): xmlReader → {XmlReader}", deleteTemp, xmlReader);
                 this.ReadManifest(xmlReader);
             }
 
@@ -339,6 +369,7 @@ namespace DotNetNuke.Services.Installer
             {
                 this.DeleteTempFolder();
             }
+			Logger.LogWarning("<<< Exiting ReadManifest(deleteTemp={DeleteTemp})", deleteTemp);
         }
 
         /// <summary>The UnInstall method uninstalls the feature.</summary>
@@ -346,6 +377,7 @@ namespace DotNetNuke.Services.Installer
         /// <returns>A value indicating whether the uninstall succeeded.</returns>
         public bool UnInstall(bool deleteFiles)
         {
+			Logger.LogError(">>> Entering UnInstall(deleteFiles={DeleteFiles})", deleteFiles);
             this.InstallerInfo.Log.StartJob(Util.UNINSTALL_Start);
             try
             {
@@ -368,29 +400,36 @@ namespace DotNetNuke.Services.Installer
 
             // log installation event
             this.LogInstallEvent("Package", "UnInstall");
+			Logger.LogWarning("<<< Exiting UnInstall(deleteFiles={DeleteFiles})", deleteFiles);
             return true;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogError(">>> Entering Dispose()");
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			Logger.LogWarning("<<< Exiting Dispose()");
         }
 
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogError(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (disposing)
             {
                 this.inputStream?.Dispose();
             }
+			Logger.LogWarning("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         private static void BackupStreamIntoFile(MemoryStream stream, PackageInfo package)
         {
+			Logger.LogError(">>> Entering BackupStreamIntoFile(stream={Stream},package={Package})", stream, package);
             try
             {
                 var filePath = Util.GetPackageBackupPath(package);
+				Logger.LogError("BackupStreamIntoFile(stream={Stream},package={Package}): filePath → {FilePath}", stream, package, filePath);
 
                 if (File.Exists(filePath))
                 {
@@ -399,6 +438,7 @@ namespace DotNetNuke.Services.Installer
                 }
 
                 using var fileStream = File.Create(filePath);
+				Logger.LogError("BackupStreamIntoFile(stream={Stream},package={Package}): fileStream → {FileStream}", stream, package, fileStream);
                 if (stream.CanSeek)
                 {
                     stream.Seek(0, SeekOrigin.Begin);
@@ -410,11 +450,13 @@ namespace DotNetNuke.Services.Installer
             {
                 Logger.Error(ex);
             }
+			Logger.LogWarning("<<< Exiting BackupStreamIntoFile(stream={Stream},package={Package})", stream, package);
         }
 
         /// <summary>The InstallPackages method installs the packages.</summary>
         private void InstallPackages(ref bool clearClientCache)
         {
+			Logger.LogError(">>> Entering InstallPackages(clearClientCache={ClearClientCache})", clearClientCache);
             for (int index = 0; index <= this.Packages.Count - 1; index++)
             {
                 PackageInstaller installer = this.Packages.Values[index];
@@ -442,6 +484,7 @@ namespace DotNetNuke.Services.Installer
                     this.InstallerInfo.Log.AddFailure(Util.INSTALL_Aborted + " - " + installer.Package.Name);
                 }
             }
+			Logger.LogWarning("<<< Exiting InstallPackages(clearClientCache={ClearClientCache})", clearClientCache);
         }
 
         /// <summary>Logs the Install event to the Event Log.</summary>
@@ -449,9 +492,11 @@ namespace DotNetNuke.Services.Installer
         /// <param name="eventType">Event Type.</param>
         private void LogInstallEvent(string package, string eventType)
         {
+			Logger.LogError(">>> Entering LogInstallEvent(package={Package},eventType={EventType})", package, eventType);
             try
             {
                 var log = new LogInfo { LogTypeKey = nameof(EventLogType.HOST_ALERT) };
+				Logger.LogError("LogInstallEvent(package={Package},eventType={EventType}): log → {Log}", package, eventType, log);
 
                 if (this.InstallerInfo.ManifestFile != null)
                 {
@@ -469,15 +514,18 @@ namespace DotNetNuke.Services.Installer
             {
                 Logger.Error(exc);
             }
+			Logger.LogWarning("<<< Exiting LogInstallEvent(package={Package},eventType={EventType})", package, eventType);
         }
 
         /// <summary>The ProcessPackages method processes the packages nodes in the manifest.</summary>
         private void ProcessPackages(XPathNavigator rootNav)
         {
+			Logger.LogError(">>> Entering ProcessPackages(rootNav={RootNav})", rootNav);
             // Parse the package nodes
             foreach (XPathNavigator nav in rootNav.Select("packages/package"))
             {
                 int order = this.Packages.Count;
+				Logger.LogError("ProcessPackages(rootNav={RootNav}): order → {Order}", rootNav, order);
                 string name = Util.ReadAttribute(nav, "name");
                 string installOrder = Util.ReadAttribute(nav, "installOrder");
                 if (!string.IsNullOrEmpty(installOrder))
@@ -487,14 +535,18 @@ namespace DotNetNuke.Services.Installer
 
                 this.Packages.Add(order, new PackageInstaller(nav.OuterXml, this.InstallerInfo));
             }
+			Logger.LogWarning("<<< Exiting ProcessPackages(rootNav={RootNav})", rootNav);
         }
 
         private void ReadManifest(XmlReader reader)
         {
+			Logger.LogError(">>> Entering ReadManifest(reader={Reader})", reader);
             var doc = new XPathDocument(reader);
 
+			Logger.LogError("ReadManifest(reader={Reader}): doc → {Doc}", reader, doc);
             // Read the root node to determine what version the manifest is
             XPathNavigator rootNav = doc.CreateNavigator();
+			Logger.LogError("ReadManifest(reader={Reader}): rootNav → {RootNav}", reader, rootNav);
             rootNav.MoveToFirstChild();
             while (rootNav.NodeType == XPathNodeType.Comment)
             {
@@ -502,6 +554,7 @@ namespace DotNetNuke.Services.Installer
             }
 
             string packageType = Null.NullString;
+			Logger.LogError("ReadManifest(reader={Reader}): packageType → {PackageType}", reader, packageType);
 
             if (rootNav.Name == "dotnetnuke")
             {
@@ -531,15 +584,18 @@ namespace DotNetNuke.Services.Installer
                     this.ProcessPackages(ConvertLegacyNavigator(rootNav, this.InstallerInfo));
                     break;
             }
+			Logger.LogWarning("<<< Exiting ReadManifest(reader={Reader})", reader);
         }
 
         private void UnInstallPackages(bool deleteFiles)
         {
+			Logger.LogError(">>> Entering UnInstallPackages(deleteFiles={DeleteFiles})", deleteFiles);
             for (int index = 0; index <= this.Packages.Count - 1; index++)
             {
                 PackageInstaller installer = this.Packages.Values[index];
                 this.InstallerInfo.Log.AddInfo(Util.UNINSTALL_Start + " - " + installer.Package.Name);
                 installer.DeleteFiles = deleteFiles;
+				Logger.LogDebug("UnInstallPackages(deleteFiles={DeleteFiles}): installer.DeleteFiles → {Arg1}", deleteFiles, installer.DeleteFiles);
                 installer.UnInstall();
                 if (this.InstallerInfo.Log.HasWarnings)
                 {
@@ -550,6 +606,7 @@ namespace DotNetNuke.Services.Installer
                     this.InstallerInfo.Log.AddInfo(Util.UNINSTALL_Success + " - " + installer.Package.Name);
                 }
             }
+			Logger.LogWarning("<<< Exiting UnInstallPackages(deleteFiles={DeleteFiles})", deleteFiles);
         }
     }
 }

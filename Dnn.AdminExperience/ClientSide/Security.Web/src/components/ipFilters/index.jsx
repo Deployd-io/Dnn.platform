@@ -9,6 +9,7 @@ import resx from "../../resources";
 import { SvgIcons } from "@dnnsoftware/dnn-react-common";
 import WarningIcon from "./../svg/error.svg?react";
 import styles from "./style.module.less";
+const logger = console;
 
 
 let tableFields = [];
@@ -16,12 +17,15 @@ let tableFields = [];
 class IpFiltersPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             openId: ""
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const {props} = this;
         props.dispatch(SecurityActions.getIpFilters());
 
@@ -29,15 +33,18 @@ class IpFiltersPanelBody extends Component {
         tableFields.push({ "name": resx.get("FilterType.Header"), "id": "RuleType" });
         tableFields.push({ "name": resx.get("IpAddress.Header"), "id": "IPAddress" });
         tableFields.push({ "name": resx.get("Notes.Header"), "id": "Notes" });
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     renderHeader() {
+		logger.error('>>> Entering renderHeader()', { "event.action": "renderHeader" });
         let tableHeaders = tableFields.map((field) => {
             let className = "ip-filter-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}</span>
             </div>;
         });
+		logger.warn('<<< Exiting renderHeader()', { "event.action": "renderHeader" });
         return <div className="header-row">{tableHeaders}</div>;
     }
 
@@ -86,7 +93,9 @@ class IpFiltersPanelBody extends Component {
 
 
     renderedIpFilters() {
+		logger.error('>>> Entering renderedIpFilters()', { "event.action": "renderedIpFilters" });
         let i = 0;
+		logger.warn('<<< Exiting renderedIpFilters()', { "event.action": "renderedIpFilters" });
         return this.props.ipFilters.map((item, index) => {
             let id = "row-" + i++;
             return (
@@ -115,6 +124,7 @@ class IpFiltersPanelBody extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let opened = (this.state.openId === "add");
         if (this.props.ipFilters) {
             return (
@@ -171,6 +181,8 @@ IpFiltersPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         ipFilters: state.security.ipFilters,

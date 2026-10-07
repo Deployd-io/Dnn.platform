@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -65,7 +66,9 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
 
   function inText(stream, state) {
     function chain(parser) {
+	logger.error(`>>> Entering chain(parser=${parser})`, { "event.action": "chain", "logrite.parser": parser });
       state.tokenize = parser;
+	logger.warn(`<<< Exiting chain(parser=${parser})`, { "event.action": "chain", "logrite.parser": parser });
       return parser(stream, state);
     }
 
@@ -112,9 +115,12 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
   inText.isInText = true;
 
   function inTag(stream, state) {
+	logger.error(`>>> Entering inTag(stream=${stream},state=${state})`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.next();
     if (ch == ">" || (ch == "/" && stream.eat(">"))) {
+	logger.error(`inTag(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
       state.tokenize = inText;
+	logger.debug(`inTag(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
       type = ch == ">" ? "endTag" : "selfcloseTag";
       return "tag bracket";
     } else if (ch == "=") {
@@ -123,8 +129,11 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
     } else if (ch == "<") {
       state.tokenize = inText;
       state.state = baseState;
+	logger.debug(`inTag(stream=${stream},state=${state}): state.state → ${state.state}`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
       state.tagName = state.tagStart = null;
+	logger.debug(`inTag(stream=${stream},state=${state}): state.tagName → ${state.tagName}`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
       var next = state.tokenize(stream, state);
+	logger.error(`inTag(stream=${stream},state=${state}): next → ${next}`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
       return next ? next + " tag error" : "tag error";
     } else if (/[\'\"]/.test(ch)) {
       state.tokenize = inAttribute(ch);
@@ -132,18 +141,23 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
       return state.tokenize(stream, state);
     } else {
       stream.match(/^[^\s\u00a0=<>\"\']*[^\s\u00a0=<>\"\'\/]/);
+	logger.warn(`<<< Exiting inTag(stream=${stream},state=${state})`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
       return "word";
     }
   }
 
   function inAttribute(quote) {
+	logger.error(`>>> Entering inAttribute(quote=${quote})`, { "event.action": "inAttribute", "logrite.quote": quote });
     var closure = function(stream, state) {
+	logger.error(`>>> Entering closure(stream=${stream},state=${state})`, { "event.action": "closure", "logrite.stream": stream, "logrite.state": state });
       while (!stream.eol()) {
         if (stream.next() == quote) {
           state.tokenize = inTag;
           break;
+		logger.debug(`closure(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "closure", "logrite.stream": stream, "logrite.state": state });
         }
       }
+	logger.warn(`<<< Exiting closure(stream=${stream},state=${state})`, { "event.action": "closure", "logrite.stream": stream, "logrite.state": state });
       return "string";
     };
     closure.isInAttribute = true;
@@ -151,6 +165,7 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
   }
 
   function inBlock(style, terminator) {
+	logger.error(`>>> Entering inBlock(style=${style},terminator=${terminator})`, { "event.action": "inBlock", "logrite.style": style, "logrite.terminator": terminator });
     return function(stream, state) {
       while (!stream.eol()) {
         if (stream.match(terminator)) {
@@ -163,6 +178,7 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
     };
   }
   function doctype(depth) {
+	logger.error(`>>> Entering doctype(depth=${depth})`, { "event.action": "doctype", "logrite.depth": depth });
     return function(stream, state) {
       var ch;
       while ((ch = stream.next()) != null) {
@@ -184,17 +200,25 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
   }
 
   function Context(state, tagName, startOfLine) {
+	logger.error(`>>> Entering Context(state=${state},tagName=${tagName},startOfLine=${startOfLine})`, { "event.action": "Context", "logrite.state": state, "logrite.tagName": tagName, "logrite.startOfLine": startOfLine });
     this.prev = state.context;
     this.tagName = tagName;
     this.indent = state.indented;
+	logger.debug(`Context(state=${state},tagName=${tagName},startOfLine=${startOfLine}): this.prev → ${this.prev}`, { "event.action": "Context", "logrite.state": state, "logrite.tagName": tagName, "logrite.startOfLine": startOfLine });
+	logger.debug(`Context(state=${state},tagName=${tagName},startOfLine=${startOfLine}): tagName → ${tagName}`, { "event.action": "Context", "logrite.state": state, "logrite.tagName": tagName, "logrite.startOfLine": startOfLine });
+	logger.debug(`Context(state=${state},tagName=${tagName},startOfLine=${startOfLine}): this.tagName → ${this.tagName}`, { "event.action": "Context", "logrite.state": state, "logrite.tagName": tagName, "logrite.startOfLine": startOfLine });
     this.startOfLine = startOfLine;
     if (Kludges.doNotIndent.hasOwnProperty(tagName) || (state.context && state.context.noIndent))
       this.noIndent = true;
+	logger.warn(`<<< Exiting Context(state=${state},tagName=${tagName},startOfLine=${startOfLine})`, { "event.action": "Context", "logrite.state": state, "logrite.tagName": tagName, "logrite.startOfLine": startOfLine });
   }
   function popContext(state) {
+	logger.error(`>>> Entering popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
     if (state.context) state.context = state.context.prev;
+	logger.warn(`<<< Exiting popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
   }
   function maybePopContext(state, nextTagName) {
+	logger.error(`>>> Entering maybePopContext(state=${state},nextTagName=${nextTagName})`, { "event.action": "maybePopContext", "logrite.state": state, "logrite.nextTagName": nextTagName });
     var parentTagName;
     while (true) {
       if (!state.context) {
@@ -206,35 +230,42 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
         return;
       }
       popContext(state);
+	logger.debug(`maybePopContext(state=${state},nextTagName=${nextTagName}): parentTagName → ${parentTagName}`, { "event.action": "maybePopContext", "logrite.state": state, "logrite.nextTagName": nextTagName });
     }
   }
 
   function baseState(type, stream, state) {
+	logger.error(`>>> Entering baseState(type=${type},stream=${stream},state=${state})`, { "event.action": "baseState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "openTag") {
       state.tagStart = stream.column();
       return tagNameState;
     } else if (type == "closeTag") {
       return closeTagNameState;
     } else {
+	logger.warn(`<<< Exiting baseState(type=${type},stream=${stream},state=${state})`, { "event.action": "baseState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
       return baseState;
     }
   }
   function tagNameState(type, stream, state) {
+	logger.error(`>>> Entering tagNameState(type=${type},stream=${stream},state=${state})`, { "event.action": "tagNameState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "word") {
       state.tagName = stream.current();
       setStyle = "tag";
       return attrState;
     } else {
       setStyle = "error";
+	logger.warn(`<<< Exiting tagNameState(type=${type},stream=${stream},state=${state})`, { "event.action": "tagNameState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
       return tagNameState;
     }
   }
   function closeTagNameState(type, stream, state) {
+	logger.error(`>>> Entering closeTagNameState(type=${type},stream=${stream},state=${state})`, { "event.action": "closeTagNameState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "word") {
       var tagName = stream.current();
       if (state.context && state.context.tagName != tagName &&
           Kludges.implicitlyClosed.hasOwnProperty(state.context.tagName))
         popContext(state);
+		logger.error(`closeTagNameState(type=${type},stream=${stream},state=${state}): tagName → ${tagName}`, { "event.action": "closeTagNameState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
       if (state.context && state.context.tagName == tagName) {
         setStyle = "tag";
         return closeState;
@@ -244,24 +275,30 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
       }
     } else {
       setStyle = "error";
+	logger.warn(`<<< Exiting closeTagNameState(type=${type},stream=${stream},state=${state})`, { "event.action": "closeTagNameState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
       return closeStateErr;
     }
   }
 
   function closeState(type, _stream, state) {
+	logger.error(`>>> Entering closeState(type=${type},_stream=${_stream},state=${state})`, { "event.action": "closeState", "logrite.type": type, "logrite._stream": _stream, "logrite.state": state });
     if (type != "endTag") {
       setStyle = "error";
       return closeState;
     }
     popContext(state);
+	logger.warn(`<<< Exiting closeState(type=${type},_stream=${_stream},state=${state})`, { "event.action": "closeState", "logrite.type": type, "logrite._stream": _stream, "logrite.state": state });
     return baseState;
   }
   function closeStateErr(type, stream, state) {
+	logger.error(`>>> Entering closeStateErr(type=${type},stream=${stream},state=${state})`, { "event.action": "closeStateErr", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     setStyle = "error";
+	logger.warn(`<<< Exiting closeStateErr(type=${type},stream=${stream},state=${state})`, { "event.action": "closeStateErr", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return closeState(type, stream, state);
   }
 
   function attrState(type, _stream, state) {
+	logger.error(`>>> Entering attrState(type=${type},_stream=${_stream},state=${state})`, { "event.action": "attrState", "logrite.type": type, "logrite._stream": _stream, "logrite.state": state });
     if (type == "word") {
       setStyle = "attribute";
       return attrEqState;
@@ -270,6 +307,7 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
       state.tagName = state.tagStart = null;
       if (type == "selfcloseTag" ||
           Kludges.autoSelfClosers.hasOwnProperty(tagName)) {
+		logger.debug(`attrState(type=${type},_stream=${_stream},state=${state}): state.tagName → ${state.tagName}`, { "event.action": "attrState", "logrite.type": type, "logrite._stream": _stream, "logrite.state": state });
         maybePopContext(state, tagName);
       } else {
         maybePopContext(state, tagName);
@@ -278,40 +316,51 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
       return baseState;
     }
     setStyle = "error";
+	logger.warn(`<<< Exiting attrState(type=${type},_stream=${_stream},state=${state})`, { "event.action": "attrState", "logrite.type": type, "logrite._stream": _stream, "logrite.state": state });
     return attrState;
   }
   function attrEqState(type, stream, state) {
+	logger.error(`>>> Entering attrEqState(type=${type},stream=${stream},state=${state})`, { "event.action": "attrEqState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "equals") return attrValueState;
     if (!Kludges.allowMissing) setStyle = "error";
+	logger.warn(`<<< Exiting attrEqState(type=${type},stream=${stream},state=${state})`, { "event.action": "attrEqState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return attrState(type, stream, state);
   }
   function attrValueState(type, stream, state) {
+	logger.error(`>>> Entering attrValueState(type=${type},stream=${stream},state=${state})`, { "event.action": "attrValueState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "string") return attrContinuedState;
     if (type == "word" && Kludges.allowUnquoted) {setStyle = "string"; return attrState;}
     setStyle = "error";
+	logger.warn(`<<< Exiting attrValueState(type=${type},stream=${stream},state=${state})`, { "event.action": "attrValueState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return attrState(type, stream, state);
   }
   function attrContinuedState(type, stream, state) {
+	logger.error(`>>> Entering attrContinuedState(type=${type},stream=${stream},state=${state})`, { "event.action": "attrContinuedState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     if (type == "string") return attrContinuedState;
+	logger.warn(`<<< Exiting attrContinuedState(type=${type},stream=${stream},state=${state})`, { "event.action": "attrContinuedState", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
     return attrState(type, stream, state);
   }
 
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {tokenize: inText,
               state: baseState,
               indented: 0,
               tagName: null, tagStart: null,
               context: null};
+			logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (!state.tagName && stream.sol())
         state.indented = stream.indentation();
 
       if (stream.eatSpace()) return null;
       type = null;
       var style = state.tokenize(stream, state);
+	logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if ((style || type) && style != "comment") {
         setStyle = null;
         state.state = state.state(type || style, stream, state);
@@ -322,6 +371,7 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
     },
 
     indent: function(state, textAfter, fullLine) {
+	logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter},fullLine=${fullLine})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter, "logrite.fullLine": fullLine });
       var context = state.context;
       // Indent multi-line strings (e.g. css).
       if (state.tokenize.isInAttribute) {
@@ -342,6 +392,7 @@ CodeMirror.defineMode("xml", function(config, parserConfig) {
       }
       if (alignCDATA && /<!\[CDATA\[/.test(textAfter)) return 0;
       var tagAfter = textAfter && /^<(\/)?([\w_:\.-]*)/.exec(textAfter);
+	logger.error(`indent(state=${state},textAfter=${textAfter},fullLine=${fullLine}): tagAfter → ${tagAfter}`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter, "logrite.fullLine": fullLine });
       if (tagAfter && tagAfter[1]) { // Closing tag spotted
         while (context) {
           if (context.tagName == tagAfter[2]) {

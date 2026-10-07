@@ -12,10 +12,13 @@ namespace DotNetNuke.Entities.Modules.Actions
     ///  collection which provides the ability to create a hierarchy of ModuleActions.</remarks>
     public class ModuleActionCollection : GenericCollectionBase<ModuleAction>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleActionCollection));
         /// <summary>Initializes a new instance of the <see cref="ModuleActionCollection"/> class.</summary>
         /// <remarks>The default constructor creates an empty collection of <see cref="ModuleAction" /> objects.</remarks>
         public ModuleActionCollection()
         {
+		Logger.LogError(">>> Entering ModuleActionCollection()");
+        Logger.LogWarning("<<< Exiting ModuleActionCollection()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleActionCollection"/> class containing the elements of the specified source collection.</summary>
@@ -23,7 +26,9 @@ namespace DotNetNuke.Entities.Modules.Actions
         /// <remarks>This overloaded constructor copies the <see cref="ModuleAction" />s from the indicated collection.</remarks>
         public ModuleActionCollection(ModuleActionCollection value)
         {
+			Logger.LogError(">>> Entering ModuleActionCollection(value={Value})", value);
             this.AddRange(value);
+			Logger.LogWarning("<<< Exiting ModuleActionCollection(value={Value})", value);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleActionCollection"/> class containing the specified array of <see cref="ModuleAction" /> objects.</summary>
@@ -42,6 +47,9 @@ namespace DotNetNuke.Entities.Modules.Actions
         /// <remarks>This method creates a new <see cref="ModuleAction" /> with the specified values, adds it to the collection and returns the index of the newly created ModuleAction.</remarks>
         public ModuleAction Add(int iD, string title, string cmdName)
         {
+			Logger.LogError(">>> Entering Add(iD={ID},title={Title},cmdName={CmdName})", iD, title, cmdName);
+            Logger.LogWarning("<<< Exiting Add(iD={ID},title={Title},cmdName={CmdName})", iD, title, cmdName);
+			Logger.LogWarning("<<< Exiting Add(iD={ID},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url},clientScript={ClientScript},useActionEvent={UseActionEvent},secure={Secure},visible={Visible},newWindow={NewWindow})", iD, title, cmdName, cmdArg, icon, url, clientScript, useActionEvent, secure, visible, newWindow);
             return this.Add(iD, title, cmdName, string.Empty, string.Empty, string.Empty, false, SecurityAccessLevel.Anonymous, true, false);
         }
 
@@ -88,11 +96,13 @@ namespace DotNetNuke.Entities.Modules.Actions
         /// <param name="value">An array of type <see cref="ModuleAction" /> containing the objects to add to the collection.</param>
         public void AddRange(ModuleAction[] value)
         {
+			Logger.LogError(">>> Entering AddRange(value={Value})", value);
             int i;
             for (i = 0; i <= value.Length - 1; i++)
             {
                 this.Add(value[i]);
             }
+			Logger.LogWarning("<<< Exiting AddRange(value={Value})", value);
         }
 
         /// <summary>Adds the contents of another <see cref="ModuleActionCollection" /> to the end of the collection.</summary>
@@ -107,8 +117,10 @@ namespace DotNetNuke.Entities.Modules.Actions
 
         public ModuleAction GetActionByCommandName(string name)
         {
+			Logger.LogError(">>> Entering GetActionByCommandName(name={Name})", name);
             ModuleAction retAction = null;
 
+			Logger.LogError("GetActionByCommandName(name={Name}): retAction → {RetAction}", name, retAction);
             // Check each action in the List
             foreach (ModuleAction modAction in this.List)
             {
@@ -122,6 +134,7 @@ namespace DotNetNuke.Entities.Modules.Actions
                 if (modAction.HasChildren())
                 {
                     ModuleAction childAction = modAction.Actions.GetActionByCommandName(name);
+					Logger.LogError("GetActionByCommandName(name={Name}): childAction → {ChildAction}", name, childAction);
                     if (childAction != null)
                     {
                         retAction = childAction;
@@ -130,13 +143,16 @@ namespace DotNetNuke.Entities.Modules.Actions
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetActionByCommandName(name={Name})", name);
             return retAction;
         }
 
         public ModuleActionCollection GetActionsByCommandName(string name)
         {
+			Logger.LogError(">>> Entering GetActionsByCommandName(name={Name})", name);
             var retActions = new ModuleActionCollection();
 
+			Logger.LogError("GetActionsByCommandName(name={Name}): retActions → {RetActions}", name, retActions);
             // Check each action in the List
             foreach (ModuleAction modAction in this.List)
             {
@@ -152,13 +168,16 @@ namespace DotNetNuke.Entities.Modules.Actions
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetActionsByCommandName(name={Name})", name);
             return retActions;
         }
 
         public ModuleAction GetActionByID(int id)
         {
+			Logger.LogError(">>> Entering GetActionByID(id={Id})", id);
             ModuleAction retAction = null;
 
+			Logger.LogError("GetActionByID(id={Id}): retAction → {RetAction}", id, retAction);
             // Check each action in the List
             foreach (ModuleAction modAction in this.List)
             {
@@ -172,6 +191,7 @@ namespace DotNetNuke.Entities.Modules.Actions
                 if (modAction.HasChildren())
                 {
                     ModuleAction childAction = modAction.Actions.GetActionByID(id);
+					Logger.LogError("GetActionByID(id={Id}): childAction → {ChildAction}", id, childAction);
                     if (childAction != null)
                     {
                         retAction = childAction;
@@ -180,6 +200,7 @@ namespace DotNetNuke.Entities.Modules.Actions
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetActionByID(id={Id})", id);
             return retAction;
         }
     }

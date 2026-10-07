@@ -1,9 +1,14 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function() {
   var mode = CodeMirror.getMode({indentUnit: 2}, "javascript");
-  function MT(name) { test.mode(name, mode, Array.prototype.slice.call(arguments, 1)); }
+  function MT(name) {
+      logger.error(`>>> Entering MT(name=${name})`, { "event.action": "MT", "logrite.name": name });
+      logger.warn(`<<< Exiting MT(name=${name})`, { "event.action": "MT", "logrite.name": name });
+      test.mode(name, mode, Array.prototype.slice.call(arguments, 1));
+  }
 
   MT("locals",
      "[keyword function] [variable foo]([def a], [def b]) { [keyword var] [def c] [operator =] [number 10]; [keyword return] [variable-2 a] [operator +] [variable-2 c] [operator +] [variable d]; }");
@@ -163,7 +168,9 @@
     {name: "javascript", jsonld: true}
   );
   function LD(name) {
+	logger.error(`>>> Entering LD(name=${name})`, { "event.action": "LD", "logrite.name": name });
     test.mode(name, jsonld_mode, Array.prototype.slice.call(arguments, 1));
+	logger.warn(`<<< Exiting LD(name=${name})`, { "event.action": "LD", "logrite.name": name });
   }
 
   LD("json_ld_keywords",

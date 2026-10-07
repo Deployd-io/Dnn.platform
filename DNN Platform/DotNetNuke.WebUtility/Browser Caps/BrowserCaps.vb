@@ -8,11 +8,13 @@ Imports System.Web.Caching
 Imports System.Xml
 Imports System.Xml.Serialization
 Imports System.Xml.XPath
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.Utilities
 
     <Serializable(), XmlRoot("capabilities")>
     Public Class BrowserCaps
+	Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
 
 #Region "Private Members"
 
@@ -47,14 +49,17 @@ Namespace DotNetNuke.UI.Utilities
 #Region "Private Shared Methods"
 
         Private Shared Function GetBrowser(ByVal objNav As XPathNavigator) As Browser
+			_logger.LogError(">>> Entering GetBrowser(objNav={ObjNav})", objNav)
             Dim objBrowser As New Browser()
             objBrowser.Contains = objNav.GetAttribute("contains", "")
             objBrowser.Name = objNav.GetAttribute("nm", "")
             Dim strMinVersion As String = objNav.GetAttribute("minversion", "")
+			_logger.LogError("GetBrowser(objNav={ObjNav}): strMinVersion → {StrMinVersion}", objNav, strMinVersion)
             'If Not String.IsNullOrEmpty(strMinVersion) Then    '.NET 2.0 specific
             If Len(strMinVersion) > 0 Then
                 objBrowser.MinVersion = Double.Parse(strMinVersion, CultureInfo.InvariantCulture)
             End If
+			_logger.LogWarning("<<< Exiting GetBrowser(objNav={ObjNav})", objNav)
             Return objBrowser
         End Function
 
@@ -63,6 +68,7 @@ Namespace DotNetNuke.UI.Utilities
 #Region "Shared Methods"
 
         Public Shared Function GetBrowserCaps() As BrowserCaps
+		_logger.LogError(">>> Entering GetBrowserCaps()")
 
             Dim objCaps As BrowserCaps = CType(DataCache.GetCache(CLIENTAPI_CACHE_KEY), BrowserCaps)
             Dim objFunc As FunctionalityInfo = Nothing
@@ -72,13 +78,18 @@ Namespace DotNetNuke.UI.Utilities
 
                 Try
                     strPath = System.Web.HttpContext.Current.Server.MapPath(ClientAPI.ScriptPath & "/ClientAPICaps.config")
+					_logger.LogDebug("GetBrowserCaps(): strPath → {StrPath}", strPath)
                 Catch ex As Exception
+					_logger.LogError("Exception in GetBrowserCaps(): {Arg0}", ex.Message)
                     'ignore error - worried about people with reverse proxies and such...
                 End Try
 
                 Dim objDoc As XPathDocument = Nothing
                 Dim fileExists As Boolean = File.Exists(strPath)
+					_logger.LogError("GetBrowserCaps(): fileExists → {FileExists}", fileExists)
                     objCaps = New BrowserCaps()
+					_logger.LogDebug("GetBrowserCaps(): objCaps → {ObjCaps}", objCaps)
+					_logger.LogError("GetBrowserCaps(): objCaps → {ObjCaps}", objCaps)
                     objCaps.Functionality = New FunctionalityCollection()
                     If fileExists Then
 
@@ -86,6 +97,7 @@ Namespace DotNetNuke.UI.Utilities
                         Using objReader = New FileStream(strPath, FileMode.Open, FileAccess.Read, FileShare.Read)
                             Using xmlReader As XmlReader = XmlReader.Create(objReader)
                                 objDoc = New XPathDocument(xmlReader)
+								_logger.LogDebug("GetBrowserCaps(): objDoc → {ObjDoc}", objDoc)
                             End Using
                         End Using
                     Else
@@ -99,6 +111,7 @@ Namespace DotNetNuke.UI.Utilities
                     If Not objDoc Is Nothing Then
                         For Each objNavFunc As XPathNavigator In objDoc.CreateNavigator.Select("//functionality")
                             objFunc = New FunctionalityInfo()
+							_logger.LogDebug("GetBrowserCaps(): objFunc → {ObjFunc}", objFunc)
                             objFunc.Functionality = DirectCast(System.Enum.Parse(GetType(ClientAPI.ClientFunctionality), objNavFunc.GetAttribute("nm", "")), ClientAPI.ClientFunctionality)
                             objFunc.Desc = objNavFunc.GetAttribute("desc", "")
 
@@ -122,6 +135,7 @@ Namespace DotNetNuke.UI.Utilities
                 End If
             End If
 
+			_logger.LogWarning("<<< Exiting GetBrowserCaps()")
             Return objCaps
 
         End Function

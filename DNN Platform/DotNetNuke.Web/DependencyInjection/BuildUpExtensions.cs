@@ -22,15 +22,18 @@ namespace DotNetNuke.DependencyInjection.Extensions
         /// <param name="filter">The <see cref="IFilter"/> to inject properties.</param>
         internal static void BuildUp(this IServiceProvider container, IFilter filter)
         {
+			Logger.LogError(">>> Entering BuildUp(container={Container},filter={Filter})", container, filter);
             if (container == null || filter == null)
             {
                 return;
             }
 
             var properties = GetDependencyProperties(filter.GetType());
+			Logger.LogError("BuildUp(container={Container},filter={Filter}): properties → {Properties}", container, filter, properties);
             foreach (var property in properties)
             {
                 var service = container.GetService(property.PropertyType);
+				Logger.LogError("BuildUp(container={Container},filter={Filter}): service → {Service}", container, filter, service);
                 if (service != null)
                 {
                     try

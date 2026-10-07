@@ -7,11 +7,13 @@ import "./style.less";
 import { CommonUsersActions } from "../../../actions";
 import utilities from "utils";
 import Combobox from "react-widgets/Combobox";
+const logger = console;
 import { GridCell, Checkbox, Pager, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 class UserRoles extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             roleSelectState: { userId: -1, keyword: "" },
             currentPage: 0,
@@ -21,14 +23,18 @@ class UserRoles extends Component {
             isOwner: false,
             allowOwner: false
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.getRoles();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
 
     getRoles() {
+		logger.error('>>> Entering getRoles()', { "event.action": "getRoles" });
         const {props, state} = this;
 
         let parameter = {
@@ -38,26 +44,34 @@ class UserRoles extends Component {
             pageSize: state.pageSize
         };
         props.dispatch(CommonUsersActions.getUserRoles(parameter));
+		logger.warn('<<< Exiting getRoles()', { "event.action": "getRoles" });
     }
 
     getSuggestRoles() {
+		logger.error('>>> Entering getSuggestRoles()', { "event.action": "getSuggestRoles" });
         const {props, state} = this;
         let keyword = state.roleSelectState.roleId >= 0 ? "" : state.roleSelectState.keyword;
         props.dispatch(CommonUsersActions.getSuggestRoles({ keyword: keyword, count: 10 }));
+		logger.error(`getSuggestRoles(): keyword → ${keyword}`, { "event.action": "getSuggestRoles" });
     }
     debounceGetSuggestRoles() {
+		logger.error('>>> Entering debounceGetSuggestRoles()', { "event.action": "debounceGetSuggestRoles" });
         this.getSuggestRoles();
+		logger.warn('<<< Exiting debounceGetSuggestRoles()', { "event.action": "debounceGetSuggestRoles" });
     }
 
     onRoleSelectorChanged(item) {
+		logger.error(`>>> Entering onRoleSelectorChanged(item=${item})`, { "event.action": "onRoleSelectorChanged", "logrite.item": item });
         if (item.roleId || item.roleName) {
             return;
         }
         this.setState({ roleSelectState: { roleId: -1, keyword: item } });
         this.debounceGetSuggestRoles();
+		logger.warn(`<<< Exiting onRoleSelectorChanged(item=${item})`, { "event.action": "onRoleSelectorChanged", "logrite.item": item });
     }
 
     onRoleSelectorSelected(item) {
+		logger.error(`>>> Entering onRoleSelectorSelected(item=${item})`, { "event.action": "onRoleSelectorSelected", "logrite.item": item });
         this.onRoleSelected(item.roleId, () => {
             this.setState({ roleSelectState: { roleId: item.roleId, keyword: item.roleName } }, () => {
                 this.getSuggestRoles();
@@ -66,9 +80,11 @@ class UserRoles extends Component {
     }
 
     onRoleSelectorToggle() {
+	logger.error('>>> Entering onRoleSelectorToggle()', { "event.action": "onRoleSelectorToggle" });
     }
 
     onAddRole() {
+		logger.error('>>> Entering onAddRole()', { "event.action": "onAddRole" });
         const {state} = this;
         let roleId = state.roleSelectState.roleId;
         if (roleId === -1 || roleId=== undefined) {
@@ -76,6 +92,7 @@ class UserRoles extends Component {
         }
         this.saveRole(roleId);
         this.setState({ roleSelectState: { roleId: -1, keyword: "" } });
+		logger.warn('<<< Exiting onAddRole()', { "event.action": "onAddRole" });
     }
     saveRole(roleId, startTime, expiresTime) {
         const {props} = this;
@@ -83,20 +100,26 @@ class UserRoles extends Component {
         let parameter = { roleId: roleId, userId: props.userDetails.userId, startTime: startTime, expiresTime: expiresTime };
         props.dispatch(CommonUsersActions.saveUserRole(parameter, this.state.sendEmail, this.state.isOwner));
         this.setState({ sendEmail: true, isOwner: false, allowOwner: false });
+		logger.warn(`<<< Exiting saveRole(roleId=${roleId},startTime=${startTime},expiresTime=${expiresTime})`, { "event.action": "saveRole", "logrite.roleId": roleId, "logrite.startTime": startTime, "logrite.expiresTime": expiresTime });
     }
 
     onPageChanged(currentPage, pageSize) {
+		logger.error(`>>> Entering onPageChanged(currentPage=${currentPage},pageSize=${pageSize})`, { "event.action": "onPageChanged", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
         let {state} = this;
         if (pageSize !== undefined && state.pageSize !== pageSize) {
+			logger.debug(`onPageChanged(currentPage=${currentPage},pageSize=${pageSize}): state.currentPage → ${state.currentPage}`, { "event.action": "onPageChanged", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
             state.pageSize = pageSize;
+			logger.debug(`onPageChanged(currentPage=${currentPage},pageSize=${pageSize}): state.pageSize → ${state.pageSize}`, { "event.action": "onPageChanged", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
         }
         state.currentPage = currentPage;
         this.setState({
             state
         });
         this.getRoles();
+		logger.warn(`<<< Exiting onPageChanged(currentPage=${currentPage},pageSize=${pageSize})`, { "event.action": "onPageChanged", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
     }
     getRoleRows() {
+		logger.error('>>> Entering getRoleRows()', { "event.action": "getRoleRows" });
         let userRoles = this.props.userRoles;
         let roleRows = userRoles.map((role, index) => {
             return <RoleRow
@@ -106,6 +129,7 @@ class UserRoles extends Component {
                 saveRole={this.saveRole.bind(this) }>
             </RoleRow>;
         });
+		logger.warn('<<< Exiting getRoleRows()', { "event.action": "getRoleRows" });
         return <div className="user-role-body">{(userRoles.length > 0) ?
             roleRows :
             <div className="no-roles-row">{Localization.get("NoRoles") }</div> }
@@ -161,8 +185,10 @@ class UserRoles extends Component {
             />;
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {state} = this;
         /* eslint-disable react/no-danger */
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <div className="userroles-form-form">
             <div className="header">
                 <div className="header-title">{Localization.get("Roles.Title") }</div>
@@ -217,6 +243,8 @@ UserRoles.defaultProps = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         matchedRoles: state.users.matchedRoles,
         userRoles: state.users.userRoles,

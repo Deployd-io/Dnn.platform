@@ -1,4 +1,5 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+﻿using Microsoft.Extensions.Logging;
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information
 
@@ -34,6 +35,7 @@ namespace DotNetNuke.Abstractions.Pages
     /// </example>
     public class PageTag
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Initializes a new instance of the <see cref="PageTag"/> class.
         /// </summary>
@@ -42,7 +44,10 @@ namespace DotNetNuke.Abstractions.Pages
         /// <exception cref="System.ArgumentNullException">Thrown when value is null.</exception>
         public PageTag(string value, int priority)
         {
+			_logger.LogError(">>> Entering PageTag(value={Value},priority={Priority})", value, priority);
             this.Value = value;
+			_logger.LogDebug("PageTag(value={Value},priority={Priority}): this.Value → {Arg2}", value, priority, this.Value);
+        _logger.LogWarning("<<< Exiting PageTag(value={Value},priority={Priority})", value, priority);
             this.Priority = priority;
         }
 

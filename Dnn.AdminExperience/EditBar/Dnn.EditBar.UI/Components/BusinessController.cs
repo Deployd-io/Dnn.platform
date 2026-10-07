@@ -11,12 +11,14 @@ namespace Dnn.EditBar.UI.Components
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			eventLogger.LogError(">>> Entering UpgradeModule(version={Version})", version);
             switch (version)
             {
                 case "01.00.00":
                     break;
             }
 
+			eventLogger.LogWarning("<<< Exiting UpgradeModule(version={Version})", version);
             return "Success";
         }
     }

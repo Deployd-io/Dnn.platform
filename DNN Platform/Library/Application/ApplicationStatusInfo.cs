@@ -31,7 +31,11 @@ namespace DotNetNuke.Application
         /// </remarks>
         public ApplicationStatusInfo(IApplicationInfo applicationInfo)
         {
+			Logger.LogError(">>> Entering ApplicationStatusInfo(applicationInfo={ApplicationInfo})", applicationInfo);
             this.applicationInfo = applicationInfo;
+			Logger.LogDebug("ApplicationStatusInfo(applicationInfo={ApplicationInfo}): applicationInfo → {ApplicationInfo1}", applicationInfo, applicationInfo);
+        Logger.LogDebug("ApplicationStatusInfo(applicationInfo={ApplicationInfo}): this.applicationInfo → {Arg1}", applicationInfo, this.applicationInfo);
+        Logger.LogWarning("<<< Exiting ApplicationStatusInfo(applicationInfo={ApplicationInfo})", applicationInfo);
         }
 
         /// <inheritdoc />
@@ -128,12 +132,18 @@ namespace DotNetNuke.Application
         /// <inheritdoc />
         public bool IsInstalled()
         {
+			Logger.LogError(">>> Entering IsInstalled()");
             const int c_PassingScore = 4;
             int installationdatefactor = Convert.ToInt32(HasInstallationDate() ? 1 : 0);
+			Logger.LogError("IsInstalled(): installationdatefactor → {Installationdatefactor}", installationdatefactor);
             int dataproviderfactor = Convert.ToInt32(HasDataProviderLogFiles() ? 3 : 0);
+			Logger.LogError("IsInstalled(): dataproviderfactor → {Dataproviderfactor}", dataproviderfactor);
             int htmlmodulefactor = Convert.ToInt32(this.ModuleDirectoryExists("html") ? 2 : 0);
+			Logger.LogError("IsInstalled(): htmlmodulefactor → {Htmlmodulefactor}", htmlmodulefactor);
             int portaldirectoryfactor = Convert.ToInt32(this.HasNonDefaultPortalDirectory() ? 2 : 0);
+			Logger.LogError("IsInstalled(): portaldirectoryfactor → {Portaldirectoryfactor}", portaldirectoryfactor);
             int localexecutionfactor = Convert.ToInt32(HttpContext.Current.Request.IsLocal ? c_PassingScore - 1 : 0);
+			Logger.LogError("IsInstalled(): localexecutionfactor → {Localexecutionfactor}", localexecutionfactor);
 
             // This calculation ensures that you have a more than one item that indicates you have already installed DNN.
             // While it is possible that you might not have an installation date or that you have deleted log files
@@ -142,6 +152,7 @@ namespace DotNetNuke.Application
 
             // we need to tighten this check. We now are enforcing the existence of the InstallVersion value in web.config. If
             // this value exists, then DNN was previously installed, and we should never try to re-install it
+			Logger.LogWarning("<<< Exiting IsInstalled()");
             return isInstalled || HasInstallVersion();
         }
 
@@ -149,13 +160,20 @@ namespace DotNetNuke.Application
         /// <param name="status">The status.</param>
         public void SetStatus(UpgradeStatus status)
         {
+			Logger.LogError(">>> Entering SetStatus(status={Status})", status);
             this.status = status;
+			Logger.LogDebug("SetStatus(status={Status}): status → {Status1}", status, status);
+        Logger.LogDebug("SetStatus(status={Status}): this.status → {Arg1}", status, this.status);
+        Logger.LogWarning("<<< Exiting SetStatus(status={Status})", status);
         }
 
         /// <inheritdoc />
         public void UpdateDatabaseVersion(Version version)
         {
+			Logger.LogError(">>> Entering UpdateDatabaseVersion(version={Version})", version);
+			Logger.LogDebug("UpdateDatabaseVersion(version={Version}): this.DatabaseVersion → {Arg1}", version, this.DatabaseVersion);
             // update the version
+			Logger.LogWarning("<<< Exiting UpdateDatabaseVersion(version={Version})", version);
             DataProvider.Instance().UpdateDatabaseVersion(version.Major, version.Minor, version.Build, this.applicationInfo.Name);
             this.DatabaseVersion = version;
         }
@@ -163,7 +181,10 @@ namespace DotNetNuke.Application
         /// <inheritdoc />
         public void UpdateDatabaseVersionIncrement(Version version, int increment)
         {
+			Logger.LogError(">>> Entering UpdateDatabaseVersionIncrement(version={Version},increment={Increment})", version, increment);
+			Logger.LogDebug("UpdateDatabaseVersionIncrement(version={Version},increment={Increment}): this.DatabaseVersion → {Arg2}", version, increment, this.DatabaseVersion);
             // update the version and increment
+			Logger.LogWarning("<<< Exiting UpdateDatabaseVersionIncrement(version={Version},increment={Increment})", version, increment);
             DataProvider.Instance().UpdateDatabaseVersionIncrement(version.Major, version.Minor, version.Build, increment, DotNetNukeContext.Current.Application.Name);
             this.DatabaseVersion = version;
         }
@@ -171,8 +192,11 @@ namespace DotNetNuke.Application
         /// <inheritdoc />
         public bool IncrementalVersionExists(Version version)
         {
+			Logger.LogError(">>> Entering IncrementalVersionExists(version={Version})", version);
             Provider currentdataprovider = Config.GetDefaultProvider("data");
             string providerpath = currentdataprovider.Attributes["providerPath"];
+			Logger.LogError("IncrementalVersionExists(version={Version}): providerpath → {Providerpath}", version, providerpath);
+			Logger.LogError("IncrementalVersionExists(version={Version}): currentdataprovider → {Currentdataprovider}", version, currentdataprovider);
 
             // If the provider path does not exist, then there can't be any log files
             if (!string.IsNullOrEmpty(providerpath))
@@ -181,6 +205,7 @@ namespace DotNetNuke.Application
                 if (Directory.Exists(providerpath))
                 {
                     var incrementalcount = Directory.GetFiles(providerpath, Upgrade.GetStringVersion(version) + ".*." + Upgrade.DefaultProvider).Length;
+					Logger.LogError("IncrementalVersionExists(version={Version}): incrementalcount → {Incrementalcount}", version, incrementalcount);
 
                     if (incrementalcount > this.GetLastAppliedIteration(version))
                     {
@@ -189,18 +214,22 @@ namespace DotNetNuke.Application
                 }
             }
 
+			Logger.LogWarning("<<< Exiting IncrementalVersionExists(version={Version})", version);
             return false;
         }
 
         /// <inheritdoc />
         public int GetLastAppliedIteration(Version version)
         {
+			Logger.LogError(">>> Entering GetLastAppliedIteration(version={Version})", version);
             try
             {
                 return DataProvider.Instance().GetLastAppliedIteration(version.Major, version.Minor, version.Build);
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in GetLastAppliedIteration(version={Version}): {Arg1}", version, Exception.Message);
+				Logger.LogWarning("<<< Exiting GetLastAppliedIteration(version={Version})", version);
                 return 0;
             }
         }
@@ -217,6 +246,8 @@ namespace DotNetNuke.Application
         /// <returns><see langword="true"/> if has installation date; otherwise, <see langword="false"/>.</returns>
         private static bool HasInstallationDate()
         {
+			Logger.LogError(">>> Entering HasInstallationDate()");
+            Logger.LogWarning("<<< Exiting HasInstallationDate()");
             return Config.GetSetting("InstallationDate") != null;
         }
 
@@ -224,8 +255,11 @@ namespace DotNetNuke.Application
         /// <returns><see langword="true"/> if has data provider log files; otherwise, <see langword="false"/>.</returns>
         private static bool HasDataProviderLogFiles()
         {
+			Logger.LogError(">>> Entering HasDataProviderLogFiles()");
             Provider currentdataprovider = Config.GetDefaultProvider("data");
             string providerpath = currentdataprovider.Attributes["providerPath"];
+			Logger.LogError("HasDataProviderLogFiles(): providerpath → {Providerpath}", providerpath);
+			Logger.LogError("HasDataProviderLogFiles(): currentdataprovider → {Currentdataprovider}", currentdataprovider);
 
             // If the provider path does not exist, then there can't be any log files
             if (!string.IsNullOrEmpty(providerpath))
@@ -237,6 +271,7 @@ namespace DotNetNuke.Application
                 }
             }
 
+			Logger.LogWarning("<<< Exiting HasDataProviderLogFiles()");
             return false;
         }
 
@@ -244,6 +279,8 @@ namespace DotNetNuke.Application
         /// <returns><see langword="true"/> if has installation date; otherwise, <see langword="false"/>.</returns>
         private static bool HasInstallVersion()
         {
+			Logger.LogError(">>> Entering HasInstallVersion()");
+            Logger.LogWarning("<<< Exiting HasInstallVersion()");
             return Config.GetSetting("InstallVersion") != null;
         }
 
@@ -251,10 +288,12 @@ namespace DotNetNuke.Application
         /// <returns>returns the domain directory.</returns>
         private static string GetCurrentDomainDirectory()
         {
+			Logger.LogError(">>> Entering GetCurrentDomainDirectory()");
             var dir = AppDomain.CurrentDomain.BaseDirectory.Replace("/", @"\");
             if (dir.Length > 3 && dir.EndsWith(@"\", StringComparison.Ordinal))
             {
                 dir = dir.Substring(0, dir.Length - 1);
+				Logger.LogError("GetCurrentDomainDirectory(): dir → {Dir}", dir);
             }
 
             return dir;
@@ -265,7 +304,10 @@ namespace DotNetNuke.Application
         /// <returns><see langword="true"/> if the module directory exist, otherwise, <see langword="false"/>.</returns>
         private bool ModuleDirectoryExists(string moduleName)
         {
+			Logger.LogError(">>> Entering ModuleDirectoryExists(moduleName={ModuleName})", moduleName);
             string dir = $@"{this.ApplicationMapPath}\desktopmodules\{moduleName}";
+			Logger.LogError("ModuleDirectoryExists(moduleName={ModuleName}): dir → {Dir}", moduleName, dir);
+			Logger.LogWarning("<<< Exiting ModuleDirectoryExists(moduleName={ModuleName})", moduleName);
             return Directory.Exists(dir);
         }
 
@@ -273,12 +315,15 @@ namespace DotNetNuke.Application
         /// <returns><see langword="true"/> if has portal directory except default portal directory in portal path; otherwise, <see langword="false"/>.</returns>
         private bool HasNonDefaultPortalDirectory()
         {
+			Logger.LogError(">>> Entering HasNonDefaultPortalDirectory()");
             string dir = $@"{this.ApplicationMapPath}\portals";
+			Logger.LogError("HasNonDefaultPortalDirectory(): dir → {Dir}", dir);
             if (Directory.Exists(dir))
             {
                 return Directory.GetDirectories(dir).Length > 1;
             }
 
+			Logger.LogWarning("<<< Exiting HasNonDefaultPortalDirectory()");
             return false;
         }
     }

@@ -8,10 +8,12 @@ import {
 } from "@dnnsoftware/dnn-react-common";
 import SiteGroupEditor from "./Editor";
 import "./Row.less";
+const logger = console;
 
 export default class SiteGroupRow extends React.Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             PortalGroupName: props.group.PortalGroupName || "",
             AuthenticationDomain: props.group.AuthenticationDomain,
@@ -27,29 +29,37 @@ export default class SiteGroupRow extends React.Component {
             }
         };
         this.submitted = false;
+		logger.debug(`constructor(props=${props}): this.submitted → ${this.submitted}`, { "event.action": "constructor", "logrite.props": props });
     }
 
     UNSAFE_componentWillReceiveProps(newProps) {
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.newProps": newProps });
         this.resetState(newProps);
+		logger.warn(`<<< Exiting UNSAFE_componentWillReceiveProps(newProps=${newProps})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.newProps": newProps });
     }
 
     clickOnPortal(index, type) {
+		logger.error(`>>> Entering clickOnPortal(index=${index},type=${type})`, { "event.action": "clickOnPortal", "logrite.index": index, "logrite.type": type });
         if (type === "assignedPortals") {
             let p = JSON.parse(JSON.stringify(this.state.Portals));
             p[index].selected = !p[index].selected;
             this.setState({ Portals: p });
         } else {
             let p = JSON.parse(JSON.stringify(this.state.UnassignedSites));
+			logger.error(`clickOnPortal(index=${index},type=${type}): p → ${p}`, { "event.action": "clickOnPortal", "logrite.index": index, "logrite.type": type });
             p[index].selected = !p[index].selected;
             this.setState({ UnassignedSites: p });
+			logger.warn(`<<< Exiting clickOnPortal(index=${index},type=${type})`, { "event.action": "clickOnPortal", "logrite.index": index, "logrite.type": type });
         }
     }
 
     moveItemsLeft() {
+		logger.error('>>> Entering moveItemsLeft()', { "event.action": "moveItemsLeft" });
         let assignedPortals = JSON.parse(JSON.stringify(this.state.Portals));
         let unassignedPortals = JSON.parse(
             JSON.stringify(this.state.UnassignedSites)
         ).filter(site => site.PortalId !== this.props.group.MasterPortal.PortalId);
+		logger.error(`moveItemsLeft(): assignedPortals → ${assignedPortals}`, { "event.action": "moveItemsLeft" });
         let itemsToStay = [],
             itemsToMove = [];
         let selectedCount = 0;
@@ -64,6 +74,7 @@ export default class SiteGroupRow extends React.Component {
             }
         });
         if (selectedCount > 0) {
+			logger.warn('<<< Exiting moveItemsLeft()', { "event.action": "moveItemsLeft" });
             this.setState({
                 UnassignedSites: unassignedPortals.concat(itemsToMove),
                 Portals: itemsToStay
@@ -72,12 +83,14 @@ export default class SiteGroupRow extends React.Component {
     }
 
     moveItemsRight() {
+		logger.error('>>> Entering moveItemsRight()', { "event.action": "moveItemsRight" });
         let assignedPortals = JSON.parse(JSON.stringify(this.state.Portals));
         let unassignedPortals = JSON.parse(
             JSON.stringify(this.state.UnassignedSites)
         );
         let itemsToStay = [],
             itemsToMove = [];
+			logger.error(`moveItemsRight(): assignedPortals → ${assignedPortals}`, { "event.action": "moveItemsRight" });
         let selectedCount = 0;
         unassignedPortals.forEach(portal => {
             let { selected } = portal;
@@ -90,6 +103,7 @@ export default class SiteGroupRow extends React.Component {
             }
         });
         if (selectedCount > 0) {
+			logger.warn('<<< Exiting moveItemsRight()', { "event.action": "moveItemsRight" });
             this.setState({
                 UnassignedSites: itemsToStay,
                 Portals: assignedPortals.concat(itemsToMove)
@@ -98,6 +112,7 @@ export default class SiteGroupRow extends React.Component {
     }
 
     moveAll(direction) {
+		logger.error(`>>> Entering moveAll(direction=${direction})`, { "event.action": "moveAll", "logrite.direction": direction });
         let assignedPortals = JSON.parse(JSON.stringify(this.state.Portals));
         let unassignedPortals = JSON.parse(
             JSON.stringify(this.state.UnassignedSites)
@@ -115,29 +130,39 @@ export default class SiteGroupRow extends React.Component {
                     UnassignedSites: unassignedPortals.concat(assignedPortals),
                     Portals: []
                 });
+				logger.warn(`<<< Exiting moveAll(direction=${direction})`, { "event.action": "moveAll", "logrite.direction": direction });
                 break;
         }
     }
 
     sortPortals(a, b) {
+		logger.error(`>>> Entering sortPortals(a=${a},b=${b})`, { "event.action": "sortPortals", "logrite.a": a, "logrite.b": b });
+		logger.warn(`<<< Exiting sortPortals(a=${a},b=${b})`, { "event.action": "sortPortals", "logrite.a": a, "logrite.b": b });
         return a.PortalName < b.PortalName ? -1 : 1;
     }
 
     isNew() {
+		logger.error('>>> Entering isNew()', { "event.action": "isNew" });
+		logger.warn('<<< Exiting isNew()', { "event.action": "isNew" });
         return this.props.group.PortalGroupId === -1;
     }
 
     save() {
+		logger.error('>>> Entering save()', { "event.action": "save" });
         this.submitted = true;
         if (this.isValid()) this.props.onSave(this.result());
+		logger.warn('<<< Exiting save()', { "event.action": "save" });
     }
 
     cancel() {
+		logger.error('>>> Entering cancel()', { "event.action": "cancel" });
         this.resetState(this.props);
         this.props.onCancelEditing();
+		logger.warn('<<< Exiting cancel()', { "event.action": "cancel" });
     }
 
     resetState(props) {
+		logger.error(`>>> Entering resetState(props=${props})`, { "event.action": "resetState", "logrite.props": props });
         this.setState({
             PortalGroupName: props.group.PortalGroupName || "",
             AuthenticationDomain: props.group.AuthenticationDomain,
@@ -149,6 +174,7 @@ export default class SiteGroupRow extends React.Component {
                 authenticationDomain: false
             }
         });
+		logger.warn(`<<< Exiting resetState(props=${props})`, { "event.action": "resetState", "logrite.props": props });
     }
 
     isValid() {
@@ -167,6 +193,8 @@ export default class SiteGroupRow extends React.Component {
     }
 
     result() {
+		logger.error('>>> Entering result()', { "event.action": "result" });
+		logger.warn('<<< Exiting result()', { "event.action": "result" });
         return {
             PortalGroup: {
                 PortalGroupId: this.props.group.PortalGroupId,
@@ -181,6 +209,8 @@ export default class SiteGroupRow extends React.Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={"row " + this.props.isOpened}>
                 <div className="rowHeader">

@@ -5,6 +5,7 @@ import { Modal, Button, Dropdown, Label } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
 import Html from "../../../../Html";
 import resx from "localization";
+const logger = console;
 import { ExtensionActions } from "actions";
 
 const modalStyles = {
@@ -33,13 +34,16 @@ const modalStyles = {
 class InUseModal extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             usageFilter: undefined,
             portalId: -1
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props, state} = this;
 
         if (props.usageFilter) {
@@ -53,13 +57,16 @@ class InUseModal extends Component {
                     portalId: portalId
                 });
                 props.dispatch(ExtensionActions.getPackageUsage(portalId, props.packageId));
+				logger.error(`UNSAFE_componentWillMount(): portalId → ${portalId}`, { "event.action": "UNSAFE_componentWillMount" });
             }
             return;
         }
         props.dispatch(ExtensionActions.GetPackageUsageFilter());
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         let {state} = this;
 
         if (state.portalId === -1) {
@@ -69,15 +76,19 @@ class InUseModal extends Component {
                 portalId: portalId
             });
             props.dispatch(ExtensionActions.getPackageUsage(portalId, props.packageId));
+			logger.error(`UNSAFE_componentWillReceiveProps(props=${props}): portalId → ${portalId}`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         }
     }
 
     onClose() {
+		logger.error('>>> Entering onClose()', { "event.action": "onClose" });
         const {props} = this;
         props.onClose();
+		logger.warn('<<< Exiting onClose()', { "event.action": "onClose" });
     }
 
     getPortalOptions() {
+		logger.error('>>> Entering getPortalOptions()', { "event.action": "getPortalOptions" });
         const {props} = this;
         let options = [];
         if (props.usageFilter !== undefined) {
@@ -87,10 +98,12 @@ class InUseModal extends Component {
                 };
             });
         }
+		logger.warn('<<< Exiting getPortalOptions()', { "event.action": "getPortalOptions" });
         return options;
     }
 
     onSelectPortal(event) {
+		logger.error(`>>> Entering onSelectPortal(event=${event})`, { "event.action": "onSelectPortal", "logrite.event": event });
         let {props} = this;
 
         this.setState({
@@ -98,9 +111,11 @@ class InUseModal extends Component {
         });
 
         props.dispatch(ExtensionActions.getPackageUsage(event.value, props.packageId));
+		logger.warn(`<<< Exiting onSelectPortal(event=${event})`, { "event.action": "onSelectPortal", "logrite.event": event });
     }
 
     getCurrentUsageFilter() {
+		logger.error('>>> Entering getCurrentUsageFilter()', { "event.action": "getCurrentUsageFilter" });
         let {props, state} = this;
         if (props.usageFilter && state.portalId !== -1) {
             return props.usageFilter.find(p => p.PortalID === state.portalId).PortalName;
@@ -109,6 +124,7 @@ class InUseModal extends Component {
     }
 
     getUsageDetailSubject() {
+		logger.error('>>> Entering getUsageDetailSubject()', { "event.action": "getUsageDetailSubject" });
         let {props} = this;
         if (props.tabUrls) {
             if (props.tabUrls.length > 0) {
@@ -116,12 +132,15 @@ class InUseModal extends Component {
             }
             else return resx.get("NoModuleUsageDetail").replace("{0}", this.getCurrentUsageFilter());
         }
+		logger.warn('<<< Exiting getUsageDetailSubject()', { "event.action": "getUsageDetailSubject" });
     }
 
      
     renderUsageDetail() {
+		logger.error('>>> Entering renderUsageDetail()', { "event.action": "renderUsageDetail" });
         const {props} = this;
         if (props.tabUrls) {
+			logger.warn('<<< Exiting renderUsageDetail()', { "event.action": "renderUsageDetail" });
             return props.tabUrls.map((item, i) => {
                 return (
                     <div key={i} className="usage-detail-taburl"><Html html={item.TabUrl} /></div>
@@ -132,7 +151,9 @@ class InUseModal extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <Modal
                 isOpen={props.isOpened}
@@ -190,6 +211,8 @@ InUseModal.PropTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         usageFilter: state.extension.usageFilter,
         tabUrls: state.extension.tabUrls

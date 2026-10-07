@@ -22,6 +22,7 @@ namespace DotNetNuke.UI.WebControls.Internal
     /// </summary>
     public class PermissionTriState : HiddenField
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PermissionTriState));
         private readonly string grantImagePath;
         private readonly string denyImagePath;
         private readonly string nullImagePath;
@@ -33,10 +34,12 @@ namespace DotNetNuke.UI.WebControls.Internal
         /// <summary>Initializes a new instance of the <see cref="PermissionTriState"/> class.</summary>
         public PermissionTriState()
         {
+			Logger.LogError(">>> Entering PermissionTriState()");
             // kind of ugly to lookup this data each time, but doesn't seem worth the effort to
             // maintain statics for the paths but require a control instance to initialize them
             // and lazy load the text bits when the page instance (or localization) changes
             LookupScriptValues(this, out this.grantImagePath, out this.denyImagePath, out this.nullImagePath, out this.lockImagePath, out this.grantAltText, out this.denyAltText, out this.nullAltText);
+			Logger.LogWarning("<<< Exiting PermissionTriState()");
         }
 
         public bool IsFullControl { get; set; }
@@ -53,6 +56,7 @@ namespace DotNetNuke.UI.WebControls.Internal
 
         public static void RegisterScripts(Page page, Control ctl)
         {
+			Logger.LogError(">>> Entering RegisterScripts(page={Page},ctl={Ctl})", page, ctl);
             const string scriptKey = "initTriState";
             if (!ClientAPI.IsClientScriptBlockRegistered(page, scriptKey))
             {
@@ -62,10 +66,12 @@ namespace DotNetNuke.UI.WebControls.Internal
 
                 ClientAPI.RegisterStartUpScript(page, scriptKey, "<script type='text/javascript'>" + GetInitScript(ctl) + "</script>");
             }
+			Logger.LogWarning("<<< Exiting RegisterScripts(page={Page},ctl={Ctl})", page, ctl);
         }
 
         public static string GetInitScript(Control ctl)
         {
+			Logger.LogError(">>> Entering GetInitScript(ctl={Ctl})", ctl);
             LookupScriptValues(ctl, out var grantImagePath, out var denyImagePath, out var nullImagePath, out _, out var grantAltText, out var denyAltText, out var nullAltText);
 
             return $$"""
@@ -84,23 +90,30 @@ namespace DotNetNuke.UI.WebControls.Internal
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             RegisterScripts(this.Page, this);
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering Render(writer={Writer})", writer);
             string imagePath;
             string altText;
             switch (this.Value)
             {
                 case "True":
                     imagePath = this.grantImagePath;
+					Logger.LogError("Render(writer={Writer}): imagePath → {ImagePath}", writer, imagePath);
+					Logger.LogDebug("Render(writer={Writer}): imagePath → {ImagePath}", writer, imagePath);
                     altText = this.grantAltText;
+					Logger.LogError("Render(writer={Writer}): altText → {AltText}", writer, altText);
                     break;
 
+				Logger.LogDebug("Render(writer={Writer}): altText → {AltText}", writer, altText);
                 case "False":
                     imagePath = this.denyImagePath;
                     altText = this.denyAltText;
@@ -145,18 +158,27 @@ namespace DotNetNuke.UI.WebControls.Internal
 
             writer.AddAttribute("class", cssClass);
             base.Render(writer);
+			Logger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
 
         private static void LookupScriptValues(Control ctl, out string grantImagePath, out string denyImagePath, out string nullImagePath, out string lockImagePath, out string grantAltText, out string denyAltText, out string nullAltText)
         {
+			Logger.LogError(">>> Entering LookupScriptValues(ctl={Ctl})", ctl);
             grantImagePath = IconController.IconURL("Grant");
             denyImagePath = IconController.IconURL("Deny");
+			Logger.LogError("LookupScriptValues(ctl={Ctl}): denyImagePath → {DenyImagePath}", ctl, denyImagePath);
+			Logger.LogDebug("LookupScriptValues(ctl={Ctl}): grantImagePath → {GrantImagePath}", ctl, grantImagePath);
             nullImagePath = IconController.IconURL("Unchecked");
+			Logger.LogError("LookupScriptValues(ctl={Ctl}): nullImagePath → {NullImagePath}", ctl, nullImagePath);
             lockImagePath = IconController.IconURL("Lock");
+			Logger.LogError("LookupScriptValues(ctl={Ctl}): lockImagePath → {LockImagePath}", ctl, lockImagePath);
 
             grantAltText = Localization.GetString("PermissionTypeGrant");
+			Logger.LogError("LookupScriptValues(ctl={Ctl}): grantAltText → {GrantAltText}", ctl, grantAltText);
             denyAltText = Localization.GetString("PermissionTypeDeny");
+			Logger.LogError("LookupScriptValues(ctl={Ctl}): denyAltText → {DenyAltText}", ctl, denyAltText);
             nullAltText = Localization.GetString("PermissionTypeNull");
+			Logger.LogError("LookupScriptValues(ctl={Ctl}): nullAltText → {NullAltText}", ctl, nullAltText);
         }
     }
 }

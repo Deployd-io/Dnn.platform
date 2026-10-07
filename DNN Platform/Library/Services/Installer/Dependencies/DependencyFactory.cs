@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Installer.Dependencies
     /// <summary>The DependencyFactory is a factory class that is used to instantiate the appropriate Dependency.</summary>
     public partial class DependencyFactory
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DependencyFactory));
         /// <summary>The GetDependency method instantiates (and returns) the relevant Dependency.</summary>
         /// <param name="dependencyNav">The manifest (XPathNavigator) for the dependency.</param>
         /// <returns>An <see cref="IDependency"/> instance.</returns>
@@ -29,12 +30,15 @@ namespace DotNetNuke.Services.Installer.Dependencies
         /// <returns>An <see cref="IDependency"/> instance.</returns>
         public static IDependency GetDependency(IServiceProvider serviceProvider, XPathNavigator dependencyNav)
         {
+			Logger.LogError(">>> Entering GetDependency(dependencyNav={DependencyNav})", dependencyNav);
             IDependency dependency = null;
+			Logger.LogError("GetDependency(serviceProvider={ServiceProvider},dependencyNav={DependencyNav}): dependency → {Dependency}", serviceProvider, dependencyNav, dependency);
             string dependencyType = Util.ReadAttribute(dependencyNav, "type");
             switch (dependencyType.ToLowerInvariant())
             {
                 case "coreversion":
                     dependency = new CoreVersionDependency();
+					Logger.LogError("GetDependency(dependencyNav={DependencyNav}): dependency → {Dependency}", dependencyNav, dependency);
                     break;
                 case "package":
                     dependency = new PackageDependency();
@@ -51,9 +55,13 @@ namespace DotNetNuke.Services.Installer.Dependencies
                 default:
                     // Dependency type is defined in the List
                     var listController = ActivatorUtilities.GetServiceOrCreateInstance<ListController>(serviceProvider);
+					Logger.LogError("GetDependency(dependencyNav={DependencyNav}): listController → {ListController}", dependencyNav, listController);
+					Logger.LogError("GetDependency(serviceProvider={ServiceProvider},dependencyNav={DependencyNav}): listController → {ListController}", serviceProvider, dependencyNav, listController);
                     ListEntryInfo entry = listController.GetListEntryInfo("Dependency", dependencyType);
                     if (entry != null && !string.IsNullOrEmpty(entry.Text))
                     {
+						Logger.LogError("GetDependency(dependencyNav={DependencyNav}): entry → {Entry}", dependencyNav, entry);
+						Logger.LogError("GetDependency(serviceProvider={ServiceProvider},dependencyNav={DependencyNav}): entry → {Entry}", serviceProvider, dependencyNav, entry);
                         // The class for the Installer is specified in the Text property
                         dependency = (DependencyBase)Reflection.CreateObject(serviceProvider, entry.Text, $"Dependency_{entry.Value}");
                     }
@@ -70,6 +78,7 @@ namespace DotNetNuke.Services.Installer.Dependencies
             // Read Manifest
             dependency.ReadManifest(dependencyNav);
 
+			Logger.LogWarning("<<< Exiting GetDependency(serviceProvider={ServiceProvider},dependencyNav={DependencyNav})", serviceProvider, dependencyNav);
             return dependency;
         }
     }

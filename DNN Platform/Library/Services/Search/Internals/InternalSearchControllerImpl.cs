@@ -68,6 +68,7 @@ namespace DotNetNuke.Services.Search.Internals
         public InternalSearchControllerImpl()
             : this(null, null, null)
         {
+		Logger.LogError(">>> Entering InternalSearchControllerImpl()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="InternalSearchControllerImpl"/> class.</summary>
@@ -77,18 +78,28 @@ namespace DotNetNuke.Services.Search.Internals
         public InternalSearchControllerImpl(IHostSettingsService hostSettingsService, IHostSettings hostSettings, IServiceProvider serviceProvider)
         {
             hostSettingsService ??= Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+			Logger.LogWarning("<<< Exiting InternalSearchControllerImpl()");
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("InternalSearchControllerImpl(hostSettingsService={HostSettingsService},hostSettings={HostSettings},serviceProvider={ServiceProvider}): hostSettings → {HostSettings1}", hostSettingsService, hostSettings, serviceProvider, hostSettings);
             this.serviceProvider = serviceProvider ?? Globals.GetCurrentServiceProvider();
+			Logger.LogDebug("InternalSearchControllerImpl(hostSettingsService={HostSettingsService},hostSettings={HostSettings},serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", hostSettingsService, hostSettings, serviceProvider, serviceProvider);
             this.titleBoost = hostSettingsService.GetInteger(Constants.SearchTitleBoostSetting, Constants.DefaultSearchTitleBoost);
+			Logger.LogDebug("InternalSearchControllerImpl(hostSettingsService={HostSettingsService},hostSettings={HostSettings},serviceProvider={ServiceProvider}): titleBoost → {TitleBoost}", hostSettingsService, hostSettings, serviceProvider, titleBoost);
             this.tagBoost = hostSettingsService.GetInteger(Constants.SearchTagBoostSetting, Constants.DefaultSearchTagBoost);
+			Logger.LogDebug("InternalSearchControllerImpl(hostSettingsService={HostSettingsService},hostSettings={HostSettings},serviceProvider={ServiceProvider}): tagBoost → {TagBoost}", hostSettingsService, hostSettings, serviceProvider, tagBoost);
             this.contentBoost = hostSettingsService.GetInteger(Constants.SearchContentBoostSetting, Constants.DefaultSearchKeywordBoost);
+			Logger.LogDebug("InternalSearchControllerImpl(hostSettingsService={HostSettingsService},hostSettings={HostSettings},serviceProvider={ServiceProvider}): contentBoost → {ContentBoost}", hostSettingsService, hostSettings, serviceProvider, contentBoost);
             this.descriptionBoost = hostSettingsService.GetInteger(Constants.SearchDescriptionBoostSetting, Constants.DefaultSearchDescriptionBoost);
+			Logger.LogDebug("InternalSearchControllerImpl(hostSettingsService={HostSettingsService},hostSettings={HostSettings},serviceProvider={ServiceProvider}): descriptionBoost → {DescriptionBoost}", hostSettingsService, hostSettings, serviceProvider, descriptionBoost);
             this.authorBoost = hostSettingsService.GetInteger(Constants.SearchAuthorBoostSetting, Constants.DefaultSearchAuthorBoost);
+			Logger.LogDebug("InternalSearchControllerImpl(hostSettingsService={HostSettingsService},hostSettings={HostSettings},serviceProvider={ServiceProvider}): authorBoost → {AuthorBoost}", hostSettingsService, hostSettings, serviceProvider, authorBoost);
+        Logger.LogWarning("<<< Exiting InternalSearchControllerImpl(hostSettingsService={HostSettingsService},hostSettings={HostSettings},serviceProvider={ServiceProvider})", hostSettingsService, hostSettings, serviceProvider);
         }
 
         /// <inheritdoc />
         public IEnumerable<SearchContentSource> GetSearchContentSourceList(int portalId)
         {
+			Logger.LogError(">>> Entering GetSearchContentSourceList(portalId={PortalId})", portalId);
             var searchableModuleDefsCacheArgs = new CacheItemArgs(
                 string.Format(
                     CultureInfo.InvariantCulture,
@@ -99,6 +110,7 @@ namespace DotNetNuke.Services.Search.Internals
                 120,
                 CacheItemPriority.Default);
 
+			Logger.LogWarning("<<< Exiting GetSearchContentSourceList(portalId={PortalId})", portalId);
             return CBO.GetCachedObject<IList<SearchContentSource>>(
                 this.hostSettings,
                 searchableModuleDefsCacheArgs,
@@ -108,26 +120,33 @@ namespace DotNetNuke.Services.Search.Internals
         /// <inheritdoc />
         public string GetSearchDocumentTypeDisplayName(SearchResult searchResult)
         {
+			Logger.LogError(">>> Entering GetSearchDocumentTypeDisplayName(searchResult={SearchResult})", searchResult);
             // ModuleDefId will be zero for non-module
             var key = $"{searchResult.SearchTypeId}-{searchResult.ModuleDefId}-{Thread.CurrentThread.CurrentCulture}";
+			Logger.LogError("GetSearchDocumentTypeDisplayName(searchResult={SearchResult}): key → {Key}", searchResult, key);
             var keys = CBO.Instance.GetCachedObject<IDictionary<string, string>>(
                 new CacheItemArgs(key, 120, CacheItemPriority.Default),
                 this.SearchDocumentTypeDisplayNameCallBack,
                 false);
 
+			Logger.LogWarning("<<< Exiting GetSearchDocumentTypeDisplayName(searchResult={SearchResult})", searchResult);
             return keys.TryGetValue(key, out var documentTypeDisplayName) ? documentTypeDisplayName : string.Empty;
         }
 
         /// <inheritdoc />
         public void AddSearchDocument(SearchDocument searchDocument)
         {
+			Logger.LogError(">>> Entering AddSearchDocument(searchDocument={SearchDocument})", searchDocument);
             this.AddSearchDocumentInternal(searchDocument, false);
+			Logger.LogWarning("<<< Exiting AddSearchDocument(searchDocument={SearchDocument})", searchDocument);
         }
 
         /// <inheritdoc />
         public void AddSearchDocuments(IEnumerable<SearchDocument> searchDocuments)
         {
+			Logger.LogError(">>> Entering AddSearchDocuments(searchDocuments={SearchDocuments})", searchDocuments);
             var searchDocs = searchDocuments as IList<SearchDocument> ?? searchDocuments.ToList();
+			Logger.LogError("AddSearchDocuments(searchDocuments={SearchDocuments}): searchDocs → {SearchDocs}", searchDocuments, searchDocs);
             if (searchDocs.Any())
             {
                 const int commitBatchSize = 1024 * 16;
@@ -155,17 +174,21 @@ namespace DotNetNuke.Services.Search.Internals
                 ////   Commit();
                 ////}
             }
+			Logger.LogWarning("<<< Exiting AddSearchDocuments(searchDocuments={SearchDocuments})", searchDocuments);
         }
 
         /// <inheritdoc />
         public void DeleteSearchDocument(SearchDocument searchDocument)
         {
+			Logger.LogError(">>> Entering DeleteSearchDocument(searchDocument={SearchDocument})", searchDocument);
             this.DeleteSearchDocumentInternal(searchDocument, false);
+			Logger.LogWarning("<<< Exiting DeleteSearchDocument(searchDocument={SearchDocument})", searchDocument);
         }
 
         /// <inheritdoc />
         public void DeleteSearchDocumentsByModule(int portalId, int moduleId, int moduleDefId)
         {
+			Logger.LogError(">>> Entering DeleteSearchDocumentsByModule(portalId={PortalId},moduleId={ModuleId},moduleDefId={ModuleDefId})", portalId, moduleId, moduleDefId);
             Requires.NotNegative("PortalId", portalId);
 
             this.DeleteSearchDocument(new SearchDocument
@@ -175,11 +198,13 @@ namespace DotNetNuke.Services.Search.Internals
                 ModuleDefId = moduleDefId,
                 SearchTypeId = SearchHelper.Instance.GetSearchTypeByName("module").SearchTypeId,
             });
+			Logger.LogWarning("<<< Exiting DeleteSearchDocumentsByModule(portalId={PortalId},moduleId={ModuleId},moduleDefId={ModuleDefId})", portalId, moduleId, moduleDefId);
         }
 
         /// <inheritdoc />
         public void DeleteAllDocuments(int portalId, int searchTypeId)
         {
+			Logger.LogError(">>> Entering DeleteAllDocuments(portalId={PortalId},searchTypeId={SearchTypeId})", portalId, searchTypeId);
             Requires.NotNegative("SearchTypeId", searchTypeId);
 
             this.DeleteSearchDocument(new SearchDocument
@@ -187,32 +212,42 @@ namespace DotNetNuke.Services.Search.Internals
                 PortalId = portalId,
                 SearchTypeId = searchTypeId,
             });
+			Logger.LogWarning("<<< Exiting DeleteAllDocuments(portalId={PortalId},searchTypeId={SearchTypeId})", portalId, searchTypeId);
         }
 
         /// <inheritdoc />
         public void Commit()
         {
+			Logger.LogError(">>> Entering Commit()");
             LuceneController.Instance.Commit();
+			Logger.LogWarning("<<< Exiting Commit()");
         }
 
         /// <inheritdoc />
         public bool OptimizeSearchIndex()
         {
+			Logger.LogError(">>> Entering OptimizeSearchIndex()");
             // run optimization in background
+			Logger.LogWarning("<<< Exiting OptimizeSearchIndex()");
             return LuceneController.Instance.OptimizeSearchIndex(true);
         }
 
         /// <inheritdoc />
         public SearchStatistics GetSearchStatistics()
         {
+			Logger.LogError(">>> Entering GetSearchStatistics()");
+            Logger.LogWarning("<<< Exiting GetSearchStatistics()");
             return LuceneController.Instance.GetSearchStatistics();
         }
 
         internal virtual object SearchContentSourceCallback(CacheItemArgs cacheItem)
         {
+			Logger.LogError(">>> Entering SearchContentSourceCallback(cacheItem={CacheItem})", cacheItem);
             var searchTypes = CBO.FillCollection<SearchType>(DataProvider.GetAllSearchTypes());
 
+			Logger.LogError("SearchContentSourceCallback(cacheItem={CacheItem}): searchTypes → {SearchTypes}", cacheItem, searchTypes);
             var results = new List<SearchContentSource>();
+			Logger.LogError("SearchContentSourceCallback(cacheItem={CacheItem}): results → {Results}", cacheItem, results);
 
             foreach (var crawler in searchTypes)
             {
@@ -222,8 +257,11 @@ namespace DotNetNuke.Services.Search.Internals
 
                         // get searchable module definition list
                         var portalId = int.Parse(cacheItem.CacheKey.Split('-')[1], CultureInfo.InvariantCulture);
+						Logger.LogError("SearchContentSourceCallback(cacheItem={CacheItem}): portalId → {PortalId}", cacheItem, portalId);
                         var modules = ModuleController.Instance.GetSearchModules(portalId);
+						Logger.LogError("SearchContentSourceCallback(cacheItem={CacheItem}): modules → {Modules}", cacheItem, modules);
                         var modDefIds = new HashSet<int>();
+						Logger.LogError("SearchContentSourceCallback(cacheItem={CacheItem}): modDefIds → {ModDefIds}", cacheItem, modDefIds);
 
                         foreach (ModuleInfo module in modules)
                         {
@@ -231,10 +269,12 @@ namespace DotNetNuke.Services.Search.Internals
                         }
 
                         var list = modDefIds.Select(ModuleDefinitionController.GetModuleDefinitionByID).ToList();
+						Logger.LogError("SearchContentSourceCallback(cacheItem={CacheItem}): list → {List}", cacheItem, list);
 
                         foreach (var def in list)
                         {
                             var text = Localization.GetSafeJSString("Module_" + def.DefinitionName, LocalizedResxFile);
+							Logger.LogError("SearchContentSourceCallback(cacheItem={CacheItem}): text → {Text}", cacheItem, text);
                             if (string.IsNullOrEmpty(text))
                             {
                                 text = def.FriendlyName;
@@ -257,8 +297,11 @@ namespace DotNetNuke.Services.Search.Internals
                     default:
 
                         var resultControllerType = Reflection.CreateType(crawler.SearchResultClass);
+						Logger.LogError("SearchContentSourceCallback(cacheItem={CacheItem}): resultControllerType → {ResultControllerType}", cacheItem, resultControllerType);
                         var resultController = (BaseResultController)Reflection.CreateObject(this.serviceProvider, resultControllerType);
+						Logger.LogError("SearchContentSourceCallback(cacheItem={CacheItem}): resultController → {ResultController}", cacheItem, resultController);
                         var localizedName = Localization.GetSafeJSString(resultController.LocalizedSearchTypeName);
+						Logger.LogError("SearchContentSourceCallback(cacheItem={CacheItem}): localizedName → {LocalizedName}", cacheItem, localizedName);
 
                         results.Add(new SearchContentSource
                         {
@@ -272,28 +315,37 @@ namespace DotNetNuke.Services.Search.Internals
                 }
             }
 
+			Logger.LogWarning("<<< Exiting SearchContentSourceCallback(cacheItem={CacheItem})", cacheItem);
             return results;
         }
 
         private static NumericRangeQuery<int> NumericValueQuery(string numericName, int numericVal)
         {
+			Logger.LogError(">>> Entering NumericValueQuery(numericName={NumericName},numericVal={NumericVal})", numericName, numericVal);
+            Logger.LogWarning("<<< Exiting NumericValueQuery(numericName={NumericName},numericVal={NumericVal})", numericName, numericVal);
             return NumericRangeQuery.NewIntRange(numericName, numericVal, numericVal, true, true);
         }
 
         /// <summary>Add Field to Doc when supplied fieldValue > 0.</summary>
         private static void AddIntField(Document doc, int fieldValue, string fieldTag)
         {
+			Logger.LogError(">>> Entering AddIntField(doc={Doc},fieldValue={FieldValue},fieldTag={FieldTag})", doc, fieldValue, fieldTag);
             if (fieldValue > 0)
             {
                 doc.Add(new NumericField(fieldTag, Field.Store.YES, true).SetIntValue(fieldValue));
             }
+			Logger.LogWarning("<<< Exiting AddIntField(doc={Doc},fieldValue={FieldValue},fieldTag={FieldTag})", doc, fieldValue, fieldTag);
         }
 
         private static string StripTagsRetainAttributes(string html, IEnumerable<string> attributes, bool decoded, bool retainSpace)
         {
+			Logger.LogError(">>> Entering StripTagsRetainAttributes(html={Html},attributes={Attributes},decoded={Decoded},retainSpace={RetainSpace})", html, attributes, decoded, retainSpace);
             var attributesList = attributes as IList<string> ?? attributes.ToList();
             var strippedString = html;
+			Logger.LogError("StripTagsRetainAttributes(html={Html},attributes={Attributes},decoded={Decoded},retainSpace={RetainSpace}): strippedString → {StrippedString}", html, attributes, decoded, retainSpace, strippedString);
             var emptySpace = retainSpace ? " " : string.Empty;
+			Logger.LogError("StripTagsRetainAttributes(html={Html},attributes={Attributes},decoded={Decoded},retainSpace={RetainSpace}): emptySpace → {EmptySpace}", html, attributes, decoded, retainSpace, emptySpace);
+			Logger.LogError("StripTagsRetainAttributes(html={Html},attributes={Attributes},decoded={Decoded},retainSpace={RetainSpace}): attributesList → {AttributesList}", html, attributes, decoded, retainSpace, attributesList);
 
             if (!string.IsNullOrEmpty(strippedString))
             {
@@ -304,6 +356,7 @@ namespace DotNetNuke.Services.Search.Internals
                 }
                 catch (RegexMatchTimeoutException ex)
                 {
+					Logger.LogError("Exception in StripTagsRetainAttributes(html={Html},attributes={Attributes},decoded={Decoded},retainSpace={RetainSpace}): {Arg4}", html, attributes, decoded, retainSpace, ex.Message);
                     DotNetNuke.Services.Exceptions.Exceptions.LogException(ex);
                     return string.Empty;
                 }
@@ -331,6 +384,7 @@ namespace DotNetNuke.Services.Search.Internals
             if (!string.IsNullOrEmpty(strippedString))
             {
                 var list = new List<string>();
+				Logger.LogError("StripTagsRetainAttributes(html={Html},attributes={Attributes},decoded={Decoded},retainSpace={RetainSpace}): list → {List}", html, attributes, decoded, retainSpace, list);
                 try
                 {
                     foreach (var match in HtmlTagsRegex.Matches(strippedString).Cast<Match>())
@@ -352,9 +406,13 @@ namespace DotNetNuke.Services.Search.Internals
                                         {
                                             list.Add(text);
                                         }
+										Logger.LogError("StripTagsRetainAttributes(html={Html},attributes={Attributes},decoded={Decoded},retainSpace={RetainSpace}): captures → {Captures}", html, attributes, decoded, retainSpace, captures);
                                     }
                                     catch (RegexMatchTimeoutException ex)
                                     {
+										Logger.LogError("StripTagsRetainAttributes(html={Html},attributes={Attributes},decoded={Decoded},retainSpace={RetainSpace}): val → {Val}", html, attributes, decoded, retainSpace, val);
+										Logger.LogError("StripTagsRetainAttributes(html={Html},attributes={Attributes},decoded={Decoded},retainSpace={RetainSpace}): pos → {Pos}", html, attributes, decoded, retainSpace, pos);
+										Logger.LogError("StripTagsRetainAttributes(html={Html},attributes={Attributes},decoded={Decoded},retainSpace={RetainSpace}): attr → {Attr}", html, attributes, decoded, retainSpace, attr);
                                         DotNetNuke.Services.Exceptions.Exceptions.LogException(ex);
                                         return string.Empty;
                                     }
@@ -390,18 +448,23 @@ namespace DotNetNuke.Services.Search.Internals
                 strippedString = StripTagsRetainAttributes(HttpUtility.HtmlDecode(strippedString), attributesList, true, retainSpace);
             }
 
+			Logger.LogWarning("<<< Exiting StripTagsRetainAttributes(html={Html},attributes={Attributes},decoded={Decoded},retainSpace={RetainSpace})", html, attributes, decoded, retainSpace);
             return strippedString;
         }
 
         private object SearchDocumentTypeDisplayNameCallBack(CacheItemArgs cacheItem)
         {
+			Logger.LogError(">>> Entering SearchDocumentTypeDisplayNameCallBack(cacheItem={CacheItem})", cacheItem);
             var data = new Dictionary<string, string>();
+			Logger.LogError("SearchDocumentTypeDisplayNameCallBack(cacheItem={CacheItem}): data → {Data}", cacheItem, data);
             foreach (IPortalInfo portal in PortalController.Instance.GetPortals())
             {
                 var searchContentSources = this.GetSearchContentSourceList(portal.PortalId);
+				Logger.LogError("SearchDocumentTypeDisplayNameCallBack(cacheItem={CacheItem}): searchContentSources → {SearchContentSources}", cacheItem, searchContentSources);
                 foreach (var searchContentSource in searchContentSources)
                 {
                     var key = $"{searchContentSource.SearchTypeId}-{searchContentSource.ModuleDefinitionId}-{Thread.CurrentThread.CurrentCulture}";
+					Logger.LogError("SearchDocumentTypeDisplayNameCallBack(cacheItem={CacheItem}): key → {Key}", cacheItem, key);
                     if (!data.ContainsKey(key))
                     {
                         data.Add(key, searchContentSource.LocalizedName);
@@ -409,11 +472,13 @@ namespace DotNetNuke.Services.Search.Internals
                 }
             }
 
+			Logger.LogWarning("<<< Exiting SearchDocumentTypeDisplayNameCallBack(cacheItem={CacheItem})", cacheItem);
             return data;
         }
 
         private void AddSearchDocumentInternal(SearchDocument searchDocument, bool autoCommit)
         {
+			Logger.LogError(">>> Entering AddSearchDocumentInternal(searchDocument={SearchDocument},autoCommit={AutoCommit})", searchDocument, autoCommit);
             Requires.NotNull("SearchDocument", searchDocument);
             Requires.NotNullOrEmpty("UniqueKey", searchDocument.UniqueKey);
             Requires.NotNegative("SearchTypeId", searchDocument.SearchTypeId);
@@ -424,6 +489,7 @@ namespace DotNetNuke.Services.Search.Internals
             {
                 if (searchDocument.ModuleDefId <= 0)
                 {
+					Logger.LogError("Throwing ArgumentException from AddSearchDocumentInternal(searchDocument={SearchDocument},autoCommit={AutoCommit})", searchDocument, autoCommit);
                     throw new ArgumentException(Localization.GetExceptionMessage("ModuleDefIdMustBeGreaterThanZero", "ModuleDefId must be greater than zero when SearchTypeId is for a module"));
                 }
 
@@ -446,7 +512,9 @@ namespace DotNetNuke.Services.Search.Internals
             }
 
             var doc = new Document();
+			Logger.LogError("AddSearchDocumentInternal(searchDocument={SearchDocument},autoCommit={AutoCommit}): doc → {Doc}", searchDocument, autoCommit, doc);
             var sb = new StringBuilder();
+			Logger.LogError("AddSearchDocumentInternal(searchDocument={SearchDocument},autoCommit={AutoCommit}): sb → {Sb}", searchDocument, autoCommit, sb);
 
             // TODO - Set setOmitTermFreqAndPositions
             // TODO - Check if Numeric fields need to have Store.YES or Store.NO
@@ -484,12 +552,15 @@ namespace DotNetNuke.Services.Search.Internals
             {
                 this.Commit();
             }
+			Logger.LogWarning("<<< Exiting AddSearchDocumentInternal(searchDocument={SearchDocument},autoCommit={AutoCommit})", searchDocument, autoCommit);
         }
 
         private void DeleteSearchDocumentInternal(SearchDocument searchDocument, bool autoCommit)
         {
+			Logger.LogError(">>> Entering DeleteSearchDocumentInternal(searchDocument={SearchDocument},autoCommit={AutoCommit})", searchDocument, autoCommit);
             var query = new BooleanQuery();
 
+			Logger.LogError("DeleteSearchDocumentInternal(searchDocument={SearchDocument},autoCommit={AutoCommit}): query → {Query}", searchDocument, autoCommit, query);
             if (searchDocument.SearchTypeId > -1)
             {
                 query.Add(NumericValueQuery(Constants.SearchTypeTag, searchDocument.SearchTypeId), Occur.MUST);
@@ -546,10 +617,12 @@ namespace DotNetNuke.Services.Search.Internals
             {
                 this.Commit();
             }
+			Logger.LogWarning("<<< Exiting DeleteSearchDocumentInternal(searchDocument={SearchDocument},autoCommit={AutoCommit})", searchDocument, autoCommit);
         }
 
         private void AddSearchDocumentParamters(Document doc, SearchDocument searchDocument, StringBuilder sb)
         {
+			Logger.LogError(">>> Entering AddSearchDocumentParamters(doc={Doc},searchDocument={SearchDocument},sb={Sb})", doc, searchDocument, sb);
             // mandatory fields
             doc.Add(new Field(Constants.UniqueKeyTag, SearchHelper.Instance.StripTagsNoAttributes(searchDocument.UniqueKey, true), Field.Store.YES, Field.Index.NOT_ANALYZED));
             doc.Add(new NumericField(Constants.PortalIdTag, Field.Store.YES, true).SetIntValue(searchDocument.PortalId));
@@ -561,9 +634,11 @@ namespace DotNetNuke.Services.Search.Internals
             if (!string.IsNullOrEmpty(searchDocument.Title))
             {
                 var field = new Field(Constants.TitleTag, StripTagsRetainAttributes(searchDocument.Title, HtmlAttributesToRetain, false, true), Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
+				Logger.LogError("AddSearchDocumentParamters(doc={Doc},searchDocument={SearchDocument},sb={Sb}): field → {Field}", doc, searchDocument, sb, field);
                 if (this.titleBoost > 0 && this.titleBoost != Constants.StandardLuceneBoost)
                 {
                     field.Boost = this.titleBoost / 10f;
+					Logger.LogDebug("AddSearchDocumentParamters(doc={Doc},searchDocument={SearchDocument},sb={Sb}): field.Boost → {Arg3}", doc, searchDocument, sb, field.Boost);
                 }
 
                 doc.Add(field);
@@ -598,7 +673,9 @@ namespace DotNetNuke.Services.Search.Internals
             foreach (var kvp in searchDocument.Keywords)
             {
                 var key = kvp.Key.ToLowerInvariant();
+				Logger.LogError("AddSearchDocumentParamters(doc={Doc},searchDocument={SearchDocument},sb={Sb}): key → {Key}", doc, searchDocument, sb, key);
                 var needAnalyzed = Constants.FieldsNeedAnalysis.Contains(key);
+				Logger.LogError("AddSearchDocumentParamters(doc={Doc},searchDocument={SearchDocument},sb={Sb}): needAnalyzed → {NeedAnalyzed}", doc, searchDocument, sb, needAnalyzed);
                 var field = new Field(SearchHelper.Instance.StripTagsNoAttributes(Constants.KeywordsPrefixTag + kvp.Key, true), SearchHelper.Instance.StripTagsNoAttributes(kvp.Value, true), Field.Store.YES, needAnalyzed ? Field.Index.ANALYZED : Field.Index.NOT_ANALYZED);
                 switch (key)
                 {
@@ -642,6 +719,7 @@ namespace DotNetNuke.Services.Search.Internals
             }
 
             bool tagBoostApplied = false;
+			Logger.LogError("AddSearchDocumentParamters(doc={Doc},searchDocument={SearchDocument},sb={Sb}): tagBoostApplied → {TagBoostApplied}", doc, searchDocument, sb, tagBoostApplied);
             foreach (var tag in searchDocument.Tags)
             {
                 var field = new Field(Constants.Tag, SearchHelper.Instance.StripTagsNoAttributes(tag.ToLowerInvariant(), true), Field.Store.YES, Field.Index.NOT_ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
@@ -666,6 +744,7 @@ namespace DotNetNuke.Services.Search.Internals
             if (searchDocument.AuthorUserId > 0)
             {
                 var user = UserController.Instance.GetUserById(searchDocument.PortalId, searchDocument.AuthorUserId);
+				Logger.LogError("AddSearchDocumentParamters(doc={Doc},searchDocument={SearchDocument},sb={Sb}): user → {User}", doc, searchDocument, sb, user);
                 if (user != null && !string.IsNullOrEmpty(user.DisplayName))
                 {
                     var field = new Field(Constants.AuthorNameTag, user.DisplayName, Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
@@ -701,6 +780,7 @@ namespace DotNetNuke.Services.Search.Internals
                     field.Boost = this.contentBoost / 10f;
                 }
             }
+			Logger.LogWarning("<<< Exiting AddSearchDocumentParamters(doc={Doc},searchDocument={SearchDocument},sb={Sb})", doc, searchDocument, sb);
         }
     }
 }

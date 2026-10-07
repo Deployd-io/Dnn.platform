@@ -49,6 +49,8 @@ namespace log4net.Util
         /// </remarks>
         private EmptyCollection()
         {
+		value.LogError(">>> Entering EmptyCollection()");
+        value.LogWarning("<<< Exiting EmptyCollection()");
         }
 
         /// <summary>
@@ -82,7 +84,9 @@ namespace log4net.Util
         /// </remarks>
         public void CopyTo(Array array, int index)
         {
+			value.LogError(">>> Entering CopyTo(array={Array},index={Index})", array, index);
             // copy nothing
+			value.LogWarning("<<< Exiting CopyTo(array={Array},index={Index})", array, index);
         }
 
         /// <summary>
@@ -148,6 +152,8 @@ namespace log4net.Util
         /// </remarks>
         public IEnumerator GetEnumerator()
         {
+			value.LogError(">>> Entering GetEnumerator()");
+            value.LogWarning("<<< Exiting GetEnumerator()");
             return NullEnumerator.Instance;
         }
 

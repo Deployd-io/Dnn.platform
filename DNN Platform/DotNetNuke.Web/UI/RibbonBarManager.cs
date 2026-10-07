@@ -126,6 +126,7 @@ namespace DotNetNuke.Web.UI
         /// <returns>The new <see cref="TabInfo"/> instance.</returns>
         public static TabInfo InitTabInfoObject(IPermissionDefinitionService permissionDefinitionService, TabInfo relativeToTab, TabRelativeLocation location)
         {
+			Logger.LogError(">>> Entering InitTabInfoObject()");
             if (relativeToTab == null)
             {
                 if ((PortalSettings.Current != null) && (PortalSettings.Current.ActiveTab != null))
@@ -147,16 +148,26 @@ namespace DotNetNuke.Web.UI
             };
 
             TabInfo parentTab = GetParentTab(relativeToTab, location);
+			Logger.LogError("InitTabInfoObject(): parentTab → {ParentTab}", parentTab);
+			Logger.LogError("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService}): parentTab → {ParentTab}", permissionDefinitionService, parentTab);
 
             if (parentTab != null)
             {
+				Logger.LogError("InitTabInfoObject(relativeToTab={RelativeToTab}): parentTab → {ParentTab}", relativeToTab, parentTab);
+				Logger.LogError("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab}): parentTab → {ParentTab}", permissionDefinitionService, relativeToTab, parentTab);
+				Logger.LogError("InitTabInfoObject(relativeToTab={RelativeToTab},location={Location}): parentTab → {ParentTab}", relativeToTab, location, parentTab);
+				Logger.LogError("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab},location={Location}): parentTab → {ParentTab}", permissionDefinitionService, relativeToTab, location, parentTab);
                 newTab.PortalID = parentTab.PortalID;
                 newTab.ParentId = parentTab.TabID;
                 newTab.Level = parentTab.Level + 1;
                 switch (PortalSettings.Current.SSLSetup)
                 {
                     case Abstractions.Security.SiteSslSetup.Off:
+						Logger.LogDebug("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab},location={Location}): newTab.PortalID → {Arg3}", permissionDefinitionService, relativeToTab, location, newTab.PortalID);
+						Logger.LogDebug("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab},location={Location}): newTab.ParentId → {Arg3}", permissionDefinitionService, relativeToTab, location, newTab.ParentId);
+						Logger.LogDebug("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab},location={Location}): newTab.Level → {Arg3}", permissionDefinitionService, relativeToTab, location, newTab.Level);
                         newTab.IsSecure = false;
+						Logger.LogDebug("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab},location={Location}): newTab.IsSecure → {Arg3}", permissionDefinitionService, relativeToTab, location, newTab.IsSecure);
                         break;
                     case Abstractions.Security.SiteSslSetup.Advanced:
                         newTab.IsSecure = parentTab.IsSecure;
@@ -185,7 +196,18 @@ namespace DotNetNuke.Web.UI
                 foreach (var permission in permissionDefinitionService.GetDefinitionsByTab())
                 {
                     IPermissionInfo newTabPermission = new TabPermissionInfo();
+					Logger.LogError("InitTabInfoObject(): newTabPermission → {NewTabPermission}", newTabPermission);
+					Logger.LogError("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService}): newTabPermission → {NewTabPermission}", permissionDefinitionService, newTabPermission);
+					Logger.LogError("InitTabInfoObject(relativeToTab={RelativeToTab}): newTabPermission → {NewTabPermission}", relativeToTab, newTabPermission);
+					Logger.LogError("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab}): newTabPermission → {NewTabPermission}", permissionDefinitionService, relativeToTab, newTabPermission);
+					Logger.LogError("InitTabInfoObject(relativeToTab={RelativeToTab},location={Location}): newTabPermission → {NewTabPermission}", relativeToTab, location, newTabPermission);
+					Logger.LogError("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab},location={Location}): newTabPermission → {NewTabPermission}", permissionDefinitionService, relativeToTab, location, newTabPermission);
+					Logger.LogDebug("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab},location={Location}): newTabPermission.PermissionKey → {Arg3}", permissionDefinitionService, relativeToTab, location, newTabPermission.PermissionKey);
+					Logger.LogDebug("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab},location={Location}): newTabPermission.PermissionName → {Arg3}", permissionDefinitionService, relativeToTab, location, newTabPermission.PermissionName);
+					Logger.LogDebug("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab},location={Location}): newTabPermission.AllowAccess → {Arg3}", permissionDefinitionService, relativeToTab, location, newTabPermission.AllowAccess);
+					Logger.LogDebug("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab},location={Location}): newTabPermission.RoleId → {Arg3}", permissionDefinitionService, relativeToTab, location, newTabPermission.RoleId);
                     newTabPermission.PermissionId = permission.PermissionId;
+					Logger.LogDebug("InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab},location={Location}): newTabPermission.PermissionId → {Arg3}", permissionDefinitionService, relativeToTab, location, newTabPermission.PermissionId);
                     newTabPermission.PermissionKey = permission.PermissionKey;
                     newTabPermission.PermissionName = permission.PermissionName;
                     newTabPermission.AllowAccess = true;
@@ -194,6 +216,7 @@ namespace DotNetNuke.Web.UI
                 }
             }
 
+			Logger.LogWarning("<<< Exiting InitTabInfoObject(permissionDefinitionService={PermissionDefinitionService},relativeToTab={RelativeToTab},location={Location})", permissionDefinitionService, relativeToTab, location);
             return newTab;
         }
 
@@ -203,12 +226,14 @@ namespace DotNetNuke.Web.UI
         /// <returns>The <see cref="TabInfo"/> or <see langword="null"/> if there is no parent.</returns>
         public static TabInfo GetParentTab(TabInfo relativeToTab, TabRelativeLocation location)
         {
+			Logger.LogError(">>> Entering GetParentTab(relativeToTab={RelativeToTab},location={Location})", relativeToTab, location);
             if (relativeToTab == null)
             {
                 return null;
             }
 
             TabInfo parentTab = null;
+			Logger.LogError("GetParentTab(relativeToTab={RelativeToTab},location={Location}): parentTab → {ParentTab}", relativeToTab, location, parentTab);
             if (location == TabRelativeLocation.CHILD)
             {
                 parentTab = relativeToTab;
@@ -218,6 +243,7 @@ namespace DotNetNuke.Web.UI
                 parentTab = TabController.Instance.GetTab(relativeToTab.ParentId, relativeToTab.PortalID, false);
             }
 
+			Logger.LogWarning("<<< Exiting GetParentTab(relativeToTab={RelativeToTab},location={Location})", relativeToTab, location);
             return parentTab;
         }
 
@@ -233,13 +259,17 @@ namespace DotNetNuke.Web.UI
         /// <returns>A list of <see cref="TabInfo"/> instances.</returns>
         public static IList<TabInfo> GetPagesList(IHostSettings hostSettings, IApplicationStatusInfo appStatus)
         {
+			Logger.LogError(">>> Entering GetPagesList()");
             IList<TabInfo> portalTabs = null;
             UserInfo userInfo = UserController.Instance.GetCurrentUserInfo();
             if ((userInfo != null) && userInfo.UserID != Null.NullInteger)
             {
+				Logger.LogError("GetPagesList(): userInfo → {UserInfo}", userInfo);
                 if (userInfo.IsSuperUser && PortalSettings.Current.ActiveTab.IsSuperTab)
                 {
+					Logger.LogError("GetPagesList(hostSettings={HostSettings},appStatus={AppStatus}): userInfo → {UserInfo}", hostSettings, appStatus, userInfo);
                     portalTabs = TabController.Instance.GetTabsByPortal(Null.NullInteger).AsList();
+					Logger.LogError("GetPagesList(): portalTabs → {PortalTabs}", portalTabs);
                 }
                 else
                 {
@@ -252,6 +282,7 @@ namespace DotNetNuke.Web.UI
                 portalTabs = new List<TabInfo>();
             }
 
+			Logger.LogWarning("<<< Exiting GetPagesList(hostSettings={HostSettings},appStatus={AppStatus})", hostSettings, appStatus);
             return portalTabs;
         }
 
@@ -259,6 +290,8 @@ namespace DotNetNuke.Web.UI
         /// <returns><see langword="true"/> if the current page is the host console, otherwise <see langword="false"/>.</returns>
         public static bool IsHostConsolePage()
         {
+			Logger.LogError(">>> Entering IsHostConsolePage()");
+            Logger.LogWarning("<<< Exiting IsHostConsolePage()");
             return PortalSettings.Current.ActiveTab.IsSuperTab && PortalSettings.Current.ActiveTab.TabPath == "//Host";
         }
 
@@ -274,6 +307,7 @@ namespace DotNetNuke.Web.UI
         /// <returns><see langword="true"/> if the current page can be moved, otherwise <see langword="false"/>.</returns>
         public static bool CanMovePage()
         {
+			Logger.LogError(">>> Entering CanMovePage()");
             // Cannot move the host console page
             if (IsHostConsolePage())
             {
@@ -290,6 +324,7 @@ namespace DotNetNuke.Web.UI
                 }
 
                 TabInfo parentTab = TabController.Instance.GetTab(parentTabID, PortalSettings.Current.ActiveTab.PortalID, false);
+				Logger.LogError("CanMovePage(): parentTab → {ParentTab}", parentTab);
                 string permissionList = "MANAGE";
                 if (!TabPermissionController.HasTabPermission(parentTab.TabPermissions, permissionList))
                 {
@@ -297,6 +332,7 @@ namespace DotNetNuke.Web.UI
                 }
             }
 
+			Logger.LogWarning("<<< Exiting CanMovePage()");
             return true;
         }
 
@@ -308,7 +344,10 @@ namespace DotNetNuke.Web.UI
             TabRelativeLocation location,
             string templateFileId)
         {
+			Logger.LogError(">>> Entering SaveTabInfoObject(tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId})", tab, relativeToTab, location, templateFileId);
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogError("SaveTabInfoObject(tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): scope → {Scope}", tab, relativeToTab, location, templateFileId, scope);
+			Logger.LogWarning("<<< Exiting SaveTabInfoObject(tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId})", tab, relativeToTab, location, templateFileId);
             return SaveTabInfoObject(scope.ServiceProvider.GetRequiredService<IBusinessControllerProvider>(), tab, relativeToTab, location, templateFileId);
         }
 
@@ -335,6 +374,7 @@ namespace DotNetNuke.Web.UI
         /// <exception cref="DotNetNukeException">If the page is invalid.</exception>
         public static int SaveTabInfoObject(IBusinessControllerProvider businessControllerProvider, IPermissionDefinitionService permissionDefinitionService, TabInfo tab, TabInfo relativeToTab, TabRelativeLocation location, string templateFileId)
         {
+			Logger.LogError(">>> Entering SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId})", businessControllerProvider, tab, relativeToTab, location, templateFileId);
             // Validation:
             // Tab name is required
             // Tab name is invalid
@@ -343,6 +383,8 @@ namespace DotNetNuke.Web.UI
                 switch (invalidType)
                 {
                     case "EmptyTabName":
+						Logger.LogError("Throwing DotNetNukeException from SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId})", businessControllerProvider, tab, relativeToTab, location, templateFileId);
+						Logger.LogError("Throwing DotNetNukeException from SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId})", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId);
                         throw new DotNetNukeException("Page name is required.", DotNetNukeErrorCode.PageNameRequired);
                     case "InvalidTabName":
                         throw new DotNetNukeException("Page name is invalid.", DotNetNukeErrorCode.PageNameInvalid);
@@ -360,14 +402,18 @@ namespace DotNetNuke.Web.UI
                 if (!usingDefaultLanguage)
                 {
                     TabInfo defaultLanguageSelectedTab = tab.DefaultLanguageTab;
+					Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): defaultLanguageSelectedTab → {DefaultLanguageSelectedTab}", businessControllerProvider, tab, relativeToTab, location, templateFileId, defaultLanguageSelectedTab);
+					Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): defaultLanguageSelectedTab → {DefaultLanguageSelectedTab}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, defaultLanguageSelectedTab);
 
                     if (defaultLanguageSelectedTab == null)
                     {
                         // get the siblings from the selected tab and iterate through until you find a sibling with a corresponding default language tab
                         // if none are found get a list of all the tabs from the default language and then select the last one
                         var selectedTabSiblings = TabController.Instance.GetTabsByPortal(tab.PortalID).WithCulture(tab.CultureCode, true).AsList();
+						Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): selectedTabSiblings → {SelectedTabSiblings}", businessControllerProvider, tab, relativeToTab, location, templateFileId, selectedTabSiblings);
                         foreach (TabInfo sibling in selectedTabSiblings)
                         {
+							Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): selectedTabSiblings → {SelectedTabSiblings}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, selectedTabSiblings);
                             TabInfo siblingDefaultTab = sibling.DefaultLanguageTab;
                             if (siblingDefaultTab != null)
                             {
@@ -380,6 +426,8 @@ namespace DotNetNuke.Web.UI
                         if (defaultLanguageSelectedTab == null)
                         {
                             var defaultLanguageTabs = TabController.Instance.GetTabsByPortal(tab.PortalID).WithCulture(PortalSettings.Current.DefaultLanguage, true).AsList();
+							Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): defaultLanguageTabs → {DefaultLanguageTabs}", businessControllerProvider, tab, relativeToTab, location, templateFileId, defaultLanguageTabs);
+							Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): defaultLanguageTabs → {DefaultLanguageTabs}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, defaultLanguageTabs);
                             defaultLanguageSelectedTab = defaultLanguageTabs[defaultLanguageTabs.Count];
 
                             // get the last tab
@@ -399,6 +447,8 @@ namespace DotNetNuke.Web.UI
                 }
 
                 TabInfo parentTab = GetParentTab(relativeToTab, location);
+				Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): parentTab → {ParentTab}", businessControllerProvider, tab, relativeToTab, location, templateFileId, parentTab);
+				Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): parentTab → {ParentTab}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, parentTab);
                 string permissionList = "ADD,COPY,EDIT,MANAGE";
 
                 // Check permissions for Page Editors when moving or inserting
@@ -415,7 +465,9 @@ namespace DotNetNuke.Web.UI
                 if (parentTab != null)
                 {
                     tab.ParentId = parentTab.TabID;
+					Logger.LogDebug("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): tab.ParentId → {Arg6}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, tab.ParentId);
                     tab.Level = parentTab.Level + 1;
+					Logger.LogDebug("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): tab.Level → {Arg6}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, tab.Level);
                 }
                 else
                 {
@@ -447,7 +499,14 @@ namespace DotNetNuke.Web.UI
                         foreach (IPermissionDefinitionInfo permission in permissionDefinitionService.GetDefinitionsByTab())
                         {
                             IPermissionInfo newTabPermission = new TabPermissionInfo();
+							Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): newTabPermission → {NewTabPermission}", businessControllerProvider, tab, relativeToTab, location, templateFileId, newTabPermission);
+							Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): newTabPermission → {NewTabPermission}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, newTabPermission);
+							Logger.LogDebug("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): newTabPermission.PermissionKey → {Arg6}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, newTabPermission.PermissionKey);
+							Logger.LogDebug("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): newTabPermission.PermissionName → {Arg6}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, newTabPermission.PermissionName);
+							Logger.LogDebug("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): newTabPermission.AllowAccess → {Arg6}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, newTabPermission.AllowAccess);
+							Logger.LogDebug("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): newTabPermission.RoleId → {Arg6}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, newTabPermission.RoleId);
                             newTabPermission.PermissionId = permission.PermissionId;
+							Logger.LogDebug("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): newTabPermission.PermissionId → {Arg6}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, newTabPermission.PermissionId);
                             newTabPermission.PermissionKey = permission.PermissionKey;
                             newTabPermission.PermissionName = permission.PermissionName;
                             newTabPermission.AllowAccess = true;
@@ -457,14 +516,19 @@ namespace DotNetNuke.Web.UI
                     }
 
                     var portalSettings = PortalController.Instance.GetCurrentSettings();
+					Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): portalSettings → {PortalSettings}", businessControllerProvider, tab, relativeToTab, location, templateFileId, portalSettings);
                     if (portalSettings.ContentLocalizationEnabled)
                     {
+						Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): portalSettings → {PortalSettings}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, portalSettings);
                         Locale defaultLocale = LocaleController.Instance.GetDefaultLocale(tab.PortalID);
+						Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): defaultLocale → {DefaultLocale}", businessControllerProvider, tab, relativeToTab, location, templateFileId, defaultLocale);
+						Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): defaultLocale → {DefaultLocale}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, defaultLocale);
                         tab.CultureCode = defaultLocale.Code;
                     }
                     else
                     {
                         tab.CultureCode = Null.NullString;
+						Logger.LogDebug("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): tab.CultureCode → {Arg6}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, tab.CultureCode);
                     }
 
                     if (location == TabRelativeLocation.AFTER && (relativeToTab != null))
@@ -523,6 +587,8 @@ namespace DotNetNuke.Web.UI
                 try
                 {
                     var templateFile = FileManager.Instance.GetFile(Convert.ToInt32(templateFileId, CultureInfo.InvariantCulture));
+					Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): templateFile → {TemplateFile}", businessControllerProvider, tab, relativeToTab, location, templateFileId, templateFile);
+					Logger.LogError("SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): templateFile → {TemplateFile}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, templateFile);
                     using (var fileContent = FileManager.Instance.GetFileContent(templateFile))
                     using (var xmlReader = XmlReader.Create(fileContent, new XmlReaderSettings { XmlResolver = null, }))
                     {
@@ -536,11 +602,14 @@ namespace DotNetNuke.Web.UI
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): {Arg5}", businessControllerProvider, tab, relativeToTab, location, templateFileId, ex.Message);
                     Exceptions.LogException(ex);
+					Logger.LogError("Exception in SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId}): {Arg6}", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId, ex.Message);
                     throw new DotNetNukeException("Unable to process page template.", ex, DotNetNukeErrorCode.DeserializePanesFailed);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting SaveTabInfoObject(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService},tab={Tab},relativeToTab={RelativeToTab},location={Location},templateFileId={TemplateFileId})", businessControllerProvider, permissionDefinitionService, tab, relativeToTab, location, templateFileId);
             return tab.TabID;
         }
 
@@ -551,9 +620,11 @@ namespace DotNetNuke.Web.UI
         [SuppressMessage("Microsoft.Design", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Breaking change")]
         public static bool Validate_IsCircularReference(int portalID, int tabID)
         {
+			Logger.LogError(">>> Entering Validate_IsCircularReference(portalID={PortalID},tabID={TabID})", portalID, tabID);
             if (tabID != -1)
             {
                 TabInfo objtab = TabController.Instance.GetTab(tabID, portalID, false);
+				Logger.LogError("Validate_IsCircularReference(portalID={PortalID},tabID={TabID}): objtab → {Objtab}", portalID, tabID, objtab);
 
                 if (objtab == null)
                 {
@@ -573,6 +644,7 @@ namespace DotNetNuke.Web.UI
                 return Validate_IsCircularReference(portalID, objtab.ParentId);
             }
 
+			Logger.LogWarning("<<< Exiting Validate_IsCircularReference(portalID={PortalID},tabID={TabID})", portalID, tabID);
             return false;
         }
 
@@ -589,23 +661,38 @@ namespace DotNetNuke.Web.UI
         /// <param name="tab">The tab/page to update.</param>
         public static void DeserializeTabPermissions(IPermissionDefinitionService permissionDefinitionService, XmlNodeList nodeTabPermissions, TabInfo tab)
         {
+			Logger.LogError(">>> Entering DeserializeTabPermissions(nodeTabPermissions={NodeTabPermissions},tab={Tab})", nodeTabPermissions, tab);
             foreach (XmlNode xmlTabPermission in nodeTabPermissions)
             {
                 var permissionKey = XmlUtils.GetNodeValue(xmlTabPermission.CreateNavigator(), "permissionkey");
+				Logger.LogError("DeserializeTabPermissions(nodeTabPermissions={NodeTabPermissions},tab={Tab}): permissionKey → {PermissionKey}", nodeTabPermissions, tab, permissionKey);
+				Logger.LogError("DeserializeTabPermissions(permissionDefinitionService={PermissionDefinitionService},nodeTabPermissions={NodeTabPermissions},tab={Tab}): permissionKey → {PermissionKey}", permissionDefinitionService, nodeTabPermissions, tab, permissionKey);
                 var permissionCode = XmlUtils.GetNodeValue(xmlTabPermission.CreateNavigator(), "permissioncode");
                 var roleName = XmlUtils.GetNodeValue(xmlTabPermission.CreateNavigator(), "rolename");
+				Logger.LogError("DeserializeTabPermissions(nodeTabPermissions={NodeTabPermissions},tab={Tab}): permissionCode → {PermissionCode}", nodeTabPermissions, tab, permissionCode);
+				Logger.LogError("DeserializeTabPermissions(permissionDefinitionService={PermissionDefinitionService},nodeTabPermissions={NodeTabPermissions},tab={Tab}): permissionCode → {PermissionCode}", permissionDefinitionService, nodeTabPermissions, tab, permissionCode);
+				Logger.LogError("DeserializeTabPermissions(nodeTabPermissions={NodeTabPermissions},tab={Tab}): roleName → {RoleName}", nodeTabPermissions, tab, roleName);
+				Logger.LogError("DeserializeTabPermissions(permissionDefinitionService={PermissionDefinitionService},nodeTabPermissions={NodeTabPermissions},tab={Tab}): roleName → {RoleName}", permissionDefinitionService, nodeTabPermissions, tab, roleName);
                 var allowAccess = XmlUtils.GetNodeValueBoolean(xmlTabPermission, "allowaccess");
                 var permissions = permissionDefinitionService.GetDefinitionsByCodeAndKey(permissionCode, permissionKey);
                 var permissionId = permissions.Last().PermissionId;
 
+				Logger.LogError("DeserializeTabPermissions(nodeTabPermissions={NodeTabPermissions},tab={Tab}): allowAccess → {AllowAccess}", nodeTabPermissions, tab, allowAccess);
+				Logger.LogError("DeserializeTabPermissions(permissionDefinitionService={PermissionDefinitionService},nodeTabPermissions={NodeTabPermissions},tab={Tab}): allowAccess → {AllowAccess}", permissionDefinitionService, nodeTabPermissions, tab, allowAccess);
                 var roleId = int.MinValue;
                 switch (roleName)
                 {
                     case Globals.glbRoleAllUsersName:
+						Logger.LogError("DeserializeTabPermissions(nodeTabPermissions={NodeTabPermissions},tab={Tab}): permissions → {Permissions}", nodeTabPermissions, tab, permissions);
+						Logger.LogError("DeserializeTabPermissions(permissionDefinitionService={PermissionDefinitionService},nodeTabPermissions={NodeTabPermissions},tab={Tab}): permissions → {Permissions}", permissionDefinitionService, nodeTabPermissions, tab, permissions);
+						Logger.LogError("DeserializeTabPermissions(nodeTabPermissions={NodeTabPermissions},tab={Tab}): permissionId → {PermissionId}", nodeTabPermissions, tab, permissionId);
+						Logger.LogError("DeserializeTabPermissions(permissionDefinitionService={PermissionDefinitionService},nodeTabPermissions={NodeTabPermissions},tab={Tab}): permissionId → {PermissionId}", permissionDefinitionService, nodeTabPermissions, tab, permissionId);
                         roleId = Convert.ToInt32(Globals.glbRoleAllUsers, CultureInfo.InvariantCulture);
                         break;
                     case Globals.glbRoleUnauthUserName:
                         roleId = Convert.ToInt32(Globals.glbRoleUnauthUser, CultureInfo.InvariantCulture);
+						Logger.LogError("DeserializeTabPermissions(nodeTabPermissions={NodeTabPermissions},tab={Tab}): roleId → {RoleId}", nodeTabPermissions, tab, roleId);
+						Logger.LogError("DeserializeTabPermissions(permissionDefinitionService={PermissionDefinitionService},nodeTabPermissions={NodeTabPermissions},tab={Tab}): roleId → {RoleId}", permissionDefinitionService, nodeTabPermissions, tab, roleId);
                         break;
                     default:
                         IPortalInfo portal = PortalController.Instance.GetPortal(tab.PortalID);
@@ -613,6 +700,10 @@ namespace DotNetNuke.Web.UI
                         if (role != null)
                         {
                             roleId = role.RoleID;
+							Logger.LogError("DeserializeTabPermissions(nodeTabPermissions={NodeTabPermissions},tab={Tab}): portal → {Portal}", nodeTabPermissions, tab, portal);
+							Logger.LogError("DeserializeTabPermissions(permissionDefinitionService={PermissionDefinitionService},nodeTabPermissions={NodeTabPermissions},tab={Tab}): portal → {Portal}", permissionDefinitionService, nodeTabPermissions, tab, portal);
+							Logger.LogError("DeserializeTabPermissions(nodeTabPermissions={NodeTabPermissions},tab={Tab}): role → {Role}", nodeTabPermissions, tab, role);
+							Logger.LogError("DeserializeTabPermissions(permissionDefinitionService={PermissionDefinitionService},nodeTabPermissions={NodeTabPermissions},tab={Tab}): role → {Role}", permissionDefinitionService, nodeTabPermissions, tab, role);
                         }
 
                         break;
@@ -633,6 +724,7 @@ namespace DotNetNuke.Web.UI
             }
 
             TabController.Instance.UpdateTab(tab);
+			Logger.LogWarning("<<< Exiting DeserializeTabPermissions(permissionDefinitionService={PermissionDefinitionService},nodeTabPermissions={NodeTabPermissions},tab={Tab})", permissionDefinitionService, nodeTabPermissions, tab);
         }
     }
 }

@@ -49,20 +49,25 @@ namespace Dnn.EditBar.UI.Controllers
         /// <inheritdoc />
         protected override Func<ILocalizationController> GetFactory()
         {
+			eventLogger.LogError(">>> Entering GetFactory()");
+			eventLogger.LogWarning("<<< Exiting GetFactory()");
             return () => new LocalizationController();
         }
 
         private static string GetNameAttribute(XmlNode node)
         {
+			eventLogger.LogError(">>> Entering GetNameAttribute(node={Node})", node);
             if (node.Attributes != null)
             {
                 var attribute = node.Attributes.GetNamedItem("name");
+				eventLogger.LogError("GetNameAttribute(node={Node}): attribute → {Attribute}", node, attribute);
                 if (attribute != null)
                 {
                     return attribute.Value;
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting GetNameAttribute(node={Node})", node);
             return null;
         }
 
@@ -73,16 +78,20 @@ namespace Dnn.EditBar.UI.Controllers
 
         private static void AssertHeaderValue(IEnumerable<XmlNode> headers, string key, string value)
         {
+			eventLogger.LogError(">>> Entering AssertHeaderValue(headers={Headers},key={Key},value={Value})", headers, key, value);
             var header = headers.FirstOrDefault(x => GetNameAttribute(x).Equals(key, StringComparison.OrdinalIgnoreCase));
+			eventLogger.LogError("AssertHeaderValue(headers={Headers},key={Key},value={Value}): header → {Header}", headers, key, value, header);
             if (header != null)
             {
                 if (!header.InnerText.Equals(value, StringComparison.OrdinalIgnoreCase))
                 {
+					eventLogger.LogError("Throwing LocalizationException from AssertHeaderValue(headers={Headers},key={Key},value={Value})", headers, key, value);
                     throw new LocalizationException($"Resource header '{key}' != '{value}'");
                 }
             }
             else
             {
+			eventLogger.LogWarning("<<< Exiting AssertHeaderValue(headers={Headers},key={Key},value={Value})", headers, key, value);
                 throw new LocalizationException($"Resource header '{key}' is missing");
             }
         }

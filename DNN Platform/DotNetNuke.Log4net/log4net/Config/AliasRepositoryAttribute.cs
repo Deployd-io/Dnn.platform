@@ -65,6 +65,7 @@ namespace log4net.Config
         /// </remarks>
         public AliasRepositoryAttribute(string name)
         {
+			value.LogError(">>> Entering AliasRepositoryAttribute(name={Name})", name);
             this.Name = name;
         }
 

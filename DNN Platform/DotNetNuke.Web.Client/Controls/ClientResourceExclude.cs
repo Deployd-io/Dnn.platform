@@ -14,6 +14,7 @@ namespace DotNetNuke.Web.Client.Controls
     /// <summary>Represents a control that excludes a client resource from being included in the page.</summary>
     public abstract class ClientResourceExclude : Control
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ClientResourceExclude));
         private readonly IClientResourceController clientResourceController;
 
         /// <summary>Initializes a new instance of the <see cref="ClientResourceExclude"/> class.</summary>
@@ -21,6 +22,8 @@ namespace DotNetNuke.Web.Client.Controls
         protected ClientResourceExclude()
             : this(null)
         {
+		Logger.LogError(">>> Entering ClientResourceExclude()");
+        Logger.LogWarning("<<< Exiting ClientResourceExclude()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ClientResourceExclude"/> class.</summary>
@@ -28,6 +31,8 @@ namespace DotNetNuke.Web.Client.Controls
         protected ClientResourceExclude(IClientResourceController clientResourceController)
         {
             this.clientResourceController = clientResourceController ?? DependencyInjection.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
+			Logger.LogDebug("ClientResourceExclude(clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", clientResourceController, clientResourceController);
+        Logger.LogWarning("<<< Exiting ClientResourceExclude(clientResourceController={ClientResourceController})", clientResourceController);
         }
 
         /// <summary>Gets or sets the name of the client resource to exclude.</summary>
@@ -39,6 +44,7 @@ namespace DotNetNuke.Web.Client.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             switch (this.DependencyType)
             {
                 case ClientDependencyType.Css:
@@ -48,6 +54,8 @@ namespace DotNetNuke.Web.Client.Controls
                     this.clientResourceController.RemoveScriptByName(this.Name);
                     break;
                 default:
+					Logger.LogError("Throwing InvalidOperationException from OnLoad(e={E})", e);
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
                     throw new InvalidOperationException("DependencyType must be either Css or Javascript");
             }
         }

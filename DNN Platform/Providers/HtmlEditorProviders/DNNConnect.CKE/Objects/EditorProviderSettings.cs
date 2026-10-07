@@ -14,13 +14,21 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <summary>Initializes a new instance of the <see cref="EditorProviderSettings"/> class.</summary>
         public EditorProviderSettings()
         {
+			eventLogger.LogError(">>> Entering EditorProviderSettings()");
             this.OverrideFileOnUpload = false;
+			eventLogger.LogDebug("EditorProviderSettings(): this.OverrideFileOnUpload → {Arg0}", this.OverrideFileOnUpload);
             this.UseAnchorSelector = true;
             this.FileListPageSize = 20;
+			eventLogger.LogDebug("EditorProviderSettings(): this.UseAnchorSelector → {Arg0}", this.UseAnchorSelector);
+			eventLogger.LogDebug("EditorProviderSettings(): this.FileListPageSize → {Arg0}", this.FileListPageSize);
             this.FileListViewMode = FileListView.DetailView;
             this.SettingMode = SettingsMode.Portal;
             this.DefaultLinkMode = LinkMode.RelativeURL;
             this.DefaultLinkProtocol = LinkProtocol.Https;
+			eventLogger.LogDebug("EditorProviderSettings(): this.FileListViewMode → {Arg0}", this.FileListViewMode);
+			eventLogger.LogDebug("EditorProviderSettings(): this.SettingMode → {Arg0}", this.SettingMode);
+			eventLogger.LogDebug("EditorProviderSettings(): this.DefaultLinkMode → {Arg0}", this.DefaultLinkMode);
+			eventLogger.LogDebug("EditorProviderSettings(): this.DefaultLinkProtocol → {Arg0}", this.DefaultLinkProtocol);
             this.InjectSyntaxJs = true;
             this.BrowserRootDirId = -1;
             this.BrowserRootDirForImgId = -1;
@@ -29,6 +37,9 @@ namespace DNNConnect.CKEditorProvider.Objects
             this.ResizeHeight = -1;
             this.ResizeWidthUpload = -1;
             this.ResizeHeightUpload = -1;
+			eventLogger.LogDebug("EditorProviderSettings(): this.InjectSyntaxJs → {Arg0}", this.InjectSyntaxJs);
+			eventLogger.LogDebug("EditorProviderSettings(): this.BrowserRootDirId → {Arg0}", this.BrowserRootDirId);
+			eventLogger.LogDebug("EditorProviderSettings(): this.BrowserRootDirForImgId → {Arg0}", this.BrowserRootDirForImgId);
             this.ResizeWidth = -1;
             this.BrowserAllowFollowFolderPerms = false;
             this.BrowserRoles = "0;Administrators;";
@@ -37,8 +48,10 @@ namespace DNNConnect.CKEditorProvider.Objects
             this.ToolBarRoles = new List<ToolbarRoles> { new ToolbarRoles { RoleId = 0, Toolbar = "Full" } };
             this.UploadSizeRoles = new List<UploadSizeRoles>
                                        {
+										eventLogger.LogDebug("EditorProviderSettings(): this.UploadDirId → {Arg0}", this.UploadDirId);
                                            new UploadSizeRoles { RoleId = 0, UploadFileLimit = -1 },
                                        };
+									eventLogger.LogDebug("EditorProviderSettings(): this.UploadDirForImgId → {Arg0}", this.UploadDirForImgId);
 
             this.Config = new EditorConfig();
         }

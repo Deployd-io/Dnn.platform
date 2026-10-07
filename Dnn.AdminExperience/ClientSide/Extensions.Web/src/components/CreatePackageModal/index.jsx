@@ -12,8 +12,11 @@ import StepSix from "./StepSix";
 import Localization from "localization";
 import utilities from "utils";
 import styles from "./style.module.less";
+const logger = console;
 
 function mapToManifestPayload(payload, manifest) {
+	logger.error(`>>> Entering mapToManifestPayload(payload=${payload},manifest=${manifest})`, { "event.action": "mapToManifestPayload", "logrite.payload": payload, "logrite.manifest": manifest });
+	logger.warn(`<<< Exiting mapToManifestPayload(payload=${payload},manifest=${manifest})`, { "event.action": "mapToManifestPayload", "logrite.payload": payload, "logrite.manifest": manifest });
     return Object.assign(manifest, {
         archiveName: payload.archiveName,
         files: manifest.files || [],
@@ -23,6 +26,8 @@ function mapToManifestPayload(payload, manifest) {
 }
 
 function mapToPackagePayload(payload, manifest) {
+	logger.error(`>>> Entering mapToPackagePayload(payload=${payload},manifest=${manifest})`, { "event.action": "mapToPackagePayload", "logrite.payload": payload, "logrite.manifest": manifest });
+	logger.warn(`<<< Exiting mapToPackagePayload(payload=${payload},manifest=${manifest})`, { "event.action": "mapToPackagePayload", "logrite.payload": payload, "logrite.manifest": manifest });
     return Object.assign(manifest, {
         archiveName: payload.archiveName,
         manifestName: payload.manifestName,
@@ -33,6 +38,8 @@ function mapToPackagePayload(payload, manifest) {
 }
 
 function mapToFileRequestPayload(manifest) {
+	logger.error(`>>> Entering mapToFileRequestPayload(manifest=${manifest})`, { "event.action": "mapToFileRequestPayload", "logrite.manifest": manifest });
+	logger.warn(`<<< Exiting mapToFileRequestPayload(manifest=${manifest})`, { "event.action": "mapToFileRequestPayload", "logrite.manifest": manifest });
     return Object.assign(manifest, {
         packageFolder: manifest.basePath,
         includeSource: true,
@@ -41,12 +48,15 @@ function mapToFileRequestPayload(manifest) {
 }
 
 function deepCopy(object) {
+	logger.error(`>>> Entering deepCopy(object=${object})`, { "event.action": "deepCopy", "logrite.object": object });
+	logger.warn(`<<< Exiting deepCopy(object=${object})`, { "event.action": "deepCopy", "logrite.object": object });
     return JSON.parse(JSON.stringify(object));
 }
 
 class CreatePackage extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
 
         this.state = {
             useExistingManifest: false,
@@ -61,20 +71,27 @@ class CreatePackage extends Component {
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         this.goToStep(0);
         let { props } = this;
         let _packagePayload = deepCopy(props.packagePayload);
+		logger.error(`UNSAFE_componentWillMount(): _packagePayload → ${_packagePayload}`, { "event.action": "UNSAFE_componentWillMount" });
+		logger.debug(`UNSAFE_componentWillMount(): _packagePayload.manifestName → ${_packagePayload.manifestName}`, { "event.action": "UNSAFE_componentWillMount" });
 
         _packagePayload.archiveName = props.packageManifest.name + "_" + props.packageManifest.version + "_Install.zip";
+		logger.debug(`UNSAFE_componentWillMount(): _packagePayload.archiveName → ${_packagePayload.archiveName}`, { "event.action": "UNSAFE_componentWillMount" });
 
         _packagePayload.manifestName = props.packageManifest.name + ".dnn";
 
         props.dispatch(CreatePackageActions.updatePackagePayload(_packagePayload));
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     goToStep(step) {
+		logger.error(`>>> Entering goToStep(step=${step})`, { "event.action": "goToStep", "logrite.step": step });
         const { props } = this;
         props.dispatch(CreatePackageActions.goToWizardStep(step));
+		logger.warn(`<<< Exiting goToStep(step=${step})`, { "event.action": "goToStep", "logrite.step": step });
     }
 
     onChange(key, event) {
@@ -111,6 +128,8 @@ class CreatePackage extends Component {
     }
 
     getManifestDropdown(manifests) {
+		logger.error(`>>> Entering getManifestDropdown(manifests=${manifests})`, { "event.action": "getManifestDropdown", "logrite.manifests": manifests });
+		logger.warn(`<<< Exiting getManifestDropdown(manifests=${manifests})`, { "event.action": "getManifestDropdown", "logrite.manifests": manifests });
         return Object.keys(manifests).map((key) => {
             return {
                 label: key,
@@ -120,15 +139,18 @@ class CreatePackage extends Component {
     }
 
     goToStepTwo() {
+		logger.error('>>> Entering goToStepTwo()', { "event.action": "goToStepTwo" });
         const { packagePayload } = this.props;
         if (packagePayload.useExistingManifest) {
             this.goToStepFour();
         } else {
             this.goToStep(1);
+			logger.warn('<<< Exiting goToStepTwo()', { "event.action": "goToStepTwo" });
         }
     }
 
     goToStepFour() {
+		logger.error('>>> Entering goToStepFour()', { "event.action": "goToStepFour" });
         const { props } = this;
         if (props.packagePayload.reviewManifest) {
             props.dispatch(CreatePackageActions.generateManifestPreview(mapToManifestPayload(deepCopy(props.packagePayload), deepCopy(props.packageManifest)), () => {
@@ -136,10 +158,12 @@ class CreatePackage extends Component {
             }));
         } else {
             this.goToStep(4);
+			logger.warn('<<< Exiting goToStepFour()', { "event.action": "goToStepFour" });
         }
     }
 
     createPackage() {
+		logger.error('>>> Entering createPackage()', { "event.action": "createPackage" });
         const { props } = this;
 
         if (props.packagePayload.createManifest) {
@@ -158,11 +182,13 @@ class CreatePackage extends Component {
                 this.goToStep(5);
             }, (data) => {
                 utilities.utilities.notifyError(JSON.parse(data.responseText).Message, 5000);
+				logger.warn('<<< Exiting createPackage()', { "event.action": "createPackage" });
             }));
         }
     }
 
     onStepBack() {
+		logger.error('>>> Entering onStepBack()', { "event.action": "onStepBack" });
         const { props } = this;
         switch (props.createPackageStep) {
             case 1:
@@ -188,49 +214,64 @@ class CreatePackage extends Component {
                 }
                 break;
             default:
+				logger.warn('<<< Exiting onStepBack()', { "event.action": "onStepBack" });
                 break;
         }
     }
 
     onFileOrAssemblyChange(key, event) {
+		logger.error(`>>> Entering onFileOrAssemblyChange(key=${key},event=${event})`, { "event.action": "onFileOrAssemblyChange", "logrite.key": key, "logrite.event": event });
         const { props } = this;
         let value = typeof event === "object" ? event.target.value : event;
+		logger.error(`onFileOrAssemblyChange(key=${key},event=${event}): value → ${value}`, { "event.action": "onFileOrAssemblyChange", "logrite.key": key, "logrite.event": event });
 
         const _fileValue = value.split("\n");
+		logger.error(`onFileOrAssemblyChange(key=${key},event=${event}): _fileValue → ${_fileValue}`, { "event.action": "onFileOrAssemblyChange", "logrite.key": key, "logrite.event": event });
 
         let packageManifest = deepCopy(props.packageManifest);
+		logger.error(`onFileOrAssemblyChange(key=${key},event=${event}): packageManifest → ${packageManifest}`, { "event.action": "onFileOrAssemblyChange", "logrite.key": key, "logrite.event": event });
 
         packageManifest[key] = _fileValue;
 
         props.dispatch(CreatePackageActions.updatePackageManifest(packageManifest));
+		logger.warn(`<<< Exiting onFileOrAssemblyChange(key=${key},event=${event})`, { "event.action": "onFileOrAssemblyChange", "logrite.key": key, "logrite.event": event });
     }
 
     onBasePathChange(event) {
+		logger.error(`>>> Entering onBasePathChange(event=${event})`, { "event.action": "onBasePathChange", "logrite.event": event });
         let value = typeof event === "object" ? event.target.value : event;
 
+		logger.error(`onBasePathChange(event=${event}): value → ${value}`, { "event.action": "onBasePathChange", "logrite.event": event });
         const { props } = this;
 
         let packageManifest = deepCopy(props.packageManifest);
+		logger.error(`onBasePathChange(event=${event}): packageManifest → ${packageManifest}`, { "event.action": "onBasePathChange", "logrite.event": event });
 
         packageManifest.basePath = value;
+		logger.debug(`onBasePathChange(event=${event}): packageManifest.basePath → ${packageManifest.basePath}`, { "event.action": "onBasePathChange", "logrite.event": event });
 
         props.dispatch(CreatePackageActions.updatePackageManifest(packageManifest));
+		logger.warn(`<<< Exiting onBasePathChange(event=${event})`, { "event.action": "onBasePathChange", "logrite.event": event });
     }
 
     onRefresh() {
+		logger.error('>>> Entering onRefresh()', { "event.action": "onRefresh" });
         const { props } = this;
 
         props.dispatch(CreatePackageActions.refreshPackageFiles(mapToFileRequestPayload(deepCopy(props.packageManifest)),
             () => { },
             (data) => {
                 utilities.utilities.notifyError(JSON.parse(data.responseText).Message);
+				logger.warn('<<< Exiting onRefresh()', { "event.action": "onRefresh" });
             }));
     }
 
     getCurrentWizardUI(step) {
+		logger.error(`>>> Entering getCurrentWizardUI(step=${step})`, { "event.action": "getCurrentWizardUI", "logrite.step": step });
         const { props } = this;
         const {packageManifest, installedPackageTypes, packagePayload} = props;
         const version = packageManifest.version ? packageManifest.version.split(".") : [0, 0, 0];
+		logger.error(`getCurrentWizardUI(step=${step}): version → ${version}`, { "event.action": "getCurrentWizardUI", "logrite.step": step });
         const manifestDropdown = this.getManifestDropdown(props.packageManifest.manifests);
         switch (step) {
             case 0:
@@ -247,6 +288,7 @@ class CreatePackage extends Component {
                     onSelect={this.onSelect.bind(this)}
                     reviewManifest={packagePayload.reviewManifest}
                     hasManifests={Object.keys(packageManifest.manifests).length > 0} />;
+					logger.debug(`getCurrentWizardUI(step=${step}): packageManifest → ${packageManifest}`, { "event.action": "getCurrentWizardUI", "logrite.step": step });
             case 1:
                 return <StepTwo
                     packageManifest={packageManifest}
@@ -283,17 +325,22 @@ class CreatePackage extends Component {
                     archiveName={packagePayload.archiveName}
                     useExistingManifest={packagePayload.useExistingManifest}
                     onPrevious={this.onStepBack.bind(this)} />;
+					logger.error(`getCurrentWizardUI(step=${step}): onCancel → ${onCancel}`, { "event.action": "getCurrentWizardUI", "logrite.step": step });
+					logger.debug(`getCurrentWizardUI(step=${step}): onCancel → ${onCancel}`, { "event.action": "getCurrentWizardUI", "logrite.step": step });
             case 5: return <StepSix
                 onClose={props.onCancel.bind(this)}
                 logs={props.createdPackage} />;
             default:
+				logger.warn(`<<< Exiting getCurrentWizardUI(step=${step})`, { "event.action": "getCurrentWizardUI", "logrite.step": step });
                 return <p>Oops, something went wrong. Click <a href="javascript:void(0)" onClick={props.onCancel.bind(this)}> here </a> to go back</p>;
         }
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         const {createPackageStep, packageManifest} = props;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.createPackage}>
                 <PersonaBarPageHeader title={Localization.get("CreatePackage_Header.Header")} />
@@ -321,6 +368,8 @@ CreatePackage.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         installedPackageTypes: state.extension.installedPackageTypes,
         createdPackage: state.createPackage.createdPackage,

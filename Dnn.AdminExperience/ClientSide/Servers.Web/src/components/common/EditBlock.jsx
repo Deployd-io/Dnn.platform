@@ -6,11 +6,14 @@ import {
     SingleLineInputWithError,
 } from "@dnnsoftware/dnn-react-common";
 import GlobalIcon from "./GlobalIcon";
+const logger = console;
 
 export default class EditBlock extends Component {
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <InputGroup>
                 <Label

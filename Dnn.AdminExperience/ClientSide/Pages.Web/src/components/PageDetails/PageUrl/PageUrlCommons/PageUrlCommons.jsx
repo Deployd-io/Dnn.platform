@@ -3,24 +3,32 @@ import PropTypes from "prop-types";
 import styles from "./style.module.less";
 import { Switch, Label } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../../../localization";
+const logger = console;
 
 
 class PageUrlCommons extends Component {
 
     onChangeField(key) {
+		logger.error(`>>> Entering onChangeField(key=${key})`, { "event.action": "onChangeField", "logrite.key": key });
         const {onChangeField} = this.props;
         onChangeField(key, event.target.value);
+		logger.warn(`<<< Exiting onChangeField(key=${key})`, { "event.action": "onChangeField", "logrite.key": key });
     }
 
     onChangeValue(key, value) {
+		logger.error(`>>> Entering onChangeValue(key=${key},value=${value})`, { "event.action": "onChangeValue", "logrite.key": key, "logrite.value": value });
         const {onChangeField} = this.props;
         onChangeField(key, value);
+		logger.warn(`<<< Exiting onChangeValue(key=${key},value=${value})`, { "event.action": "onChangeValue", "logrite.key": key, "logrite.value": value });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {page, display} = this.props;
         const gridClass = "page-url-commons-grid " + display;
+		logger.error(`render(): gridClass → ${gridClass}`, { "event.action": "render" });
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.pageUrlCommons}>
                 <div className={gridClass}>

@@ -17,11 +17,14 @@ namespace DotNetNuke.Web.UI.WebControls
     [ParseChildren(true)]
     public class DnnFormTemplateItem : DnnFormItemBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFormTemplateItem));
         /// <summary>Initializes a new instance of the <see cref="DnnFormTemplateItem"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IApplicationStatusInfo. Scheduled removal in v12.0.0.")]
         public DnnFormTemplateItem()
             : this(null, null)
         {
+		Logger.LogError(">>> Entering DnnFormTemplateItem()");
+        Logger.LogWarning("<<< Exiting DnnFormTemplateItem()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormTemplateItem"/> class.</summary>
@@ -44,12 +47,15 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void CreateControlHierarchy()
         {
+			Logger.LogError(">>> Entering CreateControlHierarchy()");
             this.CssClass += " dnnFormItem";
             this.CssClass += (this.FormMode == DnnFormMode.Long) ? " dnnFormLong" : " dnnFormShort";
 
             var template = new DnnFormEmptyTemplate();
+			Logger.LogError("CreateControlHierarchy(): template → {Template}", template);
             this.ItemTemplate.InstantiateIn(template);
             this.Controls.Add(template);
+			Logger.LogWarning("<<< Exiting CreateControlHierarchy()");
         }
     }
 }

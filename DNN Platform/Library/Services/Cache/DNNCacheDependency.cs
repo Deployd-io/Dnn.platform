@@ -12,6 +12,7 @@ namespace DotNetNuke.Services.Cache
     /// </remarks>
     public class DNNCacheDependency : IDisposable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DNNCacheDependency));
         private readonly DateTime utcStart = DateTime.MaxValue;
         private DNNCacheDependency cacheDependency;
         private string[] cacheKeys;
@@ -23,12 +24,14 @@ namespace DotNetNuke.Services.Cache
         public DNNCacheDependency(CacheDependency systemCacheDependency)
         {
             this.systemCacheDependency = systemCacheDependency;
+			Logger.LogWarning("<<< Exiting DNNCacheDependency(filenames={Filenames},cachekeys={Cachekeys})", filenames, cachekeys);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DNNCacheDependency"/> class that monitors a file or directory for changes.</summary>
         /// <param name="filename">The path to a file which the cache depends on.</param>
         public DNNCacheDependency(string filename)
         {
+			Logger.LogError(">>> Entering DNNCacheDependency(filename={Filename})", filename);
             this.fileNames = new[] { filename };
         }
 
@@ -36,6 +39,7 @@ namespace DotNetNuke.Services.Cache
         /// <param name="filenames">set the cache depend on multiple files.</param>
         public DNNCacheDependency(string[] filenames)
         {
+			Logger.LogError(">>> Entering DNNCacheDependency(filenames={Filenames})", filenames);
             this.fileNames = filenames;
         }
 
@@ -47,7 +51,10 @@ namespace DotNetNuke.Services.Cache
         /// <param name="start">The start.</param>
         public DNNCacheDependency(string[] filenames, DateTime start)
         {
+			Logger.LogError(">>> Entering DNNCacheDependency(filenames={Filenames},start={Start})", filenames, start);
+            Logger.LogError(">>> Entering DNNCacheDependency(filenames={Filenames},start={Start})", filenames, start);
             this.utcStart = start.ToUniversalTime();
+			Logger.LogDebug("DNNCacheDependency(filenames={Filenames},start={Start}): utcStart → {UtcStart}", filenames, start, utcStart);
             this.fileNames = filenames;
         }
 
@@ -59,7 +66,9 @@ namespace DotNetNuke.Services.Cache
         /// <param name="cachekeys">The cachekeys.</param>
         public DNNCacheDependency(string[] filenames, string[] cachekeys)
         {
+			Logger.LogError(">>> Entering DNNCacheDependency(filenames={Filenames},cachekeys={Cachekeys})", filenames, cachekeys);
             this.fileNames = filenames;
+			Logger.LogDebug("DNNCacheDependency(filenames={Filenames},cachekeys={Cachekeys}): this.fileNames → {Arg2}", filenames, cachekeys, this.fileNames);
             this.cacheKeys = cachekeys;
         }
 
@@ -68,10 +77,15 @@ namespace DotNetNuke.Services.Cache
         /// <param name="start">The start.</param>
         public DNNCacheDependency(string filename, DateTime start)
         {
+			Logger.LogError(">>> Entering DNNCacheDependency(filename={Filename},start={Start})", filename, start);
+            Logger.LogError(">>> Entering DNNCacheDependency(filename={Filename},start={Start})", filename, start);
             this.utcStart = start.ToUniversalTime();
+			Logger.LogDebug("DNNCacheDependency(filename={Filename},start={Start}): utcStart → {UtcStart}", filename, start, utcStart);
             if (filename != null)
             {
+				Logger.LogWarning("<<< Exiting DNNCacheDependency(filenames={Filenames},cachekeys={Cachekeys})", filenames, cachekeys);
                 this.fileNames = new[] { filename };
+				Logger.LogDebug("DNNCacheDependency(filename={Filename},start={Start}): this.fileNames → {Arg2}", filename, start, this.fileNames);
             }
         }
 
@@ -84,8 +98,11 @@ namespace DotNetNuke.Services.Cache
         /// <param name="start">The start.</param>
         public DNNCacheDependency(string[] filenames, string[] cachekeys, DateTime start)
         {
+			Logger.LogError(">>> Entering DNNCacheDependency(filenames={Filenames},cachekeys={Cachekeys},start={Start})", filenames, cachekeys, start);
+            Logger.LogError(">>> Entering DNNCacheDependency(filenames={Filenames},cachekeys={Cachekeys},start={Start})", filenames, cachekeys, start);
             this.utcStart = start.ToUniversalTime();
             this.fileNames = filenames;
+			Logger.LogDebug("DNNCacheDependency(filenames={Filenames},cachekeys={Cachekeys},start={Start}): this.fileNames → {Arg3}", filenames, cachekeys, start, this.fileNames);
             this.cacheKeys = cachekeys;
         }
 
@@ -98,7 +115,10 @@ namespace DotNetNuke.Services.Cache
         /// <param name="dependency">The dependency.</param>
         public DNNCacheDependency(string[] filenames, string[] cachekeys, DNNCacheDependency dependency)
         {
+			Logger.LogError(">>> Entering DNNCacheDependency(filenames={Filenames},cachekeys={Cachekeys},dependency={Dependency})", filenames, cachekeys, dependency);
             this.fileNames = filenames;
+			Logger.LogWarning("<<< Exiting DNNCacheDependency(filenames={Filenames},cachekeys={Cachekeys},dependency={Dependency})", filenames, cachekeys, dependency);
+			Logger.LogDebug("DNNCacheDependency(filenames={Filenames},cachekeys={Cachekeys},dependency={Dependency}): this.fileNames → {Arg3}", filenames, cachekeys, dependency, this.fileNames);
             this.cacheKeys = cachekeys;
             this.cacheDependency = dependency;
         }
@@ -116,6 +136,7 @@ namespace DotNetNuke.Services.Cache
         {
             this.utcStart = start.ToUniversalTime();
             this.fileNames = filenames;
+			Logger.LogDebug("DNNCacheDependency(filenames={Filenames},cachekeys={Cachekeys},dependency={Dependency},start={Start}): this.fileNames → {Arg4}", filenames, cachekeys, dependency, start, this.fileNames);
             this.cacheKeys = cachekeys;
             this.cacheDependency = dependency;
         }
@@ -201,15 +222,20 @@ namespace DotNetNuke.Services.Cache
         /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
         public void Dispose()
         {
+			Logger.LogError(">>> Entering Dispose()");
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			Logger.LogDebug("Dispose(disposing={Disposing}): this.cacheDependency → {Arg1}", disposing, this.cacheDependency);
+			Logger.LogWarning("<<< Exiting Dispose()");
         }
 
         // Method that does the actual disposal of resources
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogError(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (disposing)
             {
+				Logger.LogWarning("<<< Exiting Dispose()");
                 if (this.cacheDependency != null)
                 {
                     this.cacheDependency.Dispose(disposing);
@@ -220,7 +246,10 @@ namespace DotNetNuke.Services.Cache
                     this.systemCacheDependency.Dispose();
                 }
 
+				Logger.LogDebug("Dispose(disposing={Disposing}): this.cacheKeys → {Arg1}", disposing, this.cacheKeys);
+				Logger.LogDebug("Dispose(disposing={Disposing}): cacheDependency → {CacheDependency}", disposing, cacheDependency);
                 this.fileNames = null;
+				Logger.LogDebug("Dispose(disposing={Disposing}): this.fileNames → {Arg1}", disposing, this.fileNames);
                 this.cacheKeys = null;
                 this.cacheDependency = null;
                 this.systemCacheDependency = null;

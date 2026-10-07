@@ -93,6 +93,8 @@ namespace log4net.Config
         /// </remarks>
         public XmlConfiguratorAttribute() : base(0) /* configurator priority 0 */
         {
+		value.LogError(">>> Entering XmlConfiguratorAttribute()");
+        value.LogWarning("<<< Exiting XmlConfiguratorAttribute()");
         }
 
         /// <summary>Gets or sets the filename of the configuration file.</summary>
@@ -181,8 +183,10 @@ namespace log4net.Config
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="targetRepository" /> does not extend <see cref="Hierarchy"/>.</exception>
         public override void Configure(Assembly sourceAssembly, ILoggerRepository targetRepository)
         {
+			value.LogError(">>> Entering Configure(sourceAssembly={SourceAssembly},targetRepository={TargetRepository})", sourceAssembly, targetRepository);
             IList configurationMessages = new ArrayList();
 
+			value.LogError("Configure(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): configurationMessages → {ConfigurationMessages}", sourceAssembly, targetRepository, configurationMessages);
             using (new LogLog.LogReceivedAdapter(configurationMessages))
             {
                 string applicationBaseDirectory = null;
@@ -192,6 +196,7 @@ namespace log4net.Config
                 }
                 catch
                 {
+					value.LogError("Exception in Configure(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): {Arg2}", sourceAssembly, targetRepository, ex.Message);
                     // Ignore this exception because it is only thrown when ApplicationBaseDirectory is a file
                     // and the application does not have PathDiscovery permission
                 }
@@ -206,6 +211,8 @@ namespace log4net.Config
                 }
             }
 
+			value.LogWarning("<<< Exiting Configure(sourceAssembly={SourceAssembly},targetRepository={TargetRepository})", sourceAssembly, targetRepository);
+			value.LogDebug("Configure(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): targetRepository.ConfigurationMessages → {Arg2}", sourceAssembly, targetRepository, targetRepository.ConfigurationMessages);
             targetRepository.ConfigurationMessages = configurationMessages;
         }
 
@@ -214,8 +221,10 @@ namespace log4net.Config
         /// <param name="targetRepository">The repository to configure.</param>
         private void ConfigureFromFile(Assembly sourceAssembly, ILoggerRepository targetRepository)
         {
+			value.LogError(">>> Entering ConfigureFromFile(sourceAssembly={SourceAssembly},targetRepository={TargetRepository})", sourceAssembly, targetRepository);
             // Work out the full path to the config file
             string fullPath2ConfigFile = null;
+			value.LogError("ConfigureFromFile(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): fullPath2ConfigFile → {FullPath2ConfigFile}", sourceAssembly, targetRepository, fullPath2ConfigFile);
             
             // Select the config file
             if (this.m_configFile == null || this.m_configFile.Length == 0)
@@ -238,9 +247,11 @@ namespace log4net.Config
                     if (this.m_configFileExtension[0] != '.')
                     {
                         this.m_configFileExtension = "." + this.m_configFileExtension;
+						value.LogDebug("ConfigureFromFile(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): this.m_configFileExtension → {Arg2}", sourceAssembly, targetRepository, this.m_configFileExtension);
                     }
 
                     string applicationBaseDirectory = null;
+					value.LogError("ConfigureFromFile(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): applicationBaseDirectory → {ApplicationBaseDirectory}", sourceAssembly, targetRepository, applicationBaseDirectory);
                     try
                     {
                         applicationBaseDirectory = SystemInfo.ApplicationBaseDirectory;
@@ -283,6 +294,7 @@ namespace log4net.Config
             {
                 this.ConfigureFromFile(targetRepository, new FileInfo(fullPath2ConfigFile));
             }
+			value.LogWarning("<<< Exiting ConfigureFromFile(sourceAssembly={SourceAssembly},targetRepository={TargetRepository})", sourceAssembly, targetRepository);
         }
 
         /// <summary>Configure the specified repository using a <see cref="FileInfo"/></summary>
@@ -291,8 +303,10 @@ namespace log4net.Config
         private void ConfigureFromFile(ILoggerRepository targetRepository, FileInfo configFile)
         {
 #if (SSCLI)
+			value.LogError(">>> Entering ConfigureFromFile(targetRepository={TargetRepository},configFile={ConfigFile})", targetRepository, configFile);
             if (m_configureAndWatch)
             {
+				value.LogWarning("<<< Exiting ConfigureFromFile(sourceAssembly={SourceAssembly},targetRepository={TargetRepository})", sourceAssembly, targetRepository);
                 LogLog.Warn(declaringType, "XmlConfiguratorAttribute: Unable to watch config file not supported on SSCLI");
             }
             XmlConfigurator.Configure(targetRepository, configFile);
@@ -314,8 +328,10 @@ namespace log4net.Config
         /// <param name="targetRepository">The repository to configure.</param>
         private void ConfigureFromUri(Assembly sourceAssembly, ILoggerRepository targetRepository)
         {
+			value.LogError(">>> Entering ConfigureFromUri(sourceAssembly={SourceAssembly},targetRepository={TargetRepository})", sourceAssembly, targetRepository);
             // Work out the full path to the config file
             Uri fullPath2ConfigFile = null;
+			value.LogError("ConfigureFromUri(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): fullPath2ConfigFile → {FullPath2ConfigFile}", sourceAssembly, targetRepository, fullPath2ConfigFile);
             
             // Select the config file
             if (this.m_configFile == null || this.m_configFile.Length == 0)
@@ -323,6 +339,7 @@ namespace log4net.Config
                 if (this.m_configFileExtension == null || this.m_configFileExtension.Length == 0)
                 {
                     string systemConfigFilePath = null;
+					value.LogError("ConfigureFromUri(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): systemConfigFilePath → {SystemConfigFilePath}", sourceAssembly, targetRepository, systemConfigFilePath);
                     try
                     {
                         systemConfigFilePath = SystemInfo.ConfigurationFileLocation;
@@ -335,6 +352,7 @@ namespace log4net.Config
                     if (systemConfigFilePath != null)
                     {
                         Uri systemConfigFileUri = new Uri(systemConfigFilePath);
+						value.LogError("ConfigureFromUri(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): systemConfigFileUri → {SystemConfigFileUri}", sourceAssembly, targetRepository, systemConfigFileUri);
 
                         // Use the default .config file for the AppDomain
                         fullPath2ConfigFile = systemConfigFileUri;
@@ -346,6 +364,7 @@ namespace log4net.Config
                     if (this.m_configFileExtension[0] != '.')
                     {
                         this.m_configFileExtension = "." + this.m_configFileExtension;
+						value.LogDebug("ConfigureFromUri(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): this.m_configFileExtension → {Arg2}", sourceAssembly, targetRepository, this.m_configFileExtension);
                     }
 
                     string systemConfigFilePath = null;
@@ -361,10 +380,13 @@ namespace log4net.Config
                     if (systemConfigFilePath != null)
                     {
                         UriBuilder builder = new UriBuilder(new Uri(systemConfigFilePath));
+						value.LogError("ConfigureFromUri(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): builder → {Builder}", sourceAssembly, targetRepository, builder);
 
                         // Remove the current extension from the systemConfigFileUri path
                         string path = builder.Path;
+						value.LogError("ConfigureFromUri(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): path → {Path}", sourceAssembly, targetRepository, path);
                         int startOfExtension = path.LastIndexOf(".");
+						value.LogError("ConfigureFromUri(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): startOfExtension → {StartOfExtension}", sourceAssembly, targetRepository, startOfExtension);
                         if (startOfExtension >= 0)
                         {
                             path = path.Substring(0, startOfExtension);
@@ -372,6 +394,7 @@ namespace log4net.Config
                         path += this.m_configFileExtension;
 
                         builder.Path = path;
+						value.LogDebug("ConfigureFromUri(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): builder.Path → {Arg2}", sourceAssembly, targetRepository, builder.Path);
                         fullPath2ConfigFile = builder.Uri;
                     }
                 }
@@ -379,6 +402,7 @@ namespace log4net.Config
             else
             {
                 string applicationBaseDirectory = null;
+				value.LogError("ConfigureFromUri(sourceAssembly={SourceAssembly},targetRepository={TargetRepository}): applicationBaseDirectory → {ApplicationBaseDirectory}", sourceAssembly, targetRepository, applicationBaseDirectory);
                 try
                 {
                     applicationBaseDirectory = SystemInfo.ApplicationBaseDirectory;
@@ -416,6 +440,7 @@ namespace log4net.Config
                     XmlConfigurator.Configure(targetRepository, fullPath2ConfigFile);
                 }
             }
+			value.LogWarning("<<< Exiting ConfigureFromUri(sourceAssembly={SourceAssembly},targetRepository={TargetRepository})", sourceAssembly, targetRepository);
         }
 
         private string m_configFile = null;

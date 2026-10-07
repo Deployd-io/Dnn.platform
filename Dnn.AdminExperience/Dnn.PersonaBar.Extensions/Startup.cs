@@ -19,6 +19,8 @@ public class Startup : IDnnStartup
     public void ConfigureServices(IServiceCollection services)
     {
 #pragma warning disable CS0618
+		eventLogger.LogError(">>> Entering ConfigureServices(services={Services})", services);
+		eventLogger.LogWarning("<<< Exiting ConfigureServices(services={Services})", services);
         services.AddTransient<ICommandRepository, CommandRepository>();
 #pragma warning restore CS0618
 

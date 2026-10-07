@@ -8,6 +8,7 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class PrimaryKeyAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PrimaryKeyAttribute));
         /// <summary>Initializes a new instance of the <see cref="PrimaryKeyAttribute"/> class.</summary>
         /// <param name="columnName">The name of the column (or a comma-delimited list of column names) of the primary key for the table.</param>
         public PrimaryKeyAttribute(string columnName)
@@ -20,7 +21,10 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
         /// <param name="propertyName">The name of the property for the primary key.</param>
         public PrimaryKeyAttribute(string columnName, string propertyName)
         {
+			Logger.LogError(">>> Entering PrimaryKeyAttribute(columnName={ColumnName},propertyName={PropertyName})", columnName, propertyName);
             this.ColumnName = columnName;
+			Logger.LogWarning("<<< Exiting PrimaryKeyAttribute(columnName={ColumnName},propertyName={PropertyName})", columnName, propertyName);
+			Logger.LogDebug("PrimaryKeyAttribute(columnName={ColumnName},propertyName={PropertyName}): this.ColumnName → {Arg2}", columnName, propertyName, this.ColumnName);
             this.PropertyName = propertyName;
             this.AutoIncrement = true;
         }

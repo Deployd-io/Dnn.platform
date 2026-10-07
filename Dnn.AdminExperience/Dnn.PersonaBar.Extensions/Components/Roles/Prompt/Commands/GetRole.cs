@@ -30,25 +30,31 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.RoleId = this.GetFlagValue(FlagId, "Role Id", -1, true, true);
 
             if (this.RoleId < 0)
             {
                 this.AddMessage(this.LocalizeString("Prompt_RoleIdNegative"));
             }
+			eventLogger.LogWarning("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             var lst = new List<RoleModel>();
             var role = RolesController.Instance.GetRole(this.PortalSettings, this.RoleId);
+			eventLogger.LogError("Run(): lst → {Lst}", lst);
             if (role == null)
             {
+				eventLogger.LogError("Run(): role → {Role}", role);
                 return new ConsoleErrorResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("Prompt_NoRoleWithId"), this.RoleId));
             }
 
             lst.Add(new RoleModel(role));
+			eventLogger.LogWarning("<<< Exiting Run()");
             return new ConsoleResultModel
             {
                 Data = lst,

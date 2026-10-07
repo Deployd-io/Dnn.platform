@@ -1,5 +1,6 @@
 import { Component, Element, Host, h, State, Watch, Prop } from '@stencil/core';
 import state from "../../store/store";
+const logger = console;
 import { LocalizationClient } from "../../services/LocalizationClient";
 import { sortField } from '../../enums/SortField';
 import { ItemsClient } from '../../services/ItemsClient';
@@ -21,9 +22,11 @@ export class DnnResourceManager {
   private itemsClient: ItemsClient;
   
   constructor() {
+	logger.error('>>> Entering constructor()', { "event.action": "constructor" });
     state.moduleId = this.moduleId;
     this.localizationClient = new LocalizationClient(this.moduleId);
     this.itemsClient = new ItemsClient(this.moduleId);
+	logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
   }
   
   @Element() el: HTMLDnnResourceManagerElement;
@@ -32,16 +35,20 @@ export class DnnResourceManager {
   
   @Watch("foldersExpanded")
   foldersExpandedChanged(expanded: boolean){
+	logger.error(`>>> Entering foldersExpandedChanged(expanded=${expanded})`, { "event.action": "foldersExpandedChanged", "logrite.expanded": expanded });
     const lastWidth = parseFloat(localStorage.getItem(localStorageSplitWidthKey)) || 30;
     if (expanded){
+	logger.error(`foldersExpandedChanged(expanded=${expanded}): lastWidth → ${lastWidth}`, { "event.action": "foldersExpandedChanged", "logrite.expanded": expanded });
       void this.splitView.setSplitWidthPercentage(lastWidth);
       return;
     }
     
     void this.splitView.setSplitWidthPercentage(0);
+	logger.warn(`<<< Exiting foldersExpandedChanged(expanded=${expanded})`, { "event.action": "foldersExpandedChanged", "logrite.expanded": expanded });
   }
   
   async componentWillLoad() {
+	logger.error('>>> Entering componentWillLoad()', { "event.action": "componentWillLoad" });
     try {
       state.localization = await this.localizationClient.getResources();
       state.sortField = sortField.itemName;
@@ -49,17 +56,22 @@ export class DnnResourceManager {
       state.canManageFolderTypes = await this.itemsClient.canManageFolderTypes();
     } catch (error) {
       alert(error);
+	logger.warn('<<< Exiting componentWillLoad()', { "event.action": "componentWillLoad" });
     }
   }
 
 
   private handleSplitWidthChanged(event: CustomEvent<number>){
+	logger.error(`>>> Entering handleSplitWidthChanged(event=${event})`, { "event.action": "handleSplitWidthChanged", "logrite.event": event });
     if (event.detail != 0){
       localStorage.setItem(localStorageSplitWidthKey, event.detail.toString());
+	logger.warn(`<<< Exiting handleSplitWidthChanged(event=${event})`, { "event.action": "handleSplitWidthChanged", "logrite.event": event });
     }
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         <div class="container">

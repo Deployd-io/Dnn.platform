@@ -12,17 +12,20 @@ import {
     languageEditor as LanguageEditorActions
 } from "actions";
 import utils from "utils";
+const logger = console;
 
 
 class TranslatePageContent extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             pageList: [],
             basicSettings: null,
             languageBeingEdited: Object.assign({}, props.languageBeingEdited)
         };
         this.init(); 
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     init() {        
@@ -30,12 +33,15 @@ class TranslatePageContent extends Component {
         this.getPageList();
         this.getBasicSettings();
         this.getProgressData();
+		logger.warn('<<< Exiting init()', { "event.action": "init" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         const { props } = this;
         if (prevProps.languageBeingEdited !== props.languageBeingEdited) {
             this.setState({languageBeingEdited: Object.assign({}, props.languageBeingEdited)});
+			logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         }
     }
 
@@ -46,6 +52,7 @@ class TranslatePageContent extends Component {
         props.dispatch(LanguagesActions.getPageList({ cultureCode, portalId }, (data) => {
             this.setState({ pageList: data });
         }));
+		logger.warn('<<< Exiting getPageList()', { "event.action": "getPageList" });
     }
 
     getBasicSettings() {
@@ -55,6 +62,7 @@ class TranslatePageContent extends Component {
                 basicSettings: Object.assign(data.Settings)
             });
         }));
+		logger.warn('<<< Exiting getBasicSettings()', { "event.action": "getBasicSettings" });
     }
 
     getProgressData() {
@@ -70,6 +78,7 @@ class TranslatePageContent extends Component {
             }
             this.doneProgress();
         }));
+		logger.warn('<<< Exiting getProgressData()', { "event.action": "getProgressData" });
     }
 
     doneProgress() {
@@ -82,6 +91,7 @@ class TranslatePageContent extends Component {
             }
             const language = languages.find(l => l.Code === state.languageBeingEdited.Code);
             this.props.dispatch(LanguageEditorActions.setLanguageBeingEdited(language));
+			logger.error(`doneProgress(): language → ${language}`, { "event.action": "doneProgress" });
         }));
     }
 
@@ -97,13 +107,16 @@ class TranslatePageContent extends Component {
                 <a className="float-right" target="_blank" rel="noopener noreferrer" href={page.ViewUrl}>{resx.get("ViewPage") }</a>
             </div>;
         });
+		logger.warn('<<< Exiting renderPageList()', { "event.action": "renderPageList" });
     }
 
     onMarkAllPagesAsTranslated(cultureCode) {
+		logger.error(`>>> Entering onMarkAllPagesAsTranslated(cultureCode=${cultureCode})`, { "event.action": "onMarkAllPagesAsTranslated", "logrite.cultureCode": cultureCode });
         const portalId = this.props.portalId;
         this.props.dispatch(LanguagesActions.markAllPagesAsTranslated({ cultureCode, portalId }, () => {
             utils.utilities.notify(resx.get("PagesSuccessfullyTranslated"));
             this.doneProgress();
+			logger.warn(`<<< Exiting onMarkAllPagesAsTranslated(cultureCode=${cultureCode})`, { "event.action": "onMarkAllPagesAsTranslated", "logrite.cultureCode": cultureCode });
         }));
     }
 
@@ -117,16 +130,20 @@ class TranslatePageContent extends Component {
                 this.doneProgress();
             }));
         });
+		logger.warn('<<< Exiting onEraseAllLocalizedPages()', { "event.action": "onEraseAllLocalizedPages" });
     }
 
     onPublishTranslatedPages(enable = true) {
+		logger.error(`>>> Entering onPublishTranslatedPages(enable=${enable})`, { "event.action": "onPublishTranslatedPages", "logrite.enable": enable });
         const {props} = this;
         const cultureCode = props.languageBeingEdited.Code;
         const portalId = props.portalId;
         props.dispatch(LanguagesActions.publishAllPages({ portalId, cultureCode, enable }, () => {
             const message = enable ? resx.get("PublishedAllTranslatedPages") : resx.get("UnPublishedAllTranslatedPages");
+			logger.error(`onPublishTranslatedPages(enable=${enable}): message → ${message}`, { "event.action": "onPublishTranslatedPages", "logrite.enable": enable });
             utils.utilities.notify(message);
             this.doneProgress();
+			logger.warn(`<<< Exiting onPublishTranslatedPages(enable=${enable})`, { "event.action": "onPublishTranslatedPages", "logrite.enable": enable });
         }));
     }
 
@@ -137,13 +154,16 @@ class TranslatePageContent extends Component {
         props.dispatch(LanguagesActions.localizeContent({ cultureCode, portalId }, () => {
             this.getProgressData();
         }));
+		logger.warn('<<< Exiting addPages()', { "event.action": "addPages" });
     }
 
     onCancel() {
         this.props.closePersonaBarPage();
+		logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
     }
 
     goToPageSettings(pageId) {
+		logger.error(`>>> Entering goToPageSettings(pageId=${pageId})`, { "event.action": "goToPageSettings", "logrite.pageId": pageId });
         let personaBar = window.parent.dnn ? window.parent.dnn.PersonaBar : null;
         if (personaBar) {
             personaBar.openPanel("Dnn.Pages",
@@ -159,6 +179,10 @@ class TranslatePageContent extends Component {
             );
 
             let event = document.createEvent("Event");
+			logger.error(`goToPageSettings(pageId=${pageId}): event → ${event}`, { "event.action": "goToPageSettings", "logrite.pageId": pageId });
+			logger.debug(`goToPageSettings(pageId=${pageId}): event.pageId → ${event.pageId}`, { "event.action": "goToPageSettings", "logrite.pageId": pageId });
+			logger.debug(`goToPageSettings(pageId=${pageId}): event.viewTab → ${event.viewTab}`, { "event.action": "goToPageSettings", "logrite.pageId": pageId });
+			logger.debug(`goToPageSettings(pageId=${pageId}): event.referral → ${event.referral}`, { "event.action": "goToPageSettings", "logrite.pageId": pageId });
             event.initEvent("viewPageSettings", true, true);
 
             event.pageId = pageId;
@@ -167,23 +191,28 @@ class TranslatePageContent extends Component {
             event.referralText = resx.get("BackToLanguages");
 
             document.dispatchEvent(event);
+			logger.warn(`<<< Exiting goToPageSettings(pageId=${pageId})`, { "event.action": "goToPageSettings", "logrite.pageId": pageId });
         }
     }
 
     toggleActivateLanguage(languageBeingEdited) {
+		logger.error(`>>> Entering toggleActivateLanguage(languageBeingEdited=${languageBeingEdited})`, { "event.action": "toggleActivateLanguage", "logrite.languageBeingEdited": languageBeingEdited });
         this.props.dispatch(LanguagesActions.activateLanguage({
             portalId: this.props.portalId,
             cultureCode: languageBeingEdited.Code,
             enable: languageBeingEdited.Active
         }, () => {
             this.props.dispatch(LanguagesActions.getLanguages(this.props.portalId));
+			logger.warn(`<<< Exiting toggleActivateLanguage(languageBeingEdited=${languageBeingEdited})`, { "event.action": "toggleActivateLanguage", "logrite.languageBeingEdited": languageBeingEdited });
         }));
     }
 
     onToggleActive(active) {
+		logger.error(`>>> Entering onToggleActive(active=${active})`, { "event.action": "onToggleActive", "logrite.active": active });
         if (!active) {
             let {languageBeingEdited} = this.state;
             const languageName = this.props.languageDisplayMode.toLowerCase() === "native" ? languageBeingEdited.NativeName : languageBeingEdited.EnglishName;
+			logger.error(`onToggleActive(active=${active}): languageName → ${languageName}`, { "event.action": "onToggleActive", "logrite.active": active });
             utils.utilities.confirm(resx.get("DeactivateLanguageWarning").replace("{0}", languageName), resx.get("Yes"), resx.get("No"), () => {
                 languageBeingEdited.Active = !languageBeingEdited.Active;
                 this.toggleActivateLanguage(languageBeingEdited);
@@ -192,8 +221,10 @@ class TranslatePageContent extends Component {
         } else {
             let {languageBeingEdited} = this.state;
             languageBeingEdited.Active = !languageBeingEdited.Active;
+			logger.debug(`onToggleActive(active=${active}): languageBeingEdited.Active → ${languageBeingEdited.Active}`, { "event.action": "onToggleActive", "logrite.active": active });
             this.toggleActivateLanguage(languageBeingEdited);
             this.setState({ languageBeingEdited });
+			logger.warn(`<<< Exiting onToggleActive(active=${active})`, { "event.action": "onToggleActive", "logrite.active": active });
         }
     }
 
@@ -310,6 +341,8 @@ TranslatePageContent.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         pageList: state.languages.pageList,
         languageBeingEdited: state.languageEditor.languageBeingEdited,

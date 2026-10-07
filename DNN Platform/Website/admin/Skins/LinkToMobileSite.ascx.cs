@@ -15,6 +15,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>Skin object of portal links between desktop and mobile portals.</summary>
     public partial class LinkToMobileSite : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LinkToMobileSite.ascx));
         private const string MyFileName = "LinkToMobileSite.ascx";
         private readonly IRedirectionController redirectionController;
         private string localResourcesFile;
@@ -23,6 +24,8 @@ namespace DotNetNuke.UI.Skins.Controls
         public LinkToMobileSite()
             : this(null)
         {
+		Logger.LogError(">>> Entering LinkToMobileSite()");
+        Logger.LogWarning("<<< Exiting LinkToMobileSite()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="LinkToMobileSite"/> class.</summary>
@@ -30,6 +33,8 @@ namespace DotNetNuke.UI.Skins.Controls
         public LinkToMobileSite(IRedirectionController redirectionController)
         {
             this.redirectionController = redirectionController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IRedirectionController>();
+			Logger.LogDebug("LinkToMobileSite(redirectionController={RedirectionController}): redirectionController → {RedirectionController1}", redirectionController, redirectionController);
+        Logger.LogWarning("<<< Exiting LinkToMobileSite(redirectionController={RedirectionController})", redirectionController);
         }
 
         private string LocalResourcesFile
@@ -48,9 +53,11 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             var redirectUrl = this.redirectionController.GetMobileSiteUrl();
+			Logger.LogError("OnLoad(e={E}): redirectUrl → {RedirectUrl}", e, redirectUrl);
             if (!string.IsNullOrEmpty(redirectUrl))
             {
                 this.lnkPortal.NavigateUrl = redirectUrl;
@@ -58,7 +65,9 @@ namespace DotNetNuke.UI.Skins.Controls
             }
             else
             {
+				Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
                 this.Visible = false;
+				Logger.LogDebug("OnLoad(e={E}): this.Visible → {Arg1}", e, this.Visible);
             }
         }
     }

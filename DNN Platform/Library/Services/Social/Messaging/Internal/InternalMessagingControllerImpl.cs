@@ -23,6 +23,7 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
     /// <summary>The Controller class for social Messaging.</summary>
     internal class InternalMessagingControllerImpl : IInternalMessagingController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InternalMessagingControllerImpl));
         private const int DefaultPageIndex = 0;
         private const int DefaultPageSize = 10;
         private const string ConstSortColumnDate = "CreatedOnDate";
@@ -41,69 +42,93 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <param name="dataService">The data service to use.</param>
         public InternalMessagingControllerImpl(IDataService dataService)
         {
+			Logger.LogError(">>> Entering InternalMessagingControllerImpl(dataService={DataService})", dataService);
             // Argument Contract
             Requires.NotNull("dataService", dataService);
 
+			Logger.LogWarning("<<< Exiting InternalMessagingControllerImpl(dataService={DataService})", dataService);
             this.dataService = dataService;
+			Logger.LogDebug("InternalMessagingControllerImpl(dataService={DataService}): dataService → {DataService1}", dataService, dataService);
         }
 
         /// <inheritdoc />
         public virtual void DeleteMessageRecipient(int messageId, int userId)
         {
+			Logger.LogError(">>> Entering DeleteMessageRecipient(messageId={MessageId},userId={UserId})", messageId, userId);
             this.dataService.DeleteMessageRecipientByMessageAndUser(messageId, userId);
+			Logger.LogWarning("<<< Exiting DeleteMessageRecipient(messageId={MessageId},userId={UserId})", messageId, userId);
         }
 
         /// <inheritdoc />
         public virtual void DeleteUserFromConversation(int conversationId, int userId)
         {
+			Logger.LogError(">>> Entering DeleteUserFromConversation(conversationId={ConversationId},userId={UserId})", conversationId, userId);
             this.dataService.DeleteUserFromConversation(conversationId, userId);
+			Logger.LogWarning("<<< Exiting DeleteUserFromConversation(conversationId={ConversationId},userId={UserId})", conversationId, userId);
         }
 
         /// <inheritdoc />
         public virtual Message GetMessage(int messageId)
         {
+			Logger.LogError(">>> Entering GetMessage(messageId={MessageId})", messageId);
+            Logger.LogWarning("<<< Exiting GetMessage(messageId={MessageId})", messageId);
             return CBO.FillObject<Message>(this.dataService.GetMessage(messageId));
         }
 
         /// <inheritdoc />
         public virtual MessageRecipient GetMessageRecipient(int messageId, int userId)
         {
+			Logger.LogError(">>> Entering GetMessageRecipient(messageId={MessageId},userId={UserId})", messageId, userId);
+            Logger.LogWarning("<<< Exiting GetMessageRecipient(messageId={MessageId},userId={UserId})", messageId, userId);
             return CBO.FillObject<MessageRecipient>(this.dataService.GetMessageRecipientByMessageAndUser(messageId, userId));
         }
 
         /// <inheritdoc />
         public virtual IList<MessageRecipient> GetMessageRecipients(int messageId)
         {
+			Logger.LogError(">>> Entering GetMessageRecipients(messageId={MessageId})", messageId);
+            Logger.LogWarning("<<< Exiting GetMessageRecipients(messageId={MessageId})", messageId);
             return CBO.FillCollection<MessageRecipient>(this.dataService.GetMessageRecipientsByMessage(messageId));
         }
 
         /// <inheritdoc />
         public virtual void MarkArchived(int conversationId, int userId)
         {
+			Logger.LogError(">>> Entering MarkArchived(conversationId={ConversationId},userId={UserId})", conversationId, userId);
             this.dataService.UpdateMessageArchivedStatus(conversationId, userId, true);
+			Logger.LogWarning("<<< Exiting MarkArchived(conversationId={ConversationId},userId={UserId})", conversationId, userId);
         }
 
         /// <inheritdoc />
         public virtual void MarkRead(int conversationId, int userId)
         {
+			Logger.LogError(">>> Entering MarkRead(conversationId={ConversationId},userId={UserId})", conversationId, userId);
             this.dataService.UpdateMessageReadStatus(conversationId, userId, true);
+			Logger.LogWarning("<<< Exiting MarkRead(conversationId={ConversationId},userId={UserId})", conversationId, userId);
         }
 
         /// <inheritdoc />
         public virtual void MarkUnArchived(int conversationId, int userId)
         {
+			Logger.LogError(">>> Entering MarkUnArchived(conversationId={ConversationId},userId={UserId})", conversationId, userId);
             this.dataService.UpdateMessageArchivedStatus(conversationId, userId, false);
+			Logger.LogWarning("<<< Exiting MarkUnArchived(conversationId={ConversationId},userId={UserId})", conversationId, userId);
         }
 
         /// <inheritdoc />
         public virtual void MarkUnRead(int conversationId, int userId)
         {
+			Logger.LogError(">>> Entering MarkUnRead(conversationId={ConversationId},userId={UserId})", conversationId, userId);
             this.dataService.UpdateMessageReadStatus(conversationId, userId, false);
+			Logger.LogWarning("<<< Exiting MarkUnRead(conversationId={ConversationId},userId={UserId})", conversationId, userId);
         }
 
         /// <inheritdoc />
         public virtual int ReplyMessage(int conversationId, string body, IList<int> fileIDs)
         {
+			Logger.LogError(">>> Entering ReplyMessage(conversationId={ConversationId},body={Body},fileIDs={FileIDs})", conversationId, body, fileIDs);
+			Logger.LogWarning("<<< Exiting ReplyMessage(conversationId={ConversationId},body={Body},fileIDs={FileIDs})", conversationId, body, fileIDs);
+			Logger.LogWarning("<<< Exiting ReplyMessage(conversationId={ConversationId},body={Body},fileIDs={FileIDs},sender={Sender})", conversationId, body, fileIDs, sender);
             return this.ReplyMessage(conversationId, body, fileIDs, UserController.Instance.GetCurrentUserInfo());
         }
 
@@ -162,64 +187,85 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <inheritdoc />
         public virtual int WaitTimeForNextMessage(UserInfo sender)
         {
+			Logger.LogError(">>> Entering WaitTimeForNextMessage(sender={Sender})", sender);
             Requires.NotNull("sender", sender);
 
             var waitTime = 0;
+			Logger.LogError("WaitTimeForNextMessage(sender={Sender}): waitTime → {WaitTime}", sender, waitTime);
 
             // MessagingThrottlingInterval contains the number of MINUTES to wait before sending the next message
             var interval = this.GetPortalSettingAsDouble("MessagingThrottlingInterval", sender.PortalID, DefaultMessagingThrottlingIntervalMinutes) * 60;
+			Logger.LogError("WaitTimeForNextMessage(sender={Sender}): interval → {Interval}", sender, interval);
             if (interval > 0 && !this.IsAdminOrHost(sender))
             {
                 var lastSentMessage = this.GetLastSentMessage(sender);
+				Logger.LogError("WaitTimeForNextMessage(sender={Sender}): lastSentMessage → {LastSentMessage}", sender, lastSentMessage);
                 if (lastSentMessage != null)
                 {
                     waitTime = (int)(interval - this.GetDateTimeNow().Subtract(lastSentMessage.CreatedOnDate).TotalSeconds);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting WaitTimeForNextMessage(sender={Sender})", sender);
             return waitTime < 0 ? 0 : waitTime;
         }
 
         /// <inheritdoc />
         public virtual Message GetLastSentMessage(UserInfo sender)
         {
+			Logger.LogError(">>> Entering GetLastSentMessage(sender={Sender})", sender);
+            Logger.LogWarning("<<< Exiting GetLastSentMessage(sender={Sender})", sender);
             return CBO.FillObject<Message>(this.dataService.GetLastSentMessage(sender.UserID, PortalController.GetEffectivePortalId(sender.PortalID)));
         }
 
         /// <inheritdoc />
         public virtual bool IncludeAttachments(int portalId)
         {
+			Logger.LogError(">>> Entering IncludeAttachments(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting IncludeAttachments(portalId={PortalId})", portalId);
             return this.GetPortalSetting("MessagingIncludeAttachments", portalId, "YES") == "YES";
         }
 
         /// <inheritdoc />
         public virtual bool AttachmentsAllowed(int portalId)
         {
+			Logger.LogError(">>> Entering AttachmentsAllowed(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting AttachmentsAllowed(portalId={PortalId})", portalId);
             return this.GetPortalSetting("MessagingAllowAttachments", portalId, "YES") == "YES";
         }
 
         /// <inheritdoc />
         public virtual int RecipientLimit(int portalId)
         {
+			Logger.LogError(">>> Entering RecipientLimit(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting RecipientLimit(portalId={PortalId})", portalId);
             return this.GetPortalSettingAsInteger("MessagingRecipientLimit", portalId, 5);
         }
 
         /// <inheritdoc />
         public virtual bool DisablePrivateMessage(int portalId)
         {
+			Logger.LogError(">>> Entering DisablePrivateMessage(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting DisablePrivateMessage(portalId={PortalId})", portalId);
             return this.GetPortalSetting("DisablePrivateMessage", portalId, "N") == "Y";
         }
 
         /// <inheritdoc />
         public virtual MessageBoxView GetArchivedMessages(int userId, int afterMessageId, int numberOfRecords)
         {
+			Logger.LogError(">>> Entering GetArchivedMessages(userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords})", userId, afterMessageId, numberOfRecords);
             var reader = this.dataService.GetArchiveBoxView(userId, PortalController.GetEffectivePortalId(this.GetCurrentUserInfo().PortalID), afterMessageId, numberOfRecords, ConstSortColumnDate, !ConstAscending);
+			Logger.LogError("GetArchivedMessages(userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): reader → {Reader}", userId, afterMessageId, numberOfRecords, reader);
+			Logger.LogWarning("<<< Exiting GetArchivedMessages(userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords})", userId, afterMessageId, numberOfRecords);
             return new MessageBoxView { Conversations = CBO.FillCollection<MessageConversationView>(reader) };
         }
 
         /// <inheritdoc />
         public virtual MessageBoxView GetInbox(int userId, int afterMessageId, int numberOfRecords, string sortColumn, bool sortAscending)
         {
+			Logger.LogError(">>> Entering GetInbox(userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords},sortColumn={SortColumn},sortAscending={SortAscending})", userId, afterMessageId, numberOfRecords, sortColumn, sortAscending);
+            Logger.LogWarning("<<< Exiting GetInbox(userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords},sortColumn={SortColumn},sortAscending={SortAscending})", userId, afterMessageId, numberOfRecords, sortColumn, sortAscending);
+			Logger.LogWarning("<<< Exiting GetInbox(userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords},sortColumn={SortColumn},sortAscending={SortAscending},readStatus={ReadStatus},archivedStatus={ArchivedStatus})", userId, afterMessageId, numberOfRecords, sortColumn, sortAscending, readStatus, archivedStatus);
             return this.GetInbox(userId, afterMessageId, numberOfRecords, sortColumn, sortAscending, MessageReadStatus.Any, MessageArchivedStatus.UnArchived);
         }
 
@@ -227,12 +273,16 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         public virtual MessageBoxView GetInbox(int userId, int afterMessageId, int numberOfRecords, string sortColumn, bool sortAscending, MessageReadStatus readStatus, MessageArchivedStatus archivedStatus)
         {
             var reader = this.dataService.GetInBoxView(userId, PortalController.GetEffectivePortalId(this.GetCurrentUserInfo().PortalID), afterMessageId, numberOfRecords, sortColumn, sortAscending, readStatus, archivedStatus, MessageSentStatus.Received);
+			Logger.LogError("GetInbox(userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords},sortColumn={SortColumn},sortAscending={SortAscending},readStatus={ReadStatus},archivedStatus={ArchivedStatus}): reader → {Reader}", userId, afterMessageId, numberOfRecords, sortColumn, sortAscending, readStatus, archivedStatus, reader);
             return new MessageBoxView { Conversations = CBO.FillCollection<MessageConversationView>(reader) };
         }
 
         /// <inheritdoc />
         public virtual MessageThreadsView GetMessageThread(int conversationId, int userId, int afterMessageId, int numberOfRecords, ref int totalRecords)
         {
+			Logger.LogError(">>> Entering GetMessageThread(conversationId={ConversationId},userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords},totalRecords={TotalRecords})", conversationId, userId, afterMessageId, numberOfRecords, totalRecords);
+			Logger.LogWarning("<<< Exiting GetMessageThread(conversationId={ConversationId},userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords},totalRecords={TotalRecords})", conversationId, userId, afterMessageId, numberOfRecords, totalRecords);
+			Logger.LogWarning("<<< Exiting GetMessageThread(conversationId={ConversationId},userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords},sortColumn={SortColumn},sortAscending={SortAscending},totalRecords={TotalRecords})", conversationId, userId, afterMessageId, numberOfRecords, sortColumn, sortAscending, totalRecords);
             return this.GetMessageThread(conversationId, userId, afterMessageId, numberOfRecords, ConstSortColumnDate, !ConstAscending, ref totalRecords);
         }
 
@@ -274,6 +324,8 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <inheritdoc />
         public virtual MessageBoxView GetRecentInbox(int userId)
         {
+			Logger.LogError(">>> Entering GetRecentInbox(userId={UserId})", userId);
+            Logger.LogWarning("<<< Exiting GetRecentInbox(userId={UserId})", userId);
             return this.GetRecentInbox(userId, DefaultPageIndex, DefaultPageSize);
         }
 
@@ -286,6 +338,8 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <inheritdoc />
         public virtual MessageBoxView GetRecentSentbox(int userId)
         {
+			Logger.LogError(">>> Entering GetRecentSentbox(userId={UserId})", userId);
+            Logger.LogWarning("<<< Exiting GetRecentSentbox(userId={UserId})", userId);
             return this.GetRecentSentbox(userId, DefaultPageIndex, DefaultPageSize);
         }
 
@@ -298,6 +352,9 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <inheritdoc />
         public virtual MessageBoxView GetSentbox(int userId, int afterMessageId, int numberOfRecords, string sortColumn, bool sortAscending)
         {
+			Logger.LogError(">>> Entering GetSentbox(userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords},sortColumn={SortColumn},sortAscending={SortAscending})", userId, afterMessageId, numberOfRecords, sortColumn, sortAscending);
+            Logger.LogWarning("<<< Exiting GetSentbox(userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords},sortColumn={SortColumn},sortAscending={SortAscending})", userId, afterMessageId, numberOfRecords, sortColumn, sortAscending);
+			Logger.LogWarning("<<< Exiting GetSentbox(userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords},sortColumn={SortColumn},sortAscending={SortAscending},readStatus={ReadStatus},archivedStatus={ArchivedStatus})", userId, afterMessageId, numberOfRecords, sortColumn, sortAscending, readStatus, archivedStatus);
             return this.GetSentbox(userId, afterMessageId, numberOfRecords, sortColumn, sortAscending, MessageReadStatus.Any, MessageArchivedStatus.UnArchived);
         }
 
@@ -305,12 +362,15 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         public virtual MessageBoxView GetSentbox(int userId, int afterMessageId, int numberOfRecords, string sortColumn, bool sortAscending, MessageReadStatus readStatus, MessageArchivedStatus archivedStatus)
         {
             var reader = this.dataService.GetSentBoxView(userId, PortalController.GetEffectivePortalId(this.GetCurrentUserInfo().PortalID), afterMessageId, numberOfRecords, sortColumn, sortAscending);
+			Logger.LogError("GetSentbox(userId={UserId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords},sortColumn={SortColumn},sortAscending={SortAscending},readStatus={ReadStatus},archivedStatus={ArchivedStatus}): reader → {Reader}", userId, afterMessageId, numberOfRecords, sortColumn, sortAscending, readStatus, archivedStatus, reader);
             return new MessageBoxView { Conversations = CBO.FillCollection<MessageConversationView>(reader) };
         }
 
         /// <inheritdoc />
         public virtual int CheckReplyHasRecipients(int conversationId, int userId)
         {
+			Logger.LogError(">>> Entering CheckReplyHasRecipients(conversationId={ConversationId},userId={UserId})", conversationId, userId);
+			Logger.LogWarning("<<< Exiting CheckReplyHasRecipients(conversationId={ConversationId},userId={UserId})", conversationId, userId);
             return userId <= 0 ? 0 :
                 conversationId <= 0 ? 0 : this.dataService.CheckReplyHasRecipients(conversationId, userId);
         }
@@ -318,108 +378,138 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <inheritdoc />
         public virtual int CountArchivedMessagesByConversation(int conversationId)
         {
+			Logger.LogError(">>> Entering CountArchivedMessagesByConversation(conversationId={ConversationId})", conversationId);
+            Logger.LogWarning("<<< Exiting CountArchivedMessagesByConversation(conversationId={ConversationId})", conversationId);
             return conversationId <= 0 ? 0 : this.dataService.CountArchivedMessagesByConversation(conversationId);
         }
 
         /// <inheritdoc />
         public virtual int CountMessagesByConversation(int conversationId)
         {
+			Logger.LogError(">>> Entering CountMessagesByConversation(conversationId={ConversationId})", conversationId);
+            Logger.LogWarning("<<< Exiting CountMessagesByConversation(conversationId={ConversationId})", conversationId);
             return conversationId <= 0 ? 0 : this.dataService.CountMessagesByConversation(conversationId);
         }
 
         /// <inheritdoc />
         public virtual int CountConversations(int userId, int portalId)
         {
+			Logger.LogError(">>> Entering CountConversations(userId={UserId},portalId={PortalId})", userId, portalId);
             if (userId <= 0)
             {
                 return 0;
             }
 
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.UserNotificationsConversationCountCacheKey, portalId, userId);
+			Logger.LogError("CountConversations(userId={UserId},portalId={PortalId}): cacheKey → {CacheKey}", userId, portalId, cacheKey);
             var cache = CachingProvider.Instance();
+			Logger.LogError("CountConversations(userId={UserId},portalId={PortalId}): cache → {Cache}", userId, portalId, cache);
             var cacheObject = cache.GetItem(cacheKey);
+			Logger.LogError("CountConversations(userId={UserId},portalId={PortalId}): cacheObject → {CacheObject}", userId, portalId, cacheObject);
             if (cacheObject is int)
             {
                 return (int)cacheObject;
             }
 
             var count = this.dataService.CountTotalConversations(userId, portalId);
+			Logger.LogError("CountConversations(userId={UserId},portalId={PortalId}): count → {Count}", userId, portalId, count);
             cache.Insert(
                 cacheKey,
                 count,
                 (DNNCacheDependency)null,
                 DateTime.Now.AddSeconds(DataCache.NotificationsCacheTimeInSec),
                 System.Web.Caching.Cache.NoSlidingExpiration);
+			Logger.LogWarning("<<< Exiting CountConversations(userId={UserId},portalId={PortalId})", userId, portalId);
             return count;
         }
 
         /// <inheritdoc />
         public virtual int CountUnreadMessages(int userId, int portalId)
         {
+			Logger.LogError(">>> Entering CountUnreadMessages(userId={UserId},portalId={PortalId})", userId, portalId);
             if (userId <= 0)
             {
                 return 0;
             }
 
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.UserNewThreadsCountCacheKey, portalId, userId);
+			Logger.LogError("CountUnreadMessages(userId={UserId},portalId={PortalId}): cacheKey → {CacheKey}", userId, portalId, cacheKey);
             var cache = CachingProvider.Instance();
+			Logger.LogError("CountUnreadMessages(userId={UserId},portalId={PortalId}): cache → {Cache}", userId, portalId, cache);
             var cacheObject = cache.GetItem(cacheKey);
+			Logger.LogError("CountUnreadMessages(userId={UserId},portalId={PortalId}): cacheObject → {CacheObject}", userId, portalId, cacheObject);
             if (cacheObject is int)
             {
                 return (int)cacheObject;
             }
 
             var count = this.dataService.CountNewThreads(userId, portalId);
+			Logger.LogError("CountUnreadMessages(userId={UserId},portalId={PortalId}): count → {Count}", userId, portalId, count);
             cache.Insert(
                 cacheKey,
                 count,
                 (DNNCacheDependency)null,
                 DateTime.Now.AddSeconds(DataCache.NotificationsCacheTimeInSec),
                 System.Web.Caching.Cache.NoSlidingExpiration);
+			Logger.LogWarning("<<< Exiting CountUnreadMessages(userId={UserId},portalId={PortalId})", userId, portalId);
             return count;
         }
 
         /// <inheritdoc />
         public virtual int CountSentMessages(int userId, int portalId)
         {
+			Logger.LogError(">>> Entering CountSentMessages(userId={UserId},portalId={PortalId})", userId, portalId);
+            Logger.LogWarning("<<< Exiting CountSentMessages(userId={UserId},portalId={PortalId})", userId, portalId);
             return userId <= 0 ? 0 : this.dataService.CountSentMessages(userId, portalId);
         }
 
         /// <inheritdoc />
         public virtual int CountArchivedMessages(int userId, int portalId)
         {
+			Logger.LogError(">>> Entering CountArchivedMessages(userId={UserId},portalId={PortalId})", userId, portalId);
+            Logger.LogWarning("<<< Exiting CountArchivedMessages(userId={UserId},portalId={PortalId})", userId, portalId);
             return userId <= 0 ? 0 : this.dataService.CountArchivedMessages(userId, portalId);
         }
 
         /// <inheritdoc />
         public virtual int CountSentConversations(int userId, int portalId)
         {
+			Logger.LogError(">>> Entering CountSentConversations(userId={UserId},portalId={PortalId})", userId, portalId);
+            Logger.LogWarning("<<< Exiting CountSentConversations(userId={UserId},portalId={PortalId})", userId, portalId);
             return userId <= 0 ? 0 : this.dataService.CountSentConversations(userId, portalId);
         }
 
         /// <inheritdoc />
         public virtual int CountArchivedConversations(int userId, int portalId)
         {
+			Logger.LogError(">>> Entering CountArchivedConversations(userId={UserId},portalId={PortalId})", userId, portalId);
+            Logger.LogWarning("<<< Exiting CountArchivedConversations(userId={UserId},portalId={PortalId})", userId, portalId);
             return userId <= 0 ? 0 : this.dataService.CountArchivedConversations(userId, portalId);
         }
 
         /// <inheritdoc />
         public IEnumerable<MessageFileView> GetAttachments(int messageId)
         {
+			Logger.LogError(">>> Entering GetAttachments(messageId={MessageId})", messageId);
+            Logger.LogWarning("<<< Exiting GetAttachments(messageId={MessageId})", messageId);
             return this.dataService.GetMessageAttachmentsByMessage(messageId);
         }
 
         /// <inheritdoc />
         public void ConvertLegacyMessages(int pageIndex, int pageSize)
         {
+			Logger.LogError(">>> Entering ConvertLegacyMessages(pageIndex={PageIndex},pageSize={PageSize})", pageIndex, pageSize);
             this.dataService.ConvertLegacyMessages(pageIndex, pageSize);
+			Logger.LogWarning("<<< Exiting ConvertLegacyMessages(pageIndex={PageIndex},pageSize={PageSize})", pageIndex, pageSize);
         }
 
         /// <inheritdoc />
         public int CountLegacyMessages()
         {
+			Logger.LogError(">>> Entering CountLegacyMessages()");
             var totalRecords = 0;
             var dr = this.dataService.CountLegacyMessages();
+			Logger.LogError("CountLegacyMessages(): dr → {Dr}", dr);
 
             try
             {
@@ -433,31 +523,40 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
                 CBO.CloseDataReader(dr, true);
             }
 
+			Logger.LogWarning("<<< Exiting CountLegacyMessages()");
             return totalRecords;
         }
 
         /// <inheritdoc />
         public IList<MessageRecipient> GetNextMessagesForInstantDispatch(Guid schedulerInstance, int batchSize)
         {
+			Logger.LogError(">>> Entering GetNextMessagesForInstantDispatch(schedulerInstance={SchedulerInstance},batchSize={BatchSize})", schedulerInstance, batchSize);
+            Logger.LogWarning("<<< Exiting GetNextMessagesForInstantDispatch(schedulerInstance={SchedulerInstance},batchSize={BatchSize})", schedulerInstance, batchSize);
             return CBO.FillCollection<MessageRecipient>(this.dataService.GetNextMessagesForInstantDispatch(schedulerInstance, batchSize));
         }
 
         /// <inheritdoc />
         public IList<MessageRecipient> GetNextMessagesForDigestDispatch(Frequency frequency, Guid schedulerInstance, int batchSize)
         {
+			Logger.LogError(">>> Entering GetNextMessagesForDigestDispatch(frequency={Frequency},schedulerInstance={SchedulerInstance},batchSize={BatchSize})", frequency, schedulerInstance, batchSize);
+            Logger.LogWarning("<<< Exiting GetNextMessagesForDigestDispatch(frequency={Frequency},schedulerInstance={SchedulerInstance},batchSize={BatchSize})", frequency, schedulerInstance, batchSize);
             return CBO.FillCollection<MessageRecipient>(this.dataService.GetNextMessagesForDigestDispatch((int)frequency, schedulerInstance, batchSize));
         }
 
         /// <inheritdoc />
         public virtual void MarkMessageAsDispatched(int messageId, int recipientId)
         {
+			Logger.LogError(">>> Entering MarkMessageAsDispatched(messageId={MessageId},recipientId={RecipientId})", messageId, recipientId);
             this.dataService.MarkMessageAsDispatched(messageId, recipientId);
+			Logger.LogWarning("<<< Exiting MarkMessageAsDispatched(messageId={MessageId},recipientId={RecipientId})", messageId, recipientId);
         }
 
         /// <inheritdoc />
         public virtual void MarkMessageAsSent(int messageId, int recipientId)
         {
+			Logger.LogError(">>> Entering MarkMessageAsSent(messageId={MessageId},recipientId={RecipientId})", messageId, recipientId);
             this.dataService.MarkMessageAsSent(messageId, recipientId);
+			Logger.LogWarning("<<< Exiting MarkMessageAsSent(messageId={MessageId},recipientId={RecipientId})", messageId, recipientId);
         }
 
         /// <summary>
@@ -466,6 +565,8 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <returns>The current <see cref="DateTime"/>.</returns>
         internal virtual DateTime GetDateTimeNow()
         {
+			Logger.LogError(">>> Entering GetDateTimeNow()");
+            Logger.LogWarning("<<< Exiting GetDateTimeNow()");
             return DateTime.UtcNow;
         }
 
@@ -475,6 +576,8 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <returns><see cref="UserInfo"/>.</returns>
         internal virtual UserInfo GetCurrentUserInfo()
         {
+			Logger.LogError(">>> Entering GetCurrentUserInfo()");
+            Logger.LogWarning("<<< Exiting GetCurrentUserInfo()");
             return UserController.Instance.GetCurrentUserInfo();
         }
 
@@ -487,6 +590,8 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <returns>The value of the setting as an integer.</returns>
         internal virtual int GetPortalSettingAsInteger(string key, int portalId, int defaultValue)
         {
+			Logger.LogError(">>> Entering GetPortalSettingAsInteger(key={Key},portalId={PortalId},defaultValue={DefaultValue})", key, portalId, defaultValue);
+            Logger.LogWarning("<<< Exiting GetPortalSettingAsInteger(key={Key},portalId={PortalId},defaultValue={DefaultValue})", key, portalId, defaultValue);
             return PortalController.GetPortalSettingAsInteger(key, portalId, defaultValue);
         }
 
@@ -499,6 +604,8 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <returns>The setting value as a double.</returns>
         internal virtual double GetPortalSettingAsDouble(string key, int portalId, double defaultValue)
         {
+			Logger.LogError(">>> Entering GetPortalSettingAsDouble(key={Key},portalId={PortalId},defaultValue={DefaultValue})", key, portalId, defaultValue);
+            Logger.LogWarning("<<< Exiting GetPortalSettingAsDouble(key={Key},portalId={PortalId},defaultValue={DefaultValue})", key, portalId, defaultValue);
             return PortalController.GetPortalSettingAsDouble(key, portalId, defaultValue);
         }
 
@@ -511,6 +618,8 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <returns>The setting value as a string.</returns>
         internal virtual string GetPortalSetting(string settingName, int portalId, string defaultValue)
         {
+			Logger.LogError(">>> Entering GetPortalSetting(settingName={SettingName},portalId={PortalId},defaultValue={DefaultValue})", settingName, portalId, defaultValue);
+            Logger.LogWarning("<<< Exiting GetPortalSetting(settingName={SettingName},portalId={PortalId},defaultValue={DefaultValue})", settingName, portalId, defaultValue);
             return PortalController.GetPortalSetting(settingName, portalId, defaultValue);
         }
 
@@ -521,6 +630,8 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <returns>A value indicating whether the user is an admin or a host.</returns>
         internal virtual bool IsAdminOrHost(UserInfo userInfo)
         {
+			Logger.LogError(">>> Entering IsAdminOrHost(userInfo={UserInfo})", userInfo);
+            Logger.LogWarning("<<< Exiting IsAdminOrHost(userInfo={UserInfo})", userInfo);
             return userInfo.IsSuperUser || userInfo.IsInRole(PortalController.Instance.GetCurrentSettings().AdministratorRoleName);
         }
 
@@ -531,7 +642,9 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
         /// <returns>The filtered string.</returns>
         internal virtual string InputFilter(string input)
         {
+			Logger.LogError(">>> Entering InputFilter(input={Input})", input);
             var ps = PortalSecurity.Instance;
+			Logger.LogWarning("<<< Exiting InputFilter(input={Input})", input);
             return ps.InputFilter(input, PortalSecurity.FilterFlag.NoProfanity);
         }
     }

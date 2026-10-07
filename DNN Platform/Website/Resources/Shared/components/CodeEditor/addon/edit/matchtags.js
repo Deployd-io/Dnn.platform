@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -26,12 +27,15 @@
   });
 
   function clear(cm) {
+	logger.error(`>>> Entering clear(cm=${cm})`, { "event.action": "clear", "logrite.cm": cm });
     if (cm.state.tagHit) cm.state.tagHit.clear();
     if (cm.state.tagOther) cm.state.tagOther.clear();
     cm.state.tagHit = cm.state.tagOther = null;
+	logger.warn(`<<< Exiting clear(cm=${cm})`, { "event.action": "clear", "logrite.cm": cm });
   }
 
   function doMatchTags(cm) {
+	logger.error(`>>> Entering doMatchTags(cm=${cm})`, { "event.action": "doMatchTags", "logrite.cm": cm });
     cm.state.failedTagMatch = false;
     cm.operation(function() {
       clear(cm);
@@ -53,14 +57,19 @@
   }
 
   function maybeUpdateMatch(cm) {
+	logger.error(`>>> Entering maybeUpdateMatch(cm=${cm})`, { "event.action": "maybeUpdateMatch", "logrite.cm": cm });
     if (cm.state.failedTagMatch) doMatchTags(cm);
+	logger.warn(`<<< Exiting maybeUpdateMatch(cm=${cm})`, { "event.action": "maybeUpdateMatch", "logrite.cm": cm });
   }
 
   CodeMirror.commands.toMatchingTag = function(cm) {
+	logger.error(`>>> Entering toMatchingTag(cm=${cm})`, { "event.action": "toMatchingTag", "logrite.cm": cm });
     var found = CodeMirror.findMatchingTag(cm, cm.getCursor());
     if (found) {
+	logger.error(`toMatchingTag(cm=${cm}): found → ${found}`, { "event.action": "toMatchingTag", "logrite.cm": cm });
       var other = found.at == "close" ? found.open : found.close;
       if (other) cm.extendSelection(other.to, other.from);
+	logger.error(`toMatchingTag(cm=${cm}): other → ${other}`, { "event.action": "toMatchingTag", "logrite.cm": cm });
     }
   };
 });

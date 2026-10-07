@@ -25,12 +25,17 @@ namespace DotNetNuke.Services.Syndication
 
         private OpmlDownloadManager()
         {
+			Logger.LogError(">>> Entering OpmlDownloadManager()");
             // create in-memory cache
             this.cache = new Dictionary<string, Opml>();
+			Logger.LogDebug("OpmlDownloadManager(): cache → {Cache}", cache);
 
             this.defaultTtlMinutes = 60;
+			Logger.LogDebug("OpmlDownloadManager(): defaultTtlMinutes → {DefaultTtlMinutes}", defaultTtlMinutes);
+			Logger.LogDebug("OpmlDownloadManager(): this.defaultTtlMinutes → {Arg0}", this.defaultTtlMinutes);
 
             // prepare disk directory
+			Logger.LogWarning("<<< Exiting OpmlDownloadManager()");
             this.directoryOnDisk = PrepareTempDir();
         }
 
@@ -39,6 +44,8 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>The OPML feed, or an empty OPML feed if there's an error loading it.</returns>
         public static Opml GetOpmlFeed(Uri uri)
         {
+			Logger.LogError(">>> Entering GetOpmlFeed(uri={Uri})", uri);
+            Logger.LogWarning("<<< Exiting GetOpmlFeed(uri={Uri})", uri);
             return TheManager.GetFeed(uri);
         }
 
@@ -47,8 +54,10 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>The OPML feed, or an empty OPML feed if there's an error loading it.</returns>
         internal Opml GetFeed(Uri uri)
         {
+			Logger.LogError(">>> Entering GetFeed(uri={Uri})", uri);
             Opml opmlFeed = null;
 
+			Logger.LogError("GetFeed(uri={Uri}): opmlFeed → {OpmlFeed}", uri, opmlFeed);
             lock (this.cache)
             {
                 if (this.cache.TryGetValue(uri.AbsoluteUri, out opmlFeed))
@@ -71,13 +80,16 @@ namespace DotNetNuke.Services.Syndication
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetFeed(uri={Uri})", uri);
             return opmlFeed;
         }
 
         private static string PrepareTempDir()
         {
+			Logger.LogError(">>> Entering PrepareTempDir()");
             string tempDir = null;
 
+			Logger.LogError("PrepareTempDir(): tempDir → {TempDir}", tempDir);
             try
             {
                 string d = HttpContext.Current.Server.MapPath(Settings.CacheRoot + OPMLDir);
@@ -91,28 +103,36 @@ namespace DotNetNuke.Services.Syndication
             }
             catch
             {
+				Logger.LogError("Exception in PrepareTempDir(): {Arg0}", ex.Message);
                 // don't cache on disk if can't do it
             }
 
+			Logger.LogWarning("<<< Exiting PrepareTempDir()");
             return tempDir;
         }
 
         private static string GetTempFileNamePrefixFromUrl(Uri uri)
         {
+			Logger.LogError(">>> Entering GetTempFileNamePrefixFromUrl(uri={Uri})", uri);
             try
             {
                 return $"{uri.Host.Replace('.', '_')}_{uri.AbsolutePath.GetHashCode():x8}";
             }
             catch
             {
+				Logger.LogError("Exception in GetTempFileNamePrefixFromUrl(uri={Uri}): {Arg1}", uri, ex.Message);
+				Logger.LogWarning("<<< Exiting GetTempFileNamePrefixFromUrl(uri={Uri})", uri);
                 return "opml";
             }
         }
 
         private Opml DownloadOpmlFeed(Uri uri)
         {
+			Logger.LogError(">>> Entering DownloadOpmlFeed(uri={Uri})", uri);
+            var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // look for disk cache first
             Opml opmlFeed = this.TryLoadFromDisk(uri);
+			Logger.LogError("DownloadOpmlFeed(uri={Uri}): opmlFeed → {OpmlFeed}", uri, opmlFeed);
 
             if (opmlFeed != null)
             {
@@ -139,14 +159,18 @@ namespace DotNetNuke.Services.Syndication
             }
             catch
             {
+				Logger.LogError("Exception in DownloadOpmlFeed(uri={Uri}): {Arg1}", uri, ex.Message);
                 return new Opml();
             }
 
+			Logger.LogError("DownloadOpmlFeed(uri)={Uri}: external service call {Uri1} took {Arg2} ms", uri, uri, __logStart.ElapsedMilliseconds);
+			Logger.LogWarning("<<< Exiting DownloadOpmlFeed(uri={Uri})", uri);
             return opmlFeed;
         }
 
         private Opml TryLoadFromDisk(Uri uri)
         {
+			Logger.LogError(">>> Entering TryLoadFromDisk(uri={Uri})", uri);
             if (this.directoryOnDisk == null)
             {
                 return null; // no place to cache
@@ -161,9 +185,13 @@ namespace DotNetNuke.Services.Syndication
             foreach (string opmlFilename in files)
             {
                 XmlDocument opmlDoc = null;
+				Logger.LogError("TryLoadFromDisk(uri={Uri}): opmlDoc → {OpmlDoc}", uri, opmlDoc);
                 bool isOpmlFileValid = false;
+				Logger.LogError("TryLoadFromDisk(uri={Uri}): isOpmlFileValid → {IsOpmlFileValid}", uri, isOpmlFileValid);
                 DateTime utcExpiryFromOpmlFile = DateTime.MinValue;
+				Logger.LogError("TryLoadFromDisk(uri={Uri}): utcExpiryFromOpmlFile → {UtcExpiryFromOpmlFile}", uri, utcExpiryFromOpmlFile);
                 string urlFromOpmlFile = null;
+				Logger.LogError("TryLoadFromDisk(uri={Uri}): urlFromOpmlFile → {UrlFromOpmlFile}", uri, urlFromOpmlFile);
 
                 try
                 {
@@ -193,6 +221,7 @@ namespace DotNetNuke.Services.Syndication
                 }
                 catch
                 {
+					Logger.LogError("Exception in TryLoadFromDisk(uri={Uri}): {Arg1}", uri, ex.Message);
                     // error processing one file shouldn't stop processing other files
                 }
 
@@ -217,17 +246,21 @@ namespace DotNetNuke.Services.Syndication
                 {
                     // found a good one - create DOM and set expiry (as found on disk)
                     Opml opmlFeed = Opml.LoadFromXml(opmlDoc);
+					Logger.LogError("TryLoadFromDisk(uri={Uri}): opmlFeed → {OpmlFeed}", uri, opmlFeed);
                     opmlFeed.UtcExpiry = utcExpiryFromOpmlFile;
+					Logger.LogDebug("TryLoadFromDisk(uri={Uri}): opmlFeed.UtcExpiry → {Arg1}", uri, opmlFeed.UtcExpiry);
                     return opmlFeed;
                 }
             }
 
             // not found
+			Logger.LogWarning("<<< Exiting TryLoadFromDisk(uri={Uri})", uri);
             return null;
         }
 
         private void TrySaveToDisk(XmlDocument doc, Uri uri, DateTime utcExpiry)
         {
+			Logger.LogError(">>> Entering TrySaveToDisk(doc={Doc},uri={Uri},utcExpiry={UtcExpiry})", doc, uri, utcExpiry);
             if (this.directoryOnDisk == null)
             {
                 return;
@@ -243,8 +276,10 @@ namespace DotNetNuke.Services.Syndication
             }
             catch
             {
+				Logger.LogError("Exception in TrySaveToDisk(doc={Doc},uri={Uri},utcExpiry={UtcExpiry}): {Arg3}", doc, uri, utcExpiry, ex.Message);
                 // can't save to disk - not a problem
             }
+			Logger.LogWarning("<<< Exiting TrySaveToDisk(doc={Doc},uri={Uri},utcExpiry={UtcExpiry})", doc, uri, utcExpiry);
         }
     }
 }

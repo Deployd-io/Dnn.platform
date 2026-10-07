@@ -1,4 +1,5 @@
-﻿/// <reference name="MicrosoftAjax.js" />
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+/// <reference name="MicrosoftAjax.js" />
 /// <reference name="dnn.js" assembly="DotNetNuke.WebUtility" />
 
 Type.registerNamespace('dnn.dom.positioning');
@@ -11,39 +12,51 @@ dnn.extend(dnn.dom.positioning, {
 
     bodyScrollLeft: function()
     {
+		logger.error('>>> Entering bodyScrollLeft()', { "event.action": "bodyScrollLeft" });
         if (window.pageYOffset)
             return window.pageYOffset;
 
         var oBody = (document.compatMode && document.compatMode != "BackCompat") ? document.documentElement : document.body;
+		logger.warn('<<< Exiting bodyScrollLeft()', { "event.action": "bodyScrollLeft" });
+		logger.error(`bodyScrollLeft(): oBody → ${oBody}`, { "event.action": "bodyScrollLeft" });
         return oBody.scrollLeft;
     },
 
     bodyScrollTop: function()
     {
+		logger.error('>>> Entering bodyScrollTop()', { "event.action": "bodyScrollTop" });
         if (window.pageXOffset)
             return window.pageXOffset;
 
         var oBody = (document.compatMode && document.compatMode != "BackCompat") ? document.documentElement : document.body;
+		logger.warn('<<< Exiting bodyScrollTop()', { "event.action": "bodyScrollTop" });
+		logger.error(`bodyScrollTop(): oBody → ${oBody}`, { "event.action": "bodyScrollTop" });
         return oBody.scrollTop;
     },
 
     viewPortHeight: function()
     {
+		logger.error('>>> Entering viewPortHeight()', { "event.action": "viewPortHeight" });
         // supported in Mozilla, Opera, and Safari
         if (window.innerHeight)
             return window.innerHeight;
 
         var oBody = (document.compatMode && document.compatMode != "BackCompat") ? document.documentElement : document.body;
+		logger.warn('<<< Exiting viewPortHeight()', { "event.action": "viewPortHeight" });
+		logger.error(`viewPortHeight(): oBody → ${oBody}`, { "event.action": "viewPortHeight" });
         return oBody.clientHeight;
     },
 
     viewPortWidth: function()
     {
+		logger.error('>>> Entering viewPortWidth()', { "event.action": "viewPortWidth" });
         // supported in Mozilla, Opera, and Safari
         if (window.innerWidth)
             return window.innerWidth;
 
         var oBody = (document.compatMode && document.compatMode != "BackCompat") ? document.documentElement : document.body;
+		logger.warn('<<< Exiting viewPortWidth()', { "event.action": "viewPortWidth" });
+		logger.error(`viewPortWidth(): oBody → ${oBody}`, { "event.action": "viewPortWidth" });
         return oBody.clientWidth;
     },
 
@@ -80,10 +93,12 @@ dnn.extend(dnn.dom.positioning, {
 
         if (oTitle != null && oTitle.dragOver != null)
             eval(oCtl.dragOver);
+			logger.warn(`<<< Exiting dragContainer(oCtl=${oCtl},e=${e})`, { "event.action": "dragContainer", "logrite.oCtl": oCtl, "logrite.e": e });
     },
 
     elementHeight: function(eSrc)
     {
+		logger.error(`>>> Entering elementHeight(eSrc=${eSrc})`, { "event.action": "elementHeight", "logrite.eSrc": eSrc });
         if (eSrc.offsetHeight == null || eSrc.offsetHeight == 0)
         {
             if (eSrc.offsetParent == null)
@@ -104,11 +119,14 @@ dnn.extend(dnn.dom.positioning, {
 
     elementLeft: function(eSrc)
     {
+		logger.error(`>>> Entering elementLeft(eSrc=${eSrc})`, { "event.action": "elementLeft", "logrite.eSrc": eSrc });
+		logger.warn(`<<< Exiting elementLeft(eSrc=${eSrc})`, { "event.action": "elementLeft", "logrite.eSrc": eSrc });
         return this.elementPos(eSrc).l;
     },
 
     elementOverlapScore: function(oDims1, oDims2)
     {
+		logger.error(`>>> Entering elementOverlapScore(oDims1=${oDims1},oDims2=${oDims2})`, { "event.action": "elementOverlapScore", "logrite.oDims1": oDims1, "logrite.oDims2": oDims2 });
         var iLeftScore = 0;
         var iTopScore = 0;
         if (oDims1.l <= oDims2.l && oDims2.l <= oDims1.r)	//if left of content fits between panel borders
@@ -120,19 +138,28 @@ dnn.extend(dnn.dom.positioning, {
         if (oDims2.t <= oDims1.t && oDims1.t <= oDims2.b)	//if top of panel fits between content borders
             iTopScore += (oDims2.b < oDims1.b ? oDims2.b : oDims1.b) - oDims1.t; //set score based off top of panel to closest bottom border
 
+		logger.warn(`<<< Exiting elementOverlapScore(oDims1=${oDims1},oDims2=${oDims2})`, { "event.action": "elementOverlapScore", "logrite.oDims1": oDims1, "logrite.oDims2": oDims2 });
         return iLeftScore * iTopScore;
     },
 
     elementTop: function(eSrc)
     {
+		logger.error(`>>> Entering elementTop(eSrc=${eSrc})`, { "event.action": "elementTop", "logrite.eSrc": eSrc });
+		logger.warn(`<<< Exiting elementTop(eSrc=${eSrc})`, { "event.action": "elementTop", "logrite.eSrc": eSrc });
         return this.elementPos(eSrc).t;
     },
 
     elementPos: function(eSrc)
     {
+		logger.error(`>>> Entering elementPos(eSrc=${eSrc})`, { "event.action": "elementPos", "logrite.eSrc": eSrc });
         var oPos = new Object();
         oPos.t = 0; //relative top
+		logger.error(`elementPos(eSrc=${eSrc}): oPos → ${oPos}`, { "event.action": "elementPos", "logrite.eSrc": eSrc });
+		logger.debug(`elementPos(eSrc=${eSrc}): oPos.t → ${oPos.t}`, { "event.action": "elementPos", "logrite.eSrc": eSrc });
+		logger.debug(`elementPos(eSrc=${eSrc}): oPos.at → ${oPos.at}`, { "event.action": "elementPos", "logrite.eSrc": eSrc });
+		logger.debug(`elementPos(eSrc=${eSrc}): oPos.al → ${oPos.al}`, { "event.action": "elementPos", "logrite.eSrc": eSrc });
         oPos.l = 0; //relative left
+		logger.debug(`elementPos(eSrc=${eSrc}): oPos.l → ${oPos.l}`, { "event.action": "elementPos", "logrite.eSrc": eSrc });
         oPos.at = 0; //actual top
         oPos.al = 0; //actual left
 
@@ -158,6 +185,7 @@ dnn.extend(dnn.dom.positioning, {
                 else
                     style = Sys.UI.DomElement._getCurrentStyle(eParent);
 
+				logger.error(`elementPos(eSrc=${eSrc}): style → ${style}`, { "event.action": "elementPos", "logrite.eSrc": eSrc });
                 if (eParent.id == srcId || style.position != 'relative')
                 {
                     oPos.t += eParent.offsetTop;
@@ -170,11 +198,13 @@ dnn.extend(dnn.dom.positioning, {
                 break;
         }
 
+		logger.warn(`<<< Exiting elementPos(eSrc=${eSrc})`, { "event.action": "elementPos", "logrite.eSrc": eSrc });
         return oPos;
     },
 
     elementWidth: function(eSrc)
     {
+		logger.error(`>>> Entering elementWidth(eSrc=${eSrc})`, { "event.action": "elementWidth", "logrite.eSrc": eSrc });
         if (eSrc.offsetWidth == null || eSrc.offsetWidth == 0)
         {
             if (eSrc.offsetParent == null)
@@ -196,6 +226,7 @@ dnn.extend(dnn.dom.positioning, {
 
     enableDragAndDrop: function(oContainer, oTitle, sDragCompleteEvent, sDragOverEvent)
     {
+		logger.error(`>>> Entering enableDragAndDrop(oContainer=${oContainer},oTitle=${oTitle},sDragCompleteEvent=${sDragCompleteEvent},sDragOverEvent=${sDragOverEvent})`, { "event.action": "enableDragAndDrop", "logrite.oContainer": oContainer, "logrite.oTitle": oTitle, "logrite.sDragCompleteEvent": sDragCompleteEvent, "logrite.sDragOverEvent": sDragOverEvent });
         //dnn.dom.attachEvent(document.body, 'onmousemove', __dnn_bodyMouseMove);
         dnn.dom.addSafeHandler(document.body, 'onmousemove', dnn.dom.positioning, '__dnn_bodyMouseMove');
         //dnn.dom.attachEvent(document.body, 'onmouseup', __dnn_bodyMouseUp);
@@ -211,17 +242,22 @@ dnn.extend(dnn.dom.positioning, {
         if (oContainer.id.length == 0)
             oContainer.id = oTitle.id + '__dnnCtr';
 
+		logger.debug(`enableDragAndDrop(oContainer=${oContainer},oTitle=${oTitle},sDragCompleteEvent=${sDragCompleteEvent},sDragOverEvent=${sDragOverEvent}): oContainer.id → ${oContainer.id}`, { "event.action": "enableDragAndDrop", "logrite.oContainer": oContainer, "logrite.oTitle": oTitle, "logrite.sDragCompleteEvent": sDragCompleteEvent, "logrite.sDragOverEvent": sDragOverEvent });
         oTitle.contID = oContainer.id;
+		logger.debug(`enableDragAndDrop(oContainer=${oContainer},oTitle=${oTitle},sDragCompleteEvent=${sDragCompleteEvent},sDragOverEvent=${sDragOverEvent}): oTitle.contID → ${oTitle.contID}`, { "event.action": "enableDragAndDrop", "logrite.oContainer": oContainer, "logrite.oTitle": oTitle, "logrite.sDragCompleteEvent": sDragCompleteEvent, "logrite.sDragOverEvent": sDragOverEvent });
         if (sDragCompleteEvent != null)
             oTitle.dragComplete = sDragCompleteEvent;
         if (sDragOverEvent != null)
             oTitle.dragOver = sDragOverEvent;
 
+		logger.warn(`<<< Exiting enableDragAndDrop(oContainer=${oContainer},oTitle=${oTitle},sDragCompleteEvent=${sDragCompleteEvent},sDragOverEvent=${sDragOverEvent})`, { "event.action": "enableDragAndDrop", "logrite.oContainer": oContainer, "logrite.oTitle": oTitle, "logrite.sDragCompleteEvent": sDragCompleteEvent, "logrite.sDragOverEvent": sDragOverEvent });
+		logger.debug(`enableDragAndDrop(oContainer=${oContainer},oTitle=${oTitle},sDragCompleteEvent=${sDragCompleteEvent},sDragOverEvent=${sDragOverEvent}): oTitle.dragOver → ${oTitle.dragOver}`, { "event.action": "enableDragAndDrop", "logrite.oContainer": oContainer, "logrite.oTitle": oTitle, "logrite.sDragCompleteEvent": sDragCompleteEvent, "logrite.sDragOverEvent": sDragOverEvent });
         return true;
     },
 
     placeOnTop: function(oCont, bShow, sSrc)
     {
+		logger.error(`>>> Entering placeOnTop(oCont=${oCont},bShow=${bShow},sSrc=${sSrc})`, { "event.action": "placeOnTop", "logrite.oCont": oCont, "logrite.bShow": bShow, "logrite.sSrc": sSrc });
         if (dnn.dom.browser.isType(dnn.dom.browser.Opera, dnn.dom.browser.Mozilla, dnn.dom.browser.Netscape, dnn.dom.browser.Safari) ||
 	        (dnn.dom.browser.isType(dnn.dom.browser.InternetExplorer) && dnn.dom.browser.version >= 7))
             return; //not needed
@@ -231,10 +267,14 @@ dnn.extend(dnn.dom.positioning, {
         if (oIFR == null)
         {
             var oIFR = document.createElement('iframe');
+			logger.debug(`placeOnTop(oCont=${oCont},bShow=${bShow},sSrc=${sSrc}): oIFR.src → ${oIFR.src}`, { "event.action": "placeOnTop", "logrite.oCont": oCont, "logrite.bShow": bShow, "logrite.sSrc": sSrc });
+			logger.debug(`placeOnTop(oCont=${oCont},bShow=${bShow},sSrc=${sSrc}): oIFR.scrolling → ${oIFR.scrolling}`, { "event.action": "placeOnTop", "logrite.oCont": oCont, "logrite.bShow": bShow, "logrite.sSrc": sSrc });
             oIFR.id = 'ifr' + oCont.id;
+			logger.debug(`placeOnTop(oCont=${oCont},bShow=${bShow},sSrc=${sSrc}): oIFR.id → ${oIFR.id}`, { "event.action": "placeOnTop", "logrite.oCont": oCont, "logrite.bShow": bShow, "logrite.sSrc": sSrc });
             if (sSrc != null)
                 oIFR.src = sSrc;
             oIFR.style.top = '0px';
+			logger.debug(`placeOnTop(oCont=${oCont},bShow=${bShow},sSrc=${sSrc}): oIFR.frameBorder → ${oIFR.frameBorder}`, { "event.action": "placeOnTop", "logrite.oCont": oCont, "logrite.bShow": bShow, "logrite.sSrc": sSrc });
             oIFR.style.left = '0px';
             oIFR.style.filter = "progid:DXImageTransform.Microsoft.Alpha(opacity=0)";
             oIFR.scrolling = 'no';
@@ -274,9 +314,12 @@ dnn.extend(dnn.dom.positioning, {
         }
         dnn.dom.positioning.dragCtr = oCtl; //assumption is we can only drag one thing at a time
         oCtl.startTop = null;
+		logger.debug(`__dnn_containerMouseDown(oCtl=${oCtl}): oCtl.startTop → ${oCtl.startTop}`, { "event.action": "__dnn_containerMouseDown", "logrite.oCtl": oCtl });
         oCtl.startLeft = null;
+		logger.debug(`__dnn_containerMouseDown(oCtl=${oCtl}): oCtl.startLeft → ${oCtl.startLeft}`, { "event.action": "__dnn_containerMouseDown", "logrite.oCtl": oCtl });
 
         var oCont = dnn.dom.getById(oCtl.contID);
+		logger.error(`__dnn_containerMouseDown(oCtl=${oCtl}): oCont → ${oCont}`, { "event.action": "__dnn_containerMouseDown", "logrite.oCtl": oCtl });
         if (oCont.style.position == null || oCont.style.position.length == 0)
             oCont.style.position = 'relative';
 
@@ -299,14 +342,17 @@ dnn.extend(dnn.dom.positioning, {
 
     __dnn_containerMouseDownDelay: function(e)
     {
+		logger.error(`>>> Entering __dnn_containerMouseDownDelay(e=${e})`, { "event.action": "__dnn_containerMouseDownDelay", "logrite.e": e });
         var oTitle = e.srcElement;
         if (oTitle == null)
             oTitle = e.target;
         dnn.doDelay('__dnn_dragdrop', 500, this.__dnn_containerMouseDown, oTitle);
+		logger.warn(`<<< Exiting __dnn_containerMouseDownDelay(e=${e})`, { "event.action": "__dnn_containerMouseDownDelay", "logrite.e": e });
     },
 
     __dnn_bodyMouseUp: function()
     {
+		logger.error('>>> Entering __dnn_bodyMouseUp()', { "event.action": "__dnn_bodyMouseUp" });
         dnn.cancelDelay('__dnn_dragdrop');
         var oCtl = dnn.dom.positioning.dragCtr;
         if (oCtl != null && oCtl.dragComplete != null)
@@ -314,6 +360,7 @@ dnn.extend(dnn.dom.positioning, {
             eval(oCtl.dragComplete);
 
             var oCont = dnn.dom.getById(oCtl.contID);
+			logger.error(`__dnn_bodyMouseUp(): oCont → ${oCont}`, { "event.action": "__dnn_bodyMouseUp" });
 
             oCont.style.backgroundColor = oCont.getAttribute('_b');
             oCont.style.zIndex = oCont.getAttribute('_z');
@@ -327,10 +374,12 @@ dnn.extend(dnn.dom.positioning, {
         }
 
         dnn.dom.positioning.dragCtr = null;
+		logger.warn('<<< Exiting __dnn_bodyMouseUp()', { "event.action": "__dnn_bodyMouseUp" });
     },
 
     __dnn_bodyMouseMove: function(e)
     {
+		logger.error(`>>> Entering __dnn_bodyMouseMove(e=${e})`, { "event.action": "__dnn_bodyMouseMove", "logrite.e": e });
         if (this.dragCtr != null)
             this.dragContainer(this.dragCtr, e);
     }

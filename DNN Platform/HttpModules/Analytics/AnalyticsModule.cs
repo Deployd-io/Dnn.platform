@@ -38,7 +38,10 @@ namespace DotNetNuke.HttpModules.Analytics
         /// <param name="appStatus">The application status.</param>
         public AnalyticsModule(IEventLogger eventLogger, IApplicationStatusInfo appStatus)
         {
+			Logger.LogError(">>> Entering AnalyticsModule(eventLogger={EventLogger},appStatus={AppStatus})", eventLogger, appStatus);
+			Logger.LogDebug("AnalyticsModule(eventLogger={EventLogger},appStatus={AppStatus}): appStatus → {AppStatus1}", eventLogger, appStatus, appStatus);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			Logger.LogWarning("<<< Exiting AnalyticsModule(eventLogger={EventLogger},appStatus={AppStatus})", eventLogger, appStatus);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
         }
 
@@ -50,16 +53,21 @@ namespace DotNetNuke.HttpModules.Analytics
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void Init(HttpApplication application)
         {
+			Logger.LogError(">>> Entering Init(application={Application})", application);
             application.PreRequestHandlerExecute += this.OnPreRequestHandlerExecute;
+			Logger.LogWarning("<<< Exiting Init(application={Application})", application);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+		Logger.LogError(">>> Entering Dispose()");
+        Logger.LogWarning("<<< Exiting Dispose()");
         }
 
         private void OnPreRequestHandlerExecute(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRequestHandlerExecute(sender={Sender},e={E})", sender, e);
             try
             {
                 // First check if we are upgrading/installing or if it is a non-page request
@@ -99,23 +107,30 @@ namespace DotNetNuke.HttpModules.Analytics
                 this.eventLogger.AddLog(log);
                 Logger.Error(log);
             }
+			Logger.LogWarning("<<< Exiting OnPreRequestHandlerExecute(sender={Sender},e={E})", sender, e);
         }
 
         private void OnPageInitComplete(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPageInitComplete(sender={Sender},e={E})", sender, e);
             this.InitializeAnalyticsControls(sender as Page, true);
+			Logger.LogWarning("<<< Exiting OnPageInitComplete(sender={Sender},e={E})", sender, e);
         }
 
         private void OnPagePreRender(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPagePreRender(sender={Sender},e={E})", sender, e);
             this.InitializeAnalyticsControls(sender as Page, false);
+			Logger.LogWarning("<<< Exiting OnPagePreRender(sender={Sender},e={E})", sender, e);
         }
 
         private void InitializeAnalyticsControls(Page page, bool injectTop)
         {
+			Logger.LogError(">>> Entering InitializeAnalyticsControls(page={Page},injectTop={InjectTop})", page, injectTop);
             try
             {
                 var analyticsEngines = AnalyticsEngineConfiguration.GetConfig(this.appStatus, this.eventLogger).AnalyticsEngines;
+				Logger.LogError("InitializeAnalyticsControls(page={Page},injectTop={InjectTop}): analyticsEngines → {AnalyticsEngines}", page, injectTop, analyticsEngines);
                 if (analyticsEngines == null || analyticsEngines.Count == 0)
                 {
                     return;
@@ -137,13 +152,16 @@ namespace DotNetNuke.HttpModules.Analytics
                     if (!string.IsNullOrEmpty(engine.EngineType))
                     {
                         var engineType = Type.GetType(engine.EngineType);
+						Logger.LogError("InitializeAnalyticsControls(page={Page},injectTop={InjectTop}): engineType → {EngineType}", page, injectTop, engineType);
                         if (engineType == null)
                         {
                             objEngine = new GenericAnalyticsEngine();
+							Logger.LogError("InitializeAnalyticsControls(page={Page},injectTop={InjectTop}): objEngine → {ObjEngine}", page, injectTop, objEngine);
                         }
                         else
                         {
                             objEngine = (AnalyticsEngineBase)Activator.CreateInstance(engineType);
+							Logger.LogDebug("InitializeAnalyticsControls(page={Page},injectTop={InjectTop}): objEngine → {ObjEngine}", page, injectTop, objEngine);
                         }
                     }
                     else
@@ -157,6 +175,7 @@ namespace DotNetNuke.HttpModules.Analytics
                     }
 
                     var script = engine.ScriptTemplate;
+					Logger.LogError("InitializeAnalyticsControls(page={Page},injectTop={InjectTop}): script → {Script}", page, injectTop, script);
                     if (string.IsNullOrEmpty(script))
                     {
                         continue;
@@ -169,6 +188,7 @@ namespace DotNetNuke.HttpModules.Analytics
                     }
 
                     var element = (HtmlContainerControl)page.FindControl(engine.ElementId);
+					Logger.LogError("InitializeAnalyticsControls(page={Page},injectTop={InjectTop}): element → {Element}", page, injectTop, element);
                     if (element == null)
                     {
                         continue;
@@ -188,11 +208,13 @@ namespace DotNetNuke.HttpModules.Analytics
             catch (Exception ex)
             {
                 var log = new LogInfo { LogTypeKey = nameof(EventLogType.HOST_ALERT) };
+				Logger.LogError("InitializeAnalyticsControls(page={Page},injectTop={InjectTop}): log → {Log}", page, injectTop, log);
                 log.AddProperty("Analytics.AnalyticsModule", "OnPagePreRender");
                 log.AddProperty("ExceptionMessage", ex.Message);
                 this.eventLogger.AddLog(log);
                 Logger.Error(ex);
             }
+			Logger.LogWarning("<<< Exiting InitializeAnalyticsControls(page={Page},injectTop={InjectTop})", page, injectTop);
         }
     }
 }

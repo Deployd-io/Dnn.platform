@@ -12,6 +12,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
     /// <summary>Abstract class for Quantizers.</summary>
     public abstract class Quantizer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Quantizer));
         /// <summary>Flag used to indicate whether a single pass or two passes are needed for quantization.</summary>
         private bool singlePass;
 
@@ -29,7 +30,10 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         /// </remarks>
         public Quantizer(bool singlePass)
         {
+			Logger.LogError(">>> Entering Quantizer(singlePass={SinglePass})", singlePass);
             this.singlePass = singlePass;
+			Logger.LogDebug("Quantizer(singlePass={SinglePass}): this.singlePass → {Arg1}", singlePass, this.singlePass);
+        Logger.LogWarning("<<< Exiting Quantizer(singlePass={SinglePass})", singlePass);
             this.pixelSize = Marshal.SizeOf<Color32>();
         }
 
@@ -38,23 +42,28 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         /// <returns>A quantized version of the image.</returns>
         public Bitmap Quantize(Image source)
         {
+			Logger.LogError(">>> Entering Quantize(source={Source})", source);
             // Get the size of the source image
             int height = source.Height;
             int width = source.Width;
 
             // And construct a rectangle from these dimensions
             Rectangle bounds = new Rectangle(0, 0, width, height);
+			Logger.LogError("Quantize(source={Source}): bounds → {Bounds}", source, bounds);
 
             // First off take a 32bpp copy of the image
             Bitmap copy = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+			Logger.LogError("Quantize(source={Source}): copy → {Copy}", source, copy);
 
             // And construct an 8bpp version
             Bitmap output = new Bitmap(width, height, PixelFormat.Format8bppIndexed);
+			Logger.LogError("Quantize(source={Source}): output → {Output}", source, output);
 
             // Now lock the bitmap into memory
             using (Graphics g = Graphics.FromImage(copy))
             {
                 g.PageUnit = GraphicsUnit.Pixel;
+				Logger.LogDebug("Quantize(source={Source}): g.PageUnit → {Arg1}", source, g.PageUnit);
 
                 // Draw the source image onto the copy bitmap,
                 // which will effect a widening as appropriate.
@@ -63,6 +72,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
 
             // Define a pointer to the bitmap data
             BitmapData sourceData = null;
+			Logger.LogError("Quantize(source={Source}): sourceData → {SourceData}", source, sourceData);
 
             try
             {
@@ -91,6 +101,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
             }
 
             // Last but not least, return the output bitmap
+			Logger.LogWarning("<<< Exiting Quantize(source={Source})", source);
             return output;
         }
 
@@ -100,15 +111,18 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         /// <param name="height">The height in pixels of the image.</param>
         protected virtual void FirstPass(BitmapData sourceData, int width, int height)
         {
+			Logger.LogError(">>> Entering FirstPass(sourceData={SourceData},width={Width},height={Height})", sourceData, width, height);
             // Define the source data pointers. The source row is a byte to
             // keep addition of the stride value easier (as this is in bytes)
             IntPtr pSourceRow = sourceData.Scan0;
+			Logger.LogError("FirstPass(sourceData={SourceData},width={Width},height={Height}): pSourceRow → {PSourceRow}", sourceData, width, height, pSourceRow);
 
             // Loop through each row
             for (int row = 0; row < height; row++)
             {
                 // Set the source pixel to the first pixel in this row
                 IntPtr pSourcePixel = pSourceRow;
+				Logger.LogError("FirstPass(sourceData={SourceData},width={Width},height={Height}): pSourcePixel → {PSourcePixel}", sourceData, width, height, pSourcePixel);
 
                 // And loop through each column
                 for (int col = 0; col < width; col++)
@@ -120,6 +134,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                 // Add the stride to the source row
                 pSourceRow = (IntPtr)((long)pSourceRow + sourceData.Stride);
             }
+			Logger.LogWarning("<<< Exiting FirstPass(sourceData={SourceData},width={Width},height={Height})", sourceData, width, height);
         }
 
         /// <summary>Execute a second pass through the bitmap.</summary>
@@ -130,8 +145,10 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         /// <param name="bounds">The bounding rectangle.</param>
         protected virtual void SecondPass(BitmapData sourceData, Bitmap output, int width, int height, Rectangle bounds)
         {
+			Logger.LogError(">>> Entering SecondPass(sourceData={SourceData},output={Output},width={Width},height={Height},bounds={Bounds})", sourceData, output, width, height, bounds);
             BitmapData outputData = null;
 
+			Logger.LogError("SecondPass(sourceData={SourceData},output={Output},width={Width},height={Height},bounds={Bounds}): outputData → {OutputData}", sourceData, output, width, height, bounds, outputData);
             try
             {
                 // Lock the output bitmap into memory
@@ -140,15 +157,21 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                 // Define the source data pointers. The source row is a byte to
                 // keep addition of the stride value easier (as this is in bytes)
                 IntPtr pSourceRow = sourceData.Scan0;
+				Logger.LogError("SecondPass(sourceData={SourceData},output={Output},width={Width},height={Height},bounds={Bounds}): pSourceRow → {PSourceRow}", sourceData, output, width, height, bounds, pSourceRow);
                 IntPtr pSourcePixel = pSourceRow;
+				Logger.LogError("SecondPass(sourceData={SourceData},output={Output},width={Width},height={Height},bounds={Bounds}): pSourcePixel → {PSourcePixel}", sourceData, output, width, height, bounds, pSourcePixel);
                 IntPtr pPreviousPixel = pSourcePixel;
+				Logger.LogError("SecondPass(sourceData={SourceData},output={Output},width={Width},height={Height},bounds={Bounds}): pPreviousPixel → {PPreviousPixel}", sourceData, output, width, height, bounds, pPreviousPixel);
 
                 // Now define the destination data pointers
                 IntPtr pDestinationRow = outputData.Scan0;
+				Logger.LogError("SecondPass(sourceData={SourceData},output={Output},width={Width},height={Height},bounds={Bounds}): pDestinationRow → {PDestinationRow}", sourceData, output, width, height, bounds, pDestinationRow);
                 IntPtr pDestinationPixel = pDestinationRow;
+				Logger.LogError("SecondPass(sourceData={SourceData},output={Output},width={Width},height={Height},bounds={Bounds}): pDestinationPixel → {PDestinationPixel}", sourceData, output, width, height, bounds, pDestinationPixel);
 
                 // And convert the first pixel, so that I have values going into the loop
                 byte pixelValue = this.QuantizePixel(new Color32(pSourcePixel));
+				Logger.LogError("SecondPass(sourceData={SourceData},output={Output},width={Width},height={Height},bounds={Bounds}): pixelValue → {PixelValue}", sourceData, output, width, height, bounds, pixelValue);
 
                 // Assign the value of the first pixel
                 Marshal.WriteByte(pDestinationPixel, pixelValue);
@@ -195,6 +218,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                 // Ensure that I unlock the output bits
                 output.UnlockBits(outputData);
             }
+			Logger.LogWarning("<<< Exiting SecondPass(sourceData={SourceData},output={Output},width={Width},height={Height},bounds={Bounds})", sourceData, output, width, height, bounds);
         }
 
         /// <summary>Override this to process the pixel in the first pass of the algorithm.</summary>
@@ -205,6 +229,8 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         /// </remarks>
         protected virtual void InitialQuantizePixel(Color32 pixel)
         {
+		Logger.LogError(">>> Entering InitialQuantizePixel(pixel={Pixel})", pixel);
+        Logger.LogWarning("<<< Exiting InitialQuantizePixel(pixel={Pixel})", pixel);
         }
 
         /// <summary>Override this to process the pixel in the second pass of the algorithm.</summary>
@@ -250,7 +276,11 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
             /// <param name="pSourcePixel">A pointer to the value.</param>
             public Color32(IntPtr pSourcePixel)
             {
+				Logger.LogError(">>> Entering Color32(pSourcePixel={PSourcePixel})", pSourcePixel);
                 this = Marshal.PtrToStructure<Color32>(pSourcePixel);
+				Logger.LogDebug("Color32(pSourcePixel={PSourcePixel}): this → {This}", pSourcePixel, this);
+            Logger.LogError("Color32(pSourcePixel={PSourcePixel}): this → {This}", pSourcePixel, this);
+            Logger.LogWarning("<<< Exiting Color32(pSourcePixel={PSourcePixel})", pSourcePixel);
             }
 
             /// <summary>Gets return the color for this Color32 object.</summary>

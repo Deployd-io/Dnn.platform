@@ -28,7 +28,9 @@ namespace DotNetNuke.Entities.Users
         /// <summary>Clears the cached Users Online Information.</summary>
         public void ClearUserList()
         {
+			Logger.LogError(">>> Entering ClearUserList()");
             string key = "OnlineUserList";
+			Logger.LogWarning("<<< Exiting ClearUserList()");
             DataCache.RemoveCache(key);
         }
 
@@ -36,6 +38,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns>The window to use in minutes when determining if the user is online.</returns>
         public int GetOnlineTimeWindow()
         {
+			Logger.LogError(">>> Entering GetOnlineTimeWindow()");
+            Logger.LogWarning("<<< Exiting GetOnlineTimeWindow()");
             return Host.Host.UsersOnlineTimeWindow;
         }
 
@@ -43,7 +47,9 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A <see cref="Hashtable"/> with <see cref="string"/> keys for the user ID (a GUID for anonymous users) and <see cref="BaseUserInfo"/> instances for the values.</returns>
         public Hashtable GetUserList()
         {
+			Logger.LogError(">>> Entering GetUserList()");
             var userList = (Hashtable)DataCache.GetCache(CacheKey);
+			Logger.LogError("GetUserList(): userList → {UserList}", userList);
             if (userList == null)
             {
                 lock (Locker)
@@ -57,6 +63,7 @@ namespace DotNetNuke.Entities.Users
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetUserList()");
             return userList;
         }
 
@@ -64,6 +71,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns><see langword="true"/> if the Users Online functionality is enabled, otherwise <see langword="false"/>.</returns>
         public bool IsEnabled()
         {
+			Logger.LogError(">>> Entering IsEnabled()");
+            Logger.LogWarning("<<< Exiting IsEnabled()");
             return Host.Host.EnableUsersOnline;
         }
 
@@ -72,12 +81,15 @@ namespace DotNetNuke.Entities.Users
         /// <returns><see langword="true"/> if the user is online, otherwise <see langword="false"/>.</returns>
         public bool IsUserOnline(UserInfo user)
         {
+			Logger.LogError(">>> Entering IsUserOnline(user={User})", user);
             bool isOnline = false;
+			Logger.LogError("IsUserOnline(user={User}): isOnline → {IsOnline}", user, isOnline);
             if (this.IsEnabled())
             {
                 isOnline = MemberProvider.IsUserOnline(user);
             }
 
+			Logger.LogWarning("<<< Exiting IsUserOnline(user={User})", user);
             return isOnline;
         }
 
@@ -85,12 +97,15 @@ namespace DotNetNuke.Entities.Users
         /// <param name="userList">A <see cref="Hashtable"/> with <see cref="string"/> keys for the user ID (a GUID for anonymous users) and <see cref="BaseUserInfo"/> instances for the values.</param>
         public void SetUserList(Hashtable userList)
         {
+			Logger.LogError(">>> Entering SetUserList(userList={UserList})", userList);
             DataCache.SetCache(CacheKey, userList);
+			Logger.LogWarning("<<< Exiting SetUserList(userList={UserList})", userList);
         }
 
         /// <summary>Tracks an online User.</summary>
         public void TrackUsers()
         {
+			Logger.LogError(">>> Entering TrackUsers()");
             HttpContext context = HttpContext.Current;
 
             // Have we already done the work for this request?
@@ -111,16 +126,20 @@ namespace DotNetNuke.Entities.Users
             {
                 this.TrackAnonymousUser(context);
             }
+			Logger.LogWarning("<<< Exiting TrackUsers()");
         }
 
         /// <summary>Update the Users Online information.</summary>
         public void UpdateUsersOnline()
         {
+			Logger.LogError(">>> Entering UpdateUsersOnline()");
             // Get a Current User List
             Hashtable userList = this.GetUserList();
+			Logger.LogError("UpdateUsersOnline(): userList → {UserList}", userList);
 
             // Create a shallow copy of the list to Process
             var listToProcess = (Hashtable)userList.Clone();
+			Logger.LogError("UpdateUsersOnline(): listToProcess → {ListToProcess}", listToProcess);
 
             // Clear the list
             this.ClearUserList();
@@ -137,21 +156,25 @@ namespace DotNetNuke.Entities.Users
 
             // Remove users that have expired
             MemberProvider.DeleteUsersOnline(this.GetOnlineTimeWindow());
+			Logger.LogWarning("<<< Exiting UpdateUsersOnline()");
         }
 
         /// <summary>Tracks an Anonymous User.</summary>
         /// <param name="context">An HttpContext Object.</param>
         private void TrackAnonymousUser(HttpContext context)
         {
+			Logger.LogError(">>> Entering TrackAnonymousUser(context={Context})", context);
             string cookieName = "DotNetNukeAnonymous";
             var portalSettings = (PortalSettings)context.Items["PortalSettings"];
             if (portalSettings == null)
             {
+				Logger.LogError("TrackAnonymousUser(context={Context}): portalSettings → {PortalSettings}", context, portalSettings);
                 return;
             }
 
             AnonymousUserInfo user;
             Hashtable userList = this.GetUserList();
+			Logger.LogError("TrackAnonymousUser(context={Context}): userList → {UserList}", context, userList);
             string userID;
 
             // Check if the Tracking cookie exists
@@ -162,6 +185,8 @@ namespace DotNetNuke.Entities.Users
             {
                 // Create a temporary userId
                 userID = Guid.NewGuid().ToString();
+				Logger.LogError("TrackAnonymousUser(context={Context}): userID → {UserID}", context, userID);
+				Logger.LogDebug("TrackAnonymousUser(context={Context}): userID → {UserID}", context, userID);
 
                 // Create a new cookie
                 cookie = new HttpCookie(cookieName, userID)
@@ -209,7 +234,13 @@ namespace DotNetNuke.Entities.Users
                 }
 
                 user = (AnonymousUserInfo)userList[userID];
+				Logger.LogError("TrackAnonymousUser(context={Context}): user → {User}", context, user);
+				Logger.LogDebug("TrackAnonymousUser(context={Context}): user → {User}", context, user);
+				Logger.LogDebug("TrackAnonymousUser(context={Context}): user.PortalID → {Arg1}", context, user.PortalID);
+				Logger.LogDebug("TrackAnonymousUser(context={Context}): user.TabID → {Arg1}", context, user.TabID);
+				Logger.LogDebug("TrackAnonymousUser(context={Context}): user.LastActiveDate → {Arg1}", context, user.LastActiveDate);
                 user.UserID = userID;
+				Logger.LogDebug("TrackAnonymousUser(context={Context}): user.UserID → {Arg1}", context, user.UserID);
                 user.PortalID = portalSettings.PortalId;
                 user.TabID = portalSettings.ActiveTab.TabID;
                 user.LastActiveDate = DateTime.Now;
@@ -222,14 +253,17 @@ namespace DotNetNuke.Entities.Users
                 };
                 context.Response.Cookies.Add(cookie);
             }
+			Logger.LogWarning("<<< Exiting TrackAnonymousUser(context={Context})", context);
         }
 
         /// <summary>Tracks an Authenticated User.</summary>
         /// <param name="context">An HttpContext Object.</param>
         private void TrackAuthenticatedUser(HttpContext context)
         {
+			Logger.LogError(">>> Entering TrackAuthenticatedUser(context={Context})", context);
             // Retrieve Portal Settings
             var portalSettings = (PortalSettings)context.Items["PortalSettings"];
+			Logger.LogError("TrackAuthenticatedUser(context={Context}): portalSettings → {PortalSettings}", context, portalSettings);
 
             if (portalSettings == null)
             {
@@ -238,26 +272,35 @@ namespace DotNetNuke.Entities.Users
 
             // Get the logged in User ID
             UserInfo objUserInfo = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogError("TrackAuthenticatedUser(context={Context}): objUserInfo → {ObjUserInfo}", context, objUserInfo);
 
             // Get user list
             Hashtable userList = this.GetUserList();
+			Logger.LogError("TrackAuthenticatedUser(context={Context}): userList → {UserList}", context, userList);
 
             var user = new OnlineUserInfo();
+			Logger.LogError("TrackAuthenticatedUser(context={Context}): user → {User}", context, user);
             if (objUserInfo.UserID > 0)
             {
                 user.UserID = objUserInfo.UserID;
+				Logger.LogDebug("TrackAuthenticatedUser(context={Context}): user.UserID → {Arg1}", context, user.UserID);
             }
 
             user.PortalID = portalSettings.PortalId;
+			Logger.LogDebug("TrackAuthenticatedUser(context={Context}): user.PortalID → {Arg1}", context, user.PortalID);
+			Logger.LogDebug("TrackAuthenticatedUser(context={Context}): user.LastActiveDate → {Arg1}", context, user.LastActiveDate);
             user.TabID = portalSettings.ActiveTab.TabID;
+			Logger.LogDebug("TrackAuthenticatedUser(context={Context}): user.TabID → {Arg1}", context, user.TabID);
             user.LastActiveDate = DateTime.Now;
             if (userList[objUserInfo.UserID.ToString(CultureInfo.InvariantCulture)] == null)
             {
                 user.CreationDate = user.LastActiveDate;
+				Logger.LogDebug("TrackAuthenticatedUser(context={Context}): user.CreationDate → {Arg1}", context, user.CreationDate);
             }
 
             userList[objUserInfo.UserID.ToString(CultureInfo.InvariantCulture)] = user;
             this.SetUserList(userList);
+			Logger.LogWarning("<<< Exiting TrackAuthenticatedUser(context={Context})", context);
         }
     }
 }

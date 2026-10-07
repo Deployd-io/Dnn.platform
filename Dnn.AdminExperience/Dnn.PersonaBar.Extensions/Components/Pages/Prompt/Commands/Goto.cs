@@ -39,6 +39,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.PageId = this.GetFlagValue(FlagId, "Page Id", -1, false, true);
             this.ParentId = this.GetFlagValue(FlagParentId, "Parent Id", -1);
             this.PageName = this.GetFlagValue(FlagName, "Page Name", string.Empty);
@@ -47,11 +48,13 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
             {
                 this.AddMessage(this.LocalizeString("Prompt_ParameterRequired"));
             }
+			eventLogger.LogWarning("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             var tab = this.PageId > 0
                 ? TabController.Instance.GetTab(this.PageId, this.PortalId)
                 : (this.ParentId > 0
@@ -68,6 +71,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
                 return new ConsoleErrorResultModel(this.LocalizeString("MethodPermissionDenied"));
             }
 
+			eventLogger.LogWarning("<<< Exiting Run()");
             return new ConsoleResultModel(tab.FullUrl) { MustReload = true };
         }
     }

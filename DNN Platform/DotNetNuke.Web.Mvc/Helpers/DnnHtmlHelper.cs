@@ -20,6 +20,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
     public class DnnHtmlHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnHtmlHelper));
         private readonly IServicesFramework servicesFramework;
 
         /// <summary>Initializes a new instance of the <see cref="DnnHtmlHelper"/> class.</summary>
@@ -38,6 +39,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public DnnHtmlHelper(ViewContext viewContext, IViewDataContainer viewDataContainer, IServicesFramework servicesFramework)
             : this(viewContext, viewDataContainer, RouteTable.Routes, servicesFramework)
         {
+		Logger.LogError(">>> Entering DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},servicesFramework={ServicesFramework})", viewContext, viewDataContainer, servicesFramework);
+        Logger.LogWarning("<<< Exiting DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},servicesFramework={ServicesFramework})", viewContext, viewDataContainer, servicesFramework);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnHtmlHelper"/> class.</summary>
@@ -48,6 +51,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public DnnHtmlHelper(ViewContext viewContext, IViewDataContainer viewDataContainer, RouteCollection routeCollection)
             : this(viewContext, viewDataContainer, routeCollection, null)
         {
+		Logger.LogError(">>> Entering DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},routeCollection={RouteCollection})", viewContext, viewDataContainer, routeCollection);
+        Logger.LogWarning("<<< Exiting DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},routeCollection={RouteCollection})", viewContext, viewDataContainer, routeCollection);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnHtmlHelper"/> class.</summary>
@@ -58,6 +63,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public DnnHtmlHelper(ViewContext viewContext, IViewDataContainer viewDataContainer, RouteCollection routeCollection, IServicesFramework servicesFramework)
             : this(new HtmlHelper(viewContext, viewDataContainer, routeCollection), servicesFramework)
         {
+		Logger.LogError(">>> Entering DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},routeCollection={RouteCollection},servicesFramework={ServicesFramework})", viewContext, viewDataContainer, routeCollection, servicesFramework);
+        Logger.LogWarning("<<< Exiting DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},routeCollection={RouteCollection},servicesFramework={ServicesFramework})", viewContext, viewDataContainer, routeCollection, servicesFramework);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnHtmlHelper"/> class.</summary>
@@ -75,11 +82,14 @@ namespace DotNetNuke.Web.Mvc.Helpers
         {
             this.servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
             this.HtmlHelper = htmlHelper;
+			Logger.LogDebug("DnnHtmlHelper(htmlHelper={HtmlHelper},servicesFramework={ServicesFramework}): this.HtmlHelper → {Arg2}", htmlHelper, servicesFramework, this.HtmlHelper);
+			Logger.LogDebug("DnnHtmlHelper(htmlHelper={HtmlHelper},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", htmlHelper, servicesFramework, servicesFramework);
 
             var controller = htmlHelper.ViewContext.Controller as IDnnController;
 
             if (controller == null)
             {
+				Logger.LogError("Throwing InvalidOperationException from DnnHtmlHelper(htmlHelper={HtmlHelper},servicesFramework={ServicesFramework})", htmlHelper, servicesFramework);
                 throw new InvalidOperationException("The DnnHtmlHelper class can only be used in Views that inherit from DnnWebViewPage");
             }
 
@@ -102,7 +112,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
         public MvcHtmlString AntiForgeryToken()
         {
+			Logger.LogError(">>> Entering AntiForgeryToken()");
             this.servicesFramework.RequestAjaxAntiForgerySupport();
+			Logger.LogWarning("<<< Exiting AntiForgeryToken()");
             return new MvcHtmlString(string.Empty);
         }
 

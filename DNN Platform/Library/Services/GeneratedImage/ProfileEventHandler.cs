@@ -19,12 +19,14 @@ namespace DotNetNuke.Services.GeneratedImage
     [SuppressMessage("Microsoft.Design", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "Breaking change")]
     public class ProfileEventHandler : IProfileEventHandlers
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ProfileEventHandler));
         /// <summary>This method add the updated user id into cache to clear image from disk before returning to UI.</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="profileArgs">The event arguments.</param>
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void ProfileUpdated(object sender, ProfileEventArgs profileArgs)
         {
+			Logger.LogError(">>> Entering ProfileUpdated(sender={Sender},profileArgs={ProfileArgs})", sender, profileArgs);
             if (profileArgs?.User == null || profileArgs.OldProfile == null)
             {
                 return;
@@ -35,14 +37,19 @@ namespace DotNetNuke.Services.GeneratedImage
             var newProfile = user.Profile;
             var oldProfile = profileArgs.OldProfile;
             var newPhotoVisibilityMode = newProfile.GetProperty(Entities.Users.UserProfile.USERPROFILE_Photo)?.ProfileVisibility.VisibilityMode;
+			Logger.LogError("ProfileUpdated(sender={Sender},profileArgs={ProfileArgs}): newPhotoVisibilityMode → {NewPhotoVisibilityMode}", sender, profileArgs, newPhotoVisibilityMode);
             var oldPhotoVisibilityMode = oldProfile.GetProperty(Entities.Users.UserProfile.USERPROFILE_Photo)?.ProfileVisibility.VisibilityMode;
+			Logger.LogError("ProfileUpdated(sender={Sender},profileArgs={ProfileArgs}): oldPhotoVisibilityMode → {OldPhotoVisibilityMode}", sender, profileArgs, oldPhotoVisibilityMode);
             if (newProfile.Photo != oldProfile.Photo || newPhotoVisibilityMode != oldPhotoVisibilityMode)
             {
                 var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.UserIdListToClearDiskImageCacheKey, user.PortalID);
+				Logger.LogError("ProfileUpdated(sender={Sender},profileArgs={ProfileArgs}): cacheKey → {CacheKey}", sender, profileArgs, cacheKey);
                 Dictionary<int, DateTime> userIds;
                 if ((userIds = DataCache.GetCache<Dictionary<int, DateTime>>(cacheKey)) == null)
                 {
                     userIds = new Dictionary<int, DateTime>();
+					Logger.LogError("ProfileUpdated(sender={Sender},profileArgs={ProfileArgs}): userIds → {UserIds}", sender, profileArgs, userIds);
+					Logger.LogDebug("ProfileUpdated(sender={Sender},profileArgs={ProfileArgs}): userIds → {UserIds}", sender, profileArgs, userIds);
                 }
 
                 // Add the userid to the clear cache list, if not already in the list.
@@ -51,6 +58,7 @@ namespace DotNetNuke.Services.GeneratedImage
                 userIds.Add(user.UserID, DateTime.UtcNow);
                 DataCache.SetCache(cacheKey, userIds);
             }
+			Logger.LogWarning("<<< Exiting ProfileUpdated(sender={Sender},profileArgs={ProfileArgs})", sender, profileArgs);
         }
     }
 }

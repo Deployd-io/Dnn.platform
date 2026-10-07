@@ -36,7 +36,10 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <param name="eventLogger">The event logger.</param>
         public DnnFormLabel(IApplicationStatusInfo appStatus, IEventLogger eventLogger)
         {
+			eventLogger.LogError(">>> Entering DnnFormLabel(appStatus={AppStatus},eventLogger={EventLogger})", appStatus, eventLogger);
+			eventLogger.LogDebug("DnnFormLabel(appStatus={AppStatus},eventLogger={EventLogger}): eventLogger → {EventLogger1}", appStatus, eventLogger, eventLogger);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			eventLogger.LogWarning("<<< Exiting DnnFormLabel(appStatus={AppStatus},eventLogger={EventLogger})", appStatus, eventLogger);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
         }
 
@@ -58,6 +61,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			eventLogger.LogError(">>> Entering CreateChildControls()");
             string toolTipText = this.LocalizeString(this.ToolTipKey);
             if (string.IsNullOrEmpty(this.CssClass))
             {
@@ -65,6 +69,7 @@ namespace DotNetNuke.Web.UI.WebControls
             }
             else if (!this.CssClass.Contains("dnnLabel"))
             {
+				eventLogger.LogDebug("CreateChildControls(): this.CssClass → {Arg0}", this.CssClass);
                 this.CssClass += " dnnLabel";
             }
 
@@ -72,9 +77,11 @@ namespace DotNetNuke.Web.UI.WebControls
             ////outerPanel.CssClass = "dnnLabel";
             ////Controls.Add(outerPanel);
             var outerLabel = new System.Web.UI.HtmlControls.HtmlGenericControl { TagName = "label", };
+			eventLogger.LogError("CreateChildControls(): outerLabel → {OuterLabel}", outerLabel);
             this.Controls.Add(outerLabel);
 
             var label = new Label { ID = "Label", Text = this.LocalizeString(this.ResourceKey), };
+			eventLogger.LogError("CreateChildControls(): label → {Label}", label);
             if (this.RequiredField)
             {
                 label.CssClass += " dnnFormRequired";
@@ -83,6 +90,7 @@ namespace DotNetNuke.Web.UI.WebControls
             outerLabel.Controls.Add(label);
 
             var link = new LinkButton { ID = "Link", CssClass = "dnnFormHelp", TabIndex = -1, };
+			eventLogger.LogError("CreateChildControls(): link → {Link}", link);
             link.Attributes.Add("aria-label", "Help");
             this.Controls.Add(link);
 
@@ -90,15 +98,19 @@ namespace DotNetNuke.Web.UI.WebControls
             {
                 ////CssClass += "dnnLabel";
                 var tooltipPanel = new Panel { CssClass = "dnnTooltip", };
+				eventLogger.LogError("CreateChildControls(): tooltipPanel → {TooltipPanel}", tooltipPanel);
                 this.Controls.Add(tooltipPanel);
 
                 var panel = new Panel { ID = "Help", CssClass = "dnnFormHelpContent dnnClear", };
+				eventLogger.LogError("CreateChildControls(): panel → {Panel}", panel);
                 tooltipPanel.Controls.Add(panel);
 
                 var helpLabel = new Label { ID = "Text", CssClass = "dnnHelpText", Text = this.LocalizeString(this.ToolTipKey), };
+				eventLogger.LogError("CreateChildControls(): helpLabel → {HelpLabel}", helpLabel);
                 panel.Controls.Add(helpLabel);
 
                 var pinLink = new HyperLink { CssClass = "pinHelp", };
+				eventLogger.LogError("CreateChildControls(): pinLink → {PinLink}", pinLink);
                 pinLink.Attributes.Add("href", "#");
                 pinLink.Attributes.Add("aria-label", "Pin");
                 panel.Controls.Add(pinLink);
@@ -108,6 +120,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
                 ////ClientResourceManager.RegisterScript(this.Page, "~/Resources/Shared/Scripts/initTooltips.js");
             }
+			eventLogger.LogWarning("<<< Exiting CreateChildControls()");
         }
 
         /// <summary>Gets the localized string corresponding to the <paramref name="key"/>.</summary>
@@ -115,6 +128,8 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <returns>The localized text.</returns>
         protected string LocalizeString(string key)
         {
+			eventLogger.LogError(">>> Entering LocalizeString(key={Key})", key);
+            eventLogger.LogWarning("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, this.LocalResourceFile);
         }
     }

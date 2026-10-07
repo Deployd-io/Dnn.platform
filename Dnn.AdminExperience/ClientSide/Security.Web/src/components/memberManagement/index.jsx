@@ -13,6 +13,7 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 const re = /^[1-9][0-9]?[0-9]?[0-9]?$/;
 const re2 = /^[1-9][0-9]?[0-9]?[0-9]?$|^0$/;
@@ -20,6 +21,7 @@ const re2 = /^[1-9][0-9]?[0-9]?[0-9]?$|^0$/;
 class MemberManagementPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             memberSettings: undefined,
             error: {
@@ -32,9 +34,11 @@ class MemberManagementPanelBody extends Component {
             },
             triedToSubmit: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
         if (props.memberSettings) {
             this.updateMemberSettings(props.memberSettings);
@@ -43,14 +47,17 @@ class MemberManagementPanelBody extends Component {
         props.dispatch(SecurityActions.getMemberSettings((data) => {
             this.updateMemberSettings(data.Results.Settings);
         }));
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     updateMemberSettings(memberSettings) {
+		logger.error(`>>> Entering updateMemberSettings(memberSettings=${memberSettings})`, { "event.action": "updateMemberSettings", "logrite.memberSettings": memberSettings });
         if (!memberSettings) {
             return;
         }
         let {state} = this;
         let membershipResetLinkValidity = memberSettings["MembershipResetLinkValidity"];
+		logger.error(`updateMemberSettings(memberSettings=${memberSettings}): membershipResetLinkValidity → ${membershipResetLinkValidity}`, { "event.action": "updateMemberSettings", "logrite.memberSettings": memberSettings });
         if (membershipResetLinkValidity === "" || !re.test(membershipResetLinkValidity)) {
             state.error["membershipResetLinkValidity"] = true;
         }
@@ -59,6 +66,7 @@ class MemberManagementPanelBody extends Component {
         }
 
         let adminMembershipResetLinkValidity = memberSettings["AdminMembershipResetLinkValidity"];
+		logger.error(`updateMemberSettings(memberSettings=${memberSettings}): adminMembershipResetLinkValidity → ${adminMembershipResetLinkValidity}`, { "event.action": "updateMemberSettings", "logrite.memberSettings": memberSettings });
         if (adminMembershipResetLinkValidity === "" || !re.test(adminMembershipResetLinkValidity)) {
             state.error["adminMembershipResetLinkValidity"] = true;
         }
@@ -103,22 +111,29 @@ class MemberManagementPanelBody extends Component {
             triedToSubmit: false,
             error: state.error
         });
+		logger.warn(`<<< Exiting updateMemberSettings(memberSettings=${memberSettings})`, { "event.action": "updateMemberSettings", "logrite.memberSettings": memberSettings });
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         this.updateMemberSettings(props.memberSettings);
+		logger.warn(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {state, props} = this;
         let memberSettings = Object.assign({}, state.memberSettings);
+		logger.error(`onSettingChange(key=${key},event=${event}): memberSettings → ${memberSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         memberSettings[key] = typeof (event) === "object" ? event.target.value : event;
 
         this.updateMemberSettings(memberSettings);
         props.dispatch(SecurityActions.memberSettingsClientModified(memberSettings));
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -140,19 +155,23 @@ class MemberManagementPanelBody extends Component {
         }, () => {
             util.utilities.notifyError(resx.get("MemberSettingsError"));
         }));
+		logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         util.utilities.confirm(resx.get("MemberSettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SecurityActions.getMemberSettings((data) => {
                 this.updateMemberSettings(data.Results.Settings);
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
             }));
         });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {state} = this;
         if (state.memberSettings) {
             return (
@@ -383,6 +402,8 @@ MemberManagementPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         memberSettings: state.security.memberSettings,

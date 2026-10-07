@@ -1,12 +1,15 @@
-﻿/// <reference name="MicrosoftAjax.js" />
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+/// <reference name="MicrosoftAjax.js" />
 
 Type.registerNamespace('dnn.controls');
 
 dnn.controls.triStateManager = function (images, toolTips) {
+	logger.error(`>>> Entering triStateManager(images=${images},toolTips=${toolTips})`, { "event.action": "triStateManager", "logrite.images": images, "logrite.toolTips": toolTips });
     var that;
 
     that = {
         initControl: function (hidden) {
+			logger.error(`>>> Entering initControl(hidden=${hidden})`, { "event.action": "initControl", "logrite.hidden": hidden });
             var $hdn = jQuery(hidden);
             if (!$hdn.hasClass('lockedPerm')) {
                 if ($hdn.hasClass('noDenyPerm')) {
@@ -15,6 +18,7 @@ dnn.controls.triStateManager = function (images, toolTips) {
                             hidden.value = 'Null';
                         } else {
                             hidden.value = 'True';
+							logger.debug(`initControl(hidden=${hidden}): hidden.value → ${hidden.value}`, { "event.action": "initControl", "logrite.hidden": hidden });
                         }
 
                         updateState(hidden);
@@ -31,6 +35,7 @@ dnn.controls.triStateManager = function (images, toolTips) {
 
                         updateState(hidden);
                     });
+					logger.warn(`<<< Exiting initControl(hidden=${hidden})`, { "event.action": "initControl", "logrite.hidden": hidden });
                 }
             }
         }
@@ -111,9 +116,12 @@ dnn.controls.triStateManager = function (images, toolTips) {
     }
     
     function updateImage($hdn, state) {
+		logger.error(`>>> Entering updateImage($hdn=${$hdn},state=${state})`, { "event.action": "updateImage", "logrite.$hdn": $hdn, "logrite.state": state });
         var img = $hdn.siblings('img')[0];
         img.src = images[state];
+		logger.error(`updateImage($hdn=${$hdn},state=${state}): img → ${img}`, { "event.action": "updateImage", "logrite.$hdn": $hdn, "logrite.state": state });
         img.alt = toolTips[state];
+		logger.warn(`<<< Exiting updateImage($hdn=${$hdn},state=${state})`, { "event.action": "updateImage", "logrite.$hdn": $hdn, "logrite.state": state });
     }
 
     return that;

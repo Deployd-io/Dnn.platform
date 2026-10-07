@@ -44,12 +44,17 @@ namespace DotNetNuke.HttpModules.UrlRewrite
         public BasicUrlRewriter(IServiceProvider serviceProvider, IHostSettings hostSettings, IPortalAliasService portalAliasService, IHostSettingsService hostSettingsService, IPortalController portalController)
             : base(hostSettings, portalAliasService, hostSettingsService, portalController)
         {
+			Logger.LogError(">>> Entering BasicUrlRewriter(serviceProvider={ServiceProvider},hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController})", serviceProvider, hostSettings, portalAliasService, hostSettingsService, portalController);
             this.serviceProvider = serviceProvider;
+			Logger.LogDebug("BasicUrlRewriter(serviceProvider={ServiceProvider},hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController}): serviceProvider → {ServiceProvider1}", serviceProvider, hostSettings, portalAliasService, hostSettingsService, portalController, serviceProvider);
+        Logger.LogDebug("BasicUrlRewriter(serviceProvider={ServiceProvider},hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController}): this.serviceProvider → {Arg5}", serviceProvider, hostSettings, portalAliasService, hostSettingsService, portalController, this.serviceProvider);
+        Logger.LogWarning("<<< Exiting BasicUrlRewriter(serviceProvider={ServiceProvider},hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController})", serviceProvider, hostSettings, portalAliasService, hostSettingsService, portalController);
         }
 
         /// <inheritdoc />
         internal override void RewriteUrl(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering RewriteUrl(sender={Sender},e={E})", sender, e);
             var app = (HttpApplication)sender;
             HttpServerUtility server = app.Server;
             HttpRequest request = app.Request;
@@ -103,6 +108,7 @@ namespace DotNetNuke.HttpModules.UrlRewrite
             if (domainName == string.Empty && CanAutoAddPortalAlias())
             {
                 domainName = Globals.GetDomainName(app.Request, true);
+				Logger.LogDebug("RewriteUrl(sender={Sender},e={E}): domainName → {DomainName}", sender, e, domainName);
             }
 
             // from this point on we are dealing with a "standard" querystring ( ie. http://www.domain.com/default.aspx?tabid=## )
@@ -206,6 +212,7 @@ namespace DotNetNuke.HttpModules.UrlRewrite
 
                                 response.Redirect(strURL, true);
                             }
+							Logger.LogWarning("<<< Exiting RewriteUrl(sender={Sender},e={E})", sender, e);
                         }
                     }
                 }
@@ -400,31 +407,40 @@ namespace DotNetNuke.HttpModules.UrlRewrite
         // Note these formerly lived in the 'UrlRewriteModule.cs' class
         private static string FormatDomain(string url, string replaceDomain, string withDomain)
         {
+			Logger.LogError(">>> Entering FormatDomain(url={Url},replaceDomain={ReplaceDomain},withDomain={WithDomain})", url, replaceDomain, withDomain);
             if (!string.IsNullOrEmpty(replaceDomain) && !string.IsNullOrEmpty(withDomain))
             {
                 if (url.IndexOf(replaceDomain, StringComparison.Ordinal) != -1)
                 {
                     url = url.Replace(replaceDomain, withDomain);
+					Logger.LogError("FormatDomain(url={Url},replaceDomain={ReplaceDomain},withDomain={WithDomain}): url → {Url1}", url, replaceDomain, withDomain, url);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting FormatDomain(url={Url},replaceDomain={ReplaceDomain},withDomain={WithDomain})", url, replaceDomain, withDomain);
             return url;
         }
 
         private void RewriteUrl(HttpApplication app, out string portalAlias)
         {
+			Logger.LogError(">>> Entering RewriteUrl(app={App})", app);
             HttpRequest request = app.Request;
             HttpResponse response = app.Response;
+			Logger.LogError("RewriteUrl(app={App}): response → {Response}", app, response);
             string requestedPath = app.Request.Url.AbsoluteUri;
+			Logger.LogError("RewriteUrl(app={App}): requestedPath → {RequestedPath}", app, requestedPath);
 
             portalAlias = string.Empty;
 
             // determine portal alias looking for longest possible match
             string myAlias = Globals.GetDomainName(app.Request, true);
+			Logger.LogError("RewriteUrl(app={App}): myAlias → {MyAlias}", app, myAlias);
             IPortalAliasInfo objPortalAlias;
             do
             {
                 objPortalAlias = this.PortalAliasService.GetPortalAlias(myAlias);
+				Logger.LogError("RewriteUrl(app={App}): objPortalAlias → {ObjPortalAlias}", app, objPortalAlias);
+				Logger.LogDebug("RewriteUrl(app={App}): objPortalAlias → {ObjPortalAlias}", app, objPortalAlias);
 
                 if (objPortalAlias != null)
                 {
@@ -433,6 +449,7 @@ namespace DotNetNuke.HttpModules.UrlRewrite
                 }
 
                 int slashIndex = myAlias.LastIndexOf('/');
+				Logger.LogError("RewriteUrl(app={App}): slashIndex → {SlashIndex}", app, slashIndex);
                 myAlias = slashIndex > 1 ? myAlias.Substring(0, slashIndex) : string.Empty;
             }
             while (myAlias.Length > 0);
@@ -445,10 +462,12 @@ namespace DotNetNuke.HttpModules.UrlRewrite
             // http://www.domain.com/default.aspx?tabid=###&mid=###&ctl=xxx
             // The system for accomplishing this is based on an extensible Regex rules definition stored in /SiteUrls.config
             string sendTo = string.Empty;
+			Logger.LogError("RewriteUrl(app={App}): sendTo → {SendTo}", app, sendTo);
 
             // save and remove the querystring as it gets added back on later
             // path parameter specifications will take precedence over querystring parameters
             string strQueryString = string.Empty;
+			Logger.LogError("RewriteUrl(app={App}): strQueryString → {StrQueryString}", app, strQueryString);
             if (!string.IsNullOrEmpty(app.Request.Url.Query))
             {
                 strQueryString = request.QueryString.ToString();
@@ -457,9 +476,11 @@ namespace DotNetNuke.HttpModules.UrlRewrite
 
             // get url rewriting rules
             RewriterRuleCollection rules = RewriterConfiguration.GetConfig().Rules;
+			Logger.LogError("RewriteUrl(app={App}): rules → {Rules}", app, rules);
 
             // iterate through list of rules
             int matchIndex = -1;
+			Logger.LogError("RewriteUrl(app={App}): matchIndex → {MatchIndex}", app, matchIndex);
             for (int ruleIndex = 0; ruleIndex <= rules.Count - 1; ruleIndex++)
             {
                 // check for the existence of the LookFor value
@@ -467,6 +488,7 @@ namespace DotNetNuke.HttpModules.UrlRewrite
                                  RewriterUtils.ResolveUrl(app.Context.Request.ApplicationPath, rules[ruleIndex].LookFor) +
                                  "$";
                 Match objMatch = Regex.Match(requestedPath, pattern, RegexOptions.IgnoreCase);
+				Logger.LogError("RewriteUrl(app={App}): objMatch → {ObjMatch}", app, objMatch);
 
                 // if there is a match
                 if (objMatch.Success)
@@ -481,6 +503,7 @@ namespace DotNetNuke.HttpModules.UrlRewrite
                             RegexOptions.IgnoreCase));
 
                     string parameters = objMatch.Groups[2].Value;
+					Logger.LogError("RewriteUrl(app={App}): parameters → {Parameters}", app, parameters);
 
                     // process the parameters
                     if (parameters.Trim().Length > 0)
@@ -518,6 +541,7 @@ namespace DotNetNuke.HttpModules.UrlRewrite
 
                                         // get parameter value
                                         string parameterValue = string.Empty;
+										Logger.LogError("RewriteUrl(app={App}): parameterValue → {ParameterValue}", app, parameterValue);
                                         if (parameterIndex < splitParameters.Length - 1)
                                         {
                                             parameterIndex += 1;
@@ -593,10 +617,12 @@ namespace DotNetNuke.HttpModules.UrlRewrite
                      (app.Request.Url.Port != 443 && app.Request.IsSecureConnection)))
                 {
                     url = app.Request.Url.Host + ":" + app.Request.Url.Port + app.Request.Url.LocalPath;
+					Logger.LogError("RewriteUrl(app={App}): url → {Url}", app, url);
                 }
                 else
                 {
                     url = app.Request.Url.Host + app.Request.Url.LocalPath;
+					Logger.LogInformation("RewriteUrl(app={App}): url → {Url}", app, url);
                 }
 
                 if (!string.IsNullOrEmpty(myAlias))
@@ -607,6 +633,7 @@ namespace DotNetNuke.HttpModules.UrlRewrite
 
                         // Identify Tab Name
                         string tabPath = url;
+						Logger.LogError("RewriteUrl(app={App}): tabPath → {TabPath}", app, tabPath);
                         if (tabPath.StartsWith(myAlias, StringComparison.OrdinalIgnoreCase))
                         {
                             tabPath = url.Remove(0, myAlias.Length);
@@ -620,11 +647,14 @@ namespace DotNetNuke.HttpModules.UrlRewrite
 
                         // Start of patch
                         string cultureCode = string.Empty;
+						Logger.LogError("RewriteUrl(app={App}): cultureCode → {CultureCode}", app, cultureCode);
 
                         var dicLocales = LocaleController.Instance.GetLocales(portalId);
+						Logger.LogError("RewriteUrl(app={App}): dicLocales → {DicLocales}", app, dicLocales);
                         if (dicLocales.Count > 1)
                         {
                             var splitUrl = app.Request.Url.ToString().Split('/');
+							Logger.LogError("RewriteUrl(app={App}): splitUrl → {SplitUrl}", app, splitUrl);
 
                             foreach (var culturePart in splitUrl)
                             {
@@ -664,6 +694,7 @@ namespace DotNetNuke.HttpModules.UrlRewrite
                         if (tabId != Null.NullInteger)
                         {
                             string sendToUrl = "~/" + Globals.glbDefaultPage + "?TabID=" + tabId;
+							Logger.LogError("RewriteUrl(app={App}): sendToUrl → {SendToUrl}", app, sendToUrl);
                             if (!cultureCode.Equals(string.Empty, StringComparison.Ordinal))
                             {
                                 sendToUrl = sendToUrl + "&language=" + cultureCode;
@@ -686,7 +717,9 @@ namespace DotNetNuke.HttpModules.UrlRewrite
 
                         // Get the Portal
                         PortalInfo portal = Entities.Portals.PortalController.Instance.GetPortal(portalId);
+						Logger.LogError("RewriteUrl(app={App}): portal → {Portal}", app, portal);
                         string requestQuery = app.Request.Url.Query;
+						Logger.LogError("RewriteUrl(app={App}): requestQuery → {RequestQuery}", app, requestQuery);
                         if (!string.IsNullOrEmpty(requestQuery))
                         {
                             requestQuery = TabIdRegex.Replace(requestQuery, string.Empty);
@@ -805,6 +838,7 @@ namespace DotNetNuke.HttpModules.UrlRewrite
                         tabPath = tabPath.Replace("/", "//");
                         tabPath = tabPath.Replace(".aspx", string.Empty);
                         var objTabs = TabController.Instance.GetTabsByPortal(tabPath.StartsWith("//host", StringComparison.OrdinalIgnoreCase) ? Null.NullInteger : portalId);
+						Logger.LogError("RewriteUrl(app={App}): objTabs → {ObjTabs}", app, objTabs);
                         foreach (var kvp in objTabs)
                         {
                             if (!kvp.Value.IsDeleted && kvp.Value.TabPath.Equals(tabPath, StringComparison.OrdinalIgnoreCase))

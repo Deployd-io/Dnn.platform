@@ -14,6 +14,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The ImageCommandColumnTemplate provides a Template for the ImageCommandColumn.</summary>
     public class ImageCommandColumnTemplate : ITemplate
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImageCommandColumnTemplate));
         /// <summary>Initializes a new instance of the <see cref="ImageCommandColumnTemplate"/> class.</summary>
         public ImageCommandColumnTemplate()
             : this(ListItemType.Item)
@@ -24,6 +25,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="itemType">The list item type.</param>
         public ImageCommandColumnTemplate(ListItemType itemType)
         {
+			Logger.LogError(">>> Entering ImageCommandColumnTemplate(itemType={ItemType})", itemType);
             this.ItemType = itemType;
         }
 
@@ -87,6 +89,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="container">The parent container (DataGridItem).</param>
         public void InstantiateIn(Control container)
         {
+			Logger.LogError(">>> Entering InstantiateIn(container={Container})", container);
             switch (this.ItemType)
             {
                 case ListItemType.Item:
@@ -96,10 +99,13 @@ namespace DotNetNuke.UI.WebControls
                     if (this.EditMode == ImageCommandColumnEditMode.URL)
                     {
                         var hypLink = new HyperLink();
+						Logger.LogError("InstantiateIn(container={Container}): hypLink → {HypLink}", container, hypLink);
                         hypLink.ToolTip = this.Text;
+						Logger.LogDebug("InstantiateIn(container={Container}): hypLink.ToolTip → {Arg1}", container, hypLink.ToolTip);
                         if (!string.IsNullOrEmpty(this.ImageURL) && this.ShowImage)
                         {
                             var img = new Image();
+							Logger.LogError("InstantiateIn(container={Container}): img → {Img}", container, img);
                             if (this.DesignMode)
                             {
                                 img.ImageUrl = this.ImageURL.Replace("~/", "../../");
@@ -107,14 +113,17 @@ namespace DotNetNuke.UI.WebControls
                             else
                             {
                                 img.ImageUrl = this.ImageURL;
+								Logger.LogDebug("InstantiateIn(container={Container}): img.ImageUrl → {Arg1}", container, img.ImageUrl);
                             }
 
                             hypLink.Controls.Add(img);
                             img.ToolTip = this.Text;
+							Logger.LogDebug("InstantiateIn(container={Container}): img.ToolTip → {Arg1}", container, img.ToolTip);
                         }
                         else
                         {
                             hypLink.Text = this.Text;
+							Logger.LogDebug("InstantiateIn(container={Container}): hypLink.Text → {Arg1}", container, hypLink.Text);
                         }
 
                         hypLink.DataBinding += this.Item_DataBinding;
@@ -125,6 +134,7 @@ namespace DotNetNuke.UI.WebControls
                         if (!string.IsNullOrEmpty(this.ImageURL) && this.ShowImage)
                         {
                             var colIcon = new ImageButton();
+							Logger.LogError("InstantiateIn(container={Container}): colIcon → {ColIcon}", container, colIcon);
                             if (this.DesignMode)
                             {
                                 colIcon.ImageUrl = this.ImageURL.Replace("~/", "../../");
@@ -132,15 +142,18 @@ namespace DotNetNuke.UI.WebControls
                             else
                             {
                                 colIcon.ImageUrl = this.ImageURL;
+								Logger.LogDebug("InstantiateIn(container={Container}): colIcon.ImageUrl → {Arg1}", container, colIcon.ImageUrl);
                             }
 
                             colIcon.ToolTip = this.Text;
+							Logger.LogDebug("InstantiateIn(container={Container}): colIcon.ToolTip → {Arg1}", container, colIcon.ToolTip);
                             if (!string.IsNullOrEmpty(this.OnClickJS))
                             {
                                 ClientAPI.AddButtonConfirm(colIcon, this.OnClickJS);
                             }
 
                             colIcon.CommandName = this.CommandName;
+							Logger.LogDebug("InstantiateIn(container={Container}): colIcon.CommandName → {Arg1}", container, colIcon.CommandName);
                             colIcon.DataBinding += this.Item_DataBinding;
                             container.Controls.Add(colIcon);
                         }
@@ -148,14 +161,18 @@ namespace DotNetNuke.UI.WebControls
                         if (!string.IsNullOrEmpty(this.Text) && !this.ShowImage)
                         {
                             var colLink = new LinkButton();
+							Logger.LogError("InstantiateIn(container={Container}): colLink → {ColLink}", container, colLink);
                             colLink.ToolTip = this.Text;
+							Logger.LogDebug("InstantiateIn(container={Container}): colLink.ToolTip → {Arg1}", container, colLink.ToolTip);
                             if (!string.IsNullOrEmpty(this.OnClickJS))
                             {
                                 ClientAPI.AddButtonConfirm(colLink, this.OnClickJS);
                             }
 
                             colLink.CommandName = this.CommandName;
+							Logger.LogDebug("InstantiateIn(container={Container}): colLink.CommandName → {Arg1}", container, colLink.CommandName);
                             colLink.Text = this.Text;
+							Logger.LogDebug("InstantiateIn(container={Container}): colLink.Text → {Arg1}", container, colLink.Text);
                             colLink.DataBinding += this.Item_DataBinding;
                             container.Controls.Add(colLink);
                         }
@@ -167,22 +184,27 @@ namespace DotNetNuke.UI.WebControls
                     container.Controls.Add(new LiteralControl(this.Text));
                     break;
             }
+			Logger.LogWarning("<<< Exiting InstantiateIn(container={Container})", container);
         }
 
         /// <summary>Gets whether theButton is visible.</summary>
         /// <param name="container">The parent container (DataGridItem).</param>
         private bool GetIsVisible(DataGridItem container)
         {
+			Logger.LogError(">>> Entering GetIsVisible(container={Container})", container);
             bool isVisible;
             if (!string.IsNullOrEmpty(this.VisibleField))
             {
                 isVisible = Convert.ToBoolean(DataBinder.Eval(container.DataItem, this.VisibleField), CultureInfo.InvariantCulture);
+				Logger.LogError("GetIsVisible(container={Container}): isVisible → {IsVisible}", container, isVisible);
             }
             else
             {
                 isVisible = this.Visible;
+				Logger.LogDebug("GetIsVisible(container={Container}): isVisible → {IsVisible}", container, isVisible);
             }
 
+			Logger.LogWarning("<<< Exiting GetIsVisible(container={Container})", container);
             return isVisible;
         }
 
@@ -190,12 +212,15 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="container">The parent container (DataGridItem).</param>
         private int GetValue(DataGridItem container)
         {
+			Logger.LogError(">>> Entering GetValue(container={Container})", container);
             int keyValue = Null.NullInteger;
+			Logger.LogError("GetValue(container={Container}): keyValue → {KeyValue}", container, keyValue);
             if (!string.IsNullOrEmpty(this.KeyField))
             {
                 keyValue = Convert.ToInt32(DataBinder.Eval(container.DataItem, this.KeyField), CultureInfo.InvariantCulture);
             }
 
+			Logger.LogWarning("<<< Exiting GetValue(container={Container})", container);
             return keyValue;
         }
 
@@ -204,12 +229,17 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">An EventArgs object.</param>
         private void Item_DataBinding(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering Item_DataBinding(sender={Sender},e={E})", sender, e);
             DataGridItem container;
             int keyValue = Null.NullInteger;
+			Logger.LogError("Item_DataBinding(sender={Sender},e={E}): keyValue → {KeyValue}", sender, e, keyValue);
             if (this.EditMode == ImageCommandColumnEditMode.URL)
             {
                 var hypLink = (HyperLink)sender;
+				Logger.LogError("Item_DataBinding(sender={Sender},e={E}): hypLink → {HypLink}", sender, e, hypLink);
                 container = (DataGridItem)hypLink.NamingContainer;
+				Logger.LogError("Item_DataBinding(sender={Sender},e={E}): container → {Container}", sender, e, container);
+				Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): container → {Container}", sender, e, container);
                 keyValue = this.GetValue(container);
                 if (!string.IsNullOrEmpty(this.NavigateURLFormatString))
                 {
@@ -226,6 +256,7 @@ namespace DotNetNuke.UI.WebControls
                 if (!string.IsNullOrEmpty(this.ImageURL) && this.ShowImage)
                 {
                     var colIcon = (ImageButton)sender;
+					Logger.LogError("Item_DataBinding(sender={Sender},e={E}): colIcon → {ColIcon}", sender, e, colIcon);
                     container = (DataGridItem)colIcon.NamingContainer;
                     keyValue = this.GetValue(container);
                     colIcon.CommandArgument = keyValue.ToString(CultureInfo.InvariantCulture);
@@ -236,12 +267,14 @@ namespace DotNetNuke.UI.WebControls
                 {
                     // Bind Link Button
                     var colLink = (LinkButton)sender;
+					Logger.LogError("Item_DataBinding(sender={Sender},e={E}): colLink → {ColLink}", sender, e, colLink);
                     container = (DataGridItem)colLink.NamingContainer;
                     keyValue = this.GetValue(container);
                     colLink.CommandArgument = keyValue.ToString(CultureInfo.InvariantCulture);
                     colLink.Visible = this.GetIsVisible(container);
                 }
             }
+			Logger.LogWarning("<<< Exiting Item_DataBinding(sender={Sender},e={E})", sender, e);
         }
     }
 }

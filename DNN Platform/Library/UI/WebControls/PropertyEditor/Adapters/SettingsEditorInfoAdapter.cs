@@ -16,6 +16,7 @@ namespace DotNetNuke.UI.WebControls
     /// </summary>
     public class SettingsEditorInfoAdapter : IEditorInfoAdapter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SettingsEditorInfoAdapter));
         private readonly object dataMember;
         private readonly object dataSource;
         private string fieldName;
@@ -26,7 +27,11 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="fieldName">The field name.</param>
         public SettingsEditorInfoAdapter(object dataSource, object dataMember, string fieldName)
         {
+			Logger.LogError(">>> Entering SettingsEditorInfoAdapter(dataSource={DataSource},dataMember={DataMember},fieldName={FieldName})", dataSource, dataMember, fieldName);
+			Logger.LogDebug("SettingsEditorInfoAdapter(dataSource={DataSource},dataMember={DataMember},fieldName={FieldName}): dataSource → {DataSource1}", dataSource, dataMember, fieldName, dataSource);
+        Logger.LogWarning("<<< Exiting SettingsEditorInfoAdapter(dataSource={DataSource},dataMember={DataMember},fieldName={FieldName})", dataSource, dataMember, fieldName);
             this.dataMember = dataMember;
+			Logger.LogDebug("SettingsEditorInfoAdapter(dataSource={DataSource},dataMember={DataMember},fieldName={FieldName}): this.dataMember → {Arg3}", dataSource, dataMember, fieldName, this.dataMember);
             this.dataSource = dataSource;
             this.fieldName = fieldName;
         }
@@ -34,55 +39,73 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         public EditorInfo CreateEditControl()
         {
+			Logger.LogError(">>> Entering CreateEditControl()");
             var info = (SettingInfo)this.dataMember;
             var editInfo = new EditorInfo();
+			Logger.LogError("CreateEditControl(): editInfo → {EditInfo}", editInfo);
+			Logger.LogError("CreateEditControl(): info → {Info}", info);
 
             // Get the Name of the property
             editInfo.Name = info.Name;
+			Logger.LogDebug("CreateEditControl(): editInfo.Name → {Arg0}", editInfo.Name);
 
             editInfo.Category = string.Empty;
+			Logger.LogDebug("CreateEditControl(): editInfo.Category → {Arg0}", editInfo.Category);
 
             // Get Value Field
             editInfo.Value = info.Value;
+			Logger.LogDebug("CreateEditControl(): editInfo.Value → {Arg0}", editInfo.Value);
 
             // Get the type of the property
             editInfo.Type = info.Type.AssemblyQualifiedName;
+			Logger.LogDebug("CreateEditControl(): editInfo.Type → {Arg0}", editInfo.Type);
 
             // Get Editor Field
             editInfo.Editor = info.Editor;
+			Logger.LogDebug("CreateEditControl(): editInfo.Editor → {Arg0}", editInfo.Editor);
 
             // Get LabelMode Field
             editInfo.LabelMode = LabelMode.Left;
+			Logger.LogDebug("CreateEditControl(): editInfo.LabelMode → {Arg0}", editInfo.LabelMode);
 
             // Get Required Field
             editInfo.Required = false;
+			Logger.LogDebug("CreateEditControl(): editInfo.Required → {Arg0}", editInfo.Required);
 
             // Set ResourceKey Field
             editInfo.ResourceKey = editInfo.Name;
+			Logger.LogDebug("CreateEditControl(): editInfo.ResourceKey → {Arg0}", editInfo.ResourceKey);
 
             // Get Style
             editInfo.ControlStyle = new Style();
 
             // Get Validation Expression Field
             editInfo.ValidationExpression = string.Empty;
+			Logger.LogDebug("CreateEditControl(): editInfo.ValidationExpression → {Arg0}", editInfo.ValidationExpression);
 
+			Logger.LogWarning("<<< Exiting CreateEditControl()");
             return editInfo;
         }
 
         /// <inheritdoc />
         public bool UpdateValue(PropertyEditorEventArgs e)
         {
+			Logger.LogError(">>> Entering UpdateValue(e={E})", e);
             string name = e.Name;
             bool changed = e.Changed;
             object oldValue = e.OldValue;
             object newValue = e.Value;
             bool isDirty = Null.NullBoolean;
+			Logger.LogError("UpdateValue(e={E}): isDirty → {IsDirty}", e, isDirty);
 
             var settings = (Hashtable)this.dataSource;
+			Logger.LogError("UpdateValue(e={E}): settings → {Settings}", e, settings);
             var settingsEnumerator = settings.GetEnumerator();
+			Logger.LogError("UpdateValue(e={E}): settingsEnumerator → {SettingsEnumerator}", e, settingsEnumerator);
             while (settingsEnumerator.MoveNext())
             {
                 var key = Convert.ToString(settingsEnumerator.Key, CultureInfo.InvariantCulture);
+				Logger.LogError("UpdateValue(e={E}): key → {Key}", e, key);
 
                 // Do we have the item in the Hashtable being changed
                 if (key == name)
@@ -97,12 +120,15 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting UpdateValue(e={E})", e);
             return isDirty;
         }
 
         /// <inheritdoc />
         public bool UpdateVisibility(PropertyEditorEventArgs e)
         {
+			Logger.LogError(">>> Entering UpdateVisibility(e={E})", e);
+			Logger.LogWarning("<<< Exiting UpdateVisibility(e={E})", e);
             return false;
         }
     }

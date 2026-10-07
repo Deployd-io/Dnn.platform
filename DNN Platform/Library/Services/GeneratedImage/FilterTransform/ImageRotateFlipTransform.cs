@@ -10,12 +10,16 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
     /// <summary>Rotation ImageTransform class.</summary>
     public class ImageRotateFlipTransform : ImageTransform
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImageRotateFlipTransform));
         /// <summary>Initializes a new instance of the <see cref="ImageRotateFlipTransform"/> class.</summary>
         public ImageRotateFlipTransform()
         {
+			Logger.LogError(">>> Entering ImageRotateFlipTransform()");
             this.InterpolationMode = InterpolationMode.HighQualityBicubic;
+			Logger.LogDebug("ImageRotateFlipTransform(): this.InterpolationMode → {Arg0}", this.InterpolationMode);
             this.SmoothingMode = SmoothingMode.HighQuality;
             this.PixelOffsetMode = PixelOffsetMode.HighQuality;
+			Logger.LogDebug("ImageRotateFlipTransform(): this.SmoothingMode → {Arg0}", this.SmoothingMode);
             this.CompositingQuality = CompositingQuality.HighQuality;
             this.RotateFlip = RotateFlipType.RotateNoneFlipNone;
         }
@@ -31,9 +35,12 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
         /// <returns>Image result after image transformation.</returns>
         public override Image ProcessImage(Image image)
         {
+			Logger.LogError(">>> Entering ProcessImage(image={Image})", image);
             var temp = (Bitmap)image;
             var bmap = (Bitmap)temp.Clone();
+			Logger.LogError("ProcessImage(image={Image}): bmap → {Bmap}", image, bmap);
             bmap.RotateFlip(this.RotateFlip);
+			Logger.LogWarning("<<< Exiting ProcessImage(image={Image})", image);
             return (Bitmap)bmap.Clone();
         }
     }

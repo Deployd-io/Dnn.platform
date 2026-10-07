@@ -3,11 +3,13 @@ import thunkMiddleware from "redux-thunk";
 import reduxImmutableStateInvariant from "redux-immutable-state-invariant";
 import rootReducer from "../reducers/rootReducer";
 import DevTools from "../containers/DevTools";
+const logger = console;
 
  
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 export default function configureStore(initialState) {
+	logger.error(`>>> Entering configureStore(initialState=${initialState})`, { "event.action": "configureStore", "logrite.initialState": initialState });
     const store = createStore(
         rootReducer,
         initialState,
@@ -17,5 +19,6 @@ export default function configureStore(initialState) {
                 applyMiddleware(thunkMiddleware, reduxImmutableStateInvariant()), DevTools.instrument()
         )
     );
+	logger.warn(`<<< Exiting configureStore(initialState=${initialState})`, { "event.action": "configureStore", "logrite.initialState": initialState });
     return store;
 }

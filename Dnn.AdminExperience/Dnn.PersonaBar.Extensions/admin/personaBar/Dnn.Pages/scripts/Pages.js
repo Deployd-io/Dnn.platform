@@ -1,11 +1,15 @@
-﻿define(['jquery', 'knockout', 'main/extension', 'main/config', 'jquery-ui.min', 'dnn.jquery'], function ($, ko, ext, cf) {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+define(['jquery', 'knockout', 'main/extension', 'main/config', 'jquery-ui.min', 'dnn.jquery'], function ($, ko, ext, cf) {
     'use strict';
     window.ko = ko;
 
     var config = cf.init();
 
     var init = function (wrapper, util, params, callback) {
+		logger.error(`>>> Entering init(wrapper=${wrapper},util=${util},params=${params},callback=${callback})`, { "event.action": "init", "logrite.wrapper": wrapper, "logrite.util": util, "logrite.params": params, "logrite.callback": callback });
         window.dnn.initPages = function initializePages() {
+			logger.error('>>> Entering initializePages()', { "event.action": "initializePages" });
+			logger.warn('<<< Exiting initializePages()', { "event.action": "initializePages" });
             return {
                 utilities: util,
                 moduleName: "Pages",
@@ -24,6 +28,7 @@
     };
 
     var load = function (params, callback) {
+		logger.error(`>>> Entering load(params=${params},callback=${callback})`, { "event.action": "load", "logrite.params": params, "logrite.callback": callback });
         window.dnn.pages.load({
             viewName: params.viewName,
             viewParams: params.viewParams,
@@ -35,6 +40,7 @@
         }
         if (typeof callback === 'function') {
             callback();
+			logger.warn(`<<< Exiting load(params=${params},callback=${callback})`, { "event.action": "load", "logrite.params": params, "logrite.callback": callback });
         }
     };
 

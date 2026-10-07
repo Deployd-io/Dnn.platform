@@ -17,7 +17,10 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
         public ClientOption(string name, string value)
         {
+			eventLogger.LogError(">>> Entering ClientOption(name={Name},value={Value})", name, value);
             this.Name = name;
+			eventLogger.LogWarning("<<< Exiting ClientOption(name={Name},value={Value})", name, value);
+			eventLogger.LogDebug("ClientOption(name={Name},value={Value}): this.Name → {Arg2}", name, value, this.Name);
             this.Value = value;
         }
 

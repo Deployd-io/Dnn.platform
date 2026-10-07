@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -14,8 +15,11 @@
 CodeMirror.defineMode("nginx", function(config) {
 
   function words(str) {
+	logger.error(`>>> Entering words(str=${str})`, { "event.action": "words", "logrite.str": str });
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.error(`words(str=${str}): obj → ${obj}`, { "event.action": "words", "logrite.str": str });
+	logger.warn(`<<< Exiting words(str=${str})`, { "event.action": "words", "logrite.str": str });
     return obj;
   }
 
@@ -33,14 +37,20 @@ CodeMirror.defineMode("nginx", function(config) {
     );
 
   var indentUnit = config.indentUnit, type;
-  function ret(style, tp) {type = tp; return style;}
+  function ret(style, tp) {
+      logger.error(`>>> Entering ret(style=${style},tp=${tp})`, { "event.action": "ret", "logrite.style": style, "logrite.tp": tp });
+      logger.warn(`<<< Exiting ret(style=${style},tp=${tp})`, { "event.action": "ret", "logrite.style": style, "logrite.tp": tp });
+      type = tp; return style;
+  }
 
   function tokenBase(stream, state) {
+logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
 
 
     stream.eatWhile(/[\w\$_]/);
 
     var cur = stream.current();
+	logger.error(`tokenBase(stream=${stream},state=${state}): cur → ${cur}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
 
 
     if (keywords.propertyIsEnumerable(cur)) {
@@ -55,9 +65,11 @@ CodeMirror.defineMode("nginx", function(config) {
     /**/
 
     var ch = stream.next();
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     if (ch == "@") {stream.eatWhile(/[\w\\\-]/); return ret("meta", stream.current());}
     else if (ch == "/" && stream.eat("*")) {
       state.tokenize = tokenCComment;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return tokenCComment(stream, state);
     }
     else if (ch == "<" && stream.eat("!")) {
@@ -90,35 +102,43 @@ CodeMirror.defineMode("nginx", function(config) {
     }
     else {
       stream.eatWhile(/[\w\\\-]/);
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return ret("variable", "variable");
     }
   }
 
   function tokenCComment(stream, state) {
+	logger.error(`>>> Entering tokenCComment(stream=${stream},state=${state})`, { "event.action": "tokenCComment", "logrite.stream": stream, "logrite.state": state });
     var maybeEnd = false, ch;
     while ((ch = stream.next()) != null) {
       if (maybeEnd && ch == "/") {
         state.tokenize = tokenBase;
+		logger.debug(`tokenCComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenCComment", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       maybeEnd = (ch == "*");
     }
+	logger.error(`tokenCComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "tokenCComment", "logrite.stream": stream, "logrite.state": state });
     return ret("comment", "comment");
   }
 
   function tokenSGMLComment(stream, state) {
+	logger.error(`>>> Entering tokenSGMLComment(stream=${stream},state=${state})`, { "event.action": "tokenSGMLComment", "logrite.stream": stream, "logrite.state": state });
     var dashes = 0, ch;
     while ((ch = stream.next()) != null) {
       if (dashes >= 2 && ch == ">") {
         state.tokenize = tokenBase;
+		logger.debug(`tokenSGMLComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenSGMLComment", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       dashes = (ch == "-") ? dashes + 1 : 0;
     }
+	logger.error(`tokenSGMLComment(stream=${stream},state=${state}): dashes → ${dashes}`, { "event.action": "tokenSGMLComment", "logrite.stream": stream, "logrite.state": state });
     return ret("comment", "comment");
   }
 
   function tokenString(quote) {
+	logger.error(`>>> Entering tokenString(quote=${quote})`, { "event.action": "tokenString", "logrite.quote": quote });
     return function(stream, state) {
       var escaped = false, ch;
       while ((ch = stream.next()) != null) {
@@ -133,17 +153,22 @@ CodeMirror.defineMode("nginx", function(config) {
 
   return {
     startState: function(base) {
+	logger.error(`>>> Entering startState(base=${base})`, { "event.action": "startState", "logrite.base": base });
       return {tokenize: tokenBase,
               baseIndent: base || 0,
               stack: []};
+			logger.warn(`<<< Exiting startState(base=${base})`, { "event.action": "startState", "logrite.base": base });
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.eatSpace()) return null;
       type = null;
       var style = state.tokenize(stream, state);
+	logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
 
       var context = state.stack[state.stack.length-1];
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (type == "hash" && context == "rule") style = "atom";
       else if (style == "variable") {
         if (context == "rule") style = "number";
@@ -163,6 +188,7 @@ CodeMirror.defineMode("nginx", function(config) {
     },
 
     indent: function(state, textAfter) {
+	logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       var n = state.stack.length;
       if (/^\}/.test(textAfter))
         n -= state.stack[state.stack.length-1] == "rule" ? 2 : 1;

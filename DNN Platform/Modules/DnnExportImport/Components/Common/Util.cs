@@ -61,6 +61,8 @@ namespace Dnn.ExportImport.Components.Common
         [DnnDeprecated(10, 0, 0, "Please use overload with IServiceProvider")]
         public static partial IEnumerable<BasePortableService> GetPortableImplementors()
         {
+			Logger.LogError(">>> Entering GetPortableImplementors()");
+            Logger.LogWarning("<<< Exiting GetPortableImplementors()");
             return GetPortableImplementors(Globals.DependencyProvider);
         }
 
@@ -78,6 +80,7 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>A human-readable size format, for instance 1024 would return 1 KB.</returns>
         public static string FormatSize(long bytes, byte decimals = 1)
         {
+			Logger.LogError(">>> Entering FormatSize(bytes={Bytes},decimals={Decimals})", bytes, decimals);
             const long kb = 1024;
             const long mb = kb * kb;
             const long gb = mb * kb;
@@ -97,6 +100,7 @@ namespace Dnn.ExportImport.Components.Common
                 return (1.0 * bytes / mb).ToString("F" + decimals, CultureInfo.CurrentCulture) + " MB";
             }
 
+			Logger.LogWarning("<<< Exiting FormatSize(bytes={Bytes},decimals={Decimals})", bytes, decimals);
             return (1.0 * bytes / gb).ToString("F" + decimals, CultureInfo.CurrentCulture) + " GB";
         }
 
@@ -105,6 +109,8 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>A string representing the cache key.</returns>
         public static string GetExpImpJobCacheKey(ExportImportJob job)
         {
+			Logger.LogError(">>> Entering GetExpImpJobCacheKey(job={Job})", job);
+            Logger.LogWarning("<<< Exiting GetExpImpJobCacheKey(job={Job})", job);
             return string.Join(":", "ExpImpKey", job.PortalId.ToString(CultureInfo.InvariantCulture), job.JobId.ToString(CultureInfo.InvariantCulture));
         }
 
@@ -115,6 +121,7 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>-1 if not found, 1 if the user is HOST, the user id if found on the imported site.</returns>
         public static int GetUserIdByName(ExportImportJob importJob, int? exportedUserId, string exportUsername)
         {
+			Logger.LogError(">>> Entering GetUserIdByName(importJob={ImportJob},exportedUserId={ExportedUserId},exportUsername={ExportUsername})", importJob, exportedUserId, exportUsername);
             if (exportedUserId is null or <= 0)
             {
                 return -1;
@@ -131,11 +138,13 @@ namespace Dnn.ExportImport.Components.Common
             }
 
             var user = UserController.GetUserByName(importJob.PortalId, exportUsername);
+			Logger.LogError("GetUserIdByName(importJob={ImportJob},exportedUserId={ExportedUserId},exportUsername={ExportUsername}): user → {User}", importJob, exportedUserId, exportUsername, user);
             if (user == null)
             {
                 return -1;
             }
 
+			Logger.LogWarning("<<< Exiting GetUserIdByName(importJob={ImportJob},exportedUserId={ExportedUserId},exportUsername={ExportUsername})", importJob, exportedUserId, exportUsername);
             return user.UserID < 0 ? importJob.CreatedByUserId : user.UserID;
         }
 
@@ -146,12 +155,15 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>The found role id or null.</returns>
         public static int? GetRoleIdByName(int portalId, int exportRoleId, string exportRolename)
         {
+			Logger.LogError(">>> Entering GetRoleIdByName(portalId={PortalId},exportRoleId={ExportRoleId},exportRolename={ExportRolename})", portalId, exportRoleId, exportRolename);
             if (string.IsNullOrEmpty(exportRolename))
             {
                 return null;
             }
 
             var roleId = DataProvider.Instance().GetRoleIdByName(exportRoleId >= 0 ? portalId : -1, exportRolename);
+			Logger.LogError("GetRoleIdByName(portalId={PortalId},exportRoleId={ExportRoleId},exportRolename={ExportRolename}): roleId → {RoleId}", portalId, exportRoleId, exportRolename, roleId);
+			Logger.LogWarning("<<< Exiting GetRoleIdByName(portalId={PortalId},exportRoleId={ExportRoleId},exportRolename={ExportRolename})", portalId, exportRoleId, exportRolename);
             return roleId == noRole ? null : (int?)roleId;
         }
 
@@ -160,12 +172,15 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>The found module definition ID or null.</returns>
         public static int? GeModuleDefIdByFriendltName(string friendlyName)
         {
+			Logger.LogError(">>> Entering GeModuleDefIdByFriendltName(friendlyName={FriendlyName})", friendlyName);
             if (string.IsNullOrEmpty(friendlyName))
             {
                 return null;
             }
 
             var moduleDefInfo = ModuleDefinitionController.GetModuleDefinitionByFriendlyName(friendlyName);
+			Logger.LogError("GeModuleDefIdByFriendltName(friendlyName={FriendlyName}): moduleDefInfo → {ModuleDefInfo}", friendlyName, moduleDefInfo);
+			Logger.LogWarning("<<< Exiting GeModuleDefIdByFriendltName(friendlyName={FriendlyName})", friendlyName);
             return moduleDefInfo?.ModuleDefID;
         }
 
@@ -176,6 +191,7 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>The id of the permission if found, null if not found.</returns>
         public static int? GePermissionIdByName(string permissionCode, string permissionKey, string permissionName)
         {
+			Logger.LogError(">>> Entering GePermissionIdByName(permissionCode={PermissionCode},permissionKey={PermissionKey},permissionName={PermissionName})", permissionCode, permissionKey, permissionName);
             if (string.IsNullOrEmpty(permissionCode) ||
                 string.IsNullOrEmpty(permissionKey) ||
                 string.IsNullOrEmpty(permissionName))
@@ -184,6 +200,8 @@ namespace Dnn.ExportImport.Components.Common
             }
 
             IPermissionDefinitionInfo permission = EntitiesController.Instance.GetPermissionInfo(permissionCode, permissionKey, permissionName);
+			Logger.LogError("GePermissionIdByName(permissionCode={PermissionCode},permissionKey={PermissionKey},permissionName={PermissionName}): permission → {Permission}", permissionCode, permissionKey, permissionName, permission);
+			Logger.LogWarning("<<< Exiting GePermissionIdByName(permissionCode={PermissionCode},permissionKey={PermissionKey},permissionName={PermissionName})", permissionCode, permissionKey, permissionName);
             return permission?.PermissionId;
         }
 
@@ -217,12 +235,17 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>The ID of the profile property or <see langword="null"/> if not found.</returns>
         public static int? GetProfilePropertyId(IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, int portalId, int? exportedProfilePropertyId, string exportProfilePropertyName)
         {
+			Logger.LogError(">>> Entering GetProfilePropertyId(portalId={PortalId},exportedProfilePropertyId={ExportedProfilePropertyId},exportProfilePropertyname={ExportProfilePropertyname})", portalId, exportedProfilePropertyId, exportProfilePropertyname);
             if (exportedProfilePropertyId is null or <= 0)
             {
+				Logger.LogError(">>> Entering GetProfilePropertyId(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},exportedProfilePropertyId={ExportedProfilePropertyId},exportProfilePropertyName={ExportProfilePropertyName})", hostSettings, portalController, appStatus, portalGroupController, portalId, exportedProfilePropertyId, exportProfilePropertyName);
                 return -1;
             }
 
             var property = ProfileController.GetPropertyDefinitionByName(hostSettings, portalController, appStatus, portalGroupController, portalId, exportProfilePropertyName);
+			Logger.LogError("GetProfilePropertyId(portalId={PortalId},exportedProfilePropertyId={ExportedProfilePropertyId},exportProfilePropertyname={ExportProfilePropertyname}): property → {Property}", portalId, exportedProfilePropertyId, exportProfilePropertyname, property);
+			Logger.LogError("GetProfilePropertyId(hostSettings={HostSettings},portalId={PortalId},exportedProfilePropertyId={ExportedProfilePropertyId},exportProfilePropertyname={ExportProfilePropertyname}): property → {Property}", hostSettings, portalId, exportedProfilePropertyId, exportProfilePropertyname, property);
+			Logger.LogWarning("<<< Exiting GetProfilePropertyId(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId},exportedProfilePropertyId={ExportedProfilePropertyId},exportProfilePropertyName={ExportProfilePropertyName})", hostSettings, portalController, appStatus, portalGroupController, portalId, exportedProfilePropertyId, exportProfilePropertyName);
             return property?.PropertyDefinitionId;
         }
 
@@ -232,6 +255,8 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>A value indicating the total amount of pages required to contain the amount of items.</returns>
         public static int CalculateTotalPages(int totalRecords, int pageSize)
         {
+			Logger.LogError(">>> Entering CalculateTotalPages(totalRecords={TotalRecords},pageSize={PageSize})", totalRecords, pageSize);
+            Logger.LogWarning("<<< Exiting CalculateTotalPages(totalRecords={TotalRecords},pageSize={PageSize})", totalRecords, pageSize);
             return totalRecords % pageSize == 0 ? totalRecords / pageSize : (totalRecords / pageSize) + 1;
         }
 
@@ -241,7 +266,10 @@ namespace Dnn.ExportImport.Components.Common
         /// <param name="item">The item to write.</param>
         public static void WriteJson<T>(string filePath, T item)
         {
+			Logger.LogError(">>> Entering WriteJson(filePath={FilePath},item={Item})", filePath, item);
             var content = JsonConvert.SerializeObject(item);
+			Logger.LogWarning("<<< Exiting WriteJson(filePath={FilePath},item={Item})", filePath, item);
+			Logger.LogError("WriteJson(filePath={FilePath},item={Item}): content → {Content}", filePath, item, content);
             File.WriteAllText(filePath, content, Encoding.UTF8);
         }
 
@@ -251,13 +279,17 @@ namespace Dnn.ExportImport.Components.Common
         /// <param name="item">The item to extract.</param>
         public static void ReadJson<T>(string filePath, ref T item)
         {
+			Logger.LogError(">>> Entering ReadJson(filePath={FilePath},item={Item})", filePath, item);
             if (File.Exists(filePath))
             {
                 var content = File.ReadAllText(filePath);
+				Logger.LogError("ReadJson(filePath={FilePath},item={Item}): content → {Content}", filePath, item, content);
 
                 // TODO: This might throw error if file is corrupt. Should we handle error here?
                 item = JsonConvert.DeserializeObject<T>(content);
+				Logger.LogError("ReadJson(filePath={FilePath},item={Item}): item → {Item1}", filePath, item, item);
             }
+			Logger.LogWarning("<<< Exiting ReadJson(filePath={FilePath},item={Item})", filePath, item);
         }
 
         /// <summary>Replaces missing DateTime values to give them <see cref="Constants.MinDbTime"/> value.</summary>
@@ -265,7 +297,9 @@ namespace Dnn.ExportImport.Components.Common
         /// <param name="item">The item to fix.</param>
         public static void FixDateTime<T>(T item)
         {
+			Logger.LogError(">>> Entering FixDateTime(item={Item})", item);
             var properties = item.GetType().GetRuntimeProperties();
+			Logger.LogError("FixDateTime(item={Item}): properties → {Properties}", item, properties);
             foreach (var property in properties)
             {
                 if ((property.PropertyType == typeof(DateTime) || property.PropertyType == typeof(DateTime?)) &&
@@ -274,6 +308,7 @@ namespace Dnn.ExportImport.Components.Common
                     property.SetValue(item, Constants.MinDbTime);
                 }
             }
+			Logger.LogWarning("<<< Exiting FixDateTime(item={Item})", item);
         }
 
         /// <summary>Converts non local dates and times to the provided user local time.</summary>
@@ -282,6 +317,7 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>The adjusted date and time.</returns>
         public static DateTime ToLocalDateTime(DateTime dateTime, UserInfo userInfo)
         {
+			Logger.LogError(">>> Entering ToLocalDateTime(dateTime={DateTime},userInfo={UserInfo})", dateTime, userInfo);
             if (dateTime.Kind != DateTimeKind.Local)
             {
                 dateTime = new DateTime(
@@ -296,6 +332,7 @@ namespace Dnn.ExportImport.Components.Common
                 return userInfo.LocalTime(dateTime);
             }
 
+			Logger.LogWarning("<<< Exiting ToLocalDateTime(dateTime={DateTime},userInfo={UserInfo})", dateTime, userInfo);
             return dateTime;
         }
 
@@ -318,6 +355,7 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>The converted date and time.</returns>
         public static DateTime? ConvertToDbLocalTime(DateTime? dateTime)
         {
+			Logger.LogError(">>> Entering ConvertToDbLocalTime(dateTime={DateTime})", dateTime);
             if (dateTime == null)
             {
                 return null;
@@ -331,6 +369,8 @@ namespace Dnn.ExportImport.Components.Common
             var differenceInUtcTimes =
                 TimeZone.CurrentTimeZone.GetUtcOffset(DateUtils.GetDatabaseUtcTime()).TotalMilliseconds;
             var d = dateTime.Value.ToLocalTime().AddMilliseconds(differenceInUtcTimes);
+			Logger.LogError("ConvertToDbLocalTime(dateTime={DateTime}): d → {D}", dateTime, d);
+			Logger.LogWarning("<<< Exiting ConvertToDbLocalTime(dateTime={DateTime})", dateTime);
             return new DateTime(d.Year, d.Month, d.Day, d.Hour, d.Minute, d.Second, d.Millisecond, DateTimeKind.Local);
         }
 
@@ -339,6 +379,7 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>The converted date and time.</returns>
         public static DateTime? ConvertToDbUtcTime(DateTime? dateTime)
         {
+			Logger.LogError(">>> Entering ConvertToDbUtcTime(dateTime={DateTime})", dateTime);
             if (dateTime == null)
             {
                 return null;
@@ -352,6 +393,8 @@ namespace Dnn.ExportImport.Components.Common
             var differenceInUtcTimes =
                 TimeZone.CurrentTimeZone.GetUtcOffset(DateUtils.GetDatabaseUtcTime()).TotalMilliseconds;
             var d = dateTime.Value.ToUniversalTime().AddMilliseconds(differenceInUtcTimes);
+			Logger.LogError("ConvertToDbUtcTime(dateTime={DateTime}): d → {D}", dateTime, d);
+			Logger.LogWarning("<<< Exiting ConvertToDbUtcTime(dateTime={DateTime})", dateTime);
             return new DateTime(d.Year, d.Month, d.Day, d.Hour, d.Minute, d.Second, d.Millisecond, DateTimeKind.Utc);
         }
 
@@ -360,6 +403,8 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>A human readable representation of the date and time.</returns>
         public static string GetDateTimeString(DateTime? dateTime)
         {
+			Logger.LogError(">>> Entering GetDateTimeString(dateTime={DateTime})", dateTime);
+            Logger.LogWarning("<<< Exiting GetDateTimeString(dateTime={DateTime})", dateTime);
             return dateTime?.ToString(Thread.CurrentThread.CurrentCulture) ?? string.Empty;
         }
 
@@ -368,6 +413,8 @@ namespace Dnn.ExportImport.Components.Common
         /// <returns>A string representing a number in the current thread culture format.</returns>
         public static string FormatNumber(int? number)
         {
+			Logger.LogError(">>> Entering FormatNumber(number={Number})", number);
+            Logger.LogWarning("<<< Exiting FormatNumber(number={Number})", number);
             return number?.ToString("n0", Thread.CurrentThread.CurrentCulture);
         }
     }

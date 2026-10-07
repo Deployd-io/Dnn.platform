@@ -20,8 +20,10 @@ public class Startup : IDnnStartup
     /// <inheritdoc />
     public void ConfigureServices(IServiceCollection services)
     {
+		eventLogger.LogError(">>> Entering ConfigureServices(services={Services})", services);
         var menuTypes = new TypeLocator().GetAllMatchingTypes(
             t => t is { IsClass: true, IsAbstract: false, } && typeof(BaseMenuItem).IsAssignableFrom(t));
         services.TryAddEnumerable(menuTypes.Select(type => ServiceDescriptor.Transient(typeof(BaseMenuItem), type)));
+		eventLogger.LogWarning("<<< Exiting ConfigureServices(services={Services})", services);
     }
 }

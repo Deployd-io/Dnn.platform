@@ -11,9 +11,11 @@ namespace DotNetNuke.Services.Upgrade.Internals.InstallConfiguration
     /// </summary>
     public class InstallConfig
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InstallConfig));
         /// <summary>Initializes a new instance of the <see cref="InstallConfig"/> class.</summary>
         public InstallConfig()
         {
+			Logger.LogError(">>> Entering InstallConfig()");
             this.Portals = new List<PortalConfig>();
             this.Scripts = new List<string>();
             this.Settings = new List<HostSettingConfig>();

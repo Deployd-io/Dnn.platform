@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -18,9 +19,12 @@ CodeMirror.defineMode("yaml", function() {
 
   return {
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       var ch = stream.peek();
       var esc = state.escaped;
+	logger.error(`token(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       state.escaped = false;
+	logger.debug(`token(stream=${stream},state=${state}): state.escaped → ${state.escaped}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       /* comments */
       if (ch == "#" && (stream.pos == 0 || /\s/.test(stream.string.charAt(stream.pos - 1)))) {
         stream.skipToEnd();
@@ -35,7 +39,10 @@ CodeMirror.defineMode("yaml", function() {
       } else if (state.literal) { state.literal = false; }
       if (stream.sol()) {
         state.keyCol = 0;
+		logger.debug(`token(stream=${stream},state=${state}): state.keyCol → ${state.keyCol}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+		logger.debug(`token(stream=${stream},state=${state}): state.pairStart → ${state.pairStart}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         state.pair = false;
+		logger.debug(`token(stream=${stream},state=${state}): state.pair → ${state.pair}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         state.pairStart = false;
         /* document start */
         if(stream.match(/---/)) { return "def"; }
@@ -82,6 +89,7 @@ CodeMirror.defineMode("yaml", function() {
         if (state.inlinePairs > 0 && stream.match(/^\s*-?[0-9\.\,]+\s?(?=(,|}))/)) { return 'number'; }
         /* keywords */
         if (stream.match(keywordRegex)) { return 'keyword'; }
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       }
 
       /* pairs (associative arrays) -> key */
@@ -99,6 +107,7 @@ CodeMirror.defineMode("yaml", function() {
       return null;
     },
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         pair: false,
         pairStart: false,
@@ -108,6 +117,7 @@ CodeMirror.defineMode("yaml", function() {
         literal: false,
         escaped: false
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     }
   };
 });

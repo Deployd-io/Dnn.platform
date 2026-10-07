@@ -15,11 +15,14 @@ namespace DotNetNuke.Services.Upgrade.Internals.Steps
     /// <summary>Performs verifications about the IIS environment.</summary>
     public class IISVerificationStep : BaseInstallationStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(IISVerificationStep));
         /// <summary>Executes verifications on the IIS environment.</summary>
         public override void Execute()
         {
+			Logger.LogError(">>> Entering Execute()");
             this.Status = StepStatus.Running;
 
+			Logger.LogDebug("Execute(): this.Status → {Arg0}", this.Status);
             this.Details = Localization.GetString("CheckingIIS", this.LocalInstallResourceFile);
 
             // Checks for integrated pipeline mode.
@@ -39,10 +42,13 @@ namespace DotNetNuke.Services.Upgrade.Internals.Steps
             }
 
             this.Status = StepStatus.Done;
+			Logger.LogWarning("<<< Exiting Execute()");
         }
 
         private static bool IsDotNetVersionAtLeast(int version)
         {
+			Logger.LogError(">>> Entering IsDotNetVersionAtLeast(version={Version})", version);
+            Logger.LogWarning("<<< Exiting IsDotNetVersionAtLeast(version={Version})", version);
             return GetVersion() >= version;
         }
 

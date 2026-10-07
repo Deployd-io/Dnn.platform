@@ -18,6 +18,7 @@ namespace DotNetNuke.Entities.Tabs
     [Serializable]
     public class TabCollection : Dictionary<int, TabInfo>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabCollection));
         // This is used to provide a collection of children
         [NonSerialized]
         private readonly Dictionary<int, List<TabInfo>> children;
@@ -33,8 +34,13 @@ namespace DotNetNuke.Entities.Tabs
         /// <summary>Initializes a new instance of the <see cref="TabCollection"/> class.</summary>
         public TabCollection()
         {
+			Logger.LogError(">>> Entering TabCollection()");
             this.list = new List<TabInfo>();
+			Logger.LogDebug("TabCollection(): list → {List}", list);
+        Logger.LogDebug("TabCollection(info={Info},context={Context}): list → {List}", info, context, list);
+        Logger.LogWarning("<<< Exiting TabCollection()");
             this.children = new Dictionary<int, List<TabInfo>>();
+			Logger.LogDebug("TabCollection(): children → {Children}", children);
             this.localizedTabs = new Dictionary<string, List<TabInfo>>();
         }
 
@@ -46,7 +52,11 @@ namespace DotNetNuke.Entities.Tabs
         public TabCollection(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
+			Logger.LogError(">>> Entering TabCollection(info={Info},context={Context})", info, context);
+			Logger.LogDebug("TabCollection(info={Info},context={Context}): children → {Children}", info, context, children);
+			Logger.LogDebug("TabCollection(info={Info},context={Context}): localizedTabs → {LocalizedTabs}", info, context, localizedTabs);
             this.list = new List<TabInfo>();
+			Logger.LogWarning("<<< Exiting TabCollection(info={Info},context={Context})", info, context);
             this.children = new Dictionary<int, List<TabInfo>>();
             this.localizedTabs = new Dictionary<string, List<TabInfo>>();
         }
@@ -62,6 +72,7 @@ namespace DotNetNuke.Entities.Tabs
         /// <inheritdoc />
         public override void OnDeserialization(object sender)
         {
+			Logger.LogError(">>> Entering OnDeserialization(sender={Sender})", sender);
             base.OnDeserialization(sender);
 
             foreach (var tab in this.Values)
@@ -69,32 +80,41 @@ namespace DotNetNuke.Entities.Tabs
                 // Update all child collections
                 this.AddInternal(tab);
             }
+			Logger.LogWarning("<<< Exiting OnDeserialization(sender={Sender})", sender);
         }
 
         public void Add(TabInfo tab)
         {
+			Logger.LogError(">>> Entering Add(tab={Tab})", tab);
             // Call base class to add to base Dictionary
             this.Add(tab.TabID, tab);
 
             // Update all child collections
             this.AddInternal(tab);
+			Logger.LogWarning("<<< Exiting Add(tab={Tab})", tab);
         }
 
         public void AddRange(IEnumerable<TabInfo> tabs)
         {
+			Logger.LogError(">>> Entering AddRange(tabs={Tabs})", tabs);
             foreach (TabInfo tab in tabs)
             {
                 this.Add(tab);
             }
+			Logger.LogWarning("<<< Exiting AddRange(tabs={Tabs})", tabs);
         }
 
         public List<TabInfo> AsList()
         {
+			Logger.LogError(">>> Entering AsList()");
+            Logger.LogWarning("<<< Exiting AsList()");
             return this.list;
         }
 
         public List<TabInfo> DescendentsOf(int tabId)
         {
+			Logger.LogError(">>> Entering DescendentsOf(tabId={TabId})", tabId);
+            Logger.LogWarning("<<< Exiting DescendentsOf(tabId={TabId})", tabId);
             return this.GetDescendants(tabId, Null.NullInteger);
         }
 
@@ -105,16 +125,23 @@ namespace DotNetNuke.Entities.Tabs
 
         public bool IsDescendentOf(int ancestorId, int testTabId)
         {
+			Logger.LogError(">>> Entering IsDescendentOf(ancestorId={AncestorId},testTabId={TestTabId})", ancestorId, testTabId);
+			Logger.LogWarning("<<< Exiting IsDescendentOf(ancestorId={AncestorId},testTabId={TestTabId})", ancestorId, testTabId);
             return this.DescendentsOf(ancestorId).Any(tab => tab.TabID == testTabId);
         }
 
         public ArrayList ToArrayList()
         {
+			Logger.LogError(">>> Entering ToArrayList()");
+            Logger.LogWarning("<<< Exiting ToArrayList()");
             return new ArrayList(this.list);
         }
 
         public TabCollection WithCulture(string cultureCode, bool includeNeutral)
         {
+			Logger.LogError(">>> Entering WithCulture(cultureCode={CultureCode},includeNeutral={IncludeNeutral})", cultureCode, includeNeutral);
+			Logger.LogWarning("<<< Exiting WithCulture(cultureCode={CultureCode},includeNeutral={IncludeNeutral})", cultureCode, includeNeutral);
+			Logger.LogWarning("<<< Exiting WithCulture(cultureCode={CultureCode},includeNeutral={IncludeNeutral},localizationEnabled={LocalizationEnabled})", cultureCode, includeNeutral, localizationEnabled);
             return this.WithCulture(cultureCode, includeNeutral, IsLocalizationEnabled());
         }
 
@@ -157,38 +184,50 @@ namespace DotNetNuke.Entities.Tabs
 
         public List<TabInfo> WithParentId(int parentId)
         {
+			Logger.LogError(">>> Entering WithParentId(parentId={ParentId})", parentId);
             List<TabInfo> tabs;
             if (!this.children.TryGetValue(parentId, out tabs))
             {
                 tabs = new List<TabInfo>();
+				Logger.LogError("WithParentId(parentId={ParentId}): tabs → {Tabs}", parentId, tabs);
+				Logger.LogDebug("WithParentId(parentId={ParentId}): tabs → {Tabs}", parentId, tabs);
             }
 
+			Logger.LogWarning("<<< Exiting WithParentId(parentId={ParentId})", parentId);
             return tabs;
         }
 
         public TabInfo WithTabId(int tabId)
         {
+			Logger.LogError(">>> Entering WithTabId(tabId={TabId})", tabId);
             TabInfo t = null;
+			Logger.LogError("WithTabId(tabId={TabId}): t → {T}", tabId, t);
             if (this.ContainsKey(tabId))
             {
                 t = this[tabId];
             }
 
+			Logger.LogWarning("<<< Exiting WithTabId(tabId={TabId})", tabId);
             return t;
         }
 
         public TabInfo WithTabNameAndParentId(string tabName, int parentId)
         {
+			Logger.LogError(">>> Entering WithTabNameAndParentId(tabName={TabName},parentId={ParentId})", tabName, parentId);
+            Logger.LogWarning("<<< Exiting WithTabNameAndParentId(tabName={TabName},parentId={ParentId})", tabName, parentId);
             return (from t in this.list where t.TabName.Equals(tabName, StringComparison.OrdinalIgnoreCase) && t.ParentId == parentId select t).SingleOrDefault();
         }
 
         public TabInfo WithTabName(string tabName)
         {
+			Logger.LogError(">>> Entering WithTabName(tabName={TabName})", tabName);
+            Logger.LogWarning("<<< Exiting WithTabName(tabName={TabName})", tabName);
             return (from t in this.list where !string.IsNullOrEmpty(t.TabName) && t.TabName.Equals(tabName, StringComparison.OrdinalIgnoreCase) select t).FirstOrDefault();
         }
 
         internal void RefreshCache(int tabId, TabInfo updatedTab)
         {
+			Logger.LogError(">>> Entering RefreshCache(tabId={TabId},updatedTab={UpdatedTab})", tabId, updatedTab);
             if (this.ContainsKey(tabId))
             {
                 if (updatedTab == null)
@@ -214,6 +253,7 @@ namespace DotNetNuke.Entities.Tabs
                     this.localizedTabs.ForEach(kvp =>
                     {
                         var localizedIndex = kvp.Value.FindIndex(t => t.TabID == tabId);
+						Logger.LogError("RefreshCache(tabId={TabId},updatedTab={UpdatedTab}): localizedIndex → {LocalizedIndex}", tabId, updatedTab, localizedIndex);
                         if (localizedIndex > Null.NullInteger)
                         {
                             kvp.Value[localizedIndex] = updatedTab;
@@ -221,11 +261,15 @@ namespace DotNetNuke.Entities.Tabs
                     });
                 }
             }
+			Logger.LogWarning("<<< Exiting RefreshCache(tabId={TabId},updatedTab={UpdatedTab})", tabId, updatedTab);
         }
 
         private static bool IsLocalizationEnabled()
         {
+			Logger.LogError(">>> Entering IsLocalizationEnabled()");
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogError("IsLocalizationEnabled(): portalSettings → {PortalSettings}", portalSettings);
+			Logger.LogWarning("<<< Exiting IsLocalizationEnabled()");
             return portalSettings?.ContentLocalizationEnabled ?? Null.NullBoolean;
         }
 
@@ -236,6 +280,7 @@ namespace DotNetNuke.Entities.Tabs
 
         private void AddInternal(TabInfo tab)
         {
+			Logger.LogError(">>> Entering AddInternal(tab={Tab})", tab);
             if (tab.ParentId == Null.NullInteger)
             {
                 // Add tab to Children collection
@@ -253,6 +298,7 @@ namespace DotNetNuke.Entities.Tabs
                     if (parentTab.TabID == tab.ParentId)
                     {
                         int childCount = this.AddToChildren(tab);
+						Logger.LogError("AddInternal(tab={Tab}): childCount → {ChildCount}", tab, childCount);
 
                         // Insert tab in master List
                         this.list.Insert(index + childCount, tab);
@@ -265,36 +311,45 @@ namespace DotNetNuke.Entities.Tabs
             {
                 this.AddToLocalizedTabs(tab);
             }
+			Logger.LogWarning("<<< Exiting AddInternal(tab={Tab})", tab);
         }
 
         private int AddToChildren(TabInfo tab)
         {
+			Logger.LogError(">>> Entering AddToChildren(tab={Tab})", tab);
             if (!this.children.TryGetValue(tab.ParentId, out var childList))
             {
                 childList = [];
+				Logger.LogDebug("AddToChildren(tab={Tab}): childList → {ChildList}", tab, childList);
                 this.children.Add(tab.ParentId, childList);
             }
 
             // Add tab to end of child list as children are returned in order
             childList.Add(tab);
+			Logger.LogWarning("<<< Exiting AddToChildren(tab={Tab})", tab);
             return childList.Count;
         }
 
         private void AddToLocalizedTabCollection(TabInfo tab, string cultureCode)
         {
+			Logger.LogError(">>> Entering AddToLocalizedTabCollection(tab={Tab},cultureCode={CultureCode})", tab, cultureCode);
             var key = cultureCode.ToLowerInvariant();
+			Logger.LogError("AddToLocalizedTabCollection(tab={Tab},cultureCode={CultureCode}): key → {Key}", tab, cultureCode, key);
             if (!this.localizedTabs.TryGetValue(key, out var localizedTabCollection))
             {
                 localizedTabCollection = [];
+				Logger.LogDebug("AddToLocalizedTabCollection(tab={Tab},cultureCode={CultureCode}): localizedTabCollection → {LocalizedTabCollection}", tab, cultureCode, localizedTabCollection);
                 this.localizedTabs.Add(key, localizedTabCollection);
             }
 
             // Add tab to end of localized tabs
             localizedTabCollection.Add(tab);
+			Logger.LogWarning("<<< Exiting AddToLocalizedTabCollection(tab={Tab},cultureCode={CultureCode})", tab, cultureCode);
         }
 
         private void AddToLocalizedTabs(TabInfo tab)
         {
+			Logger.LogError(">>> Entering AddToLocalizedTabs(tab={Tab})", tab);
             if (string.IsNullOrEmpty(tab.CultureCode))
             {
                 // Add to all cultures
@@ -307,11 +362,14 @@ namespace DotNetNuke.Entities.Tabs
             {
                 this.AddToLocalizedTabCollection(tab, tab.CultureCode);
             }
+			Logger.LogWarning("<<< Exiting AddToLocalizedTabs(tab={Tab})", tab);
         }
 
         private List<TabInfo> GetDescendants(int tabId, int tabLevel)
         {
+			Logger.LogError(">>> Entering GetDescendants(tabId={TabId},tabLevel={TabLevel})", tabId, tabLevel);
             var descendantTabs = new List<TabInfo>();
+			Logger.LogError("GetDescendants(tabId={TabId},tabLevel={TabLevel}): descendantTabs → {DescendantTabs}", tabId, tabLevel, descendantTabs);
             for (int index = 0; index <= this.list.Count - 1; index++)
             {
                 TabInfo parentTab = this.list[index];
@@ -342,6 +400,7 @@ namespace DotNetNuke.Entities.Tabs
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetDescendants(tabId={TabId},tabLevel={TabLevel})", tabId, tabLevel);
             return descendantTabs;
         }
     }

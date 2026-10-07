@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The LanguagePackWriter class.</summary>
     public class LanguagePackWriter : PackageWriterBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LanguagePackWriter));
         private bool isCore = Null.NullBoolean;
         private Locale language;
         private LanguagePackInfo languagePack;
@@ -27,25 +28,33 @@ namespace DotNetNuke.Services.Installer.Writers
         public LanguagePackWriter(PackageInfo package)
             : base(package)
         {
+			Logger.LogError(">>> Entering LanguagePackWriter(package={Package})", package);
             this.languagePack = LanguagePackController.GetLanguagePackByPackage(package.PackageID);
+			Logger.LogDebug("LanguagePackWriter(package={Package}): languagePack → {LanguagePack}", package, languagePack);
             if (this.LanguagePack != null)
             {
                 this.language = LocaleController.Instance.GetLocale(this.languagePack.LanguageID);
+				Logger.LogDebug("LanguagePackWriter(package={Package}): language → {Language}", package, language);
                 if (this.LanguagePack.PackageType == LanguagePackType.Core)
                 {
                     this.BasePath = Null.NullString;
                 }
                 else
                 {
+					Logger.LogDebug("LanguagePackWriter(package={Package}): this.BasePath → {Arg1}", package, this.BasePath);
                     // Get the BasePath of the Dependent Package
                     PackageInfo dependendentPackage = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.PackageID == this.LanguagePack.DependentPackageID);
+					Logger.LogError("LanguagePackWriter(package={Package}): dependendentPackage → {DependendentPackage}", package, dependendentPackage);
                     PackageWriterBase dependentPackageWriter = PackageWriterFactory.GetWriter(dependendentPackage);
+					Logger.LogError("LanguagePackWriter(package={Package}): dependentPackageWriter → {DependentPackageWriter}", package, dependentPackageWriter);
                     this.BasePath = dependentPackageWriter.BasePath;
                 }
             }
             else
             {
                 this.BasePath = Null.NullString;
+				Logger.LogDebug("LanguagePackWriter(manifestNav={ManifestNav},installer={Installer}): this.BasePath → {Arg2}", manifestNav, installer, this.BasePath);
+			Logger.LogWarning("<<< Exiting LanguagePackWriter(package={Package})", package);
             }
         }
 
@@ -56,6 +65,8 @@ namespace DotNetNuke.Services.Installer.Writers
         {
             this.language = new Locale();
             XPathNavigator cultureNav = manifestNav.SelectSingleNode("Culture");
+			Logger.LogError("LanguagePackWriter(manifestNav={ManifestNav},installer={Installer}): cultureNav → {CultureNav}", manifestNav, installer, cultureNav);
+			Logger.LogDebug("LanguagePackWriter(manifestNav={ManifestNav},installer={Installer}): language → {Language}", manifestNav, installer, language);
             this.language.Text = Util.ReadAttribute(cultureNav, "DisplayName");
             this.language.Code = Util.ReadAttribute(cultureNav, "Code");
             this.language.Fallback = Localization.SystemLocale;
@@ -89,6 +100,7 @@ namespace DotNetNuke.Services.Installer.Writers
             : base(package)
         {
             this.language = language;
+			Logger.LogDebug("LanguagePackWriter(language={Language},package={Package}): this.language → {Arg2}", language, package, this.language);
             this.BasePath = Null.NullString;
         }
 
@@ -134,13 +146,16 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <inheritdoc />
         protected override void GetFiles(bool includeSource, bool includeAppCode)
         {
+			Logger.LogError(">>> Entering GetFiles(includeSource={IncludeSource},includeAppCode={IncludeAppCode})", includeSource, includeAppCode);
             // Language file starts at the root
             this.ParseFolder(Path.Combine(Globals.ApplicationMapPath, this.BasePath), Globals.ApplicationMapPath);
+			Logger.LogWarning("<<< Exiting GetFiles(includeSource={IncludeSource},includeAppCode={IncludeAppCode})", includeSource, includeAppCode);
         }
 
         /// <inheritdoc />
         protected override void ParseFiles(DirectoryInfo folder, string rootPath)
         {
+			Logger.LogError(">>> Entering ParseFiles(folder={Folder},rootPath=<redacted>)", folder);
             if (this.LanguagePack.PackageType == LanguagePackType.Core)
             {
                 if ((folder.FullName.ToLowerInvariant().Contains("desktopmodules") && !folder.FullName.ToLowerInvariant().Contains("admin")) || folder.FullName.ToLowerInvariant().Contains("providers"))
@@ -161,6 +176,7 @@ namespace DotNetNuke.Services.Installer.Writers
                 foreach (FileInfo file in files)
                 {
                     string filePath = folder.FullName.Replace(rootPath, string.Empty);
+					Logger.LogError("ParseFiles(folder={Folder},rootPath=<redacted>): filePath → {FilePath}", folder, filePath);
                     if (filePath.StartsWith(@"\", StringComparison.Ordinal))
                     {
                         filePath = filePath.Substring(1);
@@ -177,28 +193,38 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <inheritdoc />
         protected override void WriteFilesToManifest(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteFilesToManifest(writer={Writer})", writer);
             LanguageComponentWriter languageFileWriter;
             if (this.LanguagePack == null)
             {
                 languageFileWriter = new LanguageComponentWriter(this.Language, this.BasePath, this.Files, this.Package);
+				Logger.LogError("WriteFilesToManifest(writer={Writer}): languageFileWriter → {LanguageFileWriter}", writer, languageFileWriter);
             }
             else
             {
                 languageFileWriter = new LanguageComponentWriter(this.LanguagePack, this.BasePath, this.Files, this.Package);
+				Logger.LogDebug("WriteFilesToManifest(writer={Writer}): languageFileWriter → {LanguageFileWriter}", writer, languageFileWriter);
             }
 
             languageFileWriter.WriteManifest(writer);
+			Logger.LogWarning("<<< Exiting WriteFilesToManifest(writer={Writer})", writer);
         }
 
         private void ReadLegacyManifest(XPathNavigator manifestNav)
         {
+			Logger.LogError(">>> Entering ReadLegacyManifest(manifestNav={ManifestNav})", manifestNav);
             string fileName = Null.NullString;
             string filePath = Null.NullString;
+			Logger.LogError("ReadLegacyManifest(manifestNav={ManifestNav}): filePath → {FilePath}", manifestNav, filePath);
             string sourceFileName = Null.NullString;
+			Logger.LogError("ReadLegacyManifest(manifestNav={ManifestNav}): sourceFileName → {SourceFileName}", manifestNav, sourceFileName);
             string resourcetype = Null.NullString;
+			Logger.LogError("ReadLegacyManifest(manifestNav={ManifestNav}): resourcetype → {Resourcetype}", manifestNav, resourcetype);
+			Logger.LogError("ReadLegacyManifest(manifestNav={ManifestNav}): fileName → {FileName}", manifestNav, fileName);
             string moduleName = Null.NullString;
             foreach (XPathNavigator fileNav in manifestNav.Select("Files/File"))
             {
+				Logger.LogError("ReadLegacyManifest(manifestNav={ManifestNav}): moduleName → {ModuleName}", manifestNav, moduleName);
                 fileName = Util.ReadAttribute(fileNav, "FileName").ToLowerInvariant();
                 resourcetype = Util.ReadAttribute(fileNav, "FileType");
                 moduleName = Util.ReadAttribute(fileNav, "ModuleName").ToLowerInvariant();
@@ -209,6 +235,7 @@ namespace DotNetNuke.Services.Installer.Writers
                     case "GlobalResource":
                         filePath = "App_GlobalResources";
                         this.isCore = true;
+						Logger.LogDebug("ReadLegacyManifest(manifestNav={ManifestNav}): this.isCore → {Arg1}", manifestNav, this.isCore);
                         break;
                     case "ControlResource":
                         filePath = "Controls\\App_LocalResources";
@@ -510,12 +537,14 @@ namespace DotNetNuke.Services.Installer.Writers
                         {
                             // Check if language is installed
                             Locale locale = LocaleController.Instance.GetLocale(this.language.Code);
+							Logger.LogError("ReadLegacyManifest(manifestNav={ManifestNav}): locale → {Locale}", manifestNav, locale);
                             if (locale == null)
                             {
                                 this.LegacyError = "CoreLanguageError";
                             }
                             else
                             {
+								Logger.LogDebug("ReadLegacyManifest(manifestNav={ManifestNav}): this.LegacyError → {Arg1}", manifestNav, this.LegacyError);
                                 // Attempt to figure out the Extension
                                 foreach (var kvp in DesktopModuleController.GetDesktopModules(Null.NullInteger))
                                 {
@@ -523,10 +552,13 @@ namespace DotNetNuke.Services.Installer.Writers
                                     {
                                         // Found Module - Get Package
                                         var dependentPackage = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.PackageID == kvp.Value.PackageID);
+										Logger.LogError("ReadLegacyManifest(manifestNav={ManifestNav}): dependentPackage → {DependentPackage}", manifestNav, dependentPackage);
                                         this.Package.Name += "_" + dependentPackage.Name;
                                         this.Package.FriendlyName += " " + dependentPackage.FriendlyName;
+										Logger.LogDebug("ReadLegacyManifest(manifestNav={ManifestNav}): languagePack → {LanguagePack}", manifestNav, languagePack);
                                         this.languagePack = new LanguagePackInfo
                                         {
+											Logger.LogDebug("ReadLegacyManifest(manifestNav={ManifestNav}): this.languagePack → {Arg1}", manifestNav, this.languagePack);
                                             DependentPackageID = dependentPackage.PackageID,
                                             LanguageID = locale.LanguageId,
                                         };
@@ -555,6 +587,7 @@ namespace DotNetNuke.Services.Installer.Writers
                     this.AddFile(Path.Combine(filePath, fileName), sourceFileName);
                 }
             }
+			Logger.LogWarning("<<< Exiting ReadLegacyManifest(manifestNav={ManifestNav})", manifestNav);
         }
     }
 }

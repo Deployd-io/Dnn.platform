@@ -1,7 +1,9 @@
 import { languageEditor as ActionTypes } from "../constants/actionTypes";
 import utilities from "utils";
+const logger = console;
 
 function insertRecords(folders, newFolders, clearArray) {
+	logger.error(`>>> Entering insertRecords(folders=${folders},newFolders=${newFolders},clearArray=${clearArray})`, { "event.action": "insertRecords", "logrite.folders": folders, "logrite.newFolders": newFolders, "logrite.clearArray": clearArray });
     let newFolderList = !clearArray ? utilities.utilities.getObjectCopy(folders) : [];
     newFolders.forEach((folder) => {
         let alreadyThere = folders.find((_folder) => {
@@ -11,6 +13,7 @@ function insertRecords(folders, newFolders, clearArray) {
             newFolderList.push(folder);
         }
     });
+	logger.error(`insertRecords(folders=${folders},newFolders=${newFolders},clearArray=${clearArray}): newFolderList → ${newFolderList}`, { "event.action": "insertRecords", "logrite.folders": folders, "logrite.newFolders": newFolders, "logrite.clearArray": clearArray });
     return newFolderList;
 }
 

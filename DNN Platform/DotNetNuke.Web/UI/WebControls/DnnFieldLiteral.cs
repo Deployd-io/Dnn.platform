@@ -7,10 +7,13 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A literal control.</summary>
     public class DnnFieldLiteral : DnnLiteral
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFieldLiteral));
         /// <inheritdoc />
         public override void LocalizeStrings()
         {
+			Logger.LogError(">>> Entering LocalizeStrings()");
             base.LocalizeStrings();
+			Logger.LogWarning("<<< Exiting LocalizeStrings()");
             this.Text = this.Text + Utilities.GetLocalizedString("FieldSuffix.Text");
         }
     }

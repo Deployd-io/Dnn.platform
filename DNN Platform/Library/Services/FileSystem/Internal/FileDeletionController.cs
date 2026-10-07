@@ -31,13 +31,17 @@ namespace DotNetNuke.Services.FileSystem.Internal
         public FileDeletionController()
             : this(null, null, null, null, null)
         {
+		Logger.LogError(">>> Entering FileDeletionController()");
+        Logger.LogWarning("<<< Exiting FileDeletionController()");
         }
 
         /// <inheritdoc />
         public void DeleteFile(IFileInfo file)
         {
+			Logger.LogError(">>> Entering DeleteFile(file={File})", file);
             if (this.fileLockingController.IsFileLocked(file, out var lockReason))
             {
+				Logger.LogError("Throwing FileLockedException from DeleteFile(file={File})", file);
                 throw new FileLockedException(Localization.GetExceptionMessage(lockReason, "File locked. The file cannot be updated. Reason: " + lockReason));
             }
 
@@ -45,6 +49,7 @@ namespace DotNetNuke.Services.FileSystem.Internal
             try
             {
                 var folderMapping = this.folderMappingController.GetFolderMapping(file.PortalId, file.FolderMappingID);
+				Logger.LogError("DeleteFile(file={File}): folderMapping → {FolderMapping}", file, folderMapping);
                 FolderProvider.Instance(folderMapping.FolderProviderType).DeleteFile(file);
             }
             catch (Exception ex)
@@ -56,42 +61,52 @@ namespace DotNetNuke.Services.FileSystem.Internal
             this.DeleteFileData(file);
 
             DataCache.RemoveCache("GetFileById" + file.FileId);
+			Logger.LogWarning("<<< Exiting DeleteFile(file={File})", file);
         }
 
         /// <inheritdoc />
         public void UnlinkFile(IFileInfo file)
         {
+			Logger.LogError(">>> Entering UnlinkFile(file={File})", file);
             if (this.fileLockingController.IsFileLocked(file, out var lockReason))
             {
+				Logger.LogError("Throwing FileLockedException from UnlinkFile(file={File})", file);
                 throw new FileLockedException(Localization.GetExceptionMessage(lockReason, "File locked. The file cannot be updated. Reason: " + lockReason));
             }
 
             this.fileVersionController.DeleteAllUnpublishedVersions(file, false);
 
             this.DeleteFileData(file);
+			Logger.LogWarning("<<< Exiting UnlinkFile(file={File})", file);
         }
 
         /// <inheritdoc />
         public void DeleteFileData(IFileInfo file)
         {
+			Logger.LogError(">>> Entering DeleteFileData(file={File})", file);
             this.dataProvider.DeleteFile(file.PortalId, file.FileName, file.FolderId);
             this.DeleteContentItem(file.ContentItemID);
+			Logger.LogWarning("<<< Exiting DeleteFileData(file={File})", file);
         }
 
         /// <inheritdoc />
         protected override Func<IFileDeletionController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<IFileDeletionController>();
         }
 
         private void DeleteContentItem(int contentItemId)
         {
+			Logger.LogError(">>> Entering DeleteContentItem(contentItemId={ContentItemId})", contentItemId);
             if (contentItemId == Null.NullInteger)
             {
                 return;
             }
 
             this.contentController.DeleteContentItem(contentItemId);
+			Logger.LogWarning("<<< Exiting DeleteContentItem(contentItemId={ContentItemId})", contentItemId);
         }
     }
 }

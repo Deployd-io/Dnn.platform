@@ -17,6 +17,7 @@ namespace DotNetNuke.Entities.Portals
     [DnnDeprecated(9, 7, 2, "use IDictionary<string, IPortalAliasInfo> instead")]
     public partial class PortalAliasCollection : DictionaryBase, IDictionary<string, PortalAliasInfo>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalAliasCollection));
         /// <summary>Gets a value indicating whether the collection contains keys that are not null.</summary>
         public bool HasKeys => this.Dictionary.Keys.Count > 0;
 
@@ -46,13 +47,17 @@ namespace DotNetNuke.Entities.Portals
         /// <inheritdoc />
         public bool TryGetValue(string key, out PortalAliasInfo value)
         {
+			Logger.LogError(">>> Entering TryGetValue(key={Key})", key);
             if (!this.ContainsKey(key))
             {
                 value = null;
+				Logger.LogError("TryGetValue(key={Key}): value → {Value}", key, value);
+				Logger.LogDebug("TryGetValue(key={Key}): value → {Value}", key, value);
                 return false;
             }
 
             value = this[key];
+			Logger.LogWarning("<<< Exiting TryGetValue(key={Key})", key);
             return true;
         }
 
@@ -66,12 +71,14 @@ namespace DotNetNuke.Entities.Portals
         /// <inheritdoc />
         public bool Remove(string key)
         {
+			Logger.LogError(">>> Entering Remove(key={Key})", key);
             if (!this.ContainsKey(key))
             {
                 return false;
             }
 
             this.Dictionary.Remove(key);
+			Logger.LogWarning("<<< Exiting Remove(key={Key})", key);
             return true;
         }
 
@@ -98,8 +105,10 @@ namespace DotNetNuke.Entities.Portals
         public void CopyTo(KeyValuePair<string, PortalAliasInfo>[] array, int arrayIndex)
         {
             Requires.NotNull(nameof(array), array);
+			Logger.LogError(">>> Entering CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
             if (arrayIndex > array.Length)
             {
+				Logger.LogError("Throwing ArgumentOutOfRangeException from CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
                 throw new ArgumentOutOfRangeException(nameof(arrayIndex), arrayIndex, "arrayIndex must be less than the length of array");
             }
 
@@ -112,6 +121,7 @@ namespace DotNetNuke.Entities.Portals
             {
                 array[arrayIndex++] = new KeyValuePair<string, PortalAliasInfo>((string)entry.Key, (PortalAliasInfo)entry.Value);
             }
+			Logger.LogWarning("<<< Exiting CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
         }
 
         /// <inheritdoc />

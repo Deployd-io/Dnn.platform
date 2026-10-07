@@ -14,16 +14,20 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class SslSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             sslSettings: undefined,
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const { props } = this;
         if (props.sslSettings) {
             this.setState({
@@ -32,19 +36,24 @@ class SslSettingsPanelBody extends Component {
             return;
         }
         this.getSslSettings();
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         const { state, props } = this;
         let sslSettings = Object.assign({}, state.sslSettings);
+		logger.error(`onSettingChange(key=${key},event=${event}): sslSettings → ${sslSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         sslSettings[key] = typeof event === "object" ? event.target.value : event;
         this.setState({
             sslSettings: sslSettings,
         });
         props.dispatch(SecurityActions.sslSettingsClientModified(sslSettings));
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const { props, state } = this;
 
@@ -57,28 +66,33 @@ class SslSettingsPanelBody extends Component {
                 },
                 () => {
                     util.utilities.notifyError(resx.get("SslSettingsError"));
+					logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
                 }
             )
         );
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         util.utilities.confirm(
             resx.get("SslSettingsRestoreWarning"),
             resx.get("Yes"),
             resx.get("No"),
             () => {
                 this.getSslSettings();
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
             }
         );
     }
 
     onSetAllPagesSecure() {
+		logger.error('>>> Entering onSetAllPagesSecure()', { "event.action": "onSetAllPagesSecure" });
         util.utilities.confirm(
             resx.get("SslSetAllPagesSecure.Confirm"),
             resx.get("Yes"),
             resx.get("No"),
             function onSetAllPagesSecureConfirm() {
+				logger.error('>>> Entering onSetAllPagesSecureConfirm()', { "event.action": "onSetAllPagesSecureConfirm" });
                 this.props.dispatch(
                     SecurityActions.updateSslSettings(
                         this.state.sslSettings,
@@ -92,6 +106,7 @@ class SslSettingsPanelBody extends Component {
                         },
                         () => {
                             util.utilities.notifyError(resx.get("SslSettingsError"));
+							logger.warn('<<< Exiting onSetAllPagesSecureConfirm()', { "event.action": "onSetAllPagesSecureConfirm" });
                         }
                     )
                 );
@@ -100,6 +115,7 @@ class SslSettingsPanelBody extends Component {
     }
 
     getSslSettings() {
+		logger.error('>>> Entering getSslSettings()', { "event.action": "getSslSettings" });
         const { props } = this;
         props.dispatch(
             SecurityActions.getSslSettings((data) => {
@@ -109,10 +125,12 @@ class SslSettingsPanelBody extends Component {
                 });
             })
         );
+		logger.warn('<<< Exiting getSslSettings()', { "event.action": "getSslSettings" });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { state } = this;
         if (state.sslSettings) {
             let warningBox = <div />;
@@ -279,6 +297,8 @@ SslSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         sslSettings: state.security.sslSettings,

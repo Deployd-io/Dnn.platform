@@ -30,6 +30,8 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public ClientResourceController(IHostSettings hostSettings)
             : this(hostSettings, null, null)
         {
+		Logger.LogError(">>> Entering ClientResourceController(hostSettings={HostSettings})", hostSettings);
+        Logger.LogWarning("<<< Exiting ClientResourceController(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ClientResourceController"/> class.</summary>
@@ -39,6 +41,8 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public ClientResourceController(IHostSettings hostSettings, IApplicationStatusInfo appStatus)
             : this(hostSettings, appStatus, null)
         {
+		Logger.LogError(">>> Entering ClientResourceController(hostSettings={HostSettings},appStatus={AppStatus})", hostSettings, appStatus);
+        Logger.LogWarning("<<< Exiting ClientResourceController(hostSettings={HostSettings},appStatus={AppStatus})", hostSettings, appStatus);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ClientResourceController"/> class.</summary>
@@ -47,15 +51,24 @@ namespace DotNetNuke.Web.Client.ResourceManager
         /// <param name="clientResourceSettings">The client resource settings.</param>
         public ClientResourceController(IHostSettings hostSettings, IApplicationStatusInfo appStatus, IClientResourceSettings clientResourceSettings)
         {
+			Logger.LogDebug("ClientResourceController(hostSettings={HostSettings},appStatus={AppStatus},clientResourceSettings={ClientResourceSettings}): appStatus → {AppStatus1}", hostSettings, appStatus, clientResourceSettings, appStatus);
+			Logger.LogDebug("ClientResourceController(hostSettings={HostSettings},appStatus={AppStatus},clientResourceSettings={ClientResourceSettings}): clientResourceSettings → {ClientResourceSettings1}", hostSettings, appStatus, clientResourceSettings, clientResourceSettings);
             this.hostSettings = hostSettings;
+			Logger.LogDebug("ClientResourceController(hostSettings={HostSettings},appStatus={AppStatus},clientResourceSettings={ClientResourceSettings}): this.hostSettings → {Arg3}", hostSettings, appStatus, clientResourceSettings, this.hostSettings);
             this.appStatus = appStatus;
             this.clientResourceSettings = clientResourceSettings;
             this.RegisterPathNameAlias("SharedScripts", "~/Resources/Shared/Scripts/");
+			Logger.LogDebug("ClientResourceController(hostSettings={HostSettings},appStatus={AppStatus},clientResourceSettings={ClientResourceSettings}): this.appStatus → {Arg3}", hostSettings, appStatus, clientResourceSettings, this.appStatus);
             this.controllerId = Guid.NewGuid();
             if (clientResourceSettings != null)
             {
+				Logger.LogDebug("ClientResourceController(hostSettings={HostSettings},appStatus={AppStatus},clientResourceSettings={ClientResourceSettings}): this.clientResourceSettings → {Arg3}", hostSettings, appStatus, clientResourceSettings, this.clientResourceSettings);
+				Logger.LogDebug("ClientResourceController(hostSettings={HostSettings},appStatus={AppStatus},clientResourceSettings={ClientResourceSettings}): controllerId → {ControllerId}", hostSettings, appStatus, clientResourceSettings, controllerId);
+				Logger.LogDebug("ClientResourceController(hostSettings={HostSettings},appStatus={AppStatus},clientResourceSettings={ClientResourceSettings}): hostSettings → {HostSettings1}", hostSettings, appStatus, clientResourceSettings, hostSettings);
                 this.crmVersion = clientResourceSettings.OverrideDefaultSettings ? clientResourceSettings.PortalCrmVersion : clientResourceSettings.HostCrmVersion;
             }
+			Logger.LogDebug("ClientResourceController(hostSettings={HostSettings},appStatus={AppStatus},clientResourceSettings={ClientResourceSettings}): crmVersion → {CrmVersion}", hostSettings, appStatus, clientResourceSettings, crmVersion);
+			Logger.LogDebug("ClientResourceController(hostSettings={HostSettings},appStatus={AppStatus},clientResourceSettings={ClientResourceSettings}): this.crmVersion → {Arg3}", hostSettings, appStatus, clientResourceSettings, this.crmVersion);
 
             Logger.Debug($"ClientResourceController initialized with ID {this.controllerId}");
         }
@@ -77,31 +90,38 @@ namespace DotNetNuke.Web.Client.ResourceManager
         /// <inheritdoc />
         public void AddFont(IFontResource font)
         {
+			Logger.LogError(">>> Entering AddFont(font={Font})", font);
             this.Fonts = this.AddResource(this.Fonts, font);
         }
 
         /// <inheritdoc />
         public void AddScript(IScriptResource script)
         {
+			Logger.LogError(">>> Entering AddScript(script={Script})", script);
             this.Scripts = this.AddResource(this.Scripts, script);
         }
 
         /// <inheritdoc />
         public void AddStylesheet(IStylesheetResource stylesheet)
         {
+			Logger.LogError(">>> Entering AddStylesheet(stylesheet={Stylesheet})", stylesheet);
             this.Stylesheets = this.AddResource(this.Stylesheets, stylesheet);
         }
 
         /// <inheritdoc />
         public IFontResource CreateFont(string sourcePath)
         {
+			Logger.LogError(">>> Entering CreateFont(sourcePath={SourcePath})", sourcePath);
             var font = new Models.FontResource(this);
             font.FilePath = sourcePath;
+			Logger.LogDebug("CreateFont(sourcePath={SourcePath}): font.FilePath → {Arg1}", sourcePath, font.FilePath);
+			Logger.LogError("CreateFont(sourcePath={SourcePath}): font → {Font}", sourcePath, font);
 
             switch (font.FilePath?.Substring(font.FilePath.LastIndexOf('.')).ToLowerInvariant())
             {
                 case ".eot":
                     font.Type = "application/vnd.ms-fontobject";
+					Logger.LogDebug("CreateFont(sourcePath={SourcePath}): font.Type → {Arg1}", sourcePath, font.Type);
                     break;
                 case ".woff":
                     font.Type = "font/woff";
@@ -123,6 +143,9 @@ namespace DotNetNuke.Web.Client.ResourceManager
                     break;
             }
 
+			Logger.LogWarning("<<< Exiting CreateFont(sourcePath={SourcePath})", sourcePath);
+			Logger.LogWarning("<<< Exiting CreateFont(sourcePath={SourcePath},pathNameAlias={PathNameAlias})", sourcePath, pathNameAlias);
+			Logger.LogWarning("<<< Exiting CreateFont(sourcePath={SourcePath},pathNameAlias={PathNameAlias},mimeType={MimeType})", sourcePath, pathNameAlias, mimeType);
             return font;
         }
 
@@ -131,6 +154,7 @@ namespace DotNetNuke.Web.Client.ResourceManager
         {
             var font = this.CreateFont(sourcePath);
             font.PathNameAlias = pathNameAlias;
+			Logger.LogError("CreateFont(sourcePath={SourcePath},pathNameAlias={PathNameAlias}): font → {Font}", sourcePath, pathNameAlias, font);
             return font;
         }
 
@@ -139,14 +163,20 @@ namespace DotNetNuke.Web.Client.ResourceManager
         {
             var font = this.CreateFont(sourcePath, pathNameAlias);
             font.Type = mimeType;
+			Logger.LogError("CreateFont(sourcePath={SourcePath},pathNameAlias={PathNameAlias},mimeType={MimeType}): font → {Font}", sourcePath, pathNameAlias, mimeType, font);
             return font;
         }
 
         /// <inheritdoc />
         public IScriptResource CreateScript(string sourcePath)
         {
+			Logger.LogError(">>> Entering CreateScript(sourcePath={SourcePath})", sourcePath);
             var script = new Models.ScriptResource(this);
             script.FilePath = sourcePath;
+			Logger.LogDebug("CreateScript(sourcePath={SourcePath}): script.FilePath → {Arg1}", sourcePath, script.FilePath);
+			Logger.LogError("CreateScript(sourcePath={SourcePath}): script → {Script}", sourcePath, script);
+			Logger.LogWarning("<<< Exiting CreateScript(sourcePath={SourcePath})", sourcePath);
+			Logger.LogWarning("<<< Exiting CreateScript(sourcePath={SourcePath},pathNameAlias={PathNameAlias})", sourcePath, pathNameAlias);
             return script;
         }
 
@@ -155,14 +185,20 @@ namespace DotNetNuke.Web.Client.ResourceManager
         {
             var script = this.CreateScript(sourcePath);
             script.PathNameAlias = pathNameAlias;
+			Logger.LogError("CreateScript(sourcePath={SourcePath},pathNameAlias={PathNameAlias}): script → {Script}", sourcePath, pathNameAlias, script);
             return script;
         }
 
         /// <inheritdoc />
         public IStylesheetResource CreateStylesheet(string sourcePath)
         {
+			Logger.LogError(">>> Entering CreateStylesheet(sourcePath={SourcePath})", sourcePath);
             var stylesheet = new Models.StylesheetResource(this);
             stylesheet.FilePath = sourcePath;
+			Logger.LogDebug("CreateStylesheet(sourcePath={SourcePath}): stylesheet.FilePath → {Arg1}", sourcePath, stylesheet.FilePath);
+			Logger.LogError("CreateStylesheet(sourcePath={SourcePath}): stylesheet → {Stylesheet}", sourcePath, stylesheet);
+			Logger.LogWarning("<<< Exiting CreateStylesheet(sourcePath={SourcePath})", sourcePath);
+			Logger.LogWarning("<<< Exiting CreateStylesheet(sourcePath={SourcePath},pathNameAlias={PathNameAlias})", sourcePath, pathNameAlias);
             return stylesheet;
         }
 
@@ -171,59 +207,79 @@ namespace DotNetNuke.Web.Client.ResourceManager
         {
             var stylesheet = this.CreateStylesheet(sourcePath);
             stylesheet.PathNameAlias = pathNameAlias;
+			Logger.LogError("CreateStylesheet(sourcePath={SourcePath},pathNameAlias={PathNameAlias}): stylesheet → {Stylesheet}", sourcePath, pathNameAlias, stylesheet);
             return stylesheet;
         }
 
         /// <inheritdoc />
         public void RegisterPathNameAlias(string pathNameAlias, string resolvedPath)
         {
+			Logger.LogError(">>> Entering RegisterPathNameAlias(pathNameAlias={PathNameAlias},resolvedPath={ResolvedPath})", pathNameAlias, resolvedPath);
             this.PathNameAliases[pathNameAlias] = resolvedPath;
+			Logger.LogWarning("<<< Exiting RegisterPathNameAlias(pathNameAlias={PathNameAlias},resolvedPath={ResolvedPath})", pathNameAlias, resolvedPath);
         }
 
         /// <inheritdoc />
         public void RemoveFontByName(string fontName)
         {
+			Logger.LogError(">>> Entering RemoveFontByName(fontName={FontName})", fontName);
             this.FontsToExclude.Add(fontName);
+			Logger.LogWarning("<<< Exiting RemoveFontByName(fontName={FontName})", fontName);
         }
 
         /// <inheritdoc />
         public void RemoveFontByPath(string fontPath, string pathNameAlias)
         {
+			Logger.LogError(">>> Entering RemoveFontByPath(fontPath={FontPath},pathNameAlias={PathNameAlias})", fontPath, pathNameAlias);
             var fullPath = this.ResolvePath(fontPath, pathNameAlias);
+			Logger.LogWarning("<<< Exiting RemoveFontByPath(fontPath={FontPath},pathNameAlias={PathNameAlias})", fontPath, pathNameAlias);
+			Logger.LogError("RemoveFontByPath(fontPath={FontPath},pathNameAlias={PathNameAlias}): fullPath → {FullPath}", fontPath, pathNameAlias, fullPath);
             this.FontsToExclude.Add(fullPath);
         }
 
         /// <inheritdoc />
         public void RemoveScriptByName(string scriptName)
         {
+			Logger.LogError(">>> Entering RemoveScriptByName(scriptName={ScriptName})", scriptName);
             this.ScriptsToExclude.Add(scriptName);
+			Logger.LogWarning("<<< Exiting RemoveScriptByName(scriptName={ScriptName})", scriptName);
         }
 
         /// <inheritdoc />
         public void RemoveScriptByPath(string scriptPath, string pathNameAlias)
         {
+			Logger.LogError(">>> Entering RemoveScriptByPath(scriptPath={ScriptPath},pathNameAlias={PathNameAlias})", scriptPath, pathNameAlias);
             var fullPath = this.ResolvePath(scriptPath, pathNameAlias);
+			Logger.LogWarning("<<< Exiting RemoveScriptByPath(scriptPath={ScriptPath},pathNameAlias={PathNameAlias})", scriptPath, pathNameAlias);
+			Logger.LogError("RemoveScriptByPath(scriptPath={ScriptPath},pathNameAlias={PathNameAlias}): fullPath → {FullPath}", scriptPath, pathNameAlias, fullPath);
             this.ScriptsToExclude.Add(fullPath);
         }
 
         /// <inheritdoc />
         public void RemoveStylesheetByName(string stylesheetName)
         {
+			Logger.LogError(">>> Entering RemoveStylesheetByName(stylesheetName={StylesheetName})", stylesheetName);
             this.StylesheetsToExclude.Add(stylesheetName);
+			Logger.LogWarning("<<< Exiting RemoveStylesheetByName(stylesheetName={StylesheetName})", stylesheetName);
         }
 
         /// <inheritdoc />
         public void RemoveStylesheetByPath(string stylesheetPath, string pathNameAlias)
         {
+			Logger.LogError(">>> Entering RemoveStylesheetByPath(stylesheetPath={StylesheetPath},pathNameAlias={PathNameAlias})", stylesheetPath, pathNameAlias);
             var fullPath = this.ResolvePath(stylesheetPath, pathNameAlias);
+			Logger.LogWarning("<<< Exiting RemoveStylesheetByPath(stylesheetPath={StylesheetPath},pathNameAlias={PathNameAlias})", stylesheetPath, pathNameAlias);
+			Logger.LogError("RemoveStylesheetByPath(stylesheetPath={StylesheetPath},pathNameAlias={PathNameAlias}): fullPath → {FullPath}", stylesheetPath, pathNameAlias, fullPath);
             this.StylesheetsToExclude.Add(fullPath);
         }
 
         /// <inheritdoc />
         public string RenderDependencies(ResourceType resourceType, string provider, string applicationPath)
         {
+			Logger.LogError(">>> Entering RenderDependencies(resourceType={ResourceType},provider={Provider},applicationPath={ApplicationPath})", resourceType, provider, applicationPath);
             this.hasBegunRendering = true;
             Logger.Debug($"Rendering dependencies for CRC id {this.controllerId} with ResourceType={resourceType}, Provider={provider}, ApplicationPath={applicationPath}. We have {this.Scripts.Count} scripts, {this.Stylesheets.Count} stylesheets and {this.Fonts.Count} fonts.");
+			Logger.LogDebug("RenderDependencies(resourceType={ResourceType},provider={Provider},applicationPath={ApplicationPath}): this.hasBegunRendering → {Arg3}", resourceType, provider, applicationPath, this.hasBegunRendering);
             var sortedList = new List<IResource>();
             if (resourceType is ResourceType.Font or ResourceType.All)
             {
@@ -278,17 +334,20 @@ namespace DotNetNuke.Web.Client.ResourceManager
                     }
 
                     resource.ResolvedPath = rtlResolvedPath;
+					Logger.LogDebug("RenderDependencies(resourceType={ResourceType},provider={Provider},applicationPath={ApplicationPath}): resource.ResolvedPath → {Arg3}", resourceType, provider, applicationPath, resource.ResolvedPath);
 
                     return resource;
                 });
             }
 
+			Logger.LogWarning("<<< Exiting RenderDependencies(resourceType={ResourceType},provider={Provider},applicationPath={ApplicationPath})", resourceType, provider, applicationPath);
             return string.Join(string.Empty, sortedList.Select(resource => resource.Render(this.crmVersion, this.hostSettings.CdnEnabled, applicationPath)));
         }
 
         private List<T> AddResource<T>(List<T> resources, T resource)
             where T : IResource
         {
+			Logger.LogError(">>> Entering AddResource(resources={Resources},resource={Resource})", resources, resource);
             resource.ResolvedPath = this.ResolvePath(resource.FilePath, resource.PathNameAlias);
             Logger.Debug($"Adding resource {resource.ResolvedPath} to CRC id {this.controllerId} which currently has {resources.Count} resources");
 
@@ -328,13 +387,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
             }
 
             resources.Add(resource);
+			Logger.LogWarning("<<< Exiting AddResource(resources={Resources},resource={Resource})", resources, resource);
             return resources;
 
             static bool VersionIsLessThan(string version, string otherVersion)
             {
+				Logger.LogError(">>> Entering VersionIsLessThan(version={Version},otherVersion={OtherVersion})", version, otherVersion);
                 if (Version.TryParse(version, out var parsedVersion) &&
                     Version.TryParse(otherVersion, out var otherParsedVersion))
                 {
+				Logger.LogWarning("<<< Exiting VersionIsLessThan(version={Version},otherVersion={OtherVersion})", version, otherVersion);
                     return parsedVersion < otherParsedVersion;
                 }
 
@@ -344,6 +406,7 @@ namespace DotNetNuke.Web.Client.ResourceManager
 
         private string ResolvePath(string filePath, string pathNameAlias)
         {
+			Logger.LogError(">>> Entering ResolvePath(filePath={FilePath},pathNameAlias={PathNameAlias})", filePath, pathNameAlias);
             if (string.IsNullOrEmpty(filePath))
             {
                 return filePath;
@@ -371,6 +434,7 @@ namespace DotNetNuke.Web.Client.ResourceManager
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ResolvePath(filePath={FilePath},pathNameAlias={PathNameAlias})", filePath, pathNameAlias);
             return filePath;
         }
     }

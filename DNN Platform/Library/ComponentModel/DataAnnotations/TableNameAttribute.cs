@@ -8,10 +8,12 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class TableNameAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TableNameAttribute));
         /// <summary>Initializes a new instance of the <see cref="TableNameAttribute"/> class.</summary>
         /// <param name="tableName">The name of the table.</param>
         public TableNameAttribute(string tableName)
         {
+			Logger.LogError(">>> Entering TableNameAttribute(tableName={TableName})", tableName);
             this.TableName = tableName;
         }
 

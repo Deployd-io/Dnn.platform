@@ -36,6 +36,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Module
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.ModuleId = this.GetFlagValue(FlagId, "Module Id", -1, true, true, true);
             this.PageId = this.GetFlagValue(FlagPageId, "Page Id", -1, true, false, true);
         }
@@ -43,18 +44,21 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Module
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             var lst = new List<ModuleInfoModel>();
             var moduleInfo = ModulesControllerLibrary.Instance.GetModule(
                 this.PortalSettings,
                 this.ModuleId,
                 this.PageId,
                 out var message);
+				eventLogger.LogError("Run(): lst → {Lst}", lst);
             if (moduleInfo == null && !string.IsNullOrEmpty(message.Value))
             {
                 return new ConsoleErrorResultModel(message.Value);
             }
 
             lst.Add(ModuleInfoModel.FromDnnModuleInfo(moduleInfo));
+			eventLogger.LogWarning("<<< Exiting Run()");
             return new ConsoleResultModel
             {
                 Data = lst,

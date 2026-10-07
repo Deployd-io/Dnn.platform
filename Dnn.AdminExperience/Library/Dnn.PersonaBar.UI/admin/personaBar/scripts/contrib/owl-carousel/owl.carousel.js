@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 /*
  *  jQuery OwlCarousel v1.3.2
  *
@@ -14,6 +15,7 @@
 
 if (typeof Object.create !== "function") {
     Object.create = function (obj) {
+		logger.error(`>>> Entering create(obj=${obj})`, { "event.action": "create", "logrite.obj": obj });
         function F() {}
         F.prototype = obj;
         return new F();
@@ -23,19 +25,24 @@ if (typeof Object.create !== "function") {
 
     var Carousel = {
         init : function (options, el) {
+			logger.error(`>>> Entering init(options=${options},el=${el})`, { "event.action": "init", "logrite.options": options, "logrite.el": el });
             var base = this;
 
+			logger.debug(`init(options=${options},el=${el}): base.userOptions → ${base.userOptions}`, { "event.action": "init", "logrite.options": options, "logrite.el": el });
             base.$elem = $(el);
             base.options = $.extend({}, $.fn.owlCarousel.options, base.$elem.data(), options);
 
             base.userOptions = options;
             base.loadContent();
+			logger.warn(`<<< Exiting init(options=${options},el=${el})`, { "event.action": "init", "logrite.options": options, "logrite.el": el });
         },
 
         loadContent : function () {
+			logger.error('>>> Entering loadContent()', { "event.action": "loadContent" });
             var base = this, url;
 
             function getData(data) {
+				logger.error(`>>> Entering getData(data=${data})`, { "event.action": "getData", "logrite.data": data });
                 var i, content = "";
                 if (typeof base.options.jsonSuccess === "function") {
                     base.options.jsonSuccess.apply(this, [data]);
@@ -48,6 +55,7 @@ if (typeof Object.create !== "function") {
                     base.$elem.html(content);
                 }
                 base.logIn();
+				logger.warn(`<<< Exiting getData(data=${data})`, { "event.action": "getData", "logrite.data": data });
             }
 
             if (typeof base.options.beforeInit === "function") {
@@ -59,26 +67,39 @@ if (typeof Object.create !== "function") {
                 $.getJSON(url, getData);
             } else {
                 base.logIn();
+				logger.warn('<<< Exiting loadContent()', { "event.action": "loadContent" });
             }
         },
 
         logIn : function () {
+			logger.error('>>> Entering logIn()', { "event.action": "logIn" });
             var base = this;
 
+			logger.error(`logIn(): base → ${base}`, { "event.action": "logIn" });
             base.$elem.data("owl-originalStyles", base.$elem.attr("style"))
                       .data("owl-originalClasses", base.$elem.attr("class"));
 
+			logger.debug(`logIn(): base.orignalItems → ${base.orignalItems}`, { "event.action": "logIn" });
+			logger.debug(`logIn(): base.wrapperWidth → ${base.wrapperWidth}`, { "event.action": "logIn" });
+			logger.debug(`logIn(): base.checkVisible → ${base.checkVisible}`, { "event.action": "logIn" });
             base.$elem.css({opacity: 0});
             base.orignalItems = base.options.items;
             base.checkBrowser();
             base.wrapperWidth = 0;
             base.checkVisible = null;
             base.setVars();
+			logger.warn('<<< Exiting logIn()', { "event.action": "logIn" });
         },
 
         setVars : function () {
+			logger.error('>>> Entering setVars()', { "event.action": "setVars" });
             var base = this;
             if (base.$elem.children().length === 0) {return false; }
+			logger.debug(`setVars(): base.itemsAmount → ${base.itemsAmount}`, { "event.action": "setVars" });
+			logger.debug(`setVars(): base.playDirection → ${base.playDirection}`, { "event.action": "setVars" });
+			logger.debug(`setVars(): base.prevItem → ${base.prevItem}`, { "event.action": "setVars" });
+			logger.debug(`setVars(): base.prevArr → ${base.prevArr}`, { "event.action": "setVars" });
+			logger.debug(`setVars(): base.currentItem → ${base.currentItem}`, { "event.action": "setVars" });
             base.baseClass();
             base.eventTypes();
             base.$userItems = base.$elem.children();
@@ -92,11 +113,14 @@ if (typeof Object.create !== "function") {
             base.currentItem = 0;
             base.customEvents();
             base.onStartup();
+			logger.warn('<<< Exiting setVars()', { "event.action": "setVars" });
         },
 
         onStartup : function () {
+			logger.error('>>> Entering onStartup()', { "event.action": "onStartup" });
             var base = this;
             base.updateItems();
+			logger.debug(`onStartup(): base.onstartup → ${base.onstartup}`, { "event.action": "onStartup" });
             base.calculateAll();
             base.buildControls();
             base.updateControls();
@@ -124,10 +148,12 @@ if (typeof Object.create !== "function") {
             base.eachMoveUpdate();
             if (typeof base.options.afterInit === "function") {
                 base.options.afterInit.apply(this, [base.$elem]);
+				logger.warn('<<< Exiting onStartup()', { "event.action": "onStartup" });
             }
         },
 
         eachMoveUpdate : function () {
+			logger.error('>>> Entering eachMoveUpdate()', { "event.action": "eachMoveUpdate" });
             var base = this;
 
             if (base.options.lazyLoad === true) {
@@ -140,10 +166,12 @@ if (typeof Object.create !== "function") {
 
             if (typeof base.options.afterAction === "function") {
                 base.options.afterAction.apply(this, [base.$elem]);
+				logger.warn('<<< Exiting eachMoveUpdate()', { "event.action": "eachMoveUpdate" });
             }
         },
 
         updateVars : function () {
+			logger.error('>>> Entering updateVars()', { "event.action": "updateVars" });
             var base = this;
             if (typeof base.options.beforeUpdate === "function") {
                 base.options.beforeUpdate.apply(this, [base.$elem]);
@@ -156,17 +184,21 @@ if (typeof Object.create !== "function") {
             base.eachMoveUpdate();
             if (typeof base.options.afterUpdate === "function") {
                 base.options.afterUpdate.apply(this, [base.$elem]);
+				logger.warn('<<< Exiting updateVars()', { "event.action": "updateVars" });
             }
         },
 
         reload : function () {
+			logger.error('>>> Entering reload()', { "event.action": "reload" });
             var base = this;
             window.setTimeout(function () {
                 base.updateVars();
             }, 0);
+			logger.warn('<<< Exiting reload()', { "event.action": "reload" });
         },
 
         watchVisibility : function () {
+			logger.error('>>> Entering watchVisibility()', { "event.action": "watchVisibility" });
             var base = this;
 
             if (base.$elem.is(":visible") === false) {
@@ -183,17 +215,21 @@ if (typeof Object.create !== "function") {
                     window.clearInterval(base.checkVisible);
                 }
             }, 500);
+			logger.warn('<<< Exiting watchVisibility()', { "event.action": "watchVisibility" });
         },
 
         wrapItems : function () {
+			logger.error('>>> Entering wrapItems()', { "event.action": "wrapItems" });
             var base = this;
             base.$userItems.wrapAll("<div class=\"owl-wrapper\">").wrap("<div class=\"owl-item\"></div>");
             base.$elem.find(".owl-wrapper").wrap("<div class=\"owl-wrapper-outer\">");
             base.wrapperOuter = base.$elem.find(".owl-wrapper-outer");
             base.$elem.css("display", "block");
+			logger.warn('<<< Exiting wrapItems()', { "event.action": "wrapItems" });
         },
 
         baseClass : function () {
+			logger.error('>>> Entering baseClass()', { "event.action": "baseClass" });
             var base = this,
                 hasBaseClass = base.$elem.hasClass(base.options.baseClass),
                 hasThemeClass = base.$elem.hasClass(base.options.theme);
@@ -204,10 +240,12 @@ if (typeof Object.create !== "function") {
 
             if (!hasThemeClass) {
                 base.$elem.addClass(base.options.theme);
+				logger.warn('<<< Exiting baseClass()', { "event.action": "baseClass" });
             }
         },
 
         updateItems : function () {
+			logger.error('>>> Entering updateItems()', { "event.action": "updateItems" });
             var base = this, width, i;
 
             if (base.options.responsive === false) {
@@ -265,10 +303,12 @@ if (typeof Object.create !== "function") {
             //if number of items is less than declared
             if (base.options.items > base.itemsAmount && base.options.itemsScaleUp === true) {
                 base.options.items = base.itemsAmount;
+				logger.warn('<<< Exiting updateItems()', { "event.action": "updateItems" });
             }
         },
 
         response : function () {
+			logger.error('>>> Entering response()', { "event.action": "response" });
             var base = this,
                 smallDelay,
                 lastWindowWidth;
@@ -279,6 +319,7 @@ if (typeof Object.create !== "function") {
             lastWindowWidth = $(window).width();
 
             base.resizer = function () {
+				logger.error('>>> Entering resizer()', { "event.action": "resizer" });
                 if ($(window).width() !== lastWindowWidth) {
                     if (base.options.autoPlay !== false) {
                         window.clearInterval(base.autoPlayInterval);
@@ -288,20 +329,25 @@ if (typeof Object.create !== "function") {
                         lastWindowWidth = $(window).width();
                         base.updateVars();
                     }, base.options.responsiveRefreshRate);
+					logger.warn('<<< Exiting resizer()', { "event.action": "resizer" });
                 }
             };
             $(window).resize(base.resizer);
+			logger.warn('<<< Exiting response()', { "event.action": "response" });
         },
 
         updatePosition : function () {
+			logger.error('>>> Entering updatePosition()', { "event.action": "updatePosition" });
             var base = this;
             base.jumpTo(base.currentItem);
             if (base.options.autoPlay !== false) {
                 base.checkAp();
+				logger.warn('<<< Exiting updatePosition()', { "event.action": "updatePosition" });
             }
         },
 
         appendItemsSizes : function () {
+			logger.error('>>> Entering appendItemsSizes()', { "event.action": "appendItemsSizes" });
             var base = this,
                 roundPages = 0,
                 lastItem = base.itemsAmount - base.options.items;
@@ -319,9 +365,11 @@ if (typeof Object.create !== "function") {
                 }
                 $this.data("owl-roundPages", roundPages);
             });
+			logger.warn('<<< Exiting appendItemsSizes()', { "event.action": "appendItemsSizes" });
         },
 
         appendWrapperSizes : function () {
+			logger.error('>>> Entering appendWrapperSizes()', { "event.action": "appendWrapperSizes" });
             var base = this,
                 width = base.$owlItems.length * base.itemWidth;
 
@@ -330,24 +378,32 @@ if (typeof Object.create !== "function") {
                 "left": 0
             });
             base.appendItemsSizes();
+			logger.warn('<<< Exiting appendWrapperSizes()', { "event.action": "appendWrapperSizes" });
         },
 
         calculateAll : function () {
+			logger.error('>>> Entering calculateAll()', { "event.action": "calculateAll" });
             var base = this;
             base.calculateWidth();
             base.appendWrapperSizes();
             base.loops();
             base.max();
+			logger.warn('<<< Exiting calculateAll()', { "event.action": "calculateAll" });
         },
 
         calculateWidth : function () {
+			logger.error('>>> Entering calculateWidth()', { "event.action": "calculateWidth" });
             var base = this;
             base.itemWidth = Math.round(base.$elem.width() / base.options.items);
+			logger.warn('<<< Exiting calculateWidth()', { "event.action": "calculateWidth" });
         },
 
         max : function () {
+			logger.error('>>> Entering max()', { "event.action": "max" });
             var base = this,
                 maximum = ((base.itemsAmount * base.itemWidth) - base.options.items * base.itemWidth) * -1;
+				logger.debug(`max(): base.maximumItem → ${base.maximumItem}`, { "event.action": "max" });
+				logger.debug(`max(): base.maximumPixels → ${base.maximumPixels}`, { "event.action": "max" });
             if (base.options.items > base.itemsAmount) {
                 base.maximumItem = 0;
                 maximum = 0;
@@ -355,23 +411,29 @@ if (typeof Object.create !== "function") {
             } else {
                 base.maximumItem = base.itemsAmount - base.options.items;
                 base.maximumPixels = maximum;
+				logger.warn('<<< Exiting max()', { "event.action": "max" });
             }
             return maximum;
         },
 
         min : function () {
+			logger.error('>>> Entering min()', { "event.action": "min" });
+			logger.warn('<<< Exiting min()', { "event.action": "min" });
             return 0;
         },
 
         loops : function () {
+			logger.error('>>> Entering loops()', { "event.action": "loops" });
             var base = this,
                 prev = 0,
                 elWidth = 0,
                 i,
                 item,
                 roundPageNum;
+				logger.debug(`loops(): base.pagesInArray → ${base.pagesInArray}`, { "event.action": "loops" });
 
             base.positionsInArray = [0];
+				logger.debug(`loops(): base.positionsInArray → ${base.positionsInArray}`, { "event.action": "loops" });
             base.pagesInArray = [];
 
             for (i = 0; i < base.itemsAmount; i += 1) {
@@ -384,12 +446,14 @@ if (typeof Object.create !== "function") {
                     if (roundPageNum !== prev) {
                         base.pagesInArray[prev] = base.positionsInArray[i];
                         prev = roundPageNum;
+						logger.warn('<<< Exiting loops()', { "event.action": "loops" });
                     }
                 }
             }
         },
 
         buildControls : function () {
+			logger.error('>>> Entering buildControls()', { "event.action": "buildControls" });
             var base = this;
             if (base.options.navigation === true || base.options.pagination === true) {
                 base.owlControls = $("<div class=\"owl-controls\"/>").toggleClass("clickable", !base.browser.isTouch).appendTo(base.$elem);
@@ -399,10 +463,12 @@ if (typeof Object.create !== "function") {
             }
             if (base.options.navigation === true) {
                 base.buildButtons();
+				logger.warn('<<< Exiting buildControls()', { "event.action": "buildControls" });
             }
         },
 
         buildButtons : function () {
+			logger.error('>>> Entering buildButtons()', { "event.action": "buildButtons" });
             var base = this,
                 buttonsWrapper = $("<div class=\"owl-buttons\"/>");
             base.owlControls.append(buttonsWrapper);
@@ -431,11 +497,13 @@ if (typeof Object.create !== "function") {
                     base.next();
                 } else {
                     base.prev();
+					logger.warn('<<< Exiting buildButtons()', { "event.action": "buildButtons" });
                 }
             });
         },
 
         buildPagination : function () {
+			logger.error('>>> Entering buildPagination()', { "event.action": "buildPagination" });
             var base = this;
 
             base.paginationWrapper = $("<div class=\"owl-pagination\"/>");
@@ -445,11 +513,13 @@ if (typeof Object.create !== "function") {
                 event.preventDefault();
                 if (Number($(this).data("owl-page")) !== base.currentItem) {
                     base.goTo(Number($(this).data("owl-page")), true);
+					logger.warn('<<< Exiting buildPagination()', { "event.action": "buildPagination" });
                 }
             });
         },
 
         updatePagination : function () {
+			logger.error('>>> Entering updatePagination()', { "event.action": "updatePagination" });
             var base = this,
                 counter,
                 lastPage,
@@ -489,8 +559,10 @@ if (typeof Object.create !== "function") {
                 }
             }
             base.checkPagination();
+			logger.warn('<<< Exiting updatePagination()', { "event.action": "updatePagination" });
         },
         checkPagination : function () {
+			logger.error('>>> Entering checkPagination()', { "event.action": "checkPagination" });
             var base = this;
             if (base.options.pagination === false) {
                 return false;
@@ -501,11 +573,13 @@ if (typeof Object.create !== "function") {
                         .find(".owl-page")
                         .removeClass("active");
                     $(this).addClass("active");
+					logger.warn('<<< Exiting checkPagination()', { "event.action": "checkPagination" });
                 }
             });
         },
 
         checkNavigation : function () {
+			logger.error('>>> Entering checkNavigation()', { "event.action": "checkNavigation" });
             var base = this;
 
             if (base.options.navigation === false) {
@@ -524,11 +598,13 @@ if (typeof Object.create !== "function") {
                 } else if (base.currentItem !== 0 && base.currentItem !== base.maximumItem) {
                     base.buttonPrev.removeClass("disabled");
                     base.buttonNext.removeClass("disabled");
+					logger.warn('<<< Exiting checkNavigation()', { "event.action": "checkNavigation" });
                 }
             }
         },
 
         updateControls : function () {
+			logger.error('>>> Entering updateControls()', { "event.action": "updateControls" });
             var base = this;
             base.updatePagination();
             base.checkNavigation();
@@ -537,20 +613,25 @@ if (typeof Object.create !== "function") {
                     base.owlControls.hide();
                 } else {
                     base.owlControls.show();
+					logger.warn('<<< Exiting updateControls()', { "event.action": "updateControls" });
                 }
             }
         },
 
         destroyControls : function () {
+			logger.error('>>> Entering destroyControls()', { "event.action": "destroyControls" });
             var base = this;
             if (base.owlControls) {
                 base.owlControls.remove();
+				logger.warn('<<< Exiting destroyControls()', { "event.action": "destroyControls" });
             }
         },
 
         next : function (speed) {
+			logger.error(`>>> Entering next(speed=${speed})`, { "event.action": "next", "logrite.speed": speed });
             var base = this;
 
+			logger.debug(`next(speed=${speed}): base.currentItem → ${base.currentItem}`, { "event.action": "next", "logrite.speed": speed });
             if (base.isTransition) {
                 return false;
             }
@@ -561,16 +642,20 @@ if (typeof Object.create !== "function") {
                     base.currentItem = 0;
                     speed = "rewind";
                 } else {
+					logger.error(`next(speed=${speed}): speed → ${speed}`, { "event.action": "next", "logrite.speed": speed });
                     base.currentItem = base.maximumItem;
                     return false;
                 }
             }
             base.goTo(base.currentItem, speed);
+			logger.warn(`<<< Exiting next(speed=${speed})`, { "event.action": "next", "logrite.speed": speed });
         },
 
         prev : function (speed) {
+			logger.error(`>>> Entering prev(speed=${speed})`, { "event.action": "prev", "logrite.speed": speed });
             var base = this;
 
+			logger.debug(`prev(speed=${speed}): base.currentItem → ${base.currentItem}`, { "event.action": "prev", "logrite.speed": speed });
             if (base.isTransition) {
                 return false;
             }
@@ -585,16 +670,21 @@ if (typeof Object.create !== "function") {
                     base.currentItem = base.maximumItem;
                     speed = "rewind";
                 } else {
+					logger.error(`prev(speed=${speed}): speed → ${speed}`, { "event.action": "prev", "logrite.speed": speed });
                     base.currentItem = 0;
                     return false;
                 }
             }
             base.goTo(base.currentItem, speed);
+			logger.warn(`<<< Exiting prev(speed=${speed})`, { "event.action": "prev", "logrite.speed": speed });
         },
 
         goTo : function (position, speed, drag) {
+			logger.error(`>>> Entering goTo(position=${position},speed=${speed},drag=${drag})`, { "event.action": "goTo", "logrite.position": position, "logrite.speed": speed, "logrite.drag": drag });
             var base = this,
                 goToPixel;
+				logger.debug(`goTo(position=${position},speed=${speed},drag=${drag}): base.currentItem → ${base.currentItem}`, { "event.action": "goTo", "logrite.position": position, "logrite.speed": speed, "logrite.drag": drag });
+				logger.debug(`goTo(position=${position},speed=${speed},drag=${drag}): base.isCss3Finish → ${base.isCss3Finish}`, { "event.action": "goTo", "logrite.position": position, "logrite.speed": speed, "logrite.drag": drag });
 
             if (base.isTransition) {
                 return false;
@@ -654,11 +744,14 @@ if (typeof Object.create !== "function") {
                 }
             }
             base.afterGo();
+			logger.warn(`<<< Exiting goTo(position=${position},speed=${speed},drag=${drag})`, { "event.action": "goTo", "logrite.position": position, "logrite.speed": speed, "logrite.drag": drag });
         },
 
         jumpTo : function (position) {
+			logger.error(`>>> Entering jumpTo(position=${position})`, { "event.action": "jumpTo", "logrite.position": position });
             var base = this;
             if (typeof base.options.beforeMove === "function") {
+				logger.debug(`jumpTo(position=${position}): base.currentItem → ${base.currentItem}`, { "event.action": "jumpTo", "logrite.position": position });
                 base.options.beforeMove.apply(this, [base.$elem]);
             }
             if (position >= base.maximumItem || position === -1) {
@@ -674,11 +767,14 @@ if (typeof Object.create !== "function") {
             }
             base.currentItem = base.owl.currentItem = position;
             base.afterGo();
+			logger.warn(`<<< Exiting jumpTo(position=${position})`, { "event.action": "jumpTo", "logrite.position": position });
         },
 
         afterGo : function () {
+			logger.error('>>> Entering afterGo()', { "event.action": "afterGo" });
             var base = this;
 
+			logger.debug(`afterGo(): base.prevItem → ${base.prevItem}`, { "event.action": "afterGo" });
             base.prevArr.push(base.currentItem);
             base.prevItem = base.owl.prevItem = base.prevArr[base.prevArr.length - 2];
             base.prevArr.shift(0);
@@ -694,25 +790,33 @@ if (typeof Object.create !== "function") {
             }
             if (typeof base.options.afterMove === "function" && base.prevItem !== base.currentItem) {
                 base.options.afterMove.apply(this, [base.$elem]);
+				logger.warn('<<< Exiting afterGo()', { "event.action": "afterGo" });
             }
         },
 
         stop : function () {
+			logger.error('>>> Entering stop()', { "event.action": "stop" });
             var base = this;
             base.apStatus = "stop";
+			logger.debug(`stop(): base.apStatus → ${base.apStatus}`, { "event.action": "stop" });
             window.clearInterval(base.autoPlayInterval);
+			logger.warn('<<< Exiting stop()', { "event.action": "stop" });
         },
 
         checkAp : function () {
+			logger.error('>>> Entering checkAp()', { "event.action": "checkAp" });
             var base = this;
             if (base.apStatus !== "stop") {
                 base.play();
+				logger.warn('<<< Exiting checkAp()', { "event.action": "checkAp" });
             }
         },
 
         play : function () {
+			logger.error('>>> Entering play()', { "event.action": "play" });
             var base = this;
             base.apStatus = "play";
+			logger.debug(`play(): base.apStatus → ${base.apStatus}`, { "event.action": "play" });
             if (base.options.autoPlay === false) {
                 return false;
             }
@@ -720,9 +824,11 @@ if (typeof Object.create !== "function") {
             base.autoPlayInterval = window.setInterval(function () {
                 base.next(true);
             }, base.options.autoPlay);
+			logger.warn('<<< Exiting play()', { "event.action": "play" });
         },
 
         swapSpeed : function (action) {
+			logger.error(`>>> Entering swapSpeed(action=${action})`, { "event.action": "swapSpeed", "logrite.action": action });
             var base = this;
             if (action === "slideSpeed") {
                 base.$owlWrapper.css(base.addCssSpeed(base.options.slideSpeed));
@@ -730,28 +836,34 @@ if (typeof Object.create !== "function") {
                 base.$owlWrapper.css(base.addCssSpeed(base.options.paginationSpeed));
             } else if (typeof action !== "string") {
                 base.$owlWrapper.css(base.addCssSpeed(action));
+				logger.warn(`<<< Exiting swapSpeed(action=${action})`, { "event.action": "swapSpeed", "logrite.action": action });
             }
         },
 
         addCssSpeed : function (speed) {
+			logger.error(`>>> Entering addCssSpeed(speed=${speed})`, { "event.action": "addCssSpeed", "logrite.speed": speed });
             return {
                 "-webkit-transition": "all " + speed + "ms ease",
                 "-moz-transition": "all " + speed + "ms ease",
                 "-o-transition": "all " + speed + "ms ease",
                 "transition": "all " + speed + "ms ease"
             };
+			logger.warn(`<<< Exiting addCssSpeed(speed=${speed})`, { "event.action": "addCssSpeed", "logrite.speed": speed });
         },
 
         removeTransition : function () {
+			logger.error('>>> Entering removeTransition()', { "event.action": "removeTransition" });
             return {
                 "-webkit-transition": "",
                 "-moz-transition": "",
                 "-o-transition": "",
                 "transition": ""
             };
+			logger.warn('<<< Exiting removeTransition()', { "event.action": "removeTransition" });
         },
 
         doTranslate : function (pixels) {
+			logger.error(`>>> Entering doTranslate(pixels=${pixels})`, { "event.action": "doTranslate", "logrite.pixels": pixels });
             return {
                 "-webkit-transform": "translate3d(" + pixels + "px, 0px, 0px)",
                 "-moz-transform": "translate3d(" + pixels + "px, 0px, 0px)",
@@ -759,33 +871,43 @@ if (typeof Object.create !== "function") {
                 "-ms-transform": "translate3d(" + pixels + "px, 0px, 0px)",
                 "transform": "translate3d(" + pixels + "px, 0px,0px)"
             };
+			logger.warn(`<<< Exiting doTranslate(pixels=${pixels})`, { "event.action": "doTranslate", "logrite.pixels": pixels });
         },
 
         transition3d : function (value) {
+			logger.error(`>>> Entering transition3d(value=${value})`, { "event.action": "transition3d", "logrite.value": value });
             var base = this;
             base.$owlWrapper.css(base.doTranslate(value));
+			logger.warn(`<<< Exiting transition3d(value=${value})`, { "event.action": "transition3d", "logrite.value": value });
         },
 
         css2move : function (value) {
+			logger.error(`>>> Entering css2move(value=${value})`, { "event.action": "css2move", "logrite.value": value });
             var base = this;
             base.$owlWrapper.css({"left" : value});
+			logger.warn(`<<< Exiting css2move(value=${value})`, { "event.action": "css2move", "logrite.value": value });
         },
 
         css2slide : function (value, speed) {
+			logger.error(`>>> Entering css2slide(value=${value},speed=${speed})`, { "event.action": "css2slide", "logrite.value": value, "logrite.speed": speed });
             var base = this;
 
+			logger.warn(`<<< Exiting css2slide(value=${value},speed=${speed})`, { "event.action": "css2slide", "logrite.value": value, "logrite.speed": speed });
             base.isCssFinish = false;
             base.$owlWrapper.stop(true, true).animate({
                 "left" : value
             }, {
                 duration : speed || base.options.slideSpeed,
                 complete : function () {
+					logger.error('>>> Entering complete()', { "event.action": "complete" });
                     base.isCssFinish = true;
+					logger.warn('<<< Exiting complete()', { "event.action": "complete" });
                 }
             });
         },
 
         checkBrowser : function () {
+			logger.error('>>> Entering checkBrowser()', { "event.action": "checkBrowser" });
             var base = this,
                 translate3D = "translate3d(0px, 0px, 0px)",
                 tempElem = document.createElement("div"),
@@ -793,6 +915,7 @@ if (typeof Object.create !== "function") {
                 asSupport,
                 support3d,
                 isTouch;
+				logger.debug(`checkBrowser(): base.browser → ${base.browser}`, { "event.action": "checkBrowser" });
 
             tempElem.style.cssText = "  -moz-transform:" + translate3D +
                                   "; -ms-transform:"     + translate3D +
@@ -805,6 +928,7 @@ if (typeof Object.create !== "function") {
 
             isTouch = "ontouchstart" in window || window.navigator.msMaxTouchPoints;
 
+			logger.warn('<<< Exiting checkBrowser()', { "event.action": "checkBrowser" });
             base.browser = {
                 "support3d" : support3d,
                 "isTouch" : isTouch
@@ -812,18 +936,22 @@ if (typeof Object.create !== "function") {
         },
 
         moveEvents : function () {
+			logger.error('>>> Entering moveEvents()', { "event.action": "moveEvents" });
             var base = this;
             if (base.options.mouseDrag !== false || base.options.touchDrag !== false) {
                 base.gestures();
                 base.disabledEvents();
+				logger.warn('<<< Exiting moveEvents()', { "event.action": "moveEvents" });
             }
         },
 
         eventTypes : function () {
+			logger.error('>>> Entering eventTypes()', { "event.action": "eventTypes" });
             var base = this,
                 types = ["s", "e", "x"];
 
             base.ev_types = {};
+				logger.debug(`eventTypes(): base.ev_types → ${base.ev_types}`, { "event.action": "eventTypes" });
 
             if (base.options.mouseDrag === true && base.options.touchDrag === true) {
                 types = [
@@ -845,20 +973,26 @@ if (typeof Object.create !== "function") {
                 ];
             }
 
+			logger.error(`eventTypes(): types → ${types}`, { "event.action": "eventTypes" });
+			logger.debug(`eventTypes(): types → ${types}`, { "event.action": "eventTypes" });
             base.ev_types.start = types[0];
             base.ev_types.move = types[1];
             base.ev_types.end = types[2];
+			logger.warn('<<< Exiting eventTypes()', { "event.action": "eventTypes" });
         },
 
         disabledEvents :  function () {
+			logger.error('>>> Entering disabledEvents()', { "event.action": "disabledEvents" });
             var base = this;
             base.$elem.on("dragstart.owl", function (event) { event.preventDefault(); });
             base.$elem.on("mousedown.disableTextSelect", function (e) {
+				logger.warn('<<< Exiting disabledEvents()', { "event.action": "disabledEvents" });
                 return $(e.target).is('input, textarea, select, option');
             });
         },
 
         gestures : function () {
+			logger.error('>>> Entering gestures()', { "event.action": "gestures" });
             /*jslint unparam: true*/
             var base = this,
                 locals = {
@@ -875,8 +1009,11 @@ if (typeof Object.create !== "function") {
                 };
 
             base.isCssFinish = true;
+			logger.debug(`gestures(): base.isCssFinish → ${base.isCssFinish}`, { "event.action": "gestures" });
 
+			logger.warn('<<< Exiting gestures()', { "event.action": "gestures" });
             function getTouches(event) {
+				logger.error(`>>> Entering getTouches(event=${event})`, { "event.action": "getTouches", "logrite.event": event });
                 if (event.touches !== undefined) {
                     return {
                         x : event.touches[0].pageX,
@@ -892,6 +1029,7 @@ if (typeof Object.create !== "function") {
                         };
                     }
                     if (event.pageX === undefined) {
+						logger.warn(`<<< Exiting getTouches(event=${event})`, { "event.action": "getTouches", "logrite.event": event });
                         return {
                             x : event.clientX,
                             y : event.clientY
@@ -901,16 +1039,19 @@ if (typeof Object.create !== "function") {
             }
 
             function swapEvents(type) {
+				logger.error(`>>> Entering swapEvents(type=${type})`, { "event.action": "swapEvents", "logrite.type": type });
                 if (type === "on") {
                     $(document).on(base.ev_types.move, dragMove);
                     $(document).on(base.ev_types.end, dragEnd);
                 } else if (type === "off") {
                     $(document).off(base.ev_types.move);
                     $(document).off(base.ev_types.end);
+					logger.warn(`<<< Exiting swapEvents(type=${type})`, { "event.action": "swapEvents", "logrite.type": type });
                 }
             }
 
             function dragStart(event) {
+				logger.error(`>>> Entering dragStart(event=${event})`, { "event.action": "dragStart", "logrite.event": event });
                 var ev = event.originalEvent || event || window.event,
                     position;
 
@@ -924,6 +1065,7 @@ if (typeof Object.create !== "function") {
                     return false;
                 }
                 if (base.isCss3Finish === false && !base.options.dragBeforeAnimFinish) {
+					logger.warn(`<<< Exiting dragStart(event=${event})`, { "event.action": "dragStart", "logrite.event": event });
                     return false;
                 }
 
@@ -953,9 +1095,11 @@ if (typeof Object.create !== "function") {
             }
 
             function dragMove(event) {
+				logger.error(`>>> Entering dragMove(event=${event})`, { "event.action": "dragMove", "logrite.event": event });
                 var ev = event.originalEvent || event || window.event,
                     minSwipe,
                     maxSwipe;
+					logger.debug(`dragMove(event=${event}): ev.returnValue → ${ev.returnValue}`, { "event.action": "dragMove", "logrite.event": event });
 
                 base.newPosX = getTouches(ev).x - locals.offsetX;
                 base.newPosY = getTouches(ev).y - locals.offsetY;
@@ -980,10 +1124,14 @@ if (typeof Object.create !== "function") {
                 }
 
                 minSwipe = function () {
+					logger.error('>>> Entering minSwipe()', { "event.action": "minSwipe" });
+					logger.warn('<<< Exiting minSwipe()', { "event.action": "minSwipe" });
                     return base.newRelativeX / 5;
                 };
 
                 maxSwipe = function () {
+					logger.error('>>> Entering maxSwipe()', { "event.action": "maxSwipe" });
+					logger.warn('<<< Exiting maxSwipe()', { "event.action": "maxSwipe" });
                     return base.maximumPixels + base.newRelativeX / 5;
                 };
 
@@ -993,15 +1141,18 @@ if (typeof Object.create !== "function") {
                 } else {
                     base.css2move(base.newPosX);
                 }
+				logger.warn(`<<< Exiting dragMove(event=${event})`, { "event.action": "dragMove", "logrite.event": event });
             }
 
             function dragEnd(event) {
+				logger.error(`>>> Entering dragEnd(event=${event})`, { "event.action": "dragEnd", "logrite.event": event });
                 var ev = event.originalEvent || event || window.event,
                     newPosition,
                     handlers,
                     owlStopEvent;
 
                 ev.target = ev.target || ev.srcElement;
+					logger.debug(`dragEnd(event=${event}): ev.target → ${ev.target}`, { "event.action": "dragEnd", "logrite.event": event });
 
                 locals.dragging = false;
 
@@ -1031,13 +1182,16 @@ if (typeof Object.create !== "function") {
                     }
                 }
                 swapEvents("off");
+				logger.warn(`<<< Exiting dragEnd(event=${event})`, { "event.action": "dragEnd", "logrite.event": event });
             }
             base.$elem.on(base.ev_types.start, ".owl-wrapper", dragStart);
         },
 
         getNewPosition : function () {
+			logger.error('>>> Entering getNewPosition()', { "event.action": "getNewPosition" });
             var base = this,
                 newPosition = base.closestItem();
+				logger.debug(`getNewPosition(): base.currentItem → ${base.currentItem}`, { "event.action": "getNewPosition" });
 
             if (newPosition > base.maximumItem) {
                 base.currentItem = base.maximumItem;
@@ -1045,14 +1199,17 @@ if (typeof Object.create !== "function") {
             } else if (base.newPosX >= 0) {
                 newPosition = 0;
                 base.currentItem = 0;
+				logger.warn('<<< Exiting getNewPosition()', { "event.action": "getNewPosition" });
             }
             return newPosition;
         },
         closestItem : function () {
+			logger.error('>>> Entering closestItem()', { "event.action": "closestItem" });
             var base = this,
                 array = base.options.scrollPerPage === true ? base.pagesInArray : base.positionsInArray,
                 goal = base.newPosX,
                 closest = null;
+				logger.debug(`closestItem(): base.currentItem → ${base.currentItem}`, { "event.action": "closestItem" });
 
             $.each(array, function (i, v) {
                 if (goal - (base.itemWidth / 20) > array[i + 1] && goal - (base.itemWidth / 20) < v && base.moveDirection() === "left") {
@@ -1069,6 +1226,7 @@ if (typeof Object.create !== "function") {
                     } else {
                         closest = array[i + 1];
                         base.currentItem = i + 1;
+						logger.warn('<<< Exiting closestItem()', { "event.action": "closestItem" });
                     }
                 }
             });
@@ -1076,21 +1234,26 @@ if (typeof Object.create !== "function") {
         },
 
         moveDirection : function () {
+			logger.error('>>> Entering moveDirection()', { "event.action": "moveDirection" });
             var base = this,
                 direction;
+				logger.debug(`moveDirection(): base.playDirection → ${base.playDirection}`, { "event.action": "moveDirection" });
             if (base.newRelativeX < 0) {
                 direction = "right";
                 base.playDirection = "next";
             } else {
                 direction = "left";
                 base.playDirection = "prev";
+				logger.warn('<<< Exiting moveDirection()', { "event.action": "moveDirection" });
             }
             return direction;
         },
 
         customEvents : function () {
+			logger.error('>>> Entering customEvents()', { "event.action": "customEvents" });
             /*jslint unparam: true*/
             var base = this;
+			logger.debug(`customEvents(): base.hoverStatus → ${base.hoverStatus}`, { "event.action": "customEvents" });
             base.$elem.on("owl.next", function () {
                 base.next();
             });
@@ -1112,9 +1275,11 @@ if (typeof Object.create !== "function") {
             base.$elem.on("owl.jumpTo", function (event, item) {
                 base.jumpTo(item);
             });
+			logger.warn('<<< Exiting customEvents()', { "event.action": "customEvents" });
         },
 
         stopOnHover : function () {
+			logger.error('>>> Entering stopOnHover()', { "event.action": "stopOnHover" });
             var base = this;
             if (base.options.stopOnHover === true && base.browser.isTouch !== true && base.options.autoPlay !== false) {
                 base.$elem.on("mouseover", function () {
@@ -1123,12 +1288,14 @@ if (typeof Object.create !== "function") {
                 base.$elem.on("mouseout", function () {
                     if (base.hoverStatus !== "stop") {
                         base.play();
+						logger.warn('<<< Exiting stopOnHover()', { "event.action": "stopOnHover" });
                     }
                 });
             }
         },
 
         lazyLoad : function () {
+			logger.error('>>> Entering lazyLoad()', { "event.action": "lazyLoad" });
             var base = this,
                 i,
                 $item,
@@ -1164,11 +1331,13 @@ if (typeof Object.create !== "function") {
                 }
                 if (follow && itemNumber < base.currentItem + base.options.items && $lazyImg.length) {
                     base.lazyPreload($item, $lazyImg);
+					logger.warn('<<< Exiting lazyLoad()', { "event.action": "lazyLoad" });
                 }
             }
         },
 
         lazyPreload : function ($item, $lazyImg) {
+			logger.error(`>>> Entering lazyPreload($item=${$item},$lazyImg=${$lazyImg})`, { "event.action": "lazyPreload", "logrite.$item": $item, "logrite.$lazyImg": $lazyImg });
             var base = this,
                 iterations = 0,
                 isBackgroundImg;
@@ -1178,9 +1347,11 @@ if (typeof Object.create !== "function") {
                 isBackgroundImg = true;
             } else {
                 $lazyImg[0].src = $lazyImg.data("src");
+				logger.warn(`<<< Exiting lazyPreload($item=${$item},$lazyImg=${$lazyImg})`, { "event.action": "lazyPreload", "logrite.$item": $item, "logrite.$lazyImg": $lazyImg });
             }
 
             function showImage() {
+				logger.error('>>> Entering showImage()', { "event.action": "showImage" });
                 $item.data("owl-loaded", "loaded").removeClass("loading");
                 $lazyImg.removeAttr("data-src");
                 if (base.options.lazyEffect === "fade") {
@@ -1190,10 +1361,12 @@ if (typeof Object.create !== "function") {
                 }
                 if (typeof base.options.afterLazyLoad === "function") {
                     base.options.afterLazyLoad.apply(this, [base.$elem]);
+					logger.warn('<<< Exiting showImage()', { "event.action": "showImage" });
                 }
             }
 
             function checkLazyImage() {
+				logger.error('>>> Entering checkLazyImage()', { "event.action": "checkLazyImage" });
                 iterations += 1;
                 if (base.completeImg($lazyImg.get(0)) || isBackgroundImg === true) {
                     showImage();
@@ -1201,6 +1374,7 @@ if (typeof Object.create !== "function") {
                     window.setTimeout(checkLazyImage, 100);
                 } else {
                     showImage();
+					logger.warn('<<< Exiting checkLazyImage()', { "event.action": "checkLazyImage" });
                 }
             }
 
@@ -1208,21 +1382,26 @@ if (typeof Object.create !== "function") {
         },
 
         autoHeight : function () {
+			logger.error('>>> Entering autoHeight()', { "event.action": "autoHeight" });
             var base = this,
                 $currentimg = $(base.$owlItems[base.currentItem]).find("img"),
                 iterations;
+				logger.warn('<<< Exiting autoHeight()', { "event.action": "autoHeight" });
 
             function addHeight() {
+				logger.error('>>> Entering addHeight()', { "event.action": "addHeight" });
                 var $currentItem = $(base.$owlItems[base.currentItem]).height();
                 base.wrapperOuter.css("height", $currentItem + "px");
                 if (!base.wrapperOuter.hasClass("autoHeight")) {
                     window.setTimeout(function () {
                         base.wrapperOuter.addClass("autoHeight");
                     }, 0);
+					logger.warn('<<< Exiting addHeight()', { "event.action": "addHeight" });
                 }
             }
 
             function checkImage() {
+				logger.error('>>> Entering checkImage()', { "event.action": "checkImage" });
                 iterations += 1;
                 if (base.completeImg($currentimg.get(0))) {
                     addHeight();
@@ -1230,6 +1409,7 @@ if (typeof Object.create !== "function") {
                     window.setTimeout(checkImage, 100);
                 } else {
                     base.wrapperOuter.css("height", ""); //Else remove height attribute
+					logger.warn('<<< Exiting checkImage()', { "event.action": "checkImage" });
                 }
             }
 
@@ -1242,6 +1422,7 @@ if (typeof Object.create !== "function") {
         },
 
         completeImg : function (img) {
+			logger.error(`>>> Entering completeImg(img=${img})`, { "event.action": "completeImg", "logrite.img": img });
             var naturalWidthType;
 
             if (!img.complete) {
@@ -1249,14 +1430,18 @@ if (typeof Object.create !== "function") {
             }
             naturalWidthType = typeof img.naturalWidth;
             if (naturalWidthType !== "undefined" && img.naturalWidth === 0) {
+				logger.warn(`<<< Exiting completeImg(img=${img})`, { "event.action": "completeImg", "logrite.img": img });
+				logger.debug(`completeImg(img=${img}): naturalWidthType → ${naturalWidthType}`, { "event.action": "completeImg", "logrite.img": img });
                 return false;
             }
             return true;
         },
 
         onVisibleItems : function () {
+			logger.error('>>> Entering onVisibleItems()', { "event.action": "onVisibleItems" });
             var base = this,
                 i;
+				logger.debug(`onVisibleItems(): base.visibleItems → ${base.visibleItems}`, { "event.action": "onVisibleItems" });
 
             if (base.options.addClassActive === true) {
                 base.$owlItems.removeClass("active");
@@ -1270,6 +1455,7 @@ if (typeof Object.create !== "function") {
                 }
             }
             base.owl.visibleItems = base.visibleItems;
+			logger.warn('<<< Exiting onVisibleItems()', { "event.action": "onVisibleItems" });
         },
 
         transitionTypes : function (className) {
@@ -1280,6 +1466,7 @@ if (typeof Object.create !== "function") {
         },
 
         singleItemTransition : function () {
+			logger.error('>>> Entering singleItemTransition()', { "event.action": "singleItemTransition" });
             var base = this,
                 outClass = base.outClass,
                 inClass = base.inClass,
@@ -1290,7 +1477,9 @@ if (typeof Object.create !== "function") {
                 animEnd = 'webkitAnimationEnd oAnimationEnd MSAnimationEnd animationend';
 
             base.isTransition = true;
+				logger.debug(`singleItemTransition(): base.isTransition → ${base.isTransition}`, { "event.action": "singleItemTransition" });
 
+			logger.warn('<<< Exiting singleItemTransition()', { "event.action": "singleItemTransition" });
             base.$owlWrapper
                 .addClass('owl-origin')
                 .css({
@@ -1299,6 +1488,8 @@ if (typeof Object.create !== "function") {
                     "perspective-origin" : origin + "px"
                 });
             function transStyles(prevPos) {
+				logger.error(`>>> Entering transStyles(prevPos=${prevPos})`, { "event.action": "transStyles", "logrite.prevPos": prevPos });
+				logger.warn(`<<< Exiting transStyles(prevPos=${prevPos})`, { "event.action": "transStyles", "logrite.prevPos": prevPos });
                 return {
                     "position" : "relative",
                     "left" : prevPos + "px"
@@ -1324,6 +1515,7 @@ if (typeof Object.create !== "function") {
         },
 
         clearTransStyle : function (item, classToRemove) {
+			logger.error(`>>> Entering clearTransStyle(item=${item},classToRemove=${classToRemove})`, { "event.action": "clearTransStyle", "logrite.item": item, "logrite.classToRemove": classToRemove });
             var base = this;
             item.css({
                 "position" : "",
@@ -1332,13 +1524,17 @@ if (typeof Object.create !== "function") {
 
             if (base.endPrev && base.endCurrent) {
                 base.$owlWrapper.removeClass('owl-origin');
+				logger.debug(`clearTransStyle(item=${item},classToRemove=${classToRemove}): base.endCurrent → ${base.endCurrent}`, { "event.action": "clearTransStyle", "logrite.item": item, "logrite.classToRemove": classToRemove });
                 base.endPrev = false;
+				logger.debug(`clearTransStyle(item=${item},classToRemove=${classToRemove}): base.endPrev → ${base.endPrev}`, { "event.action": "clearTransStyle", "logrite.item": item, "logrite.classToRemove": classToRemove });
                 base.endCurrent = false;
                 base.isTransition = false;
+				logger.debug(`clearTransStyle(item=${item},classToRemove=${classToRemove}): base.isTransition → ${base.isTransition}`, { "event.action": "clearTransStyle", "logrite.item": item, "logrite.classToRemove": classToRemove });
             }
         },
 
         owlStatus : function () {
+			logger.error('>>> Entering owlStatus()', { "event.action": "owlStatus" });
             var base = this;
             base.owl = {
                 "userOptions"   : base.userOptions,
@@ -1352,16 +1548,20 @@ if (typeof Object.create !== "function") {
                 "browser"       : base.browser,
                 "dragDirection" : base.dragDirection
             };
+			logger.warn('<<< Exiting owlStatus()', { "event.action": "owlStatus" });
         },
 
         clearEvents : function () {
+			logger.error('>>> Entering clearEvents()', { "event.action": "clearEvents" });
             var base = this;
             base.$elem.off(".owl owl mousedown.disableTextSelect");
             $(document).off(".owl owl");
             $(window).off("resize", base.resizer);
+			logger.warn('<<< Exiting clearEvents()', { "event.action": "clearEvents" });
         },
 
         unWrap : function () {
+			logger.error('>>> Entering unWrap()', { "event.action": "unWrap" });
             var base = this;
             if (base.$elem.children().length !== 0) {
                 base.$owlWrapper.unwrap();
@@ -1371,29 +1571,36 @@ if (typeof Object.create !== "function") {
                 }
             }
             base.clearEvents();
+			logger.warn('<<< Exiting unWrap()', { "event.action": "unWrap" });
             base.$elem
                 .attr("style", base.$elem.data("owl-originalStyles") || "")
                 .attr("class", base.$elem.data("owl-originalClasses"));
         },
 
         destroy : function () {
+			logger.error('>>> Entering destroy()', { "event.action": "destroy" });
             var base = this;
             base.stop();
             window.clearInterval(base.checkVisible);
             base.unWrap();
             base.$elem.removeData();
+			logger.warn('<<< Exiting destroy()', { "event.action": "destroy" });
         },
 
         reinit : function (newOptions) {
+			logger.error(`>>> Entering reinit(newOptions=${newOptions})`, { "event.action": "reinit", "logrite.newOptions": newOptions });
             var base = this,
                 options = $.extend({}, base.userOptions, newOptions);
             base.unWrap();
             base.init(options, base.$elem);
+			logger.warn(`<<< Exiting reinit(newOptions=${newOptions})`, { "event.action": "reinit", "logrite.newOptions": newOptions });
         },
 
         addItem : function (htmlString, targetPosition) {
+			logger.error(`>>> Entering addItem(htmlString=${htmlString},targetPosition=${targetPosition})`, { "event.action": "addItem", "logrite.htmlString": htmlString, "logrite.targetPosition": targetPosition });
             var base = this,
                 position;
+				logger.error(`addItem(htmlString=${htmlString},targetPosition=${targetPosition}): base → ${base}`, { "event.action": "addItem", "logrite.htmlString": htmlString, "logrite.targetPosition": targetPosition });
 
             if (!htmlString) {return false; }
 
@@ -1415,11 +1622,14 @@ if (typeof Object.create !== "function") {
             }
 
             base.setVars();
+			logger.warn(`<<< Exiting addItem(htmlString=${htmlString},targetPosition=${targetPosition})`, { "event.action": "addItem", "logrite.htmlString": htmlString, "logrite.targetPosition": targetPosition });
         },
 
         removeItem : function (targetPosition) {
+			logger.error(`>>> Entering removeItem(targetPosition=${targetPosition})`, { "event.action": "removeItem", "logrite.targetPosition": targetPosition });
             var base = this,
                 position;
+				logger.error(`removeItem(targetPosition=${targetPosition}): base → ${base}`, { "event.action": "removeItem", "logrite.targetPosition": targetPosition });
 
             if (base.$elem.children().length === 0) {
                 return false;
@@ -1433,11 +1643,13 @@ if (typeof Object.create !== "function") {
             base.unWrap();
             base.$userItems.eq(position).remove();
             base.setVars();
+			logger.warn(`<<< Exiting removeItem(targetPosition=${targetPosition})`, { "event.action": "removeItem", "logrite.targetPosition": targetPosition });
         }
 
     };
 
     $.fn.owlCarousel = function (options) {
+		logger.error(`>>> Entering owlCarousel(options=${options})`, { "event.action": "owlCarousel", "logrite.options": options });
         return this.each(function () {
             if ($(this).data("owl-init") === true) {
                 return false;
@@ -1447,6 +1659,7 @@ if (typeof Object.create !== "function") {
             carousel.init(options, this);
             $.data(this, "owlCarousel", carousel);
         });
+		logger.warn(`<<< Exiting owlCarousel(options=${options})`, { "event.action": "owlCarousel", "logrite.options": options });
     };
 
     $.fn.owlCarousel.options = {

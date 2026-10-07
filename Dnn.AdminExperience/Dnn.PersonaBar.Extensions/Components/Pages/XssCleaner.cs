@@ -11,6 +11,7 @@ namespace Dnn.PersonaBar.Pages.Components
     {
         public static void Clean(this PageSettings input)
         {
+			eventLogger.LogError(">>> Entering Clean(input={Input})", input);
             input.Title = Clean(input.Title);
             input.Description = Clean(input.Description);
             input.Name = Clean(input.Name);
@@ -21,6 +22,7 @@ namespace Dnn.PersonaBar.Pages.Components
             input.Alias = Clean(input.Alias);
             input.LocalizedName = Clean(input.LocalizedName);
             input.PageStyleSheet = Clean(input.PageStyleSheet);
+			eventLogger.LogWarning("<<< Exiting Clean(input={Input})", input);
         }
 
         public static void Clean(this BulkPage input)

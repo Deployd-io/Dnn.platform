@@ -4,33 +4,42 @@ import TextArea from "../MultiLineInputWithError";
 import Input from "../SingleLineInputWithError";
 import { EditIcon } from "../SvgIcons";
 import "./style.less";
+const logger = console;
 
 class EditableField extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             editMode: false,
             value: props.value,
             error: false
         };
         this.uniqueId = "editableField-" + (Date.now() * Math.random());
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
     
     toggleEditMode() {
+		logger.error('>>> Entering toggleEditMode()', { "event.action": "toggleEditMode" });
         this.setState({
             editMode: !this.state.editMode
         });
         if (!this.state.editMode) {
             this.editableInputRef.focus();
+			logger.warn('<<< Exiting toggleEditMode()', { "event.action": "toggleEditMode" });
         }
     }
 
     getEditableLabelClass() {
+		logger.error('>>> Entering getEditableLabelClass()', { "event.action": "getEditableLabelClass" });
         const { props, state } = this;
 
         let editableLabelClass = state.editMode ? " in-edit" : "";
+		logger.error(`getEditableLabelClass(): editableLabelClass → ${editableLabelClass}`, { "event.action": "getEditableLabelClass" });
         let inputTypeClass = props.inputType === "textArea" ? " textArea" : " singleLine";
+		logger.error(`getEditableLabelClass(): inputTypeClass → ${inputTypeClass}`, { "event.action": "getEditableLabelClass" });
 
+		logger.warn('<<< Exiting getEditableLabelClass()', { "event.action": "getEditableLabelClass" });
         return "dnn-editable-field" + editableLabelClass + inputTypeClass;
     }
 
@@ -41,6 +50,7 @@ class EditableField extends Component {
         }
     }
     getInputFromType() {
+		logger.error('>>> Entering getInputFromType()', { "event.action": "getInputFromType" });
         const { props, state } = this;
         if (props.inputType && props.inputType === "textArea") {
             return <TextArea
@@ -55,6 +65,7 @@ class EditableField extends Component {
                 errorMessage={props.errorMessage}
             />;
         } else {
+			logger.warn('<<< Exiting getInputFromType()', { "event.action": "getInputFromType" });
             return <Input
                 value={state.value}
                 onKeyDown={this.onKeyDown.bind(this)}
@@ -141,27 +152,33 @@ class EditableField extends Component {
     }
 
     getUrl(text) {
+		logger.error(`>>> Entering getUrl(text=${text})`, { "event.action": "getUrl", "logrite.text": text });
         if (text.indexOf("http://") !== 0 && text.indexOf("https://") !== 0) {
             return "http://" + text;
         }
+		logger.warn(`<<< Exiting getUrl(text=${text})`, { "event.action": "getUrl", "logrite.text": text });
         return text;
     }
 
     getEditableValue() {
+		logger.error('>>> Entering getEditableValue()', { "event.action": "getEditableValue" });
         const { props, state } = this;
         if (!props.isUrl) {
             return <span className="editable-value">{state.value}</span>;
         }
+		logger.warn('<<< Exiting getEditableValue()', { "event.action": "getEditableValue" });
         return <span className="editable-value"><a href={this.getUrl(state.value)} target="_blank" rel="noopener noreferrer">{state.value}</a></span>;
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props, refs } = this;
         const editableLabelClass = this.getEditableLabelClass();
         const input = this.getInputFromType();
         const editableValue = this.getEditableValue();
         const editButton = this.getEditButton();
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={editableLabelClass}>
                 <label className="editable-label" htmlFor={refs.input}>{props.label}</label>

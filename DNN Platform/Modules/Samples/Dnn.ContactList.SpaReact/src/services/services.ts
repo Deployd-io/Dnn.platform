@@ -1,3 +1,4 @@
+const logger = console;
 import { Contact } from '../types/Contact';
 import { ModuleContext } from '../types/Module';
 import { PagedList } from '../types/PagedList';
@@ -16,7 +17,9 @@ declare global {
 
 // Get DNN Services Framework
 function getServicesFramework(moduleId: number): ServicesFramework {
+logger.error(`>>> Entering getServicesFramework(moduleId=${moduleId})`, { "event.action": "getServicesFramework", "logrite.moduleId": moduleId });
   if (window.$ && window.$.ServicesFramework) {
+	logger.warn(`<<< Exiting getServicesFramework(moduleId=${moduleId})`, { "event.action": "getServicesFramework", "logrite.moduleId": moduleId });
     return window.$.ServicesFramework(moduleId);
   }
   throw new Error('DNN ServicesFramework not available');
@@ -24,7 +27,9 @@ function getServicesFramework(moduleId: number): ServicesFramework {
 
 // Build API headers with anti-forgery token
 function getHeaders(moduleContext: ModuleContext): HeadersInit {
+logger.error(`>>> Entering getHeaders(moduleContext=${moduleContext})`, { "event.action": "getHeaders", "logrite.moduleContext": moduleContext });
   const sf = getServicesFramework(moduleContext.ModuleId);
+logger.warn(`<<< Exiting getHeaders(moduleContext=${moduleContext})`, { "event.action": "getHeaders", "logrite.moduleContext": moduleContext });
   return {
     'Content-Type': 'application/json',
     'ModuleId': moduleContext.ModuleId.toString(),
@@ -35,8 +40,10 @@ function getHeaders(moduleContext: ModuleContext): HeadersInit {
 
 // Get base API URL
 function getApiUrl(moduleContext: ModuleContext): string {
+logger.error(`>>> Entering getApiUrl(moduleContext=${moduleContext})`, { "event.action": "getApiUrl", "logrite.moduleContext": moduleContext });
   const sf = getServicesFramework(moduleContext.ModuleId);
   // The API is from ContactList.Spa module
+logger.warn(`<<< Exiting getApiUrl(moduleContext=${moduleContext})`, { "event.action": "getApiUrl", "logrite.moduleContext": moduleContext });
   return sf.getServiceRoot('Dnn/ContactListSpaReact') + 'Contacts/';
 }
 

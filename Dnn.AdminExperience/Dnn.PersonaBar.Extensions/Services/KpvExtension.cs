@@ -14,6 +14,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
     {
         public static IEnumerable<LocalizationEntry> MapEntries(this IEnumerable<KeyValuePair<string, string>> list)
         {
+			eventLogger.LogError(">>> Entering MapEntries(list={List})", list);
             var appPath = Globals.ApplicationMapPath;
             var appPathLen = appPath.Length;
             if (!appPath.EndsWith(@"\", StringComparison.Ordinal))
@@ -21,6 +22,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 appPathLen++;
             }
 
+			eventLogger.LogWarning("<<< Exiting MapEntries(list={List})", list);
             return list.Select(kpv => new LocalizationEntry
             {
                 Name = kpv.Key,

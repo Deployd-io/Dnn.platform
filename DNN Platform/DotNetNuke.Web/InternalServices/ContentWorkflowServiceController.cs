@@ -33,6 +33,7 @@ namespace DotNetNuke.Web.InternalServices
     public partial class ContentWorkflowServiceController(IContentController contentController, IWorkflowEngine workflowEngine, ITabController tabController)
         : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ContentWorkflowServiceController));
         private readonly IContentController contentController = contentController ?? ContentController.Instance;
         private readonly IWorkflowEngine workflowEngine = workflowEngine ?? WorkflowEngine.Instance;
         private readonly ITabController tabController = tabController ?? TabController.Instance;
@@ -42,6 +43,8 @@ namespace DotNetNuke.Web.InternalServices
         public ContentWorkflowServiceController()
             : this(null, null, null)
         {
+		Logger.LogError(">>> Entering ContentWorkflowServiceController()");
+        Logger.LogWarning("<<< Exiting ContentWorkflowServiceController()");
         }
 
         /// <summary>Rejects a workflow.</summary>
@@ -51,9 +54,11 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Reject(NotificationDTO postData)
         {
+			Logger.LogError(">>> Entering Reject(postData={PostData})", postData);
             try
             {
                 var notification = NotificationsController.Instance.GetNotification(postData.NotificationId);
+				Logger.LogError("Reject(postData={PostData}): notification → {Notification}", postData, notification);
                 if (notification != null)
                 {
                     if (string.IsNullOrEmpty(notification.Context))
@@ -77,9 +82,11 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in Reject(postData={PostData}): {Arg1}", postData, exc.Message);
                 Exceptions.LogException(exc);
             }
 
+			Logger.LogWarning("<<< Exiting Reject(postData={PostData})", postData);
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
         }
 
@@ -90,9 +97,11 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Approve(NotificationDTO postData)
         {
+			Logger.LogError(">>> Entering Approve(postData={PostData})", postData);
             try
             {
                 var notification = NotificationsController.Instance.GetNotification(postData.NotificationId);
+				Logger.LogError("Approve(postData={PostData}): notification → {Notification}", postData, notification);
                 if (notification != null)
                 {
                     if (string.IsNullOrEmpty(notification.Context))
@@ -116,9 +125,11 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in Approve(postData={PostData}): {Arg1}", postData, exc.Message);
                 Exceptions.LogException(exc);
             }
 
+			Logger.LogWarning("<<< Exiting Approve(postData={PostData})", postData);
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
         }
 
@@ -128,6 +139,7 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage CompleteState()
         {
+			Logger.LogError(">>> Entering CompleteState()");
             try
             {
                 this.workflowEngine.CompleteState(this.BuildStateTransaction());
@@ -135,9 +147,11 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in CompleteState(): {Arg0}", exc.Message);
                 Exceptions.LogException(exc);
             }
 
+			Logger.LogWarning("<<< Exiting CompleteState()");
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
         }
 
@@ -147,6 +161,7 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DiscardState()
         {
+			Logger.LogError(">>> Entering DiscardState()");
             try
             {
                 this.workflowEngine.DiscardState(this.BuildStateTransaction());
@@ -154,9 +169,11 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in DiscardState(): {Arg0}", exc.Message);
                 Exceptions.LogException(exc);
             }
 
+			Logger.LogWarning("<<< Exiting DiscardState()");
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
         }
 
@@ -166,6 +183,7 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage CompleteWorkflow()
         {
+			Logger.LogError(">>> Entering CompleteWorkflow()");
             try
             {
                 this.workflowEngine.CompleteWorkflow(this.BuildStateTransaction());
@@ -173,9 +191,11 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in CompleteWorkflow(): {Arg0}", exc.Message);
                 Exceptions.LogException(exc);
             }
 
+			Logger.LogWarning("<<< Exiting CompleteWorkflow()");
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
         }
 
@@ -185,6 +205,7 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DiscardWorkflow()
         {
+			Logger.LogError(">>> Entering DiscardWorkflow()");
             try
             {
                 this.workflowEngine.DiscardWorkflow(this.BuildStateTransaction());
@@ -192,19 +213,25 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in DiscardWorkflow(): {Arg0}", exc.Message);
                 Exceptions.LogException(exc);
             }
 
+			Logger.LogWarning("<<< Exiting DiscardWorkflow()");
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
         }
 
         private StateTransaction BuildStateTransaction()
         {
+			Logger.LogError(">>> Entering BuildStateTransaction()");
             var portalId = this.PortalSettings.PortalId;
             var tabId = this.Request.FindTabId();
+			Logger.LogError("BuildStateTransaction(): tabId → {TabId}", tabId);
             var currentPage = this.tabController.GetTab(tabId, portalId);
+			Logger.LogError("BuildStateTransaction(): currentPage → {CurrentPage}", currentPage);
             var contentItemId = currentPage.ContentItemId;
             var contentItem = this.contentController.GetContentItem(contentItemId);
+			Logger.LogError("BuildStateTransaction(): contentItem → {ContentItem}", contentItem);
             var stateTransaction = new StateTransaction
             {
                 ContentItemId = contentItem.ContentItemId,
@@ -212,6 +239,7 @@ namespace DotNetNuke.Web.InternalServices
                 Message = new StateTransactionMessage(),
                 UserId = this.UserInfo.UserID,
             };
+			Logger.LogWarning("<<< Exiting BuildStateTransaction()");
             return stateTransaction;
         }
     }

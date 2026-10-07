@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -15,6 +16,8 @@ CodeMirror.defineMode("julia", function(_conf, parserConf) {
   var ERRORCLASS = 'error';
 
   function wordRegexp(words) {
+	logger.error(`>>> Entering wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
+	logger.warn(`<<< Exiting wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
     return new RegExp("^((" + words.join(")|(") + "))\\b");
   }
 

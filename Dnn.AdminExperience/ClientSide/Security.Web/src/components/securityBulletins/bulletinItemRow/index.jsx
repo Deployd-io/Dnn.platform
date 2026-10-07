@@ -2,39 +2,50 @@ import React, {Component } from "react";
 import PropTypes from "prop-types";
 import { Collapsible } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
+const logger = console;
 
 class BulletinItemRow extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             collapsed: true,
             collapsedClass: true,
             repainting: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     uncollapse() {
+		logger.error('>>> Entering uncollapse()', { "event.action": "uncollapse" });
         this.setState({
             collapsed: false
         });
+		logger.warn('<<< Exiting uncollapse()', { "event.action": "uncollapse" });
     }
 
     collapse() {
+		logger.error('>>> Entering collapse()', { "event.action": "collapse" });
         this.setState({
             collapsed: true
         });
+		logger.warn('<<< Exiting collapse()', { "event.action": "collapse" });
     }
 
     toggle() {
+		logger.error('>>> Entering toggle()', { "event.action": "toggle" });
         if (this.state.collapsed) {
             this.uncollapse();
         } else {
             this.collapse();
+			logger.warn('<<< Exiting toggle()', { "event.action": "toggle" });
         }
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="bulletinItem">
                 <div className={"collapsible-bulletinitemdetail-header " + state.collapsed} >

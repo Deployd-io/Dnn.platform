@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.GeneratedImage
     /// <summary>Validates urls that could be used in the Image Handler.</summary>
     internal class UriValidator
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UriValidator));
         private static readonly char[] AliasSeparator = ['/',];
         private readonly IPortalAliasService portalAliasService;
 
@@ -20,7 +21,11 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <param name="portalAliasService">Provides services related to portal aliases.</param>
         public UriValidator(IPortalAliasService portalAliasService)
         {
+			Logger.LogError(">>> Entering UriValidator(portalAliasService={PortalAliasService})", portalAliasService);
             this.portalAliasService = portalAliasService;
+			Logger.LogDebug("UriValidator(portalAliasService={PortalAliasService}): portalAliasService → {PortalAliasService1}", portalAliasService, portalAliasService);
+        Logger.LogDebug("UriValidator(portalAliasService={PortalAliasService}): this.portalAliasService → {Arg1}", portalAliasService, this.portalAliasService);
+        Logger.LogWarning("<<< Exiting UriValidator(portalAliasService={PortalAliasService})", portalAliasService);
         }
 
         /// <summary>Checks if a URI belongs to hosted sites.</summary>
@@ -28,6 +33,7 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <returns>A value indicating whether the provided URI belongs to a valid site.</returns>
         internal bool UriBelongsToSite(Uri uri)
         {
+			Logger.LogError(">>> Entering UriBelongsToSite(uri={Uri})", uri);
             IEnumerable<string> hostAliases =
                 this.portalAliasService
                     .GetPortalAliases().Values
@@ -41,6 +47,7 @@ namespace DotNetNuke.Services.GeneratedImage
             foreach (var alias in hostAliases)
             {
                 var aliasParts = alias.Split(AliasSeparator, 2, StringSplitOptions.None); // Split on the first '/' to separate host and path
+				Logger.LogError("UriBelongsToSite(uri={Uri}): aliasParts → {AliasParts}", uri, aliasParts);
                 string aliasHost = aliasParts[0]; // Host part of the alias (e.g., "mysite.com")
                 string aliasPath = aliasParts.Length > 1 ? "/" + aliasParts[1].TrimEnd('/') : string.Empty; // Path part, if any
 
@@ -53,6 +60,7 @@ namespace DotNetNuke.Services.GeneratedImage
             }
 
             // No matching alias found
+			Logger.LogWarning("<<< Exiting UriBelongsToSite(uri={Uri})", uri);
             return false;
         }
     }

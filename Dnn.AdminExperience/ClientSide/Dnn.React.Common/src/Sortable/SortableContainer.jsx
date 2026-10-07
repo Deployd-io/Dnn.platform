@@ -2,9 +2,11 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Droppable from "./Droppable";
 import SortableItem from "./SortableItem";
+const logger = console;
 
 class SortableContainer extends Component {
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const sortableList = this.props.children.map((child, index) => {
             return <SortableItem
                 cloneElementOnDrag={true}
@@ -16,6 +18,7 @@ class SortableContainer extends Component {
                 {child}
             </SortableItem>;
         });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <div>
             {sortableList}
         </div>;

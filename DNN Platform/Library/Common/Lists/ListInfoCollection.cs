@@ -26,6 +26,8 @@ namespace DotNetNuke.Common.Lists
         public ListInfoCollection()
             : this(null)
         {
+		Logger.LogError(">>> Entering ListInfoCollection()");
+        Logger.LogWarning("<<< Exiting ListInfoCollection()");
         }
 
         /// <summary>Gets the children from a parent name.</summary>
@@ -33,6 +35,8 @@ namespace DotNetNuke.Common.Lists
         /// <returns>A <see cref="ListInfo"/>.</returns>
         public ListInfo GetChildren(string parentName)
         {
+			Logger.LogError(">>> Entering GetChildren(parentName={ParentName})", parentName);
+            Logger.LogWarning("<<< Exiting GetChildren(parentName={ParentName})", parentName);
             return (ListInfo)this.Item(parentName);
         }
 
@@ -41,6 +45,7 @@ namespace DotNetNuke.Common.Lists
         /// <param name="value">The value of the object.</param>
         public void Add(string key, object value)
         {
+			Logger.LogError(">>> Entering Add(key={Key},value={Value})", key, value);
             try
             {
                 var index = this.List.Add(value);
@@ -50,6 +55,7 @@ namespace DotNetNuke.Common.Lists
             {
                 Logger.Error(exc);
             }
+			Logger.LogWarning("<<< Exiting Add(key={Key},value={Value})", key, value);
         }
 
         /// <summary>Gets the item at the specified index.</summary>
@@ -57,6 +63,7 @@ namespace DotNetNuke.Common.Lists
         /// <returns>The item.</returns>
         public object Item(int index)
         {
+			Logger.LogError(">>> Entering Item(index={Index})", index);
             try
             {
                 return this.List[index];
@@ -64,6 +71,9 @@ namespace DotNetNuke.Common.Lists
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting Item(index={Index})", index);
+			Logger.LogWarning("<<< Exiting Item(key={Key})", key);
+			Logger.LogWarning("<<< Exiting Item(key={Key},cache={Cache})", key, cache);
                 return null;
             }
         }
@@ -140,7 +150,9 @@ namespace DotNetNuke.Common.Lists
         /// <returns>An ArrayList of <see cref="ListInfo"/>.</returns>
         public ArrayList GetChild(string parentKey)
         {
+			Logger.LogError(">>> Entering GetChild(parentKey={ParentKey})", parentKey);
             var childList = new ArrayList();
+			Logger.LogError("GetChild(parentKey={ParentKey}): childList → {ChildList}", parentKey, childList);
             foreach (object child in this.List)
             {
                 if (((ListInfo)child).Key.Contains(parentKey, StringComparison.OrdinalIgnoreCase))
@@ -149,14 +161,17 @@ namespace DotNetNuke.Common.Lists
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetChild(parentKey={ParentKey})", parentKey);
             return childList;
         }
 
         /// <summary>Clears the collection.</summary>
         internal new void Clear()
         {
+			Logger.LogError(">>> Entering Clear()");
             this.mKeyIndexLookup.Clear();
             base.Clear();
+			Logger.LogWarning("<<< Exiting Clear()");
         }
     }
 }

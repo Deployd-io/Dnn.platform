@@ -8,6 +8,7 @@ namespace DotNetNuke.Common.Utilities
     /// <summary>The XmlExtensions class allows you to write more efficient code to manage Xml documents.</summary>
     public static class XmlExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(XmlExtensions));
         /// <summary>Adds an element to the specified XmlNode.</summary>
         /// <param name="node">The node to add the element to.</param>
         /// <param name="elementName">Name of the element.</param>
@@ -17,6 +18,10 @@ namespace DotNetNuke.Common.Utilities
         /// </returns>
         public static XmlNode AddElement(this XmlNode node, string elementName, string elementValue)
         {
+			Logger.LogError(">>> Entering AddElement(node={Node},elementName={ElementName},elementValue={ElementValue})", node, elementName, elementValue);
+            Logger.LogWarning("<<< Exiting AddElement(node={Node},elementName={ElementName},elementValue={ElementValue})", node, elementName, elementValue);
+			Logger.LogWarning("<<< Exiting AddElement(node={Node},elementName={ElementName},elementValue={ElementValue},useCData={UseCData})", node, elementName, elementValue, useCData);
+			Logger.LogWarning("<<< Exiting AddElement(node={Node},elementName={ElementName},elementValue={ElementValue},useCData={UseCData},namespaceUri={NamespaceUri},namespaceAbbr={NamespaceAbbr})", node, elementName, elementValue, useCData, namespaceUri, namespaceAbbr);
             return node.AddElement(elementName, elementValue, false);
         }
 
@@ -79,9 +84,14 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The node the attribute was added to.</returns>
         public static XmlNode AddAttribute(this XmlNode node, string attributeName, string attributeValue)
         {
+			Logger.LogError(">>> Entering AddAttribute(node={Node},attributeName={AttributeName},attributeValue={AttributeValue})", node, attributeName, attributeValue);
             XmlAttribute newAttribute = node.OwnerDocument.CreateAttribute(attributeName);
             newAttribute.InnerText = attributeValue;
+			Logger.LogDebug("AddAttribute(node={Node},attributeName={AttributeName},attributeValue={AttributeValue}): newAttribute.InnerText → {Arg3}", node, attributeName, attributeValue, newAttribute.InnerText);
+			Logger.LogError("AddAttribute(node={Node},attributeName={AttributeName},attributeValue={AttributeValue}): newAttribute → {NewAttribute}", node, attributeName, attributeValue, newAttribute);
             node.Attributes.Append(newAttribute);
+			Logger.LogWarning("<<< Exiting AddAttribute(node={Node},attributeName={AttributeName},attributeValue={AttributeValue})", node, attributeName, attributeValue);
+			Logger.LogWarning("<<< Exiting AddAttribute(node={Node},attributeName={AttributeName},attributeValue={AttributeValue},namespaceUri={NamespaceUri},namespaceAbbr={NamespaceAbbr})", node, attributeName, attributeValue, namespaceUri, namespaceAbbr);
             return node;
         }
 
@@ -107,14 +117,17 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="childNodeName">The child node name.</param>
         public static void RemoveChildNode(this XmlNode node, string childNodeName)
         {
+			Logger.LogError(">>> Entering RemoveChildNode(node={Node},childNodeName={ChildNodeName})", node, childNodeName);
             if (node != null)
             {
                 var childNode = node.SelectSingleNode(childNodeName);
+				Logger.LogError("RemoveChildNode(node={Node},childNodeName={ChildNodeName}): childNode → {ChildNode}", node, childNodeName, childNode);
                 if (childNode != null)
                 {
                     node.RemoveChild(childNode);
                 }
             }
+			Logger.LogWarning("<<< Exiting RemoveChildNode(node={Node},childNodeName={ChildNodeName})", node, childNodeName);
         }
     }
 }

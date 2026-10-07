@@ -1,4 +1,6 @@
+const logger = console;
 export function updateLogSettingList(logSettingList, logSettingDetail) {
+	logger.error(`>>> Entering updateLogSettingList(logSettingList=${logSettingList},logSettingDetail=${logSettingDetail})`, { "event.action": "updateLogSettingList", "logrite.logSettingList": logSettingList, "logrite.logSettingDetail": logSettingDetail });
     if (logSettingList.some(logSetting => logSetting.ID === logSettingDetail.ID)) {
         logSettingList = logSettingList.filter(logSetting => {
             return logSetting.ID !== logSettingDetail.ID;

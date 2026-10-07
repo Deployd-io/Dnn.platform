@@ -26,6 +26,7 @@ namespace DotNetNuke.Web.Components.Controllers
     /// <summary>The service locator and implementation for <see cref="IControlBarController"/>.</summary>
     public class ControlBarController : ServiceLocator<IControlBarController, ControlBarController>, IControlBarController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ControlBarController));
         private const string BookmarkModulesTitle = "module";
         private const string BookmarkCategoryProperty = "ControlBar_BookmarkCategory";
         private readonly ExtensionPointManager mef = new ExtensionPointManager();
@@ -47,7 +48,12 @@ namespace DotNetNuke.Web.Components.Controllers
         /// <param name="portalController">The portal controller.</param>
         public ControlBarController(PersonalizationController personalizationController, IHostSettings hostSettings, IHostSettingsService hostSettingsService, IPortalController portalController)
         {
+			Logger.LogError(">>> Entering ControlBarController(personalizationController={PersonalizationController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController})", personalizationController, hostSettings, hostSettingsService, portalController);
+			Logger.LogDebug("ControlBarController(personalizationController={PersonalizationController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController}): hostSettings → {HostSettings1}", personalizationController, hostSettings, hostSettingsService, portalController, hostSettings);
+			Logger.LogDebug("ControlBarController(personalizationController={PersonalizationController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController}): hostSettingsService → {HostSettingsService1}", personalizationController, hostSettings, hostSettingsService, portalController, hostSettingsService);
+			Logger.LogDebug("ControlBarController(personalizationController={PersonalizationController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController}): portalController → {PortalController1}", personalizationController, hostSettings, hostSettingsService, portalController, portalController);
             this.personalizationController = personalizationController ?? Globals.GetCurrentServiceProvider().GetRequiredService<PersonalizationController>();
+			Logger.LogWarning("<<< Exiting ControlBarController(personalizationController={PersonalizationController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController})", personalizationController, hostSettings, hostSettingsService, portalController);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
@@ -78,63 +84,86 @@ namespace DotNetNuke.Web.Components.Controllers
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void SaveBookMark(int portalId, int userId, string bookmarkTitle, string bookmarkValue)
         {
+			Logger.LogError(">>> Entering SaveBookMark(portalId={PortalId},userId={UserId},bookmarkTitle={BookmarkTitle},bookmarkValue={BookmarkValue})", portalId, userId, bookmarkTitle, bookmarkValue);
             var ensuredBookmarkValue = bookmarkValue;
+			Logger.LogError("SaveBookMark(portalId={PortalId},userId={UserId},bookmarkTitle={BookmarkTitle},bookmarkValue={BookmarkValue}): ensuredBookmarkValue → {EnsuredBookmarkValue}", portalId, userId, bookmarkTitle, bookmarkValue, ensuredBookmarkValue);
             if (bookmarkTitle == BookmarkModulesTitle)
             {
                 ensuredBookmarkValue = this.EnsureBookmarkValue(portalId, ensuredBookmarkValue);
             }
 
             var personalization = this.personalizationController.LoadProfile(userId, portalId);
+			Logger.LogError("SaveBookMark(portalId={PortalId},userId={UserId},bookmarkTitle={BookmarkTitle},bookmarkValue={BookmarkValue}): personalization → {Personalization}", portalId, userId, bookmarkTitle, bookmarkValue, personalization);
             personalization.Profile["ControlBar:" + bookmarkTitle + portalId] = ensuredBookmarkValue;
             personalization.IsModified = true;
+			Logger.LogDebug("SaveBookMark(portalId={PortalId},userId={UserId},bookmarkTitle={BookmarkTitle},bookmarkValue={BookmarkValue}): personalization.IsModified → {Arg4}", portalId, userId, bookmarkTitle, bookmarkValue, personalization.IsModified);
             this.personalizationController.SaveProfile(personalization);
+			Logger.LogWarning("<<< Exiting SaveBookMark(portalId={PortalId},userId={UserId},bookmarkTitle={BookmarkTitle},bookmarkValue={BookmarkValue})", portalId, userId, bookmarkTitle, bookmarkValue);
         }
 
         /// <inheritdoc />
         public string GetBookmarkCategory(int portalId)
         {
+			Logger.LogError(">>> Entering GetBookmarkCategory(portalId={PortalId})", portalId);
             var bookmarkCategory = PortalController.GetPortalSetting(this.portalController, BookmarkCategoryProperty, portalId, string.Empty);
+			Logger.LogError("GetBookmarkCategory(portalId={PortalId}): bookmarkCategory → {BookmarkCategory}", portalId, bookmarkCategory);
             if (string.IsNullOrEmpty(bookmarkCategory))
             {
                 PortalController.UpdatePortalSetting(this.portalController, portalId, BookmarkCategoryProperty, "Common");
                 return "Common";
             }
 
+			Logger.LogWarning("<<< Exiting GetBookmarkCategory(portalId={PortalId})", portalId);
             return bookmarkCategory;
         }
 
         /// <inheritdoc />
         public UpgradeIndicatorViewModel GetUpgradeIndicator(Version version, bool isLocal, bool isSecureConnection)
         {
+			Logger.LogError(">>> Entering GetUpgradeIndicator(version={Version},isLocal={IsLocal},isSecureConnection={IsSecureConnection})", version, isLocal, isSecureConnection);
             var imageUrl = Upgrade.UpgradeIndicator(this.hostSettings, this.hostSettingsService, this.portalController, version, isLocal, isSecureConnection);
+			Logger.LogError("GetUpgradeIndicator(version={Version},isLocal={IsLocal},isSecureConnection={IsSecureConnection}): imageUrl → {ImageUrl}", version, isLocal, isSecureConnection, imageUrl);
+			Logger.LogWarning("<<< Exiting GetUpgradeIndicator(version={Version},isLocal={IsLocal},isSecureConnection={IsSecureConnection})", version, isLocal, isSecureConnection);
             return !string.IsNullOrEmpty(imageUrl) ? GetDefaultUpgradeIndicator(imageUrl) : null;
         }
 
         /// <inheritdoc />
         public string GetControlBarLogoURL()
         {
+			Logger.LogError(">>> Entering GetControlBarLogoURL()");
+            Logger.LogWarning("<<< Exiting GetControlBarLogoURL()");
             return this.hostSettingsService.GetString("ControlBarLogoURL", "~/admin/controlpanel/controlbarimages/dnnLogo.png");
         }
 
         /// <inheritdoc />
         public IEnumerable<MenuItemViewModel> GetCustomMenuItems()
         {
+			Logger.LogError(">>> Entering GetCustomMenuItems()");
             var menuItemsExtensionPoints = this.mef.GetUserControlExtensionPoints("ControlBar", "CustomMenuItems");
+			Logger.LogError("GetCustomMenuItems(): menuItemsExtensionPoints → {MenuItemsExtensionPoints}", menuItemsExtensionPoints);
+			Logger.LogWarning("<<< Exiting GetCustomMenuItems()");
             return menuItemsExtensionPoints.Select(GetMenuItemFromExtensionPoint);
         }
 
         /// <inheritdoc />
         protected override Func<IControlBarController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => Globals.GetCurrentServiceProvider().GetRequiredService<IControlBarController>();
         }
 
         private static UpgradeIndicatorViewModel GetDefaultUpgradeIndicator(string imageUrl)
         {
+			Logger.LogError(">>> Entering GetDefaultUpgradeIndicator(imageUrl={ImageUrl})", imageUrl);
             var alt = LocalizationHelper.GetControlBarString("Upgrade.Text");
             var toolTip = LocalizationHelper.GetControlBarString("Upgrade.ToolTip");
+			Logger.LogError("GetDefaultUpgradeIndicator(imageUrl={ImageUrl}): toolTip → {ToolTip}", imageUrl, toolTip);
             var navigateUrl = Upgrade.UpgradeRedirect();
+			Logger.LogError("GetDefaultUpgradeIndicator(imageUrl={ImageUrl}): navigateUrl → {NavigateUrl}", imageUrl, navigateUrl);
+			Logger.LogError("GetDefaultUpgradeIndicator(imageUrl={ImageUrl}): alt → {Alt}", imageUrl, alt);
 
+			Logger.LogWarning("<<< Exiting GetDefaultUpgradeIndicator(imageUrl={ImageUrl})", imageUrl);
             return new UpgradeIndicatorViewModel
             {
                 ID = "ServiceImg",
@@ -148,6 +177,8 @@ namespace DotNetNuke.Web.Components.Controllers
 
         private static MenuItemViewModel GetMenuItemFromExtensionPoint(IUserControlExtensionPoint userControlExtensionPoint)
         {
+			Logger.LogError(">>> Entering GetMenuItemFromExtensionPoint(userControlExtensionPoint={UserControlExtensionPoint})", userControlExtensionPoint);
+			Logger.LogWarning("<<< Exiting GetMenuItemFromExtensionPoint(userControlExtensionPoint={UserControlExtensionPoint})", userControlExtensionPoint);
             return new MenuItemViewModel
             {
                 ID = Path.GetFileNameWithoutExtension(userControlExtensionPoint.UserControlSrc),
@@ -159,8 +190,12 @@ namespace DotNetNuke.Web.Components.Controllers
 
         private string EnsureBookmarkValue(int portalId, string bookmarkValue)
         {
+			Logger.LogError(">>> Entering EnsureBookmarkValue(portalId={PortalId},bookmarkValue={BookmarkValue})", portalId, bookmarkValue);
             var bookmarkCategoryModules = this.GetCategoryDesktopModules(portalId, this.GetBookmarkCategory(portalId));
             var ensuredModules = bookmarkValue.Split(',').Where(desktopModuleId => bookmarkCategoryModules.All(m => m.Value.DesktopModuleID.ToString(CultureInfo.InvariantCulture) != desktopModuleId)).ToList();
+			Logger.LogError("EnsureBookmarkValue(portalId={PortalId},bookmarkValue={BookmarkValue}): ensuredModules → {EnsuredModules}", portalId, bookmarkValue, ensuredModules);
+			Logger.LogError("EnsureBookmarkValue(portalId={PortalId},bookmarkValue={BookmarkValue}): bookmarkCategoryModules → {BookmarkCategoryModules}", portalId, bookmarkValue, bookmarkCategoryModules);
+			Logger.LogWarning("<<< Exiting EnsureBookmarkValue(portalId={PortalId},bookmarkValue={BookmarkValue})", portalId, bookmarkValue);
             return string.Join(",", ensuredModules.Distinct());
         }
 

@@ -16,6 +16,7 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let isHost = false;
 
@@ -26,6 +27,7 @@ class PrivacySettingsPanelBody extends Component {
             privacySettings: undefined
         };
         isHost = util.settings.isHost;
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     loadData() {
@@ -37,13 +39,16 @@ class PrivacySettingsPanelBody extends Component {
                 });
             })
         );
+		logger.warn('<<< Exiting loadData()', { "event.action": "loadData" });
     }
 
     componentDidMount() {
         this.loadData();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         const { props } = this;
         if (props.privacySettings) {
             let portalIdChanged = props.portalId !== undefined && prevProps.portalId !== props.portalId;
@@ -51,6 +56,7 @@ class PrivacySettingsPanelBody extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
             }
         }
     }
@@ -88,9 +94,11 @@ class PrivacySettingsPanelBody extends Component {
                 );
             }.bind(this)
         );
+		logger.warn('<<< Exiting onDataConsentResetTermsConfirm()', { "event.action": "onDataConsentResetTermsConfirm" });
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let { state, props } = this;
         let privacySettings = Object.assign({}, state.privacySettings);
 
@@ -98,6 +106,7 @@ class PrivacySettingsPanelBody extends Component {
             key === "DataConsentUserDeleteAction" ||
       key === "DataConsentDelayMeasurement"
         ) {
+			logger.error(`onSettingChange(key=${key},event=${event}): privacySettings → ${privacySettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
             privacySettings[key] = event.value;
         } else {
             privacySettings[key] =
@@ -114,6 +123,7 @@ class PrivacySettingsPanelBody extends Component {
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const { props, state } = this;
 
@@ -130,6 +140,7 @@ class PrivacySettingsPanelBody extends Component {
                 },
                 () => {
                     util.utilities.notifyError(resx.get("SettingsError"));
+					logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
                 }
             )
         );
@@ -151,6 +162,7 @@ class PrivacySettingsPanelBody extends Component {
                 );
             }
         );
+		logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
     }
 
      
@@ -194,6 +206,7 @@ class PrivacySettingsPanelBody extends Component {
         ) : (
             <div key="column-one-left" className="left-column" />
         );
+		logger.error(`render(): TabParameters_1 → ${TabParameters_1}`, { "event.action": "render" });
         const columnTwoLeft = state.privacySettings ? (
             <div key="column-two-left" className="left-column">
                 <InputGroup>
@@ -394,6 +407,8 @@ PrivacySettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         privacySettings: state.siteBehavior.privacySettings,

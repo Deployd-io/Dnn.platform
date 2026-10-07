@@ -14,6 +14,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin/theme object which displays a list of page links.</summary>
     public partial class Links : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Links.ascx));
         private static readonly Regex SrcRegex = new Regex("src=[']?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private string alignment;
         private bool forceLinks = true;
@@ -81,15 +82,18 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             string strCssClass;
             if (!string.IsNullOrEmpty(this.CssClass))
             {
                 strCssClass = this.CssClass;
+				Logger.LogError("OnLoad(e={E}): strCssClass → {StrCssClass}", e, strCssClass);
             }
             else
             {
                 strCssClass = "SkinObject";
+				Logger.LogDebug("OnLoad(e={E}): strCssClass → {StrCssClass}", e, strCssClass);
             }
 
             string strSeparator = string.Empty;
@@ -108,11 +112,13 @@ namespace DotNetNuke.UI.Skins.Controls
             {
                 this.Separator = " ";
             }
+			Logger.LogDebug("OnLoad(e={E}): this.Separator → {Arg1}", e, this.Separator);
 
             // build links
             string strLinks = string.Empty;
 
             strLinks = this.BuildLinks(this.Level, strSeparator, strCssClass);
+			Logger.LogError("OnLoad(e={E}): strLinks → {StrLinks}", e, strLinks);
 
             // Render links, even if nothing is returned with the currently set level
             if (string.IsNullOrEmpty(strLinks) && this.ForceLinks)
@@ -121,14 +127,19 @@ namespace DotNetNuke.UI.Skins.Controls
             }
 
             this.lblLinks.Text = strLinks;
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         private string BuildLinks(string strLevel, string strSeparator, string strCssClass)
         {
+			Logger.LogError(">>> Entering BuildLinks(strLevel={StrLevel},strSeparator={StrSeparator},strCssClass={StrCssClass})", strLevel, strSeparator, strCssClass);
             var sbLinks = new StringBuilder();
 
+			Logger.LogError("BuildLinks(strLevel={StrLevel},strSeparator={StrSeparator},strCssClass={StrCssClass}): sbLinks → {SbLinks}", strLevel, strSeparator, strCssClass, sbLinks);
             List<TabInfo> portalTabs = TabController.GetTabsBySortOrder(this.PortalSettings.PortalId);
+			Logger.LogError("BuildLinks(strLevel={StrLevel},strSeparator={StrSeparator},strCssClass={StrCssClass}): portalTabs → {PortalTabs}", strLevel, strSeparator, strCssClass, portalTabs);
             List<TabInfo> hostTabs = TabController.GetTabsBySortOrder(Null.NullInteger);
+			Logger.LogError("BuildLinks(strLevel={StrLevel},strSeparator={StrSeparator},strCssClass={StrCssClass}): hostTabs → {HostTabs}", strLevel, strSeparator, strCssClass, hostTabs);
 
             foreach (TabInfo objTab in portalTabs)
             {
@@ -140,11 +151,13 @@ namespace DotNetNuke.UI.Skins.Controls
                 sbLinks.Append(this.ProcessLink(this.ProcessTab(objTab, strLevel, strCssClass), sbLinks.ToString().Length));
             }
 
+			Logger.LogWarning("<<< Exiting BuildLinks(strLevel={StrLevel},strSeparator={StrSeparator},strCssClass={StrCssClass})", strLevel, strSeparator, strCssClass);
             return sbLinks.ToString();
         }
 
         private string ProcessTab(TabInfo objTab, string strLevel, string strCssClass)
         {
+			Logger.LogError(">>> Entering ProcessTab(objTab={ObjTab},strLevel={StrLevel},strCssClass={StrCssClass})", objTab, strLevel, strCssClass);
             if (Navigation.CanShowTab(objTab, this.AdminMode, this.ShowDisabled))
             {
                 switch (strLevel)
@@ -184,11 +197,13 @@ namespace DotNetNuke.UI.Skins.Controls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ProcessTab(objTab={ObjTab},strLevel={StrLevel},strCssClass={StrCssClass})", objTab, strLevel, strCssClass);
             return string.Empty;
         }
 
         private string ProcessLink(string sLink, int iLinksLength)
         {
+			Logger.LogError(">>> Entering ProcessLink(sLink={SLink},iLinksLength={ILinksLength})", sLink, iLinksLength);
             // wrap in a div if set to vertical
             if (string.IsNullOrEmpty(sLink))
             {
@@ -198,6 +213,7 @@ namespace DotNetNuke.UI.Skins.Controls
             if (this.Alignment == "vertical")
             {
                 sLink = string.Concat("<div>", this.Separator, sLink, "</div>");
+				Logger.LogError("ProcessLink(sLink={SLink},iLinksLength={ILinksLength}): sLink → {SLink1}", sLink, iLinksLength, sLink);
             }
             else if (!string.IsNullOrEmpty(this.Separator) && iLinksLength > 0)
             {
@@ -205,11 +221,14 @@ namespace DotNetNuke.UI.Skins.Controls
                 sLink = string.Concat(this.Separator, sLink);
             }
 
+			Logger.LogWarning("<<< Exiting ProcessLink(sLink={SLink},iLinksLength={ILinksLength})", sLink, iLinksLength);
             return sLink;
         }
 
         private string AddLink(string strTabName, string strURL, string strCssClass)
         {
+			Logger.LogError(">>> Entering AddLink(strTabName={StrTabName},strURL={StrURL},strCssClass={StrCssClass})", strTabName, strURL, strCssClass);
+            Logger.LogWarning("<<< Exiting AddLink(strTabName={StrTabName},strURL={StrURL},strCssClass={StrCssClass})", strTabName, strURL, strCssClass);
             return string.Format("<a class=\"{0}\" href=\"{1}\">{2}</a>", strCssClass, strURL, strTabName);
         }
     }

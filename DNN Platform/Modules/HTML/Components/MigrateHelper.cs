@@ -1,4 +1,5 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+﻿using Microsoft.Extensions.Logging;
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information
 
@@ -9,23 +10,30 @@ namespace DotNetNuke.Modules.Html.Components
     /// </summary>
     public class MigrateHelper
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Executes the migration of HTML workflows, including running the migration procedure,
         /// dropping obsolete tables and procedures, and adding required foreign keys.
         /// </summary>
         public static void MigrateHtmlWorkflows()
         {
+			_logger.LogError(">>> Entering MigrateHtmlWorkflows()");
             var db = Data.DataProvider.Instance();
             var databaseOwner = db.DatabaseOwner;
+			_logger.LogError("MigrateHtmlWorkflows(): databaseOwner → {DatabaseOwner}", databaseOwner);
+			_logger.LogError("MigrateHtmlWorkflows(): db → {Db}", db);
             var objectQualifier = db.ObjectQualifier;
 
             var localizationHelper = new LocalizationHelper();
+			_logger.LogError("MigrateHtmlWorkflows(): localizationHelper → {LocalizationHelper}", localizationHelper);
 
             // "Published|veröffentlicht|Publicado|Publié|Pubblicato|Publiceren"
             var publishedLocalizations = string.Join("|", localizationHelper.StateLocalizations("DefaultWorkflowState3.StateName"));
+			_logger.LogError("MigrateHtmlWorkflows(): publishedLocalizations → {PublishedLocalizations}", publishedLocalizations);
 
             // "Draft|Entwurf|Borrador|Brouillon|Bozza|Concept"
             var draftLocalizations = string.Join("|", localizationHelper.StateLocalizations("DefaultWorkflowState1.StateName"));
+			_logger.LogError("MigrateHtmlWorkflows(): draftLocalizations → {DraftLocalizations}", draftLocalizations);
 
             // 1. Execute the migration procedure
             db.ExecuteNonQuery("MigrateHtmlWorkflows", publishedLocalizations, draftLocalizations);

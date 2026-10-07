@@ -15,13 +15,18 @@ namespace DotNetNuke.Services.Tokens
     /// <summary>Property Access to Objects using Reflection.</summary>
     public class PropertyAccess : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PropertyAccess));
         private readonly object obj;
 
         /// <summary>Initializes a new instance of the <see cref="PropertyAccess"/> class.</summary>
         /// <param name="tokenSource">The object to use as the source for the tokens.</param>
         public PropertyAccess(object tokenSource)
         {
+			Logger.LogError(">>> Entering PropertyAccess(tokenSource=<redacted>)");
             this.obj = tokenSource;
+			Logger.LogDebug("PropertyAccess(tokenSource=<redacted>): obj → {Obj}", obj);
+        Logger.LogDebug("PropertyAccess(tokenSource=<redacted>): this.obj → {Arg1}", this.obj);
+        Logger.LogWarning("<<< Exiting PropertyAccess(tokenSource=<redacted>)");
         }
 
         public static string ContentLocked
@@ -47,7 +52,9 @@ namespace DotNetNuke.Services.Tokens
         /// <returns><c>"Yes"</c> or <c>"No"</c> localized into the given culture.</returns>
         public static string Boolean2LocalizedYesNo(bool value, CultureInfo formatProvider)
         {
+			Logger.LogError(">>> Entering Boolean2LocalizedYesNo(value={Value},formatProvider={FormatProvider})", value, formatProvider);
             string strValue = Convert.ToString(value ? "Yes" : "No");
+			Logger.LogWarning("<<< Exiting Boolean2LocalizedYesNo(value={Value},formatProvider={FormatProvider})", value, formatProvider);
             return Localization.GetString(strValue, null, formatProvider.ToString());
         }
 
@@ -57,6 +64,7 @@ namespace DotNetNuke.Services.Tokens
         /// <returns>formatted string.</returns>
         public static string FormatString(string value, string format)
         {
+			Logger.LogError(">>> Entering FormatString(value={Value},format={Format})", value, format);
             if (format.Trim() == string.Empty)
             {
                 return value;
@@ -67,6 +75,7 @@ namespace DotNetNuke.Services.Tokens
             }
             else
             {
+				Logger.LogWarning("<<< Exiting FormatString(value={Value},format={Format})", value, format);
                 return string.Empty;
             }
         }
@@ -80,11 +89,15 @@ namespace DotNetNuke.Services.Tokens
         /// <returns>Localized Property.</returns>
         public static string GetObjectProperty(object objObject, string strPropertyName, string strFormat, CultureInfo formatProvider, ref bool propertyNotFound)
         {
+			Logger.LogError(">>> Entering GetObjectProperty(objObject={ObjObject},strPropertyName={StrPropertyName},strFormat={StrFormat},formatProvider={FormatProvider},propertyNotFound={PropertyNotFound})", objObject, strPropertyName, strFormat, formatProvider, propertyNotFound);
             propertyNotFound = false;
+			Logger.LogError("GetObjectProperty(objObject={ObjObject},strPropertyName={StrPropertyName},strFormat={StrFormat},formatProvider={FormatProvider},propertyNotFound={PropertyNotFound}): propertyNotFound → {PropertyNotFound1}", objObject, strPropertyName, strFormat, formatProvider, propertyNotFound, propertyNotFound);
             if (CBO.GetProperties(objObject.GetType()).TryGetValue(strPropertyName, out var objProperty))
             {
                 object propValue = objProperty.GetValue(objObject, null);
+				Logger.LogError("GetObjectProperty(objObject={ObjObject},strPropertyName={StrPropertyName},strFormat={StrFormat},formatProvider={FormatProvider},propertyNotFound={PropertyNotFound}): propValue → {PropValue}", objObject, strPropertyName, strFormat, formatProvider, propertyNotFound, propValue);
                 Type t = typeof(string);
+				Logger.LogError("GetObjectProperty(objObject={ObjObject},strPropertyName={StrPropertyName},strFormat={StrFormat},formatProvider={FormatProvider},propertyNotFound={PropertyNotFound}): t → {T}", objObject, strPropertyName, strFormat, formatProvider, propertyNotFound, t);
                 if (propValue != null)
                 {
                     switch (objProperty.PropertyType.Name)
@@ -101,6 +114,7 @@ namespace DotNetNuke.Services.Tokens
                             if (strFormat == string.Empty)
                             {
                                 strFormat = "g";
+								Logger.LogError("GetObjectProperty(objObject={ObjObject},strPropertyName={StrPropertyName},strFormat={StrFormat},formatProvider={FormatProvider},propertyNotFound={PropertyNotFound}): strFormat → {StrFormat1}", objObject, strPropertyName, strFormat, formatProvider, propertyNotFound, strFormat);
                             }
 
                             return ((IFormattable)propValue).ToString(strFormat, formatProvider);
@@ -113,17 +127,20 @@ namespace DotNetNuke.Services.Tokens
             }
 
             propertyNotFound = true;
+			Logger.LogWarning("<<< Exiting GetObjectProperty(objObject={ObjObject},strPropertyName={StrPropertyName},strFormat={StrFormat},formatProvider={FormatProvider},propertyNotFound={PropertyNotFound})", objObject, strPropertyName, strFormat, formatProvider, propertyNotFound);
             return string.Empty;
         }
 
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogError(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             if (this.obj == null)
             {
                 return string.Empty;
             }
 
+			Logger.LogWarning("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return GetObjectProperty(this.obj, propertyName, format, formatProvider, ref propertyNotFound);
         }
     }

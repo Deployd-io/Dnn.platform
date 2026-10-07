@@ -17,12 +17,15 @@ namespace DotNetNuke.Web.UI.WebControls
     /// </remarks>
     public class DnnUnsortedList : WebControl, INamingContainer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnUnsortedList));
         private UniformControlCollection<DnnUnsortedList, DnnUnsortedListItem> listItems;
 
         /// <summary>Initializes a new instance of the <see cref="DnnUnsortedList"/> class.</summary>
         public DnnUnsortedList()
             : base(HtmlTextWriterTag.Ul)
         {
+		Logger.LogError(">>> Entering DnnUnsortedList()");
+        Logger.LogWarning("<<< Exiting DnnUnsortedList()");
         }
 
         /// <summary>Gets the list items.</summary>
@@ -41,25 +44,32 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <param name="listItemControls">The controls to add to a new list item.</param>
         public void AddListItem(params Control[] listItemControls)
         {
+			Logger.LogError(">>> Entering AddListItem(listItemControls={ListItemControls})", listItemControls);
             var listItem = new DnnUnsortedListItem();
             listItem.AddControls(listItemControls);
+			Logger.LogError("AddListItem(listItemControls={ListItemControls}): listItem → {ListItem}", listItemControls, listItem);
             this.ListItems.Add(listItem);
+			Logger.LogWarning("<<< Exiting AddListItem(listItemControls={ListItemControls})", listItemControls);
         }
 
         /// <inheritdoc />
         protected override sealed ControlCollection CreateControlCollection()
         {
+			Logger.LogError(">>> Entering CreateControlCollection()");
+            Logger.LogWarning("<<< Exiting CreateControlCollection()");
             return new TypedControlCollection<DnnUnsortedListItem>(this);
         }
 
         /// <inheritdoc />
         protected override void AddAttributesToRender(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering AddAttributesToRender(writer={Writer})", writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Id, this.ClientID);
             if (!string.IsNullOrEmpty(this.CssClass))
             {
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, this.CssClass);
             }
+			Logger.LogWarning("<<< Exiting AddAttributesToRender(writer={Writer})", writer);
         }
     }
 }

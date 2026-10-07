@@ -44,13 +44,18 @@ namespace DotNetNuke.HttpModules.Config
         /// <returns>An <see cref="AnalyticsEngineConfiguration"/> instance.</returns>
         public static AnalyticsEngineConfiguration GetConfig(IApplicationStatusInfo appStatus, IEventLogger eventLogger)
         {
+			Logger.LogError(">>> Entering GetConfig()");
             var config = new AnalyticsEngineConfiguration { AnalyticsEngines = new AnalyticsEngineCollection() };
+			Logger.LogError("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): config → {Config}", appStatus, eventLogger, config);
             string filePath = null;
             try
             {
+				Logger.LogError("GetConfig(): filePath → {FilePath}", filePath);
+				Logger.LogError("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): filePath → {FilePath}", appStatus, eventLogger, filePath);
                 config = (AnalyticsEngineConfiguration)DataCache.GetCache("AnalyticsEngineConfig");
                 if (config == null)
                 {
+					Logger.LogError("GetConfig(): config → {Config}", config);
                     filePath = Config.GetPathToFile(appStatus, Config.ConfigFileType.SiteAnalytics);
 
                     // Create a FileStream for the Config file
@@ -59,6 +64,9 @@ namespace DotNetNuke.HttpModules.Config
                     using (var xmlReader = XmlReader.Create(fileReader))
                     {
                         doc = new XPathDocument(xmlReader);
+						Logger.LogError("GetConfig(): doc → {Doc}", doc);
+						Logger.LogError("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): doc → {Doc}", appStatus, eventLogger, doc);
+						Logger.LogDebug("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): doc → {Doc}", appStatus, eventLogger, doc);
                     }
 
                     config = new AnalyticsEngineConfiguration { AnalyticsEngines = new AnalyticsEngineCollection() };
@@ -86,6 +94,8 @@ namespace DotNetNuke.HttpModules.Config
             {
                 // log it
                 var log = new LogInfo { LogTypeKey = nameof(EventLogType.HOST_ALERT), };
+				Logger.LogError("GetConfig(): log → {Log}", log);
+				Logger.LogError("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): log → {Log}", appStatus, eventLogger, log);
                 log.AddProperty("Analytics.AnalyticsEngineConfiguration", "GetConfig Failed");
                 if (!string.IsNullOrEmpty(filePath))
                 {
@@ -97,6 +107,7 @@ namespace DotNetNuke.HttpModules.Config
                 Logger.Error(log);
             }
 
+			Logger.LogWarning("<<< Exiting GetConfig(appStatus={AppStatus},eventLogger={EventLogger})", appStatus, eventLogger);
             return config;
         }
     }

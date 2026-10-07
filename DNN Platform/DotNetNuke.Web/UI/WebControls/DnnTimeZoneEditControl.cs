@@ -13,11 +13,14 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A time zone edit control.</summary>
     public class DnnTimeZoneEditControl : TextEditControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnTimeZoneEditControl));
         private DnnTimeZoneComboBox timeZones;
 
         /// <summary>Initializes a new instance of the <see cref="DnnTimeZoneEditControl"/> class.</summary>
         public DnnTimeZoneEditControl()
         {
+		Logger.LogError(">>> Entering DnnTimeZoneEditControl()");
+        Logger.LogWarning("<<< Exiting DnnTimeZoneEditControl()");
         }
 
         /// <inheritdoc />
@@ -33,50 +36,65 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public override bool LoadPostData(string postDataKey, System.Collections.Specialized.NameValueCollection postCollection)
         {
+			Logger.LogError(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             bool dataChanged = false;
             string presentValue = this.StringValue;
+			Logger.LogError("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): dataChanged → {DataChanged}", postDataKey, postCollection, dataChanged);
             string postedValue = this.timeZones.SelectedValue;
             if (!presentValue.Equals(postedValue, StringComparison.Ordinal))
             {
                 this.Value = postedValue;
                 dataChanged = true;
             }
+			Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): this.Value → {Arg2}", postDataKey, postCollection, this.Value);
 
+			Logger.LogWarning("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             return dataChanged;
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			Logger.LogError(">>> Entering CreateChildControls()");
             this.timeZones = new DnnTimeZoneComboBox();
             this.timeZones.ViewStateMode = ViewStateMode.Disabled;
+			Logger.LogDebug("CreateChildControls(): timeZones → {TimeZones}", timeZones);
 
             this.Controls.Clear();
             this.Controls.Add(this.timeZones);
 
             base.CreateChildControls();
+			Logger.LogWarning("<<< Exiting CreateChildControls()");
         }
 
         /// <inheritdoc />
         protected override void OnDataChanged(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnDataChanged(e={E})", e);
             var args = new PropertyEditorEventArgs(this.Name);
             args.Value = TimeZoneInfo.FindSystemTimeZoneById(this.StringValue);
+			Logger.LogError("OnDataChanged(e={E}): args → {Args}", e, args);
+			Logger.LogDebug("OnDataChanged(e={E}): args.StringValue → {Arg1}", e, args.StringValue);
             args.OldValue = this.OldStringValue;
+			Logger.LogDebug("OnDataChanged(e={E}): args.OldValue → {Arg1}", e, args.OldValue);
             args.StringValue = this.StringValue;
             this.OnValueChanged(args);
+			Logger.LogWarning("<<< Exiting OnDataChanged(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnInit(System.EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             this.EnsureChildControls();
             base.OnInit(e);
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(System.EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             this.timeZones.DataBind(this.StringValue);
@@ -85,22 +103,27 @@ namespace DotNetNuke.Web.UI.WebControls
             {
                 this.Page.RegisterRequiresPostBack(this);
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void RenderEditMode(System.Web.UI.HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderEditMode(writer={Writer})", writer);
             this.RenderChildren(writer);
+			Logger.LogWarning("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
 
         /// <inheritdoc />
         protected override void RenderViewMode(System.Web.UI.HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderViewMode(writer={Writer})", writer);
             string propValue = this.Page.Server.HtmlDecode(Convert.ToString(this.Value, CultureInfo.InvariantCulture));
             this.ControlStyle.AddAttributesToRender(writer);
             writer.RenderBeginTag(HtmlTextWriterTag.Span);
             writer.Write(propValue);
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderViewMode(writer={Writer})", writer);
         }
     }
 }

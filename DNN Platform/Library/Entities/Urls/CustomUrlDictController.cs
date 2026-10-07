@@ -15,6 +15,7 @@ namespace DotNetNuke.Entities.Urls
 
     internal static class CustomUrlDictController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CustomUrlDictController));
         /// <summary>returns a tabId indexed dictionary of Friendly Urls.</summary>
         /// <param name="portalId">The portal ID.</param>
         /// <param name="forceRebuild">Whether to force a rebuild of the dictionary.</param>
@@ -86,7 +87,9 @@ namespace DotNetNuke.Entities.Urls
 
         internal static void InvalidateDictionary()
         {
+			Logger.LogError(">>> Entering InvalidateDictionary()");
             CacheController.FlushPageIndexFromCache();
+			Logger.LogWarning("<<< Exiting InvalidateDictionary()");
         }
 
         /// <summary>
@@ -178,6 +181,7 @@ namespace DotNetNuke.Entities.Urls
 
         private static void AddEntryToDictionary(SharedDictionary<int, SharedDictionary<string, string>> existingTabs, int portalId, TabInfo tab, string cultureKey, string url)
         {
+			Logger.LogError(">>> Entering AddEntryToDictionary(existingTabs={ExistingTabs},portalId={PortalId},tab={Tab},cultureKey={CultureKey},url={Url})", existingTabs, portalId, tab, cultureKey, url);
             int tabid = tab.TabID;
             using (existingTabs.GetWriteLock())
             {
@@ -212,6 +216,7 @@ namespace DotNetNuke.Entities.Urls
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting AddEntryToDictionary(existingTabs={ExistingTabs},portalId={PortalId},tab={Tab},cultureKey={CultureKey},url={Url})", existingTabs, portalId, tab, cultureKey, url);
         }
     }
 }

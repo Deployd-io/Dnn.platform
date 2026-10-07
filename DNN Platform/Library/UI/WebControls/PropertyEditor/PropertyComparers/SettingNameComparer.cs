@@ -8,15 +8,19 @@ namespace DotNetNuke.UI.WebControls
 
     public class SettingNameComparer : IComparer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SettingNameComparer));
         /// <inheritdoc />
         public int Compare(object x, object y)
         {
+			Logger.LogError(">>> Entering Compare(x={X},y={Y})", x, y);
             if (x is SettingInfo && y is SettingInfo)
             {
                 return string.Compare(((SettingInfo)x).Name, ((SettingInfo)y).Name, StringComparison.Ordinal);
             }
             else
             {
+				Logger.LogError("Throwing ArgumentException from Compare(x={X},y={Y})", x, y);
+			Logger.LogWarning("<<< Exiting Compare(x={X},y={Y})", x, y);
                 throw new ArgumentException("Object is not of type SettingInfo");
             }
         }

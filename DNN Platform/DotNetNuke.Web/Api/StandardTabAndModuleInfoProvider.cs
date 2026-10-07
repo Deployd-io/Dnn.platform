@@ -28,29 +28,39 @@ namespace DotNetNuke.Web.Api
         /// <inheritdoc />
         public bool TryFindTabId(HttpRequestMessage request, out int tabId)
         {
+			Logger.LogError(">>> Entering TryFindTabId(request={Request})", request);
+            Logger.LogWarning("<<< Exiting TryFindTabId(request={Request})", request);
+			Logger.LogWarning("<<< Exiting TryFindTabId(request={Request},tryMoniker={TryMoniker})", request, tryMoniker);
             return TryFindTabId(request, out tabId, true);
         }
 
         /// <inheritdoc />
         public bool TryFindModuleId(HttpRequestMessage request, out int moduleId)
         {
+			Logger.LogError(">>> Entering TryFindModuleId(request={Request})", request);
+            Logger.LogWarning("<<< Exiting TryFindModuleId(request={Request})", request);
+			Logger.LogWarning("<<< Exiting TryFindModuleId(request={Request},tryMoniker={TryMoniker})", request, tryMoniker);
             return TryFindModuleId(request, out moduleId, true);
         }
 
         /// <inheritdoc />
         public bool TryFindModuleInfo(HttpRequestMessage request, out ModuleInfo moduleInfo)
         {
+			Logger.LogError(">>> Entering TryFindModuleInfo(request={Request})", request);
             if (TryFindTabId(request, out var tabId, false) && TryFindModuleId(request, out var moduleId, false))
             {
                 moduleInfo = ModuleController.Instance.GetModule(moduleId, tabId, false);
+				Logger.LogDebug("TryFindModuleInfo(request={Request}): moduleInfo → {ModuleInfo}", request, moduleInfo);
                 if (moduleInfo is { IsDeleted: true, })
                 {
                     moduleInfo = null;
+					Logger.LogError("TryFindModuleInfo(request={Request}): moduleInfo → {ModuleInfo}", request, moduleInfo);
                 }
 
                 return moduleInfo != null;
             }
 
+			Logger.LogWarning("<<< Exiting TryFindModuleInfo(request={Request})", request);
             return TryFindByMoniker(request, out moduleInfo);
         }
 
@@ -96,7 +106,9 @@ namespace DotNetNuke.Web.Api
 
         private static int FindInt(HttpRequestMessage requestMessage, string key)
         {
+			Logger.LogError(">>> Entering FindInt(requestMessage={RequestMessage},key={Key})", requestMessage, key);
             string value = null;
+			Logger.LogError("FindInt(requestMessage={RequestMessage},key={Key}): value → {Value}", requestMessage, key, value);
             if (requestMessage != null && requestMessage.Headers.TryGetValues(key, out var values))
             {
                 value = values.FirstOrDefault();
@@ -105,54 +117,69 @@ namespace DotNetNuke.Web.Api
             if (string.IsNullOrEmpty(value) && requestMessage?.RequestUri != null)
             {
                 var queryString = HttpUtility.ParseQueryString(requestMessage.RequestUri.Query);
+				Logger.LogError("FindInt(requestMessage={RequestMessage},key={Key}): queryString → {QueryString}", requestMessage, key, queryString);
                 value = queryString[key];
             }
 
+			Logger.LogWarning("<<< Exiting FindInt(requestMessage={RequestMessage},key={Key})", requestMessage, key);
             return int.TryParse(value, out var id) ? id : Null.NullInteger;
         }
 
         private static bool TryFindByMoniker(HttpRequestMessage requestMessage, out ModuleInfo moduleInfo)
         {
+			Logger.LogError(">>> Entering TryFindByMoniker(requestMessage={RequestMessage})", requestMessage);
             var id = FindIntInHeader(requestMessage, MonikerHeaderKey);
+			Logger.LogError("TryFindByMoniker(requestMessage={RequestMessage}): id → {Id}", requestMessage, id);
             if (id <= Null.NullInteger)
             {
                 id = FindIntInQueryString(requestMessage, MonikerQueryKey);
             }
 
             moduleInfo = id > Null.NullInteger ? ModuleController.Instance.GetTabModule(id) : null;
+			Logger.LogDebug("TryFindByMoniker(requestMessage={RequestMessage}): moduleInfo → {ModuleInfo}", requestMessage, moduleInfo);
             if (moduleInfo is { IsDeleted: true, })
             {
                 moduleInfo = null;
+				Logger.LogError("TryFindByMoniker(requestMessage={RequestMessage}): moduleInfo → {ModuleInfo}", requestMessage, moduleInfo);
             }
 
+			Logger.LogWarning("<<< Exiting TryFindByMoniker(requestMessage={RequestMessage})", requestMessage);
             return moduleInfo != null;
         }
 
         private static int FindIntInHeader(HttpRequestMessage requestMessage, string key)
         {
+			Logger.LogError(">>> Entering FindIntInHeader(requestMessage={RequestMessage},key={Key})", requestMessage, key);
             string value = null;
+			Logger.LogError("FindIntInHeader(requestMessage={RequestMessage},key={Key}): value → {Value}", requestMessage, key, value);
             if (requestMessage != null && requestMessage.Headers.TryGetValues(key, out var values))
             {
                 value = values.FirstOrDefault();
             }
 
+			Logger.LogWarning("<<< Exiting FindIntInHeader(requestMessage={RequestMessage},key={Key})", requestMessage, key);
             return GetTabModuleInfoFromMoniker(value);
         }
 
         private static int FindIntInQueryString(HttpRequestMessage requestMessage, string key)
         {
+			Logger.LogError(">>> Entering FindIntInQueryString(requestMessage={RequestMessage},key={Key})", requestMessage, key);
             string value = null;
+			Logger.LogError("FindIntInQueryString(requestMessage={RequestMessage},key={Key}): value → {Value}", requestMessage, key, value);
             if (requestMessage.RequestUri != null)
             {
                 var queryString = HttpUtility.ParseQueryString(requestMessage.RequestUri.Query);
+				Logger.LogError("FindIntInQueryString(requestMessage={RequestMessage},key={Key}): queryString → {QueryString}", requestMessage, key, queryString);
                 value = queryString[key];
             }
 
+			Logger.LogWarning("<<< Exiting FindIntInQueryString(requestMessage={RequestMessage},key={Key})", requestMessage, key);
             return GetTabModuleInfoFromMoniker(value);
         }
 
         private static int GetTabModuleInfoFromMoniker(string monikerValue)
         {
+			Logger.LogError(">>> Entering GetTabModuleInfoFromMoniker(monikerValue={MonikerValue})", monikerValue);
             monikerValue = (monikerValue ?? string.Empty).Trim();
             if (monikerValue.Length > 0)
             {
@@ -168,6 +195,7 @@ namespace DotNetNuke.Web.Api
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetTabModuleInfoFromMoniker(monikerValue={MonikerValue})", monikerValue);
             return Null.NullInteger;
         }
     }

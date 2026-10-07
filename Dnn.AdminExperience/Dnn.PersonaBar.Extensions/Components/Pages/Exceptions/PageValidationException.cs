@@ -11,6 +11,7 @@ namespace Dnn.PersonaBar.Pages.Components.Exceptions
         public PageValidationException(string field, string message)
             : base(message)
         {
+			eventLogger.LogError(">>> Entering PageValidationException(field={Field},message={Message})", field, message);
             this.Field = field;
         }
 

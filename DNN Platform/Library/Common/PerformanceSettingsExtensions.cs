@@ -9,11 +9,14 @@ using OldPerformanceSettings = DotNetNuke.Common.Globals.PerformanceSettings;
 
 public static class PerformanceSettingsExtensions
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PerformanceSettingsExtensions));
     /// <summary>Converts a <see cref="NewPerformanceSettings"/> value into a <see cref="OldPerformanceSettings"/> value.</summary>
     /// <param name="newValue">The new value.</param>
     /// <returns>The old value.</returns>
     public static OldPerformanceSettings ToOldEnum(this NewPerformanceSettings newValue)
     {
+		Logger.LogError(">>> Entering ToOldEnum(newValue={NewValue})", newValue);
+		Logger.LogWarning("<<< Exiting ToOldEnum(newValue={NewValue})", newValue);
         return newValue switch
         {
             NewPerformanceSettings.NoCaching => OldPerformanceSettings.NoCaching,
@@ -29,6 +32,8 @@ public static class PerformanceSettingsExtensions
     /// <returns>The new value.</returns>
     public static NewPerformanceSettings ToNewEnum(this OldPerformanceSettings oldValue)
     {
+		Logger.LogError(">>> Entering ToNewEnum(oldValue={OldValue})", oldValue);
+		Logger.LogWarning("<<< Exiting ToNewEnum(oldValue={OldValue})", oldValue);
         return oldValue switch
         {
             OldPerformanceSettings.NoCaching => NewPerformanceSettings.NoCaching,

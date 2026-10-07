@@ -22,6 +22,7 @@ namespace Dnn.Modules.ResourceManager
     /// <summary>Provides editing capabilities for a folder mapping.</summary>
     public partial class EditFolderMapping : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EditFolderMapping.ascx));
         private readonly INavigationManager navigationManager;
         private readonly IFolderMappingController folderMappingController = FolderMappingController.Instance;
         private int folderMappingID = Null.NullInteger;
@@ -29,7 +30,10 @@ namespace Dnn.Modules.ResourceManager
         /// <summary>Initializes a new instance of the <see cref="EditFolderMapping"/> class.</summary>
         public EditFolderMapping()
         {
+			Logger.LogError(">>> Entering EditFolderMapping()");
             this.navigationManager = this.DependencyProvider.GetRequiredService<INavigationManager>();
+			Logger.LogDebug("EditFolderMapping(): navigationManager → {NavigationManager}", navigationManager);
+        Logger.LogWarning("<<< Exiting EditFolderMapping()");
         }
 
         /// <summary>Gets the portalId for the folder.</summary>
@@ -61,6 +65,7 @@ namespace Dnn.Modules.ResourceManager
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (!this.UserInfo.IsSuperUser && !this.UserInfo.IsInRole(this.PortalSettings.AdministratorRoleName))
@@ -72,16 +77,20 @@ namespace Dnn.Modules.ResourceManager
             this.CancelHyperLink.NavigateUrl = this.navigationManager.NavigateURL();
 
             var controlTitle = Localization.GetString("ControlTitle", this.LocalResourceFile);
+			Logger.LogError("OnInit(e={E}): controlTitle → {ControlTitle}", e, controlTitle);
             var controlTitlePrefix = (this.FolderMappingID == Null.NullInteger) ? Localization.GetString("New") : Localization.GetString("Edit");
+			Logger.LogError("OnInit(e={E}): controlTitlePrefix → {ControlTitlePrefix}", e, controlTitlePrefix);
 
             this.SyncWarningPlaceHolder.Visible = this.FolderMappingID != Null.NullInteger;
 
             this.ModuleConfiguration.ModuleControl.ControlTitle = string.Format(controlTitle, controlTitlePrefix);
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.UpdateButton.Click += this.CmdUpdate_Click;
@@ -101,7 +110,9 @@ namespace Dnn.Modules.ResourceManager
                         if (this.ProviderSettingsPlaceHolder.Controls.Count > 0 && this.ProviderSettingsPlaceHolder.Controls[0] is FolderMappingSettingsControlBase)
                         {
                             var folderMapping = this.folderMappingController.GetFolderMapping(this.FolderMappingID);
+							Logger.LogError("OnLoad(e={E}): folderMapping → {FolderMapping}", e, folderMapping);
                             var settingsControl = (FolderMappingSettingsControlBase)this.ProviderSettingsPlaceHolder.Controls[0];
+							Logger.LogError("OnLoad(e={E}): settingsControl → {SettingsControl}", e, settingsControl);
                             settingsControl.LoadSettings(folderMapping.FolderMappingSettings);
                         }
                     }
@@ -109,8 +120,10 @@ namespace Dnn.Modules.ResourceManager
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 DotNetNuke.Services.Exceptions.Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>Handles the folder providers selection change.</summary>
@@ -118,11 +131,14 @@ namespace Dnn.Modules.ResourceManager
         /// <param name="e">The event arguments.</param>
         protected void CboFolderProviders_SelectedIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering CboFolderProviders_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
             this.BindFolderMappingSettings();
+			Logger.LogWarning("<<< Exiting CboFolderProviders_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdUpdate_Click(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering CmdUpdate_Click(sender={Sender},e={E})", sender, e);
             this.Page.Validate("vgEditFolderMapping");
 
             if (!this.Page.IsValid)
@@ -133,6 +149,7 @@ namespace Dnn.Modules.ResourceManager
             try
             {
                 var folderMapping = new FolderMappingInfo();
+				Logger.LogError("CmdUpdate_Click(sender={Sender},e={E}): folderMapping → {FolderMapping}", sender, e, folderMapping);
 
                 if (this.FolderMappingID != Null.NullInteger)
                 {
@@ -140,7 +157,11 @@ namespace Dnn.Modules.ResourceManager
                 }
 
                 folderMapping.FolderMappingID = this.FolderMappingID;
+				Logger.LogDebug("CmdUpdate_Click(sender={Sender},e={E}): folderMapping.FolderMappingID → {Arg2}", sender, e, folderMapping.FolderMappingID);
+				Logger.LogDebug("CmdUpdate_Click(sender={Sender},e={E}): folderMapping.FolderProviderType → {Arg2}", sender, e, folderMapping.FolderProviderType);
+				Logger.LogDebug("CmdUpdate_Click(sender={Sender},e={E}): folderMapping.PortalID → {Arg2}", sender, e, folderMapping.PortalID);
                 folderMapping.MappingName = this.NameTextbox.Text;
+				Logger.LogDebug("CmdUpdate_Click(sender={Sender},e={E}): folderMapping.MappingName → {Arg2}", sender, e, folderMapping.MappingName);
                 folderMapping.FolderProviderType = this.FolderProvidersComboBox.SelectedValue;
                 folderMapping.PortalID = this.FolderPortalID;
 
@@ -149,6 +170,7 @@ namespace Dnn.Modules.ResourceManager
                 try
                 {
                     var folderMappingID = this.FolderMappingID;
+					Logger.LogError("CmdUpdate_Click(sender={Sender},e={E}): folderMappingID → {FolderMappingID}", sender, e, folderMappingID);
 
                     if (folderMappingID == Null.NullInteger)
                     {
@@ -162,6 +184,7 @@ namespace Dnn.Modules.ResourceManager
                     if (this.ProviderSettingsPlaceHolder.Controls.Count > 0 && this.ProviderSettingsPlaceHolder.Controls[0] is FolderMappingSettingsControlBase)
                     {
                         var settingsControl = (FolderMappingSettingsControlBase)this.ProviderSettingsPlaceHolder.Controls[0];
+						Logger.LogError("CmdUpdate_Click(sender={Sender},e={E}): settingsControl → {SettingsControl}", sender, e, settingsControl);
 
                         try
                         {
@@ -169,6 +192,7 @@ namespace Dnn.Modules.ResourceManager
                         }
                         catch
                         {
+							Logger.LogError("Exception in CmdUpdate_Click(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                             if (this.FolderMappingID == Null.NullInteger)
                             {
                                 this.folderMappingController.DeleteFolderMapping(this.FolderPortalID, folderMappingID);
@@ -182,11 +206,13 @@ namespace Dnn.Modules.ResourceManager
                     {
                         // Check if some setting has changed
                         var updatedSettings = this.folderMappingController.GetFolderMappingSettings(this.FolderMappingID);
+						Logger.LogError("CmdUpdate_Click(sender={Sender},e={E}): updatedSettings → {UpdatedSettings}", sender, e, updatedSettings);
 
                         if (originalSettings.Keys.Cast<object>().Any(key => updatedSettings.ContainsKey(key) && !originalSettings[key].ToString().Equals(updatedSettings[key].ToString())))
                         {
                             // Re-synchronize folders using the existing mapping. It's important to synchronize them in descending order
                             var folders = FolderManager.Instance.GetFolders(this.FolderPortalID).Where(f => f.FolderMappingID == this.FolderMappingID).OrderByDescending(f => f.FolderPath);
+							Logger.LogError("CmdUpdate_Click(sender={Sender},e={E}): folders → {Folders}", sender, e, folders);
 
                             foreach (var folder in folders)
                             {
@@ -210,42 +236,53 @@ namespace Dnn.Modules.ResourceManager
             {
                 DotNetNuke.Services.Exceptions.Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting CmdUpdate_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void BindFolderProviders()
         {
+			Logger.LogError(">>> Entering BindFolderProviders()");
             var defaultProviders = DefaultFolderProviders.GetDefaultProviders();
 
+			Logger.LogError("BindFolderProviders(): defaultProviders → {DefaultProviders}", defaultProviders);
             foreach (var provider in FolderProvider.GetProviderList().Keys.Where(provider => !defaultProviders.Contains(provider)).OrderBy(provider => provider))
             {
                 this.FolderProvidersComboBox.Items.Add(new ListItem(provider, provider));
             }
 
             this.FolderProvidersComboBox.Items.Insert(0, new ListItem(string.Empty, string.Empty));
+			Logger.LogWarning("<<< Exiting BindFolderProviders()");
         }
 
         private void BindFolderMapping()
         {
+			Logger.LogError(">>> Entering BindFolderMapping()");
             var folderMapping = this.folderMappingController.GetFolderMapping(this.FolderMappingID);
 
+			Logger.LogError("BindFolderMapping(): folderMapping → {FolderMapping}", folderMapping);
             this.NameTextbox.Text = folderMapping.MappingName;
 
             this.FolderProvidersComboBox.SelectedValue = folderMapping.FolderProviderType;
             this.FolderProvidersComboBox.Enabled = false;
+			Logger.LogWarning("<<< Exiting BindFolderMapping()");
         }
 
         private void BindFolderMappingSettings()
         {
+			Logger.LogError(">>> Entering BindFolderMappingSettings()");
             string folderProviderType;
 
             if (this.FolderMappingID != Null.NullInteger)
             {
                 var folderMapping = this.folderMappingController.GetFolderMapping(this.FolderMappingID);
+				Logger.LogError("BindFolderMappingSettings(): folderMapping → {FolderMapping}", folderMapping);
                 folderProviderType = folderMapping.FolderProviderType;
+				Logger.LogError("BindFolderMappingSettings(): folderProviderType → {FolderProviderType}", folderProviderType);
             }
             else
             {
                 folderProviderType = this.FolderProvidersComboBox.SelectedValue;
+				Logger.LogDebug("BindFolderMappingSettings(): folderProviderType → {FolderProviderType}", folderProviderType);
             }
 
             if (string.IsNullOrEmpty(folderProviderType))
@@ -254,12 +291,14 @@ namespace Dnn.Modules.ResourceManager
             }
 
             var settingsControlVirtualPath = FolderProvider.Instance(folderProviderType).GetSettingsControlVirtualPath();
+			Logger.LogError("BindFolderMappingSettings(): settingsControlVirtualPath → {SettingsControlVirtualPath}", settingsControlVirtualPath);
             if (string.IsNullOrEmpty(settingsControlVirtualPath))
             {
                 return;
             }
 
             var settingsControl = this.LoadControl(settingsControlVirtualPath);
+			Logger.LogError("BindFolderMappingSettings(): settingsControl → {SettingsControl}", settingsControl);
             if (settingsControl == null || !(settingsControl is FolderMappingSettingsControlBase))
             {
                 return;
@@ -267,13 +306,16 @@ namespace Dnn.Modules.ResourceManager
 
             // This is important to allow settings control to be localizable
             var baseType = settingsControl.GetType().BaseType;
+			Logger.LogError("BindFolderMappingSettings(): baseType → {BaseType}", baseType);
             if (baseType != null)
             {
                 settingsControl.ID = baseType.Name;
+				Logger.LogDebug("BindFolderMappingSettings(): settingsControl.ID → {Arg0}", settingsControl.ID);
             }
 
             this.ProviderSettingsPlaceHolder.Controls.Clear();
             this.ProviderSettingsPlaceHolder.Controls.Add(settingsControl);
+			Logger.LogWarning("<<< Exiting BindFolderMappingSettings()");
         }
     }
 }

@@ -19,11 +19,15 @@ namespace Dnn.PersonaBar.Users.Components
         /// <inheritdoc />
         public void UpdateParameters(MenuItem menuItem)
         {
+		eventLogger.LogError(">>> Entering UpdateParameters(menuItem={MenuItem})", menuItem);
+        eventLogger.LogWarning("<<< Exiting UpdateParameters(menuItem={MenuItem})", menuItem);
         }
 
         /// <inheritdoc />
         public bool Visible(MenuItem menuItem)
         {
+			eventLogger.LogError(">>> Entering Visible(menuItem={MenuItem})", menuItem);
+			eventLogger.LogWarning("<<< Exiting Visible(menuItem={MenuItem})", menuItem);
             return true;
         }
 

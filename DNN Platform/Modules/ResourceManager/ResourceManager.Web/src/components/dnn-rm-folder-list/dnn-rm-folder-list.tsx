@@ -3,6 +3,7 @@ import { FolderTreeItem, InternalServicesClient } from "../../services/InternalS
 import { Item, ItemsClient } from "../../services/ItemsClient";
 import { GetFolderContentResponse } from "../../services/ItemsClient";
 import state from "../../store/store";
+const logger = console;
 
 @Component({
   tag: 'dnn-rm-folder-list',
@@ -27,16 +28,21 @@ export class DnnRmFolderList {
   private rootItemContextMenu: HTMLDnnContextMenuElement;
 
   constructor(){
+	logger.error('>>> Entering constructor()', { "event.action": "constructor" });
     this.internalServicesClient = new InternalServicesClient(state.moduleId);
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
   }
 
   @Listen("dnnRmFoldersChanged", {target: "document"})
   handleFoldersChanged(){
+	logger.error('>>> Entering handleFoldersChanged()', { "event.action": "handleFoldersChanged" });
     void this.getFolders();
+	logger.warn('<<< Exiting handleFoldersChanged()', { "event.action": "handleFoldersChanged" });
   }
 
   async componentWillLoad() {
+	logger.error('>>> Entering componentWillLoad()', { "event.action": "componentWillLoad" });
     try {
       await this.getFolders();
       state.currentItems = await this.itemsClient.getFolderContent(
@@ -48,24 +54,31 @@ export class DnnRmFolderList {
         this.rootItem = await this.itemsClient.getFolderItem(state.settings.HomeFolderId)
     } catch (error) {
       alert(error);
+	logger.warn('<<< Exiting componentWillLoad()', { "event.action": "componentWillLoad" });
     }
   }
 
   private async getFolders() {
+	logger.error('>>> Entering getFolders()', { "event.action": "getFolders" });
     try {
       const data = await this.internalServicesClient.getFolders(state.settings.HomeFolderId)
       state.rootFolders = data;
+	logger.error(`getFolders(): data → ${data}`, { "event.action": "getFolders" });
     } catch (error) {
       alert(error);
+	logger.warn('<<< Exiting getFolders()', { "event.action": "getFolders" });
     }
   }
 
   private handleFolderPicked(e: CustomEvent<FolderTreeItem>): void {
+	logger.error(`>>> Entering handleFolderPicked(e=${e})`, { "event.action": "handleFolderPicked", "logrite.e": e });
     this.selectedFolder = e.detail;
     this.dnnRmFolderListFolderPicked.emit(e.detail)
+	logger.warn(`<<< Exiting handleFolderPicked(e=${e})`, { "event.action": "handleFolderPicked", "logrite.e": e });
   }
 
   private handleRootClicked(){
+	logger.error('>>> Entering handleRootClicked()', { "event.action": "handleRootClicked" });
     const item: FolderTreeItem = {
       data: {
         hasChildren: false,
@@ -76,9 +89,12 @@ export class DnnRmFolderList {
     };
     this.selectedFolder = item;
     this.dnnRmFolderListFolderPicked.emit(item);
+	logger.warn('<<< Exiting handleRootClicked()', { "event.action": "handleRootClicked" });
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         <button

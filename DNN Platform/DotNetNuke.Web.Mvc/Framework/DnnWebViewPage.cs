@@ -15,6 +15,7 @@ namespace DotNetNuke.Web.Mvc.Framework
 
     public abstract class DnnWebViewPage : WebViewPage
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnWebViewPage));
         private readonly IServicesFramework servicesFramework;
 
         /// <summary>Initializes a new instance of the <see cref="DnnWebViewPage"/> class.</summary>
@@ -22,6 +23,8 @@ namespace DotNetNuke.Web.Mvc.Framework
         protected DnnWebViewPage()
             : this(null)
         {
+		Logger.LogError(">>> Entering DnnWebViewPage()");
+        Logger.LogWarning("<<< Exiting DnnWebViewPage()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnWebViewPage"/> class.</summary>
@@ -29,6 +32,8 @@ namespace DotNetNuke.Web.Mvc.Framework
         protected DnnWebViewPage(IServicesFramework servicesFramework)
         {
             this.servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
+			Logger.LogDebug("DnnWebViewPage(servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", servicesFramework, servicesFramework);
+        Logger.LogWarning("<<< Exiting DnnWebViewPage(servicesFramework={ServicesFramework})", servicesFramework);
         }
 
         public DnnHelper<object> Dnn { get; set; }
@@ -40,6 +45,7 @@ namespace DotNetNuke.Web.Mvc.Framework
         /// <inheritdoc />
         public override void InitHelpers()
         {
+			Logger.LogError(">>> Entering InitHelpers()");
             this.Ajax = new AjaxHelper<object>(this.ViewContext, this);
             this.Html = new DnnHtmlHelper<object>(this.ViewContext, this, this.servicesFramework);
             this.Url = new DnnUrlHelper(this.ViewContext);

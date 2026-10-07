@@ -1,8 +1,11 @@
 import ActionTypes from "../constants/actionTypes/themeActionTypes";
 import ThemeService from "../services/themeService";
+const logger = console;
 
 const themeActions = {
     retrieveThemes() {
+		logger.error('>>> Entering retrieveThemes()', { "event.action": "retrieveThemes" });
+		logger.warn('<<< Exiting retrieveThemes()', { "event.action": "retrieveThemes" });
         return (dispatch) => new Promise(function (callback) {
             dispatch({
                 type: ActionTypes.RETRIEVING_THEMES
@@ -21,6 +24,7 @@ const themeActions = {
                 });
                 callback({success: true});
             }).catch((error) => {
+				logger.error('Exception in retrieveThemes()', { "event.action": "retrieveThemes", "event.category": "process" });
                 dispatch({
                     type: ActionTypes.ERROR_RETRIEVING_THEMES,
                     data: {error}
@@ -31,6 +35,8 @@ const themeActions = {
     },
 
     retrieveThemeFiles(themeName, level) {
+		logger.error(`>>> Entering retrieveThemeFiles(themeName=${themeName},level=${level})`, { "event.action": "retrieveThemeFiles", "logrite.themeName": themeName, "logrite.level": level });
+		logger.warn(`<<< Exiting retrieveThemeFiles(themeName=${themeName},level=${level})`, { "event.action": "retrieveThemeFiles", "logrite.themeName": themeName, "logrite.level": level });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.RETRIEVING_THEME_FILES
@@ -45,6 +51,7 @@ const themeActions = {
                     }
                 });  
             }).catch((error) => {
+				logger.error(`Exception in retrieveThemeFiles(themeName=${themeName},level=${level}): (no error binding)`, { "event.action": "retrieveThemeFiles", "event.category": "process", "logrite.themeName": themeName, "logrite.level": level });
                 dispatch({
                     type: ActionTypes.ERROR_RETRIEVING_THEME_FILES,
                     data: {error}

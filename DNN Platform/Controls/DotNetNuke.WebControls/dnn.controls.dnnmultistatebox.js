@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 /// <reference name="MicrosoftAjax.js" />
 /// <reference name="dnn.controls.js" assembly="DotNetNuke.WebControls" />
 /// <reference name="dnn.js" assembly="DotNetNuke.WebUtility" />
@@ -9,10 +10,13 @@ Type.registerNamespace('dnn.controls');
 dnn.extend(dnn.controls, {
     initMultiStateBox: function (ctl) 
     {    	
+		logger.error(`>>> Entering initMultiStateBox(ctl=${ctl})`, { "event.action": "initMultiStateBox", "logrite.ctl": ctl });
 	    if (ctl)
 	    {
 		    var ts = new dnn.controls.DNNMultiStateBox(ctl);
 		    ts.initialize();
+			logger.error(`initMultiStateBox(ctl=${ctl}): ts → ${ts}`, { "event.action": "initMultiStateBox", "logrite.ctl": ctl });
+			logger.warn(`<<< Exiting initMultiStateBox(ctl=${ctl})`, { "event.action": "initMultiStateBox", "logrite.ctl": ctl });
 		    return ts;
 	    }
     }
@@ -68,9 +72,14 @@ dnn.controls.DNNMultiStateBox = function(o)
 
 dnn.controls.DNNMultiStateBox.prototype = 
 {
-get_Value: function() {return this.container.value;},
+get_Value: function() {
+    logger.error('>>> Entering get_Value()', { "event.action": "get_Value" });
+    logger.warn('<<< Exiting get_Value()', { "event.action": "get_Value" });
+    return this.container.value;
+},
 set_Value: function(value) 
 {
+	logger.error(`>>> Entering set_Value(value=${value})`, { "event.action": "set_Value", "logrite.value": value });
     var index = this.stateIndex[value];
     var state = this.states[index];
 
@@ -83,11 +92,13 @@ set_Value: function(value)
         this._label.innerHTML = state.Text;
     
     this.container.value = state.Key;
+	logger.warn(`<<< Exiting set_Value(value=${value})`, { "event.action": "set_Value", "logrite.value": value });
 },
 
 //--- Event Handlers ---//
 click: function(sender, args)
 {
+	logger.error(`>>> Entering click(sender=${sender},args=${args})`, { "event.action": "click", "logrite.sender": sender, "logrite.args": args });
     if (this.enabled)
     {
         var index = this.stateIndex[this.get_Value()] + 1;
@@ -96,17 +107,22 @@ click: function(sender, args)
         this.set_Value(this.states[index].Key);
     }
     this.container.checked = true;
+	logger.warn(`<<< Exiting click(sender=${sender},args=${args})`, { "event.action": "click", "logrite.sender": sender, "logrite.args": args });
 },
 
 keypress: function(sender, args)
 {
+logger.error(`>>> Entering keypress(sender=${sender},args=${args})`, { "event.action": "keypress", "logrite.sender": sender, "logrite.args": args });
 debugger;
+logger.warn(`<<< Exiting keypress(sender=${sender},args=${args})`, { "event.action": "keypress", "logrite.sender": sender, "logrite.args": args });
 },
 
 // Methods
 dispose: function()
 {
+	logger.error('>>> Entering dispose()', { "event.action": "dispose" });
     dnn.controls.DNNMultiStateBox.callBaseMethod(this, 'dispose');
+	logger.warn('<<< Exiting dispose()', { "event.action": "dispose" });
 }
 
 }

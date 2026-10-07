@@ -1,3 +1,4 @@
+const logger = console;
 import {
     pagination as ActionTypes
 } from "actionTypes";
@@ -14,6 +15,7 @@ const switchCase = [{
 
 
 export default function getReducer(initialState, additionalCases) {
+	logger.error(`>>> Entering getReducer(initialState=${initialState},additionalCases=${additionalCases})`, { "event.action": "getReducer", "logrite.initialState": initialState, "logrite.additionalCases": additionalCases });
     return function common(state = Object.assign({
         pageIndex: 0,
         pageSize: 100,
@@ -21,6 +23,7 @@ export default function getReducer(initialState, additionalCases) {
         filter: ""
     }, initialState), action) {
         let _switchCase = getFinalSwitchCase(switchCase, additionalCases);
+		logger.error(`getReducer(initialState=${initialState},additionalCases=${additionalCases}): _switchCase → ${_switchCase}`, { "event.action": "getReducer", "logrite.initialState": initialState, "logrite.additionalCases": additionalCases });
 
         let returnCase = { ...state };
 

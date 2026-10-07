@@ -2,26 +2,32 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Collapsible, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
+const logger = console;
 
 class SiteAliasRow extends Component {
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     toggle() {
+		logger.error('>>> Entering toggle()', { "event.action": "toggle" });
         if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
             this.props.Collapse();
         }
         else {
             this.props.OpenCollapse(this.props.id);
+			logger.warn('<<< Exiting toggle()', { "event.action": "toggle" });
         }
     }
 
      
     getBooleanDisplay(prop) {
+		logger.error(`>>> Entering getBooleanDisplay(prop=${prop})`, { "event.action": "getBooleanDisplay", "logrite.prop": prop });
         if (this.props.id !== "add") {
             if (prop) {
                 return <div className="checkMarkIcon"><SvgIcons.CheckMarkIcon /></div>;
@@ -33,8 +39,10 @@ class SiteAliasRow extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={"collapsible-component-alias" + (opened ? " row-opened" : "")}>
                 <div className={"collapsible-alias " + !opened} >

@@ -23,19 +23,24 @@
     keywords = new RegExp("^((" + keywords.join(")|(") + "))\\b");
 
     function tokenBase (stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       stream.eatWhile(/[^\{]/);
       var ch = stream.next();
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       if (ch == "{") {
         if (ch = stream.eat(/\{|%|#/)) {
           state.tokenize = inTag(ch);
+		logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
           return "tag";
         }
       }
     }
     function inTag (close) {
+	logger.error(`>>> Entering inTag(close=${close})`, { "event.action": "inTag", "logrite.close": close });
       if (close == "{") {
         close = "}";
       }
+	logger.warn(`<<< Exiting inTag(close=${close})`, { "event.action": "inTag", "logrite.close": close });
       return function (stream, state) {
         var ch = stream.next();
         if ((ch == close) && stream.eat("}")) {
@@ -45,14 +50,19 @@
         if (stream.match(keywords)) {
           return "keyword";
         }
+		logger.error(`inTag(close=${close}): close → ${close}`, { "event.action": "inTag", "logrite.close": close });
         return close == "#" ? "comment" : "string";
       };
     }
     return {
       startState: function () {
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
+		logger.warn('<<< Exiting startState()', { "event.action": "startState" });
         return {tokenize: tokenBase};
       },
       token: function (stream, state) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return state.tokenize(stream, state);
       }
     };

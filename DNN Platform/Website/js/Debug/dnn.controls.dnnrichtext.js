@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 /// <reference name="MicrosoftAjax.js" />
 /// <reference name="dnn.controls.js" assembly="DotNetNuke.WebControls" />
 /// <reference name="dnn.controls.dnnlabeledit.js" assembly="DotNetNuke.WebControls" />
@@ -37,19 +38,25 @@ dnn.controls.DNNRichText.prototype =
 {
 focus: function()
 {
+	logger.error('>>> Entering focus()', { "event.action": "focus" });
 	if (this.supportsCE)
 		this.control.focus();
 	else
 		this.container.contentWindow.focus();
+		logger.warn('<<< Exiting focus()', { "event.action": "focus" });
 },
 
 execCommand: function(cmd, ui, vValue)
 {
+	logger.error(`>>> Entering execCommand(cmd=${cmd},ui=${ui},vValue=${vValue})`, { "event.action": "execCommand", "logrite.cmd": cmd, "logrite.ui": ui, "logrite.vValue": vValue });
 	this.document.execCommand(cmd, ui, vValue);	
+	logger.warn(`<<< Exiting execCommand(cmd=${cmd},ui=${ui},vValue=${vValue})`, { "event.action": "execCommand", "logrite.cmd": cmd, "logrite.ui": ui, "logrite.vValue": vValue });
 },
 
 getText: function()
 {
+		logger.error('>>> Entering getText()', { "event.action": "getText" });
+		logger.warn('<<< Exiting getText()', { "event.action": "getText" });
 		return this.control.innerHTML;
 },
 
@@ -59,11 +66,13 @@ setText: function (s)
 		this.control.innerHTML = s;		
 	else
 		this.text = s;
+		logger.warn(`<<< Exiting setText(s=${s})`, { "event.action": "setText", "logrite.s": s });
 },
 
 //method continually called until iframe is completely loaded
 initDocument: function ()
 {
+	logger.error('>>> Entering initDocument()', { "event.action": "initDocument" });
 	if (this.container.contentDocument != null)
 	{
 		if (this.document == null)	//iframe loaded, now write some HTML, thus causing it to not be loaded again
@@ -71,6 +80,7 @@ initDocument: function ()
 			this.container.contentDocument.designMode = 'on';
 			this.document = this.container.contentWindow.document;
 			this.document.open();
+			logger.debug(`initDocument(): this.document → ${this.document}`, { "event.action": "initDocument" });
 			dnn.dom.addSafeHandler(this.container, 'onload', this, 'initDocument');
 			this.document.write('<HEAD>' + this._getCSSLinks() + '</HEAD><BODY id="__dnn_body"></BODY>');
 			this.document.close();
@@ -82,20 +92,26 @@ initDocument: function ()
 			this.control.tabIndex = 0;
 			this.initialized = true;
 			this.setText(this.text);
+			logger.debug(`initDocument(): this.initialized → ${this.initialized}`, { "event.action": "initDocument" });
 			this.initFunc();		
 		}
 	}
 	if (this.initialized == false)	//iframe and body not loaded, call ourselves until it is
 	    dnn.doDelay(this.container.id + 'initEdit', 10, this._initDelegate);
+		logger.warn('<<< Exiting initDocument()', { "event.action": "initDocument" });
 },
 
 _getCSSLinks: function()	//probably a better way to handle this...
 {
+	logger.error('>>> Entering _getCSSLinks()', { "event.action": "_getCSSLinks" });
 	var arr = dnn.dom.getByTagName('link');
 	var s = '';
+	logger.error(`_getCSSLinks(): s → ${s}`, { "event.action": "_getCSSLinks" });
+	logger.error(`_getCSSLinks(): arr → ${arr}`, { "event.action": "_getCSSLinks" });
 	for (var i=0; i< arr.length; i++)
 	{
 		s+= '<LINK href="' + arr[i].href + '" type=text/css rel=stylesheet>';
+		logger.warn('<<< Exiting _getCSSLinks()', { "event.action": "_getCSSLinks" });
 	}
 	return s;
 }

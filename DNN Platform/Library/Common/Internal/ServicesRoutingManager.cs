@@ -18,6 +18,7 @@ namespace DotNetNuke.Common.Internal
         /// <summary>Registers all the service routes.</summary>
         public static void RegisterServiceRoutes()
         {
+			Logger.LogError(">>> Entering RegisterServiceRoutes()");
             try
             {
                 foreach (var routingManager in Globals.GetCurrentServiceProvider().GetServices<IRoutingManager>())
@@ -29,15 +30,18 @@ namespace DotNetNuke.Common.Internal
             {
                 Logger.Error("Unable to register service routes", e);
             }
+			Logger.LogWarning("<<< Exiting RegisterServiceRoutes()");
         }
 
         /// <summary>Re-registers all the routes while the site is still running.</summary>
         public static void ReRegisterServiceRoutesWhileSiteIsRunning()
         {
+			Logger.LogError(">>> Entering ReRegisterServiceRoutesWhileSiteIsRunning()");
             // by clearing a "fake" key on the caching provider we can echo this
             // command to all the members of a web farm
             // the caching provider will call to make the actual registration of new routes
             CachingProvider.Instance().Clear("ServiceFrameworkRoutes", "-1");
+			Logger.LogWarning("<<< Exiting ReRegisterServiceRoutesWhileSiteIsRunning()");
         }
     }
 }

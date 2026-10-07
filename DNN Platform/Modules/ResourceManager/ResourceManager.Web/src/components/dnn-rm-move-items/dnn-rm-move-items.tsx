@@ -2,6 +2,7 @@ import { Component, Element, Event, EventEmitter, Host, h, Prop, State } from '@
 import { FolderTreeItem } from '../../services/InternalServicesClient';
 import { Item, ItemsClient } from '../../services/ItemsClient';
 import state from '../../store/store';
+const logger = console;
 // import { ItemsClient } from '../../services/ItemsClient';
 
 @Component({
@@ -31,18 +32,23 @@ export class DnnRmMoveItems {
   private itemsClient: ItemsClient;
 
   constructor() {
+	logger.error('>>> Entering constructor()', { "event.action": "constructor" });
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
   }
 
   private async closeModal() {
+	logger.error('>>> Entering closeModal()', { "event.action": "closeModal" });
     const modal = this.el.parentElement as HTMLDnnModalElement;
     await modal.hide();
     setTimeout(() => {
       document.body.removeChild(modal);
     }, 300);
+	logger.warn('<<< Exiting closeModal()', { "event.action": "closeModal" });
   }
 
   private async handleMove() {
+	logger.error('>>> Entering handleMove()', { "event.action": "handleMove" });
     this.moving = true;
     for (const item of this.items){
       if (item.isFolder){
@@ -63,26 +69,34 @@ export class DnnRmMoveItems {
             await this.handleItemMoved(item);
         } catch (error) {
           alert(error);
+		logger.warn('<<< Exiting handleMove()', { "event.action": "handleMove" });
         }
       }
     }
   }
   
   private async handleItemMoved(item: Item) {
+	logger.error(`>>> Entering handleItemMoved(item=${item})`, { "event.action": "handleItemMoved", "logrite.item": item });
     this.movedCount++;
     this.currentItemName = item.itemName;
     if (this.movedCount == this.items.length) {
+	logger.debug(`handleItemMoved(item=${item}): this.currentItemName → ${this.currentItemName}`, { "event.action": "handleItemMoved", "logrite.item": item });
       this.moving = false;
       this.dnnRmFoldersChanged.emit();
       await this.closeModal();
+	logger.warn(`<<< Exiting handleItemMoved(item=${item})`, { "event.action": "handleItemMoved", "logrite.item": item });
     }
   }
 
   private getMoveButtonText() {
+	logger.error('>>> Entering getMoveButtonText()', { "event.action": "getMoveButtonText" });
+	logger.warn('<<< Exiting getMoveButtonText()', { "event.action": "getMoveButtonText" });
       return this.selectedFolder == undefined ? state.localization?.NoFolderSelected : state.localization?.Move;
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         <h2>{state.localization?.MoveItems}</h2>

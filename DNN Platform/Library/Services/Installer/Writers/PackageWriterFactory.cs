@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The PackageWriterFactory is a factory class that is used to instantiate the appropriate Package Writer.</summary>
     public partial class PackageWriterFactory
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PackageWriterFactory));
         /// <summary>The GetWriter method instantiates the relevant PackageWriter Installer.</summary>
         /// <param name="package">The associated PackageInfo instance.</param>
         /// <returns>A <see cref="PackageWriterBase"/> instance or <see langword="null"/>.</returns>
@@ -29,11 +30,14 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <returns>A <see cref="PackageWriterBase"/> instance or <see langword="null"/>.</returns>
         public static PackageWriterBase GetWriter(IServiceProvider serviceProvider, PackageInfo package)
         {
+			Logger.LogError(">>> Entering GetWriter(package={Package})", package);
             PackageWriterBase writer = null;
             switch (package.PackageType)
             {
                 case "Auth_System":
                     writer = new AuthenticationPackageWriter(package);
+					Logger.LogError("GetWriter(package={Package}): writer → {Writer}", package, writer);
+					Logger.LogError("GetWriter(serviceProvider={ServiceProvider},package={Package}): writer → {Writer}", serviceProvider, package, writer);
                     break;
                 case "Module":
                     writer = new ModulePackageWriter(package);
@@ -63,10 +67,14 @@ namespace DotNetNuke.Services.Installer.Writers
                 default:
                     // PackageType is defined in the List
                     var listController = ActivatorUtilities.GetServiceOrCreateInstance<ListController>(serviceProvider);
+					Logger.LogError("GetWriter(package={Package}): listController → {ListController}", package, listController);
+					Logger.LogError("GetWriter(serviceProvider={ServiceProvider},package={Package}): listController → {ListController}", serviceProvider, package, listController);
                     ListEntryInfo entry = listController.GetListEntryInfo("PackageWriter", package.PackageType);
 
+					Logger.LogError("GetWriter(package={Package}): entry → {Entry}", package, entry);
                     if (entry != null && !string.IsNullOrEmpty(entry.Text))
                     {
+						Logger.LogError("GetWriter(serviceProvider={ServiceProvider},package={Package}): entry → {Entry}", serviceProvider, package, entry);
                         // The class for the Installer is specified in the Text property
                         writer = (PackageWriterBase)Reflection.CreateObject(serviceProvider, entry.Text, $"PackageWriter_{entry.Value}");
                     }
@@ -74,6 +82,7 @@ namespace DotNetNuke.Services.Installer.Writers
                     break;
             }
 
+			Logger.LogWarning("<<< Exiting GetWriter(serviceProvider={ServiceProvider},package={Package})", serviceProvider, package);
             return writer;
         }
     }

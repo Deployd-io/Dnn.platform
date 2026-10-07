@@ -35,6 +35,8 @@ namespace DotNetNuke.Web.InternalServices
         public RelationshipServiceController()
             : this(null)
         {
+		Logger.LogError(">>> Entering RelationshipServiceController()");
+        Logger.LogWarning("<<< Exiting RelationshipServiceController()");
         }
 
         /// <summary>Accept a friend.</summary>
@@ -44,20 +46,26 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage AcceptFriend(NotificationDTO postData)
         {
+			Logger.LogError(">>> Entering AcceptFriend(postData={PostData})", postData);
             var success = false;
 
+			Logger.LogError("AcceptFriend(postData={PostData}): success → {Success}", postData, success);
             try
             {
                 var recipient = InternalMessagingController.Instance.GetMessageRecipient(postData.NotificationId, this.UserInfo.UserID);
+				Logger.LogError("AcceptFriend(postData={PostData}): recipient → {Recipient}", postData, recipient);
                 if (recipient != null)
                 {
                     var notification = NotificationsController.Instance.GetNotification(postData.NotificationId);
+					Logger.LogError("AcceptFriend(postData={PostData}): notification → {Notification}", postData, notification);
                     if (int.TryParse(notification.Context, out var userRelationshipId))
                     {
                         var userRelationship = RelationshipController.Instance.GetUserRelationship(userRelationshipId);
+						Logger.LogError("AcceptFriend(postData={PostData}): userRelationship → {UserRelationship}", postData, userRelationship);
                         if (userRelationship != null)
                         {
                             var friend = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, userRelationship.UserId);
+							Logger.LogError("AcceptFriend(postData={PostData}): friend → {Friend}", postData, friend);
                             FriendsController.Instance.AcceptFriend(friend);
                             success = true;
                         }
@@ -74,6 +82,7 @@ namespace DotNetNuke.Web.InternalServices
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
 
+			Logger.LogWarning("<<< Exiting AcceptFriend(postData={PostData})", postData);
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
         }
 
@@ -84,17 +93,22 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage FollowBack(NotificationDTO postData)
         {
+			Logger.LogError(">>> Entering FollowBack(postData={PostData})", postData);
             var success = false;
 
+			Logger.LogError("FollowBack(postData={PostData}): success → {Success}", postData, success);
             try
             {
                 var recipient = InternalMessagingController.Instance.GetMessageRecipient(postData.NotificationId, this.UserInfo.UserID);
+				Logger.LogError("FollowBack(postData={PostData}): recipient → {Recipient}", postData, recipient);
                 if (recipient != null)
                 {
                     var notification = NotificationsController.Instance.GetNotification(postData.NotificationId);
+					Logger.LogError("FollowBack(postData={PostData}): notification → {Notification}", postData, notification);
                     if (int.TryParse(notification.Context, out var targetUserId))
                     {
                         var targetUser = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, targetUserId);
+						Logger.LogError("FollowBack(postData={PostData}): targetUser → {TargetUser}", postData, targetUser);
 
                         if (targetUser == null)
                         {
@@ -104,6 +118,7 @@ namespace DotNetNuke.Web.InternalServices
                                     "UserDoesNotExist",
                                     "The user you are trying to follow no longer exists."),
                             };
+							Logger.LogDebug("FollowBack(postData={PostData}): Message → {Message}", postData, Message);
                             return this.Request.CreateResponse(HttpStatusCode.InternalServerError, response);
                         }
 
@@ -136,6 +151,7 @@ namespace DotNetNuke.Web.InternalServices
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
 
+			Logger.LogWarning("<<< Exiting FollowBack(postData={PostData})", postData);
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
         }
     }

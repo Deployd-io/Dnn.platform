@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -12,10 +13,13 @@
   var Pos = CodeMirror.Pos;
 
   function forEach(arr, f) {
+	logger.error(`>>> Entering forEach(arr=${arr},f=${f})`, { "event.action": "forEach", "logrite.arr": arr, "logrite.f": f });
     for (var i = 0, e = arr.length; i < e; ++i) f(arr[i]);
+	logger.warn(`<<< Exiting forEach(arr=${arr},f=${f})`, { "event.action": "forEach", "logrite.arr": arr, "logrite.f": f });
   }
 
   function arrayContains(arr, item) {
+	logger.error(`>>> Entering arrayContains(arr=${arr},item=${item})`, { "event.action": "arrayContains", "logrite.arr": arr, "logrite.item": item });
     if (!Array.prototype.indexOf) {
       var i = arr.length;
       while (i--) {
@@ -25,6 +29,7 @@
       }
       return false;
     }
+	logger.warn(`<<< Exiting arrayContains(arr=${arr},item=${item})`, { "event.action": "arrayContains", "logrite.arr": arr, "logrite.item": item });
     return arr.indexOf(item) != -1;
   }
 
@@ -58,6 +63,8 @@
   }
 
   function javascriptHint(editor, options) {
+	logger.error(`>>> Entering javascriptHint(editor=${editor},options=${options})`, { "event.action": "javascriptHint", "logrite.editor": editor, "logrite.options": options });
+	logger.warn(`<<< Exiting javascriptHint(editor=${editor},options=${options})`, { "event.action": "javascriptHint", "logrite.editor": editor, "logrite.options": options });
     return scriptHint(editor, javascriptKeywords,
                       function (e, cur) {return e.getTokenAt(cur);},
                       options);
@@ -65,10 +72,14 @@
   CodeMirror.registerHelper("hint", "javascript", javascriptHint);
 
   function getCoffeeScriptToken(editor, cur) {
+logger.error(`>>> Entering getCoffeeScriptToken(editor=${editor},cur=${cur})`, { "event.action": "getCoffeeScriptToken", "logrite.editor": editor, "logrite.cur": cur });
   // This getToken, it is for coffeescript, imitates the behavior of
   // getTokenAt method in javascript.js, that is, returning "property"
   // type and treat "." as indepenent token.
     var token = editor.getTokenAt(cur);
+	logger.debug(`getCoffeeScriptToken(editor=${editor},cur=${cur}): token.end → ${token.end}`, { "event.action": "getCoffeeScriptToken", "logrite.editor": editor, "logrite.cur": cur });
+	logger.debug(`getCoffeeScriptToken(editor=${editor},cur=${cur}): token.string → ${token.string}`, { "event.action": "getCoffeeScriptToken", "logrite.editor": editor, "logrite.cur": cur });
+	logger.debug(`getCoffeeScriptToken(editor=${editor},cur=${cur}): token.type → ${token.type}`, { "event.action": "getCoffeeScriptToken", "logrite.editor": editor, "logrite.cur": cur });
     if (cur.ch == token.start + 1 && token.string.charAt(0) == '.') {
       token.end = token.start;
       token.string = '.';
@@ -83,6 +94,8 @@
   }
 
   function coffeescriptHint(editor, options) {
+	logger.error(`>>> Entering coffeescriptHint(editor=${editor},options=${options})`, { "event.action": "coffeescriptHint", "logrite.editor": editor, "logrite.options": options });
+	logger.warn(`<<< Exiting coffeescriptHint(editor=${editor},options=${options})`, { "event.action": "coffeescriptHint", "logrite.editor": editor, "logrite.options": options });
     return scriptHint(editor, coffeescriptKeywords, getCoffeeScriptToken, options);
   }
   CodeMirror.registerHelper("hint", "coffeescript", coffeescriptHint);
@@ -100,13 +113,17 @@
   function getCompletions(token, context, keywords, options) {
     var found = [], start = token.string, global = options && options.globalScope || window;
     function maybeAdd(str) {
+	logger.error(`>>> Entering maybeAdd(str=${str})`, { "event.action": "maybeAdd", "logrite.str": str });
       if (str.lastIndexOf(start, 0) == 0 && !arrayContains(found, str)) found.push(str);
+	logger.warn(`<<< Exiting maybeAdd(str=${str})`, { "event.action": "maybeAdd", "logrite.str": str });
     }
     function gatherCompletions(obj) {
+	logger.error(`>>> Entering gatherCompletions(obj=${obj})`, { "event.action": "gatherCompletions", "logrite.obj": obj });
       if (typeof obj == "string") forEach(stringProps, maybeAdd);
       else if (obj instanceof Array) forEach(arrayProps, maybeAdd);
       else if (obj instanceof Function) forEach(funcProps, maybeAdd);
       for (var name in obj) maybeAdd(name);
+	logger.warn(`<<< Exiting gatherCompletions(obj=${obj})`, { "event.action": "gatherCompletions", "logrite.obj": obj });
     }
 
     if (context && context.length) {

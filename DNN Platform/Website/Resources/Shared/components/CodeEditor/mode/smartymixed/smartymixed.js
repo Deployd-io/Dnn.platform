@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -52,13 +53,17 @@ CodeMirror.defineMode("smartymixed", function(config) {
   var helpers = {
     chain: function(stream, state, parser) {
       state.tokenize = parser;
+	logger.warn(`<<< Exiting chain(stream=${stream},state=${state},parser=${parser})`, { "event.action": "chain", "logrite.stream": stream, "logrite.state": state, "logrite.parser": parser });
       return parser(stream, state);
     },
 
     cleanChain: function(stream, state, parser) {
+	logger.error(`>>> Entering cleanChain(stream=${stream},state=${state},parser=${parser})`, { "event.action": "cleanChain", "logrite.stream": stream, "logrite.state": state, "logrite.parser": parser });
       state.tokenize = null;
       state.localState = null;
+	logger.debug(`cleanChain(stream=${stream},state=${state},parser=${parser}): state.tokenize → ${state.tokenize}`, { "event.action": "cleanChain", "logrite.stream": stream, "logrite.state": state, "logrite.parser": parser });
       state.localMode = null;
+	logger.warn(`<<< Exiting cleanChain(stream=${stream},state=${state},parser=${parser})`, { "event.action": "cleanChain", "logrite.stream": stream, "logrite.state": state, "logrite.parser": parser });
       return (typeof parser == "string") ? (parser ? parser : null) : parser(stream, state);
     },
 
@@ -71,6 +76,7 @@ CodeMirror.defineMode("smartymixed", function(config) {
         stream.backUp(cur.length);
         if (!stream.match(pat, false)) stream.match(cur[0]);
       }
+	logger.warn(`<<< Exiting maybeBackup(stream=${stream},pat=${pat},style=${style})`, { "event.action": "maybeBackup", "logrite.stream": stream, "logrite.pat": pat, "logrite.style": style });
       return style;
     }
   };
@@ -92,6 +98,7 @@ CodeMirror.defineMode("smartymixed", function(config) {
         state.localState = smartyMode.startState(htmlMixedMode.indent(state.htmlMixedState, ""));
         return helpers.maybeBackup(stream, settings.leftDelimiter, smartyMode.token(stream, state.localState));
       }
+	logger.warn(`<<< Exiting html(stream=${stream},state=${state})`, { "event.action": "html", "logrite.stream": stream, "logrite.state": state });
       return htmlMixedMode.token(stream, state.htmlMixedState);
     },
 
@@ -108,6 +115,7 @@ CodeMirror.defineMode("smartymixed", function(config) {
         return "tag";
       }
 
+	logger.warn(`<<< Exiting smarty(stream=${stream},state=${state})`, { "event.action": "smarty", "logrite.stream": stream, "logrite.state": state });
       return helpers.maybeBackup(stream, settings.rightDelimiter, smartyMode.token(stream, state.localState));
     },
 
@@ -120,6 +128,7 @@ CodeMirror.defineMode("smartymixed", function(config) {
           }
           stream.next();
         }
+	logger.warn(`<<< Exiting inBlock(style=${style},terminator=${terminator})`, { "event.action": "inBlock", "logrite.style": style, "logrite.terminator": terminator });
         return style;
       };
     }
@@ -127,6 +136,7 @@ CodeMirror.defineMode("smartymixed", function(config) {
 
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       var state = htmlMixedMode.startState();
       return {
         token: parsers.html,
@@ -136,12 +146,16 @@ CodeMirror.defineMode("smartymixed", function(config) {
         tokenize: null,
         inLiteral: false
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
 
     copyState: function(state) {
+	logger.error(`>>> Entering copyState(state=${state})`, { "event.action": "copyState", "logrite.state": state });
       var local = null, tok = (state.tokenize || state.token);
       if (state.localState) {
         local = CodeMirror.copyState((tok != parsers.html ? smartyMode : htmlMixedMode), state.localState);
+		logger.error(`copyState(state=${state}): local → ${local}`, { "event.action": "copyState", "logrite.state": state });
+		logger.warn(`<<< Exiting copyState(state=${state})`, { "event.action": "copyState", "logrite.state": state });
       }
       return {
         token: state.token,
@@ -154,9 +168,11 @@ CodeMirror.defineMode("smartymixed", function(config) {
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.match(settings.leftDelimiter, false)) {
         if (!state.inLiteral && stream.match(regs.literalOpen, true)) {
           state.inLiteral = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.inLiteral → ${state.inLiteral}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           return "keyword";
         } else if (state.inLiteral && stream.match(regs.literalClose, true)) {
           state.inLiteral = false;
@@ -165,28 +181,37 @@ CodeMirror.defineMode("smartymixed", function(config) {
       }
       if (state.inLiteral && state.localState != state.htmlMixedState) {
         state.tokenize = parsers.html;
+		logger.debug(`token(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+		logger.debug(`token(stream=${stream},state=${state}): state.localState → ${state.localState}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         state.localMode = htmlMixedMode;
+		logger.debug(`token(stream=${stream},state=${state}): state.localMode → ${state.localMode}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         state.localState = state.htmlMixedState;
       }
 
       var style = (state.tokenize || state.token)(stream, state);
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+	logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return style;
     },
 
     indent: function(state, textAfter) {
+	logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       if (state.localMode == smartyMode
           || (state.inLiteral && !state.localMode)
          || regs.hasLeftDelimeter.test(textAfter)) {
         return CodeMirror.Pass;
       }
+	logger.warn(`<<< Exiting indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       return htmlMixedMode.indent(state.htmlMixedState, textAfter);
     },
 
     innerMode: function(state) {
+	logger.error(`>>> Entering innerMode(state=${state})`, { "event.action": "innerMode", "logrite.state": state });
       return {
         state: state.localState || state.htmlMixedState,
         mode: state.localMode || htmlMixedMode
       };
+	logger.warn(`<<< Exiting innerMode(state=${state})`, { "event.action": "innerMode", "logrite.state": state });
     }
   };
 }, "htmlmixed", "smarty");

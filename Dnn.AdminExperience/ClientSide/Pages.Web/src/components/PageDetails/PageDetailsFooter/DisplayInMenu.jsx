@@ -2,11 +2,14 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import { Switch, Label } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../../localization";
+const logger = console;
 
 class DisplayInMenu extends Component {
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <div>
             <Label
                 labelType="inline"

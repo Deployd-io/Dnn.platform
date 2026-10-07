@@ -23,6 +23,7 @@ namespace DotNetNuke.UI.UserControls
     /// </remarks>
     public class SectionHeadControl : UserControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SectionHeadControl));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         protected ImageButton imgIcon;
@@ -124,6 +125,7 @@ namespace DotNetNuke.UI.UserControls
         /// <param name="e">The event args.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             try
@@ -136,19 +138,23 @@ namespace DotNetNuke.UI.UserControls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>Renders the SectionHeadControl.</summary>
         /// <param name="e">The event args.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             try
             {
                 var ctl = (HtmlControl)this.Parent.FindControl(this.Section);
+				Logger.LogError("OnPreRender(e={E}): ctl → {Ctl}", e, ctl);
                 if (ctl != null)
                 {
                     this.lblTitle.Attributes.Add("onclick", this.imgIcon.ClientID + ".click();");
@@ -161,8 +167,10 @@ namespace DotNetNuke.UI.UserControls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnPreRender(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -171,10 +179,14 @@ namespace DotNetNuke.UI.UserControls
         // ReSharper disable once InconsistentNaming
         protected void imgIcon_Click(object sender, ImageClickEventArgs e)
         {
+			Logger.LogError(">>> Entering imgIcon_Click(sender={Sender},e={E})", sender, e);
             var ctl = (HtmlControl)this.Parent.FindControl(this.Section);
+			Logger.LogError("imgIcon_Click(sender={Sender},e={E}): ctl → {Ctl}", sender, e, ctl);
             if (ctl != null)
             {
+				Logger.LogWarning("<<< Exiting imgIcon_Click(sender={Sender},e={E})", sender, e);
                 this.IsExpanded = !this.IsExpanded;
+				Logger.LogDebug("imgIcon_Click(sender={Sender},e={E}): this.IsExpanded → {Arg2}", sender, e, this.IsExpanded);
             }
         }
     }

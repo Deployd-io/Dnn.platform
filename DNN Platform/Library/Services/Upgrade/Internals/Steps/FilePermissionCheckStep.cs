@@ -22,11 +22,14 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
         /// <summary>Main method to execute the step.</summary>
         public override void Execute()
         {
+			Logger.LogError(">>> Entering Execute()");
             this.Percentage = 0;
             this.Status = StepStatus.Running;
+			Logger.LogDebug("Execute(): this.Percentage → {Arg0}", this.Percentage);
 
             var verifiers = new List<FileSystemPermissionVerifier>
                                 {
+									Logger.LogDebug("Execute(): this.Status → {Arg0}", this.Status);
                                     new FileSystemPermissionVerifier(HttpContext.Current.Server.MapPath("~")),
                                     new FileSystemPermissionVerifier(HttpContext.Current.Server.MapPath("~/App_Data")),
                                 };
@@ -42,6 +45,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
                 this.Errors.Add(string.Format(CultureInfo.CurrentCulture, Localization.GetString("StepFailed", this.LocalInstallResourceFile), this.Details));
             }
 
+			Logger.LogWarning("<<< Exiting Execute()");
             this.Percentage = 100;
 
             this.Status = this.Errors.Count > 0 ? StepStatus.Retry : StepStatus.Done;

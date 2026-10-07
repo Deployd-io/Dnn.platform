@@ -2,6 +2,7 @@
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
 Imports System.Diagnostics.CodeAnalysis
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.Utilities
 
@@ -21,13 +22,18 @@ Namespace DotNetNuke.UI.Utilities
     ''' -----------------------------------------------------------------------------
     <SuppressMessage("Microsoft.Design", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification := "Breaking change")>
     Public Class ClientAPIPostBackEventArgs
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         <SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification := "Breaking change")>
         Public EventName As String
         <SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification := "Breaking change")>
         Public EventArguments As Hashtable = New Hashtable
 
         Public Sub New()
+		_logger.LogError(">>> Entering New()")
 
+		_logger.LogWarning("<<< Exiting New()")
+		_logger.LogError(">>> Entering New(strEventArgument={StrEventArgument})", strEventArgument)
+		_logger.LogWarning("<<< Exiting New(strEventArgument={StrEventArgument})", strEventArgument)
         End Sub
 
         Public Sub New(ByVal strEventArgument As String)

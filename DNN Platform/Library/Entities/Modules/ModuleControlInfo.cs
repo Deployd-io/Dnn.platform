@@ -17,12 +17,17 @@ namespace DotNetNuke.Entities.Modules
     [Serializable]
     public class ModuleControlInfo : ControlInfo, IXmlSerializable, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleControlInfo));
         /// <summary>Initializes a new instance of the <see cref="ModuleControlInfo"/> class.</summary>
         public ModuleControlInfo()
         {
+			Logger.LogError(">>> Entering ModuleControlInfo()");
             this.ModuleControlID = Null.NullInteger;
+			Logger.LogDebug("ModuleControlInfo(): this.ModuleControlID → {Arg0}", this.ModuleControlID);
             this.ModuleDefID = Null.NullInteger;
             this.ControlType = SecurityAccessLevel.Anonymous;
+			Logger.LogDebug("ModuleControlInfo(): this.ModuleDefID → {Arg0}", this.ModuleDefID);
+        Logger.LogWarning("<<< Exiting ModuleControlInfo()");
             this.SupportsPopUps = false;
         }
 
@@ -68,6 +73,7 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.ModuleControlID = Null.SetNullInteger(dr["ModuleControlID"]);
             this.FillInternal(dr);
             this.ModuleDefID = Null.SetNullInteger(dr["ModuleDefID"]);
@@ -80,11 +86,14 @@ namespace DotNetNuke.Entities.Modules
 
             // Call the base classes fill method to populate base class properties
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <inheritdoc />
         public XmlSchema GetSchema()
         {
+			Logger.LogError(">>> Entering GetSchema()");
+			Logger.LogWarning("<<< Exiting GetSchema()");
             return null;
         }
 
@@ -92,6 +101,7 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="reader">The XmlReader to use.</param>
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogError(">>> Entering ReadXml(reader={Reader})", reader);
             while (reader.Read())
             {
                 if (reader.NodeType == XmlNodeType.EndElement)
@@ -139,12 +149,14 @@ namespace DotNetNuke.Entities.Modules
                         break;
                 }
             }
+			Logger.LogWarning("<<< Exiting ReadXml(reader={Reader})", reader);
         }
 
         /// <summary>Writes a ModuleControlInfo to an XmlWriter.</summary>
         /// <param name="writer">The XmlWriter to use.</param>
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteXml(writer={Writer})", writer);
             // Write start of main elements
             writer.WriteStartElement("moduleControl");
 
@@ -162,6 +174,7 @@ namespace DotNetNuke.Entities.Modules
 
             // Write end of main element
             writer.WriteEndElement();
+			Logger.LogWarning("<<< Exiting WriteXml(writer={Writer})", writer);
         }
     }
 }

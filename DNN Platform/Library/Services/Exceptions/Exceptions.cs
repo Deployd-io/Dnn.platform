@@ -56,6 +56,7 @@ namespace DotNetNuke.Services.Exceptions
         /// <returns>Exception info.</returns>
         public static ExceptionInfo GetExceptionInfo(Exception e)
         {
+			Logger.LogError(">>> Entering GetExceptionInfo(e={E})", e);
             var objExceptionInfo = new ExceptionInfo(e);
 
             while (e.InnerException != null)
@@ -81,6 +82,7 @@ namespace DotNetNuke.Services.Exceptions
                     // Append the name of the method.
                     res += mi.Name;
                     objExceptionInfo.Method = res;
+					Logger.LogDebug("GetExceptionInfo(e={E}): objExceptionInfo.Method → {Arg1}", e, objExceptionInfo.Method);
                 }
                 catch (Exception exc)
                 {
@@ -97,31 +99,44 @@ namespace DotNetNuke.Services.Exceptions
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetExceptionInfo(e={E})", e);
             return objExceptionInfo;
         }
 
         public static void ProcessHttpException()
         {
+			Logger.LogError(">>> Entering ProcessHttpException()");
             var notFoundErrorString = Localization.GetString("ResourceNotFound", Localization.SharedResourceFile);
+			Logger.LogWarning("<<< Exiting ProcessHttpException()");
             var exc = new HttpException(404, notFoundErrorString);
+			Logger.LogError("ProcessHttpException(): exc → {Exc}", exc);
+			Logger.LogError("ProcessHttpException(): notFoundErrorString → {NotFoundErrorString}", notFoundErrorString);
+        Logger.LogWarning("<<< Exiting ProcessHttpException(exc={Exc})", exc);
             ProcessHttpException(exc, HttpContext.Current.Request.RawUrl);
         }
 
         public static void ProcessHttpException(string url)
         {
+			Logger.LogError(">>> Entering ProcessHttpException(url={Url})", url);
+			Logger.LogError("ProcessHttpException(url={Url}): exc → {Exc}", url, exc);
             var notFoundErrorString = Localization.GetString("ResourceNotFound", Localization.SharedResourceFile);
+			Logger.LogWarning("<<< Exiting ProcessHttpException(url={Url})", url);
             var exc = new HttpException(404, notFoundErrorString);
             ProcessHttpException(exc, url);
         }
 
         public static void ProcessHttpException(HttpException exc)
         {
+			Logger.LogError(">>> Entering ProcessHttpException(exc={Exc})", exc);
             ProcessHttpException(exc, HttpContext.Current.Request.RawUrl);
         }
 
         public static void ProcessHttpException(HttpRequest request)
         {
+			Logger.LogError(">>> Entering ProcessHttpException(request={Request})", request);
+			Logger.LogError("ProcessHttpException(request={Request}): exc → {Exc}", request, exc);
             var notFoundErrorString = Localization.GetString("ResourceNotFound", Localization.SharedResourceFile);
+			Logger.LogWarning("<<< Exiting ProcessHttpException(request={Request})", request);
             var exc = new HttpException(404, notFoundErrorString);
             ProcessHttpException(exc, request.RawUrl);
         }
@@ -131,7 +146,9 @@ namespace DotNetNuke.Services.Exceptions
         /// <param name="exc">The exception.</param>
         public static void ProcessModuleLoadException(PortalModuleBase objPortalModuleBase, Exception exc)
         {
+			Logger.LogError(">>> Entering ProcessModuleLoadException(objPortalModuleBase={ObjPortalModuleBase},exc={Exc})", objPortalModuleBase, exc);
             ProcessModuleLoadException((Control)objPortalModuleBase, exc);
+			Logger.LogWarning("<<< Exiting ProcessModuleLoadException(objPortalModuleBase={ObjPortalModuleBase},exc={Exc})", objPortalModuleBase, exc);
         }
 
         /// <summary>Processes the module load exception.</summary>
@@ -140,7 +157,9 @@ namespace DotNetNuke.Services.Exceptions
         /// <param name="displayErrorMessage">if set to <see langword="true"/> display error message.</param>
         public static void ProcessModuleLoadException(PortalModuleBase objPortalModuleBase, Exception exc, bool displayErrorMessage)
         {
+			Logger.LogError(">>> Entering ProcessModuleLoadException(objPortalModuleBase={ObjPortalModuleBase},exc={Exc},displayErrorMessage={DisplayErrorMessage})", objPortalModuleBase, exc, displayErrorMessage);
             ProcessModuleLoadException((Control)objPortalModuleBase, exc, displayErrorMessage);
+			Logger.LogWarning("<<< Exiting ProcessModuleLoadException(objPortalModuleBase={ObjPortalModuleBase},exc={Exc},displayErrorMessage={DisplayErrorMessage})", objPortalModuleBase, exc, displayErrorMessage);
         }
 
         /// <summary>Processes the module load exception.</summary>
@@ -150,7 +169,9 @@ namespace DotNetNuke.Services.Exceptions
         /// <param name="displayErrorMessage">if set to <see langword="true"/> display error message.</param>
         public static void ProcessModuleLoadException(string friendlyMessage, PortalModuleBase objPortalModuleBase, Exception exc, bool displayErrorMessage)
         {
+			Logger.LogError(">>> Entering ProcessModuleLoadException(friendlyMessage={FriendlyMessage},objPortalModuleBase={ObjPortalModuleBase},exc={Exc},displayErrorMessage={DisplayErrorMessage})", friendlyMessage, objPortalModuleBase, exc, displayErrorMessage);
             ProcessModuleLoadException(friendlyMessage, (Control)objPortalModuleBase, exc, displayErrorMessage);
+			Logger.LogWarning("<<< Exiting ProcessModuleLoadException(friendlyMessage={FriendlyMessage},objPortalModuleBase={ObjPortalModuleBase},exc={Exc},displayErrorMessage={DisplayErrorMessage})", friendlyMessage, objPortalModuleBase, exc, displayErrorMessage);
         }
 
         /// <summary>Processes the module load exception.</summary>
@@ -158,6 +179,7 @@ namespace DotNetNuke.Services.Exceptions
         /// <param name="exc">The exception.</param>
         public static void ProcessModuleLoadException(Control ctrl, Exception exc)
         {
+			Logger.LogError(">>> Entering ProcessModuleLoadException(ctrl={Ctrl},exc={Exc})", ctrl, exc);
             // Exit Early if ThreadAbort Exception
             if (ThreadAbortCheck(exc))
             {
@@ -165,6 +187,7 @@ namespace DotNetNuke.Services.Exceptions
             }
 
             ProcessModuleLoadException(ctrl, exc, true);
+			Logger.LogWarning("<<< Exiting ProcessModuleLoadException(ctrl={Ctrl},exc={Exc})", ctrl, exc);
         }
 
         /// <summary>Processes the module load exception.</summary>
@@ -173,6 +196,7 @@ namespace DotNetNuke.Services.Exceptions
         /// <param name="displayErrorMessage">if set to <see langword="true"/> displays an error message.</param>
         public static void ProcessModuleLoadException(Control ctrl, Exception exc, bool displayErrorMessage)
         {
+			Logger.LogError(">>> Entering ProcessModuleLoadException(ctrl={Ctrl},exc={Exc},displayErrorMessage={DisplayErrorMessage})", ctrl, exc, displayErrorMessage);
             // Exit Early if ThreadAbort Exception
             if (ThreadAbortCheck(exc))
             {
@@ -180,6 +204,7 @@ namespace DotNetNuke.Services.Exceptions
             }
 
             string friendlyMessage = Localization.GetString("ErrorOccurred");
+			Logger.LogError("ProcessModuleLoadException(ctrl={Ctrl},exc={Exc},displayErrorMessage={DisplayErrorMessage}): friendlyMessage → {FriendlyMessage}", ctrl, exc, displayErrorMessage, friendlyMessage);
             var ctrlModule = ctrl as IModuleControl;
             if (ctrlModule == null)
             {
@@ -190,6 +215,7 @@ namespace DotNetNuke.Services.Exceptions
             {
                 // IModuleControl
                 string moduleTitle = Null.NullString;
+				Logger.LogError("ProcessModuleLoadException(ctrl={Ctrl},exc={Exc},displayErrorMessage={DisplayErrorMessage}): moduleTitle → {ModuleTitle}", ctrl, exc, displayErrorMessage, moduleTitle);
                 if (ctrlModule != null && ctrlModule.ModuleContext.Configuration != null)
                 {
                     moduleTitle = ctrlModule.ModuleContext.Configuration.ModuleTitle;
@@ -199,6 +225,7 @@ namespace DotNetNuke.Services.Exceptions
             }
 
             ProcessModuleLoadException(friendlyMessage, ctrl, exc, displayErrorMessage);
+			Logger.LogWarning("<<< Exiting ProcessModuleLoadException(ctrl={Ctrl},exc={Exc},displayErrorMessage={DisplayErrorMessage})", ctrl, exc, displayErrorMessage);
         }
 
         /// <summary>Processes the module load exception.</summary>
@@ -207,6 +234,7 @@ namespace DotNetNuke.Services.Exceptions
         /// <param name="exc">The exception.</param>
         public static void ProcessModuleLoadException(string friendlyMessage, Control ctrl, Exception exc)
         {
+			Logger.LogError(">>> Entering ProcessModuleLoadException(friendlyMessage={FriendlyMessage},ctrl={Ctrl},exc={Exc})", friendlyMessage, ctrl, exc);
             // Exit Early if ThreadAbort Exception
             if (ThreadAbortCheck(exc))
             {
@@ -214,6 +242,7 @@ namespace DotNetNuke.Services.Exceptions
             }
 
             ProcessModuleLoadException(friendlyMessage, ctrl, exc, true);
+			Logger.LogWarning("<<< Exiting ProcessModuleLoadException(friendlyMessage={FriendlyMessage},ctrl={Ctrl},exc={Exc})", friendlyMessage, ctrl, exc);
         }
 
         /// <summary>Processes the module load exception.</summary>
@@ -223,6 +252,7 @@ namespace DotNetNuke.Services.Exceptions
         /// <param name="displayErrorMessage">if set to <see langword="true"/> display error message.</param>
         public static void ProcessModuleLoadException(string friendlyMessage, Control ctrl, Exception exc, bool displayErrorMessage)
         {
+			Logger.LogError(">>> Entering ProcessModuleLoadException(friendlyMessage={FriendlyMessage},ctrl={Ctrl},exc={Exc},displayErrorMessage={DisplayErrorMessage})", friendlyMessage, ctrl, exc, displayErrorMessage);
             // Exit Early if ThreadAbort Exception
             if (ThreadAbortCheck(exc))
             {
@@ -233,6 +263,7 @@ namespace DotNetNuke.Services.Exceptions
             {
                 if (!Host.UseCustomErrorMessages)
                 {
+					Logger.LogError("Throwing ModuleLoadException from ProcessModuleLoadException(friendlyMessage={FriendlyMessage},ctrl={Ctrl},exc={Exc},displayErrorMessage={DisplayErrorMessage})", friendlyMessage, ctrl, exc, displayErrorMessage);
                     throw new ModuleLoadException(friendlyMessage, exc);
                 }
                 else
@@ -274,7 +305,9 @@ namespace DotNetNuke.Services.Exceptions
                         {
                             // hide the module
                             ctrl.Visible = false;
+							Logger.LogDebug("ProcessModuleLoadException(friendlyMessage={FriendlyMessage},ctrl={Ctrl},exc={Exc},displayErrorMessage={DisplayErrorMessage}): ctrl.Visible → {Arg4}", friendlyMessage, ctrl, exc, displayErrorMessage, ctrl.Visible);
                             errorPlaceholder.Visible = true;
+							Logger.LogDebug("ProcessModuleLoadException(friendlyMessage={FriendlyMessage},ctrl={Ctrl},exc={Exc},displayErrorMessage={DisplayErrorMessage}): errorPlaceholder.Visible → {Arg4}", friendlyMessage, ctrl, exc, displayErrorMessage, errorPlaceholder.Visible);
                             errorPlaceholder.Controls.Add(new ErrorContainer(friendlyMessage, lex).Container);
                         }
                         else
@@ -292,12 +325,14 @@ namespace DotNetNuke.Services.Exceptions
             }
 
             Logger.ErrorFormat(CultureInfo.InvariantCulture, "FriendlyMessage=\"{0}\" ctrl=\"{1}\" exc=\"{2}\"", friendlyMessage, ctrl, exc);
+			Logger.LogWarning("<<< Exiting ProcessModuleLoadException(friendlyMessage={FriendlyMessage},ctrl={Ctrl},exc={Exc},displayErrorMessage={DisplayErrorMessage})", friendlyMessage, ctrl, exc, displayErrorMessage);
         }
 
         /// <summary>Processes the page load exception.</summary>
         /// <param name="exc">The exception.</param>
         public static void ProcessPageLoadException(Exception exc)
         {
+			Logger.LogError(">>> Entering ProcessPageLoadException(exc={Exc})", exc);
             string appURL = Globals.ApplicationURL();
             if (appURL.IndexOf("?", StringComparison.Ordinal) == Null.NullInteger)
             {
@@ -309,6 +344,7 @@ namespace DotNetNuke.Services.Exceptions
             }
 
             ProcessPageLoadException(exc, appURL);
+			Logger.LogWarning("<<< Exiting ProcessPageLoadException(exc={Exc})", exc);
         }
 
         /// <summary>Processes the page load exception.</summary>
@@ -316,6 +352,7 @@ namespace DotNetNuke.Services.Exceptions
         /// <param name="url">The URL.</param>
         public static void ProcessPageLoadException(Exception exc, string url)
         {
+			Logger.LogError(">>> Entering ProcessPageLoadException(exc={Exc},url={Url})", exc, url);
             Logger.Error(url, exc);
             if (ThreadAbortCheck(exc))
             {
@@ -324,6 +361,7 @@ namespace DotNetNuke.Services.Exceptions
 
             if (!Host.UseCustomErrorMessages)
             {
+				Logger.LogError("Throwing PageLoadException from ProcessPageLoadException(exc={Exc},url={Url})", exc, url);
                 throw new PageLoadException(exc == null ? string.Empty : exc.Message, exc);
             }
             else
@@ -347,15 +385,18 @@ namespace DotNetNuke.Services.Exceptions
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting ProcessPageLoadException(exc={Exc},url={Url})", exc, url);
         }
 
         /// <summary>Logs a <see cref="ModuleLoadException"/>.</summary>
         /// <param name="exc">The exception.</param>
         public static void LogException(ModuleLoadException exc)
         {
+			Logger.LogError(">>> Entering LogException(exc={Exc})", exc);
             Logger.Error(exc);
             var objExceptionLog = new ExceptionLogController();
             objExceptionLog.AddLog(exc, ExceptionLogController.ExceptionLogType.MODULE_LOAD_EXCEPTION);
+			Logger.LogWarning("<<< Exiting LogException(exc={Exc})", exc);
         }
 
         /// <summary>Logs a <see cref="PageLoadException"/>.</summary>
@@ -398,18 +439,22 @@ namespace DotNetNuke.Services.Exceptions
         /// <param name="exc">The exception.</param>
         public static void ProcessSchedulerException(Exception exc)
         {
+			Logger.LogError(">>> Entering ProcessSchedulerException(exc={Exc})", exc);
             Logger.Error(exc);
             var objExceptionLog = new ExceptionLogController();
             objExceptionLog.AddLog(exc, ExceptionLogController.ExceptionLogType.SCHEDULER_EXCEPTION);
+			Logger.LogWarning("<<< Exiting ProcessSchedulerException(exc={Exc})", exc);
         }
 
         /// <summary>Logs the search exception.</summary>
         /// <param name="exc">The exception.</param>
         public static void LogSearchException(SearchException exc)
         {
+			Logger.LogError(">>> Entering LogSearchException(exc={Exc})", exc);
             Logger.Error(exc);
             var objExceptionLog = new ExceptionLogController();
             objExceptionLog.AddLog(exc, ExceptionLogController.ExceptionLogType.SEARCH_INDEXER_EXCEPTION);
+			Logger.LogWarning("<<< Exiting LogSearchException(exc={Exc})", exc);
         }
 
         /// <summary>Resets a thread abort if the exception is a <see cref="ThreadAbortException"/>.</summary>
@@ -417,6 +462,7 @@ namespace DotNetNuke.Services.Exceptions
         /// <returns><see langword="true"/> if <paramref name="exc"/> is a <see cref="ThreadAbortException"/> instance, otherwise <see langword="false"/>.</returns>
         private static bool ThreadAbortCheck(Exception exc)
         {
+			Logger.LogError(">>> Entering ThreadAbortCheck(exc={Exc})", exc);
             if (exc is ThreadAbortException)
             {
                 Thread.ResetAbort();
@@ -424,12 +470,14 @@ namespace DotNetNuke.Services.Exceptions
             }
             else
             {
+				Logger.LogWarning("<<< Exiting ThreadAbortCheck(exc={Exc})", exc);
                 return false;
             }
         }
 
         private static void ProcessHttpException(HttpException exc, string url)
         {
+			Logger.LogError(">>> Entering ProcessHttpException(exc={Exc},url={Url})", exc, url);
             var notFoundErrorString = Localization.GetString("ResourceNotFound", Localization.SharedResourceFile);
             Logger.Error(notFoundErrorString + ": - " + url, exc);
 
@@ -447,6 +495,7 @@ namespace DotNetNuke.Services.Exceptions
 
             LogController.Instance.AddLog(log);
 
+			Logger.LogWarning("<<< Exiting ProcessHttpException(exc={Exc},url={Url})", exc, url);
             throw exc;
         }
     }

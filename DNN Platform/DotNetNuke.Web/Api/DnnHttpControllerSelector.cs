@@ -22,6 +22,7 @@ namespace DotNetNuke.Web.Api
     /// <summary>Selects the web API controller.</summary>
     internal class DnnHttpControllerSelector : IHttpControllerSelector
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnHttpControllerSelector));
         private const string ControllerSuffix = "Controller";
         private const string ControllerKey = "controller";
 
@@ -32,12 +33,16 @@ namespace DotNetNuke.Web.Api
         /// <param name="configuration">The HTTP configuration.</param>
         public DnnHttpControllerSelector(HttpConfiguration configuration)
         {
+			Logger.LogError(">>> Entering DnnHttpControllerSelector(configuration={Configuration})", configuration);
+			Logger.LogInformation("DnnHttpControllerSelector(configuration={Configuration}): configuration → {Configuration1}", configuration, configuration);
             Requires.NotNull("configuration", configuration);
+			Logger.LogWarning("<<< Exiting DnnHttpControllerSelector(configuration={Configuration})", configuration);
 
             this.configuration = configuration;
             this.descriptorCache = new Lazy<ConcurrentDictionary<string, HttpControllerDescriptor>>(
                 this.InitTypeCache,
                 isThreadSafe: true);
+				Logger.LogDebug("DnnHttpControllerSelector(configuration={Configuration}): this.configuration → {Arg1}", configuration, this.configuration);
         }
 
         private ConcurrentDictionary<string, HttpControllerDescriptor> DescriptorCache => this.descriptorCache.Value;
@@ -45,18 +50,23 @@ namespace DotNetNuke.Web.Api
         /// <inheritdoc />
         public HttpControllerDescriptor SelectController(HttpRequestMessage request)
         {
+			Logger.LogError(">>> Entering SelectController(request={Request})", request);
             Requires.NotNull("request", request);
 
             string controllerName = GetControllerName(request);
+			Logger.LogError("SelectController(request={Request}): controllerName → {ControllerName}", request, controllerName);
             IEnumerable<string> namespaces = GetNameSpaces(request);
+			Logger.LogError("SelectController(request={Request}): namespaces → {Namespaces}", request, namespaces);
             if (namespaces == null || !namespaces.Any() || string.IsNullOrEmpty(controllerName))
             {
+				Logger.LogError("Throwing HttpResponseException from SelectController(request={Request})", request);
                 throw new HttpResponseException(request.CreateErrorResponse(
                     HttpStatusCode.NotFound,
                     "Unable to locate a controller for " + request.RequestUri));
             }
 
             var matches = new List<HttpControllerDescriptor>();
+			Logger.LogError("SelectController(request={Request}): matches → {Matches}", request, matches);
             foreach (string ns in namespaces)
             {
                 string fullName = GetFullName(controllerName, ns);
@@ -78,6 +88,7 @@ namespace DotNetNuke.Web.Api
                 throw new HttpResponseException(request.CreateErrorResponse(HttpStatusCode.NotFound, string.Format(CultureInfo.CurrentCulture, Localization.GetString("ControllerNotFound", Localization.ExceptionsResourceFile), request.RequestUri, string.Join(", ", namespaces))));
             }
 
+			Logger.LogWarning("<<< Exiting SelectController(request={Request})", request);
             throw new HttpResponseException(request.CreateErrorResponse(HttpStatusCode.Conflict, string.Format(CultureInfo.CurrentCulture, Localization.GetString("AmbiguousController", Localization.ExceptionsResourceFile), controllerName, string.Join(", ", namespaces))));
         }
 
@@ -89,17 +100,23 @@ namespace DotNetNuke.Web.Api
 
         private static string GetFullName(string controllerName, string ns)
         {
+			Logger.LogError(">>> Entering GetFullName(controllerName={ControllerName},ns={Ns})", controllerName, ns);
+            Logger.LogWarning("<<< Exiting GetFullName(controllerName={ControllerName},ns={Ns})", controllerName, ns);
             return $"{ns}.{controllerName}{ControllerSuffix}".ToLowerInvariant();
         }
 
         private static string[] GetNameSpaces(HttpRequestMessage request)
         {
+			Logger.LogError(">>> Entering GetNameSpaces(request={Request})", request);
+            Logger.LogWarning("<<< Exiting GetNameSpaces(request={Request})", request);
             return request.GetRouteData()?.Route.GetNameSpaces();
         }
 
         private static string GetControllerName(HttpRequestMessage request)
         {
+			Logger.LogError(">>> Entering GetControllerName(request={Request})", request);
             IHttpRouteData routeData = request.GetRouteData();
+			Logger.LogError("GetControllerName(request={Request}): routeData → {RouteData}", request, routeData);
             if (routeData == null)
             {
                 return null;
@@ -107,6 +124,7 @@ namespace DotNetNuke.Web.Api
 
             // Look up controller in route data
             routeData.Values.TryGetValue(ControllerKey, out var controllerName);
+			Logger.LogWarning("<<< Exiting GetControllerName(request={Request})", request);
             return controllerName as string;
         }
 

@@ -10,6 +10,7 @@ namespace DotNetNuke.Common.Utilities
     /// <typeparam name="T">The type of the variable's value.</typeparam>
     public abstract class StateVariable<T>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(StateVariable));
         private readonly string key;
         private readonly Func<T> initializer;
 
@@ -17,11 +18,16 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="key">The key to use for storing the value in the items.</param>
         protected StateVariable(string key)
         {
+			Logger.LogError(">>> Entering StateVariable(key={Key})", key);
             if (string.IsNullOrEmpty(key))
             {
+				Logger.LogError("Throwing ArgumentNullException from StateVariable(key={Key})", key);
                 throw new ArgumentNullException(nameof(key));
             }
 
+			Logger.LogWarning("<<< Exiting StateVariable(key={Key})", key);
+			Logger.LogDebug("StateVariable(key={Key},initializer={Initializer}): initializer → {Initializer1}", key, initializer, initializer);
+        Logger.LogWarning("<<< Exiting StateVariable(key={Key},initializer={Initializer})", key, initializer);
             this.key = key + this.GetType().FullName;
         }
 
@@ -83,7 +89,9 @@ namespace DotNetNuke.Common.Utilities
         /// <summary>Clears the value in the current items.</summary>
         public void Clear()
         {
+			Logger.LogError(">>> Entering Clear()");
             this.Remove(this.key);
+			Logger.LogWarning("<<< Exiting Clear()");
         }
 
         /// <summary>Removes the value in associated dictionary according.</summary>
@@ -92,13 +100,16 @@ namespace DotNetNuke.Common.Utilities
 
         private object GetInitializedInternalValue()
         {
+			Logger.LogError(">>> Entering GetInitializedInternalValue()");
             var value = this[this.key];
+			Logger.LogError("GetInitializedInternalValue(): value → {Value}", value);
             if (value == null && this.initializer != null)
             {
                 value = this.initializer();
                 this[this.key] = value;
             }
 
+			Logger.LogWarning("<<< Exiting GetInitializedInternalValue()");
             return value;
         }
     }

@@ -24,6 +24,7 @@ namespace DotNetNuke.Entities.Host
     [DnnDeprecated(10, 0, 2, "Use DotNetNuke.Abstractions.Application.IHostSettings or DotNetNuke.Abstractions.Application.IMailSettings via dependency injection")]
     public partial class Host : BaseEntityInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Host));
         private static Globals.PerformanceSettings? performanceSetting;
 
         /// <summary>Gets the duration before an account is automatically unlocked.</summary>
@@ -500,6 +501,8 @@ namespace DotNetNuke.Entities.Host
 
                 return HostController.Instance.GetInteger("SMTPConnectionLimit", 2);
             }
+			Logger.LogError(">>> Entering GetSmtpSetting(settingName={SettingName})", settingName);
+			Logger.LogWarning("<<< Exiting GetSmtpSetting(settingName={SettingName})", settingName);
         }
 
         /// <summary>Gets the SMTP MaxIdleTime.</summary>

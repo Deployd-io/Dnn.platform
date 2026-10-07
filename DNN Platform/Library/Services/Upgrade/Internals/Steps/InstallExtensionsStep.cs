@@ -19,11 +19,15 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
         /// <summary>Main method to execute the step.</summary>
         public override void Execute()
         {
+			Logger.LogError(">>> Entering Execute()");
             var packages = Upgrade.GetInstallPackages();
+			Logger.LogError("Execute(): packages → {Packages}", packages);
             if (packages.Count == 0)
             {
                 this.Percentage = 100;
+				Logger.LogDebug("Execute(): this.Percentage → {Arg0}", this.Percentage);
                 this.Status = StepStatus.Done;
+				Logger.LogDebug("Execute(): this.Status → {Arg0}", this.Status);
                 return;
             }
 
@@ -37,9 +41,12 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
                 var file = package.Key;
                 var packageType = package.Value.PackageType;
                 var message = string.Format(CultureInfo.CurrentCulture, Localization.GetString("InstallingExtension", this.LocalInstallResourceFile), packageType, Path.GetFileName(file));
+				Logger.LogError("Execute(): message → {Message}", message);
                 this.Details = message;
+				Logger.LogDebug("Execute(): this.Details → {Arg0}", this.Details);
                 Logger.Trace(this.Details);
                 var success = Upgrade.InstallPackage(file, packageType, false);
+				Logger.LogError("Execute(): success → {Success}", success);
                 if (!success)
                 {
                     this.Errors.Add(message);
@@ -50,6 +57,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             }
 
             this.Status = this.Errors.Count > 0 ? StepStatus.Retry : StepStatus.Done;
+			Logger.LogWarning("<<< Exiting Execute()");
         }
     }
 }

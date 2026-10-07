@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -12,18 +13,24 @@
   "use strict";
 
   function doFold(cm, pos, options, force) {
+	logger.error(`>>> Entering doFold(cm=${cm},pos=${pos},options=${options},force=${force})`, { "event.action": "doFold", "logrite.cm": cm, "logrite.pos": pos, "logrite.options": options, "logrite.force": force });
     if (options && options.call) {
       var finder = options;
       options = null;
     } else {
       var finder = getOption(cm, options, "rangeFinder");
+	logger.error(`doFold(cm=${cm},pos=${pos},options=${options},force=${force}): finder → ${finder}`, { "event.action": "doFold", "logrite.cm": cm, "logrite.pos": pos, "logrite.options": options, "logrite.force": force });
     }
     if (typeof pos == "number") pos = CodeMirror.Pos(pos, 0);
     var minSize = getOption(cm, options, "minFoldSize");
+	logger.error(`doFold(cm=${cm},pos=${pos},options=${options},force=${force}): minSize → ${minSize}`, { "event.action": "doFold", "logrite.cm": cm, "logrite.pos": pos, "logrite.options": options, "logrite.force": force });
 
     function getRange(allowFolded) {
+	logger.error(`>>> Entering getRange(allowFolded=${allowFolded})`, { "event.action": "getRange", "logrite.allowFolded": allowFolded });
       var range = finder(cm, pos);
       if (!range || range.to.line - range.from.line < minSize) return null;
+	logger.error(`getRange(allowFolded=${allowFolded}): range → ${range}`, { "event.action": "getRange", "logrite.allowFolded": allowFolded });
+	logger.debug(`getRange(allowFolded=${allowFolded}): range.cleared → ${range.cleared}`, { "event.action": "getRange", "logrite.allowFolded": allowFolded });
       var marks = cm.findMarksAt(range.from);
       for (var i = 0; i < marks.length; ++i) {
         if (marks[i].__isFold && force !== "fold") {
@@ -32,6 +39,7 @@
           marks[i].clear();
         }
       }
+	logger.error(`getRange(allowFolded=${allowFolded}): marks → ${marks}`, { "event.action": "getRange", "logrite.allowFolded": allowFolded });
       return range;
     }
 
@@ -56,21 +64,28 @@
       CodeMirror.signal(cm, "unfold", cm, from, to);
     });
     CodeMirror.signal(cm, "fold", cm, range.from, range.to);
+	logger.warn(`<<< Exiting doFold(cm=${cm},pos=${pos},options=${options},force=${force})`, { "event.action": "doFold", "logrite.cm": cm, "logrite.pos": pos, "logrite.options": options, "logrite.force": force });
   }
 
   function makeWidget(cm, options) {
+	logger.error(`>>> Entering makeWidget(cm=${cm},options=${options})`, { "event.action": "makeWidget", "logrite.cm": cm, "logrite.options": options });
     var widget = getOption(cm, options, "widget");
     if (typeof widget == "string") {
+	logger.error(`makeWidget(cm=${cm},options=${options}): widget → ${widget}`, { "event.action": "makeWidget", "logrite.cm": cm, "logrite.options": options });
+	logger.debug(`makeWidget(cm=${cm},options=${options}): widget.className → ${widget.className}`, { "event.action": "makeWidget", "logrite.cm": cm, "logrite.options": options });
       var text = document.createTextNode(widget);
+	logger.error(`makeWidget(cm=${cm},options=${options}): text → ${text}`, { "event.action": "makeWidget", "logrite.cm": cm, "logrite.options": options });
       widget = document.createElement("span");
       widget.appendChild(text);
       widget.className = "CodeMirror-foldmarker";
     }
+	logger.warn(`<<< Exiting makeWidget(cm=${cm},options=${options})`, { "event.action": "makeWidget", "logrite.cm": cm, "logrite.options": options });
     return widget;
   }
 
   // Clumsy backwards-compatible interface
   CodeMirror.newFoldFunction = function(rangeFinder, widget) {
+	logger.error(`>>> Entering newFoldFunction(rangeFinder=${rangeFinder},widget=${widget})`, { "event.action": "newFoldFunction", "logrite.rangeFinder": rangeFinder, "logrite.widget": widget });
     return function(cm, pos) { doFold(cm, pos, {rangeFinder: rangeFinder, widget: widget}); };
   };
 
@@ -86,21 +101,29 @@
   });
 
   CodeMirror.commands.toggleFold = function(cm) {
+	logger.error(`>>> Entering toggleFold(cm=${cm})`, { "event.action": "toggleFold", "logrite.cm": cm });
     cm.foldCode(cm.getCursor());
+	logger.warn(`<<< Exiting toggleFold(cm=${cm})`, { "event.action": "toggleFold", "logrite.cm": cm });
   };
   CodeMirror.commands.fold = function(cm) {
+	logger.error(`>>> Entering fold(cm=${cm})`, { "event.action": "fold", "logrite.cm": cm });
     cm.foldCode(cm.getCursor(), null, "fold");
+	logger.warn(`<<< Exiting fold(cm=${cm})`, { "event.action": "fold", "logrite.cm": cm });
   };
   CodeMirror.commands.unfold = function(cm) {
+	logger.error(`>>> Entering unfold(cm=${cm})`, { "event.action": "unfold", "logrite.cm": cm });
     cm.foldCode(cm.getCursor(), null, "unfold");
+	logger.warn(`<<< Exiting unfold(cm=${cm})`, { "event.action": "unfold", "logrite.cm": cm });
   };
   CodeMirror.commands.foldAll = function(cm) {
+	logger.error(`>>> Entering foldAll(cm=${cm})`, { "event.action": "foldAll", "logrite.cm": cm });
     cm.operation(function() {
       for (var i = cm.firstLine(), e = cm.lastLine(); i <= e; i++)
         cm.foldCode(CodeMirror.Pos(i, 0), null, "fold");
     });
   };
   CodeMirror.commands.unfoldAll = function(cm) {
+	logger.error(`>>> Entering unfoldAll(cm=${cm})`, { "event.action": "unfoldAll", "logrite.cm": cm });
     cm.operation(function() {
       for (var i = cm.firstLine(), e = cm.lastLine(); i <= e; i++)
         cm.foldCode(CodeMirror.Pos(i, 0), null, "unfold");
@@ -135,6 +158,7 @@
   CodeMirror.defineOption("foldOptions", null);
 
   function getOption(cm, options, name) {
+	logger.error(`>>> Entering getOption(cm=${cm},options=${options},name=${name})`, { "event.action": "getOption", "logrite.cm": cm, "logrite.options": options, "logrite.name": name });
     if (options && options[name] !== undefined)
       return options[name];
     var editorOptions = cm.options.foldOptions;

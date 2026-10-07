@@ -9,18 +9,22 @@ namespace DotNetNuke.Services.Syndication
     /// <summary>The base class for all RSS elements (item, image, channel) has collection of attributes.</summary>
     public abstract class RssElementBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RssElementBase));
         /// <summary>Gets the attributes.</summary>
         protected internal Dictionary<string, string> Attributes { get; private set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>When overridden in a derived class, initializes the attributes to the defaults.</summary>
         public virtual void SetDefaults()
         {
+		Logger.LogError(">>> Entering SetDefaults()");
+        Logger.LogWarning("<<< Exiting SetDefaults()");
         }
 
         /// <summary>Sets the element attributes.</summary>
         /// <param name="attributes">The attributes.</param>
         internal void SetAttributes(Dictionary<string, string> attributes)
         {
+			Logger.LogError(">>> Entering SetAttributes(attributes={Attributes})", attributes);
             this.Attributes = attributes;
         }
 
@@ -29,13 +33,16 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>The value or <see cref="string.Empty"/>.</returns>
         protected string GetAttributeValue(string attributeName)
         {
+			Logger.LogError(">>> Entering GetAttributeValue(attributeName={AttributeName})", attributeName);
             string attributeValue;
 
             if (!this.Attributes.TryGetValue(attributeName, out attributeValue))
             {
                 attributeValue = string.Empty;
+				Logger.LogDebug("GetAttributeValue(attributeName={AttributeName}): attributeValue → {AttributeValue}", attributeName, attributeValue);
             }
 
+			Logger.LogWarning("<<< Exiting GetAttributeValue(attributeName={AttributeName})", attributeName);
             return attributeValue;
         }
 
@@ -44,7 +51,9 @@ namespace DotNetNuke.Services.Syndication
         /// <param name="attributeValue">The attribute value.</param>
         protected void SetAttributeValue(string attributeName, string attributeValue)
         {
+			Logger.LogError(">>> Entering SetAttributeValue(attributeName={AttributeName},attributeValue={AttributeValue})", attributeName, attributeValue);
             this.Attributes[attributeName] = attributeValue;
+			Logger.LogWarning("<<< Exiting SetAttributeValue(attributeName={AttributeName},attributeValue={AttributeValue})", attributeName, attributeValue);
         }
     }
 }

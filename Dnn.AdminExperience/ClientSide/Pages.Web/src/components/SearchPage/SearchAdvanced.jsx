@@ -4,24 +4,31 @@ import { Collapsible, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../localization";
 import SearchAdvancedDetails from "./SearchAdvancedDetails";
 import "./styles.less";
+const logger = console;
 
 
 class SearchAdvanced extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             collapsed:false
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     toggle() {
+		logger.error('>>> Entering toggle()', { "event.action": "toggle" });
         this.setState({
             collapsed:!this.state.collapsed
         });
+		logger.warn('<<< Exiting toggle()', { "event.action": "toggle" });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={`advancedCollapsibleComponent ${this.state.collapsed?"open":""}`}>
                 <div className={"collapsible-header false" } onClick={this.toggle.bind(this)}>

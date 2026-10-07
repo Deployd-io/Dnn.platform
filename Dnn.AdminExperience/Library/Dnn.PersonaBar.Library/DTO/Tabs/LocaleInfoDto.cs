@@ -9,9 +9,12 @@ namespace Dnn.PersonaBar.Library.Dto.Tabs
     [JsonObject]
     public class LocaleInfoDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LocaleInfoDto));
         public LocaleInfoDto(string cultureCode)
         {
+			Logger.LogError(">>> Entering LocaleInfoDto(cultureCode={CultureCode})", cultureCode);
             this.CultureCode = cultureCode;
+			Logger.LogDebug("LocaleInfoDto(cultureCode={CultureCode}): this.CultureCode → {Arg1}", cultureCode, this.CultureCode);
             this.Icon = string.IsNullOrEmpty(cultureCode)
                 ? "/images/Flags/none.gif"
                 : $"/images/Flags/{cultureCode}.gif";

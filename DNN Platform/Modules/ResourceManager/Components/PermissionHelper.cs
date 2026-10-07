@@ -24,12 +24,15 @@ namespace Dnn.Modules.ResourceManager.Components
     /// <summary>Helper methods for permissions.</summary>
     public static class PermissionHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PermissionHelper));
         /// <summary>Adds user permissions to the <see cref="Permissions"/> dto.</summary>
         /// <param name="dto"><see cref="Permissions"/> data transfer object to extend.</param>
         /// <param name="permissionInfo">Permission to add.</param>
         public static void AddUserPermission(this Permissions dto, IPermissionInfo permissionInfo)
         {
+			Logger.LogError(">>> Entering AddUserPermission(dto={Dto},permissionInfo={PermissionInfo})", dto, permissionInfo);
             var userPermission = dto.UserPermissions.FirstOrDefault(p => p.UserId == permissionInfo.UserId);
+			Logger.LogError("AddUserPermission(dto={Dto},permissionInfo={PermissionInfo}): userPermission → {UserPermission}", dto, permissionInfo, userPermission);
             if (userPermission == null)
             {
                 userPermission = new UserPermission
@@ -49,6 +52,7 @@ namespace Dnn.Modules.ResourceManager.Components
                     AllowAccess = permissionInfo.AllowAccess,
                 });
             }
+			Logger.LogWarning("<<< Exiting AddUserPermission(dto={Dto},permissionInfo={PermissionInfo})", dto, permissionInfo);
         }
 
         /// <summary>Adds role permissions to the <see cref="Permissions"/> dto.</summary>
@@ -56,7 +60,9 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <param name="permissionInfo">Permission to add.</param>
         public static void AddRolePermission(this Permissions dto, IPermissionInfo permissionInfo)
         {
+			Logger.LogError(">>> Entering AddRolePermission(dto={Dto},permissionInfo={PermissionInfo})", dto, permissionInfo);
             var rolePermission = dto.RolePermissions.FirstOrDefault(p => p.RoleId == permissionInfo.RoleId);
+			Logger.LogError("AddRolePermission(dto={Dto},permissionInfo={PermissionInfo}): rolePermission → {RolePermission}", dto, permissionInfo, rolePermission);
             if (rolePermission == null)
             {
                 rolePermission = new RolePermission
@@ -76,18 +82,21 @@ namespace Dnn.Modules.ResourceManager.Components
                     AllowAccess = permissionInfo.AllowAccess,
                 });
             }
+			Logger.LogWarning("<<< Exiting AddRolePermission(dto={Dto},permissionInfo={PermissionInfo})", dto, permissionInfo);
         }
 
         /// <summary>Ensures the <see cref="Permissions"/> dto has the default roles.</summary>
         /// <param name="dto"><see cref="Permissions"/> dto to extend.</param>
         public static void EnsureDefaultRoles(this Permissions dto)
         {
+			Logger.LogError(">>> Entering EnsureDefaultRoles(dto={Dto})", dto);
             // Administrators Role always has implicit permissions, then it should be always in
             dto.EnsureRole(RoleController.Instance.GetRoleById(PortalSettings.Current.PortalId, PortalSettings.Current.AdministratorRoleId), true, true);
 
             // Show also default roles
             dto.EnsureRole(RoleController.Instance.GetRoleById(PortalSettings.Current.PortalId, PortalSettings.Current.RegisteredRoleId), false, true);
             dto.EnsureRole(new RoleInfo { RoleID = int.Parse(Globals.glbRoleAllUsers, CultureInfo.InvariantCulture), RoleName = Globals.glbRoleAllUsersName, }, false, true);
+			Logger.LogWarning("<<< Exiting EnsureDefaultRoles(dto={Dto})", dto);
         }
 
         /// <summary>Ensures the <see cref="Permissions"/> dto has the given role.</summary>
@@ -95,7 +104,9 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <param name="role">The role to ensure is include, <see cref="RoleInfo"/>.</param>
         public static void EnsureRole(this Permissions dto, RoleInfo role)
         {
+			Logger.LogError(">>> Entering EnsureRole(dto={Dto},role={Role})", dto, role);
             dto.EnsureRole(role, false);
+			Logger.LogWarning("<<< Exiting EnsureRole(dto={Dto},role={Role})", dto, role);
         }
 
         /// <summary>Ensures the <see cref="Permissions"/> dto has the given role.</summary>
@@ -104,7 +115,9 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <param name="locked">A value indicating whether that role is locked.</param>
         public static void EnsureRole(this Permissions dto, RoleInfo role, bool locked)
         {
+			Logger.LogError(">>> Entering EnsureRole(dto={Dto},role={Role},locked={Locked})", dto, role, locked);
             dto.EnsureRole(role, locked, false);
+			Logger.LogWarning("<<< Exiting EnsureRole(dto={Dto},role={Role},locked={Locked})", dto, role, locked);
         }
 
         /// <summary>Ensures the <see cref="Permissions"/> dto has a specific role.</summary>
@@ -114,6 +127,7 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <param name="isDefault">A value indicating whether the role is a default role.</param>
         public static void EnsureRole(this Permissions dto, RoleInfo role, bool locked, bool isDefault)
         {
+			Logger.LogError(">>> Entering EnsureRole(dto={Dto},role={Role},locked={Locked},isDefault={IsDefault})", dto, role, locked, isDefault);
             if (dto.RolePermissions.All(r => r.RoleId != role.RoleID))
             {
                 dto.RolePermissions.Add(new RolePermission
@@ -124,6 +138,7 @@ namespace Dnn.Modules.ResourceManager.Components
                     IsDefault = isDefault,
                 });
             }
+			Logger.LogWarning("<<< Exiting EnsureRole(dto={Dto},role={Role},locked={Locked},isDefault={IsDefault})", dto, role, locked, isDefault);
         }
 
         /// <summary>Check if the permission is for full control.</summary>
@@ -131,6 +146,8 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <returns>A value indicating whether this permission is for full control.</returns>
         public static bool IsFullControl(IPermissionDefinitionInfo permissionInfo)
         {
+			Logger.LogError(">>> Entering IsFullControl(permissionInfo={PermissionInfo})", permissionInfo);
+            Logger.LogWarning("<<< Exiting IsFullControl(permissionInfo={PermissionInfo})", permissionInfo);
             return (permissionInfo.PermissionKey == "EDIT") && PermissionProvider.Instance().SupportsFullControl();
         }
 
@@ -139,6 +156,8 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <returns>A value indicating whether the permission is for view.</returns>
         public static bool IsViewPermission(IPermissionDefinitionInfo permissionInfo)
         {
+			Logger.LogError(">>> Entering IsViewPermission(permissionInfo={PermissionInfo})", permissionInfo);
+            Logger.LogWarning("<<< Exiting IsViewPermission(permissionInfo={PermissionInfo})", permissionInfo);
             return permissionInfo.PermissionKey == "VIEW";
         }
 
@@ -160,9 +179,12 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <returns>An objected containing the roles.</returns>
         public static object GetRoles(RoleProvider roleProvider, IRoleController roleController, int portalId)
         {
+			Logger.LogError(">>> Entering GetRoles(portalId={PortalId})", portalId);
             var data = new { Groups = new List<object>(), Roles = new List<object>() };
 
             // Retrieves role groups info
+			Logger.LogError("GetRoles(roleProvider={RoleProvider},roleController={RoleController},portalId={PortalId}): data → {Data}", roleProvider, roleController, portalId, data);
+			Logger.LogError("GetRoles(portalId={PortalId}): data → {Data}", portalId, data);
             data.Groups.Add(new { GroupId = -2, Name = "AllRoles" });
             data.Groups.Add(new { GroupId = -1, Name = "GlobalRoles", Selected = true });
 
@@ -179,6 +201,7 @@ namespace Dnn.Modules.ResourceManager.Components
                 data.Roles.Add(new { GroupId = role.RoleGroupID, RoleId = role.RoleID, Name = role.RoleName });
             }
 
+			Logger.LogWarning("<<< Exiting GetRoles(roleProvider={RoleProvider},roleController={RoleController},portalId={PortalId})", roleProvider, roleController, portalId);
             return data;
         }
 
@@ -201,6 +224,8 @@ namespace Dnn.Modules.ResourceManager.Components
                     iInfo.PermissionId = permission.PermissionId;
                     iInfo.RoleId = p.RoleId;
                     iInfo.UserId = Null.NullInteger;
+				Logger.LogError(">>> Entering AsFolderPermissions(permissions={Permissions},folderId={FolderId})", permissions, folderId);
+				Logger.LogWarning("<<< Exiting AsFolderPermissions(permissions={Permissions},folderId={FolderId})", permissions, folderId);
                     return info;
                 });
         }
@@ -211,6 +236,7 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <returns>An ArrayList of <see cref="FolderPermissionInfo"/>.</returns>
         public static IEnumerable<FolderPermissionInfo> AsFolderPermissions(this IEnumerable<UserPermission> permissions, int folderId)
         {
+			Logger.LogError(">>> Entering AsFolderPermissions(permissions={Permissions},folderId={FolderId})", permissions, folderId);
             return permissions.SelectMany(
                 p => p.Permissions,
                 (p, permission) =>
@@ -221,9 +247,12 @@ namespace Dnn.Modules.ResourceManager.Components
                     };
                     IFolderPermissionInfo iInfo = info;
                     iInfo.FolderId = folderId;
+					Logger.LogDebug("AsFolderPermissions(permissions={Permissions},folderId={FolderId}): iInfo.FolderId → {Arg2}", permissions, folderId, iInfo.FolderId);
                     iInfo.PermissionId = permission.PermissionId;
+					Logger.LogDebug("AsFolderPermissions(permissions={Permissions},folderId={FolderId}): iInfo.PermissionId → {Arg2}", permissions, folderId, iInfo.PermissionId);
                     iInfo.RoleId = int.Parse(Globals.glbRoleNothing, CultureInfo.InvariantCulture);
                     iInfo.UserId = p.UserId;
+					Logger.LogDebug("AsFolderPermissions(permissions={Permissions},folderId={FolderId}): iInfo.UserId → {Arg2}", permissions, folderId, iInfo.UserId);
                     return info;
                 });
         }
@@ -236,8 +265,10 @@ namespace Dnn.Modules.ResourceManager.Components
             this IPermissionDefinitionService permissionDefinitionService,
             FolderPermissionCollection collection)
         {
+			Logger.LogError(">>> Entering GetFolderPermissions(permissionDefinitionService={PermissionDefinitionService},collection={Collection})", permissionDefinitionService, collection);
             var permissions = new Permissions();
 
+			Logger.LogError("GetFolderPermissions(permissionDefinitionService={PermissionDefinitionService},collection={Collection}): permissions → {Permissions}", permissionDefinitionService, collection, permissions);
             // Load the definitions
             foreach (var definition in permissionDefinitionService.GetDefinitionsByFolder())
             {
@@ -277,6 +308,7 @@ namespace Dnn.Modules.ResourceManager.Components
                 .Select(
                     p =>
                     {
+						Logger.LogDebug("GetFolderPermissions(permissionDefinitionService={PermissionDefinitionService},collection={Collection}): permissions.RolePermissions → {Arg2}", permissionDefinitionService, collection, permissions.RolePermissions);
                         p.RoleName = DotNetNuke.Services.Localization.Localization.LocalizeRole(p.RoleName);
                         return p;
                     })
@@ -288,7 +320,9 @@ namespace Dnn.Modules.ResourceManager.Components
             permissions.UserPermissions = permissions.UserPermissions
                 .OrderBy(p => p.DisplayName)
                 .ToList();
+				Logger.LogDebug("GetFolderPermissions(permissionDefinitionService={PermissionDefinitionService},collection={Collection}): permissions.UserPermissions → {Arg2}", permissionDefinitionService, collection, permissions.UserPermissions);
 
+			Logger.LogWarning("<<< Exiting GetFolderPermissions(permissionDefinitionService={PermissionDefinitionService},collection={Collection})", permissionDefinitionService, collection);
             return permissions;
         }
     }

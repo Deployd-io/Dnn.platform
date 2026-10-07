@@ -20,19 +20,23 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
     /// </summary>
     internal class DiscardWorkflow : TabActionBase, IWorkflowAction
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DiscardWorkflow));
         /// <summary>
         /// Discards the tab version.
         /// </summary>
         /// <param name="stateTransaction">The state transaction.</param>
         public void DoActionOnStateChanging(StateTransaction stateTransaction)
         {
+			Logger.LogError(">>> Entering DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
             var tab = GetTab(stateTransaction.ContentItemId);
+			Logger.LogError("DoActionOnStateChanging(stateTransaction={StateTransaction}): tab → {Tab}", stateTransaction, tab);
             if (tab == null)
             {
                 return;
             }
 
             TabVersionBuilder.Instance.Discard(tab.TabID, stateTransaction.UserId);
+			Logger.LogWarning("<<< Exiting DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <summary>
@@ -41,7 +45,9 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
         /// <param name="stateTransaction">The state transaction.</param>
         public void DoActionOnStateChanged(StateTransaction stateTransaction)
         {
+			Logger.LogError(">>> Entering DoActionOnStateChanged(stateTransaction={StateTransaction})", stateTransaction);
             var tab = GetTab(stateTransaction.ContentItemId);
+			Logger.LogError("DoActionOnStateChanged(stateTransaction={StateTransaction}): tab → {Tab}", stateTransaction, tab);
             if (tab == null)
             {
                 return;
@@ -54,6 +60,7 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
             }
 
             DataCache.RemoveCache($"Tab_Tabs{tab.PortalID}");
+			Logger.LogWarning("<<< Exiting DoActionOnStateChanged(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <inheritdoc />
@@ -71,7 +78,10 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
         /// <returns>True if the tab has only one version; otherwise, false.</returns>
         private static bool HasOnlyOneTabVersion(TabInfo tabInfo)
         {
+			Logger.LogError(">>> Entering HasOnlyOneTabVersion(tabInfo={TabInfo})", tabInfo);
             var tabVersions = TabVersionController.Instance.GetTabVersions(tabInfo.TabID, true);
+			Logger.LogError("HasOnlyOneTabVersion(tabInfo={TabInfo}): tabVersions → {TabVersions}", tabInfo, tabVersions);
+			Logger.LogWarning("<<< Exiting HasOnlyOneTabVersion(tabInfo={TabInfo})", tabInfo);
             return tabVersions == null || !tabVersions.Any();
         }
     }

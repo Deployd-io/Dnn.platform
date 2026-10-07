@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import "./style.less";
 import util from "../../../../utils";
 import resx from "../../../../resources";
+const logger = console;
 import { SingleLineInputWithError, MultiLineInput, Button, Label }  from "@dnnsoftware/dnn-react-common";
 import {
     roles as RolesActions
@@ -12,7 +13,9 @@ import {
 class RoleGroupEditor extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         let group = Object.assign({}, props.group);
+		logger.error(`constructor(props=${props}): group → ${group}`, { "event.action": "constructor", "logrite.props": props });
 
         this.state = {
             group,
@@ -22,19 +25,26 @@ class RoleGroupEditor extends Component {
         };
         this.submitted = false;
         this.handleClick = this.handleClick.bind(this);
+		logger.debug(`constructor(props=${props}): this.submitted → ${this.submitted}`, { "event.action": "constructor", "logrite.props": props });
         this.node = React.createRef();
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         document.addEventListener("click", this.handleClick);
         this._isMounted = true;
+		logger.debug(`componentDidMount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentDidMount" });
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         document.removeEventListener("click", this.handleClick);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentWillUnmount" });
     }
 
     handleClick(event) {
+		logger.error(`>>> Entering handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
         // the "findDOMNode was called on an unmounted component." error we need to check if the component is mounted before execute this code
@@ -46,9 +56,11 @@ class RoleGroupEditor extends Component {
                 this.props.onCancel();
             }
             this.props.onCancel();
+			logger.warn(`<<< Exiting handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         }
     }
     onEditFieldChanged(name, event) {
+		logger.error(`>>> Entering onEditFieldChanged(name=${name},event=${event})`, { "event.action": "onEditFieldChanged", "logrite.name": name, "logrite.event": event });
         let {group} = this.state;
         group[name] = event.target.value || "";
         this.setState({
@@ -56,9 +68,11 @@ class RoleGroupEditor extends Component {
         }, () => {
             this.validateForm();
         });
+		logger.warn(`<<< Exiting onEditFieldChanged(name=${name},event=${event})`, { "event.action": "onEditFieldChanged", "logrite.name": name, "logrite.event": event });
     }
 
     onCancel(e) {
+		logger.error(`>>> Entering onCancel(e=${e})`, { "event.action": "onCancel", "logrite.e": e });
         e.stopPropagation();
 
         this.setState({
@@ -66,20 +80,24 @@ class RoleGroupEditor extends Component {
         }, () => {
             if (typeof this.props.onCancel === "function") {
                 this.props.onCancel();
+				logger.warn(`<<< Exiting onCancel(e=${e})`, { "event.action": "onCancel", "logrite.e": e });
             }
         });
     }
 
     onSave(e) {
+		logger.error(`>>> Entering onSave(e=${e})`, { "event.action": "onSave", "logrite.e": e });
         e.stopPropagation();
 
         const {props, state} = this;
         this.submitted = true;
         if (this.validateForm()) {
+			logger.debug(`onSave(e=${e}): this.submitted → ${this.submitted}`, { "event.action": "onSave", "logrite.e": e });
             props.dispatch(RolesActions.saveRoleGroup(state.group, (group) => {
                 util.utilities.notify(resx.get("RoleGroupUpdated.Message"));
                 if (typeof this.props.onSave === "function") {
                     this.props.onSave(group);
+					logger.warn(`<<< Exiting onSave(e=${e})`, { "event.action": "onSave", "logrite.e": e });
                 }
             }));
         }
@@ -103,8 +121,10 @@ class RoleGroupEditor extends Component {
 
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         let group = Object.assign({}, state.group);
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return props.visible && <div ref={node => this.rootElement = node} className="role-group-editor" onClick={this.props.onClick.bind(this) }>
             <h2>{resx.get(props.title) }</h2>
             <div className="edit-form">
@@ -155,6 +175,8 @@ RoleGroupEditor.defaultProps = {
 };
 
 function mapStateToProps() {
+	logger.error('>>> Entering mapStateToProps()', { "event.action": "mapStateToProps" });
+	logger.warn('<<< Exiting mapStateToProps()', { "event.action": "mapStateToProps" });
     return {};
 }
 

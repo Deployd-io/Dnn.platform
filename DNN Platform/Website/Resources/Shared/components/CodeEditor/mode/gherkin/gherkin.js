@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -29,6 +30,7 @@ Report bugs/issues here: https://github.com/codemirror/CodeMirror/issues
 CodeMirror.defineMode("gherkin", function () {
   return {
     startState: function () {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         lineNumber: 0,
         tableHeaderLine: false,
@@ -42,16 +44,22 @@ CodeMirror.defineMode("gherkin", function () {
         inMultilineTable: false,
         inKeywordLine: false
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     token: function (stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.sol()) {
         state.lineNumber++;
         state.inKeywordLine = false;
+		logger.debug(`token(stream=${stream},state=${state}): state.inKeywordLine → ${state.inKeywordLine}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if (state.inMultilineTable) {
             state.tableHeaderLine = false;
+			logger.debug(`token(stream=${stream},state=${state}): state.tableHeaderLine → ${state.tableHeaderLine}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
             if (!stream.match(/\s*\|/, false)) {
               state.allowMultilineArgument = false;
+			logger.debug(`token(stream=${stream},state=${state}): state.allowMultilineArgument → ${state.allowMultilineArgument}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
               state.inMultilineTable = false;
+			logger.debug(`token(stream=${stream},state=${state}): state.inMultilineTable → ${state.inMultilineTable}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
             }
         }
       }
@@ -64,6 +72,7 @@ CodeMirror.defineMode("gherkin", function () {
         if (state.inMultilineString) {
           if (stream.match('"""')) {
             state.inMultilineString = false;
+			logger.debug(`token(stream=${stream},state=${state}): state.inMultilineString → ${state.inMultilineString}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
             state.allowMultilineArgument = false;
           } else {
             stream.match(/.*/);
@@ -106,7 +115,11 @@ CodeMirror.defineMode("gherkin", function () {
       // FEATURE
       } else if (!state.inKeywordLine && state.allowFeature && stream.match(/(機能|功能|フィーチャ|기능|โครงหลัก|ความสามารถ|ความต้องการทางธุรกิจ|ಹೆಚ್ಚಳ|గుణము|ਮੁਹਾਂਦਰਾ|ਨਕਸ਼ ਨੁਹਾਰ|ਖਾਸੀਅਤ|रूप लेख|وِیژگی|خاصية|תכונה|Функціонал|Функция|Функционалност|Функционал|Үзенчәлеклелек|Свойство|Особина|Мөмкинлек|Могућност|Λειτουργία|Δυνατότητα|Właściwość|Vlastnosť|Trajto|Tính năng|Savybė|Pretty much|Požiadavka|Požadavek|Potrzeba biznesowa|Özellik|Osobina|Ominaisuus|Omadus|OH HAI|Mogućnost|Mogucnost|Jellemző|Hwæt|Hwaet|Funzionalità|Funktionalitéit|Funktionalität|Funkcja|Funkcionalnost|Funkcionalitāte|Funkcia|Fungsi|Functionaliteit|Funcționalitate|Funcţionalitate|Functionalitate|Funcionalitat|Funcionalidade|Fonctionnalité|Fitur|Fīča|Feature|Eiginleiki|Egenskap|Egenskab|Característica|Caracteristica|Business Need|Aspekt|Arwedd|Ahoy matey!|Ability):/)) {
         state.allowScenario = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.allowScenario → ${state.allowScenario}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+		logger.debug(`token(stream=${stream},state=${state}): state.allowPlaceholders → ${state.allowPlaceholders}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+		logger.debug(`token(stream=${stream},state=${state}): state.allowSteps → ${state.allowSteps}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         state.allowBackground = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.allowBackground → ${state.allowBackground}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         state.allowPlaceholders = false;
         state.allowSteps = false;
         state.allowMultilineArgument = false;
@@ -150,6 +163,7 @@ CodeMirror.defineMode("gherkin", function () {
       // STEPS
       } else if (!state.inKeywordLine && state.allowSteps && stream.match(/(那麼|那么|而且|當|当|并且|同時|同时|前提|假设|假設|假定|假如|但是|但し|並且|もし|ならば|ただし|しかし|かつ|하지만|조건|먼저|만일|만약|단|그리고|그러면|และ |เมื่อ |แต่ |ดังนั้น |กำหนดให้ |ಸ್ಥಿತಿಯನ್ನು |ಮತ್ತು |ನೀಡಿದ |ನಂತರ |ಆದರೆ |మరియు |చెప్పబడినది |కాని |ఈ పరిస్థితిలో |అప్పుడు |ਪਰ |ਤਦ |ਜੇਕਰ |ਜਿਵੇਂ ਕਿ |ਜਦੋਂ |ਅਤੇ |यदि |परन्तु |पर |तब |तदा |तथा |जब |चूंकि |किन्तु |कदा |और |अगर |و |هنگامی |متى |لكن |عندما |ثم |بفرض |با فرض |اما |اذاً |آنگاه |כאשר |וגם |בהינתן |אזי |אז |אבל |Якщо |Һәм |Унда |Тоді |Тогда |То |Также |Та |Пусть |Припустимо, що |Припустимо |Онда |Но |Нехай |Нәтиҗәдә |Лекин |Ләкин |Коли |Когда |Когато |Када |Кад |К тому же |І |И |Задато |Задати |Задате |Если |Допустим |Дано |Дадено |Вә |Ва |Бирок |Әмма |Әйтик |Әгәр |Аммо |Али |Але |Агар |А також |А |Τότε |Όταν |Και |Δεδομένου |Αλλά |Þurh |Þegar |Þa þe |Þá |Þa |Zatati |Zakładając |Zadato |Zadate |Zadano |Zadani |Zadan |Za předpokladu |Za predpokladu |Youse know when youse got |Youse know like when |Yna |Yeah nah |Y'know |Y |Wun |Wtedy |When y'all |When |Wenn |WEN |wann |Ve |Và |Und |Un |ugeholl |Too right |Thurh |Thì |Then y'all |Then |Tha the |Tha |Tetapi |Tapi |Tak |Tada |Tad |Stel |Soit |Siis |Și |Şi |Si |Sed |Se |Så |Quando |Quand |Quan |Pryd |Potom |Pokud |Pokiaľ |Però |Pero |Pak |Oraz |Onda |Ond |Oletetaan |Og |Och |O zaman |Niin |Nhưng |När |Når |Mutta |Men |Mas |Maka |Majd |Mając |Mais |Maar |mä |Ma |Lorsque |Lorsqu'|Logo |Let go and haul |Kun |Kuid |Kui |Kiedy |Khi |Ketika |Kemudian |Keď |Když |Kaj |Kai |Kada |Kad |Jeżeli |Jeśli |Ja |It's just unbelievable |Ir |I CAN HAZ |I |Ha |Givun |Givet |Given y'all |Given |Gitt |Gegeven |Gegeben seien |Gegeben sei |Gdy |Gangway! |Fakat |Étant donnés |Etant donnés |Étant données |Etant données |Étant donnée |Etant donnée |Étant donné |Etant donné |Et |És |Entonces |Entón |Então |Entao |En |Eğer ki |Ef |Eeldades |E |Ðurh |Duota |Dun |Donitaĵo |Donat |Donada |Do |Diyelim ki |Diberi |Dengan |Den youse gotta |DEN |De |Dato |Dați fiind |Daţi fiind |Dati fiind |Dati |Date fiind |Date |Data |Dat fiind |Dar |Dann |dann |Dan |Dados |Dado |Dadas |Dada |Ða ðe |Ða |Cuando |Cho |Cando |Când |Cand |Cal |But y'all |But at the end of the day I reckon |BUT |But |Buh |Blimey! |Biết |Bet |Bagi |Aye |awer |Avast! |Atunci |Atesa |Atès |Apabila |Anrhegedig a |Angenommen |And y'all |And |AN |An |an |Amikor |Amennyiben |Ama |Als |Alors |Allora |Ali |Aleshores |Ale |Akkor |Ak |Adott |Ac |Aber |A zároveň |A tiež |A taktiež |A také |A |a |7 |\* )/)) {
         state.inStep = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.inStep → ${state.inStep}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         state.allowPlaceholders = true;
         state.allowMultilineArgument = true;
         state.inKeywordLine = true;
@@ -167,6 +181,7 @@ CodeMirror.defineMode("gherkin", function () {
       } else {
         stream.next();
         stream.eatWhile(/[^@"<#]/);
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return null;
       }
     }

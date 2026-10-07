@@ -8,11 +8,17 @@ Imports System.Collections
 Imports System.ComponentModel
 Imports System.Drawing
 Imports System.Web.UI
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     Public Class ScriptGenerator
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Public Shared Function GetMarshalledProperties(ByVal instance As Object) As Hashtable
+			_logger.LogError(">>> Entering GetMarshalledProperties(instance={Instance})", instance)
+			_logger.LogError(">>> Entering GetMarshalledProperties(instance={Instance},properties={Properties})", instance, properties)
+			_logger.LogWarning("<<< Exiting GetMarshalledProperties(instance={Instance})", instance)
+			_logger.LogWarning("<<< Exiting GetMarshalledProperties(instance={Instance},properties={Properties})", instance, properties)
             Return ScriptGenerator.GetMarshalledProperties(instance, New Hashtable)
         End Function
 
@@ -90,7 +96,11 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Shared Function GetMarshalledPropertyJSON(ByVal instance As Object) As String
+			_logger.LogError(">>> Entering GetMarshalledPropertyJSON(instance={Instance})", instance)
             Dim properties As New Hashtable
+			_logger.LogError(">>> Entering GetMarshalledPropertyJSON(instance={Instance},properties={Properties})", instance, properties)
+			_logger.LogWarning("<<< Exiting GetMarshalledPropertyJSON(instance={Instance})", instance)
+			_logger.LogWarning("<<< Exiting GetMarshalledPropertyJSON(instance={Instance},properties={Properties})", instance, properties)
             Return ScriptGenerator.GetMarshalledPropertyJSON(instance, properties)
         End Function
 

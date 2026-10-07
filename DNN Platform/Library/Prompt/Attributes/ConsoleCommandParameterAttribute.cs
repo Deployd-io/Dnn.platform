@@ -9,6 +9,7 @@ namespace DotNetNuke.Prompt
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class ConsoleCommandParameterAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConsoleCommandParameterAttribute));
         /// <summary>Initializes a new instance of the <see cref="ConsoleCommandParameterAttribute"/> class.</summary>
         /// <param name="name">The parameter name.</param>
         /// <param name="descriptionKey">The resource key for the parameter description.</param>
@@ -16,10 +17,16 @@ namespace DotNetNuke.Prompt
         /// <param name="defaultValue">The default value for the parameter.</param>
         public ConsoleCommandParameterAttribute(string name, string descriptionKey, bool required, string defaultValue)
         {
+			Logger.LogError(">>> Entering ConsoleCommandParameterAttribute(name={Name},descriptionKey={DescriptionKey},required={Required},defaultValue={DefaultValue})", name, descriptionKey, required, defaultValue);
             this.Name = name;
+			Logger.LogDebug("ConsoleCommandParameterAttribute(name={Name},descriptionKey={DescriptionKey},required={Required},defaultValue={DefaultValue}): this.Name → {Arg4}", name, descriptionKey, required, defaultValue, this.Name);
             this.Required = required;
             this.DefaultValue = defaultValue;
+			Logger.LogDebug("ConsoleCommandParameterAttribute(name={Name},descriptionKey={DescriptionKey},required={Required},defaultValue={DefaultValue}): this.Required → {Arg4}", name, descriptionKey, required, defaultValue, this.Required);
+        Logger.LogWarning("<<< Exiting ConsoleCommandParameterAttribute(name={Name},descriptionKey={DescriptionKey},required={Required},defaultValue={DefaultValue})", name, descriptionKey, required, defaultValue);
             this.DescriptionKey = descriptionKey;
+			Logger.LogError(">>> Entering ConsoleCommandParameterAttribute(name={Name},descriptionKey={DescriptionKey},required={Required})", name, descriptionKey, required);
+        Logger.LogWarning("<<< Exiting ConsoleCommandParameterAttribute(name={Name},descriptionKey={DescriptionKey},required={Required})", name, descriptionKey, required);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ConsoleCommandParameterAttribute"/> class.</summary>

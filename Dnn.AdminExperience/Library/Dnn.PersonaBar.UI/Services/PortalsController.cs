@@ -31,9 +31,11 @@ namespace Dnn.PersonaBar.UI.Services
         [HttpGet]
         public HttpResponseMessage GetPortals(bool addAll = false)
         {
+			Logger.LogError(">>> Entering GetPortals(addAll={AddAll})", addAll);
             try
             {
                 var portals = PortalController.Instance.GetPortals().OfType<IPortalInfo>();
+				Logger.LogError("GetPortals(addAll={AddAll}): portals → {Portals}", addAll, portals);
                 if (!this.UserInfo.IsSuperUser)
                 {
                     portals = portals.Where(portal => portal.PortalId == this.PortalId);
@@ -66,6 +68,7 @@ namespace Dnn.PersonaBar.UI.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetPortals(addAll={AddAll})", addAll);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

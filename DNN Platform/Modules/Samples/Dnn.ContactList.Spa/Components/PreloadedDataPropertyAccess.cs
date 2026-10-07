@@ -9,6 +9,7 @@ using DotNetNuke.Common;
 using DotNetNuke.Entities.Users;
 using DotNetNuke.Services.Tokens;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Dnn.ContactList.Spa.Components
 {
@@ -19,6 +20,7 @@ namespace Dnn.ContactList.Spa.Components
     /// </summary>
     public class PreloadedDataPropertyAccess : IPropertyAccess
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private readonly IContactService _service;
         private readonly int _portalId;
         private readonly string searchTerm;
@@ -30,7 +32,9 @@ namespace Dnn.ContactList.Spa.Components
         /// </summary>
         public PreloadedDataPropertyAccess(int portalId) : this(portalId, ContactService.Instance)
         {
+		_logger.LogError(">>> Entering PreloadedDataPropertyAccess(portalId={PortalId})", portalId);
 
+		_logger.LogWarning("<<< Exiting PreloadedDataPropertyAccess(portalId={PortalId})", portalId);
         }
 
         /// <summary>
@@ -38,13 +42,20 @@ namespace Dnn.ContactList.Spa.Components
         /// </summary>
         public PreloadedDataPropertyAccess(int portalId, IContactService service)
         {
+			_logger.LogError(">>> Entering PreloadedDataPropertyAccess(portalId={PortalId},service={Service})", portalId, service);
             Requires.NotNull(service);
+			_logger.LogWarning("<<< Exiting PreloadedDataPropertyAccess(portalId={PortalId})", portalId);
 
             _service = service;
+			_logger.LogDebug("PreloadedDataPropertyAccess(portalId={PortalId},service={Service}): _service → {_service}", portalId, service, _service);
             _portalId = portalId;
+			_logger.LogDebug("PreloadedDataPropertyAccess(portalId={PortalId},service={Service}): _portalId → {_portalId}", portalId, service, _portalId);
             searchTerm = "";
+			_logger.LogError("PreloadedDataPropertyAccess(portalId={PortalId},service={Service}): searchTerm → {SearchTerm}", portalId, service, searchTerm);
+			_logger.LogDebug("PreloadedDataPropertyAccess(portalId={PortalId},service={Service}): searchTerm → {SearchTerm}", portalId, service, searchTerm);
             pageIndex = 0;
             pageSize = 6;
+			_logger.LogDebug("PreloadedDataPropertyAccess(portalId={PortalId},service={Service}): pageIndex → {PageIndex}", portalId, service, pageIndex);
         }
 
         /// <summary>
@@ -67,10 +78,13 @@ namespace Dnn.ContactList.Spa.Components
         /// <returns></returns>
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			_logger.LogError(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             var contactList = _service.GetContacts(searchTerm, _portalId, pageIndex, pageSize);
             var contacts = contactList
                                  .Select(contact => new ContactViewModel(contact))
                                  .ToList();
+								_logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): contactList → {ContactList}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, contactList);
+			_logger.LogWarning("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return "{ results: " + JsonConvert.SerializeObject(contacts) + ", pageCount: " + contactList.TotalCount + "}";
         }
     }

@@ -132,8 +132,10 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         public override bool LoadPostData(string postDataKey, NameValueCollection postCollection)
         {
+			Logger.LogError(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             this.EnsureChildControls();
             bool dataChanged = false;
+			Logger.LogError("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): dataChanged → {DataChanged}", postDataKey, postCollection, dataChanged);
             string presentValue = this.StringValue;
             string postedValue = postCollection[postDataKey + "date"];
             if (!presentValue.Equals(postedValue, StringComparison.Ordinal))
@@ -142,15 +144,18 @@ namespace DotNetNuke.UI.WebControls
                 dataChanged = true;
             }
 
+			Logger.LogWarning("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             return dataChanged;
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			Logger.LogError(">>> Entering CreateChildControls()");
             base.CreateChildControls();
 
             this.dateField = new TextBox();
+			Logger.LogDebug("CreateChildControls(): dateField → {DateField}", dateField);
             this.dateField.ControlStyle.CopyFrom(this.ControlStyle);
             this.dateField.ID = this.ID + "date";
             this.Controls.Add(this.dateField);
@@ -158,34 +163,44 @@ namespace DotNetNuke.UI.WebControls
             this.Controls.Add(new LiteralControl("&nbsp;"));
 
             this.linkCalendar = new HyperLink();
+			Logger.LogDebug("CreateChildControls(): linkCalendar → {LinkCalendar}", linkCalendar);
             this.linkCalendar.CssClass = "CommandButton";
             this.linkCalendar.Text = "<img src=\"" + Globals.ApplicationPath + "/images/calendar.png\" border=\"0\" />&nbsp;&nbsp;" + Localization.GetString("Calendar");
             this.linkCalendar.NavigateUrl = Calendar.InvokePopupCal(this.dateField);
             this.Controls.Add(this.linkCalendar);
+			Logger.LogWarning("<<< Exiting CreateChildControls()");
         }
 
         protected virtual void LoadDateControls()
         {
+			Logger.LogError(">>> Entering LoadDateControls()");
             if (this.DateValue != Null.NullDate)
             {
                 this.dateField.Text = this.DateValue.Date.ToString("d", CultureInfo.CurrentCulture);
             }
+			Logger.LogWarning("<<< Exiting LoadDateControls()");
         }
 
         /// <summary>OnDataChanged is called by the PostBack Handler when the Data has changed.</summary>
         /// <param name="e">An EventArgs object.</param>
         protected override void OnDataChanged(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnDataChanged(e={E})", e);
             var args = new PropertyEditorEventArgs(this.Name);
             args.Value = this.DateValue;
+			Logger.LogDebug("OnDataChanged(e={E}): args.Value → {Arg1}", e, args.Value);
+			Logger.LogError("OnDataChanged(e={E}): args → {Args}", e, args);
             args.OldValue = this.OldDateValue;
+			Logger.LogDebug("OnDataChanged(e={E}): args.OldValue → {Arg1}", e, args.OldValue);
             args.StringValue = this.DateValue.ToString(CultureInfo.InvariantCulture);
             this.OnValueChanged(args);
+			Logger.LogWarning("<<< Exiting OnDataChanged(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             this.LoadDateControls();
@@ -194,23 +209,28 @@ namespace DotNetNuke.UI.WebControls
             {
                 this.Page.RegisterRequiresPostBack(this);
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>RenderEditMode is called by the base control to render the control in Edit Mode.</summary>
         /// <param name="writer">The HTML text writer to which this control is to be rendered.</param>
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderEditMode(writer={Writer})", writer);
             this.RenderChildren(writer);
+			Logger.LogWarning("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
 
         /// <summary>RenderViewMode renders the View (readonly) mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderViewMode(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderViewMode(writer={Writer})", writer);
             this.ControlStyle.AddAttributesToRender(writer);
             writer.RenderBeginTag(HtmlTextWriterTag.Span);
             writer.Write(this.StringValue);
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderViewMode(writer={Writer})", writer);
         }
     }
 }

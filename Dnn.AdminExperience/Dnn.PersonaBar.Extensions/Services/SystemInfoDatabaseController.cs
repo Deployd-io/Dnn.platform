@@ -24,9 +24,11 @@ namespace Dnn.PersonaBar.Servers.Services
         [HttpGet]
         public HttpResponseMessage GetDatabaseServerInfo()
         {
+			Logger.LogError(">>> Entering GetDatabaseServerInfo()");
             try
             {
                 var dbInfo = this.databaseController.GetDbInfo();
+				Logger.LogError("GetDatabaseServerInfo(): dbInfo → {DbInfo}", dbInfo);
                 var dbBackups = this.databaseController.GetDbBackups().Select(b => new
                 {
                     name = b.Name,
@@ -56,6 +58,7 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetDatabaseServerInfo()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

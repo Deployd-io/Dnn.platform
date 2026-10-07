@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -26,24 +27,30 @@ CodeMirror.defineMode("pig", function(_config, parserConfig) {
   var isOperatorChar = /[*+\-%<>=&?:\/!|]/;
 
   function chain(stream, state, f) {
+	logger.error(`>>> Entering chain(stream=${stream},state=${state},f=${f})`, { "event.action": "chain", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
     state.tokenize = f;
+	logger.warn(`<<< Exiting chain(stream=${stream},state=${state},f=${f})`, { "event.action": "chain", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
     return f(stream, state);
   }
 
   function tokenComment(stream, state) {
+	logger.error(`>>> Entering tokenComment(stream=${stream},state=${state})`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
     var isEnd = false;
     var ch;
     while(ch = stream.next()) {
       if(ch == "/" && isEnd) {
         state.tokenize = tokenBase;
+		logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       isEnd = (ch == "*");
     }
+	logger.error(`tokenComment(stream=${stream},state=${state}): isEnd → ${isEnd}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
     return "comment";
   }
 
   function tokenString(quote) {
+	logger.error(`>>> Entering tokenString(quote=${quote})`, { "event.action": "tokenString", "logrite.quote": quote });
     return function(stream, state) {
       var escaped = false, next, end = false;
       while((next = stream.next()) != null) {
@@ -60,8 +67,10 @@ CodeMirror.defineMode("pig", function(_config, parserConfig) {
 
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.next();
 
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     // is a start of string?
     if (ch == '"' || ch == "'")
       return chain(stream, state, tokenString(ch));
@@ -122,15 +131,20 @@ CodeMirror.defineMode("pig", function(_config, parserConfig) {
   // Interface
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         tokenize: tokenBase,
         startOfLine: true
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if(stream.eatSpace()) return null;
       var style = state.tokenize(stream, state);
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+	logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return style;
     }
   };
@@ -138,8 +152,11 @@ CodeMirror.defineMode("pig", function(_config, parserConfig) {
 
 (function() {
   function keywords(str) {
+	logger.error(`>>> Entering keywords(str=${str})`, { "event.action": "keywords", "logrite.str": str });
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.error(`keywords(str=${str}): obj → ${obj}`, { "event.action": "keywords", "logrite.str": str });
+	logger.warn(`<<< Exiting keywords(str=${str})`, { "event.action": "keywords", "logrite.str": str });
     return obj;
   }
 

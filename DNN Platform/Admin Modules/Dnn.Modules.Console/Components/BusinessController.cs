@@ -11,9 +11,11 @@ namespace Dnn.Modules.Console.Components
     /// <summary>Implements the module's business controller interface(s).</summary>
     public class BusinessController : IUpgradeable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(BusinessController));
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			Logger.LogError(">>> Entering UpgradeModule(version={Version})", version);
             try
             {
                 switch (version)
@@ -27,6 +29,8 @@ namespace Dnn.Modules.Console.Components
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in UpgradeModule(version={Version}): {Arg1}", version, Exception.Message);
+				Logger.LogWarning("<<< Exiting UpgradeModule(version={Version})", version);
                 return "Failed";
             }
         }

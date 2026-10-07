@@ -13,13 +13,18 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
     /// <summary>Renders client resources.</summary>
     public class DnnResources : Literal
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnResources));
         private readonly IClientResourceController clientResourceController;
 
         /// <summary>Initializes a new instance of the <see cref="DnnResources"/> class.</summary>
         /// <param name="clientResourceController">The client resource controller.</param>
         public DnnResources(IClientResourceController clientResourceController)
         {
+			Logger.LogError(">>> Entering DnnResources(clientResourceController={ClientResourceController})", clientResourceController);
             this.clientResourceController = clientResourceController;
+			Logger.LogDebug("DnnResources(clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", clientResourceController, clientResourceController);
+        Logger.LogDebug("DnnResources(clientResourceController={ClientResourceController}): this.clientResourceController → {Arg1}", clientResourceController, this.clientResourceController);
+        Logger.LogWarning("<<< Exiting DnnResources(clientResourceController={ClientResourceController})", clientResourceController);
         }
 
         /// <summary>Gets or sets the application path.</summary>
@@ -34,42 +39,59 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering Render(writer={Writer})", writer);
             base.Render(writer);
             writer.Write(this.clientResourceController.RenderDependencies(ResourceType.All, this.Provider, this.ApplicationPath));
 
             var scriptManager = ScriptManager.GetCurrent(this.Page);
+			Logger.LogError("Render(writer={Writer}): scriptManager → {ScriptManager}", writer, scriptManager);
             if (this.Provider == ClientResourceProviders.DnnBodyProvider && scriptManager != null && scriptManager.IsInAsyncPostBack)
             {
                 var holderControl = this.Page.FindControl("BodySCRIPTS");
+				Logger.LogError("Render(writer={Writer}): holderControl → {HolderControl}", writer, holderControl);
                 holderControl.ID = "$crm_BodySCRIPTS";
+				Logger.LogDebug("Render(writer={Writer}): holderControl.ID → {Arg1}", writer, holderControl.ID);
 
                 // Get scripts to be loaded during async postback
                 var js = this.clientResourceController.RenderDependencies(ResourceType.Script, ClientResourceProviders.DnnBodyProvider, this.ApplicationPath);
+				Logger.LogError("Render(writer={Writer}): js → {Js}", writer, js);
                 var css = this.clientResourceController.RenderDependencies(ResourceType.Stylesheet, ClientResourceProviders.DefaultCssProvider, this.ApplicationPath);
+				Logger.LogError("Render(writer={Writer}): css → {Css}", writer, css);
                 scriptManager.RegisterDataItem(holderControl, $"{js}{css}");
             }
+			Logger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
 
         /// <inheritdoc />
         protected override void OnInit(System.EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             if (AsyncPostBackHandlerEnabled && ScriptManager.GetCurrent(this.Page) == null)
             {
+				Logger.LogError("Throwing ScriptManagerRequiredException from OnInit(e={E})", e);
                 throw new ScriptManagerRequiredException("The ClientResourceLoader control requires a ScriptManager on the page when AsyncPostBackHandlerEnabled is true.");
             }
 
             base.OnInit(e);
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc/>
         protected override void OnPreRender(System.EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             if (AsyncPostBackHandlerEnabled)
             {
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
                 const string handlerScript = @"
 var loadScriptInSingleMode = function(){
     var s = document.createElement( 'script' );
+	Logger.LogError("OnPreRender(e={E}): s → {S}", e, s);
+	Logger.LogDebug("OnPreRender(e={E}): s.src → {Arg1}", e, s.src);
+	Logger.LogDebug("OnPreRender(e={E}): s.onload → {Arg1}", e, s.onload);
+	Logger.LogDebug("OnPreRender(e={E}): s.onerror → {Arg1}", e, s.onerror);
     s.type = 'text/javascript';
+	Logger.LogDebug("OnPreRender(e={E}): s.type → {Arg1}", e, s.type);
     s.src = window.dnnLoadScriptsInAjaxMode[0];
     s.onload = window.dnnLoadScriptsInAjaxModeComplete;
     s.onerror = window.dnnLoadScriptsInAjaxModeComplete;
@@ -88,21 +110,26 @@ var loadScriptInMultipleMode = function(){
 };
 
 var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+Logger.LogError("OnPreRender(e={E}): isFirefox → {IsFirefox}", e, isFirefox);
 
 (function($){
 Sys.WebForms.PageRequestManager.getInstance().add_pageLoading(function (sender, args){
     var dataItems = args.get_dataItems();
+	Logger.LogError("OnPreRender(e={E}): dataItems → {DataItems}", e, dataItems);
     for(var item in dataItems){
         if(item.indexOf('$crm_') > -1){
             var content = dataItems[item];
             //check whether script already register to page.
             if(typeof window.dnnLoadScriptsInAjaxMode === 'undefined'){
                 window.dnnLoadScriptsInAjaxMode = [];
+				Logger.LogDebug("OnPreRender(e={E}): window.dnnLoadScriptsInAjaxMode → {Arg1}", e, window.dnnLoadScriptsInAjaxMode);
             }
             var scripts = content.match(/<script.+?><\/script>/gi);
+			Logger.LogError("OnPreRender(e={E}): scripts → {Scripts}", e, scripts);
             if(scripts && scripts.length > 0){
                 for(var i = 0; i < scripts.length; i++){
                     var src = scripts[i].match(/src=""(.+?)""/i)[1];
+					Logger.LogError("OnPreRender(e={E}): src → {Src}", e, src);
                     if($('script[src=""' + src + '""]').length == 0){
                         window.dnnLoadScriptsInAjaxMode.push(src);
                     }
@@ -110,6 +137,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoading(function (sender, 
             }
 
             var styles = content.match(/<link[^>]+?>/gi);
+			Logger.LogError("OnPreRender(e={E}): styles → {Styles}", e, styles);
             if(styles && styles.length > 0){
                 for(var i = 0; i < styles.length; i++){
                     var src = styles[i].match(/href=""(.+?)""/i)[1];
@@ -123,6 +151,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoading(function (sender, 
     
     if(window.dnnLoadScriptsInAjaxMode.length > 0){
         window.loadingScriptsInAsyncRequest = true;
+		Logger.LogDebug("OnPreRender(e={E}): window.loadingScriptsInAsyncRequest → {Arg1}", e, window.loadingScriptsInAsyncRequest);
         if(isFirefox || window['forceLoadScriptsInSingleMode'] === true){
             loadScriptInSingleMode();
         } else {
@@ -152,6 +181,7 @@ if(typeof window.dnnLoadScriptsInAjaxModeComplete == 'undefined'){
 }
 
 var originalScriptLoad = Sys._ScriptLoader.getInstance().loadScripts;
+Logger.LogError("OnPreRender(e={E}): originalScriptLoad → {OriginalScriptLoad}", e, originalScriptLoad);
 Sys._ScriptLoader.getInstance().loadScripts = function(){
     var self = this, args = arguments;
     if(window.loadingScriptsInAsyncRequest === true){

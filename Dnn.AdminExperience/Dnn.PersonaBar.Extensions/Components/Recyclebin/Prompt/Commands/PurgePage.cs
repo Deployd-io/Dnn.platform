@@ -45,7 +45,11 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <param name="contentVerifier">The content verifier.</param>
         public PurgePage(ITabController tabController, IRecyclebinController recyclebinController, IContentVerifier contentVerifier)
         {
+			eventLogger.LogError(">>> Entering PurgePage(tabController={TabController},recyclebinController={RecyclebinController},contentVerifier={ContentVerifier})", tabController, recyclebinController, contentVerifier);
+			eventLogger.LogDebug("PurgePage(tabController={TabController},recyclebinController={RecyclebinController},contentVerifier={ContentVerifier}): recyclebinController → {RecyclebinController1}", tabController, recyclebinController, contentVerifier, recyclebinController);
             this.tabController = tabController;
+			eventLogger.LogWarning("<<< Exiting PurgePage(tabController={TabController},recyclebinController={RecyclebinController},contentVerifier={ContentVerifier})", tabController, recyclebinController, contentVerifier);
+			eventLogger.LogDebug("PurgePage(tabController={TabController},recyclebinController={RecyclebinController},contentVerifier={ContentVerifier}): this.tabController → {Arg3}", tabController, recyclebinController, contentVerifier, this.tabController);
             this.recyclebinController = recyclebinController;
             this.contentVerifier = contentVerifier;
         }
@@ -60,6 +64,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.PageId = this.GetFlagValue(FlagId, "Page Id", -1, true, true, true);
             this.DeleteChildren = this.GetFlagValue(FlagDeleteChildren, "Delete Children", false);
         }
@@ -67,16 +72,20 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             var tabInfo = this.tabController.GetTab(this.PageId, this.PortalSettings.PortalId);
             if (tabInfo == null ||
                 !this.contentVerifier.IsContentExistsForRequestedPortal(tabInfo.PortalID, this.PortalSettings))
             {
+				eventLogger.LogError("Run(): tabInfo → {TabInfo}", tabInfo);
                 return new ConsoleErrorResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("PageNotFound"), this.PageId));
             }
 
             var errors = new StringBuilder();
+			eventLogger.LogError("Run(): errors → {Errors}", errors);
             this.recyclebinController.DeleteTabs(new List<TabInfo> { tabInfo }, errors, this.DeleteChildren);
 
+			eventLogger.LogWarning("<<< Exiting Run()");
             return errors.Length > 0
                 ? new ConsoleErrorResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("Service_RemoveTabError"), errors))
                 : new ConsoleResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("Prompt_PagePurgedSuccessfully"), this.PageId)) { Records = 1 };

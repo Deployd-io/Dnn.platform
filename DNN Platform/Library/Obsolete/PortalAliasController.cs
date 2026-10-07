@@ -21,6 +21,7 @@ namespace DotNetNuke.Entities.Portals
     public partial class PortalAliasController : ServiceLocator<IPortalAliasController, PortalAliasController>, IPortalAliasController
 #pragma warning restore CS0618 // Type or member is obsolete
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalAliasController));
         [Obsolete("Deprecated in DotNetNuke 9.7.2. Use DotNetNuke.Abstractions.Portals.IPortalAliasService via dependency injection instead. Scheduled removal in v11.0.0.")]
         public static new IPortalAliasController Instance
         {
@@ -91,12 +92,14 @@ namespace DotNetNuke.Entities.Portals
         [DnnDeprecated(9, 7, 2, "use DotNetNuke.Abstractions.Portals.IPortalAliasService via dependency injection instead")]
         public partial PortalAliasCollection GetPortalAliases()
         {
+			Logger.LogError(">>> Entering GetPortalAliases()");
             var aliasCollection = new PortalAliasCollection();
             foreach (var alias in this.GetPortalAliasesInternal().Values)
             {
                 aliasCollection.Add(alias.HTTPAlias, alias);
             }
 
+			Logger.LogWarning("<<< Exiting GetPortalAliases()");
             return aliasCollection;
         }
 

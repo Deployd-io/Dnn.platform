@@ -12,13 +12,17 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The AuthenticationPackageWriter class.</summary>
     public class AuthenticationPackageWriter : PackageWriterBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AuthenticationPackageWriter));
         /// <summary>Initializes a new instance of the <see cref="AuthenticationPackageWriter"/> class.</summary>
         /// <param name="package">The package info.</param>
         public AuthenticationPackageWriter(PackageInfo package)
             : base(package)
         {
+			Logger.LogError(">>> Entering AuthenticationPackageWriter(package={Package})", package);
             this.AuthSystem = AuthenticationController.GetAuthenticationServiceByPackageID(package.PackageID);
             this.Initialize();
+			Logger.LogWarning("<<< Exiting AuthenticationPackageWriter(authSystem={AuthSystem},package={Package})", authSystem, package);
+			Logger.LogDebug("AuthenticationPackageWriter(authSystem={AuthSystem},package={Package}): this.AuthSystem → {Arg2}", authSystem, package, this.AuthSystem);
         }
 
         /// <summary>Initializes a new instance of the <see cref="AuthenticationPackageWriter"/> class.</summary>
@@ -38,12 +42,15 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <inheritdoc />
         protected override void WriteManifestComponent(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteManifestComponent(writer={Writer})", writer);
             // Write Authentication Component
             this.WriteAuthenticationComponent(writer);
+			Logger.LogWarning("<<< Exiting WriteManifestComponent(writer={Writer})", writer);
         }
 
         private void Initialize()
         {
+			Logger.LogError(">>> Entering Initialize()");
             this.BasePath = Path.Combine("DesktopModules\\AuthenticationServices", this.AuthSystem.AuthenticationType);
             this.AppCodePath = Path.Combine("App_Code\\AuthenticationServices", this.AuthSystem.AuthenticationType);
             this.AssemblyPath = "bin";
@@ -51,6 +58,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
         private void WriteAuthenticationComponent(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteAuthenticationComponent(writer={Writer})", writer);
             // Start component Element
             writer.WriteStartElement("component");
             writer.WriteAttributeString("type", "AuthenticationSystem");
@@ -68,6 +76,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
             // End component Element
             writer.WriteEndElement();
+			Logger.LogWarning("<<< Exiting WriteAuthenticationComponent(writer={Writer})", writer);
         }
     }
 }

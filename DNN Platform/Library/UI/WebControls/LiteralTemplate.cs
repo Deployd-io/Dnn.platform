@@ -7,6 +7,7 @@ namespace DotNetNuke.UI.WebControls
 
     public class LiteralTemplate : ITemplate
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LiteralTemplate));
         private readonly Control objControl;
         private readonly string strHTML = string.Empty;
 
@@ -14,6 +15,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="html">The literal HTML that is the contents of this template.</param>
         public LiteralTemplate(string html)
         {
+			Logger.LogError(">>> Entering LiteralTemplate(html={Html})", html);
             this.strHTML = html;
         }
 
@@ -21,12 +23,16 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="ctl">A control that is the contents of this template.</param>
         public LiteralTemplate(Control ctl)
         {
+			Logger.LogError(">>> Entering LiteralTemplate(ctl={Ctl})", ctl);
             this.objControl = ctl;
+			Logger.LogDebug("LiteralTemplate(ctl={Ctl}): objControl → {ObjControl}", ctl, objControl);
+        Logger.LogWarning("<<< Exiting LiteralTemplate(ctl={Ctl})", ctl);
         }
 
         /// <inheritdoc />
         public void InstantiateIn(Control container)
         {
+			Logger.LogError(">>> Entering InstantiateIn(container={Container})", container);
             if (this.objControl == null)
             {
                 container.Controls.Add(new LiteralControl(this.strHTML));
@@ -35,6 +41,7 @@ namespace DotNetNuke.UI.WebControls
             {
                 container.Controls.Add(this.objControl);
             }
+			Logger.LogWarning("<<< Exiting InstantiateIn(container={Container})", container);
         }
     }
 }

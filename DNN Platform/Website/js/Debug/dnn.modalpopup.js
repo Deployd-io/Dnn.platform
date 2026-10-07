@@ -1,5 +1,7 @@
-﻿(function(window, $) {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+(function(window, $) {
 	function parseUri (str) {
+		logger.error(`>>> Entering parseUri(str=${str})`, { "event.action": "parseUri", "logrite.str": str });
 		var	o   = parseUri.options,
 			m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
 			uri = {},
@@ -12,6 +14,7 @@
 			if ($1) uri[o.q.name][$1] = $2;
 		});
 
+		logger.warn(`<<< Exiting parseUri(str=${str})`, { "event.action": "parseUri", "logrite.str": str });
 		return uri;
 	};
 	
@@ -37,6 +40,7 @@
     window.dnnModal = {
 
         load: function () {
+			logger.error('>>> Entering load()', { "event.action": "load" });
             
             try {
                 if (parent.location.href !== undefined) {
@@ -48,11 +52,16 @@
                         if (location.href.indexOf('popUp') == -1 || windowTop.location.href.indexOf("popUp") > -1) {
 
                             var popup = windowTop.jQuery("#iPopUp");
+							logger.error(`load(): popup → ${popup}`, { "event.action": "load" });
                             var refresh = popup.dialog("option", "refresh");
+							logger.error(`load(): refresh → ${refresh}`, { "event.action": "load" });
                             var closingUrl = popup.dialog("option", "closingUrl");
                             var width = popup.dialog("option", "minWidth");
+							logger.error(`load(): width → ${width}`, { "event.action": "load" });
                             var height = popup.dialog("option", "minHeight");
+							logger.error(`load(): height → ${height}`, { "event.action": "load" });
                             var showReturn = popup.dialog("option", "showReturn");
+							logger.error(`load(): showReturn → ${showReturn}`, { "event.action": "load" });
 
                             if (!closingUrl) {
                                 closingUrl = location.href;
@@ -62,6 +71,7 @@
 
                                 popup.dialog("option", {
                                     close: function(event, ui) {
+										logger.error(`>>> Entering close(event=${event},ui=${ui})`, { "event.action": "close" });
                                         dnnModal.refreshPopup({
                                             url: closingUrl,
                                             width: width,
@@ -69,6 +79,9 @@
                                             showReturn: showReturn,
                                             refresh: refresh
                                         });
+										logger.warn(`<<< Exiting close(event=${event},ui=${ui})`, { "event.action": "close" });
+										logger.error('>>> Entering close()', { "event.action": "close" });
+										logger.warn('<<< Exiting close()', { "event.action": "close" });
                                     }
                                 }).dialog('close');
                             }
@@ -79,11 +92,14 @@
                 }
                 return false;
             } catch(err) {
+				logger.warn('<<< Exiting load()', { "event.action": "load" });
+				logger.error('Exception in load():', err.message, err, { "event.action": "load", "event.category": "process" });
                 return true;
             }
         },
 
         show: function(url, showReturn, height, width, refresh, closingUrl) {
+			logger.error(`>>> Entering show(url=${url},showReturn=${showReturn},height=${height},width=${width},refresh=${refresh},closingUrl=${closingUrl})`, { "event.action": "show", "logrite.sUrl": sUrl, "logrite.sShowReturn": sShowReturn, "logrite.sHeight": sHeight, "logrite.sWidth": sWidth, "logrite.sRefresh": sRefresh, "logrite.sClosingUrl": sClosingUrl });
             var $modal = $("#iPopUp");
 			
             if ($modal.length) {
@@ -106,21 +122,28 @@
 				}
 			}			
 			var isMobile = !isAdmin && ($(window).width() < 481 || mobileBrowser);
+			logger.error(`show(url=${url},showReturn=${showReturn},height=${height},width=${width},refresh=${refresh},closingUrl=${closingUrl}): isMobile → ${isMobile}`, { "event.action": "show", "logrite.sUrl": sUrl, "logrite.sShowReturn": sShowReturn, "logrite.sHeight": sHeight, "logrite.sWidth": sWidth, "logrite.sRefresh": sRefresh, "logrite.sClosingUrl": sClosingUrl });
 			if (isMobile) $('html').addClass('mobileView');	else $('html').removeClass('mobileView');
 			
 			var mobileWidth = 0;
+			logger.error(`show(url=${url},showReturn=${showReturn},height=${height},width=${width},refresh=${refresh},closingUrl=${closingUrl}): mobileWidth → ${mobileWidth}`, { "event.action": "show", "logrite.sUrl": sUrl, "logrite.sShowReturn": sShowReturn, "logrite.sHeight": sHeight, "logrite.sWidth": sWidth, "logrite.sRefresh": sRefresh, "logrite.sClosingUrl": sClosingUrl });
 			var showLoading = function() {
+				logger.error('>>> Entering showLoading()', { "event.action": "showLoading" });
                 var loading = $("<div class=\"dnnLoading\"></div>");
                 loading.css({
                     width: $modal.width(),
                     height: $modal.height()
                 });
                 $modal.before(loading);
+				logger.error(`showLoading(): loading → ${loading}`, { "event.action": "showLoading" });
             };
             var hideLoading = function() {
+				logger.error('>>> Entering hideLoading()', { "event.action": "hideLoading" });
                 $modal.prev(".dnnLoading").remove();
+				logger.warn('<<< Exiting hideLoading()', { "event.action": "hideLoading" });
             };			
             var dialogOpened = function () {
+				logger.error('>>> Entering dialogOpened()', { "event.action": "dialogOpened" });
                 
                 $modal.on("load", function () {
 					hideLoading();
@@ -157,7 +180,9 @@
 								if (popup.dialog('isOpen')) {
 									popup.dialog("option", {
 										close: function () {
+											logger.error('>>> Entering close()', { "event.action": "close" });
 											parent.dnnModal.show(sUrl, sShowReturn, sHeight, sWidth, sRefresh, sClosingUrl);
+											logger.warn('<<< Exiting close()', { "event.action": "close" });
 										}
 									}).dialog('close');
 								}
@@ -192,7 +217,11 @@
                     showReturn: showReturn,
                     closingUrl: closingUrl,
 					open: dialogOpened,
-                    close: function() { window.dnnModal.closePopUp(refresh, closingUrl); }
+                    close: function() {
+                        logger.error('>>> Entering close()', { "event.action": "close" });
+                        logger.warn('<<< Exiting close()', { "event.action": "close" });
+                        window.dnnModal.closePopUp(refresh, closingUrl);
+                    }
                 })
                     .width(width - 11)
                     .height(height - 11);
@@ -277,10 +306,13 @@
                     position: { my: "top", at: "top" },
                     draggable: false,
 					open: function() { 
+							logger.error('>>> Entering open()', { "event.action": "open" });
 							$('#Form').hide();
 							$('body').css('height', 'auto');
+							logger.error(`show(url=${url},showReturn=${showReturn},height=${height},width=${width},refresh=${refresh},closingUrl=${closingUrl}): originalHeightCss → ${originalHeightCss}`, { "event.action": "show", "logrite.sUrl": sUrl, "logrite.sShowReturn": sShowReturn, "logrite.sHeight": sHeight, "logrite.sWidth": sWidth, "logrite.sRefresh": sRefresh, "logrite.sClosingUrl": sClosingUrl });
 							$modal.parent().css({ 'width': 'auto', 'left': '0', 'right': '0', 'top': '0', 'box-shadow': 'none' });
 							window.scrollTo(0, 0);
+							logger.warn('<<< Exiting open()', { "event.action": "open" });
 							dialogOpened();
 						
 						},
@@ -297,13 +329,17 @@
             showLoading();
 			
             if (showReturn.toString() === "true") {
+				logger.warn(`<<< Exiting show(sUrl=${sUrl},sShowReturn=${sShowReturn},sHeight=${sHeight},sWidth=${sWidth},sRefresh=${sRefresh},sClosingUrl=${sClosingUrl})`, { "event.action": "show", "logrite.sUrl": sUrl, "logrite.sShowReturn": sShowReturn, "logrite.sHeight": sHeight, "logrite.sWidth": sWidth, "logrite.sRefresh": sRefresh, "logrite.sClosingUrl": sClosingUrl });
+				logger.warn(`<<< Exiting show(url=${url},showReturn=${showReturn},height=${height},width=${width},refresh=${refresh},closingUrl=${closingUrl})`, { "event.action": "show", "logrite.sUrl": sUrl, "logrite.sShowReturn": sShowReturn, "logrite.sHeight": sHeight, "logrite.sWidth": sWidth, "logrite.sRefresh": sRefresh, "logrite.sClosingUrl": sClosingUrl });
                 return false;
             }
         },
 
         closePopUp: function(refresh, url) {
+			logger.error(`>>> Entering closePopUp(refresh=${refresh},url=${url})`, { "event.action": "closePopUp", "logrite.refresh": refresh, "logrite.url": url });
             var windowTop = parent; //needs to be assign to a varaible for Opera compatibility issues.
             var popup = windowTop.jQuery("#iPopUp");
+			logger.error(`closePopUp(refresh=${refresh},url=${url}): popup → ${popup}`, { "event.action": "closePopUp", "logrite.refresh": refresh, "logrite.url": url });
 
             if (typeof refresh === "undefined" || refresh == null) {
                 refresh = true;
@@ -319,9 +355,11 @@
                 popup.dialog('option', 'close', null).dialog('close');
             }
             $(windowTop.document).find('html').css('overflow', '');
+			logger.warn(`<<< Exiting closePopUp(refresh=${refresh},url=${url})`, { "event.action": "closePopUp", "logrite.refresh": refresh, "logrite.url": url });
         },
 
         refreshPopup: function(options) {
+			logger.error(`>>> Entering refreshPopup(options=${options})`, { "event.action": "refreshPopup", "logrite.options": options });
             var windowTop = parent;
             var windowTopTop = windowTop.parent;
             if (windowTop.location.href !== windowTopTop.location.href &&
@@ -329,6 +367,7 @@
                 windowTopTop.dnnModal.show(options.url, options.showReturn, options.height, options.width, options.refresh, options.closingUrl);
             } else {
                 dnnModal.closePopUp(options.refresh, options.url);
+				logger.warn(`<<< Exiting refreshPopup(options=${options})`, { "event.action": "refreshPopup", "logrite.options": options });
             }
         }
     };

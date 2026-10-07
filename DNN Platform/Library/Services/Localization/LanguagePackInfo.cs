@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Localization
     [Serializable]
     public class LanguagePackInfo : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LanguagePackInfo));
         private int dependentPackageID = Null.NullInteger;
         private int languageID = Null.NullInteger;
         private int languagePackID = Null.NullInteger;
@@ -102,6 +103,7 @@ namespace DotNetNuke.Services.Localization
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.LanguagePackID = Null.SetNullInteger(dr["LanguagePackID"]);
             this.LanguageID = Null.SetNullInteger(dr["LanguageID"]);
             this.PackageID = Null.SetNullInteger(dr["PackageID"]);
@@ -109,6 +111,7 @@ namespace DotNetNuke.Services.Localization
 
             // Call the base classes fill method to populate base class proeprties
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

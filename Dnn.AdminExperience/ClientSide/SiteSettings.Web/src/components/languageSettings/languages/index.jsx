@@ -12,6 +12,7 @@ import { Collapsible, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 
 let tableFields = [];
 let isHost = false;
@@ -19,6 +20,7 @@ let isHost = false;
 class LanguagesPanel extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             languageList: [],
             openId: "",
@@ -26,14 +28,17 @@ class LanguagesPanel extends Component {
             contentLocalizationEnabled: false
         };
         isHost = util.settings.isHost;
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     loadData() {
+		logger.error('>>> Entering loadData()', { "event.action": "loadData" });
         const {props} = this;
 
         this.getHeaderColumns(props.contentLocalizationEnabled);
 
         props.dispatch(LanguagesActions.getLanguages(props.portalId, (data) => {
+			logger.warn('<<< Exiting loadData()', { "event.action": "loadData" });
             this.setState({
                 languageList: data.Languages,
                 contentLocalizationEnabled: props.contentLocalizationEnabled
@@ -42,19 +47,24 @@ class LanguagesPanel extends Component {
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.loadData();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         let { props } = this;
 
         if (prevProps.portalId !== props.portalId || 
             prevProps.contentLocalizationEnabled !== props.contentLocalizationEnabled) {
             this.loadData();
+			logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         }
     }
 
     getHeaderColumns(contentLocalizationEnabled) {
+		logger.error(`>>> Entering getHeaderColumns(contentLocalizationEnabled=${contentLocalizationEnabled})`, { "event.action": "getHeaderColumns", "logrite.contentLocalizationEnabled": contentLocalizationEnabled });
         tableFields = [];
         if (contentLocalizationEnabled) {
             tableFields.push({ "name": resx.get("Culture.Header"), "id": "adv-Culture" });
@@ -67,16 +77,19 @@ class LanguagesPanel extends Component {
         else {
             tableFields.push({ "name": resx.get("Culture.Header"), "id": "Culture" });
             tableFields.push({ "name": resx.get("Enabled.Header"), "id": "Enabled" });
+			logger.warn(`<<< Exiting getHeaderColumns(contentLocalizationEnabled=${contentLocalizationEnabled})`, { "event.action": "getHeaderColumns", "logrite.contentLocalizationEnabled": contentLocalizationEnabled });
         }
     }
 
     renderHeader() {
+		logger.error('>>> Entering renderHeader()', { "event.action": "renderHeader" });
         let tableHeaders = tableFields.map((field) => {
             let className = "languages-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.warn('<<< Exiting renderHeader()', { "event.action": "renderHeader" });
         return <div className="header-row">{tableHeaders}</div>;
     }
 
@@ -175,8 +188,10 @@ class LanguagesPanel extends Component {
 
      
     renderedLanguages() {
+		logger.error('>>> Entering renderedLanguages()', { "event.action": "renderedLanguages" });
         let i = 0;
         if (this.props.languageList) {
+			logger.warn('<<< Exiting renderedLanguages()', { "event.action": "renderedLanguages" });
             return this.props.languageList.map((item, index) => {
                 let id = "row-" + i++;
                 return (
@@ -223,7 +238,9 @@ class LanguagesPanel extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let opened = (this.state.openId === "add");
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <div className="language-items">
@@ -286,6 +303,8 @@ LanguagesPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         languageList: state.languages.languageList,
         tabIndex: state.pagination.tabIndex,

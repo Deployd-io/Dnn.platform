@@ -16,19 +16,23 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
     /// </summary>
     internal class CompleteWorkflow : TabActionBase, IWorkflowAction
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CompleteWorkflow));
         /// <summary>
         /// Publishes the tab version.
         /// </summary>
         /// <param name="stateTransaction">The state transaction.</param>
         public void DoActionOnStateChanging(StateTransaction stateTransaction)
         {
+			Logger.LogError(">>> Entering DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
             var tab = GetTab(stateTransaction.ContentItemId);
+			Logger.LogError("DoActionOnStateChanging(stateTransaction={StateTransaction}): tab → {Tab}", stateTransaction, tab);
             if (tab == null)
             {
                 return;
             }
 
             TabVersionBuilder.Instance.Publish(tab.PortalID, tab.TabID, stateTransaction.UserId);
+			Logger.LogWarning("<<< Exiting DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <inheritdoc />

@@ -10,13 +10,18 @@ namespace DotNetNuke.UI.WebControls
 
     public class NavDataPageHierarchyData : IHierarchyData, INavigateUIData
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NavDataPageHierarchyData));
         private readonly DNNNode objNode;
 
         /// <summary>Initializes a new instance of the <see cref="NavDataPageHierarchyData"/> class.</summary>
         /// <param name="obj">The node.</param>
         public NavDataPageHierarchyData(DNNNode obj)
         {
+			Logger.LogError(">>> Entering NavDataPageHierarchyData(obj={Obj})", obj);
             this.objNode = obj;
+			Logger.LogDebug("NavDataPageHierarchyData(obj={Obj}): objNode → {ObjNode}", obj, objNode);
+        Logger.LogDebug("NavDataPageHierarchyData(obj={Obj}): this.objNode → {Arg1}", obj, this.objNode);
+        Logger.LogWarning("<<< Exiting NavDataPageHierarchyData(obj={Obj})", obj);
         }
 
         /// <summary>Gets nodes image.</summary>
@@ -72,7 +77,9 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>A collection of nodes.</returns>
         public virtual IHierarchicalEnumerable GetChildren()
         {
+			Logger.LogError(">>> Entering GetChildren()");
             var objNodes = new NavDataPageHierarchicalEnumerable();
+			Logger.LogError("GetChildren(): objNodes → {ObjNodes}", objNodes);
             if (this.objNode != null)
             {
                 foreach (DNNNode objNode in this.objNode.DNNNodes)
@@ -81,6 +88,7 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetChildren()");
             return objNodes;
         }
 
@@ -88,12 +96,14 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>The parent node or <see langword="null"/>.</returns>
         public virtual IHierarchyData GetParent()
         {
+			Logger.LogError(">>> Entering GetParent()");
             if (this.objNode != null)
             {
                 return new NavDataPageHierarchyData(this.objNode.ParentNode);
             }
             else
             {
+				Logger.LogWarning("<<< Exiting GetParent()");
                 return null;
             }
         }
@@ -101,6 +111,8 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogError(">>> Entering ToString()");
+            Logger.LogWarning("<<< Exiting ToString()");
             return this.objNode.Text;
         }
 
@@ -110,12 +122,14 @@ namespace DotNetNuke.UI.WebControls
         /// <returns><paramref name="value"/> or <paramref name="def"/> if <paramref name="value"/> is <see langword="null"/>.</returns>
         private static string GetSafeValue(string value, string def)
         {
+			Logger.LogError(">>> Entering GetSafeValue(value={Value},def={Def})", value, def);
             if (value != null)
             {
                 return value;
             }
             else
             {
+				Logger.LogWarning("<<< Exiting GetSafeValue(value={Value},def={Def})", value, def);
                 return def;
             }
         }
@@ -126,10 +140,13 @@ namespace DotNetNuke.UI.WebControls
         /// <remarks>Not sure if it is ok to hardcode the "\" separator, but also not sure where I would get it from.</remarks>
         private static string GetValuePath(DNNNode objNode)
         {
+			Logger.LogError(">>> Entering GetValuePath(objNode={ObjNode})", objNode);
             DNNNode objParent = objNode.ParentNode;
             string strPath = GetSafeValue(objNode.Key, string.Empty);
+			Logger.LogError("GetValuePath(objNode={ObjNode}): objParent → {ObjParent}", objNode, objParent);
             do
             {
+				Logger.LogError("GetValuePath(objNode={ObjNode}): strPath → {StrPath}", objNode, strPath);
                 if (objParent == null || objParent.Level == -1)
                 {
                     break;
@@ -139,6 +156,7 @@ namespace DotNetNuke.UI.WebControls
                 objParent = objParent.ParentNode;
             }
             while (true);
+			Logger.LogWarning("<<< Exiting GetValuePath(objNode={ObjNode})", objNode);
             return strPath;
         }
     }

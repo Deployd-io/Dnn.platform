@@ -28,20 +28,24 @@ namespace Dnn.PersonaBar.Servers.Services
 
         public static string FirstCharToUpper(string input, CultureInfo culture)
         {
+			Logger.LogError(">>> Entering FirstCharToUpper(input={Input})", input);
             if (string.IsNullOrEmpty(input))
             {
                 return input;
             }
 
+			Logger.LogWarning("<<< Exiting FirstCharToUpper(input={Input},culture={Culture})", input, culture);
             return input.First().ToString().ToUpper(culture) + string.Join(string.Empty, input.Skip(1));
         }
 
         [HttpGet]
         public HttpResponseMessage GetApplicationInfo()
         {
+			Logger.LogError(">>> Entering GetApplicationInfo()");
             try
             {
                 var friendlyUrlProvider = GetProviderConfiguration("friendlyUrl");
+				Logger.LogError("GetApplicationInfo(): friendlyUrlProvider → {FriendlyUrlProvider}", friendlyUrlProvider);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
                 {
                     product = DotNetNukeContext.Current.Application.Description,
@@ -62,19 +66,26 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetApplicationInfo()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
 
         private static string GetFriendlyUrlType(string friendlyUrlProvider)
         {
+			Logger.LogError(">>> Entering GetFriendlyUrlType(friendlyUrlProvider={FriendlyUrlProvider})", friendlyUrlProvider);
             var urlProvider = (Provider)ProviderConfiguration.GetProviderConfiguration("friendlyUrl").Providers[friendlyUrlProvider];
             var urlFormat = urlProvider.Attributes["urlformat"];
+			Logger.LogError("GetFriendlyUrlType(friendlyUrlProvider={FriendlyUrlProvider}): urlFormat → {UrlFormat}", friendlyUrlProvider, urlFormat);
+			Logger.LogError("GetFriendlyUrlType(friendlyUrlProvider={FriendlyUrlProvider}): urlProvider → {UrlProvider}", friendlyUrlProvider, urlProvider);
+			Logger.LogWarning("<<< Exiting GetFriendlyUrlType(friendlyUrlProvider={FriendlyUrlProvider})", friendlyUrlProvider);
             return string.IsNullOrWhiteSpace(urlFormat) ? "SearchFriendly" : FirstCharToUpper(urlFormat, CultureInfo.InvariantCulture);
         }
 
         private static string GetProviderConfiguration(string providerName)
         {
+			Logger.LogError(">>> Entering GetProviderConfiguration(providerName={ProviderName})", providerName);
+            Logger.LogWarning("<<< Exiting GetProviderConfiguration(providerName={ProviderName})", providerName);
             return ProviderConfiguration.GetProviderConfiguration(providerName).DefaultProvider;
         }
     }

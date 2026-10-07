@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.GeneratedImage
     /// <summary>An abstract ImageTransform class.</summary>
     public abstract class ImageTransform
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImageTransform));
         // REVIEW: should this property be abstract?
 
         /// <summary>Gets provides an Unique String for the image transformation.</summary>
@@ -37,6 +38,7 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <returns>Image object.</returns>
         public virtual Bitmap CopyImage(Stream imgStream)
         {
+			Logger.LogError(">>> Entering CopyImage(imgStream={ImgStream})", imgStream);
             using (var srcImage = new Bitmap(imgStream))
             {
                 var destImage = new Bitmap(srcImage.Width, srcImage.Height);
@@ -49,6 +51,7 @@ namespace DotNetNuke.Services.GeneratedImage
                     graph.DrawImage(srcImage, new Rectangle(0, 0, srcImage.Width, srcImage.Height));
                 }
 
+				Logger.LogWarning("<<< Exiting CopyImage(imgStream={ImgStream})", imgStream);
                 return destImage;
             }
         }

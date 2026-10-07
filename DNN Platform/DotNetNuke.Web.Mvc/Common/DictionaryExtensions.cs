@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Mvc.Common
 
     internal static class DictionaryExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DictionaryExtensions));
         /// <summary>Remove entries from dictionary that match the removeCondition.</summary>
         /// <param name="dictionary">The dictionary.</param>
         /// <param name="removeCondition">A function determining whether to remove the <see cref="KeyValuePair{TKey,TValue}"/>.</param>
@@ -20,10 +21,12 @@ namespace DotNetNuke.Web.Mvc.Common
         /// <typeparam name="TValue">The type of values in the dictionary.</typeparam>
         public static void RemoveFromDictionary<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, Func<KeyValuePair<TKey, TValue>, bool> removeCondition)
         {
+			Logger.LogError(">>> Entering RemoveFromDictionary(dictionary={Dictionary},removeCondition={RemoveCondition})", dictionary, removeCondition);
             // Pass the delegate as the state to avoid a delegate and closure
             dictionary.RemoveFromDictionary(
                 (entry, innerCondition) =>
             {
+				Logger.LogWarning("<<< Exiting RemoveFromDictionary(dictionary={Dictionary},removeCondition={RemoveCondition})", dictionary, removeCondition);
                 return innerCondition(entry);
             },
                 removeCondition);
@@ -71,6 +74,7 @@ namespace DotNetNuke.Web.Mvc.Common
         /// <returns><see langword="true"/> if key was found, value is non-null, and value is of type <typeparamref name="T"/>; otherwise false.</returns>
         public static bool TryGetValue<T>(this IDictionary<string, object> collection, string key, out T value)
         {
+			Logger.LogError(">>> Entering TryGetValue(collection={Collection},key={Key})", collection, key);
             Contract.Assert(collection != null);
 
             object valueObj;
@@ -79,10 +83,13 @@ namespace DotNetNuke.Web.Mvc.Common
                 if (valueObj is T)
                 {
                     value = (T)valueObj;
+					Logger.LogError("TryGetValue(collection={Collection},key={Key}): value → {Value}", collection, key, value);
+					Logger.LogDebug("TryGetValue(collection={Collection},key={Key}): value → {Value}", collection, key, value);
                     return true;
                 }
             }
 
+			Logger.LogWarning("<<< Exiting TryGetValue(collection={Collection},key={Key})", collection, key);
             value = default(T);
             return false;
         }

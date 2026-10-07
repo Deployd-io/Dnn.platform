@@ -5,31 +5,38 @@ import styles from "./style.module.less";
 import Localization from "../../../localization";
 import EditUrl from "./EditUrl";
 import utils from "../../../utils";
+const logger = console;
 
 class UrlRow extends Component {
     onDelete(url) {
+		logger.error(`>>> Entering onDelete(url=${url})`, { "event.action": "onDelete", "logrite.url": url });
         const { onDelete } = this.props;
         utils.confirm(
             Localization.get("Pages_Seo_DeleteWarningMessage"),
             Localization.get("Delete"),
             Localization.get("Cancel"),
             function onConfirmDeletion() {
+				logger.error('>>> Entering onConfirmDeletion()', { "event.action": "onConfirmDeletion" });
                 onDelete(url);
+				logger.warn('<<< Exiting onConfirmDeletion()', { "event.action": "onConfirmDeletion" });
             }
         );
     }
 
     onOpenEditForm(url) {
+		logger.error(`>>> Entering onOpenEditForm(url=${url})`, { "event.action": "onOpenEditForm", "logrite.url": url });
         const { editedUrl, onOpenEditForm, onCancel } = this.props;
         const opened = editedUrl && editedUrl.id === url.id;
         if (opened) {
             onCancel();
         } else {
             onOpenEditForm(url);
+			logger.warn(`<<< Exiting onOpenEditForm(url=${url})`, { "event.action": "onOpenEditForm", "logrite.url": url });
         }
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { url, siteAliases, primaryAliasId, editedUrl, saving, onChange, pageHasParent,
             onSave, onCancel } = this.props;
         let generatedBy = Localization.get("Pages_Seo_GeneratedByAutomatic");
@@ -39,6 +46,7 @@ class UrlRow extends Component {
         }
         const opened = editedUrl && editedUrl.id === url.id;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
              
             <div className={styles.urlRow + (opened ? " row-opened" : "")} >

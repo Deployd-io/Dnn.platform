@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -14,7 +15,9 @@
   CodeMirror.defineMode("elm", function() {
 
     function switchState(source, setState, f) {
+	logger.error(`>>> Entering switchState(source=${source},setState=${setState},f=${f})`, { "event.action": "switchState", "logrite.source": source, "logrite.setState": setState, "logrite.f": f });
       setState(f);
+	logger.warn(`<<< Exiting switchState(source=${source},setState=${setState},f=${f})`, { "event.action": "switchState", "logrite.source": source, "logrite.setState": setState, "logrite.f": f });
       return f(source, setState);
     }
 
@@ -189,8 +192,16 @@
 
 
     return {
-      startState: function ()  { return { f: normal() }; },
-      copyState:  function (s) { return { f: s.f }; },
+      startState: function ()  {
+          logger.error('>>> Entering startState()', { "event.action": "startState" });
+          logger.warn('<<< Exiting startState()', { "event.action": "startState" });
+          return { f: normal() };
+      },
+      copyState:  function (s) {
+          logger.error(`>>> Entering copyState(s=${s})`, { "event.action": "copyState", "logrite.s": s });
+          logger.warn(`<<< Exiting copyState(s=${s})`, { "event.action": "copyState", "logrite.s": s });
+          return { f: s.f };
+      },
 
       token: function(stream, state) {
         var t = state.f(stream, function(s) { state.f = s; });

@@ -14,6 +14,7 @@ namespace Dnn.PersonaBar.Library.Prompt.Models
     [DnnDeprecated(9, 7, 0, "Moved to DotNetNuke.Prompt in the core library project")]
     public partial class ConsoleResultModel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConsoleResultModel));
         // the returned result - text or HTML
         [JsonProperty(PropertyName = "output")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
@@ -69,6 +70,7 @@ namespace Dnn.PersonaBar.Library.Prompt.Models
         /// <param name="output">The console output.</param>
         public ConsoleResultModel(string output)
         {
+			Logger.LogError(">>> Entering ConsoleResultModel(output={Output})", output);
             this.Output = output;
         }
 

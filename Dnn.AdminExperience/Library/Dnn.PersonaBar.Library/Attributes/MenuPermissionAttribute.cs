@@ -20,6 +20,7 @@ namespace Dnn.PersonaBar.Library.Attributes
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class MenuPermissionAttribute : AuthorizeAttributeBase, IOverrideDefaultAuthLevel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MenuPermissionAttribute));
         /// <summary>Gets or sets the default service scope when <see cref="MenuName"/> is not defined.</summary>
         public ServiceScope Scope { get; set; }
 
@@ -42,11 +43,14 @@ namespace Dnn.PersonaBar.Library.Attributes
         /// <inheritdoc />
         public override bool IsAuthorized(AuthFilterContext context)
         {
+			Logger.LogError(">>> Entering IsAuthorized(context={Context})", context);
             var authenticated = Thread.CurrentPrincipal.Identity.IsAuthenticated;
             var portalSettings = PortalSettings.Current;
             var currentUser = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogError("IsAuthorized(context={Context}): currentUser → {CurrentUser}", context, currentUser);
 
             var administratorRoleName = Constants.AdminsRoleName;
+			Logger.LogError("IsAuthorized(context={Context}): administratorRoleName → {AdministratorRoleName}", context, administratorRoleName);
             if (portalSettings != null)
             {
                 administratorRoleName = portalSettings.AdministratorRoleName;
@@ -54,6 +58,7 @@ namespace Dnn.PersonaBar.Library.Attributes
 
             var isHost = currentUser.IsSuperUser;
             var isAdmin = currentUser.IsInRole(administratorRoleName);
+			Logger.LogError("IsAuthorized(context={Context}): isAdmin → {IsAdmin}", context, isAdmin);
             var isRegular = currentUser.UserID > 0;
 
             if (authenticated && isHost)
@@ -67,6 +72,7 @@ namespace Dnn.PersonaBar.Library.Attributes
                 foreach (var roleName in this.Exclude.Split(';'))
                 {
                     var cleanRoleName = roleName.Trim();
+					Logger.LogError("IsAuthorized(context={Context}): cleanRoleName → {CleanRoleName}", context, cleanRoleName);
                     if (!string.IsNullOrEmpty(cleanRoleName))
                     {
                         if (currentUser.IsInRole(cleanRoleName))
@@ -86,11 +92,13 @@ namespace Dnn.PersonaBar.Library.Attributes
                 }
 
                 var hasPermission = false;
+				Logger.LogError("IsAuthorized(context={Context}): hasPermission → {HasPermission}", context, hasPermission);
                 this.MenuName.Split(',').ForEach(menuName =>
                 {
                     if (!hasPermission)
                     {
                         var menuItem = GetMenuByIdentifier(menuName);
+						Logger.LogError("IsAuthorized(context={Context}): menuItem → {MenuItem}", context, menuItem);
                         if (menuItem != null && portalSettings != null)
                         {
                             hasPermission = this.PersonaBarController.IsVisible(portalSettings, portalSettings.UserInfo, menuItem);
@@ -115,17 +123,20 @@ namespace Dnn.PersonaBar.Library.Attributes
 
                     return isAdmin || isRegular;
                 default:
+					Logger.LogWarning("<<< Exiting IsAuthorized(context={Context})", context);
                     return false;
             }
         }
 
         private static MenuItem GetMenuByIdentifier(string menuName)
         {
+			Logger.LogError(">>> Entering GetMenuByIdentifier(menuName={MenuName})", menuName);
             if (string.IsNullOrEmpty(menuName))
             {
                 return null;
             }
 
+			Logger.LogWarning("<<< Exiting GetMenuByIdentifier(menuName={MenuName})", menuName);
             return PersonaBarRepository.Instance.GetMenuItem(menuName.Trim());
         }
     }

@@ -24,6 +24,7 @@ namespace DotNetNuke.UI.UserControls
     /// </remarks>
     public abstract class HelpButtonControl : UserControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HelpButtonControl));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         protected LinkButton cmdHelp;
@@ -75,6 +76,7 @@ namespace DotNetNuke.UI.UserControls
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdHelp.Click += this.cmdHelp_Click;
@@ -86,18 +88,22 @@ namespace DotNetNuke.UI.UserControls
                 {
                     // Set Help Key to the Resource Key plus ".Help"
                     this.HelpKey = this.ResourceKey + ".Help";
+					Logger.LogDebug("OnLoad(e={E}): this.HelpKey → {Arg1}", e, this.HelpKey);
                 }
 
                 string helpText = Localization.GetString(this.HelpKey, this);
                 if (!string.IsNullOrEmpty(helpText))
                 {
                     this.HelpText = helpText;
+					Logger.LogDebug("OnLoad(e={E}): this.HelpText → {Arg1}", e, this.HelpText);
                 }
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -106,7 +112,9 @@ namespace DotNetNuke.UI.UserControls
         // ReSharper disable once InconsistentNaming
         protected void cmdHelp_Click(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering cmdHelp_Click(sender={Sender},e={E})", sender, e);
             this.pnlHelp.Visible = true;
+			Logger.LogWarning("<<< Exiting cmdHelp_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

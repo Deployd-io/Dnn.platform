@@ -13,32 +13,40 @@ import Localization from "../../../../localization";
 import util from "../../../../utils";
 import "./style.less";
 import serversTabService from "../../../../services/serversTabService";
+const logger = console;
 
 export default class ServerRow extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             server: props.server,
             newUrl: props.server.url,
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     toggleEdit() {
+		logger.error('>>> Entering toggleEdit()', { "event.action": "toggleEdit" });
         if (this.props.inEdit) {
             this.props.collapse();
         } else {
             this.changeUrl(this.props.server.url);
             this.props.openCollapse();
+			logger.warn('<<< Exiting toggleEdit()', { "event.action": "toggleEdit" });
         }
     }
 
     changeUrl(newUrl) {
+		logger.error(`>>> Entering changeUrl(newUrl=${newUrl})`, { "event.action": "changeUrl", "logrite.newUrl": newUrl });
         this.setState({
             newUrl: newUrl,
         });
+		logger.warn(`<<< Exiting changeUrl(newUrl=${newUrl})`, { "event.action": "changeUrl", "logrite.newUrl": newUrl });
     }
 
     updateUrl() {
+		logger.error('>>> Entering updateUrl()', { "event.action": "updateUrl" });
         serversTabService
             .editServerUrl(this.props.server.serverId, this.state.newUrl)
             .then((response) => {
@@ -57,6 +65,7 @@ export default class ServerRow extends Component {
     }
 
     deleteServer() {
+		logger.error('>>> Entering deleteServer()', { "event.action": "deleteServer" });
         util.confirm(
             Localization.get("DeleteServerConfirm"),
             Localization.get("Confirm"),
@@ -68,7 +77,9 @@ export default class ServerRow extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { server } = this.state;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={"collapsible-component1 " + this.props.inEdit}>
                 <div className={"collapsible-header1 " + !this.props.inEdit}>

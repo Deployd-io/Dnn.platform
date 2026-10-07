@@ -1,3 +1,4 @@
+const logger = console;
 import { IInitStylesConfig, INotifyOptions } from "../window.dnn";
 
 export default class StylesClient {
@@ -7,6 +8,7 @@ export default class StylesClient {
     private isHost: boolean = false;
 
     constructor() {
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         const dnnStyles = window.dnn as unknown as IDnnWrapper;
         this.config = dnnStyles.initStyles();
         if (this.config == undefined) {
@@ -18,16 +20,20 @@ export default class StylesClient {
 
         const sf = this.config.utility.sf;
         sf.moduleRoot = "PersonaBar";
+		logger.debug(`constructor(): sf.moduleRoot → ${sf.moduleRoot}`, { "event.action": "constructor" });
         this.serviceRoot = sf.getServiceRoot();
         this.serviceRoot += "Styles/";
 
         const headers = new Headers();
+		logger.debug(`constructor(): headers → ${headers}`, { "event.action": "constructor" });
         headers.append("RequestVerificationToken", sf.antiForgeryToken);
         headers.append("Content-Type", "application/json");
 
         this.headers = headers;
 
+		logger.debug(`constructor(): this.headers → ${this.headers}`, { "event.action": "constructor" });
         this.isHost = this.config?.params?.settings?.isHost ?? false;
+		logger.debug(`constructor(): this.isHost → ${this.isHost}`, { "event.action": "constructor" });
     }
 
     public get isHostUser(): boolean {
@@ -35,12 +41,15 @@ export default class StylesClient {
     }
 
     getStyles(){
+		logger.error('>>> Entering getStyles()', { "event.action": "getStyles" });
+		logger.warn('<<< Exiting getStyles()', { "event.action": "getStyles" });
         return new Promise<IPortalStyles>((resolve, reject) => {
             fetch(`${this.serviceRoot}GetStyles`, {
                 method: "GET",
             })
             .then((response) => {
                 if (!response.ok) {
+					const _start_getStyles_37 = Date.now();
                     throw new Error(response.statusText);
                 }
                 return response.json();
@@ -55,6 +64,8 @@ export default class StylesClient {
     }
 
     saveStyles(styles: IPortalStyles){
+		logger.error(`>>> Entering saveStyles(styles=${styles})`, { "event.action": "saveStyles", "logrite.styles": styles });
+		logger.warn(`<<< Exiting saveStyles(styles=${styles})`, { "event.action": "saveStyles", "logrite.styles": styles });
         return new Promise<void>((resolve, reject) => {
             fetch(`${this.serviceRoot}SaveStyles`, {
                 method: "POST",
@@ -63,6 +74,7 @@ export default class StylesClient {
             })
             .then(response => {
                 if (!response.ok) {
+					const _start_saveStyles_57 = Date.now();
                     throw new Error(response.statusText);
                 }
                 resolve();
@@ -74,6 +86,8 @@ export default class StylesClient {
     }
 
     restoreStyles(){
+		logger.error('>>> Entering restoreStyles()', { "event.action": "restoreStyles" });
+		logger.warn('<<< Exiting restoreStyles()', { "event.action": "restoreStyles" });
         return new Promise<IPortalStyles>((resolve, reject) => {
             fetch(`${this.serviceRoot}RestoreStyles`, {
                 method: "POST",
@@ -81,6 +95,7 @@ export default class StylesClient {
             })
             .then(response => {
                 if (!response.ok) {
+					const _start_restoreStyles_76 = Date.now();
                     throw new Error(response.statusText);
                 }
                 return response.json();
@@ -95,10 +110,13 @@ export default class StylesClient {
     }
 
     notify(message: string, options?: INotifyOptions){
+		logger.error(`>>> Entering notify(message=${message},options=${options})`, { "event.action": "notify", "logrite.message": message, "logrite.options": options });
         this.config.utility.notify(message, options);
+		logger.warn(`<<< Exiting notify(message=${message},options=${options})`, { "event.action": "notify", "logrite.message": message, "logrite.options": options });
     }
 
     notifyError(message: string, options?: INotifyOptions){
+		logger.error(`>>> Entering notifyError(message=${message},options=${options})`, { "event.action": "notifyError", "logrite.message": message, "logrite.options": options });
         if (options == undefined) {
             options = {
                 clickToClose: true,
@@ -107,9 +125,11 @@ export default class StylesClient {
 
         if (options.clickToClose == undefined) {
             options.clickToClose = true;
+			logger.debug(`notifyError(message=${message},options=${options}): options.clickToClose → ${options.clickToClose}`, { "event.action": "notifyError", "logrite.message": message, "logrite.options": options });
         }
 
         this.config.utility.notifyError(message, options);
+		logger.warn(`<<< Exiting notifyError(message=${message},options=${options})`, { "event.action": "notifyError", "logrite.message": message, "logrite.options": options });
     }
 }
 export interface IPortalStyles {

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -20,9 +21,12 @@ CodeMirror.defineMode("puppet", function () {
   // Takes a string of words separated by spaces and adds them as
   // keys with the value of the first argument 'style'
   function define(style, string) {
+	logger.error(`>>> Entering define(style=${style},string=${string})`, { "event.action": "define", "logrite.style": style, "logrite.string": string });
     var split = string.split(' ');
     for (var i = 0; i < split.length; i++) {
+	logger.error(`define(style=${style},string=${string}): split → ${split}`, { "event.action": "define", "logrite.style": style, "logrite.string": string });
       words[split[i]] = style;
+	logger.warn(`<<< Exiting define(style=${style},string=${string})`, { "event.action": "define", "logrite.style": style, "logrite.string": string });
     }
   }
 
@@ -45,6 +49,7 @@ CodeMirror.defineMode("puppet", function () {
   // If a variable is encountered along the way, we display it differently when it
   // is encapsulated in a double-quoted string.
   function tokenString(stream, state) {
+	logger.error(`>>> Entering tokenString(stream=${stream},state=${state})`, { "event.action": "tokenString", "logrite.stream": stream, "logrite.state": state });
     var current, prev, found_var = false;
     while (!stream.eol() && (current = stream.next()) != state.pending) {
       if (current === '$' && prev != '\\' && state.pending == '"') {
@@ -61,23 +66,30 @@ CodeMirror.defineMode("puppet", function () {
     } else {
       state.continueString = true;
     }
+	logger.warn(`<<< Exiting tokenString(stream=${stream},state=${state})`, { "event.action": "tokenString", "logrite.stream": stream, "logrite.state": state });
     return "string";
   }
 
   // Main function
   function tokenize(stream, state) {
+	logger.error(`>>> Entering tokenize(stream=${stream},state=${state})`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
     // Matches one whole word
     var word = stream.match(/[\w]+/, false);
+	logger.error(`tokenize(stream=${stream},state=${state}): word → ${word}`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
     // Matches attributes (i.e. ensure => present ; 'ensure' would be matched)
     var attribute = stream.match(/(\s+)?\w+\s+=>.*/, false);
+	logger.error(`tokenize(stream=${stream},state=${state}): attribute → ${attribute}`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
     // Matches non-builtin resource declarations
     // (i.e. "apache::vhost {" or "mycustomclasss {" would be matched)
     var resource = stream.match(/(\s+)?[\w:_]+(\s+)?{/, false);
+	logger.error(`tokenize(stream=${stream},state=${state}): resource → ${resource}`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
     // Matches virtual and exported resources (i.e. @@user { ; and the like)
     var special_resource = stream.match(/(\s+)?[@]{1,2}[\w:_]+(\s+)?{/, false);
+	logger.error(`tokenize(stream=${stream},state=${state}): special_resource → ${special_resource}`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
 
     // Finally advance the stream
     var ch = stream.next();
+	logger.error(`tokenize(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
 
     // Have we found a variable?
     if (ch === '$') {
@@ -92,6 +104,7 @@ CodeMirror.defineMode("puppet", function () {
     if (state.continueString) {
       // If so, go through the loop again
       stream.backUp(1);
+	logger.warn(`<<< Exiting tokenize(stream=${stream},state=${state})`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
       return tokenString(stream, state);
     }
     // Are we in a definition (class, node, define)?
@@ -103,12 +116,14 @@ CodeMirror.defineMode("puppet", function () {
       // Match the rest it the next time around
       stream.match(/\s+{/);
       state.inDefinition = false;
+	logger.debug(`tokenize(stream=${stream},state=${state}): state.inDefinition → ${state.inDefinition}`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
     }
     // Are we in an 'include' statement?
     if (state.inInclude) {
       // Match and return the included class
       stream.match(/(\s+)?\S+(\s+)?/);
       state.inInclude = false;
+	logger.debug(`tokenize(stream=${stream},state=${state}): state.inInclude → ${state.inInclude}`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
       return 'def';
     }
     // Do we just have a function on our hands?
@@ -166,6 +181,7 @@ CodeMirror.defineMode("puppet", function () {
     if (ch == "'" || ch == '"') {
       // Store the type (single or double)
       state.pending = ch;
+	logger.debug(`tokenize(stream=${stream},state=${state}): state.pending → ${state.pending}`, { "event.action": "tokenize", "logrite.stream": stream, "logrite.state": state });
       // Perform the looping function to find the end
       return tokenString(stream, state);
     }
@@ -199,16 +215,23 @@ CodeMirror.defineMode("puppet", function () {
   // Start it all
   return {
     startState: function () {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       var state = {};
       state.inDefinition = false;
       state.inInclude = false;
+	logger.debug(`startState(): state.inDefinition → ${state.inDefinition}`, { "event.action": "startState" });
+	logger.debug(`startState(): state.inInclude → ${state.inInclude}`, { "event.action": "startState" });
+	logger.debug(`startState(): state.pending → ${state.pending}`, { "event.action": "startState" });
       state.continueString = false;
       state.pending = false;
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       return state;
     },
     token: function (stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       // Strip the spaces, but regex will account for them eitherway
       if (stream.eatSpace()) return null;
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       // Go through the main process
       return tokenize(stream, state);
     }

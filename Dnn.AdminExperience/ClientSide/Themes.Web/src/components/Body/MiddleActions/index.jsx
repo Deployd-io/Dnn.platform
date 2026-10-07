@@ -6,11 +6,13 @@ import { GridCell, SearchBox, Dropdown } from "@dnnsoftware/dnn-react-common";
 import utils from "utils";
 import RestoreTheme from "./RestoreTheme";
 import "./style.less";
+const logger = console;
 
 let canEdit = false;
 class MiddleActions extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             selectedThemeFilter: {
                 label: Localization.get("ThemeLevelAll"),
@@ -18,20 +20,25 @@ class MiddleActions extends Component {
             }
         };
         canEdit = utils.params.settings.isHost || utils.params.settings.isAdmin || (utils.params.settings.permissions && utils.params.settings.permissions.EDIT === true);
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     onKeywordChanged(value) {
+		logger.error(`>>> Entering onKeywordChanged(value=${value})`, { "event.action": "onKeywordChanged", "logrite.value": value });
         const { props } = this;
 
         props.onSearch.call(this, value);
+		logger.warn(`<<< Exiting onKeywordChanged(value=${value})`, { "event.action": "onKeywordChanged", "logrite.value": value });
     }
 
     buildFiltersOptions() {
+		logger.error('>>> Entering buildFiltersOptions()', { "event.action": "buildFiltersOptions" });
         const levelFilters = [
             { "Key": Localization.get("ThemeLevelAll"), "Value": 7 },
             { "Key": Localization.get("ThemeLevelGlobal"), "Value": 4 },
             { "Key": Localization.get("ThemeLevelSite"), "Value": 2 }
         ];
+		logger.warn('<<< Exiting buildFiltersOptions()', { "event.action": "buildFiltersOptions" });
         return levelFilters.map((levelFilter) => {
             return { label: levelFilter.Key, value: levelFilter.Value };
         });
@@ -50,7 +57,9 @@ class MiddleActions extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let themeFilterOptions = this.buildFiltersOptions();
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className="middle-actions">
                 <GridCell columnSize={40}>
@@ -91,6 +100,8 @@ MiddleActions.propTypes = {
 };
 
 function mapStateToProps() {
+	logger.error('>>> Entering mapStateToProps()', { "event.action": "mapStateToProps" });
+	logger.warn('<<< Exiting mapStateToProps()', { "event.action": "mapStateToProps" });
     return {};
 }
 

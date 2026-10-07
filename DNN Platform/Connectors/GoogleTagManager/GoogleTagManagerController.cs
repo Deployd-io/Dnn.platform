@@ -11,15 +11,19 @@ namespace DotNetNuke.Services.Analytics
     using System.Text;
 
     using DotNetNuke.Instrumentation;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>  Controller class definition for GoogleTagManager which handles upgrades.</summary>
     public class GoogleTagManagerController
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>  Handles module upgrades includes a new Google Tag Manager Asychronous script.</summary>
         /// <param name="version">Target Version number for the upgrade.</param>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void UpgradeModule(string version)
         {
+		_logger.LogError(">>> Entering UpgradeModule(version={Version})", version);
+        _logger.LogWarning("<<< Exiting UpgradeModule(version={Version})", version);
         }
     }
 }

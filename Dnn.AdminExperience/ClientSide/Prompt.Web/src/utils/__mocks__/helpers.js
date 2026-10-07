@@ -1,15 +1,19 @@
 import React  from "react";
 import utilities from "./utilities";
+const logger = console;
 
 export function formatString() {
+	logger.error('>>> Entering formatString()', { "event.action": "formatString" });
     let format = arguments[0];
     let methodsArgs = arguments;
     return format.replace(/[{\[](\d+)[\]}]/gi, function (value, index) {
         let argsIndex = parseInt(index) + 1;
+	logger.warn('<<< Exiting formatString()', { "event.action": "formatString" });
         return methodsArgs[argsIndex];
     });
 }
 export function sort(items, column, order) {
+	logger.error(`>>> Entering sort(items=${items},column=${column},order=${order})`, { "event.action": "sort", "logrite.items": items, "logrite.column": column, "logrite.order": order });
     order = order === undefined ? "asc" : order;
     items = items.sort(function (a, b) {
         if (a[column] > b[column]) //sort string descending
@@ -22,26 +26,32 @@ export function sort(items, column, order) {
 }
 
 export function formatLabel(input) {
+	logger.error(`>>> Entering formatLabel(input=${input})`, { "event.action": "formatLabel", "logrite.input": input });
     if (typeof input === "string") {
         // format camelcase and remove Is from labels
         let output = input.replace("$", "").replace(/^(Is)(.+)/i, "$2");
         output = output.match(/[A-Z][a-z]+/g).join(" "); // rudimentary but should handle normal Camelcase
+		logger.error(`formatLabel(input=${input}): output → ${output}`, { "event.action": "formatLabel", "logrite.input": input });
         return output;
     }
+	logger.warn(`<<< Exiting formatLabel(input=${input})`, { "event.action": "formatLabel", "logrite.input": input });
     return "";
 }
 
 export function getColumnsFromRow(row) {
+	logger.error(`>>> Entering getColumnsFromRow(row=${row})`, { "event.action": "getColumnsFromRow", "logrite.row": row });
     const columns = [];
     for (let key in row) {
         if (key.indexOf("__") !== 0) {
             columns.push(key);
         }
     }
+	logger.warn(`<<< Exiting getColumnsFromRow(row=${row})`, { "event.action": "getColumnsFromRow", "logrite.row": row });
     return columns;
 }
 
 export function renderObject(data, fieldOrder) {
+logger.error(`>>> Entering renderObject(data=${data},fieldOrder=${fieldOrder})`, { "event.action": "renderObject", "logrite.data": data, "logrite.fieldOrder": fieldOrder });
 
     const columns = !fieldOrder || fieldOrder.length === 0 ? getColumnsFromRow(data) : fieldOrder;
     const rows = columns.map((fldName, index) => {
@@ -56,6 +66,7 @@ export function renderObject(data, fieldOrder) {
         }
 
     });
+	logger.warn(`<<< Exiting renderObject(data=${data},fieldOrder=${fieldOrder})`, { "event.action": "renderObject", "logrite.data": data, "logrite.fieldOrder": fieldOrder });
     return <table className="dnn-prompt-tbl"><tbody>{rows}</tbody></table>;
 }
 

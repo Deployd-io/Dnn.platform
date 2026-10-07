@@ -43,6 +43,7 @@
         waitSeconds: 30
     });
     requirejs.onError = function (err) {
+		logger.error(`>>> Entering onError(err=${err})`, { "event.action": "onError", "logrite.err": err });
         // If requireJs throws a timeout reload the page
         if (err.requireType === 'timeout') {
             console.error(err);
@@ -50,6 +51,7 @@
         }
         else {
             console.error(err);
+			logger.warn(`<<< Exiting onError(err=${err})`, { "event.action": "onError", "logrite.err": err });
             throw err;
         }
     };
@@ -111,34 +113,47 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
             inAnimation: inAnimation,
 
             setConfirmationDialogPosition: function () {
+				logger.error('>>> Entering setConfirmationDialogPosition()', { "event.action": "setConfirmationDialogPosition" });
                 var confirmation = document.getElementById('confirmation-dialog');
                 var personaBarPage = document.getElementsByClassName('dnn-persona-bar-page')[0];
+				logger.error(`setConfirmationDialogPosition(): confirmation → ${confirmation}`, { "event.action": "setConfirmationDialogPosition" });
+				logger.error(`setConfirmationDialogPosition(): personaBarPage → ${personaBarPage}`, { "event.action": "setConfirmationDialogPosition" });
                 var condition = personaBarPage.classList.contains('full-width')
                 confirmation.classList.toggle("confirmation-dialog-full-width-center", condition);
+				logger.error(`setConfirmationDialogPosition(): condition → ${condition}`, { "event.action": "setConfirmationDialogPosition" });
             },
 
 
             openSocialTasks: function openTaskWindow(){
+				logger.error('>>> Entering openTaskWindow()', { "event.action": "openTaskWindow" });
                  var taskWindow = $('.socialtasks');
                  taskWindow.css({visibility:'visible'});
+				logger.error(`openTaskWindow(): taskWindow → ${taskWindow}`, { "event.action": "openTaskWindow" });
             },
 
             closeSocialTasks: function closeTaskWindow() {
+				logger.error('>>> Entering closeTaskWindow()', { "event.action": "closeTaskWindow" });
                  var taskWindow = $('.socialtasks')
                  taskWindow.css({visibility:'hidden'});
+				logger.error(`closeTaskWindow(): taskWindow → ${taskWindow}`, { "event.action": "closeTaskWindow" });
             },
 
             expandPersonaBarPage: function expandPersonaBar(){
+				logger.error('>>> Entering expandPersonaBar()', { "event.action": "expandPersonaBar" });
                 var personaBarPage = $(".dnn-persona-bar-page")
                 personaBarPage.css({width:"1159px"});
+				logger.error(`expandPersonaBar(): personaBarPage → ${personaBarPage}`, { "event.action": "expandPersonaBar" });
             },
 
             contractPersonaBarPage: function contractPersonaBar(){
+				logger.error('>>> Entering contractPersonaBar()', { "event.action": "contractPersonaBar" });
                 var personaBarPage = $('.dnn-persona-bar-page');
                 personaBarPage.css({width: cachedPersonaBarPageWidth+'px'});
+				logger.error(`contractPersonaBar(): personaBarPage → ${personaBarPage}`, { "event.action": "contractPersonaBar" });
             },
 
             closePersonaBar: function handleClosePersonarBar(callback, keepSelection) {
+				logger.error(`>>> Entering handleClosePersonarBar(callback=${callback},keepSelection=${keepSelection})`, { "event.action": "handleClosePersonarBar", "logrite.callback": callback, "logrite.keepSelection": keepSelection });
                 var self = this;
 
                 if ($personaBarPlaceholder.is(":hidden")) {
@@ -196,8 +211,10 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                         expandPersonaBar: false
                     });
                 }
+				logger.warn(`<<< Exiting handleClosePersonarBar(callback=${callback},keepSelection=${keepSelection})`, { "event.action": "handleClosePersonarBar", "logrite.callback": callback, "logrite.keepSelection": keepSelection });
             },
             loadPanel: function handleLoadPanel(identifier, params) {
+				logger.error(`>>> Entering handleLoadPanel(identifier=${identifier},params=${params})`, { "event.action": "handleLoadPanel", "logrite.identifier": identifier, "logrite.params": params });
                 if (inAnimation) return;
 
                 var $menuItem = $('ul.personabarnav').find('[id="' + identifier + '"]');
@@ -207,6 +224,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
 
                 if (!params.identifier) {
                     params.identifier = identifier;
+					logger.debug(`handleLoadPanel(identifier=${identifier},params=${params}): params.identifier → ${params.identifier}`, { "event.action": "handleLoadPanel", "logrite.identifier": identifier, "logrite.params": params });
                 }
 
                 if (!params.settings) {
@@ -250,6 +268,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                 $btn.addClass('selected');
 
                 var hoverMenuItemSelector = ".hovermenu > ul > li[id='" + identifier + "']";
+				logger.error(`handleLoadPanel(identifier=${identifier},params=${params}): hoverMenuItemSelector → ${hoverMenuItemSelector}`, { "event.action": "handleLoadPanel", "logrite.identifier": identifier, "logrite.params": params });
                 if (moduleName) {
                     hoverMenuItemSelector += "[data-module-name='" + moduleName + "']";
                 } else {
@@ -260,6 +279,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                     .closest('.btn_panel').addClass('selected');
 
                 var panelId = utility.getPanelIdFromPath(path);
+				logger.error(`handleLoadPanel(identifier=${identifier},params=${params}): panelId → ${panelId}`, { "event.action": "handleLoadPanel", "logrite.identifier": identifier, "logrite.params": params });
                 var $panel = $('#' + panelId);
                 if ($panel.length === 0) {
                     $panel = $("<div class='socialpanel' id='" + panelId + "'></div>");
@@ -267,6 +287,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                 }
                 var template = path;
                 var loaded = self.loaded(template);
+				logger.error(`handleLoadPanel(identifier=${identifier},params=${params}): loaded → ${loaded}`, { "event.action": "handleLoadPanel", "logrite.identifier": identifier, "logrite.params": params });
 
                 if ($mask.css("display") === 'none') {
                     activePath = path;
@@ -315,7 +336,9 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                         inAnimation = true;
                         var $activePanel = $('#' + util.getPanelIdFromPath(activePath));
                         $activePanel.fadeOut("fast", function handleHideCurrentPanel() {
+							logger.error(`>>> Entering handleHideCurrentPanel(activePath=${activePath})`, { "event.action": "handleHideCurrentPanel", "logrite.activePath": activePath });
                             $panel.css({ left: personaBarMenuWidth }).fadeIn("fast", function handleShowSelectedPanel() {
+							logger.error(`>>> Entering handleShowSelectedPanel(personaBarMenuWidth=${personaBarMenuWidth})`, { "event.action": "handleShowSelectedPanel", "logrite.personaBarMenuWidth": personaBarMenuWidth });
 
                                 activePath = path;
                                 activemodule = moduleName;
@@ -323,6 +346,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                                 self.loadTemplate(folderName, template, $panel, params, function () {
                                     self.panelLoaded(params, loaded);
                                 });
+								logger.warn(`<<< Exiting handleShowSelectedPanel(personaBarMenuWidth=${personaBarMenuWidth})`, { "event.action": "handleShowSelectedPanel", "logrite.personaBarMenuWidth": personaBarMenuWidth });
 
                                 saveUserSetting({
                                     expandPersonaBar: true,
@@ -338,22 +362,28 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                     }
                 }
                 setCloseButtonClass(panelId);
+				logger.warn(`<<< Exiting handleLoadPanel(identifier=${identifier},params=${params})`, { "event.action": "handleLoadPanel", "logrite.identifier": identifier, "logrite.params": params });
             },
             panelLoaded: function (params, loaded) {
+				logger.error(`>>> Entering panelLoaded(params=${params},loaded=${loaded})`, { "event.action": "panelLoaded", "logrite.params": params, "logrite.loaded": loaded });
                 extension.load(util, params);
                 this.loadCustomModules();
 
                 if (params.handleTabViewInModule !== true && loaded === false) {
                     var panelId = util.getPanelIdFromPath(params.path);
                     util.updatePanelTabView(panelId);
+					logger.error(`panelLoaded(params=${params},loaded=${loaded}): panelId → ${panelId}`, { "event.action": "panelLoaded", "logrite.params": params, "logrite.loaded": loaded });
                 }
             },
             initCustomModules: function (callback) {
+				logger.error(`>>> Entering initCustomModules(callback=${callback})`, { "event.action": "initCustomModules", "logrite.callback": callback });
                 if (config.customModules && config.customModules.length > 0) {
                     var self = this;
                     for (var i = 0; i < config.customModules.length; i++) {
                         (function (index) {
+							logger.warn(`<<< Exiting initCustomModules(callback=${callback})`, { "event.action": "initCustomModules", "logrite.callback": callback });
                             var path = '../' + config.customModules[index];
+							logger.error(`initCustomModules(callback=${callback}): path → ${path}`, { "event.action": "initCustomModules", "logrite.callback": callback });
                             require([path], function (module) {
                                 customModules.push(module);
                                 if (typeof module.init === "function") {
@@ -372,22 +402,28 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                 }
             },
             loadCustomModules: function () {
+				logger.error('>>> Entering loadCustomModules()', { "event.action": "loadCustomModules" });
                 for (var i = 0; i < customModules.length; i++) {
                     if (typeof customModules[i].load === "function") {
                         customModules[i].load.call(this);
+						logger.warn('<<< Exiting loadCustomModules()', { "event.action": "loadCustomModules" });
                     }
                 }
             },
             leaveCustomModules: function () {
+				logger.error('>>> Entering leaveCustomModules()', { "event.action": "leaveCustomModules" });
                 for (var i = 0; i < customModules.length; i++) {
                     if (typeof customModules[i].leave === "function") {
                         customModules[i].leave.call(this);
+						logger.warn('<<< Exiting leaveCustomModules()', { "event.action": "leaveCustomModules" });
                     }
                 }
             },
             findMenuSettings: function(identifier, menuItems) {
+				logger.error(`>>> Entering findMenuSettings(identifier=${identifier},menuItems=${menuItems})`, { "event.action": "findMenuSettings", "logrite.identifier": identifier, "logrite.menuItems": menuItems });
                 menuItems = menuItems || menuViewModel.menu.menuItems;
                 var settings = null;
+				logger.error(`findMenuSettings(identifier=${identifier},menuItems=${menuItems}): settings → ${settings}`, { "event.action": "findMenuSettings", "logrite.identifier": identifier, "logrite.menuItems": menuItems });
                 for (var i = 0; i < menuItems.length; i++) {
                     var menuItem = menuItems[i];
                     if (typeof menuItem.length === "number" && menuItem.length > 0) {
@@ -413,9 +449,11 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                     }
                 }
 
+				logger.warn(`<<< Exiting findMenuSettings(identifier=${identifier},menuItems=${menuItems})`, { "event.action": "findMenuSettings", "logrite.identifier": identifier, "logrite.menuItems": menuItems });
                 return settings;
             },
             updateMenuSettings: function(identifier, settings, menuItems) {
+				logger.error(`>>> Entering updateMenuSettings(identifier=${identifier},settings=${settings},menuItems=${menuItems})`, { "event.action": "updateMenuSettings", "logrite.identifier": identifier, "logrite.settings": settings, "logrite.menuItems": menuItems });
                 menuItems = menuItems || menuViewModel.menu.menuItems;
                 for (var i = 0; i < menuItems.length; i++) {
                     var menuItem = menuItems[i];
@@ -426,6 +464,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                             menuItem.settings = JSON.stringify(settings);
                         } else if (typeof menuItem.menuItems !== "undefined" && menuItem.menuItems.length > 0) {
                             this.updateMenuSettings(identifier, settings, menuItem.menuItems);
+							logger.warn(`<<< Exiting updateMenuSettings(identifier=${identifier},settings=${settings},menuItems=${menuItems})`, { "event.action": "updateMenuSettings", "logrite.identifier": identifier, "logrite.settings": settings, "logrite.menuItems": menuItems });
                         }
                     }
                 }
@@ -436,12 +475,15 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
              * @param path string|array
              */
             loadBundleScript: function (path) {
+			logger.error(`>>> Entering loadBundleScript(path=${path})`, { "event.action": "loadBundleScript", "logrite.path": path });
 
                 var urls = path;
                 if(Array.isArray(urls) === false) {
                     urls = [path];
+					logger.warn(`<<< Exiting loadBundleScript(path=${path})`, { "event.action": "loadBundleScript", "logrite.path": path });
                 }
                 function ajax(urls, build) {
+					logger.error(`>>> Entering ajax(urls=${urls},build=${build})`, { "event.action": "ajax", "logrite.urls": urls, "logrite.build": build });
                     if(urls.length == 0) {
                         return;
                     }
@@ -453,21 +495,29 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                         },
                         url: urls.pop(),
                         complete: function() {
+							logger.error('>>> Entering complete()', { "event.action": "complete" });
                             ajax(urls, build);
+							logger.warn('<<< Exiting complete()', { "event.action": "complete" });
                         }
                     });
+					logger.warn(`<<< Exiting ajax(urls=${urls},build=${build})`, { "event.action": "ajax", "logrite.urls": urls, "logrite.build": build });
                 }
 
                 ajax(urls.reverse(), config.buildNumber);
             },
             panelViewData: function (panelId, viewData) {
+				logger.error(`>>> Entering panelViewData(panelId=${panelId},viewData=${viewData})`, { "event.action": "panelViewData", "logrite.panelId": panelId, "logrite.viewData": viewData });
                 var localStorageAllowed = function () {
+					logger.error('>>> Entering localStorageAllowed()', { "event.action": "localStorageAllowed" });
                     var mod = 'DNN_localStorageTEST';
                     try {
+						logger.error(`localStorageAllowed(): mod → ${mod}`, { "event.action": "localStorageAllowed" });
                         window.localStorage.setItem(mod, mod);
                         window.localStorage.removeItem(mod);
                         return true;
                     } catch (e) {
+						logger.error(`Exception in panelViewData(panelId=${panelId},viewData=${viewData}): ${e.message}`, e, { "event.action": "panelViewData", "event.category": "process", "logrite.panelId": panelId, "logrite.viewData": viewData });
+						logger.warn('<<< Exiting localStorageAllowed()', { "event.action": "localStorageAllowed" });
                         return false;
                     }
                 };
@@ -477,6 +527,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                 }
 
                 var cacheKey = "DNN_PB_PANEL_VIEW";
+				logger.error(`panelViewData(panelId=${panelId},viewData=${viewData}): cacheKey → ${cacheKey}`, { "event.action": "panelViewData", "logrite.panelId": panelId, "logrite.viewData": viewData });
                 var savedData = window.localStorage[cacheKey];
                 if (!savedData) {
                     savedData = {};
@@ -498,9 +549,11 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                     }
                 }
 
+				logger.warn(`<<< Exiting panelViewData(panelId=${panelId},viewData=${viewData})`, { "event.action": "panelViewData", "logrite.panelId": panelId, "logrite.viewData": viewData });
                 return panelId ? savedData[panelId] : savedData;
             },
             savePanelTabView: function(panelId) {
+				logger.error(`>>> Entering savePanelTabView(panelId=${panelId})`, { "event.action": "savePanelTabView", "logrite.panelId": panelId });
                 var $panel = $('#' + panelId);
                 var $primaryTabs = $panel.find('.dnn-tabs.primary, .ui-tabs').eq(0).find('> ul > li');
                 if (!$primaryTabs.length) {
@@ -509,6 +562,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                 var $primarySelected = $primaryTabs.parent().find('>li[aria-selected="true"],>li[class*="selected"]');
                 if ($primarySelected.length) {
                     var primaryIndex = $primaryTabs.index($primarySelected);
+					logger.error(`savePanelTabView(panelId=${panelId}): primaryIndex → ${primaryIndex}`, { "event.action": "savePanelTabView", "logrite.panelId": panelId });
 
                     var viewData = [primaryIndex];
                     var $primaryPanel = $('#' + $primarySelected.attr('aria-controls'));
@@ -518,22 +572,29 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                         var $secondarySelected = $secondaryTabs.parent().find('>li[aria-selected="true"],>li[class*="selected"]');
                         if ($secondarySelected.length) {
                             var secondaryIndex = $secondaryTabs.index($secondarySelected);
+							logger.error(`savePanelTabView(panelId=${panelId}): secondaryIndex → ${secondaryIndex}`, { "event.action": "savePanelTabView", "logrite.panelId": panelId });
 
                             viewData.push(secondaryIndex);
                         }
                     }
 
                     util.panelViewData(panelId, { tab: viewData });
+					logger.warn(`<<< Exiting savePanelTabView(panelId=${panelId})`, { "event.action": "savePanelTabView", "logrite.panelId": panelId });
                 }
             },
             updatePanelTabView: function (panelId) {
+				logger.error(`>>> Entering updatePanelTabView(panelId=${panelId})`, { "event.action": "updatePanelTabView", "logrite.panelId": panelId });
                 var viewData = (util.panelViewData(panelId) || {}).tab;
                 if (!viewData || !viewData.length) {
+				logger.error(`updatePanelTabView(panelId=${panelId}): viewData → ${viewData}`, { "event.action": "updatePanelTabView", "logrite.panelId": panelId });
                     return;
                 }
 
                 var sleep = function(timeout) {
+					logger.warn(`<<< Exiting updatePanelTabView(panelId=${panelId})`, { "event.action": "updatePanelTabView", "logrite.panelId": panelId });
                     setTimeout(function() {
+						logger.error(`>>> Entering sleep(timeout=${timeout})`, { "event.action": "sleep", "logrite.timeout": timeout });
+						logger.warn(`<<< Exiting sleep(timeout=${timeout})`, { "event.action": "sleep", "logrite.timeout": timeout });
                         util.updatePanelTabView(panelId);
                     }, timeout);
                 }
@@ -572,8 +633,10 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
         // end define util
 
         function setCloseButtonClass(id) {
+			logger.error(`>>> Entering setCloseButtonClass(id=${id})`, { "event.action": "setCloseButtonClass", "logrite.id": id });
             var panel = document.querySelector('#' + id + '>div');
             if (panel != null && panel.innerHTML !== "") {
+				logger.error(`setCloseButtonClass(id=${id}): panel → ${panel}`, { "event.action": "setCloseButtonClass", "logrite.id": id });
                 var page = panel.querySelector('.dnn-persona-bar-page');
                 if (page != null && page.classList.contains('full-width')) {
                     $showSiteButton.addClass('full-width-mode');
@@ -582,6 +645,8 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                     $showSiteButton.removeClass();
                 }
                 $showSiteButton.show();
+				logger.error(`setCloseButtonClass(id=${id}): page → ${page}`, { "event.action": "setCloseButtonClass", "logrite.id": id });
+				logger.warn(`<<< Exiting setCloseButtonClass(id=${id})`, { "event.action": "setCloseButtonClass", "logrite.id": id });
                 return;
             }
             else {
@@ -592,18 +657,24 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
         }
 
         function onShownPersonaBar() {
+			logger.error('>>> Entering onShownPersonaBar()', { "event.action": "onShownPersonaBar" });
             (function handleResizeWindow() {
+				logger.error('>>> Entering handleResizeWindow()', { "event.action": "handleResizeWindow" });
                 var evt = document.createEvent('HTMLEvents');
                 evt.initEvent('resize', true, false);
+				logger.error(`handleResizeWindow(): evt → ${evt}`, { "event.action": "handleResizeWindow" });
                 window.top.dispatchEvent(evt);
+				logger.warn('<<< Exiting handleResizeWindow()', { "event.action": "handleResizeWindow" });
             })();
 
             (function ($) {
                 $(parent.document).trigger('personabar:show');
             }(parent.$));
+			logger.warn('<<< Exiting onShownPersonaBar()', { "event.action": "onShownPersonaBar" });
         }
 
         function checkMenuLink($menu) {
+			logger.error(`>>> Entering checkMenuLink($menu=${$menu})`, { "event.action": "checkMenuLink", "logrite.$menu": $menu });
             var href = $menu.attr('href');
             if (href) {
                 if (href.indexOf('://') > -1) {
@@ -621,52 +692,67 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
         }
 
         function calculateHoverMenuPosition($menu) {
+			logger.error(`>>> Entering calculateHoverMenuPosition($menu=${$menu})`, { "event.action": "calculateHoverMenuPosition", "logrite.$menu": $menu });
             if ($menu.length === 0) {
                 return;
             }
 
             var bottom = $menu.parent().offset().top + $menu.outerHeight();
+			logger.error(`calculateHoverMenuPosition($menu=${$menu}): bottom → ${bottom}`, { "event.action": "calculateHoverMenuPosition", "logrite.$menu": $menu });
             var availableArea = $(window).height() + $(window).scrollTop() - bottom;
             $menu.css('top', availableArea < 0 ? availableArea + 'px' : '');
+			logger.error(`calculateHoverMenuPosition($menu=${$menu}): availableArea → ${availableArea}`, { "event.action": "calculateHoverMenuPosition", "logrite.$menu": $menu });
         }
 
         function getSiteRoot() {
+			logger.error('>>> Entering getSiteRoot()', { "event.action": "getSiteRoot" });
+			logger.warn('<<< Exiting getSiteRoot()', { "event.action": "getSiteRoot" });
             return config.siteRoot || "/";
         }
 
         function saveBtnEditSettings(success, error) {
+			logger.error(`>>> Entering saveBtnEditSettings(success=${success},error=${error})`, { "event.action": "saveBtnEditSettings", "logrite.success": success, "logrite.error": error });
             saveUserSetting({
                 expandPersonaBar: false,
                 activePath: null,
                 activeIdentifier: null
             }, success, error);
+			logger.warn(`<<< Exiting saveBtnEditSettings(success=${success},error=${error})`, { "event.action": "saveBtnEditSettings", "logrite.success": success, "logrite.error": error });
         }
 
         function saveUserSetting(settings, success, error) {
+			logger.error(`>>> Entering saveUserSetting(settings=${settings},success=${success},error=${error})`, { "event.action": "saveUserSetting", "logrite.settings": settings, "logrite.success": success, "logrite.error": error });
             util.persistent.save(settings, success, error);
+			logger.warn(`<<< Exiting saveUserSetting(settings=${settings},success=${success},error=${error})`, { "event.action": "saveUserSetting", "logrite.settings": settings, "logrite.success": success, "logrite.error": error });
         }
 
         function inLockEditMode() {
+			logger.error('>>> Entering inLockEditMode()', { "event.action": "inLockEditMode" });
             if (typeof window.top.dnn != "undefined") {
                 return window.top.dnn.dom.getCookie('StayInEditMode') === "YES";
             }
 
+			logger.warn('<<< Exiting inLockEditMode()', { "event.action": "inLockEditMode" });
             return false;
         }
 
         function setLockEditMode(locked) {
+			logger.error(`>>> Entering setLockEditMode(locked=${locked})`, { "event.action": "setLockEditMode", "logrite.locked": locked });
             if (typeof window.top.dnn != "undefined") {
                 window.top.dnn.dom.setCookie('StayInEditMode', locked ? "YES" : "NO", '', getSiteRoot());
 
                 updateLockModeTooltip(locked);
+				logger.warn(`<<< Exiting setLockEditMode(locked=${locked})`, { "event.action": "setLockEditMode", "logrite.locked": locked });
             }
         }
 
         function updateLockModeTooltip(locked) {
+			logger.error(`>>> Entering updateLockModeTooltip(locked=${locked})`, { "event.action": "updateLockModeTooltip", "logrite.locked": locked });
             var $btnEdit = $("#Edit.btn_panel");
             var title, message;
             if (locked) {
                 title = util.resx.PersonaBar["UnlockEditMode"];
+				logger.error(`updateLockModeTooltip(locked=${locked}): title → ${title}`, { "event.action": "updateLockModeTooltip", "logrite.locked": locked });
                 message = util.resx.PersonaBar["UnlockEditMode.Help"];
             } else {
                 title = util.resx.PersonaBar["LockEditMode"];
@@ -684,10 +770,12 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                 $btnEdit.removeClass('unlocked').addClass('locked');
             } else {
                 $btnEdit.removeClass('locked').addClass('unlocked');
+				logger.warn(`<<< Exiting updateLockModeTooltip(locked=${locked})`, { "event.action": "updateLockModeTooltip", "logrite.locked": locked });
             }
         }
 
         function handleDisabledEditBar($btnEdit) {
+		logger.error(`>>> Entering handleDisabledEditBar($btnEdit=${$btnEdit})`, { "event.action": "handleDisabledEditBar", "logrite.$btnEdit": $btnEdit });
 
             $btnEdit.addClass('disabled');
 
@@ -699,7 +787,9 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
             $btnEdit.append($tooltip);
 
             var title = util.resx.PersonaBar["DisableEditBar"];
+			logger.error(`handleDisabledEditBar($btnEdit=${$btnEdit}): title → ${title}`, { "event.action": "handleDisabledEditBar", "logrite.$btnEdit": $btnEdit });
             var message = util.resx.PersonaBar["DisableEditBar.Help"];
+			logger.error(`handleDisabledEditBar($btnEdit=${$btnEdit}): message → ${message}`, { "event.action": "handleDisabledEditBar", "logrite.$btnEdit": $btnEdit });
 
             $btnEdit.find(".editmode-tooltip > span").fadeOut('fast', '', function () {
                 $btnEdit.find('.tooltip-title').html(title);
@@ -707,9 +797,11 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
 
                 $btnEdit.find(".editmode-tooltip > span").fadeIn('fast');
             });
+			logger.warn(`<<< Exiting handleDisabledEditBar($btnEdit=${$btnEdit})`, { "event.action": "handleDisabledEditBar", "logrite.$btnEdit": $btnEdit });
         }
 
         function handleLockEditState($btnEdit) {
+			logger.error(`>>> Entering handleLockEditState($btnEdit=${$btnEdit})`, { "event.action": "handleLockEditState", "logrite.$btnEdit": $btnEdit });
             var $tooltip = $('<div class="editmode-tooltip"><span class="tooltip-title"></span><span class="tooltip-message"></span></div>');
             $tooltip.click(function(e) {
                 e.preventDefault();
@@ -717,20 +809,24 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
             });
             $btnEdit.append($tooltip);
             var lockEdit = inLockEditMode();
+			logger.error(`handleLockEditState($btnEdit=${$btnEdit}): lockEdit → ${lockEdit}`, { "event.action": "handleLockEditState", "logrite.$btnEdit": $btnEdit });
             updateLockModeTooltip(lockEdit);
 
 
             $btnEdit.on('click', function handleEdit() {
+				logger.error('>>> Entering handleEdit()', { "event.action": "handleEdit" });
                 setLockEditMode(!inLockEditMode());
                 util.closePersonaBar(saveBtnEditSettings);
             });
 
             eventEmitter.addPanelCloseEventListener(function handleClosingPersonaBar() {
+				logger.error('>>> Entering handleClosingPersonaBar()', { "event.action": "handleClosingPersonaBar" });
                 saveBtnEditSettings();
             });
         }
 
         function handleTabSelection (callback) {
+			logger.error(`>>> Entering handleTabSelection(callback=${callback})`, { "event.action": "handleTabSelection", "logrite.callback": callback });
             $('#personabar-panels').on('click',
                 '> .socialpanel .dnn-tabs.primary > ul > li,' +
                 '> .socialpanel .dnn-tabs.secondary > ul > li,' +
@@ -739,7 +835,9 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                     return;
                 }
 
+				logger.warn(`<<< Exiting handleTabSelection(callback=${callback})`, { "event.action": "handleTabSelection", "logrite.callback": callback });
                 var panelId = $(this).parents('.socialpanel').attr('id');
+				logger.error(`handleTabSelection(callback=${callback}): panelId → ${panelId}`, { "event.action": "handleTabSelection", "logrite.callback": callback });
                 setTimeout(function() {
                     util.savePanelTabView(panelId);
                 }, 0);
@@ -751,6 +849,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
         util.asyncParallel([
                 function (callback) {
                     util.loadResx(function onResxLoaded() {
+						logger.error('>>> Entering onResxLoaded()', { "event.action": "onResxLoaded" });
                         var viewModel = {
                             resx: util.resx.PersonaBar,
                             menu: menuViewModel.menu,
@@ -759,19 +858,23 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                             updateCritical: ko.observable(false),
                             logOff: function() {
                                 function onLogOffSuccess() {
+									logger.error('>>> Entering onLogOffSuccess()', { "event.action": "onLogOffSuccess" });
                                     if (typeof window.top.dnn != "undefined" && typeof window.top.dnn.PersonaBar != "undefined") {
                                         window.top.dnn.PersonaBar.userLoggedOut = true;
                                     }
                                     window.top.document.location.href = window.top.document.location.href;
+									logger.warn('<<< Exiting onLogOffSuccess()', { "event.action": "onLogOffSuccess" });
                                 };
 
                                 util.sf.rawCall("GET", config.logOff, null, onLogOffSuccess);
                                 return;
                             },
                             startLocalUpgrade: function() {
+								logger.error('>>> Entering startLocalUpgrade()', { "event.action": "startLocalUpgrade" });
                                 util.sf.moduleRoot = 'personabar';
                                 util.sf.controller = "serversummary";
                                 util.sf.postsilence('StartLocalUpgrade', {}, function onSuccess() {
+									logger.error('>>> Entering onSuccess()', { "event.action": "onSuccess" });
                                     window.top.document.location.href = window.top.document.location.href;
                                 });
                             }
@@ -847,6 +950,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                             var isIe = (function isInternetExplorer() {
                                 if (navigator.appName === 'Microsoft Internet Explorer') return true;
                                 if (navigator.appName === 'Netscape') {
+									logger.error('>>> Entering isInternetExplorer()', { "event.action": "isInternetExplorer" });
                                     var ua = navigator.userAgent;
                                     if (ua.indexOf('Trident') > -1) return true;
                                 }
@@ -861,11 +965,13 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
 
 
                                 (function setupMenu() {
+									logger.error('>>> Entering setupMenu()', { "event.action": "setupMenu" });
                                     $(".btn_panel .hovermenu").click(function(e) {
                                         e.stopPropagation();
                                     });
 
                                     $(".btn_panel, .hovermenu > ul > li").click(function handleClickOnHoverMenuItem(evt) {
+										logger.error('>>> Entering handleClickOnHoverMenuItem()', { "event.action": "handleClickOnHoverMenuItem" });
                                         evt.preventDefault();
                                         evt.stopPropagation();
 
@@ -873,7 +979,9 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
 
                                         if ($this.hasClass('selected')) {
                                             var panelId = utility.getPanelIdFromPath($this.data('path'));
+											logger.error(`handleClickOnHoverMenuItem(): panelId → ${panelId}`, { "event.action": "handleClickOnHoverMenuItem" });
                                             var panelAlreadyOpened = $('#' + panelId + ':not(visible)');
+											logger.error(`handleClickOnHoverMenuItem(): panelAlreadyOpened → ${panelAlreadyOpened}`, { "event.action": "handleClickOnHoverMenuItem" });
                                             if (panelAlreadyOpened) {
                                                 panelAlreadyOpened.fadeIn('fast');
                                             }
@@ -888,6 +996,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                                         var folderName = $this.data('folder-name');
                                         var query = $this.data('query');
                                         var settings = util.findMenuSettings(identifier);
+										logger.error(`handleClickOnHoverMenuItem(): settings → ${settings}`, { "event.action": "handleClickOnHoverMenuItem" });
                                         if (path === '') {
                                             var menuItems = menuViewModel.menu.menuItems;
                                             for (var i = 0; i < menuItems.length; i++) {
@@ -935,7 +1044,9 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                                     $showSiteButton.click(function handleShowSite(e, keepSelection) {
                                         e.preventDefault();
                                         var needRefresh = $(this).data('need-refresh');
+										logger.error(`handleShowSite(needRefresh=${needRefresh}): needRefresh → ${needRefresh}`, { "event.action": "handleShowSite", "logrite.needRefresh": needRefresh });
                                         var needHomeRedirect = $(this).data('need-homeredirect');
+										logger.error(`handleShowSite(needRefresh=${needRefresh}): needHomeRedirect → ${needHomeRedirect}`, { "event.action": "handleShowSite", "logrite.needRefresh": needRefresh });
                                         $showSiteButton.hide();
                                         util.closePersonaBar(function() {
                                             if (needHomeRedirect) {
@@ -950,6 +1061,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                                 }());
 
                                 (function setupHoverMenu() {
+								logger.error('>>> Entering setupHoverMenu()', { "event.action": "setupHoverMenu" });
 
 
                                     var showMenuHandlers = [];
@@ -958,6 +1070,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                                     var mouseOnButton = false;
 
                                     var resetHandlers = function() {
+										logger.error('>>> Entering resetHandlers()', { "event.action": "resetHandlers" });
                                         if (showMenuHandlers.length > 0) {
                                             $.each(showMenuHandlers, function(index, item) {
                                                 clearTimeout(item);
@@ -970,6 +1083,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                                                 clearTimeout(item);
                                             });
                                             leaveSubMenuHandlers = [];
+											logger.warn('<<< Exiting resetHandlers()', { "event.action": "resetHandlers" });
                                         }
                                     };
 
@@ -1026,6 +1140,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                                             }
                                         }, function () {
                                             mouseOnButton = false;
+											logger.warn('<<< Exiting setupHoverMenu()', { "event.action": "setupHoverMenu" });
                                             if (($hoverMenu.css('display') == 'block' || $this.find('> div').length > 0) && !mouseOnHovermenu) {
                                                 setTimeout(function () {
                                                     if (($hoverMenu.css('display') == 'block' || $this.find('> div').length > 0) && !mouseOnButton && !mouseOnHovermenu) {
@@ -1070,6 +1185,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                             }
 
                             (function setupEditButton() {
+								logger.error('>>> Entering setupEditButton()', { "event.action": "setupEditButton" });
                                 var $btnEdit = $("#Edit.btn_panel");
                                 if (!config.visible) {
                                     return;
@@ -1084,20 +1200,25 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                                     $btnEdit.show();
                                 });
                                 eventEmitter.addPanelOpenEventListener(function handleOpeningPersonaBar() {
+									logger.error('>>> Entering handleOpeningPersonaBar()', { "event.action": "handleOpeningPersonaBar" });
                                     $btnEdit.hide();
                                 });
 
                                 if (config.userMode !== 'Edit') {
                                     $btnEdit.on('click', function handleEdit() {
                                         function toogleUserMode(mode, successCallback) {
+											logger.error(`>>> Entering toogleUserMode(mode=${mode},successCallback=${successCallback})`, { "event.action": "toogleUserMode", "logrite.mode": mode, "logrite.successCallback": successCallback });
                                             util.sf.moduleRoot = 'internalservices';
                                             util.sf.controller = "controlBar";
                                             util.sf.post('ToggleUserMode', { UserMode: mode }, successCallback);
+											logger.warn(`<<< Exiting toogleUserMode(mode=${mode},successCallback=${successCallback})`, { "event.action": "toogleUserMode", "logrite.mode": mode, "logrite.successCallback": successCallback });
                                         };
                                         util.closePersonaBar(function () {
                                             toogleUserMode('EDIT', function() {
                                                 function reloadPage() {
+													logger.error('>>> Entering reloadPage()', { "event.action": "reloadPage" });
                                                     window.top.location = window.top.location.protocol + '//' + window.top.location.host + window.top.location.pathname + window.top.location.search;
+													logger.warn('<<< Exiting reloadPage()', { "event.action": "reloadPage" });
                                                 }
                                                 saveBtnEditSettings(reloadPage, reloadPage);
                                             });
@@ -1113,6 +1234,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
 
                             var retryTimes = 0;
                             var handleLogoutFunc = function() {
+								logger.error('>>> Entering handleLogoutFunc()', { "event.action": "handleLogoutFunc" });
                                 var $logout = $('li#Logout');
                                 if (!$logout.length && retryTimes < 3) {
                                     setTimeout(handleLogoutFunc, 500);
@@ -1131,6 +1253,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                                     };
 
                                     util.sf.rawCall("GET", config.logOff, null, onLogOffSuccess, null, null, null, null, true);
+								logger.warn('<<< Exiting handleLogoutFunc()', { "event.action": "handleLogoutFunc" });
                                     return;
                                 });
                             };
@@ -1144,6 +1267,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                     });
                 },
                 function showPersonaBar(callback) {
+					logger.error(`>>> Entering showPersonaBar(callback=${callback})`, { "event.action": "showPersonaBar", "logrite.callback": callback });
                     var $personaBar = $(".personabar");
                     var $parentBody = $(parentBody);
 
@@ -1163,6 +1287,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                     $mask.click(function(e) {
                         $showSiteButton.trigger('click', [true]);
                     });
+					logger.warn(`<<< Exiting showPersonaBar(callback=${callback})`, { "event.action": "showPersonaBar", "logrite.callback": callback });
                 },
                 function initCustomModules(callback) {
                     util.initCustomModules(callback);
@@ -1172,15 +1297,19 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                 }
         ],
         function loadPanelFromPersistedSetting() {
+			logger.error('>>> Entering loadPanelFromPersistedSetting()', { "event.action": "loadPanelFromPersistedSetting" });
             var pageUrl = window.top.location.href.toLowerCase();
             if (pageUrl.indexOf("skinsrc=") > -1 || pageUrl.indexOf("containersrc=") > -1 || pageUrl.indexOf("dnnprintmode=") > -1) {
                 return;
             }
 
             var settings = util.persistent.load();
+			logger.error(`loadPanelFromPersistedSetting(): pageUrl → ${pageUrl}`, { "event.action": "loadPanelFromPersistedSetting" });
+			logger.error(`loadPanelFromPersistedSetting(): settings → ${settings}`, { "event.action": "loadPanelFromPersistedSetting" });
             if (settings.expandPersonaBar && settings.activeIdentifier) {
                 var identifier = settings.activeIdentifier;
                 util.loadPanel(identifier, {});
+				logger.warn('<<< Exiting loadPanelFromPersistedSetting()', { "event.action": "loadPanelFromPersistedSetting" });
             }
         });
 

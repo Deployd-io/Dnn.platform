@@ -1,9 +1,12 @@
 import { languages as ActionTypes } from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
 import LanguageEditorService from "services/languageEditorService";
+const logger = console;
 
 const languagesActions = {
     getLanguageSettings(portalId, cultureCode, callback) {
+		logger.error(`>>> Entering getLanguageSettings(portalId=${portalId},cultureCode=${cultureCode},callback=${callback})`, { "event.action": "getLanguageSettings", "logrite.portalId": portalId, "logrite.cultureCode": cultureCode, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getLanguageSettings(portalId=${portalId},cultureCode=${cultureCode},callback=${callback})`, { "event.action": "getLanguageSettings", "logrite.portalId": portalId, "logrite.cultureCode": cultureCode, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getLanguageSettings(portalId, cultureCode, data => {
                 dispatch({
@@ -22,6 +25,8 @@ const languagesActions = {
         };
     },
     languageSettingsClientModified(parameter) {
+		logger.error(`>>> Entering languageSettingsClientModified(parameter=${parameter})`, { "event.action": "languageSettingsClientModified", "logrite.parameter": parameter });
+		logger.warn(`<<< Exiting languageSettingsClientModified(parameter=${parameter})`, { "event.action": "languageSettingsClientModified", "logrite.parameter": parameter });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SITESETTINGS_LANGUAGE_SETTINGS_CLIENT_MODIFIED,
@@ -33,6 +38,8 @@ const languagesActions = {
         };
     },
     updateLanguageSettings(payload, languageList, callback, failureCallback) {
+		logger.error(`>>> Entering updateLanguageSettings(payload=${payload},languageList=${languageList},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateLanguageSettings", "logrite.payload": payload, "logrite.languageList": languageList, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting updateLanguageSettings(payload=${payload},languageList=${languageList},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateLanguageSettings", "logrite.payload": payload, "logrite.languageList": languageList, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.updateLanguageSettings(payload, data => {
                 dispatch({
@@ -54,6 +61,8 @@ const languagesActions = {
         };
     },
     getLanguages(portalId, callback) {
+		logger.error(`>>> Entering getLanguages(portalId=${portalId},callback=${callback})`, { "event.action": "getLanguages", "logrite.portalId": portalId, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getLanguages(portalId=${portalId},callback=${callback})`, { "event.action": "getLanguages", "logrite.portalId": portalId, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getLanguages(portalId, data => {
                 dispatch({
@@ -69,6 +78,8 @@ const languagesActions = {
         };
     },
     getLanguage(portalId, languageId, callback) {
+		logger.error(`>>> Entering getLanguage(portalId=${portalId},languageId=${languageId},callback=${callback})`, { "event.action": "getLanguage", "logrite.portalId": portalId, "logrite.languageId": languageId, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getLanguage(portalId=${portalId},languageId=${languageId},callback=${callback})`, { "event.action": "getLanguage", "logrite.portalId": portalId, "logrite.languageId": languageId, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getLanguage(portalId, languageId, data => {
                 dispatch({
@@ -86,6 +97,8 @@ const languagesActions = {
         };
     },
     getAllLanguages(callback) {
+		logger.error(`>>> Entering getAllLanguages(callback=${callback})`, { "event.action": "getAllLanguages", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getAllLanguages(callback=${callback})`, { "event.action": "getAllLanguages", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getAllLanguages(data => {
                 dispatch({
@@ -101,6 +114,8 @@ const languagesActions = {
         };
     },
     languageClientModified(parameter) {
+		logger.error(`>>> Entering languageClientModified(parameter=${parameter})`, { "event.action": "languageClientModified", "logrite.parameter": parameter });
+		logger.warn(`<<< Exiting languageClientModified(parameter=${parameter})`, { "event.action": "languageClientModified", "logrite.parameter": parameter });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SITESETTINGS_LANGUAGE_CLIENT_MODIFIED,
@@ -112,6 +127,8 @@ const languagesActions = {
         };
     },
     cancelLanguageClientModified() {
+		logger.error('>>> Entering cancelLanguageClientModified()', { "event.action": "cancelLanguageClientModified" });
+		logger.warn('<<< Exiting cancelLanguageClientModified()', { "event.action": "cancelLanguageClientModified" });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CANCELED_SITESETTINGS_LANGUAGE_CLIENT_MODIFIED,
@@ -122,6 +139,8 @@ const languagesActions = {
         };
     },
     addLanguage(payload, callback, failureCallback) {
+		logger.error(`>>> Entering addLanguage(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "addLanguage", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting addLanguage(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "addLanguage", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.addLanguage(payload, data => {
                 dispatch({
@@ -141,6 +160,8 @@ const languagesActions = {
         };
     },
     updateLanguage(payload, callback, failureCallback) {
+		logger.error(`>>> Entering updateLanguage(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateLanguage", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting updateLanguage(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateLanguage", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.updateLanguage(payload, data => {
                 dispatch({
@@ -160,6 +181,8 @@ const languagesActions = {
         };
     },
     updateLanguageRoles(payload, callback, failureCallback) {
+		logger.error(`>>> Entering updateLanguageRoles(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateLanguageRoles", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting updateLanguageRoles(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateLanguageRoles", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.updateLanguageRoles(payload, data => {
                 dispatch({
@@ -179,6 +202,8 @@ const languagesActions = {
         };
     },
     verifyLanguageResourceFiles(callback) {
+		logger.error(`>>> Entering verifyLanguageResourceFiles(callback=${callback})`, { "event.action": "verifyLanguageResourceFiles", "logrite.callback": callback });
+		logger.warn(`<<< Exiting verifyLanguageResourceFiles(callback=${callback})`, { "event.action": "verifyLanguageResourceFiles", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.verifyLanguageResourceFiles(data => {
                 dispatch({
@@ -194,6 +219,8 @@ const languagesActions = {
         };
     },
     getModuleList(type, callback) {
+		logger.error(`>>> Entering getModuleList(type=${type},callback=${callback})`, { "event.action": "getModuleList", "logrite.type": type, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getModuleList(type=${type},callback=${callback})`, { "event.action": "getModuleList", "logrite.type": type, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getModuleList(type, data => {
                 dispatch({
@@ -209,6 +236,8 @@ const languagesActions = {
         };
     },
     createLanguagePack(payload, callback, failureCallback) {
+		logger.error(`>>> Entering createLanguagePack(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "createLanguagePack", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting createLanguagePack(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "createLanguagePack", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.createLanguagePack(payload, data => {
                 dispatch({
@@ -228,11 +257,15 @@ const languagesActions = {
         };
     },
     disableLocalizedContent(portalId, callback) {
+		logger.error(`>>> Entering disableLocalizedContent(portalId=${portalId},callback=${callback})`, { "event.action": "disableLocalizedContent", "logrite.portalId": portalId, "logrite.callback": callback });
+		logger.warn(`<<< Exiting disableLocalizedContent(portalId=${portalId},callback=${callback})`, { "event.action": "disableLocalizedContent", "logrite.portalId": portalId, "logrite.callback": callback });
         return () => {
             LanguageEditorService.disableLocalizedContent(portalId, callback);
         };
     },
     deleteLanguagePages(payload, callback) {
+		logger.error(`>>> Entering deleteLanguagePages(payload=${payload},callback=${callback})`, { "event.action": "deleteLanguagePages", "logrite.payload": payload, "logrite.callback": callback });
+		logger.warn(`<<< Exiting deleteLanguagePages(payload=${payload},callback=${callback})`, { "event.action": "deleteLanguagePages", "logrite.payload": payload, "logrite.callback": callback });
         return (dispatch) => {
             LanguageEditorService.deleteLanguagePages(payload, data => {
                 dispatch({
@@ -246,6 +279,8 @@ const languagesActions = {
         };
     },
     publishAllPages(payload, callback, failureCallback) {
+		logger.error(`>>> Entering publishAllPages(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "publishAllPages", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting publishAllPages(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "publishAllPages", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             LanguageEditorService.publishAllPages(payload, data => {
                 dispatch({
@@ -263,6 +298,8 @@ const languagesActions = {
         };
     },
     enableLocalizedContent(payload, callback, failureCallback) {
+		logger.error(`>>> Entering enableLocalizedContent(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "enableLocalizedContent", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting enableLocalizedContent(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "enableLocalizedContent", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             LanguageEditorService.enableLocalizedContent(payload, data => {
                 dispatch({
@@ -282,6 +319,8 @@ const languagesActions = {
         };
     },
     localizeContent(payload, callback, failureCallback) {
+		logger.error(`>>> Entering localizeContent(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "localizeContent", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting localizeContent(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "localizeContent", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             LanguageEditorService.localizeContent(payload, data => {
                 dispatch({
@@ -299,6 +338,8 @@ const languagesActions = {
         };
     },
     getLocalizationProgress(callback) {
+		logger.error(`>>> Entering getLocalizationProgress(callback=${callback})`, { "event.action": "getLocalizationProgress", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getLocalizationProgress(callback=${callback})`, { "event.action": "getLocalizationProgress", "logrite.callback": callback });
         return () => {
             LanguageEditorService.getLocalizationProgress(data => {
                 if (callback) {
@@ -308,6 +349,8 @@ const languagesActions = {
         };
     },
     getRoleGroups(portalId, callback) {
+		logger.error(`>>> Entering getRoleGroups(portalId=${portalId},callback=${callback})`, { "event.action": "getRoleGroups", "logrite.portalId": portalId, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getRoleGroups(portalId=${portalId},callback=${callback})`, { "event.action": "getRoleGroups", "logrite.portalId": portalId, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getRoleGroups(portalId, data => {
                 dispatch({
@@ -323,6 +366,8 @@ const languagesActions = {
         };
     },
     getRoles(portalId, groupId, cultureCode, callback) {
+		logger.error(`>>> Entering getRoles(portalId=${portalId},groupId=${groupId},cultureCode=${cultureCode},callback=${callback})`, { "event.action": "getRoles", "logrite.portalId": portalId, "logrite.groupId": groupId, "logrite.cultureCode": cultureCode, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getRoles(portalId=${portalId},groupId=${groupId},cultureCode=${cultureCode},callback=${callback})`, { "event.action": "getRoles", "logrite.portalId": portalId, "logrite.groupId": groupId, "logrite.cultureCode": cultureCode, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getRoles(portalId, groupId, cultureCode, data => {
                 dispatch({
@@ -338,6 +383,8 @@ const languagesActions = {
         };
     },
     getPageList(payload, callback) {
+		logger.error(`>>> Entering getPageList(payload=${payload},callback=${callback})`, { "event.action": "getPageList", "logrite.payload": payload, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getPageList(payload=${payload},callback=${callback})`, { "event.action": "getPageList", "logrite.payload": payload, "logrite.callback": callback });
         return (dispatch) => {
             LanguageEditorService.getPageList(payload, data => {
                 dispatch({
@@ -353,8 +400,11 @@ const languagesActions = {
         };
     },
     SelectLanguageRoles(roles, role, selected) {
+		logger.error(`>>> Entering SelectLanguageRoles(roles=${roles},role=${role},selected=${selected})`, { "event.action": "SelectLanguageRoles", "logrite.roles": roles, "logrite.role": role, "logrite.selected": selected });
+		logger.warn(`<<< Exiting SelectLanguageRoles(roles=${roles},role=${role},selected=${selected})`, { "event.action": "SelectLanguageRoles", "logrite.roles": roles, "logrite.role": role, "logrite.selected": selected });
         return (dispatch) => {
             let list = roles.map((item) => {
+				logger.error(`SelectLanguageRoles(roles=${roles},role=${role},selected=${selected}): list → ${list}`, { "event.action": "SelectLanguageRoles", "logrite.roles": roles, "logrite.role": role, "logrite.selected": selected });
                 if (item.RoleName === role) {
                     return { RoleID: item.RoleID, RoleName: item.RoleName, Selected: selected };
                 }
@@ -373,6 +423,8 @@ const languagesActions = {
         };
     },
     activateLanguage(payload, callback) {
+		logger.error(`>>> Entering activateLanguage(payload=${payload},callback=${callback})`, { "event.action": "activateLanguage", "logrite.payload": payload, "logrite.callback": callback });
+		logger.warn(`<<< Exiting activateLanguage(payload=${payload},callback=${callback})`, { "event.action": "activateLanguage", "logrite.payload": payload, "logrite.callback": callback });
         return () => {
             ApplicationService.activateLanguage(payload, () => {
                 if (callback) {
@@ -382,6 +434,8 @@ const languagesActions = {
         };
     },
     markAllPagesAsTranslated(payload, callback) {
+		logger.error(`>>> Entering markAllPagesAsTranslated(payload=${payload},callback=${callback})`, { "event.action": "markAllPagesAsTranslated", "logrite.payload": payload, "logrite.callback": callback });
+		logger.warn(`<<< Exiting markAllPagesAsTranslated(payload=${payload},callback=${callback})`, { "event.action": "markAllPagesAsTranslated", "logrite.payload": payload, "logrite.callback": callback });
         return () => {
             ApplicationService.markAllPagesAsTranslated(payload, () => {
                 if (callback) {

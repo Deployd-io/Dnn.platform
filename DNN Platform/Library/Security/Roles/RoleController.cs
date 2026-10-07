@@ -64,7 +64,17 @@ namespace DotNetNuke.Security.Roles
         /// <param name="dataProvider">The data provider.</param>
         public RoleController(RoleProvider roleProvider, IHostSettings hostSettings, IEventLogger eventLogger, IPortalController portalController, IUserController userController, IEventManager eventManager, IFileManager fileManager, IFolderManager folderManager, DataProvider dataProvider)
         {
+			Logger.LogError(">>> Entering RoleController(roleProvider={RoleProvider},hostSettings={HostSettings},eventLogger={EventLogger},portalController={PortalController},userController={UserController},eventManager={EventManager},fileManager={FileManager},folderManager={FolderManager},dataProvider={DataProvider})", roleProvider, hostSettings, eventLogger, portalController, userController, eventManager, fileManager, folderManager, dataProvider);
+			Logger.LogDebug("RoleController(roleProvider={RoleProvider},hostSettings={HostSettings},eventLogger={EventLogger},portalController={PortalController},userController={UserController},eventManager={EventManager},fileManager={FileManager},folderManager={FolderManager},dataProvider={DataProvider}): hostSettings → {HostSettings1}", roleProvider, hostSettings, eventLogger, portalController, userController, eventManager, fileManager, folderManager, dataProvider, hostSettings);
+			Logger.LogDebug("RoleController(roleProvider={RoleProvider},hostSettings={HostSettings},eventLogger={EventLogger},portalController={PortalController},userController={UserController},eventManager={EventManager},fileManager={FileManager},folderManager={FolderManager},dataProvider={DataProvider}): eventLogger → {EventLogger1}", roleProvider, hostSettings, eventLogger, portalController, userController, eventManager, fileManager, folderManager, dataProvider, eventLogger);
+			Logger.LogDebug("RoleController(roleProvider={RoleProvider},hostSettings={HostSettings},eventLogger={EventLogger},portalController={PortalController},userController={UserController},eventManager={EventManager},fileManager={FileManager},folderManager={FolderManager},dataProvider={DataProvider}): portalController → {PortalController1}", roleProvider, hostSettings, eventLogger, portalController, userController, eventManager, fileManager, folderManager, dataProvider, portalController);
+			Logger.LogDebug("RoleController(roleProvider={RoleProvider},hostSettings={HostSettings},eventLogger={EventLogger},portalController={PortalController},userController={UserController},eventManager={EventManager},fileManager={FileManager},folderManager={FolderManager},dataProvider={DataProvider}): userController → {UserController1}", roleProvider, hostSettings, eventLogger, portalController, userController, eventManager, fileManager, folderManager, dataProvider, userController);
+			Logger.LogDebug("RoleController(roleProvider={RoleProvider},hostSettings={HostSettings},eventLogger={EventLogger},portalController={PortalController},userController={UserController},eventManager={EventManager},fileManager={FileManager},folderManager={FolderManager},dataProvider={DataProvider}): eventManager → {EventManager1}", roleProvider, hostSettings, eventLogger, portalController, userController, eventManager, fileManager, folderManager, dataProvider, eventManager);
+			Logger.LogDebug("RoleController(roleProvider={RoleProvider},hostSettings={HostSettings},eventLogger={EventLogger},portalController={PortalController},userController={UserController},eventManager={EventManager},fileManager={FileManager},folderManager={FolderManager},dataProvider={DataProvider}): fileManager → {FileManager1}", roleProvider, hostSettings, eventLogger, portalController, userController, eventManager, fileManager, folderManager, dataProvider, fileManager);
+			Logger.LogDebug("RoleController(roleProvider={RoleProvider},hostSettings={HostSettings},eventLogger={EventLogger},portalController={PortalController},userController={UserController},eventManager={EventManager},fileManager={FileManager},folderManager={FolderManager},dataProvider={DataProvider}): folderManager → {FolderManager1}", roleProvider, hostSettings, eventLogger, portalController, userController, eventManager, fileManager, folderManager, dataProvider, folderManager);
+			Logger.LogDebug("RoleController(roleProvider={RoleProvider},hostSettings={HostSettings},eventLogger={EventLogger},portalController={PortalController},userController={UserController},eventManager={EventManager},fileManager={FileManager},folderManager={FolderManager},dataProvider={DataProvider}): dataProvider → {DataProvider1}", roleProvider, hostSettings, eventLogger, portalController, userController, eventManager, fileManager, folderManager, dataProvider, dataProvider);
             this.roleProvider = roleProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<RoleProvider>();
+			Logger.LogWarning("<<< Exiting RoleController(roleProvider={RoleProvider},hostSettings={HostSettings},eventLogger={EventLogger},portalController={PortalController},userController={UserController},eventManager={EventManager},fileManager={FileManager},folderManager={FolderManager},dataProvider={DataProvider})", roleProvider, hostSettings, eventLogger, portalController, userController, eventManager, fileManager, folderManager, dataProvider);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
@@ -103,6 +113,7 @@ namespace DotNetNuke.Security.Roles
         /// <returns>The ID of the new role.</returns>
         public static int AddRoleGroup(RoleProvider roleProvider, IEventLogger eventLogger, IUserController userController, IPortalSettings portalSettings, RoleGroupInfo roleGroupInfo)
         {
+			Logger.LogError(">>> Entering AddRoleGroup(objRoleGroupInfo=<redacted>)");
             var id = roleProvider.CreateRoleGroup(roleGroupInfo);
             eventLogger.AddLog(
                 roleGroupInfo,
@@ -110,6 +121,10 @@ namespace DotNetNuke.Security.Roles
                 userController.GetCurrentUserInfo().UserID,
                 string.Empty,
                 EventLogType.USER_ROLE_CREATED);
+				Logger.LogError("AddRoleGroup(objRoleGroupInfo=<redacted>): id → {Id}", id);
+				Logger.LogError("AddRoleGroup(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},portalSettings={PortalSettings},roleGroupInfo=<redacted>): id → {Id}", roleProvider, eventLogger, userController, portalSettings, id);
+        Logger.LogWarning("<<< Exiting AddRoleGroup(objRoleGroupInfo=<redacted>)");
+        Logger.LogWarning("<<< Exiting AddRoleGroup(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},portalSettings={PortalSettings},roleGroupInfo=<redacted>)", roleProvider, eventLogger, userController, portalSettings);
             return id;
         }
 
@@ -197,9 +212,12 @@ namespace DotNetNuke.Security.Roles
         /// <returns><see langword="true"/> if the role can be removed, otherwise <see langword="false"/>.</returns>
         public static bool CanRemoveUserFromRole(PortalSettings portalSettings, int userId, int roleId)
         {
+			Logger.LogError(">>> Entering CanRemoveUserFromRole(portalSettings={PortalSettings},userId={UserId},roleId={RoleId})", portalSettings, userId, roleId);
             // [DNN-4285] Refactored this check into a method for use in SecurityRoles.ascx.vb
             // HACK: Duplicated in CanRemoveUserFromRole(PortalInfo, Integer, Integer) method below
             // changes to this method should be reflected in the other method as well
+			Logger.LogWarning("<<< Exiting CanRemoveUserFromRole(portalSettings={PortalSettings},userId={UserId},roleId={RoleId})", portalSettings, userId, roleId);
+			Logger.LogWarning("<<< Exiting CanRemoveUserFromRole(portalInfo={PortalInfo},userId={UserId},roleId={RoleId})", portalInfo, userId, roleId);
             return !((portalSettings.AdministratorId == userId && portalSettings.AdministratorRoleId == roleId) || portalSettings.RegisteredRoleId == roleId);
         }
 
@@ -260,6 +278,7 @@ namespace DotNetNuke.Security.Roles
         /// <param name="roleGroupInfo">The RoleGroup to Delete.</param>
         public static void DeleteRoleGroup(RoleProvider roleProvider, IEventLogger eventLogger, IUserController userController, IPortalSettings portalSettings, RoleGroupInfo roleGroupInfo)
         {
+			Logger.LogError(">>> Entering DeleteRoleGroup(portalID={PortalID},roleGroupId={RoleGroupId})", portalID, roleGroupId);
             roleProvider.DeleteRoleGroup(roleGroupInfo);
             eventLogger.AddLog(
                 roleGroupInfo,
@@ -303,9 +322,12 @@ namespace DotNetNuke.Security.Roles
         /// <returns><see langword="true"/> if the role was deleted, otherwise <see langword="false"/>.</returns>
         public static bool DeleteUserRole(RoleProvider roleProvider, IRoleController roleController, IEventManager eventManager, IPortalController portalController, IUserController userController, IEventLogger eventLogger, UserInfo user, RoleInfo role, PortalSettings portalSettings, bool notifyUser)
         {
+			Logger.LogError(">>> Entering DeleteUserRole(objUser={ObjUser},role={Role},portalSettings={PortalSettings},notifyUser={NotifyUser})", objUser, role, portalSettings, notifyUser);
             var canDelete = DeleteUserRoleInternal(roleProvider, roleController, eventManager, portalController, userController, eventLogger, portalSettings.PortalId, user.UserID, role.RoleID);
             if (!canDelete)
             {
+				Logger.LogError("DeleteUserRole(roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},user={User},role={Role},portalSettings={PortalSettings},notifyUser={NotifyUser}): canDelete → {CanDelete}", roleProvider, roleController, eventManager, portalController, userController, eventLogger, user, role, portalSettings, notifyUser, canDelete);
+				Logger.LogError("DeleteUserRole(objUser={ObjUser},role={Role},portalSettings={PortalSettings},notifyUser={NotifyUser}): canDelete → {CanDelete}", objUser, role, portalSettings, notifyUser, canDelete);
                 return false;
             }
 
@@ -314,6 +336,7 @@ namespace DotNetNuke.Security.Roles
                 SendNotification(roleController, userController, user, role, portalSettings, UserRoleActions.Delete);
             }
 
+			Logger.LogWarning("<<< Exiting DeleteUserRole(roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},user={User},role={Role},portalSettings={PortalSettings},notifyUser={NotifyUser})", roleProvider, roleController, eventManager, portalController, userController, eventLogger, user, role, portalSettings, notifyUser);
             return true;
         }
 
@@ -332,6 +355,7 @@ namespace DotNetNuke.Security.Roles
         /// <returns>A <see cref="RoleGroupInfo"/> instance or <see langword="null"/>.</returns>
         public static RoleGroupInfo GetRoleGroup(RoleProvider roleProvider, int portalId, int roleGroupId)
         {
+			Logger.LogError(">>> Entering GetRoleGroup(portalId={PortalId},roleGroupId={RoleGroupId})", portalId, roleGroupId);
             return roleProvider.GetRoleGroup(portalId, roleGroupId);
         }
 
@@ -350,6 +374,7 @@ namespace DotNetNuke.Security.Roles
         /// <returns>A <see cref="RoleGroupInfo"/> instance or <see langword="null"/>.</returns>
         public static RoleGroupInfo GetRoleGroupByName(RoleProvider roleProvider, int portalId, string roleGroupName)
         {
+			Logger.LogError(">>> Entering GetRoleGroupByName(portalId={PortalId},roleGroupName={RoleGroupName})", portalId, roleGroupName);
             return roleProvider.GetRoleGroupByName(portalId, roleGroupName);
         }
 
@@ -366,6 +391,9 @@ namespace DotNetNuke.Security.Roles
         /// <returns>An ArrayList of RoleGroups.</returns>
         public static ArrayList GetRoleGroups(RoleProvider roleProvider, int portalId)
         {
+			Logger.LogError(">>> Entering GetRoleGroups(portalID={PortalID})", portalID);
+			Logger.LogError(">>> Entering GetRoleGroups(roleProvider={RoleProvider},portalId={PortalId})", roleProvider, portalId);
+        Logger.LogWarning("<<< Exiting GetRoleGroups(roleProvider={RoleProvider},portalId={PortalId})", roleProvider, portalId);
             return roleProvider.GetRoleGroups(portalId);
         }
 
@@ -382,6 +410,7 @@ namespace DotNetNuke.Security.Roles
         /// <param name="portalId">The ID of the Portal.</param>
         public static void SerializeRoleGroups(RoleProvider roleProvider, XmlWriter writer, int portalId)
         {
+			Logger.LogError(">>> Entering SerializeRoleGroups(writer={Writer},portalID={PortalID})", writer, portalID);
             // Serialize Role Groups
             writer.WriteStartElement("rolegroups");
             foreach (RoleGroupInfo objRoleGroup in GetRoleGroups(roleProvider, portalId))
@@ -397,6 +426,7 @@ namespace DotNetNuke.Security.Roles
             };
             CBO.SerializeObject(globalRoleGroup, writer);
             writer.WriteEndElement();
+			Logger.LogWarning("<<< Exiting SerializeRoleGroups(roleProvider={RoleProvider},writer={Writer},portalId={PortalId})", roleProvider, writer, portalId);
         }
 
         /// <summary>Updates a Role Group.</summary>
@@ -420,7 +450,10 @@ namespace DotNetNuke.Security.Roles
         /// <param name="roleGroup">The RoleGroup to Update.</param>
         public static void UpdateRoleGroup(RoleProvider roleProvider, IRoleController roleController, IEventLogger eventLogger, IUserController userController, IPortalSettings portalSettings, RoleGroupInfo roleGroup)
         {
+			Logger.LogError(">>> Entering UpdateRoleGroup(roleGroup={RoleGroup})", roleGroup);
             UpdateRoleGroup(roleProvider, roleController, eventLogger, userController, portalSettings, roleGroup, false);
+			Logger.LogError(">>> Entering UpdateRoleGroup(roleProvider={RoleProvider},roleController={RoleController},eventLogger={EventLogger},userController={UserController},portalSettings={PortalSettings},roleGroup={RoleGroup})", roleProvider, roleController, eventLogger, userController, portalSettings, roleGroup);
+        Logger.LogWarning("<<< Exiting UpdateRoleGroup(roleProvider={RoleProvider},roleController={RoleController},eventLogger={EventLogger},userController={UserController},portalSettings={PortalSettings},roleGroup={RoleGroup})", roleProvider, roleController, eventLogger, userController, portalSettings, roleGroup);
         }
 
         public static void UpdateRoleGroup(RoleGroupInfo roleGroup, bool includeRoles)
@@ -448,21 +481,27 @@ namespace DotNetNuke.Security.Roles
                 roleController.UpdateRole(role);
                 eventLogger.AddLog(role, portalSettings, userController.GetCurrentUserInfo().UserID, string.Empty, EventLogType.ROLE_UPDATED);
             }
+			Logger.LogWarning("<<< Exiting UpdateRoleGroup(roleProvider={RoleProvider},roleController={RoleController},eventLogger={EventLogger},userController={UserController},portalSettings={PortalSettings},roleGroup={RoleGroup},includeRoles={IncludeRoles})", roleProvider, roleController, eventLogger, userController, portalSettings, roleGroup, includeRoles);
         }
 
         /// <inheritdoc />
         public int AddRole(RoleInfo role)
         {
+			Logger.LogError(">>> Entering AddRole(role={Role})", role);
+            Logger.LogWarning("<<< Exiting AddRole(role={Role})", role);
             return ((IRoleController)this).AddRole(role, true);
         }
 
         /// <inheritdoc />
         public void AddUserRole(int portalId, int userId, int roleId, RoleStatus status, bool isOwner, DateTime effectiveDate, DateTime expiryDate)
         {
+			Logger.LogError(">>> Entering AddUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},effectiveDate={EffectiveDate},expiryDate={ExpiryDate})", portalId, userId, roleId, status, isOwner, effectiveDate, expiryDate);
             var user = UserController.GetUserById(portalId, userId);
             var userRole = this.GetUserRole(portalId, userId, roleId);
+			Logger.LogError("AddUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},effectiveDate={EffectiveDate},expiryDate={ExpiryDate}): user → {User}", portalId, userId, roleId, status, isOwner, effectiveDate, expiryDate, user);
             if (userRole == null)
             {
+				Logger.LogError("AddUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},effectiveDate={EffectiveDate},expiryDate={ExpiryDate}): userRole → {UserRole}", portalId, userId, roleId, status, isOwner, effectiveDate, expiryDate, userRole);
                 // Create new UserRole
                 userRole = new UserRoleInfo
                 {
@@ -480,7 +519,11 @@ namespace DotNetNuke.Security.Roles
             else
             {
                 userRole.Status = status;
+				Logger.LogDebug("AddUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},effectiveDate={EffectiveDate},expiryDate={ExpiryDate}): userRole.Status → {Arg7}", portalId, userId, roleId, status, isOwner, effectiveDate, expiryDate, userRole.Status);
+				Logger.LogDebug("AddUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},effectiveDate={EffectiveDate},expiryDate={ExpiryDate}): userRole.EffectiveDate → {Arg7}", portalId, userId, roleId, status, isOwner, effectiveDate, expiryDate, userRole.EffectiveDate);
+				Logger.LogDebug("AddUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},effectiveDate={EffectiveDate},expiryDate={ExpiryDate}): userRole.ExpiryDate → {Arg7}", portalId, userId, roleId, status, isOwner, effectiveDate, expiryDate, userRole.ExpiryDate);
                 userRole.IsOwner = isOwner;
+				Logger.LogDebug("AddUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},effectiveDate={EffectiveDate},expiryDate={ExpiryDate}): userRole.IsOwner → {Arg7}", portalId, userId, roleId, status, isOwner, effectiveDate, expiryDate, userRole.IsOwner);
                 userRole.EffectiveDate = effectiveDate;
                 userRole.ExpiryDate = expiryDate;
                 this.roleProvider.UpdateUserRole(userRole);
@@ -491,22 +534,26 @@ namespace DotNetNuke.Security.Roles
 
             // Remove the UserInfo and Roles from the Cache, as they have been modified
             DataCache.ClearUserCache(portalId, user.Username);
+			Logger.LogWarning("<<< Exiting AddUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},effectiveDate={EffectiveDate},expiryDate={ExpiryDate})", portalId, userId, roleId, status, isOwner, effectiveDate, expiryDate);
             this.ClearRoleCache(portalId);
         }
 
         /// <inheritdoc />
         public void ClearRoleCache(int portalId)
         {
+			Logger.LogError(">>> Entering ClearRoleCache(portalId={PortalId})", portalId);
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.RolesCacheKey, portalId));
             if (portalId != Null.NullInteger)
             {
                 DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.RolesCacheKey, Null.NullInteger));
             }
+			Logger.LogWarning("<<< Exiting ClearRoleCache(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public void DeleteRole(RoleInfo role)
         {
+			Logger.LogError(">>> Entering DeleteRole(role={Role})", role);
             Requires.NotNull("role", role);
 
             this.AddMessage(role, EventLogType.ROLE_DELETED);
@@ -515,8 +562,10 @@ namespace DotNetNuke.Security.Roles
             {
                 // remove group artifacts
                 var portalSettings = this.portalController.GetCurrentSettings();
+				Logger.LogError("DeleteRole(role={Role}): portalSettings → {PortalSettings}", role, portalSettings);
 
                 var groupFolder = this.folderManager.GetFolder(portalSettings.PortalId, $"Groups/{role.RoleID}");
+				Logger.LogError("DeleteRole(role={Role}): groupFolder → {GroupFolder}", role, groupFolder);
                 if (groupFolder != null)
                 {
                     this.fileManager.DeleteFiles(this.folderManager.GetFiles(groupFolder));
@@ -528,6 +577,7 @@ namespace DotNetNuke.Security.Roles
 
             // Get users before deleting role
             var users = role.UserCount > 0 ? this.GetUsersByRole(role.PortalID, role.RoleName) : Enumerable.Empty<UserInfo>();
+			Logger.LogError("DeleteRole(role={Role}): users → {Users}", role, users);
 
             this.roleProvider.DeleteRole(role);
 
@@ -549,31 +599,42 @@ namespace DotNetNuke.Security.Roles
             };
 
             this.dataProvider.AddSearchDeletedItems(document);
+			Logger.LogWarning("<<< Exiting DeleteRole(role={Role})", role);
         }
 
         /// <inheritdoc />
         public RoleInfo GetRole(int portalId, Func<RoleInfo, bool> predicate)
         {
+			Logger.LogError(">>> Entering GetRole(portalId={PortalId},predicate={Predicate})", portalId, predicate);
+            Logger.LogWarning("<<< Exiting GetRole(portalId={PortalId},predicate={Predicate})", portalId, predicate);
             return this.GetRoles(portalId).Where(predicate).FirstOrDefault();
         }
 
         /// <inheritdoc />
         public RoleInfo GetRoleById(int portalId, int roleId)
         {
+			Logger.LogError(">>> Entering GetRoleById(portalId={PortalId},roleId={RoleId})", portalId, roleId);
+			Logger.LogWarning("<<< Exiting GetRoleById(portalId={PortalId},roleId={RoleId})", portalId, roleId);
             return this.GetRole(portalId, r => r.RoleID == roleId);
         }
 
         /// <inheritdoc />
         public RoleInfo GetRoleByName(int portalId, string roleName)
         {
+			Logger.LogError(">>> Entering GetRoleByName(portalId={PortalId},roleName={RoleName})", portalId, roleName);
             roleName = roleName.Trim();
+			Logger.LogError("GetRoleByName(portalId={PortalId},roleName={RoleName}): roleName → {RoleName1}", portalId, roleName, roleName);
+			Logger.LogWarning("<<< Exiting GetRoleByName(portalId={PortalId},roleName={RoleName})", portalId, roleName);
             return this.GetRoles(portalId).SingleOrDefault(r => roleName.Equals(r.RoleName.Trim(), StringComparison.OrdinalIgnoreCase) && r.PortalID == portalId);
         }
 
         /// <inheritdoc />
         public IList<RoleInfo> GetRoles(int portalId)
         {
+			Logger.LogError(">>> Entering GetRoles(portalId={PortalId})", portalId);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.RolesCacheKey, portalId);
+			Logger.LogError("GetRoles(portalId={PortalId}): cacheKey → {CacheKey}", portalId, cacheKey);
+			Logger.LogWarning("<<< Exiting GetRoles(portalId={PortalId})", portalId);
             return CBO.GetCachedObject<IList<RoleInfo>>(
                 this.hostSettings,
                 new CacheItemArgs(cacheKey, DataCache.RolesCacheTimeOut, DataCache.RolesCachePriority),
@@ -589,6 +650,8 @@ namespace DotNetNuke.Security.Roles
         /// <inheritdoc />
         public IList<RoleInfo> GetRolesBasicSearch(int portalId, int pageSize, string filterBy)
         {
+			Logger.LogError(">>> Entering GetRolesBasicSearch(portalId={PortalId},pageSize={PageSize},filterBy={FilterBy})", portalId, pageSize, filterBy);
+            Logger.LogWarning("<<< Exiting GetRolesBasicSearch(portalId={PortalId},pageSize={PageSize},filterBy={FilterBy})", portalId, pageSize, filterBy);
             return this.roleProvider.GetRolesBasicSearch(portalId, pageSize, filterBy);
         }
 
@@ -605,6 +668,8 @@ namespace DotNetNuke.Security.Roles
         /// <returns>A UserRoleInfo object.</returns>
         public UserRoleInfo GetUserRole(int portalId, int userId, int roleId)
         {
+			Logger.LogError(">>> Entering GetUserRole(portalId={PortalId},userId={UserId},roleId={RoleId})", portalId, userId, roleId);
+            Logger.LogWarning("<<< Exiting GetUserRole(portalId={PortalId},userId={UserId},roleId={RoleId})", portalId, userId, roleId);
             return this.roleProvider.GetUserRole(portalId, userId, roleId);
         }
 
@@ -614,6 +679,8 @@ namespace DotNetNuke.Security.Roles
         /// <returns>A list of UserRoleInfo objects.</returns>
         public IList<UserRoleInfo> GetUserRoles(UserInfo user, bool includePrivate)
         {
+			Logger.LogError(">>> Entering GetUserRoles(user={User},includePrivate={IncludePrivate})", user, includePrivate);
+            Logger.LogWarning("<<< Exiting GetUserRoles(user={User},includePrivate={IncludePrivate})", user, includePrivate);
             return this.roleProvider.GetUserRoles(user, includePrivate);
         }
 
@@ -626,12 +693,15 @@ namespace DotNetNuke.Security.Roles
         /// <inheritdoc />
         public IList<UserInfo> GetUsersByRole(int portalId, string roleName)
         {
+			Logger.LogError(">>> Entering GetUsersByRole(portalId={PortalId},roleName={RoleName})", portalId, roleName);
+            Logger.LogWarning("<<< Exiting GetUsersByRole(portalId={PortalId},roleName={RoleName})", portalId, roleName);
             return this.roleProvider.GetUsersByRoleName(portalId, roleName).Cast<UserInfo>().ToList();
         }
 
         /// <inheritdoc />
         public void UpdateRole(RoleInfo role, bool addToExistUsers)
         {
+			Logger.LogError(">>> Entering UpdateRole(role={Role},addToExistUsers={AddToExistUsers})", role, addToExistUsers);
             Requires.NotNull("role", role);
 
             this.roleProvider.UpdateRole(role);
@@ -645,32 +715,40 @@ namespace DotNetNuke.Security.Roles
             this.ClearRoleCache(role.PortalID);
 
             this.eventManager.OnRoleUpdated(new RoleEventArgs() { Role = role });
+			Logger.LogWarning("<<< Exiting UpdateRole(role={Role},addToExistUsers={AddToExistUsers})", role, addToExistUsers);
         }
 
         /// <inheritdoc />
         public void UpdateRoleSettings(RoleInfo role, bool clearCache)
         {
+			Logger.LogError(">>> Entering UpdateRoleSettings(role={Role},clearCache={ClearCache})", role, clearCache);
             this.roleProvider.UpdateRoleSettings(role);
 
             if (clearCache)
             {
                 this.ClearRoleCache(role.PortalID);
             }
+			Logger.LogWarning("<<< Exiting UpdateRoleSettings(role={Role},clearCache={ClearCache})", role, clearCache);
         }
 
         /// <inheritdoc />
         public void UpdateUserRole(int portalId, int userId, int roleId, RoleStatus status, bool isOwner, bool cancel)
         {
+			Logger.LogError(">>> Entering UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel})", portalId, userId, roleId, status, isOwner, cancel);
             var user = UserController.GetUserById(portalId, userId);
             var userRole = this.GetUserRole(portalId, userId, roleId);
+			Logger.LogError("UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel}): user → {User}", portalId, userId, roleId, status, isOwner, cancel, user);
             if (cancel)
             {
+				Logger.LogError("UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel}): userRole → {UserRole}", portalId, userId, roleId, status, isOwner, cancel, userRole);
                 if (userRole != null && userRole.ServiceFee > 0.0 && userRole.IsTrialUsed)
                 {
                     // Expire Role so we retain trial used data
                     userRole.ExpiryDate = DateTime.Now.AddDays(-1);
                     userRole.Status = status;
+					Logger.LogDebug("UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel}): userRole.Status → {Arg6}", portalId, userId, roleId, status, isOwner, cancel, userRole.Status);
                     userRole.IsOwner = isOwner;
+					Logger.LogDebug("UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel}): userRole.IsOwner → {Arg6}", portalId, userId, roleId, status, isOwner, cancel, userRole.IsOwner);
                     this.roleProvider.UpdateUserRole(userRole);
                     this.eventLogger.AddLog(userRole, this.portalController.GetCurrentSettings(), this.userController.GetCurrentUserInfo().UserID, string.Empty, EventLogType.USER_ROLE_UPDATED);
                 }
@@ -689,11 +767,17 @@ namespace DotNetNuke.Security.Roles
             else
             {
                 var userRoleId = -1;
+				Logger.LogError("UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel}): userRoleId → {UserRoleId}", portalId, userId, roleId, status, isOwner, cancel, userRoleId);
                 var expiryDate = DateTime.Now;
+				Logger.LogError("UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel}): expiryDate → {ExpiryDate}", portalId, userId, roleId, status, isOwner, cancel, expiryDate);
                 var effectiveDate = Null.NullDate;
+				Logger.LogError("UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel}): effectiveDate → {EffectiveDate}", portalId, userId, roleId, status, isOwner, cancel, effectiveDate);
                 var isTrialUsed = false;
+				Logger.LogError("UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel}): isTrialUsed → {IsTrialUsed}", portalId, userId, roleId, status, isOwner, cancel, isTrialUsed);
                 var period = 0;
+				Logger.LogError("UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel}): period → {Period}", portalId, userId, roleId, status, isOwner, cancel, period);
                 var frequency = string.Empty;
+				Logger.LogError("UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel}): frequency → {Frequency}", portalId, userId, roleId, status, isOwner, cancel, frequency);
                 if (userRole != null)
                 {
                     userRoleId = userRole.UserRoleID;
@@ -703,6 +787,7 @@ namespace DotNetNuke.Security.Roles
                 }
 
                 var role = this.GetRole(portalId, r => r.RoleID == roleId);
+				Logger.LogError("UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel}): role → {Role}", portalId, userId, roleId, status, isOwner, cancel, role);
                 if (role != null)
                 {
                     if (isTrialUsed == false && role.TrialFrequency != "N")
@@ -748,6 +833,7 @@ namespace DotNetNuke.Security.Roles
                 if (userRoleId != -1 && userRole != null)
                 {
                     userRole.ExpiryDate = expiryDate;
+					Logger.LogDebug("UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel}): userRole.ExpiryDate → {Arg6}", portalId, userId, roleId, status, isOwner, cancel, userRole.ExpiryDate);
                     userRole.Status = status;
                     userRole.IsOwner = isOwner;
                     this.roleProvider.UpdateUserRole(userRole);
@@ -762,6 +848,7 @@ namespace DotNetNuke.Security.Roles
             // Remove the UserInfo from the Cache, as it has been modified
             DataCache.ClearUserCache(portalId, user.Username);
             this.ClearRoleCache(portalId);
+			Logger.LogWarning("<<< Exiting UpdateUserRole(portalId={PortalId},userId={UserId},roleId={RoleId},status={Status},isOwner={IsOwner},cancel={Cancel})", portalId, userId, roleId, status, isOwner, cancel);
         }
 
         /// <inheritdoc />
@@ -800,26 +887,35 @@ namespace DotNetNuke.Security.Roles
         /// <param name="user">User for which all roles must be deleted. The PortalId property is used to determine for which portal roles must be removed.</param>
         internal static void DeleteUserRoles(RoleProvider roleProvider, IRoleController roleController, UserInfo user)
         {
+			Logger.LogError(">>> Entering DeleteUserRoles(roleProvider={RoleProvider},roleController={RoleController},user={User})", roleProvider, roleController, user);
             var userRoles = roleController.GetUserRoles(user, true);
+			Logger.LogError("DeleteUserRoles(roleProvider={RoleProvider},roleController={RoleController},user={User}): userRoles → {UserRoles}", roleProvider, roleController, user, userRoles);
             foreach (var ur in userRoles.Where(r => r.PortalID == user.PortalID))
             {
                 roleProvider.RemoveUserFromRole(user.PortalID, user, ur);
             }
+			Logger.LogWarning("<<< Exiting DeleteUserRoles(roleProvider={RoleProvider},roleController={RoleController},user={User})", roleProvider, roleController, user);
         }
 
         /// <inheritdoc />
         protected override Func<IRoleController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => Globals.GetCurrentServiceProvider().GetRequiredService<IRoleController>();
         }
 
         private static bool DeleteUserRoleInternal(RoleProvider roleProvider, IRoleController roleController, IEventManager eventManager, IPortalController portalController, IUserController userController, IEventLogger eventLogger, int portalId, int userId, int roleId)
         {
+			Logger.LogError(">>> Entering DeleteUserRoleInternal(roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},portalId={PortalId},userId={UserId},roleId={RoleId})", roleProvider, roleController, eventManager, portalController, userController, eventLogger, portalId, userId, roleId);
             var user = UserController.GetUserById(portalId, userId);
             var userRole = roleController.GetUserRole(portalId, userId, roleId);
+			Logger.LogError("DeleteUserRoleInternal(roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},portalId={PortalId},userId={UserId},roleId={RoleId}): userRole → {UserRole}", roleProvider, roleController, eventManager, portalController, userController, eventLogger, portalId, userId, roleId, userRole);
+			Logger.LogError("DeleteUserRoleInternal(roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},portalId={PortalId},userId={UserId},roleId={RoleId}): user → {User}", roleProvider, roleController, eventManager, portalController, userController, eventLogger, portalId, userId, roleId, user);
             var portal = portalController.GetPortal(portalId);
             if (portal == null || userRole == null)
             {
+				Logger.LogError("DeleteUserRoleInternal(roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},portalId={PortalId},userId={UserId},roleId={RoleId}): portal → {Portal}", roleProvider, roleController, eventManager, portalController, userController, eventLogger, portalId, userId, roleId, portal);
                 return true;
             }
 
@@ -846,20 +942,25 @@ namespace DotNetNuke.Security.Roles
 
         private static void SendNotification(IRoleController roleController, IUserController userController, UserInfo user, RoleInfo role, PortalSettings portalSettings, UserRoleActions action)
         {
+			Logger.LogError(">>> Entering SendNotification(roleController={RoleController},userController={UserController},user={User},role={Role},portalSettings={PortalSettings},action={Action})", roleController, userController, user, role, portalSettings, action);
             var profile = userController.GetUserById(user.PortalID, user.UserID).Profile;
             var custom = new ArrayList { role.RoleName, role.Description, };
+			Logger.LogError("SendNotification(roleController={RoleController},userController={UserController},user={User},role={Role},portalSettings={PortalSettings},action={Action}): profile → {Profile}", roleController, userController, user, role, portalSettings, action, profile);
             switch (action)
             {
                 case UserRoleActions.Add:
                 case UserRoleActions.Update:
                     var preferredLocale = profile.PreferredLocale;
+					Logger.LogError("SendNotification(roleController={RoleController},userController={UserController},user={User},role={Role},portalSettings={PortalSettings},action={Action}): preferredLocale → {PreferredLocale}", roleController, userController, user, role, portalSettings, action, preferredLocale);
                     if (string.IsNullOrEmpty(preferredLocale))
                     {
                         preferredLocale = portalSettings.DefaultLanguage;
                     }
 
                     var ci = new CultureInfo(preferredLocale);
+					Logger.LogError("SendNotification(roleController={RoleController},userController={UserController},user={User},role={Role},portalSettings={PortalSettings},action={Action}): ci → {Ci}", roleController, userController, user, role, portalSettings, action, ci);
                     var userRole = roleController.GetUserRole(portalSettings.PortalId, user.UserID, role.RoleID);
+					Logger.LogError("SendNotification(roleController={RoleController},userController={UserController},user={User},role={Role},portalSettings={PortalSettings},action={Action}): userRole → {UserRole}", roleController, userController, user, role, portalSettings, action, userRole);
                     custom.Add(Null.IsNull(userRole.EffectiveDate)
                                    ? DateTime.Today.ToString("g", ci)
                                    : userRole.EffectiveDate.ToString("g", ci));
@@ -892,20 +993,24 @@ namespace DotNetNuke.Security.Roles
 
             ////_messagingController.SaveMessage(_message);
             Mail.SendEmail(portalSettings.Email, user.Email, message.Subject, message.Body);
+			Logger.LogWarning("<<< Exiting SendNotification(roleController={RoleController},userController={UserController},user={User},role={Role},portalSettings={PortalSettings},action={Action})", roleController, userController, user, role, portalSettings, action);
         }
 
         private void AddMessage(RoleInfo roleInfo, EventLogType logType)
         {
+			Logger.LogError(">>> Entering AddMessage(roleInfo={RoleInfo},logType={LogType})", roleInfo, logType);
             this.eventLogger.AddLog(
                 roleInfo,
                 this.portalController.GetCurrentSettings(),
                 this.userController.GetCurrentUserInfo().UserID,
                 string.Empty,
                 logType);
+				Logger.LogWarning("<<< Exiting AddMessage(roleInfo={RoleInfo},logType={LogType})", roleInfo, logType);
         }
 
         private void AutoAssignUsers(RoleInfo role)
         {
+			Logger.LogError(">>> Entering AutoAssignUsers(role={Role})", role);
             if (!role.AutoAssignment)
             {
                 return;
@@ -924,6 +1029,7 @@ namespace DotNetNuke.Security.Roles
                     Logger.Error(exc);
                 }
             }
+			Logger.LogWarning("<<< Exiting AutoAssignUsers(role={Role})", role);
         }
     }
 }

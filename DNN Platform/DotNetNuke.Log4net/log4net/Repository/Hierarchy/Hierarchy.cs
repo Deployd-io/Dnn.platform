@@ -67,7 +67,11 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public LoggerCreationEventArgs(Logger log)
         {
+			log.ErrorFormat(">>> Entering LoggerCreationEventArgs(log={0})", log);
             this.m_log = log;
+			log.DebugFormat("LoggerCreationEventArgs(log={0}): m_log → {1}", log, m_log);
+        log.DebugFormat("LoggerCreationEventArgs(log={0}): this.m_log → {1}", log, this.m_log);
+        log.WarnFormat("<<< Exiting LoggerCreationEventArgs(log={0})", log);
         }
 
         /// <summary>
@@ -142,6 +146,8 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public Hierarchy() : this(new DefaultLoggerFactory())
         {
+		log.ErrorFormat(">>> Entering Hierarchy()");
+        log.WarnFormat("<<< Exiting Hierarchy()");
         }
 
         /// <summary>
@@ -155,6 +161,8 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public Hierarchy(PropertiesDictionary properties) : this(properties, new DefaultLoggerFactory())
         {
+		log.ErrorFormat(">>> Entering Hierarchy(properties={0})", properties);
+        log.WarnFormat("<<< Exiting Hierarchy(properties={0})", properties);
         }
 
         /// <summary>
@@ -169,6 +177,8 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public Hierarchy(ILoggerFactory loggerFactory) : this(new PropertiesDictionary(), loggerFactory)
         {
+		log.ErrorFormat(">>> Entering Hierarchy(loggerFactory={0})", loggerFactory);
+        log.WarnFormat("<<< Exiting Hierarchy(loggerFactory={0})", loggerFactory);
         }
 
         /// <summary>
@@ -184,14 +194,20 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public Hierarchy(PropertiesDictionary properties, ILoggerFactory loggerFactory) : base(properties)
         {
+			log.ErrorFormat(">>> Entering Hierarchy(properties={0},loggerFactory={1})", properties, loggerFactory);
             if (loggerFactory == null)
             {
+				log.ErrorFormat("Throwing ArgumentNullException from Hierarchy(properties={0},loggerFactory={1})", properties, loggerFactory);
                 throw new ArgumentNullException("loggerFactory");
             }
 
+			log.WarnFormat("<<< Exiting Hierarchy(properties={0},loggerFactory={1})", properties, loggerFactory);
             this.m_defaultFactory = loggerFactory;
+			log.DebugFormat("Hierarchy(properties={0},loggerFactory={1}): m_defaultFactory → {2}", properties, loggerFactory, m_defaultFactory);
+			log.DebugFormat("Hierarchy(properties={0},loggerFactory={1}): this.m_defaultFactory → {2}", properties, loggerFactory, this.m_defaultFactory);
 
             this.m_ht = Hashtable.Synchronized(new Hashtable());
+			log.DebugFormat("Hierarchy(properties={0},loggerFactory={1}): m_ht → {2}", properties, loggerFactory, m_ht);
         }
 
         /// <summary>
@@ -276,13 +292,16 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public override ILogger Exists(string name) 
         {	
+			log.ErrorFormat(">>> Entering Exists(name={0})", name);
             if (name == null)
             {
+				log.ErrorFormat("Throwing ArgumentNullException from Exists(name={0})", name);
                 throw new ArgumentNullException("name");
             }
 
             lock(this.m_ht) 
             {
+				log.WarnFormat("<<< Exiting Exists(name={0})", name);
                 return this.m_ht[new LoggerKey(name)] as Logger;
             }
         }
@@ -300,12 +319,14 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public override ILogger[] GetCurrentLoggers() 
         {
+			log.ErrorFormat(">>> Entering GetCurrentLoggers()");
             // The accumulation in loggers is necessary because not all elements in
             // ht are Logger objects as there might be some ProvisionNodes
             // as well.
             lock(this.m_ht) 
             {
                 ArrayList loggers = new ArrayList(this.m_ht.Count);
+				log.ErrorFormat("GetCurrentLoggers(): loggers → {0}", loggers);
     
                 // Iterate through m_ht values
                 foreach(object node in this.m_ht.Values)
@@ -315,6 +336,7 @@ namespace log4net.Repository.Hierarchy
                         loggers.Add(node);
                     }
                 }
+				log.WarnFormat("<<< Exiting GetCurrentLoggers()");
                 return (Logger[])loggers.ToArray(typeof(Logger));
             }
         }
@@ -338,11 +360,15 @@ namespace log4net.Repository.Hierarchy
         /// <returns>The logger object with the name specified</returns>
         public override ILogger GetLogger(string name) 
         {
+			log.ErrorFormat(">>> Entering GetLogger(name={0})", name);
             if (name == null)
             {
+				log.ErrorFormat("Throwing ArgumentNullException from GetLogger(name={0})", name);
                 throw new ArgumentNullException("name");
             }
 
+			log.WarnFormat("<<< Exiting GetLogger(name={0})", name);
+			log.WarnFormat("<<< Exiting GetLogger(name={0},factory={1})", name, factory);
             return this.GetLogger(name, this.m_defaultFactory);
         }
 
@@ -369,6 +395,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public override void Shutdown() 
         {
+			log.ErrorFormat(">>> Entering Shutdown()");
             LogLog.Debug(declaringType, "Shutdown called on Hierarchy ["+this.Name+"]");
 
             // begin by closing nested appenders
@@ -393,6 +420,7 @@ namespace log4net.Repository.Hierarchy
             }
 
             base.Shutdown();
+			log.WarnFormat("<<< Exiting Shutdown()");
         }
 
         /// <summary>
@@ -417,6 +445,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public override void ResetConfiguration() 
         {
+			log.ErrorFormat(">>> Entering ResetConfiguration()");
             this.Root.Level = this.LevelMap.LookupWithDefault(Level.Debug);
             this.Threshold = this.LevelMap.LookupWithDefault(Level.All);
     
@@ -428,6 +457,8 @@ namespace log4net.Repository.Hierarchy
                 foreach(Logger l in this.GetCurrentLoggers())
                 {
                     l.Level = null;
+					log.DebugFormat("ResetConfiguration(): l.Level → {0}", l.Level);
+					log.DebugFormat("ResetConfiguration(): l.Additivity → {0}", l.Additivity);
                     l.Additivity = true;
                 }
             }
@@ -436,6 +467,7 @@ namespace log4net.Repository.Hierarchy
 
             // Notify listeners
             this.OnConfigurationChanged(null);
+			log.WarnFormat("<<< Exiting ResetConfiguration()");
         }
 
         /// <summary>
@@ -456,12 +488,15 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public override void Log(LoggingEvent logEvent)
         {
+			log.ErrorFormat(">>> Entering Log(logEvent={0})", logEvent);
             if (logEvent == null)
             {
+				log.ErrorFormat("Throwing ArgumentNullException from Log(logEvent={0})", logEvent);
                 throw new ArgumentNullException("logEvent");
             }
 
             this.GetLogger(logEvent.LoggerName, this.m_defaultFactory).Log(logEvent);
+			log.WarnFormat("<<< Exiting Log(logEvent={0})", logEvent);
         }
 
         /// <summary>
@@ -480,8 +515,10 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public override IAppender[] GetAppenders()
         {
+			log.ErrorFormat(">>> Entering GetAppenders()");
             ArrayList appenderList = new ArrayList();
 
+			log.ErrorFormat("GetAppenders(): appenderList → {0}", appenderList);
             CollectAppenders(appenderList, this.Root);
 
             foreach(Logger logger in this.GetCurrentLoggers())
@@ -489,6 +526,7 @@ namespace log4net.Repository.Hierarchy
                 CollectAppenders(appenderList, logger);
             }
 
+			log.WarnFormat("<<< Exiting GetAppenders()");
             return (IAppender[])appenderList.ToArray(typeof(IAppender));
         }
 
@@ -500,6 +538,7 @@ namespace log4net.Repository.Hierarchy
         /// <param name="appender"></param>
         private static void CollectAppender(ArrayList appenderList, IAppender appender)
         {
+			log.ErrorFormat(">>> Entering CollectAppender(appenderList={0},appender={1})", appenderList, appender);
             if (!appenderList.Contains(appender))
             {
                 appenderList.Add(appender);
@@ -510,6 +549,7 @@ namespace log4net.Repository.Hierarchy
                     CollectAppenders(appenderList, container);
                 }
             }
+			log.WarnFormat("<<< Exiting CollectAppender(appenderList={0},appender={1})", appenderList, appender);
         }
 
         /// <summary>
@@ -519,10 +559,12 @@ namespace log4net.Repository.Hierarchy
         /// <param name="container"></param>
         private static void CollectAppenders(ArrayList appenderList, IAppenderAttachable container)
         {
+			log.ErrorFormat(">>> Entering CollectAppenders(appenderList={0},container={1})", appenderList, container);
             foreach(IAppender appender in container.Appenders)
             {
                 CollectAppender(appenderList, appender);
             }
+			log.WarnFormat("<<< Exiting CollectAppenders(appenderList={0},container={1})", appenderList, container);
         }
 
         /// <summary>
@@ -556,8 +598,10 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected void BasicRepositoryConfigure(params IAppender[] appenders)
         {
+			log.ErrorFormat(">>> Entering BasicRepositoryConfigure(appenders={0})", appenders);
             ArrayList configurationMessages = new ArrayList();
 
+			log.ErrorFormat("BasicRepositoryConfigure(appenders={0}): configurationMessages → {1}", appenders, configurationMessages);
             using (new LogLog.LogReceivedAdapter(configurationMessages))
             {
                 foreach (IAppender appender in appenders)
@@ -567,11 +611,14 @@ namespace log4net.Repository.Hierarchy
             }
 
             this.Configured = true;
+			log.DebugFormat("BasicRepositoryConfigure(appenders={0}): this.Configured → {1}", appenders, this.Configured);
 
             this.ConfigurationMessages = configurationMessages;
+			log.DebugFormat("BasicRepositoryConfigure(appenders={0}): this.ConfigurationMessages → {1}", appenders, this.ConfigurationMessages);
 
             // Notify listeners
             this.OnConfigurationChanged(new ConfigurationChangedEventArgs(configurationMessages));
+			log.WarnFormat("<<< Exiting BasicRepositoryConfigure(appenders={0})", appenders);
         }
 
         /// <summary>
@@ -596,8 +643,10 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected void XmlRepositoryConfigure(System.Xml.XmlElement element)
         {
+			log.ErrorFormat(">>> Entering XmlRepositoryConfigure(element={0})", element);
             ArrayList configurationMessages = new ArrayList();
 
+			log.ErrorFormat("XmlRepositoryConfigure(element={0}): configurationMessages → {1}", element, configurationMessages);
             using (new LogLog.LogReceivedAdapter(configurationMessages))
             {
                 XmlHierarchyConfigurator config = new XmlHierarchyConfigurator(this);
@@ -605,11 +654,14 @@ namespace log4net.Repository.Hierarchy
             }
 
             this.Configured = true;
+			log.DebugFormat("XmlRepositoryConfigure(element={0}): this.Configured → {1}", element, this.Configured);
+			log.DebugFormat("XmlRepositoryConfigure(element={0}): this.ConfigurationMessages → {1}", element, this.ConfigurationMessages);
 
             this.ConfigurationMessages = configurationMessages;
 
             // Notify listeners
             this.OnConfigurationChanged(new ConfigurationChangedEventArgs(configurationMessages));
+			log.WarnFormat("<<< Exiting XmlRepositoryConfigure(element={0})", element);
         }
 
         /// <summary>
@@ -635,9 +687,11 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public bool IsDisabled(Level level) 
         {
+			log.ErrorFormat(">>> Entering IsDisabled(level={0})", level);
             // Cast level to object for performance
             if ((object)level == null)
             {
+				log.ErrorFormat("Throwing ArgumentNullException from IsDisabled(level={0})", level);
                 throw new ArgumentNullException("level");
             }
 
@@ -648,6 +702,7 @@ namespace log4net.Repository.Hierarchy
             else
             {
                 // If not configured the hierarchy is effectively disabled
+				log.WarnFormat("<<< Exiting IsDisabled(level={0})", level);
                 return true;
             }
         }
@@ -668,10 +723,12 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public void Clear() 
         {
+			log.ErrorFormat(">>> Entering Clear()");
             lock(this.m_ht) 
             {
                 this.m_ht.Clear();
             }
+			log.WarnFormat("<<< Exiting Clear()");
         }
 
         /// <summary>
@@ -753,11 +810,13 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected virtual void OnLoggerCreationEvent(Logger logger) 
         {
+			log.ErrorFormat(">>> Entering OnLoggerCreationEvent(logger={0})", logger);
             LoggerCreationEventHandler handler = this.m_loggerCreatedEvent;
             if (handler != null)
             {
                 handler(this, new LoggerCreationEventArgs(logger));
             }
+			log.WarnFormat("<<< Exiting OnLoggerCreationEvent(logger={0})", logger);
         }
 
         /// <summary>
@@ -797,9 +856,11 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         private void UpdateParents(Logger log) 
         {
+			log.ErrorFormat(">>> Entering UpdateParents(log={0})", log);
             string name = log.Name;
             int length = name.Length;
             bool parentFound = false;
+			log.ErrorFormat("UpdateParents(log={0}): parentFound → {1}", log, parentFound);
     
             // if name = "w.x.y.z", loop through "w.x.y", "w.x" and "w", but not "w.x.y.z" 
             for(int i = name.LastIndexOf('.', length-1); i >= 0; i = name.LastIndexOf('.', i-1))  
@@ -807,11 +868,13 @@ namespace log4net.Repository.Hierarchy
                 string substr = name.Substring(0, i);
 
                 LoggerKey key = new LoggerKey(substr); // simple constructor
+				log.ErrorFormat("UpdateParents(log={0}): key → {1}", log, key);
                 Object node = this.m_ht[key];
                 // Create a provision node for a future parent.
                 if (node == null) 
                 {
                     ProvisionNode pn = new ProvisionNode(log);
+					log.ErrorFormat("UpdateParents(log={0}): pn → {1}", log, pn);
                     this.m_ht[key] = pn;
                 } 
                 else
@@ -821,6 +884,7 @@ namespace log4net.Repository.Hierarchy
                     {
                         parentFound = true;
                         log.Parent = nodeLogger;
+						log.DebugFormat("UpdateParents(log={0}): log.Parent → {1}", log, log.Parent);
                         break; // no need to update the ancestors of the closest ancestor
                     }
                     else
@@ -848,6 +912,7 @@ namespace log4net.Repository.Hierarchy
             {
                 log.Parent = this.Root;
             }
+			log.WarnFormat("<<< Exiting UpdateParents(log={0})", log);
         }
 
         /// <summary>
@@ -876,18 +941,23 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         private static void UpdateChildren(ProvisionNode pn, Logger log) 
         {
+			log.ErrorFormat(">>> Entering UpdateChildren(pn={0},log={1})", pn, log);
             for(int i = 0; i < pn.Count; i++) 
             {
                 Logger childLogger = (Logger)pn[i];
+				log.ErrorFormat("UpdateChildren(pn={0},log={1}): childLogger → {2}", pn, log, childLogger);
 
                 // Unless this child already points to a correct (lower) parent,
                 // make log.Parent point to childLogger.Parent and childLogger.Parent to log.
                 if (!childLogger.Parent.Name.StartsWith(log.Name)) 
                 {
                     log.Parent = childLogger.Parent;
+					log.DebugFormat("UpdateChildren(pn={0},log={1}): log.Parent → {2}", pn, log, log.Parent);
+					log.DebugFormat("UpdateChildren(pn={0},log={1}): childLogger.Parent → {2}", pn, log, childLogger.Parent);
                     childLogger.Parent = log;	  
                 }
             }
+			log.WarnFormat("<<< Exiting UpdateChildren(pn={0},log={1})", pn, log);
         }
 
         /// <summary>
@@ -904,8 +974,10 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         internal void AddLevel(LevelEntry levelEntry)
         {
+			log.ErrorFormat(">>> Entering AddLevel(levelEntry={0})", levelEntry);
             if (levelEntry == null)
             {
+				log.ErrorFormat("Throwing ArgumentNullException from AddLevel(levelEntry={0})", levelEntry);
                 throw new ArgumentNullException("levelEntry");
             }
 
@@ -920,13 +992,16 @@ namespace log4net.Repository.Hierarchy
                 Level previousLevel = this.LevelMap[levelEntry.Name];
                 if (previousLevel == null)
                 {
+					log.ErrorFormat("Throwing InvalidOperationException from AddLevel(levelEntry={0})", levelEntry);
                     throw new InvalidOperationException("Cannot redefine level ["+levelEntry.Name+"] because it is not defined in the LevelMap. To define the level supply the level value.");
                 }
 
                 levelEntry.Value = previousLevel.Value;
+				log.DebugFormat("AddLevel(levelEntry={0}): levelEntry.Value → {1}", levelEntry, levelEntry.Value);
             }
 
             this.LevelMap.Add(levelEntry.Name, levelEntry.Value, levelEntry.DisplayName);
+			log.WarnFormat("<<< Exiting AddLevel(levelEntry={0})", levelEntry);
         }
 
         /// <summary>
@@ -998,6 +1073,8 @@ namespace log4net.Repository.Hierarchy
             /// <returns>string info about this object</returns>
             public override string ToString()
             {
+				log.ErrorFormat(">>> Entering ToString()");
+                log.WarnFormat("<<< Exiting ToString()");
                 return "LevelEntry(Value="+ this.m_levelValue+", Name="+ this.m_levelName+", DisplayName="+ this.m_levelDisplayName+")";
             }
         }
@@ -1016,8 +1093,10 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         internal void AddProperty(PropertyEntry propertyEntry)
         {
+			log.ErrorFormat(">>> Entering AddProperty(propertyEntry={0})", propertyEntry);
             if (propertyEntry == null)
             {
+				log.ErrorFormat("Throwing ArgumentNullException from AddProperty(propertyEntry={0})", propertyEntry);
                 throw new ArgumentNullException("propertyEntry");
             }
 
@@ -1027,6 +1106,7 @@ namespace log4net.Repository.Hierarchy
             }
 
             this.Properties[propertyEntry.Key] = propertyEntry.Value;
+			log.WarnFormat("<<< Exiting AddProperty(propertyEntry={0})", propertyEntry);
         }
 
         private ILoggerFactory m_defaultFactory;

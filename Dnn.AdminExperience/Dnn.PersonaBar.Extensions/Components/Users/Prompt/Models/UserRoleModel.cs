@@ -24,6 +24,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Models
 
         public static UserRoleModel FromDnnUserRoleInfo(DotNetNuke.Entities.Users.UserRoleInfo userRoleInfo)
         {
+			eventLogger.LogError(">>> Entering FromDnnUserRoleInfo(userRoleInfo={UserRoleInfo})", userRoleInfo);
             var userRoleModel = new UserRoleModel
             {
                 RoleId = userRoleInfo.RoleID,
@@ -33,6 +34,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Models
                 Start = userRoleInfo.EffectiveDate.ToPromptShortDateString(),
                 End = userRoleInfo.ExpiryDate.ToPromptShortDateString(),
             };
+			eventLogger.LogWarning("<<< Exiting FromDnnUserRoleInfo(userRoleInfo={UserRoleInfo})", userRoleInfo);
             return userRoleModel;
         }
     }

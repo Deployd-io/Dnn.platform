@@ -39,9 +39,11 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [HttpGet]
         public HttpResponseMessage GetServers()
         {
+			Logger.LogError(">>> Entering GetServers()");
             try
             {
                 var servers = ServerController.GetServers();
+				Logger.LogError("GetServers(): servers → {Servers}", servers);
                 var query = from ServerInfo server in servers
                             where server.Enabled == true
                             select server;
@@ -67,6 +69,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetServers()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -78,12 +81,16 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [HttpGet]
         public HttpResponseMessage GetScheduleItems(string serverName = "")
         {
+			Logger.LogError(">>> Entering GetScheduleItems(serverName={ServerName})", serverName);
             try
             {
                 var scheduleviews = this.controller.GetScheduleItems(null, serverName);
+				Logger.LogError("GetScheduleItems(serverName={ServerName}): scheduleviews → {Scheduleviews}", serverName, scheduleviews);
                 var arrSchedule = scheduleviews.ToArray();
+				Logger.LogError("GetScheduleItems(serverName={ServerName}): arrSchedule → {ArrSchedule}", serverName, arrSchedule);
                 var response = new
                 {
+					Logger.LogDebug("GetScheduleItems(serverName={ServerName}): Results → {Results}", serverName, Results);
                     Success = true,
                     Results = arrSchedule.Select(v => new
                     {
@@ -101,6 +108,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetScheduleItems(serverName={ServerName})", serverName);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -111,6 +119,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [HttpGet]
         public HttpResponseMessage GetSchedulerSettings()
         {
+			Logger.LogError(">>> Entering GetSchedulerSettings()");
             try
             {
                 KeyValuePair<string, string>[] modes = new KeyValuePair<string, string>[]
@@ -123,6 +132,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
                 var response = new
                 {
                     Results = new
+					Logger.LogDebug("GetSchedulerSettings(): Results → {Results}", Results);
                     {
                         SchedulerMode = HostController.Instance.GetString("SchedulerMode"),
                         SchedulerModeOptions = modes,
@@ -135,6 +145,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetSchedulerSettings()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -147,9 +158,11 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateSchedulerSettings(UpdateSettingsRequest request)
         {
+			Logger.LogError(">>> Entering UpdateSchedulerSettings(request={Request})", request);
             try
             {
                 var originalSchedulerMode = (SchedulerMode)Convert.ToInt32(HostController.Instance.GetString("SchedulerMode"), CultureInfo.InvariantCulture);
+				Logger.LogError("UpdateSchedulerSettings(request={Request}): originalSchedulerMode → {OriginalSchedulerMode}", request, originalSchedulerMode);
                 Enum.TryParse(request.SchedulerMode, true, out SchedulerMode newSchedulerMode);
                 if (originalSchedulerMode != newSchedulerMode)
                 {
@@ -157,14 +170,17 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
                     {
                         case SchedulerMode.DISABLED:
                             var newThread1 = new Thread(new ThreadStart(Halt)) { IsBackground = true };
+							Logger.LogError("UpdateSchedulerSettings(request={Request}): newThread1 → {NewThread1}", request, newThread1);
                             newThread1.Start();
                             break;
                         case SchedulerMode.TIMER_METHOD:
                             var newThread2 = new Thread(SchedulingProvider.Instance().Start) { IsBackground = true };
+							Logger.LogError("UpdateSchedulerSettings(request={Request}): newThread2 → {NewThread2}", request, newThread2);
                             newThread2.Start();
                             break;
                         default:
                             var newThread3 = new Thread(new ThreadStart(Halt)) { IsBackground = true };
+							Logger.LogError("UpdateSchedulerSettings(request={Request}): newThread3 → {NewThread3}", request, newThread3);
                             newThread3.Start();
                             break;
                     }
@@ -191,6 +207,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [HttpGet]
         public HttpResponseMessage GetScheduleItemHistory(int scheduleId = -1, int pageIndex = 0, int pageSize = 20)
         {
+			Logger.LogError(">>> Entering GetScheduleItemHistory(scheduleId={ScheduleId},pageIndex={PageIndex},pageSize={PageSize})", scheduleId, pageIndex, pageSize);
             try
             {
                 var query =
@@ -214,6 +231,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
                             ? history.NextStart.ToString(CultureInfo.CurrentCulture)
                             : string.Empty,
                     };
+					Logger.LogDebug("GetScheduleItemHistory(scheduleId={ScheduleId},pageIndex={PageIndex},pageSize={PageSize}): NextStart → {NextStart}", scheduleId, pageIndex, pageSize, NextStart);
 
                 var response = new
                 {
@@ -237,14 +255,18 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [HttpGet]
         public HttpResponseMessage GetScheduleItem(int scheduleId)
         {
+			Logger.LogError(">>> Entering GetScheduleItem(scheduleId={ScheduleId})", scheduleId);
             try
             {
                 ScheduleItem scheduleItem = SchedulingProvider.Instance().GetSchedule(scheduleId);
+				Logger.LogError("GetScheduleItem(scheduleId={ScheduleId}): scheduleItem → {ScheduleItem}", scheduleId, scheduleItem);
 
                 var recommendedServers = this.controller.GetRecommendedServers(scheduleItem.ScheduleID);
+				Logger.LogError("GetScheduleItem(scheduleId={ScheduleId}): recommendedServers → {RecommendedServers}", scheduleId, recommendedServers);
 
                 var response = new
                 {
+					Logger.LogDebug("GetScheduleItem(scheduleId={ScheduleId}): Results → {Results}", scheduleId, Results);
                     Success = true,
                     Results = new
                     {
@@ -272,6 +294,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetScheduleItem(scheduleId={ScheduleId})", scheduleId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -284,11 +307,13 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage CreateScheduleItem(ScheduleDto scheduleDto)
         {
+			Logger.LogError(">>> Entering CreateScheduleItem(scheduleDto={ScheduleDto})", scheduleDto);
             try
             {
                 if (scheduleDto.RetryTimeLapse == 0)
                 {
                     scheduleDto.RetryTimeLapse = Null.NullInteger;
+					Logger.LogDebug("CreateScheduleItem(scheduleDto={ScheduleDto}): scheduleDto.RetryTimeLapse → {Arg1}", scheduleDto, scheduleDto.RetryTimeLapse);
                 }
 
                 if (!VerifyValidTimeLapseRetry(scheduleDto.TimeLapse, scheduleDto.TimeLapseMeasurement, scheduleDto.RetryTimeLapse, scheduleDto.RetryTimeLapseMeasurement))
@@ -317,6 +342,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting CreateScheduleItem(scheduleDto={ScheduleDto})", scheduleDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -329,11 +355,13 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateScheduleItem(ScheduleDto scheduleDto)
         {
+			Logger.LogError(">>> Entering UpdateScheduleItem(scheduleDto={ScheduleDto})", scheduleDto);
             try
             {
                 if (scheduleDto.RetryTimeLapse == 0)
                 {
                     scheduleDto.RetryTimeLapse = Null.NullInteger;
+					Logger.LogDebug("UpdateScheduleItem(scheduleDto={ScheduleDto}): scheduleDto.RetryTimeLapse → {Arg1}", scheduleDto, scheduleDto.RetryTimeLapse);
                 }
 
                 if (!VerifyValidTimeLapseRetry(scheduleDto.TimeLapse, scheduleDto.TimeLapseMeasurement, scheduleDto.RetryTimeLapse, scheduleDto.RetryTimeLapseMeasurement))
@@ -342,6 +370,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
                 }
 
                 var existingItem = SchedulingProvider.Instance().GetSchedule(scheduleDto.ScheduleID);
+				Logger.LogError("UpdateScheduleItem(scheduleDto={ScheduleDto}): existingItem → {ExistingItem}", scheduleDto, existingItem);
 
                 var updatedItem = this.controller.CreateScheduleItem(
                     scheduleDto.TypeFullName,
@@ -358,6 +387,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
                     scheduleDto.ScheduleStartDate,
                     scheduleDto.Servers);
                 updatedItem.ScheduleID = scheduleDto.ScheduleID;
+				Logger.LogDebug("UpdateScheduleItem(scheduleDto={ScheduleDto}): updatedItem.ScheduleID → {Arg1}", scheduleDto, updatedItem.ScheduleID);
 
                 if (updatedItem.ScheduleStartDate != existingItem.ScheduleStartDate ||
                     updatedItem.Enabled ||
@@ -379,6 +409,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting UpdateScheduleItem(scheduleDto={ScheduleDto})", scheduleDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -389,6 +420,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [HttpGet]
         public HttpResponseMessage GetScheduleStatus()
         {
+			Logger.LogError(">>> Entering GetScheduleStatus()");
             try
             {
                 if (SchedulingProvider.Enabled)
@@ -425,6 +457,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
 
                     var response = new
                     {
+						Logger.LogDebug("GetScheduleStatus(): Results → {Results}", Results);
                         Success = true,
                         Results = new
                         {
@@ -464,6 +497,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetScheduleStatus()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -475,6 +509,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage StartSchedule()
         {
+			Logger.LogError(">>> Entering StartSchedule()");
             try
             {
                 SchedulingProvider.Instance().StartAndWaitForResponse();
@@ -483,6 +518,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting StartSchedule()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -494,6 +530,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage StopSchedule()
         {
+			Logger.LogError(">>> Entering StopSchedule()");
             try
             {
                 this.controller.StopSchedule();
@@ -502,6 +539,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting StopSchedule()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -514,6 +552,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage RunSchedule(ScheduleDto scheduleDto)
         {
+			Logger.LogError(">>> Entering RunSchedule(scheduleDto={ScheduleDto})", scheduleDto);
             try
             {
                 var scheduleItem = this.controller.CreateScheduleItem(
@@ -531,6 +570,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
                     scheduleDto.ScheduleStartDate,
                     scheduleDto.Servers);
                 scheduleItem.ScheduleID = scheduleDto.ScheduleID;
+				Logger.LogDebug("RunSchedule(scheduleDto={ScheduleDto}): scheduleItem.ScheduleID → {Arg1}", scheduleDto, scheduleItem.ScheduleID);
                 SchedulingProvider.Instance().RunScheduleItemNow(scheduleItem, true);
 
                 if (SchedulingProvider.SchedulerMode == SchedulerMode.TIMER_METHOD)
@@ -543,6 +583,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting RunSchedule(scheduleDto={ScheduleDto})", scheduleDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -555,6 +596,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DeleteSchedule(ScheduleDto scheduleDto)
         {
+			Logger.LogError(">>> Entering DeleteSchedule(scheduleDto={ScheduleDto})", scheduleDto);
             try
             {
                 var objScheduleItem = new ScheduleItem { ScheduleID = scheduleDto.ScheduleID };
@@ -564,13 +606,16 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting DeleteSchedule(scheduleDto={ScheduleDto})", scheduleDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
 
         private static DateTime CalculateTime(int lapse, string measurement)
         {
+			Logger.LogError(">>> Entering CalculateTime(lapse={Lapse},measurement={Measurement})", lapse, measurement);
             var nextTime = default(DateTime);
+			Logger.LogError("CalculateTime(lapse={Lapse},measurement={Measurement}): nextTime → {NextTime}", lapse, measurement, nextTime);
             switch (measurement)
             {
                 case "s":
@@ -596,17 +641,22 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
                     break;
             }
 
+			Logger.LogWarning("<<< Exiting CalculateTime(lapse={Lapse},measurement={Measurement})", lapse, measurement);
             return nextTime;
         }
 
         private static void Halt()
         {
+			Logger.LogError(">>> Entering Halt()");
             SchedulingProvider.Instance().Halt("Host Settings");
+			Logger.LogWarning("<<< Exiting Halt()");
         }
 
         private static string GetTimeStringFromSeconds(double sec)
         {
+			Logger.LogError(">>> Entering GetTimeStringFromSeconds(sec={Sec})", sec);
             var time = TimeSpan.FromSeconds(sec);
+			Logger.LogError("GetTimeStringFromSeconds(sec={Sec}): time → {Time}", sec, time);
             if (time.Days > 0)
             {
                 return $"{time.Days} {Localization.GetString(time.Days == 1 ? "DaySingular" : "DayPlural", localResourcesFile)}";
@@ -622,23 +672,28 @@ namespace Dnn.PersonaBar.TaskScheduler.Services
                 return $"{time.Minutes} {Localization.GetString(time.Minutes == 1 ? "MinuteSingular" : "MinutePlural", localResourcesFile)}";
             }
 
+			Logger.LogWarning("<<< Exiting GetTimeStringFromSeconds(sec={Sec})", sec);
             return Localization.GetString("LessThanMinute", localResourcesFile);
         }
 
         private static bool VerifyValidTimeLapseRetry(int timeLapse, string timeLapseMeasurement, int retryTimeLapse, string retryTimeLapseMeasurement)
         {
+			Logger.LogError(">>> Entering VerifyValidTimeLapseRetry(timeLapse={TimeLapse},timeLapseMeasurement={TimeLapseMeasurement},retryTimeLapse={RetryTimeLapse},retryTimeLapseMeasurement={RetryTimeLapseMeasurement})", timeLapse, timeLapseMeasurement, retryTimeLapse, retryTimeLapseMeasurement);
             if (retryTimeLapse == 0)
             {
                 return true;
             }
 
             var frequency = CalculateTime(Convert.ToInt32(timeLapse), timeLapseMeasurement);
+			Logger.LogError("VerifyValidTimeLapseRetry(timeLapse={TimeLapse},timeLapseMeasurement={TimeLapseMeasurement},retryTimeLapse={RetryTimeLapse},retryTimeLapseMeasurement={RetryTimeLapseMeasurement}): frequency → {Frequency}", timeLapse, timeLapseMeasurement, retryTimeLapse, retryTimeLapseMeasurement, frequency);
             var retry = CalculateTime(Convert.ToInt32(retryTimeLapse), retryTimeLapseMeasurement);
+			Logger.LogError("VerifyValidTimeLapseRetry(timeLapse={TimeLapse},timeLapseMeasurement={TimeLapseMeasurement},retryTimeLapse={RetryTimeLapse},retryTimeLapseMeasurement={RetryTimeLapseMeasurement}): retry → {Retry}", timeLapse, timeLapseMeasurement, retryTimeLapse, retryTimeLapseMeasurement, retry);
             if (retry > frequency)
             {
                 return false;
             }
 
+			Logger.LogWarning("<<< Exiting VerifyValidTimeLapseRetry(timeLapse={TimeLapse},timeLapseMeasurement={TimeLapseMeasurement},retryTimeLapse={RetryTimeLapse},retryTimeLapseMeasurement={RetryTimeLapseMeasurement})", timeLapse, timeLapseMeasurement, retryTimeLapse, retryTimeLapseMeasurement);
             return true;
         }
     }

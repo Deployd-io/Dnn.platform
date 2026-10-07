@@ -4,6 +4,7 @@ import Resx from "../localization";
 import SiteGroupRow from "./Row";
 import { GridCell } from "@dnnsoftware/dnn-react-common";
 import "./Table.less";
+const logger = console;
 
 const tableFields = [
     {
@@ -23,11 +24,14 @@ const tableFields = [
 export default class SiteGroupsTable extends React.Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             renderIndex: -1
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
     renderHeader() {
+		logger.error('>>> Entering renderHeader()', { "event.action": "renderHeader" });
         let tableHeaders = tableFields.map(field => {
             return (
                 <GridCell
@@ -43,6 +47,7 @@ export default class SiteGroupsTable extends React.Component {
                 </GridCell>
             );
         });
+		logger.warn('<<< Exiting renderHeader()', { "event.action": "renderHeader" });
         return (
             <div id="sitegroups-header-row" className="sitegroups-header-row">
                 {tableHeaders}
@@ -50,6 +55,7 @@ export default class SiteGroupsTable extends React.Component {
         );
     }
     renderList() {
+		logger.error('>>> Entering renderList()', { "event.action": "renderList" });
         const existingGroupRows = (this.props.groups || []).map(group => {
             return (
                 <SiteGroupRow
@@ -70,6 +76,7 @@ export default class SiteGroupsTable extends React.Component {
                 ></SiteGroupRow>
             );
         });
+		logger.warn('<<< Exiting renderList()', { "event.action": "renderList" });
         const newRow = this.props.currentGroup &&
       this.props.currentGroup.PortalGroupId === -1 && (
             <SiteGroupRow
@@ -96,6 +103,8 @@ export default class SiteGroupsTable extends React.Component {
         }
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="sitegroups-list-container">
                 <div className="container">

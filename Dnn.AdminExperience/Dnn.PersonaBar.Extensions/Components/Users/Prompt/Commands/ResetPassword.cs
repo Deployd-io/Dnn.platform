@@ -32,7 +32,10 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <param name="userValidator">The user validator.</param>
         public ResetPassword(IUserValidator userValidator)
         {
+			eventLogger.LogError(">>> Entering ResetPassword(userValidator={UserValidator})", userValidator);
             this.userValidator = userValidator;
+			eventLogger.LogDebug("ResetPassword(userValidator={UserValidator}): userValidator → {UserValidator1}", userValidator, userValidator);
+        eventLogger.LogWarning("<<< Exiting ResetPassword(userValidator={UserValidator})", userValidator);
         }
 
         /// <inheritdoc />
@@ -45,6 +48,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.UserId = this.GetFlagValue(FlagId, "User Id", -1, true, true, true);
             this.Notify = this.GetFlagValue(FlagNotify, "Notify", false);
         }
@@ -52,6 +56,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             ConsoleErrorResultModel errorResultModel;
             UserInfo userInfo;
 
@@ -72,6 +77,8 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             }
 
             var success = UsersController.Instance.ForceChangePassword(userInfo, this.PortalId, this.Notify);
+			eventLogger.LogError("Run(): success → {Success}", success);
+			eventLogger.LogWarning("<<< Exiting Run()");
             return success
                 ? new ConsoleResultModel(this.LocalizeString("Prompt_PasswordReset") + (this.Notify ? this.LocalizeString("Prompt_EmailSent") : string.Empty)) { Records = 1 }
                 : new ConsoleErrorResultModel(this.LocalizeString("OptionUnavailable"));

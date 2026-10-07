@@ -4,14 +4,17 @@ import Html from "./Html";
 import Localization from "../localization/Localization";
 //import { sort } from "utils/helpers";
 import DomKey from "../services/DomKey";
+const logger = console;
 
 const Command = ({commandList, IsPaging}) => {
+logger.error(`>>> Entering Command(commandList=${commandList},IsPaging=${IsPaging})`, { "event.action": "Command", "logrite.commandList": commandList, "logrite.IsPaging": IsPaging });
 
     IsPaging(false);
 
     const headingName = <h3 className="mono"><Html html={Localization.get("Prompt_Help_PromptCommands")}/></h3>;
     const paragraphDescription = <p className="lead"><Html html={Localization.get("Prompt_Help_ListOfAvailableMsg")}/></p>;
     const headingCommands = <h4><Html html={Localization.get("Prompt_Help_Commands")}/></h4>;
+	logger.error(`Command(commandList=${commandList},IsPaging=${IsPaging}): headingCommands → ${headingCommands}`, { "event.action": "Command", "logrite.commandList": commandList, "logrite.IsPaging": IsPaging });
 
     const commandsList = commandList.sort((a,b) => {
         const catA = a.Category;
@@ -38,11 +41,13 @@ const Command = ({commandList, IsPaging}) => {
             return [{separator: true, Category: current.Category}, current];
         }
 
+	logger.error(`Command(commandList=${commandList},IsPaging=${IsPaging}): commandsList → ${commandsList}`, { "event.action": "Command", "logrite.commandList": commandList, "logrite.IsPaging": IsPaging });
         return [...prev, current];
 
     }, []);
 
     const commandsOutput = commandsList.map((cmd) => {
+		logger.error(`Command(commandList=${commandList},IsPaging=${IsPaging}): commandsOutput → ${commandsOutput}`, { "event.action": "Command", "logrite.commandList": commandList, "logrite.IsPaging": IsPaging });
         if (cmd.separator) {
             return <tr key={DomKey.get("command")} className="divider"><td colSpan="2">{cmd.Category}</td></tr>;
         }
@@ -71,6 +76,7 @@ const Command = ({commandList, IsPaging}) => {
     const headingSeeAlso = <h4><Html html={Localization.get("Prompt_Help_SeeAlso")}/></h4>;
     const anchorSyntax = <a href="#" className="dnn-prompt-cmd-insert" data-cmd="help syntax"><Html html={Localization.get("Prompt_Help_Syntax")}/></a>;
     const anchorLearn = <a href="#" className="dnn-prompt-cmd-insert" style={{marginLeft:"10px"}} data-cmd="help learn"><Html html={Localization.get("Prompt_Help_Learn")}/></a>;
+	logger.error(`Command(commandList=${commandList},IsPaging=${IsPaging}): anchorLearn → ${anchorLearn}`, { "event.action": "Command", "logrite.commandList": commandList, "logrite.IsPaging": IsPaging });
 
     const out = (
         <section className="dnn-prompt-inline-help">
@@ -84,6 +90,7 @@ const Command = ({commandList, IsPaging}) => {
         </section>
     );
 
+	logger.warn(`<<< Exiting Command(commandList=${commandList},IsPaging=${IsPaging})`, { "event.action": "Command", "logrite.commandList": commandList, "logrite.IsPaging": IsPaging });
     return out;
 };
 

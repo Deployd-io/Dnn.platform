@@ -17,6 +17,8 @@ namespace Dnn.PersonaBar.Servers.Components.PerformanceSettings
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public object GetPageStatePersistenceOptions()
         {
+			eventLogger.LogError(">>> Entering GetPageStatePersistenceOptions()");
+			eventLogger.LogWarning("<<< Exiting GetPageStatePersistenceOptions()");
             return new[]
             {
                 new KeyValuePair<string, string>("Page", "P"),
@@ -47,6 +49,8 @@ namespace Dnn.PersonaBar.Servers.Components.PerformanceSettings
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public object GetCacheSettingOptions()
         {
+			eventLogger.LogError(">>> Entering GetCacheSettingOptions()");
+			eventLogger.LogWarning("<<< Exiting GetCacheSettingOptions()");
             return new[]
             {
                 new KeyValuePair<string, int>("NoCaching", 0),
@@ -59,6 +63,8 @@ namespace Dnn.PersonaBar.Servers.Components.PerformanceSettings
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public object GetCacheabilityOptions()
         {
+			eventLogger.LogError(">>> Entering GetCacheabilityOptions()");
+			eventLogger.LogWarning("<<< Exiting GetCacheabilityOptions()");
             return new[]
             {
                 new KeyValuePair<string, int>("NoCache", 1),
@@ -72,6 +78,8 @@ namespace Dnn.PersonaBar.Servers.Components.PerformanceSettings
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public string GetCachingProvider()
         {
+			eventLogger.LogError(">>> Entering GetCachingProvider()");
+            eventLogger.LogWarning("<<< Exiting GetCachingProvider()");
             return ProviderConfiguration.GetProviderConfiguration("caching").DefaultProvider;
         }
 

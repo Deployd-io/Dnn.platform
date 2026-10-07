@@ -10,6 +10,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A form panel control.</summary>
     public class DnnFormPanel : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFormPanel));
         /// <summary>Gets or sets a value indicating whether the panel is expanded.</summary>
         public bool Expanded { get; set; }
 
@@ -19,6 +20,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering Render(writer={Writer})", writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Class, this.CssClass);
             writer.RenderBeginTag(HtmlTextWriterTag.H2);
 
@@ -38,6 +40,7 @@ namespace DotNetNuke.Web.UI.WebControls
             this.RenderChildren(writer);
 
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

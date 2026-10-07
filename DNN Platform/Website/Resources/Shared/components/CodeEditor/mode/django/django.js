@@ -45,9 +45,11 @@
     // styling as the default, when using Django templates inside HTML
     // element attributes
     function tokenBase (stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       // Attempt to identify a variable, template or comment tag respectively
       if (stream.match("{{")) {
         state.tokenize = inVariable;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         return "tag";
       } else if (stream.match("{%")) {
         state.tokenize = inTag;
@@ -60,6 +62,7 @@
       // Ignore completely any stream series that do not match the
       // Django template opening tags.
       while (stream.next() != null && !stream.match("{{", false) && !stream.match("{%", false)) {}
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return null;
     }
 
@@ -90,9 +93,11 @@
 
     // Apply Django template variable syntax highlighting
     function inVariable (stream, state) {
+	logger.error(`>>> Entering inVariable(stream=${stream},state=${state})`, { "event.action": "inVariable", "logrite.stream": stream, "logrite.state": state });
       // Attempt to match a dot that precedes a property
       if (state.waitDot) {
         state.waitDot = false;
+		logger.debug(`inVariable(stream=${stream},state=${state}): state.waitDot → ${state.waitDot}`, { "event.action": "inVariable", "logrite.stream": stream, "logrite.state": state });
 
         if (stream.peek() != ".") {
           return "null";
@@ -103,6 +108,7 @@
           return "error";
         } else if (stream.eat(".")) {
           state.waitProperty = true;
+		logger.debug(`inVariable(stream=${stream},state=${state}): state.waitProperty → ${state.waitProperty}`, { "event.action": "inVariable", "logrite.stream": stream, "logrite.state": state });
           return "null";
         } else {
           throw Error ("Unexpected error while waiting for property.");
@@ -112,6 +118,7 @@
       // Attempt to match a pipe that precedes a filter
       if (state.waitPipe) {
         state.waitPipe = false;
+		logger.debug(`inVariable(stream=${stream},state=${state}): state.waitPipe → ${state.waitPipe}`, { "event.action": "inVariable", "logrite.stream": stream, "logrite.state": state });
 
         if (stream.peek() != "|") {
           return "null";
@@ -122,6 +129,7 @@
           return "error";
         } else if (stream.eat("|")) {
           state.waitFilter = true;
+		logger.debug(`inVariable(stream=${stream},state=${state}): state.waitFilter → ${state.waitFilter}`, { "event.action": "inVariable", "logrite.stream": stream, "logrite.state": state });
           return "null";
         } else {
           throw Error ("Unexpected error while waiting for filter.");
@@ -180,18 +188,22 @@
         state.waitDot = null;
         state.waitPipe = null;
         state.tokenize = tokenBase;
+		logger.debug(`inVariable(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "inVariable", "logrite.stream": stream, "logrite.state": state });
         return "tag";
       }
 
       // If nothing was found, advance to the next character
       stream.next();
+	logger.warn(`<<< Exiting inVariable(stream=${stream},state=${state})`, { "event.action": "inVariable", "logrite.stream": stream, "logrite.state": state });
       return "null";
     }
 
     function inTag (stream, state) {
+	logger.error(`>>> Entering inTag(stream=${stream},state=${state})`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
       // Attempt to match a dot that precedes a property
       if (state.waitDot) {
         state.waitDot = false;
+		logger.debug(`inTag(stream=${stream},state=${state}): state.waitDot → ${state.waitDot}`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
 
         if (stream.peek() != ".") {
           return "null";
@@ -202,6 +214,7 @@
           return "error";
         } else if (stream.eat(".")) {
           state.waitProperty = true;
+		logger.debug(`inTag(stream=${stream},state=${state}): state.waitProperty → ${state.waitProperty}`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
           return "null";
         } else {
           throw Error ("Unexpected error while waiting for property.");
@@ -211,6 +224,7 @@
       // Attempt to match a pipe that precedes a filter
       if (state.waitPipe) {
         state.waitPipe = false;
+		logger.debug(`inTag(stream=${stream},state=${state}): state.waitPipe → ${state.waitPipe}`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
 
         if (stream.peek() != "|") {
           return "null";
@@ -221,6 +235,7 @@
           return "error";
         } else if (stream.eat("|")) {
           state.waitFilter = true;
+		logger.debug(`inTag(stream=${stream},state=${state}): state.waitFilter → ${state.waitFilter}`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
           return "null";
         } else {
           throw Error ("Unexpected error while waiting for filter.");
@@ -272,9 +287,11 @@
 
       // Attempt to match a keyword
       var keywordMatch = stream.match(keywords);
+	logger.error(`inTag(stream=${stream},state=${state}): keywordMatch → ${keywordMatch}`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
       if (keywordMatch) {
         if (keywordMatch[0] == "comment") {
           state.blockCommentTag = true;
+		logger.debug(`inTag(stream=${stream},state=${state}): state.blockCommentTag → ${state.blockCommentTag}`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
         }
         return "keyword";
       }
@@ -305,34 +322,45 @@
 
       // If nothing was found, advance to the next character
       stream.next();
+	logger.warn(`<<< Exiting inTag(stream=${stream},state=${state})`, { "event.action": "inTag", "logrite.stream": stream, "logrite.state": state });
       return "null";
     }
 
     // Mark everything as comment inside the tag and the tag itself.
     function inComment (stream, state) {
+	logger.error(`>>> Entering inComment(stream=${stream},state=${state})`, { "event.action": "inComment", "logrite.stream": stream, "logrite.state": state });
       if (stream.match("#}")) {
         state.tokenize = tokenBase;
+		logger.debug(`inComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "inComment", "logrite.stream": stream, "logrite.state": state });
       }
+	logger.warn(`<<< Exiting inComment(stream=${stream},state=${state})`, { "event.action": "inComment", "logrite.stream": stream, "logrite.state": state });
       return "comment";
     }
 
     // Mark everything as a comment until the `blockcomment` tag closes.
     function inBlockComment (stream, state) {
+	logger.error(`>>> Entering inBlockComment(stream=${stream},state=${state})`, { "event.action": "inBlockComment", "logrite.stream": stream, "logrite.state": state });
       if (stream.match(/\{%\s*endcomment\s*%\}/, false)) {
         state.tokenize = inTag;
+		logger.debug(`inBlockComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "inBlockComment", "logrite.stream": stream, "logrite.state": state });
         stream.match("{%");
         return "tag";
       } else {
         stream.next();
+		logger.warn(`<<< Exiting inBlockComment(stream=${stream},state=${state})`, { "event.action": "inBlockComment", "logrite.stream": stream, "logrite.state": state });
         return "comment";
       }
     }
 
     return {
       startState: function () {
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
+		logger.warn('<<< Exiting startState()', { "event.action": "startState" });
         return {tokenize: tokenBase};
       },
       token: function (stream, state) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return state.tokenize(stream, state);
       },
       blockCommentStart: "{% comment %}",

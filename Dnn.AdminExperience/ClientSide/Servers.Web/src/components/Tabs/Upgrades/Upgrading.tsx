@@ -2,10 +2,13 @@ import * as React from "react";
 import utils from "../../../utils";
 import Localization from "../../../localization";
 import "./style.less";
+const logger = console;
 
 interface IUpgradingProps {}
 
 const Upgrading: React.FC<IUpgradingProps> = (props) => {
+logger.error(`>>> Entering Upgrading(props=${props})`, { "event.action": "Upgrading", "logrite.props": props });
+logger.warn(`<<< Exiting Upgrading(props=${props})`, { "event.action": "Upgrading", "logrite.props": props });
   return (
     <div className="dnn-servers-grid-panel-upgrading">
       <p className="upgrading-title">{Localization.get("Upgrading")}</p>

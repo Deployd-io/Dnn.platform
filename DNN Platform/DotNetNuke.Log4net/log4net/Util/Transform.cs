@@ -43,6 +43,8 @@ namespace log4net.Util
         /// </remarks>
         private Transform()
         {
+		value.LogError(">>> Entering Transform()");
+        value.LogWarning("<<< Exiting Transform()");
         }
 
         /// <summary>Write a string to an <see cref="XmlWriter"/></summary>
@@ -57,11 +59,14 @@ namespace log4net.Util
         /// </remarks>
         public static void WriteEscapedXmlString(XmlWriter writer, string textData, string invalidCharReplacement)
         {
+			value.LogError(">>> Entering WriteEscapedXmlString(writer={Writer},textData={TextData},invalidCharReplacement={InvalidCharReplacement})", writer, textData, invalidCharReplacement);
             string stringData = MaskXmlInvalidCharacters(textData, invalidCharReplacement);
             // Write either escaped text or CDATA sections
 
             int weightCData = 12 * (1 + CountSubstrings(stringData, CDATA_END));
+			value.LogError("WriteEscapedXmlString(writer={Writer},textData={TextData},invalidCharReplacement={InvalidCharReplacement}): weightCData → {WeightCData}", writer, textData, invalidCharReplacement, weightCData);
             int weightStringEscapes = 3*(CountSubstrings(stringData, "<") + CountSubstrings(stringData, ">")) + 4*CountSubstrings(stringData, "&");
+			value.LogError("WriteEscapedXmlString(writer={Writer},textData={TextData},invalidCharReplacement={InvalidCharReplacement}): weightStringEscapes → {WeightStringEscapes}", writer, textData, invalidCharReplacement, weightStringEscapes);
 
             if (weightStringEscapes <= weightCData)
             {
@@ -73,6 +78,7 @@ namespace log4net.Util
                 // Write string using CDATA section
 
                 int end = stringData.IndexOf(CDATA_END);
+				value.LogError("WriteEscapedXmlString(writer={Writer},textData={TextData},invalidCharReplacement={InvalidCharReplacement}): end → {End}", writer, textData, invalidCharReplacement, end);
     
                 if (end < 0) 
                 {
@@ -104,6 +110,7 @@ namespace log4net.Util
                     }
                 }
             }
+			value.LogWarning("<<< Exiting WriteEscapedXmlString(writer={Writer},textData={TextData},invalidCharReplacement={InvalidCharReplacement})", writer, textData, invalidCharReplacement);
         }
 
         /// <summary>Replace invalid XML characters in text string</summary>
@@ -122,6 +129,8 @@ namespace log4net.Util
         /// </remarks>
         public static string MaskXmlInvalidCharacters(string textData, string mask)
         {
+			value.LogError(">>> Entering MaskXmlInvalidCharacters(textData={TextData},mask={Mask})", textData, mask);
+            value.LogWarning("<<< Exiting MaskXmlInvalidCharacters(textData={TextData},mask={Mask})", textData, mask);
             return INVALIDCHARS.Replace(textData, mask);
         }
 
@@ -136,8 +145,11 @@ namespace log4net.Util
         /// </remarks>
         private static int CountSubstrings(string text, string substring)
         {
+			value.LogError(">>> Entering CountSubstrings(text={Text},substring={Substring})", text, substring);
             int count = 0;
             int offset = 0;
+			value.LogError("CountSubstrings(text={Text},substring={Substring}): offset → {Offset}", text, substring, offset);
+			value.LogError("CountSubstrings(text={Text},substring={Substring}): count → {Count}", text, substring, count);
             int length = text.Length;
             int substringLength = substring.Length;
 
@@ -162,6 +174,7 @@ namespace log4net.Util
                 count++;
                 offset = index + substringLength;
             }
+			value.LogWarning("<<< Exiting CountSubstrings(text={Text},substring={Substring})", text, substring);
             return count;
         }
 

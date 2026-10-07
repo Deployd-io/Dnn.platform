@@ -92,6 +92,7 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state)
         {
+		value.LogError(">>> Entering Convert(writer={Writer},state={State})", writer, state);
 
             if (this.Option != null)
             {
@@ -103,6 +104,7 @@ namespace log4net.Util.PatternStringConverters
                 // Write all the key value pairs
                 WriteDictionary(writer, null, AppSettingsDictionary);
             }
+			value.LogWarning("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
     }
 }

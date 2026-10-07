@@ -14,6 +14,7 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 const re = /^[1-9][0-9]?[0-9]?$|^0$/;
 const re2 = /^([9]\d|\d{3,4})$/;
@@ -22,6 +23,7 @@ const re3 = /^([1][2-9]|[2-9][0-9]|\d{3,})$/;
 class OtherSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             otherSettings: undefined,
             error: {
@@ -31,9 +33,11 @@ class OtherSettingsPanelBody extends Component {
             },
             triedToSubmit: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
         if (props.otherSettings) {
             this.setState({
@@ -47,12 +51,15 @@ class OtherSettingsPanelBody extends Component {
                 otherSettings
             });
         }));
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         let {state} = this;
 
         let autoAccountUnlockDuration = props.otherSettings["AutoAccountUnlockDuration"];
+		logger.error(`UNSAFE_componentWillReceiveProps(props=${props}): autoAccountUnlockDuration → ${autoAccountUnlockDuration}`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         if (autoAccountUnlockDuration === "" || !re.test(autoAccountUnlockDuration)) {
             state.error["autoAccountUnlockDuration"] = true;
         }
@@ -60,6 +67,7 @@ class OtherSettingsPanelBody extends Component {
             state.error["autoAccountUnlockDuration"] = false;
         }
         let asyncTimeout = props.otherSettings["AsyncTimeout"];
+		logger.error(`UNSAFE_componentWillReceiveProps(props=${props}): asyncTimeout → ${asyncTimeout}`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         if (asyncTimeout === "" || !re2.test(asyncTimeout)) {
             state.error["asyncTimeout"] = true;
         }
@@ -67,11 +75,13 @@ class OtherSettingsPanelBody extends Component {
             state.error["asyncTimeout"] = false;
         }
         let maxUploadSize = props.otherSettings["MaxUploadSize"];
+		logger.error(`UNSAFE_componentWillReceiveProps(props=${props}): maxUploadSize → ${maxUploadSize}`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         if (!this.isMaxUploadSizeValid(maxUploadSize)) {
             state.error["maxUploadSize"] = true;
         }
         else if (this.isMaxUploadSizeValid(maxUploadSize)) {
             state.error["maxUploadSize"] = false;
+			logger.warn(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         }
 
         this.setState({
@@ -82,6 +92,7 @@ class OtherSettingsPanelBody extends Component {
     }
 
     isMaxUploadSizeValid(size) {
+		logger.error(`>>> Entering isMaxUploadSizeValid(size=${size})`, { "event.action": "isMaxUploadSizeValid", "logrite.size": size });
         let {props} = this;
         if (props.otherSettings === undefined) {
             return true;
@@ -96,14 +107,17 @@ class OtherSettingsPanelBody extends Component {
                 return false;
             }
             else {
+				logger.warn(`<<< Exiting isMaxUploadSizeValid(size=${size})`, { "event.action": "isMaxUploadSizeValid", "logrite.size": size });
                 return true;
             }
         }
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {state, props} = this;
         let otherSettings = Object.assign({}, state.otherSettings);
+		logger.error(`onSettingChange(key=${key},event=${event}): otherSettings → ${otherSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         otherSettings[key] = typeof (event) === "object" ? event.target.value : event;
 
         if (!re.test(otherSettings[key]) && key === "AutoAccountUnlockDuration") {
@@ -131,9 +145,11 @@ class OtherSettingsPanelBody extends Component {
             triedToSubmit: false
         });
         props.dispatch(SecurityActions.otherSettingsClientModified(otherSettings));
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -150,12 +166,15 @@ class OtherSettingsPanelBody extends Component {
         }, () => {
             util.utilities.notifyError(resx.get("OtherSettingsError"));
         }));
+		logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         util.utilities.confirm(resx.get("OtherSettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SecurityActions.getOtherSettings((data) => {
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
                 let otherSettings = Object.assign({}, data.Results.Settings);
                 this.setState({
                     otherSettings
@@ -166,6 +185,7 @@ class OtherSettingsPanelBody extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { state } = this;
         if (state.otherSettings) {
             return (
@@ -379,6 +399,8 @@ OtherSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         otherSettings: state.security.otherSettings,

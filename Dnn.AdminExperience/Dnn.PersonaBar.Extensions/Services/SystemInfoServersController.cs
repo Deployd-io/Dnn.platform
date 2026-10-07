@@ -24,6 +24,7 @@ namespace Dnn.PersonaBar.Servers.Services
         [HttpGet]
         public HttpResponseMessage GetServers()
         {
+			Logger.LogError(">>> Entering GetServers()");
             try
             {
                 return this.Request.CreateResponse(HttpStatusCode.OK, GetServerList());
@@ -31,6 +32,7 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetServers()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -38,6 +40,7 @@ namespace Dnn.PersonaBar.Servers.Services
         [HttpPost]
         public HttpResponseMessage DeleteServer(DeleteServerDTO data)
         {
+			Logger.LogError(">>> Entering DeleteServer(data={Data})", data);
             try
             {
                 DotNetNuke.Entities.Host.ServerController.DeleteServer(data.ServerId);
@@ -47,6 +50,7 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting DeleteServer(data={Data})", data);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -54,10 +58,13 @@ namespace Dnn.PersonaBar.Servers.Services
         [HttpPost]
         public HttpResponseMessage EditServerUrl(EditServerUrlDTO data)
         {
+			Logger.LogError(">>> Entering EditServerUrl(data={Data})", data);
             try
             {
                 var server = DotNetNuke.Entities.Host.ServerController.GetServers().FirstOrDefault(s => s.ServerID == data.ServerId);
+				Logger.LogError("EditServerUrl(data={Data}): server → {Server}", data, server);
                 server.Url = data.NewUrl;
+				Logger.LogDebug("EditServerUrl(data={Data}): server.Url → {Arg1}", data, server.Url);
                 DotNetNuke.Entities.Host.ServerController.UpdateServer(server);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, true);
@@ -65,6 +72,7 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting EditServerUrl(data={Data})", data);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -72,6 +80,7 @@ namespace Dnn.PersonaBar.Servers.Services
         [HttpPost]
         public HttpResponseMessage DeleteNonActiveServers()
         {
+			Logger.LogError(">>> Entering DeleteNonActiveServers()");
             try
             {
                 foreach (var s in DotNetNuke.Entities.Host.ServerController.GetInActiveServers(1440))
@@ -84,12 +93,15 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting DeleteNonActiveServers()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
 
         private static IEnumerable<WebServer> GetServerList()
         {
+			Logger.LogError(">>> Entering GetServerList()");
+			Logger.LogWarning("<<< Exiting GetServerList()");
             return DotNetNuke.Entities.Host.ServerController.GetServers().Select(s => new WebServer()
             {
                 ServerId = s.ServerID,

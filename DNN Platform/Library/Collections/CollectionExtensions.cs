@@ -67,6 +67,8 @@ namespace DotNetNuke.Collections
         /// <returns>The dictionary's contents as a <see cref="string" />.</returns>
         public static string DictionaryToString(this Dictionary<string, string> dictionary, string pairsSeparator, string pairSeparator)
         {
+			Logger.LogError(">>> Entering DictionaryToString(dictionary={Dictionary},pairsSeparator={PairsSeparator},pairSeparator={PairSeparator})", dictionary, pairsSeparator, pairSeparator);
+			Logger.LogWarning("<<< Exiting DictionaryToString(dictionary={Dictionary},pairsSeparator={PairsSeparator},pairSeparator={PairSeparator})", dictionary, pairsSeparator, pairSeparator);
             return string.Join(pairsSeparator, dictionary.Select(pair => pair.Key + pairSeparator + pair.Value));
         }
 
@@ -143,6 +145,8 @@ namespace DotNetNuke.Collections
         /// <exception cref="ArgumentException"><paramref name="node"/> does not contain a value for <paramref name="key"/>.</exception>
         public static T GetValue<T>(this IXPathNavigable node, string key)
         {
+			Logger.LogError(">>> Entering GetValue(node={Node},key={Key})", node, key);
+            Logger.LogWarning("<<< Exiting GetValue(node={Node},key={Key})", node, key);
             return node.ToDictionary().GetValue<T>(key);
         }
 
@@ -336,6 +340,8 @@ namespace DotNetNuke.Collections
         /// <exception cref="ArgumentNullException"><paramref name="dictionary"/> is <c>null</c>.</exception>
         public static T GetValueOrDefault<T>(this IDictionary dictionary, string key)
         {
+			Logger.LogError(">>> Entering GetValueOrDefault(dictionary={Dictionary},key={Key})", dictionary, key);
+            Logger.LogWarning("<<< Exiting GetValueOrDefault(dictionary={Dictionary},key={Key})", dictionary, key);
             return dictionary.GetValueOrDefault(key, default(T));
         }
 
@@ -770,6 +776,8 @@ namespace DotNetNuke.Collections
         /// <exception cref="ArgumentNullException"><paramref name="lookup"/> is <c>null</c>.</exception>
         public static IEnumerable<T> GetValues<T>(this ILookup<string, string> lookup, string key)
         {
+			Logger.LogError(">>> Entering GetValues(lookup={Lookup},key={Key})", lookup, key);
+            Logger.LogWarning("<<< Exiting GetValues(lookup={Lookup},key={Key})", lookup, key);
             return lookup.GetValues(key, ConvertValue<T>);
         }
 
@@ -840,11 +848,13 @@ namespace DotNetNuke.Collections
         /// <returns>The provided source after the action was performed on each element.</returns>
         public static IEnumerable<TType> ForEach<TType>(this IEnumerable<TType> source, Action<TType> action)
         {
+			Logger.LogError(">>> Entering ForEach(source={Source},action={Action})", source, action);
             foreach (TType element in source)
             {
                 action(element);
             }
 
+			Logger.LogWarning("<<< Exiting ForEach(source={Source},action={Action})", source, action);
             return source;
         }
 
@@ -856,14 +866,25 @@ namespace DotNetNuke.Collections
         /// <returns>A serializable list of type T.</returns>
         public static SerializablePagedList<T> Serialize<T>(this IPagedList<T> list)
         {
+			Logger.LogError(">>> Entering Serialize(list={List})", list);
             var res = new SerializablePagedList<T>();
+			Logger.LogWarning("<<< Exiting Serialize(list={List})", list);
+			Logger.LogDebug("Serialize(list={List}): res.PageSize → {Arg1}", list, res.PageSize);
+			Logger.LogDebug("Serialize(list={List}): res.IsFirstPage → {Arg1}", list, res.IsFirstPage);
+			Logger.LogDebug("Serialize(list={List}): res.IsLastPage → {Arg1}", list, res.IsLastPage);
+			Logger.LogDebug("Serialize(list={List}): res.PageCount → {Arg1}", list, res.PageCount);
+			Logger.LogDebug("Serialize(list={List}): res.TotalCount → {Arg1}", list, res.TotalCount);
+			Logger.LogDebug("Serialize(list={List}): res.Data → {Arg1}", list, res.Data);
+			Logger.LogError("Serialize(list={List}): res → {Res}", list, res);
             res.PageIndex = list.PageIndex;
+			Logger.LogDebug("Serialize(list={List}): res.PageIndex → {Arg1}", list, res.PageIndex);
             res.PageSize = list.PageSize;
             res.IsFirstPage = list.IsFirstPage;
             res.IsLastPage = list.IsLastPage;
             res.PageCount = list.PageCount;
             res.TotalCount = list.TotalCount;
             res.Data = list;
+			Logger.LogWarning("<<< Exiting Serialize(list={List},cast={Cast})", list, cast);
             return res;
         }
 
@@ -879,7 +900,14 @@ namespace DotNetNuke.Collections
         {
             var res = new SerializablePagedList<TU>();
             res.PageIndex = list.PageIndex;
+			Logger.LogDebug("Serialize(list={List},cast={Cast}): res.PageIndex → {Arg2}", list, cast, res.PageIndex);
+			Logger.LogDebug("Serialize(list={List},cast={Cast}): res.IsFirstPage → {Arg2}", list, cast, res.IsFirstPage);
+			Logger.LogDebug("Serialize(list={List},cast={Cast}): res.IsLastPage → {Arg2}", list, cast, res.IsLastPage);
+			Logger.LogDebug("Serialize(list={List},cast={Cast}): res.PageCount → {Arg2}", list, cast, res.PageCount);
+			Logger.LogDebug("Serialize(list={List},cast={Cast}): res.TotalCount → {Arg2}", list, cast, res.TotalCount);
+			Logger.LogError("Serialize(list={List},cast={Cast}): res → {Res}", list, cast, res);
             res.PageSize = list.PageSize;
+			Logger.LogDebug("Serialize(list={List},cast={Cast}): res.PageSize → {Arg2}", list, cast, res.PageSize);
             res.IsFirstPage = list.IsFirstPage;
             res.IsLastPage = list.IsLastPage;
             res.PageCount = list.PageCount;
@@ -899,6 +927,7 @@ namespace DotNetNuke.Collections
         /// </exception>
         private static T ConvertValue<T>(object value)
         {
+			Logger.LogError(">>> Entering ConvertValue(value={Value})", value);
             if (value is T)
             {
                 return (T)value;
@@ -915,6 +944,7 @@ namespace DotNetNuke.Collections
                 {
                     if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Nullable<>))
                     {
+					Logger.LogError("Throwing InvalidCastException from ConvertValue(value={Value})", value);
                         return (T)value;
                     }
 
@@ -930,6 +960,7 @@ namespace DotNetNuke.Collections
                 return (T)(object)value.ToString();
             }
 
+			Logger.LogWarning("<<< Exiting ConvertValue(value={Value})", value);
             return (T)value;
         }
 

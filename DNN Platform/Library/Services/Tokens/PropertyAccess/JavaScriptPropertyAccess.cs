@@ -17,20 +17,27 @@ namespace DotNetNuke.Services.Tokens
     /// <summary>Property Access implementation for javascript registration.</summary>
     public class JavaScriptPropertyAccess : JsonPropertyAccess<JavaScriptDto>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JavaScriptPropertyAccess));
         private readonly Page page;
 
         /// <summary>Initializes a new instance of the <see cref="JavaScriptPropertyAccess"/> class.</summary>
         /// <param name="page">The current page.</param>
         public JavaScriptPropertyAccess(Page page)
         {
+			Logger.LogError(">>> Entering JavaScriptPropertyAccess(page={Page})", page);
             this.page = page;
+			Logger.LogDebug("JavaScriptPropertyAccess(page={Page}): page → {Page1}", page, page);
+        Logger.LogDebug("JavaScriptPropertyAccess(page={Page}): this.page → {Arg1}", page, this.page);
+        Logger.LogWarning("<<< Exiting JavaScriptPropertyAccess(page={Page})", page);
         }
 
         /// <inheritdoc />
         protected override string ProcessToken(JavaScriptDto model, UserInfo accessingUser, Scope accessLevel)
         {
+			Logger.LogError(">>> Entering ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel})", model, accessingUser, accessLevel);
             if (string.IsNullOrEmpty(model.JsName) && string.IsNullOrEmpty(model.Path))
             {
+				Logger.LogError("Throwing ArgumentException from ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel})", model, accessingUser, accessLevel);
                 throw new ArgumentException("If the jsname property is not specified then the JavaScript token must specify a path.");
             }
 
@@ -55,15 +62,19 @@ namespace DotNetNuke.Services.Tokens
                     model.HtmlAttributes);
             }
 
+			Logger.LogWarning("<<< Exiting ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel})", model, accessingUser, accessLevel);
             return string.Empty;
         }
 
         private static void RegisterInstalledLibrary(JavaScriptDto model)
         {
+			Logger.LogError(">>> Entering RegisterInstalledLibrary(model={Model})", model);
             Version version = null;
             var specific = SpecificVersion.Latest;
+			Logger.LogError("RegisterInstalledLibrary(model={Model}): version → {Version}", model, version);
             if (!string.IsNullOrEmpty(model.Version))
             {
+				Logger.LogError("RegisterInstalledLibrary(model={Model}): specific → {Specific}", model, specific);
                 version = new Version(model.Version);
 
                 if (!string.IsNullOrEmpty(model.Specific))
@@ -87,6 +98,7 @@ namespace DotNetNuke.Services.Tokens
             }
 
             JavaScript.RequestRegistration(model.JsName, version, specific);
+			Logger.LogWarning("<<< Exiting RegisterInstalledLibrary(model={Model})", model);
         }
     }
 }

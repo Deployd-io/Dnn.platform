@@ -151,10 +151,13 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
 
         public void SetModuleInfoHelp()
         {
+			eventLogger.LogError(">>> Entering SetModuleInfoHelp()");
             var returnValue = string.Empty;
             var moduleInfo = ModuleController.Instance.GetModule(this.ModuleId, Null.NullInteger, true);
+			eventLogger.LogError("SetModuleInfoHelp(): returnValue → {ReturnValue}", returnValue);
             if (moduleInfo != null)
             {
+				eventLogger.LogError("SetModuleInfoHelp(): moduleInfo → {ModuleInfo}", moduleInfo);
                 if (moduleInfo.IsDeleted)
                 {
                     returnValue = this.LocalizeString("ModuleDeleted.Text");
@@ -171,12 +174,15 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
                         : this.LocalizeString("ModuleInfoForNonAdmins.Text");
                 }
             }
+			eventLogger.LogWarning("<<< Exiting SetModuleInfoHelp()");
 
             this.ModuleInfoHelp = returnValue;
         }
 
         private string LocalizeString(string localizationKey)
         {
+			eventLogger.LogError(">>> Entering LocalizeString(localizationKey={LocalizationKey})", localizationKey);
+            eventLogger.LogWarning("<<< Exiting LocalizeString(localizationKey={LocalizationKey})", localizationKey);
             return Localization.GetString(localizationKey, this.LocalResourceFile) ?? string.Empty;
         }
     }

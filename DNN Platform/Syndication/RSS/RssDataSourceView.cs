@@ -9,6 +9,7 @@ namespace DotNetNuke.Services.Syndication
     /// <summary>An RSS <see cref="DataSourceView"/>.</summary>
     public class RssDataSourceView : DataSourceView
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RssDataSourceView));
         private readonly RssDataSource owner;
 
         /// <summary>Initializes a new instance of the <see cref="RssDataSourceView"/> class.</summary>
@@ -16,18 +17,26 @@ namespace DotNetNuke.Services.Syndication
         internal RssDataSourceView(RssDataSource owner, string viewName)
             : base(owner, viewName)
         {
+			Logger.LogError(">>> Entering RssDataSourceView(owner={Owner},viewName={ViewName})", owner, viewName);
             this.owner = owner;
+			Logger.LogDebug("RssDataSourceView(owner={Owner},viewName={ViewName}): owner → {Owner1}", owner, viewName, owner);
+        Logger.LogDebug("RssDataSourceView(owner={Owner},viewName={ViewName}): this.owner → {Arg2}", owner, viewName, this.owner);
+        Logger.LogWarning("<<< Exiting RssDataSourceView(owner={Owner},viewName={ViewName})", owner, viewName);
         }
 
         /// <inheritdoc />
         public override void Select(DataSourceSelectArguments arguments, DataSourceViewSelectCallback callback)
         {
+			Logger.LogError(">>> Entering Select(arguments={Arguments},callback={Callback})", arguments, callback);
             callback(this.ExecuteSelect(arguments));
+			Logger.LogWarning("<<< Exiting Select(arguments={Arguments},callback={Callback})", arguments, callback);
         }
 
         /// <inheritdoc />
         protected override IEnumerable ExecuteSelect(DataSourceSelectArguments arguments)
         {
+			Logger.LogError(">>> Entering ExecuteSelect(arguments={Arguments})", arguments);
+            Logger.LogWarning("<<< Exiting ExecuteSelect(arguments={Arguments})", arguments);
             return this.owner.Channel.SelectItems(this.owner.MaxItems);
         }
     }

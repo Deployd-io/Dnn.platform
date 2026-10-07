@@ -25,6 +25,7 @@ namespace Dnn.PersonaBar.Library.Common
             where TContract : class
             where TConcrete : class, new()
         {
+			Logger.LogError(">>> Entering RegisterComponent(name={Name})", name);
             try
             {
                 if (!string.IsNullOrEmpty(name))
@@ -33,6 +34,7 @@ namespace Dnn.PersonaBar.Library.Common
                 }
 
                 var component = GetInstanceLocal<TContract>(name);
+				Logger.LogError("RegisterComponent(name={Name}): component → {Component}", name, component);
 
                 if (component != null)
                 {
@@ -53,6 +55,7 @@ namespace Dnn.PersonaBar.Library.Common
             catch (Exception e)
             {
                 Logger.Error(e);
+			Logger.LogWarning("<<< Exiting RegisterComponent(name={Name})", name);
                 return false;
             }
         }
@@ -99,12 +102,14 @@ namespace Dnn.PersonaBar.Library.Common
         public static TContract GetInstance<TContract>(string name = null)
             where TContract : class
         {
+			Logger.LogError(">>> Entering GetInstance(name={Name})", name);
             if (!string.IsNullOrEmpty(name))
             {
                 name += "." + typeof(TContract).FullName;
             }
 
             var instance = GetInstanceLocal<TContract>(name);
+			Logger.LogError("GetInstance(name={Name}): instance → {Instance}", name, instance);
             if (instance == null)
             {
                 Logger.WarnFormat(
@@ -114,6 +119,7 @@ namespace Dnn.PersonaBar.Library.Common
                     name ?? "<empty>");
             }
 
+			Logger.LogWarning("<<< Exiting GetInstance(name={Name})", name);
             return instance;
         }
 
@@ -123,13 +129,18 @@ namespace Dnn.PersonaBar.Library.Common
         public static IEnumerable<TContract> GetInstanceContracts<TContract>()
             where TContract : class
         {
+			Logger.LogError(">>> Entering GetInstanceContracts()");
             var instances = ComponentFactory.GetComponents<TContract>();
+			Logger.LogWarning("<<< Exiting GetInstanceContracts()");
+			Logger.LogError("GetInstanceContracts(): instances → {Instances}", instances);
             return instances.Values;
         }
 
         private static TContract GetInstanceLocal<TContract>(string name)
             where TContract : class
         {
+			Logger.LogError(">>> Entering GetInstanceLocal(name={Name})", name);
+            Logger.LogWarning("<<< Exiting GetInstanceLocal(name={Name})", name);
             return string.IsNullOrEmpty(name)
                 ? ComponentFactory.GetComponent<TContract>()
                 : ComponentFactory.GetComponent<TContract>(name);

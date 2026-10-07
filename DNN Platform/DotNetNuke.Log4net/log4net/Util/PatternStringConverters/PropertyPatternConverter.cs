@@ -56,16 +56,21 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state) 
         {
+			value.LogError(">>> Entering Convert(writer={Writer},state={State})", writer, state);
+			value.LogWarning("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
             CompositeProperties compositeProperties = new CompositeProperties();
 
 #if !NETCF
+			value.LogError("Convert(writer={Writer},state={State}): compositeProperties → {CompositeProperties}", writer, state, compositeProperties);
             PropertiesDictionary logicalThreadProperties = LogicalThreadContext.Properties.GetProperties(false);
+			value.LogError("Convert(writer={Writer},state={State}): logicalThreadProperties → {LogicalThreadProperties}", writer, state, logicalThreadProperties);
             if (logicalThreadProperties != null)
             {
                 compositeProperties.Add(logicalThreadProperties);
             }
 #endif
             PropertiesDictionary threadProperties = ThreadContext.Properties.GetProperties(false);
+			value.LogError("Convert(writer={Writer},state={State}): threadProperties → {ThreadProperties}", writer, state, threadProperties);
             if (threadProperties != null)
             {
                 compositeProperties.Add(threadProperties);

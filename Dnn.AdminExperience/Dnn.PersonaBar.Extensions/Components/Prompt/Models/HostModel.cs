@@ -56,6 +56,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
 
         public static HostModel Current(IHostSettings hostSettings, IPortalController portalController, IUserController userController)
         {
+			eventLogger.LogError(">>> Entering Current()");
             hostSettings ??= Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             portalController ??= Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
             userController ??= Globals.GetCurrentServiceProvider().GetRequiredService<IUserController>();
@@ -64,11 +65,22 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
             var controlBarController = DotNetNuke.Web.Components.Controllers.ControlBarController.Instance;
             var request = HttpContextSource.Current.Request;
             var upgradeIndicator = controlBarController.GetUpgradeIndicator(application.Version, request.IsLocal, request.IsSecureConnection);
+			eventLogger.LogError("Current(): upgradeIndicator → {UpgradeIndicator}", upgradeIndicator);
+			eventLogger.LogError("Current(hostSettings={HostSettings},portalController={PortalController},userController={UserController}): upgradeIndicator → {UpgradeIndicator}", hostSettings, portalController, userController, upgradeIndicator);
             var hostName = System.Net.Dns.GetHostName();
             var hostPortal = portalController.GetPortal(hostSettings.HostPortalId);
+			eventLogger.LogError("Current(): hostName → {HostName}", hostName);
             var portalCount = portalController.GetPortals().Count;
+			eventLogger.LogError("Current(hostSettings={HostSettings},portalController={PortalController},userController={UserController}): portalCount → {PortalCount}", hostSettings, portalController, userController, portalCount);
+			eventLogger.LogError("Current(hostSettings={HostSettings},portalController={PortalController},userController={UserController}): hostName → {HostName}", hostSettings, portalController, userController, hostName);
             var isHost = userController.GetCurrentUserInfo()?.IsSuperUser ?? false;
 
+			eventLogger.LogError("Current(hostSettings={HostSettings},portalController={PortalController},userController={UserController}): isHost → {IsHost}", hostSettings, portalController, userController, isHost);
+			eventLogger.LogError("Current(): hostPortal → {HostPortal}", hostPortal);
+			eventLogger.LogError("Current(): isHost → {IsHost}", isHost);
+			eventLogger.LogError("Current(hostSettings={HostSettings},portalController={PortalController},userController={UserController}): hostPortal → {HostPortal}", hostSettings, portalController, userController, hostPortal);
+			eventLogger.LogError("Current(): portalCount → {PortalCount}", portalCount);
+			eventLogger.LogWarning("<<< Exiting Current(hostSettings={HostSettings},portalController={PortalController},userController={UserController})", hostSettings, portalController, userController);
             return new HostModel
             {
                 Version = "v." + Globals.FormatVersion(application.Version, true),

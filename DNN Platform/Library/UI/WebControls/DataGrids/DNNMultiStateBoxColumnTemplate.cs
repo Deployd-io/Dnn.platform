@@ -13,6 +13,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The DNNMultiStateBoxColumnTemplate provides a Template for the DNNMultiStateBoxColumn.</summary>
     public class DNNMultiStateBoxColumnTemplate : ITemplate
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DNNMultiStateBoxColumnTemplate));
         private string mDataField = Null.NullString;
         private bool mEnabled = true;
         private string mEnabledField = Null.NullString;
@@ -32,6 +33,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="itemType">The list item type.</param>
         public DNNMultiStateBoxColumnTemplate(ListItemType itemType)
         {
+			Logger.LogError(">>> Entering DNNMultiStateBoxColumnTemplate(itemType={ItemType})", itemType);
             this.ItemType = itemType;
         }
 
@@ -178,6 +180,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="container">The container control.</param>
         public void InstantiateIn(Control container)
         {
+			Logger.LogError(">>> Entering InstantiateIn(container={Container})", container);
             if (!string.IsNullOrEmpty(this.Text))
             {
                 container.Controls.Add(new LiteralControl(this.Text + "<br/>"));
@@ -186,7 +189,10 @@ namespace DotNetNuke.UI.WebControls
             if (this.ItemType != ListItemType.Header)
             {
                 var box = new DNNMultiStateBox();
+				Logger.LogError("InstantiateIn(container={Container}): box → {Box}", container, box);
+				Logger.LogDebug("InstantiateIn(container={Container}): box.ImagePath → {Arg1}", container, box.ImagePath);
                 box.AutoPostBack = this.AutoPostBack;
+				Logger.LogDebug("InstantiateIn(container={Container}): box.AutoPostBack → {Arg1}", container, box.AutoPostBack);
                 box.ImagePath = this.ImagePath;
                 foreach (DNNMultiState objState in this.States)
                 {
@@ -196,18 +202,23 @@ namespace DotNetNuke.UI.WebControls
                 box.DataBinding += this.Item_DataBinding;
                 container.Controls.Add(box);
             }
+			Logger.LogWarning("<<< Exiting InstantiateIn(container={Container})", container);
         }
 
         /// <summary>Called when the template item is Data Bound.</summary>
         private void Item_DataBinding(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering Item_DataBinding(sender={Sender},e={E})", sender, e);
             var box = (DNNMultiStateBox)sender;
             var container = (DataGridItem)box.NamingContainer;
+			Logger.LogError("Item_DataBinding(sender={Sender},e={E}): box → {Box}", sender, e, box);
             if (!string.IsNullOrEmpty(this.DataField) && this.ItemType != ListItemType.Header)
             {
+				Logger.LogError("Item_DataBinding(sender={Sender},e={E}): container → {Container}", sender, e, container);
                 if (this.DesignMode)
                 {
                     box.SelectedStateKey = string.Empty;
+					Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): box.SelectedStateKey → {Arg2}", sender, e, box.SelectedStateKey);
                 }
                 else
                 {
@@ -224,6 +235,7 @@ namespace DotNetNuke.UI.WebControls
                 if (this.DesignMode)
                 {
                     box.Enabled = false;
+					Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): box.Enabled → {Arg2}", sender, e, box.Enabled);
                 }
                 else
                 {
@@ -234,6 +246,7 @@ namespace DotNetNuke.UI.WebControls
             {
                 box.Enabled = this.Enabled;
             }
+			Logger.LogWarning("<<< Exiting Item_DataBinding(sender={Sender},e={E})", sender, e);
         }
     }
 }

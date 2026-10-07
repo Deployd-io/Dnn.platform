@@ -26,6 +26,7 @@ namespace Dnn.Modules.ResourceManager.Components
     /// <summary>Manages module settings.</summary>
     public class SettingsManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SettingsManager));
         private readonly Hashtable moduleSettingsDictionary;
         private readonly int groupId;
 
@@ -44,10 +45,16 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <param name="groupId">The id of the group.</param>
         public SettingsManager(IModuleController moduleController, int moduleId, int groupId)
         {
+			Logger.LogError(">>> Entering SettingsManager(moduleController={ModuleController},moduleId={ModuleId},groupId={GroupId})", moduleController, moduleId, groupId);
             this.groupId = groupId;
+			Logger.LogWarning("<<< Exiting SettingsManager(moduleController={ModuleController},moduleId={ModuleId},groupId={GroupId})", moduleController, moduleId, groupId);
+			Logger.LogDebug("SettingsManager(moduleController={ModuleController},moduleId={ModuleId},groupId={GroupId}): this.groupId → {Arg3}", moduleController, moduleId, groupId, this.groupId);
             var module = moduleController.GetModule(moduleId, Null.NullInteger, false);
+			Logger.LogError("SettingsManager(moduleController={ModuleController},moduleId={ModuleId},groupId={GroupId}): module → {Module}", moduleController, moduleId, groupId, module);
 
             this.moduleSettingsDictionary = module.ModuleSettings;
+			Logger.LogDebug("SettingsManager(moduleController={ModuleController},moduleId={ModuleId},groupId={GroupId}): moduleSettingsDictionary → {ModuleSettingsDictionary}", moduleController, moduleId, groupId, moduleSettingsDictionary);
+			Logger.LogDebug("SettingsManager(moduleController={ModuleController},moduleId={ModuleId},groupId={GroupId}): this.moduleSettingsDictionary → {Arg3}", moduleController, moduleId, groupId, this.moduleSettingsDictionary);
             this.LoadSettings();
         }
 
@@ -65,17 +72,21 @@ namespace Dnn.Modules.ResourceManager.Components
 
         private void LoadSettings()
         {
+			Logger.LogError(">>> Entering LoadSettings()");
             this.Mode = this.GetSettingIntValueOrDefault(ModeSettingName, DefaultMode);
             this.ValidateMode(this.Mode);
             this.HomeFolderId = this.GetHomeFolderId(this.Mode);
 
             var homeFolder = FolderManager.Instance.GetFolder(this.HomeFolderId);
+			Logger.LogError("LoadSettings(): homeFolder → {HomeFolder}", homeFolder);
             this.HomeFolderName = this.GetHomeFolderName(homeFolder);
             this.IsHostPortal = homeFolder.PortalID == Null.NullInteger;
+			Logger.LogWarning("<<< Exiting LoadSettings()");
         }
 
         private string GetHomeFolderName(IFolderInfo homeFolder)
         {
+			Logger.LogError(">>> Entering GetHomeFolderName(homeFolder={HomeFolder})", homeFolder);
             if (homeFolder.PortalID == Null.NullInteger && homeFolder.ParentID == Null.NullInteger)
             {
                 return Localization.GetString(
@@ -93,6 +104,7 @@ namespace Dnn.Modules.ResourceManager.Components
             if (this.groupId > 0)
             {
                 var socialRole = RoleController.Instance.GetRole(homeFolder.PortalID, r => r.RoleID == this.groupId);
+				Logger.LogError("GetHomeFolderName(homeFolder={HomeFolder}): socialRole → {SocialRole}", homeFolder, socialRole);
                 var template = Localization.GetString(
                     "GroupAssets",
                     Constants.ViewResourceFileName);
@@ -102,8 +114,10 @@ namespace Dnn.Modules.ResourceManager.Components
             if (this.Mode == (int)ModuleModes.User)
             {
                 var user = UserController.Instance.GetCurrentUserInfo();
+				Logger.LogError("GetHomeFolderName(homeFolder={HomeFolder}): user → {User}", homeFolder, user);
                 if (user.UserID < 0)
                 {
+					Logger.LogError("Throwing ModeValidationException from GetHomeFolderName(homeFolder={HomeFolder})", homeFolder);
                     throw new ModeValidationException("UserModeError");
                 }
 
@@ -113,23 +127,29 @@ namespace Dnn.Modules.ResourceManager.Components
                 return string.Format(template, user.DisplayName);
             }
 
+			Logger.LogWarning("<<< Exiting GetHomeFolderName(homeFolder={HomeFolder})", homeFolder);
             return homeFolder.FolderName;
         }
 
         private int GetSettingIntValueOrDefault(string settingName, int defaultValue = -1)
         {
+			Logger.LogError(">>> Entering GetSettingIntValueOrDefault(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
             var settingValue = this.moduleSettingsDictionary.ContainsKey(settingName) ? this.moduleSettingsDictionary[settingName].ToString() : null;
 
+			Logger.LogError("GetSettingIntValueOrDefault(settingName={SettingName},defaultValue={DefaultValue}): settingValue → {SettingValue}", settingName, defaultValue, settingValue);
+			Logger.LogWarning("<<< Exiting GetSettingIntValueOrDefault(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
             return string.IsNullOrEmpty(settingValue) ? defaultValue : int.Parse(settingValue);
         }
 
         private void ValidateMode(int moduleMode)
         {
+			Logger.LogError(">>> Entering ValidateMode(moduleMode={ModuleMode})", moduleMode);
             switch (moduleMode)
             {
                 case (int)ModuleModes.Group:
                     if (this.groupId <= 0)
                     {
+						Logger.LogError("Throwing ModeValidationException from ValidateMode(moduleMode={ModuleMode})", moduleMode);
                         throw new ModeValidationException("GroupModeError");
                     }
 
@@ -137,6 +157,7 @@ namespace Dnn.Modules.ResourceManager.Components
 
                 case (int)ModuleModes.User:
                     var user = UserController.Instance.GetCurrentUserInfo();
+					Logger.LogError("ValidateMode(moduleMode={ModuleMode}): user → {User}", moduleMode, user);
                     if (user.UserID < 0)
                     {
                         throw new ModeValidationException("UserModeError");
@@ -144,12 +165,15 @@ namespace Dnn.Modules.ResourceManager.Components
 
                     break;
             }
+			Logger.LogWarning("<<< Exiting ValidateMode(moduleMode={ModuleMode})", moduleMode);
         }
 
         private int GetHomeFolderId(int moduleMode)
         {
+			Logger.LogError(">>> Entering GetHomeFolderId(moduleMode={ModuleMode})", moduleMode);
             var portalId = PortalSettings.Current.PortalId;
             var folderId = 0;
+			Logger.LogError("GetHomeFolderId(moduleMode={ModuleMode}): folderId → {FolderId}", moduleMode, folderId);
 
             switch (moduleMode)
             {
@@ -159,15 +183,18 @@ namespace Dnn.Modules.ResourceManager.Components
 
                 case (int)ModuleModes.User:
                     var user = UserController.Instance.GetCurrentUserInfo();
+					Logger.LogError("GetHomeFolderId(moduleMode={ModuleMode}): user → {User}", moduleMode, user);
                     folderId = FolderManager.Instance.GetUserFolder(user).FolderID;
                     break;
 
                 case (int)ModuleModes.Normal:
                     var defaultHomeFolderId = FolderManager.Instance.GetFolder(portalId, string.Empty).FolderID;
+					Logger.LogError("GetHomeFolderId(moduleMode={ModuleMode}): defaultHomeFolderId → {DefaultHomeFolderId}", moduleMode, defaultHomeFolderId);
                     folderId = this.GetSettingIntValueOrDefault(HomeFolderSettingName, defaultHomeFolderId);
                     break;
             }
 
+			Logger.LogWarning("<<< Exiting GetHomeFolderId(moduleMode={ModuleMode})", moduleMode);
             return folderId;
         }
     }

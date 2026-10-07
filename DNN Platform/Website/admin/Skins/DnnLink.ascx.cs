@@ -11,6 +11,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin/theme object which displays a link to the DNN Corp website.</summary>
     public partial class DnnLink : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnLink.ascx));
         private const string MyFileName = "DnnLink.ascx";
 
         public string CssClass { get; set; }
@@ -20,6 +21,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             if (!string.IsNullOrEmpty(this.CssClass))
             {
@@ -36,7 +38,9 @@ namespace DotNetNuke.UI.Skins.Controls
             string utmTerm = "&utm_term=cms-by-dnn";
             string hostName = this.Request.Url.Host.ToLowerInvariant().Replace("www.", string.Empty);
             int charPos = 0;
+			Logger.LogError("OnLoad(e={E}): charPos → {CharPos}", e, charPos);
             string linkText = "CMS by DNN";
+			Logger.LogError("OnLoad(e={E}): linkText → {LinkText}", e, linkText);
             if (hostName.Length > 0)
             {
                 // convert first letter of hostname to int pos in alphabet
@@ -76,6 +80,7 @@ namespace DotNetNuke.UI.Skins.Controls
 
             this.aDnnLink.InnerText = linkText;
             this.aDnnLink.HRef = HttpUtility.HtmlEncode(url + utmTerm);
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

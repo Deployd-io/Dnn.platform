@@ -43,7 +43,10 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="eventLogger">The event logger.</param>
         public VisibilityControl(IApplicationStatusInfo appStatus, IEventLogger eventLogger)
         {
+			eventLogger.LogError(">>> Entering VisibilityControl(appStatus={AppStatus},eventLogger={EventLogger})", appStatus, eventLogger);
+			eventLogger.LogDebug("VisibilityControl(appStatus={AppStatus},eventLogger={EventLogger}): eventLogger → {EventLogger1}", appStatus, eventLogger, eventLogger);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			eventLogger.LogWarning("<<< Exiting VisibilityControl(appStatus={AppStatus},eventLogger={EventLogger})", appStatus, eventLogger);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
         }
 
@@ -76,15 +79,20 @@ namespace DotNetNuke.UI.WebControls
         /// <returns><see langword="true"/> if the value has changed, otherwise <see langword="false"/>.</returns>
         public virtual bool LoadPostData(string postDataKey, NameValueCollection postCollection)
         {
+			eventLogger.LogError(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             var dataChanged = false;
             var presentVisibility = this.Visibility.VisibilityMode;
+			eventLogger.LogError("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): dataChanged → {DataChanged}", postDataKey, postCollection, dataChanged);
             var postedValue = Convert.ToInt32(postCollection[postDataKey], CultureInfo.InvariantCulture);
+			eventLogger.LogError("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): postedValue → {PostedValue}", postDataKey, postCollection, postedValue);
             var postedVisibility = (UserVisibilityMode)Enum.ToObject(typeof(UserVisibilityMode), postedValue);
+			eventLogger.LogError("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): postedVisibility → {PostedVisibility}", postDataKey, postCollection, postedVisibility);
             if (!presentVisibility.Equals(postedVisibility) || postedVisibility == UserVisibilityMode.FriendsAndGroups)
             {
                 if (postedVisibility == UserVisibilityMode.FriendsAndGroups)
                 {
                     var sb = new StringBuilder();
+					eventLogger.LogError("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): sb → {Sb}", postDataKey, postCollection, sb);
                     sb.Append("G:");
                     foreach (var role in this.User.Social.Roles)
                     {
@@ -112,6 +120,7 @@ namespace DotNetNuke.UI.WebControls
                 {
                     this.Value = new ProfileVisibility
                     {
+						eventLogger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): this.Value → {Arg2}", postDataKey, postCollection, this.Value);
                         VisibilityMode = postedVisibility,
                     };
                 }
@@ -128,42 +137,52 @@ namespace DotNetNuke.UI.WebControls
         /// </summary>
         public void RaisePostDataChangedEvent()
         {
+			eventLogger.LogError(">>> Entering RaisePostDataChangedEvent()");
             // Raise the VisibilityChanged Event
             var args = new PropertyEditorEventArgs(this.Name) { Value = this.Value };
+			eventLogger.LogError("RaisePostDataChangedEvent(): args → {Args}", args);
             this.OnVisibilityChanged(args);
+			eventLogger.LogWarning("<<< Exiting RaisePostDataChangedEvent()");
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, PortalSettings.Current, CommonJs.jQuery);
+			eventLogger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             this.Page.RegisterRequiresPostBack(this);
             this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "visibleChange", "$(document).ready(function(){$('.dnnFormVisibility').on('click', 'input[type=radio]', function(){$(this).parent().parent().find('ul').hide();$(this).parent().next('ul').show();});});", true);
+			eventLogger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>OnVisibilityChanged runs when the Visibility has changed.  It raises the <see cref="VisibilityChanged"/> Event.</summary>
         /// <param name="e">The event arguments.</param>
         protected virtual void OnVisibilityChanged(PropertyEditorEventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnVisibilityChanged(e={E})", e);
             if (this.VisibilityChanged != null)
             {
                 this.VisibilityChanged(this, e);
             }
+			eventLogger.LogWarning("<<< Exiting OnVisibilityChanged(e={E})", e);
         }
 
         /// <summary>Render renders the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void Render(HtmlTextWriter writer)
         {
+			eventLogger.LogError(">>> Entering Render(writer={Writer})", writer);
             // Render Div container
             writer.AddAttribute(HtmlTextWriterAttribute.Class, "dnnFormVisibility dnnDropdownSettings");
             writer.AddAttribute(HtmlTextWriterAttribute.Name, this.UniqueID);
@@ -223,10 +242,12 @@ namespace DotNetNuke.UI.WebControls
 
             // Close Div
             writer.RenderEndTag();
+			eventLogger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
 
         private void RenderVisibility(HtmlTextWriter writer, string optionValue, UserVisibilityMode selectedVisibility, string optionText)
         {
+			eventLogger.LogError(">>> Entering RenderVisibility(writer={Writer},optionValue={OptionValue},selectedVisibility={SelectedVisibility},optionText={OptionText})", writer, optionValue, selectedVisibility, optionText);
             // Render Li
             writer.RenderBeginTag(HtmlTextWriterTag.Li);
 
@@ -246,10 +267,12 @@ namespace DotNetNuke.UI.WebControls
 
             // Close Li
             writer.RenderEndTag();
+			eventLogger.LogWarning("<<< Exiting RenderVisibility(writer={Writer},optionValue={OptionValue},selectedVisibility={SelectedVisibility},optionText={OptionText})", writer, optionValue, selectedVisibility, optionText);
         }
 
         private void RenderCheckboxItem(HtmlTextWriter writer, string prefix, string value, string text, bool selected)
         {
+			eventLogger.LogError(">>> Entering RenderCheckboxItem(writer={Writer},prefix={Prefix},value={Value},text={Text},selected={Selected})", writer, prefix, value, text, selected);
             // Render Li
             writer.RenderBeginTag(HtmlTextWriterTag.Li);
 
@@ -269,10 +292,12 @@ namespace DotNetNuke.UI.WebControls
 
             // Close Li
             writer.RenderEndTag();
+			eventLogger.LogWarning("<<< Exiting RenderCheckboxItem(writer={Writer},prefix={Prefix},value={Value},text={Text},selected={Selected})", writer, prefix, value, text, selected);
         }
 
         private void RenderGroups(HtmlTextWriter writer)
         {
+			eventLogger.LogError(">>> Entering RenderGroups(writer={Writer})", writer);
             foreach (var group in this.User.Social.Roles.Where((role) => role.SecurityMode != SecurityMode.SecurityRole))
             {
                 this.RenderCheckboxItem(
@@ -282,13 +307,16 @@ namespace DotNetNuke.UI.WebControls
                     group.RoleName,
                     this.Visibility.RoleVisibilities.Count(r => r.RoleID == group.RoleID) == 1);
             }
+			eventLogger.LogWarning("<<< Exiting RenderGroups(writer={Writer})", writer);
         }
 
         private void RenderRelationships(HtmlTextWriter writer)
         {
+			eventLogger.LogError(">>> Entering RenderRelationships(writer={Writer})", writer);
             foreach (var relationship in this.User.Social.Relationships)
             {
                 var selected = this.Visibility.RelationshipVisibilities.Count(r => r.RelationshipId == relationship.RelationshipId) == 1;
+				eventLogger.LogError("RenderRelationships(writer={Writer}): selected → {Selected}", writer, selected);
                 this.RenderCheckboxItem(
                     writer,
                     ":relationship_",
@@ -296,6 +324,7 @@ namespace DotNetNuke.UI.WebControls
                     relationship.Name,
                     selected);
             }
+			eventLogger.LogWarning("<<< Exiting RenderRelationships(writer={Writer})", writer);
         }
     }
 }

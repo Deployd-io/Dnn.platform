@@ -64,6 +64,7 @@ namespace log4net.Config
         /// </remarks>
         public PluginAttribute(string typeName)
         {
+			value.LogError(">>> Entering PluginAttribute(typeName={TypeName})", typeName);
             this.m_typeName = typeName;
         }
 #endif
@@ -80,7 +81,10 @@ namespace log4net.Config
         /// </remarks>
         public PluginAttribute(Type type)
         {
+			value.LogError(">>> Entering PluginAttribute(type={Type})", type);
             this.m_type = type;
+			value.LogDebug("PluginAttribute(type={Type}): m_type → {M_type}", type, m_type);
+        value.LogWarning("<<< Exiting PluginAttribute(type={Type})", type);
         }
 
         /// <summary>Gets or sets the type for the plugin.</summary>
@@ -126,22 +130,27 @@ namespace log4net.Config
         /// <returns>The plugin object.</returns>
         public IPlugin CreatePlugin()
         {
+			value.LogError(">>> Entering CreatePlugin()");
+			value.LogWarning("<<< Exiting CreatePlugin()");
             Type pluginType = this.m_type;
 #if !NETSTANDARD1_3
             if (this.m_type == null)
             {
                 // Get the plugin object type from the string type name
                 pluginType = SystemInfo.GetTypeFromString(this.m_typeName, true, true);
+				value.LogError("CreatePlugin(): pluginType → {PluginType}", pluginType);
             }
 #endif
             // Check that the type is a plugin
             if (!(typeof(IPlugin).IsAssignableFrom(pluginType)))
             {
+				value.LogError("Throwing LogException from CreatePlugin()");
                 throw new LogException("Plugin type [" + pluginType.FullName + "] does not implement the log4net.IPlugin interface");
             }
 
             // Create an instance of the plugin using the default constructor
             IPlugin plugin = (IPlugin)Activator.CreateInstance(pluginType);
+			value.LogError("CreatePlugin(): plugin → {Plugin}", plugin);
 
             return plugin;
         }
@@ -156,10 +165,12 @@ namespace log4net.Config
         /// <returns>A representation of the properties of this object</returns>
         public override string ToString()
         {
+			value.LogError(">>> Entering ToString()");
             if (this.m_type != null)
             {
                 return "PluginAttribute[Type=" + this.m_type.FullName + "]";
             }
+			value.LogWarning("<<< Exiting ToString()");
             return "PluginAttribute[Type=" + this.m_typeName + "]";
         }
 

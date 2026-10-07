@@ -56,15 +56,22 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.RoleName = this.GetFlagValue(FlagRoleName, "Rolename", string.Empty, true, true);
             this.Description = this.GetFlagValue(FlagDescription, "Description", string.Empty);
+			Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): Description → {Description}", args, portalSettings, userInfo, activeTabId, Description);
+			Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): AutoAssign → {AutoAssign}", args, portalSettings, userInfo, activeTabId, AutoAssign);
             this.IsPublic = this.GetFlagValue(FlagIsPublic, "Is Public", false);
+			Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): IsPublic → {IsPublic}", args, portalSettings, userInfo, activeTabId, IsPublic);
             this.AutoAssign = this.GetFlagValue(FlagAutoAssign, "Auto Assign", false, true);
             var status = this.GetFlagValue(FlagStatus, "Status", "approved");
             switch (status)
             {
                 case "pending":
+					Logger.LogError("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): status → {Status}", args, portalSettings, userInfo, activeTabId, status);
                     this.Status = RoleStatus.Pending;
+					Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): Status → {Status}", args, portalSettings, userInfo, activeTabId, Status);
+					Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.Status → {Arg4}", args, portalSettings, userInfo, activeTabId, this.Status);
                     break;
                 case "approved":
                     this.Status = RoleStatus.Approved;
@@ -76,14 +83,17 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
                     this.AddMessage(string.Format(CultureInfo.InvariantCulture, this.LocalizeString("Prompt_InvalidRoleStatus"), FlagStatus));
                     break;
             }
+			Logger.LogWarning("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogError(">>> Entering Run()");
             try
             {
                 var lstResults = new List<RoleModel>();
+				Logger.LogError("Run(): lstResults → {LstResults}", lstResults);
                 var roleDto = new RoleDto
                 {
                     Id = Null.NullInteger,
@@ -98,6 +108,7 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
                 };
                 KeyValuePair<HttpStatusCode, string> message;
                 var success = RolesController.Instance.SaveRole(this.PortalSettings, roleDto, false, out message);
+				Logger.LogError("Run(): success → {Success}", success);
                 if (!success)
                 {
                     return new ConsoleErrorResultModel(message.Value);
@@ -109,6 +120,7 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(this.LocalizeString("RoleAdded.Error"));
             }
         }

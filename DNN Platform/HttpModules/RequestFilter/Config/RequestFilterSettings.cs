@@ -23,6 +23,7 @@ namespace DotNetNuke.HttpModules.RequestFilter
     [XmlRoot("RewriterConfig")]
     public class RequestFilterSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RequestFilterSettings));
         private const string RequestFilterConfig = "RequestFilter.Config";
         private readonly IHostSettings hostSettings;
 
@@ -32,13 +33,18 @@ namespace DotNetNuke.HttpModules.RequestFilter
         public RequestFilterSettings()
             : this(null)
         {
+		Logger.LogError(">>> Entering RequestFilterSettings()");
+        Logger.LogWarning("<<< Exiting RequestFilterSettings()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="RequestFilterSettings"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
         public RequestFilterSettings(IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering RequestFilterSettings(hostSettings={HostSettings})", hostSettings);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("RequestFilterSettings(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
+        Logger.LogWarning("<<< Exiting RequestFilterSettings(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Gets a value indicating whether request filters are enabled.</summary>
@@ -59,10 +65,13 @@ namespace DotNetNuke.HttpModules.RequestFilter
         /// <returns>A <see cref="RequestFilterSettings"/> instance.</returns>
         public static RequestFilterSettings GetSettings(IHostSettings hostSettings, IApplicationStatusInfo appStatus)
         {
+			Logger.LogError(">>> Entering GetSettings()");
             var settings = (RequestFilterSettings)DataCache.GetCache(RequestFilterConfig);
             if (settings == null)
             {
                 settings = new RequestFilterSettings(hostSettings);
+				Logger.LogError("GetSettings(hostSettings={HostSettings},appStatus={AppStatus}): settings → {Settings}", hostSettings, appStatus, settings);
+				Logger.LogError("GetSettings(): settings → {Settings}", settings);
                 string filePath = Config.GetPathToFile(appStatus, Config.ConfigFileType.DotNetNuke);
 
                 // Create a FileStream for the Config file
@@ -71,26 +80,36 @@ namespace DotNetNuke.HttpModules.RequestFilter
                 using (var xmlReader = XmlReader.Create(fileReader))
                 {
                     doc = new XPathDocument(xmlReader);
+					Logger.LogError("GetSettings(): doc → {Doc}", doc);
+					Logger.LogError("GetSettings(hostSettings={HostSettings},appStatus={AppStatus}): doc → {Doc}", hostSettings, appStatus, doc);
+					Logger.LogDebug("GetSettings(hostSettings={HostSettings},appStatus={AppStatus}): doc → {Doc}", hostSettings, appStatus, doc);
                 }
 
                 XPathNodeIterator ruleList = doc.CreateNavigator().Select("/configuration/blockrequests/rule");
+				Logger.LogError("GetSettings(): ruleList → {RuleList}", ruleList);
                 while (ruleList.MoveNext())
                 {
+					Logger.LogError("GetSettings(hostSettings={HostSettings},appStatus={AppStatus}): ruleList → {RuleList}", hostSettings, appStatus, ruleList);
                     try
                     {
                         string serverVar = ruleList.Current.GetAttribute("servervar", string.Empty);
                         string values = ruleList.Current.GetAttribute("values", string.Empty);
                         var ac = (RequestFilterRuleType)Enum.Parse(typeof(RequestFilterRuleType), ruleList.Current.GetAttribute("action", string.Empty));
+						Logger.LogError("GetSettings(): ac → {Ac}", ac);
+						Logger.LogError("GetSettings(hostSettings={HostSettings},appStatus={AppStatus}): ac → {Ac}", hostSettings, appStatus, ac);
                         var op = (RequestFilterOperatorType)Enum.Parse(typeof(RequestFilterOperatorType), ruleList.Current.GetAttribute("operator", string.Empty));
                         string location = ruleList.Current.GetAttribute("location", string.Empty);
                         var rule = new RequestFilterRule(serverVar, values, op, ac, location);
                         settings.Rules.Add(rule);
+						Logger.LogError("GetSettings(): op → {Op}", op);
                     }
                     catch (Exception ex)
                     {
                         DotNetNuke.Services.Exceptions.Exceptions.LogException(new RequestFilterException($"Unable to read RequestFilter Rule: {ruleList.Current.OuterXml}:", ex));
+						Logger.LogError("Exception in GetSettings(): {Arg0}", ex.Message);
                     }
                 }
+				Logger.LogError("Exception in GetSettings(hostSettings={HostSettings},appStatus={AppStatus}): {Arg2}", hostSettings, appStatus, ex.Message);
 
                 if (File.Exists(filePath))
                 {
@@ -99,6 +118,7 @@ namespace DotNetNuke.HttpModules.RequestFilter
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetSettings(hostSettings={HostSettings},appStatus={AppStatus})", hostSettings, appStatus);
             return settings;
         }
 
@@ -113,6 +133,7 @@ namespace DotNetNuke.HttpModules.RequestFilter
         /// <param name="rules">The rules.</param>
         public static void Save(IApplicationStatusInfo appStatus, List<RequestFilterRule> rules)
         {
+			Logger.LogError(">>> Entering Save(rules={Rules})", rules);
             string filePath = Config.GetPathToFile(appStatus, Config.ConfigFileType.DotNetNuke);
             if (!File.Exists(filePath))
             {
@@ -130,34 +151,55 @@ namespace DotNetNuke.HttpModules.RequestFilter
             }
 
             XmlNode ruleRoot = doc.SelectSingleNode("/configuration/blockrequests");
+			Logger.LogError("Save(rules={Rules}): ruleRoot → {RuleRoot}", rules, ruleRoot);
+			Logger.LogError("Save(appStatus={AppStatus},rules={Rules}): ruleRoot → {RuleRoot}", appStatus, rules, ruleRoot);
             ruleRoot.RemoveAll();
             foreach (RequestFilterRule rule in rules)
             {
                 XmlElement xmlRule = doc.CreateElement("rule");
+				Logger.LogError("Save(rules={Rules}): xmlRule → {XmlRule}", rules, xmlRule);
+				Logger.LogError("Save(appStatus={AppStatus},rules={Rules}): xmlRule → {XmlRule}", appStatus, rules, xmlRule);
                 XmlAttribute var = doc.CreateAttribute("servervar");
                 var.Value = rule.ServerVariable;
+				Logger.LogError("Save(rules={Rules}): var → {Var}", rules, var);
+				Logger.LogError("Save(appStatus={AppStatus},rules={Rules}): var → {Var}", appStatus, rules, var);
+				Logger.LogDebug("Save(appStatus={AppStatus},rules={Rules}): var.Value → {Arg2}", appStatus, rules, var.Value);
                 xmlRule.Attributes.Append(var);
                 XmlAttribute val = doc.CreateAttribute("values");
+				Logger.LogError("Save(rules={Rules}): val → {Val}", rules, val);
+				Logger.LogError("Save(appStatus={AppStatus},rules={Rules}): val → {Val}", appStatus, rules, val);
                 val.Value = rule.RawValue;
                 xmlRule.Attributes.Append(val);
                 XmlAttribute op = doc.CreateAttribute("operator");
+				Logger.LogError("Save(rules={Rules}): op → {Op}", rules, op);
+				Logger.LogError("Save(appStatus={AppStatus},rules={Rules}): op → {Op}", appStatus, rules, op);
+				Logger.LogDebug("Save(appStatus={AppStatus},rules={Rules}): val.Value → {Arg2}", appStatus, rules, val.Value);
                 op.Value = rule.Operator.ToString();
                 xmlRule.Attributes.Append(op);
                 XmlAttribute action = doc.CreateAttribute("action");
+				Logger.LogError("Save(rules={Rules}): action → {Action}", rules, action);
+				Logger.LogError("Save(appStatus={AppStatus},rules={Rules}): action → {Action}", appStatus, rules, action);
                 action.Value = rule.Action.ToString();
                 xmlRule.Attributes.Append(action);
                 XmlAttribute location = doc.CreateAttribute("location");
+				Logger.LogError("Save(rules={Rules}): location → {Location}", rules, location);
+				Logger.LogError("Save(appStatus={AppStatus},rules={Rules}): location → {Location}", appStatus, rules, location);
                 location.Value = rule.Location;
+				Logger.LogDebug("Save(appStatus={AppStatus},rules={Rules}): location.Value → {Arg2}", appStatus, rules, location.Value);
                 xmlRule.Attributes.Append(location);
                 ruleRoot.AppendChild(xmlRule);
             }
 
             var settings = new XmlWriterSettings();
+			Logger.LogError("Save(rules={Rules}): settings → {Settings}", rules, settings);
             settings.Indent = true;
+			Logger.LogDebug("Save(appStatus={AppStatus},rules={Rules}): settings.Indent → {Arg2}", appStatus, rules, settings.Indent);
             using (XmlWriter writer = XmlWriter.Create(filePath, settings))
             {
+				Logger.LogError("Save(appStatus={AppStatus},rules={Rules}): settings → {Settings}", appStatus, rules, settings);
                 doc.WriteContentTo(writer);
             }
+			Logger.LogWarning("<<< Exiting Save(appStatus={AppStatus},rules={Rules})", appStatus, rules);
         }
     }
 }

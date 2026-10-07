@@ -11,10 +11,15 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class CacheableAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CacheableAttribute));
         /// <summary>Initializes a new instance of the <see cref="CacheableAttribute"/> class.</summary>
         public CacheableAttribute()
         {
+			Logger.LogError(">>> Entering CacheableAttribute()");
             this.CachePriority = CacheItemPriority.Default;
+			Logger.LogDebug("CacheableAttribute(): this.CachePriority → {Arg0}", this.CachePriority);
+        Logger.LogDebug("CacheableAttribute(cacheKey={CacheKey},priority={Priority},timeOut={TimeOut}): this.CachePriority → {Arg3}", cacheKey, priority, timeOut, this.CachePriority);
+        Logger.LogWarning("<<< Exiting CacheableAttribute()");
             this.CacheTimeOut = 20;
         }
 
@@ -23,6 +28,8 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
         public CacheableAttribute(string cacheKey)
             : this(cacheKey, CacheItemPriority.Default, 20)
         {
+		Logger.LogError(">>> Entering CacheableAttribute(cacheKey={CacheKey})", cacheKey);
+        Logger.LogWarning("<<< Exiting CacheableAttribute(cacheKey={CacheKey})", cacheKey);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CacheableAttribute"/> class.</summary>
@@ -31,6 +38,8 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
         public CacheableAttribute(string cacheKey, CacheItemPriority priority)
             : this(cacheKey, priority, 20)
         {
+		Logger.LogError(">>> Entering CacheableAttribute(cacheKey={CacheKey},priority={Priority})", cacheKey, priority);
+        Logger.LogWarning("<<< Exiting CacheableAttribute(cacheKey={CacheKey},priority={Priority})", cacheKey, priority);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CacheableAttribute"/> class.</summary>
@@ -40,6 +49,7 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
         public CacheableAttribute(string cacheKey, CacheItemPriority priority, int timeOut)
         {
             this.CacheKey = cacheKey;
+			Logger.LogDebug("CacheableAttribute(cacheKey={CacheKey},priority={Priority},timeOut={TimeOut}): this.CacheKey → {Arg3}", cacheKey, priority, timeOut, this.CacheKey);
             this.CachePriority = priority;
             this.CacheTimeOut = timeOut;
         }

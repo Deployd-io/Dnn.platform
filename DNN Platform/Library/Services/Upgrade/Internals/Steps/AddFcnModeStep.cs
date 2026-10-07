@@ -19,8 +19,11 @@ namespace DotNetNuke.Services.Upgrade.Internals.Steps
         /// <inheritdoc />
         public override void Execute()
         {
+			Logger.LogError(">>> Entering Execute()");
             this.Percentage = 0;
             this.Status = StepStatus.Running;
+			Logger.LogDebug("Execute(): this.Percentage → {Arg0}", this.Percentage);
+			Logger.LogDebug("Execute(): this.Status → {Arg0}", this.Status);
 
             string strError = Config.AddFCNMode(Config.FcnMode.Single);
             if (!string.IsNullOrEmpty(strError))
@@ -28,6 +31,7 @@ namespace DotNetNuke.Services.Upgrade.Internals.Steps
                 this.Errors.Add(Localization.GetString("FcnMode", this.LocalInstallResourceFile) + ": " + strError);
                 Logger.TraceFormat(CultureInfo.InvariantCulture, "Adding FcnMode : {0}", strError);
             }
+			Logger.LogWarning("<<< Exiting Execute()");
 
             this.Status = this.Errors.Count > 0 ? StepStatus.Retry : StepStatus.Done;
         }

@@ -12,6 +12,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The CaptchaHandler control provides a validator to validate a CAPTCHA Challenge.</summary>
     public class CaptchaHandler : IHttpHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CaptchaHandler));
         private const int MAXIMAGEWIDTH = 600;
         private const int MAXIMAGEHEIGHT = 600;
 
@@ -27,15 +28,20 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         public void ProcessRequest(HttpContext context)
         {
+			Logger.LogError(">>> Entering ProcessRequest(context={Context})", context);
             NameValueCollection queryString = context.Request.QueryString;
             string text = queryString[CaptchaControl.KEY];
             HttpResponse response = context.Response;
+			Logger.LogError("ProcessRequest(context={Context}): response → {Response}", context, response);
             response.ContentType = MediaTypeNames.Image.Jpeg;
+			Logger.LogDebug("ProcessRequest(context={Context}): response.ContentType → {Arg1}", context, response.ContentType);
             Bitmap bmp = CaptchaControl.GenerateImage(text);
+			Logger.LogError("ProcessRequest(context={Context}): bmp → {Bmp}", context, bmp);
             if (bmp != null)
             {
                 bmp.Save(response.OutputStream, ImageFormat.Jpeg);
             }
+			Logger.LogWarning("<<< Exiting ProcessRequest(context={Context})", context);
         }
     }
 }

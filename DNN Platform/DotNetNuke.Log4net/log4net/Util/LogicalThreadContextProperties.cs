@@ -75,6 +75,8 @@ namespace log4net.Util
         /// </remarks>
         internal LogicalThreadContextProperties()
         {
+		value.LogError(">>> Entering LogicalThreadContextProperties()");
+        value.LogWarning("<<< Exiting LogicalThreadContextProperties()");
         }
 
         /// <summary>Gets or sets the value of a property</summary>
@@ -119,13 +121,17 @@ namespace log4net.Util
         /// </remarks>
         public void Remove(string key)
         {
+			value.LogError(">>> Entering Remove(key={Key})", key);
             PropertiesDictionary dictionary = this.GetProperties(false);
+			value.LogError("Remove(key={Key}): dictionary → {Dictionary}", key, dictionary);
             if (dictionary != null)
             {
                 PropertiesDictionary immutableProps = new PropertiesDictionary(dictionary);
+				value.LogError("Remove(key={Key}): immutableProps → {ImmutableProps}", key, immutableProps);
                 immutableProps.Remove(key);
                 SetLogicalProperties(immutableProps);
             }
+			value.LogWarning("<<< Exiting Remove(key={Key})", key);
         }
 
         /// <summary>Clear all the context properties</summary>
@@ -136,12 +142,16 @@ namespace log4net.Util
         /// </remarks>
         public void Clear()
         {
+			value.LogError(">>> Entering Clear()");
             PropertiesDictionary dictionary = this.GetProperties(false);
+			value.LogError("Clear(): dictionary → {Dictionary}", dictionary);
             if (dictionary != null)
             {
                 PropertiesDictionary immutableProps = new PropertiesDictionary();
+				value.LogError("Clear(): immutableProps → {ImmutableProps}", immutableProps);
                 SetLogicalProperties(immutableProps);
             }
+			value.LogWarning("<<< Exiting Clear()");
         }
 
         /// <summary>Get the PropertiesDictionary stored in the LocalDataStoreSlot for this thread.</summary>
@@ -156,11 +166,13 @@ namespace log4net.Util
         /// </remarks>
         internal PropertiesDictionary GetProperties(bool create)
         {
+			value.LogError(">>> Entering GetProperties(create={Create})", create);
             if (!this.m_disabled)
             {
                 try
                 {
                     PropertiesDictionary properties = GetLogicalProperties();
+					value.LogError("GetProperties(create={Create}): properties → {Properties}", create, properties);
                     if (properties == null && create)
                     {
                         properties = new PropertiesDictionary();
@@ -171,6 +183,7 @@ namespace log4net.Util
                 catch (SecurityException secEx)
                 {
                     this.m_disabled = true;
+					value.LogDebug("GetProperties(create={Create}): this.m_disabled → {Arg1}", create, this.m_disabled);
                     
                     // Thrown if we don't have permission to read or write the CallContext
                     LogLog.Warn(declaringType, "SecurityException while accessing CallContext. Disabling LogicalThreadContextProperties", secEx);
@@ -182,6 +195,7 @@ namespace log4net.Util
             {
                 return new PropertiesDictionary();
             }
+			value.LogWarning("<<< Exiting GetProperties(create={Create})", create);
             return null;
         }
 
@@ -198,6 +212,8 @@ namespace log4net.Util
         private static PropertiesDictionary GetLogicalProperties()
         {
 #if NETSTANDARD
+			value.LogError(">>> Entering GetLogicalProperties()");
+			value.LogWarning("<<< Exiting GetLogicalProperties()");
             return AsyncLocalDictionary.Value;
 #elif NET_2_0 || MONO_2_0 || MONO_3_5 || MONO_4_0
             return CallContext.LogicalGetData(c_SlotName) as PropertiesDictionary;
@@ -219,6 +235,9 @@ namespace log4net.Util
         private static void SetLogicalProperties(PropertiesDictionary properties)
         {
 #if NETSTANDARD
+			value.LogError(">>> Entering SetLogicalProperties(properties={Properties})", properties);
+			value.LogDebug("SetLogicalProperties(properties={Properties}): AsyncLocalDictionary.Value → {Arg1}", properties, AsyncLocalDictionary.Value);
+			value.LogWarning("<<< Exiting SetLogicalProperties(properties={Properties})", properties);
             AsyncLocalDictionary.Value = properties;
 #elif NET_2_0 || MONO_2_0 || MONO_3_5 || MONO_4_0
             CallContext.LogicalSetData(c_SlotName, properties);

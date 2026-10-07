@@ -78,7 +78,9 @@ namespace DNNConnect.CKEditorProvider.Controls
         /// <param name="eventArgument">A <see cref="T:System.String"/> that represents an optional event argument to be passed to the event handler.</param>
         public void RaisePostBackEvent(string eventArgument)
         {
+			eventLogger.LogError(">>> Entering RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
             this.CurrentPageIndex = int.Parse(eventArgument.Replace("Page_", string.Empty));
+			eventLogger.LogWarning("<<< Exiting RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
             this.OnPageChanged(new EventArgs());
         }
 
@@ -86,33 +88,43 @@ namespace DNNConnect.CKEditorProvider.Controls
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         protected void OnPageChanged(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnPageChanged(e={E})", e);
             if (this.PageChanged != null)
             {
                 this.PageChanged(this, e);
             }
+			eventLogger.LogWarning("<<< Exiting OnPageChanged(e={E})", e);
         }
 
         /// <summary>Renders the control to the specified HTML writer.</summary>
         /// <param name="writer">The <see cref="T:System.Web.UI.HtmlTextWriter"/> object that receives the control content.</param>
         protected override void Render(HtmlTextWriter writer)
         {
+			eventLogger.LogError(">>> Entering Render(writer={Writer})", writer);
             this.GeneratePagerLinks(writer);
+			eventLogger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
 
         /// <summary>Generates the pager links.</summary>
         /// <param name="writer">The writer.</param>
         private void GeneratePagerLinks(HtmlTextWriter writer)
         {
+			eventLogger.LogError(">>> Entering GeneratePagerLinks(writer={Writer})", writer);
             var mainTable = new Table { CssClass = "PagerTable" };
 
+			eventLogger.LogError("GeneratePagerLinks(writer={Writer}): mainTable → {MainTable}", writer, mainTable);
             var mainTableRow = new TableRow();
+			eventLogger.LogError("GeneratePagerLinks(writer={Writer}): mainTableRow → {MainTableRow}", writer, mainTableRow);
 
             mainTable.Rows.Add(mainTableRow);
 
             var previousColumn = new TableCell { CssClass = "PagerFirstColumn" };
+			eventLogger.LogError("GeneratePagerLinks(writer={Writer}): previousColumn → {PreviousColumn}", writer, previousColumn);
 
             int iStart = this.CurrentPageIndex - 2;
+			eventLogger.LogError("GeneratePagerLinks(writer={Writer}): iStart → {IStart}", writer, iStart);
             int iEnd = this.CurrentPageIndex + 3;
+			eventLogger.LogError("GeneratePagerLinks(writer={Writer}): iEnd → {IEnd}", writer, iEnd);
 
             if (iStart < 0)
             {
@@ -125,6 +137,7 @@ namespace DNNConnect.CKEditorProvider.Controls
             }
 
             var ulFirstElement = new HtmlGenericControl("ul");
+			eventLogger.LogError("GeneratePagerLinks(writer={Writer}): ulFirstElement → {UlFirstElement}", writer, ulFirstElement);
 
             ulFirstElement.Attributes.Add("class", "FilesPager");
 
@@ -132,6 +145,7 @@ namespace DNNConnect.CKEditorProvider.Controls
             if (iStart > 0)
             {
                 var liFirstElement = new HtmlGenericControl("li");
+				eventLogger.LogError("GeneratePagerLinks(writer={Writer}): liFirstElement → {LiFirstElement}", writer, liFirstElement);
 
                 liFirstElement.Attributes.Add("class", "FirstPage");
 
@@ -153,6 +167,7 @@ namespace DNNConnect.CKEditorProvider.Controls
             if (this.CurrentPageIndex > iStart)
             {
                 var liPrevElement = new HtmlGenericControl("li");
+				eventLogger.LogError("GeneratePagerLinks(writer={Writer}): liPrevElement → {LiPrevElement}", writer, liPrevElement);
 
                 liPrevElement.Attributes.Add("class", "PreviousPage");
 
@@ -177,18 +192,22 @@ namespace DNNConnect.CKEditorProvider.Controls
 
             // Second Page Numbers Column
             var ulSecondElement = new HtmlGenericControl("ul");
+			eventLogger.LogError("GeneratePagerLinks(writer={Writer}): ulSecondElement → {UlSecondElement}", writer, ulSecondElement);
 
             var pageNumbersColumn = new TableCell { CssClass = "PagerNumbersColumn", HorizontalAlign = HorizontalAlign.Center };
+			eventLogger.LogError("GeneratePagerLinks(writer={Writer}): pageNumbersColumn → {PageNumbersColumn}", writer, pageNumbersColumn);
 
             ulSecondElement.Attributes.Add("class", "FilesPager");
 
             for (int i = iStart; i < iEnd; i++)
             {
                 var liElement = new HtmlGenericControl("li");
+				eventLogger.LogError("GeneratePagerLinks(writer={Writer}): liElement → {LiElement}", writer, liElement);
 
                 liElement.Attributes.Add("class", i.Equals(this.CurrentPageIndex) ? "ActivePage" : "NormalPage");
 
                 var page = (i + 1).ToString();
+				eventLogger.LogError("GeneratePagerLinks(writer={Writer}): page → {Page}", writer, page);
 
                 var pageLink = new HyperLink
                 {
@@ -210,15 +229,18 @@ namespace DNNConnect.CKEditorProvider.Controls
 
             // Last Page Column
             var ulThirdElement = new HtmlGenericControl("ul");
+			eventLogger.LogError("GeneratePagerLinks(writer={Writer}): ulThirdElement → {UlThirdElement}", writer, ulThirdElement);
 
             ulThirdElement.Attributes.Add("class", "FilesPager");
 
             var lastColumn = new TableCell { CssClass = "PagerLastColumn" };
+			eventLogger.LogError("GeneratePagerLinks(writer={Writer}): lastColumn → {LastColumn}", writer, lastColumn);
 
             // Next Page
             if (this.CurrentPageIndex < (this.PageCount - 1))
             {
                 var liNextElement = new HtmlGenericControl("li");
+				eventLogger.LogError("GeneratePagerLinks(writer={Writer}): liNextElement → {LiNextElement}", writer, liNextElement);
 
                 liNextElement.Attributes.Add("class", "NextPage");
 
@@ -240,6 +262,7 @@ namespace DNNConnect.CKEditorProvider.Controls
             if (iEnd < this.PageCount)
             {
                 var liLastElement = new HtmlGenericControl("li");
+				eventLogger.LogError("GeneratePagerLinks(writer={Writer}): liLastElement → {LiLastElement}", writer, liLastElement);
 
                 liLastElement.Attributes.Add("class", "LastPage");
 
@@ -271,6 +294,7 @@ namespace DNNConnect.CKEditorProvider.Controls
 
             // Render Complete Control
             mainTable.RenderControl(writer);
+			eventLogger.LogWarning("<<< Exiting GeneratePagerLinks(writer={Writer})", writer);
         }
     }
 }

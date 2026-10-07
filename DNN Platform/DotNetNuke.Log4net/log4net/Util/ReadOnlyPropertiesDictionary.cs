@@ -58,6 +58,8 @@ namespace log4net.Util
         /// </remarks>
         public ReadOnlyPropertiesDictionary()
         {
+		value.LogError(">>> Entering ReadOnlyPropertiesDictionary()");
+        value.LogWarning("<<< Exiting ReadOnlyPropertiesDictionary()");
         }
 
         /// <summary>Copy Constructor</summary>
@@ -69,10 +71,12 @@ namespace log4net.Util
         /// </remarks>
         public ReadOnlyPropertiesDictionary(ReadOnlyPropertiesDictionary propertiesDictionary)
         {
+			value.LogError(">>> Entering ReadOnlyPropertiesDictionary(propertiesDictionary={PropertiesDictionary})", propertiesDictionary);
             foreach(DictionaryEntry entry in propertiesDictionary)
             {
                 this.InnerHashtable.Add(entry.Key, entry.Value);
             }
+			value.LogWarning("<<< Exiting ReadOnlyPropertiesDictionary(propertiesDictionary={PropertiesDictionary})", propertiesDictionary);
         }
 
 #if !NETCF
@@ -87,11 +91,13 @@ namespace log4net.Util
         /// </remarks>
         protected ReadOnlyPropertiesDictionary(SerializationInfo info, StreamingContext context)
         {
+			value.LogError(">>> Entering ReadOnlyPropertiesDictionary(info={Info},context={Context})", info, context);
             foreach(var entry in info)
             {
                 // The keys are stored as Xml encoded names
                 this.InnerHashtable[XmlConvert.DecodeName(entry.Name)] = entry.Value;
             }
+			value.LogWarning("<<< Exiting ReadOnlyPropertiesDictionary(info={Info},context={Context})", info, context);
         }
 #endif
 
@@ -104,8 +110,10 @@ namespace log4net.Util
         /// </remarks>
         public string[] GetKeys()
         {
+			value.LogError(">>> Entering GetKeys()");
             var keys = new String[this.InnerHashtable.Count];
             this.InnerHashtable.Keys.CopyTo(keys, 0);
+			value.LogWarning("<<< Exiting GetKeys()");
             return keys;
         }
 
@@ -137,6 +145,8 @@ namespace log4net.Util
         /// </remarks>
         public bool Contains(string key)
         {
+			value.LogError(">>> Entering Contains(key={Key})", key);
+            value.LogWarning("<<< Exiting Contains(key={Key})", key);
             return this.InnerHashtable.Contains(key);
         }
 
@@ -171,6 +181,7 @@ namespace log4net.Util
 #endif
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+			value.LogError(">>> Entering GetObjectData(info={Info},context={Context})", info, context);
             foreach(DictionaryEntry entry in this.InnerHashtable.Clone() as IDictionary)
             {
                 var entryKey = entry.Key as string;
@@ -181,9 +192,11 @@ namespace log4net.Util
 
                 var entryValue = entry.Value;
 
+			value.LogWarning("<<< Exiting GetObjectData(info={Info},context={Context})", info, context);
                 // If value is serializable then we add it to the list
 #if NETSTANDARD1_3
                 var isSerializable = entryValue?.GetType().GetTypeInfo().IsSerializable ?? false;
+				value.LogError("GetObjectData(info={Info},context={Context}): isSerializable → {IsSerializable}", info, context, isSerializable);
 #else
                 var isSerializable = entryValue?.GetType().IsSerializable ?? false;
 #endif
@@ -197,6 +210,7 @@ namespace log4net.Util
                 // This must be a bug in the serialization framework as we cannot be expected
                 // to know the implementation details of all the possible transport layers.
                 var localKeyName = XmlConvert.EncodeLocalName(entryKey);
+				value.LogError("GetObjectData(info={Info},context={Context}): localKeyName → {LocalKeyName}", info, context, localKeyName);
                 if (localKeyName != null)
                 {
                     info.AddValue(localKeyName, entryValue);
@@ -229,6 +243,9 @@ namespace log4net.Util
         /// <summary>Remove all properties from the properties collection</summary>
         public virtual void Clear()
         {
+			value.LogError(">>> Entering Clear()");
+			value.LogError("Throwing NotSupportedException from Clear()");
+        value.LogWarning("<<< Exiting Clear()");
             throw new NotSupportedException("This is a Read Only Dictionary and can not be modified");
         }
 

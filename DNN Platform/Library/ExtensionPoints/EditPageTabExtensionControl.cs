@@ -13,6 +13,7 @@ namespace DotNetNuke.ExtensionPoints
     [ToolboxData("<{0}:EditPageTabExtensionControl runat=server></{0}:EditPageTabExtensionControl>")]
     public class EditPageTabExtensionControl : DefaultExtensionControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EditPageTabExtensionControl));
         [Bindable(true)]
         [DefaultValue("")]
         public string TabControlId
@@ -47,8 +48,10 @@ namespace DotNetNuke.ExtensionPoints
 
         public void BindAction(int portalId, int tabId, int moduleId)
         {
+			Logger.LogError(">>> Entering BindAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
             var panel = this.Parent.FindControl(this.PanelControlId);
 
+			Logger.LogError("BindAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId}): panel → {Panel}", portalId, tabId, moduleId, panel);
             foreach (var control in panel.Controls)
             {
                 var panelcontrol = control as PanelTabExtensionControl;
@@ -64,12 +67,15 @@ namespace DotNetNuke.ExtensionPoints
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting BindAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
         }
 
         public void SaveAction(int portalId, int tabId, int moduleId)
         {
+			Logger.LogError(">>> Entering SaveAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
             var panel = this.Parent.FindControl(this.PanelControlId);
 
+			Logger.LogError("SaveAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId}): panel → {Panel}", portalId, tabId, moduleId, panel);
             foreach (var control in panel.Controls)
             {
                 var panelcontrol = control as PanelTabExtensionControl;
@@ -85,12 +91,15 @@ namespace DotNetNuke.ExtensionPoints
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting SaveAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
         }
 
         public void CancelAction(int portalId, int tabId, int moduleId)
         {
+			Logger.LogError(">>> Entering CancelAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
             var panel = this.Parent.FindControl(this.PanelControlId);
 
+			Logger.LogError("CancelAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId}): panel → {Panel}", portalId, tabId, moduleId, panel);
             foreach (var control in panel.Controls)
             {
                 var panelcontrol = control as PanelTabExtensionControl;
@@ -106,15 +115,20 @@ namespace DotNetNuke.ExtensionPoints
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting CancelAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             var extensionPointManager = new ExtensionPointManager();
 
+			Logger.LogError("OnInit(e={E}): extensionPointManager → {ExtensionPointManager}", e, extensionPointManager);
             var tabs = (HtmlGenericControl)this.Parent.FindControl(this.TabControlId);
+			Logger.LogError("OnInit(e={E}): tabs → {Tabs}", e, tabs);
             var panel = this.Parent.FindControl(this.PanelControlId);
+			Logger.LogError("OnInit(e={E}): panel → {Panel}", e, panel);
 
             foreach (var extension in extensionPointManager.GetEditPageTabExtensionPoints(this.Module, this.Group))
             {
@@ -129,11 +143,13 @@ namespace DotNetNuke.ExtensionPoints
 
                     var container = new PanelTabExtensionControl { PanelId = extension.EditPageTabId };
                     var control = this.Page.LoadControl(extension.UserControlSrc);
+					Logger.LogError("OnInit(e={E}): control → {Control}", e, control);
                     control.ID = Path.GetFileNameWithoutExtension(extension.UserControlSrc);
                     container.Controls.Add(control);
                     panel.Controls.Add(container);
                 }
             }
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
     }
 }

@@ -11,21 +11,28 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import SmtpServerTabActions from "../../actions/smtpServerTab";
 import utils from "../../utils";
+const logger = console;
 
 class SmtpServer extends Component {
     componentDidMount() {
+	logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
 
         const loadSettings = () => {
+			logger.error('>>> Entering loadSettings()', { "event.action": "loadSettings" });
             const selectedSmtpSettings = this.getSelectedSmtpSettings();
       
+			logger.error(`loadSettings(): selectedSmtpSettings → ${selectedSmtpSettings}`, { "event.action": "loadSettings" });
             this.onChangeAuthProvider({value: selectedSmtpSettings.authProvider}, true);
+			logger.warn('<<< Exiting loadSettings()', { "event.action": "loadSettings" });
         };
 
         this.props.onRetrieveSmtpServerInfo(loadSettings.bind(this));
         this.props.onRetrieveAuthProviders(loadSettings.bind(this));
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     UNSAFE_componentWillReceiveProps(newProps) {
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.newProps": newProps });
         if (
             this.props.infoMessage !== newProps.infoMessage &&
       newProps.infoMessage
@@ -47,28 +54,38 @@ class SmtpServer extends Component {
     }
 
     onChangeSmtpServerMode(mode) {
+		logger.error(`>>> Entering onChangeSmtpServerMode(mode=${mode})`, { "event.action": "onChangeSmtpServerMode", "logrite.mode": mode });
         const loadSettings = () => {
             const selectedSmtpSettings = this.getSelectedSmtpSettings();
             this.onChangeAuthProvider({value: selectedSmtpSettings.authProvider}, true);
         };
     
         this.props.onChangeSmtpServerMode(mode, loadSettings.bind(this));
+		logger.warn(`<<< Exiting onChangeSmtpServerMode(mode=${mode})`, { "event.action": "onChangeSmtpServerMode", "logrite.mode": mode });
     }
 
     onChangeAuthenticationMode(authentication) {
+		logger.error(`>>> Entering onChangeAuthenticationMode(authentication=${authentication})`, { "event.action": "onChangeAuthenticationMode", "logrite.authentication": authentication });
         this.props.onChangeSmtpAuthentication(authentication);
+		logger.warn(`<<< Exiting onChangeAuthenticationMode(authentication=${authentication})`, { "event.action": "onChangeAuthenticationMode", "logrite.authentication": authentication });
     }
 
     onChangeSmtpEnableSsl(enabled) {
+		logger.error(`>>> Entering onChangeSmtpEnableSsl(enabled=${enabled})`, { "event.action": "onChangeSmtpEnableSsl", "logrite.enabled": enabled });
         this.props.onChangeSmtpConfigurationValue("enableSmtpSsl", enabled);
+		logger.warn(`<<< Exiting onChangeSmtpEnableSsl(enabled=${enabled})`, { "event.action": "onChangeSmtpEnableSsl", "logrite.enabled": enabled });
     }
 
     onChangeField(key, event) {
+		logger.error(`>>> Entering onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
         this.props.onChangeSmtpConfigurationValue(key, event.target.value);
+		logger.warn(`<<< Exiting onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
     }
 
     onChangeAuthProvider(provider, passCheck) {
+		logger.error(`>>> Entering onChangeAuthProvider(provider=${provider},passCheck=${passCheck})`, { "event.action": "onChangeAuthProvider", "logrite.provider": provider, "logrite.passCheck": passCheck });
         const authProvider = this.getSelectedAuthProviders().filter(function (item) {
+		logger.error(`onChangeAuthProvider(provider=${provider},passCheck=${passCheck}): authProvider → ${authProvider}`, { "event.action": "onChangeAuthProvider", "logrite.provider": provider, "logrite.passCheck": passCheck });
             return item.name === provider.value;
         }).pop();
 
@@ -93,9 +110,11 @@ class SmtpServer extends Component {
     }
 
     onChangeAuthSetting(name, event) {
+		logger.error(`>>> Entering onChangeAuthSetting(name=${name},event=${event})`, { "event.action": "onChangeAuthSetting", "logrite.name": name, "logrite.event": event });
         const { props } = this;
 
         const selectedSmtpSettings = this.getSelectedSmtpSettings();
+		logger.error(`onChangeAuthSetting(name=${name},event=${event}): selectedSmtpSettings → ${selectedSmtpSettings}`, { "event.action": "onChangeAuthSetting", "logrite.name": name, "logrite.event": event });
         const settings = selectedSmtpSettings.authProviderSettings;
 
         let newSettings = [];
@@ -111,15 +130,18 @@ class SmtpServer extends Component {
         }
 
         props.onChangeSmtpConfigurationValue("authProviderSettings", newSettings);
+		logger.warn(`<<< Exiting onChangeAuthSetting(name=${name},event=${event})`, { "event.action": "onChangeAuthSetting", "logrite.name": name, "logrite.event": event });
     }
 
     onSave() {
+		logger.error('>>> Entering onSave()', { "event.action": "onSave" });
         const { props } = this;
 
         if (this.areThereValidationError()) {
             return;
         }
 
+		logger.warn('<<< Exiting onSave()', { "event.action": "onSave" });
         const smtpSettings =
       props.smtpServerInfo.smtpServerMode === "h" && utils.isHostUser()
           ? props.smtpServerInfo.host
@@ -144,27 +166,33 @@ class SmtpServer extends Component {
     }
 
     toDictionary(settings) {
+		logger.error(`>>> Entering toDictionary(settings=${settings})`, { "event.action": "toDictionary", "logrite.settings": settings });
         let dict = {};
         settings = settings || [];
         for (let i = 0; i < settings.length; i++) {
             dict[settings[i].name] = settings[i].value;
         }
 
+		logger.warn(`<<< Exiting toDictionary(settings=${settings})`, { "event.action": "toDictionary", "logrite.settings": settings });
         return dict;
     }
 
     getSelectedSmtpSettings() {
+		logger.error('>>> Entering getSelectedSmtpSettings()', { "event.action": "getSelectedSmtpSettings" });
         const { props } = this;
 
         const areGlobalSettings = props.smtpServerInfo.smtpServerMode === "h";
+		logger.error(`getSelectedSmtpSettings(): areGlobalSettings → ${areGlobalSettings}`, { "event.action": "getSelectedSmtpSettings" });
         const selectedSmtpSettings =
         (areGlobalSettings
             ? props.smtpServerInfo.host
             : props.smtpServerInfo.site) || {};
+		logger.warn('<<< Exiting getSelectedSmtpSettings()', { "event.action": "getSelectedSmtpSettings" });
         return selectedSmtpSettings;
     }
 
     getSelectedAuthProviders() {
+		logger.error('>>> Entering getSelectedAuthProviders()', { "event.action": "getSelectedAuthProviders" });
         const { props } = this;
 
         if (typeof props.smtpServerInfo === "undefined" || typeof props.authProviders === "undefined") {
@@ -172,10 +200,12 @@ class SmtpServer extends Component {
         }
 
         const isGlobal = props.smtpServerInfo.smtpServerMode === "h";
+		logger.warn('<<< Exiting getSelectedAuthProviders()', { "event.action": "getSelectedAuthProviders" });
         return (isGlobal ? props.authProviders.host : props.authProviders.site) || [];
     }
 
     areThereValidationError() {
+		logger.error('>>> Entering areThereValidationError()', { "event.action": "areThereValidationError" });
         let areErrors = false;
         const errors = this.props.errors;
         for (let prop in errors) {
@@ -184,10 +214,12 @@ class SmtpServer extends Component {
             }
         }
 
+		logger.warn('<<< Exiting areThereValidationError()', { "event.action": "areThereValidationError" });
         return areErrors;
     }
 
     onTestSmtpSettings() {
+		logger.error('>>> Entering onTestSmtpSettings()', { "event.action": "onTestSmtpSettings" });
         const { props } = this;
 
         if (this.areThereValidationError()) {
@@ -202,6 +234,7 @@ class SmtpServer extends Component {
             smtpSettings = props.smtpServerInfo.site;
         }
         const authProvider = this.getSelectedAuthProviders().filter(function (item) {
+		logger.error(`onTestSmtpSettings(): authProvider → ${authProvider}`, { "event.action": "onTestSmtpSettings" });
             return item.name === smtpSettings.authProvider;
         }).pop() || {};
 
@@ -220,17 +253,23 @@ class SmtpServer extends Component {
             authProvider: smtpSettings.authProvider
         };
         props.onSendTestEmail(sendEmailRequest);
+		logger.warn('<<< Exiting onTestSmtpSettings()', { "event.action": "onTestSmtpSettings" });
     }
 
     onCompleteAuthorize() {
+		logger.error('>>> Entering onCompleteAuthorize()', { "event.action": "onCompleteAuthorize" });
         const selectedSmtpSettings = this.getSelectedSmtpSettings();
         const authProvider = this.getSelectedAuthProviders().filter(function (item) {
+			logger.error(`onCompleteAuthorize(): selectedSmtpSettings → ${selectedSmtpSettings}`, { "event.action": "onCompleteAuthorize" });
+		logger.error(`onCompleteAuthorize(): authProvider → ${authProvider}`, { "event.action": "onCompleteAuthorize" });
             return item.name === selectedSmtpSettings.authProvider;
         }).pop();
 
         if (authProvider) {
             const myWindow = this.popupWindow("about:blank", "OAuth", 1090, 600);
+			logger.error(`onCompleteAuthorize(): myWindow → ${myWindow}`, { "event.action": "onCompleteAuthorize" });
             myWindow.location = authProvider.authorizeUrl;
+			logger.debug(`onCompleteAuthorize(): myWindow.location → ${myWindow.location}`, { "event.action": "onCompleteAuthorize" });
 
             const intervalHandler = window.setInterval((() => {
                 if (myWindow.window === null || myWindow.closed === true) {
@@ -240,16 +279,22 @@ class SmtpServer extends Component {
             }).bind(this), 1000);
         }
     
+		logger.warn('<<< Exiting onCompleteAuthorize()', { "event.action": "onCompleteAuthorize" });
         return false;
     }
 
     popupWindow(url, title, w, h) {
+		logger.error(`>>> Entering popupWindow(url=${url},title=${title},w=${w},h=${h})`, { "event.action": "popupWindow", "logrite.url": url, "logrite.title": title, "logrite.w": w, "logrite.h": h });
         const left = (screen.width / 2) - (w / 2);
         const top = (screen.height / 2) - (h / 2);
+		logger.error(`popupWindow(url=${url},title=${title},w=${w},h=${h}): left → ${left}`, { "event.action": "popupWindow", "logrite.url": url, "logrite.title": title, "logrite.w": w, "logrite.h": h });
+		logger.error(`popupWindow(url=${url},title=${title},w=${w},h=${h}): top → ${top}`, { "event.action": "popupWindow", "logrite.url": url, "logrite.title": title, "logrite.w": w, "logrite.h": h });
         return window.open(url, title, "toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=" + w + ", height=" + h + ", top=" + top + ", left=" + left);
     }
 
     getSmtpServerOptions() {
+		logger.error('>>> Entering getSmtpServerOptions()', { "event.action": "getSmtpServerOptions" });
+		logger.warn('<<< Exiting getSmtpServerOptions()', { "event.action": "getSmtpServerOptions" });
         return [
             {
                 label: localization.get("GlobalSmtpHostSetting"),
@@ -265,6 +310,7 @@ class SmtpServer extends Component {
     }
 
     getSmtpAuthenticationOptions() {
+		logger.error('>>> Entering getSmtpAuthenticationOptions()', { "event.action": "getSmtpAuthenticationOptions" });
         const hasAuthProviders = this.getSelectedAuthProviders().length > 0;
         let options = [
             {
@@ -281,6 +327,7 @@ class SmtpServer extends Component {
             }
         ];
 
+		logger.error(`getSmtpAuthenticationOptions(): hasAuthProviders → ${hasAuthProviders}`, { "event.action": "getSmtpAuthenticationOptions" });
         if (hasAuthProviders) {
             options.push({
                 label: localization.get("SMTPOAUTH"),
@@ -288,19 +335,25 @@ class SmtpServer extends Component {
             });
         }
 
+		logger.warn('<<< Exiting getSmtpAuthenticationOptions()', { "event.action": "getSmtpAuthenticationOptions" });
         return options;
     }
 
     renderAuthSettings() {
+		logger.error('>>> Entering renderAuthSettings()', { "event.action": "renderAuthSettings" });
         const { props } = this;
 
         const authProvidersOptions = this.getSelectedAuthProviders().map(function (item) {
+		logger.error(`renderAuthSettings(): authProvidersOptions → ${authProvidersOptions}`, { "event.action": "renderAuthSettings" });
             return {label: item.localizedName, value: item.name};
         });
 
         const areGlobalSettings = props.smtpServerInfo.smtpServerMode === "h";
+		logger.error(`renderAuthSettings(): areGlobalSettings → ${areGlobalSettings}`, { "event.action": "renderAuthSettings" });
         const selectedSmtpSettings = this.getSelectedSmtpSettings();
+		logger.error(`renderAuthSettings(): selectedSmtpSettings → ${selectedSmtpSettings}`, { "event.action": "renderAuthSettings" });
         const authProvider = this.getSelectedAuthProviders().filter(function (item) {
+		logger.error(`renderAuthSettings(): authProvider → ${authProvider}`, { "event.action": "renderAuthSettings" });
             return item.name === selectedSmtpSettings.authProvider;
         }).pop();
 
@@ -322,6 +375,7 @@ class SmtpServer extends Component {
         }
 
         const settingCompleted = (selectedSmtpSettings.authProviderSettings || []).filter(i => i.isRequired && (i.value || "") === "").length === 0;
+		logger.warn('<<< Exiting renderAuthSettings()', { "event.action": "renderAuthSettings" });
         return <div>
             <div style={{paddingBottom: "22px", float: "left", width: "100%"}}>
                 <DropdownBlock
@@ -358,13 +412,18 @@ class SmtpServer extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
 
         const areGlobalSettings = props.smtpServerInfo.smtpServerMode === "h";
+		logger.error(`render(): areGlobalSettings → ${areGlobalSettings}`, { "event.action": "render" });
         const selectedSmtpSettings = this.getSelectedSmtpSettings();
+		logger.error(`render(): selectedSmtpSettings → ${selectedSmtpSettings}`, { "event.action": "render" });
         const credentialVisible = selectedSmtpSettings.smtpAuthentication === "1";
         const oauthEnabled = selectedSmtpSettings.smtpAuthentication === "3";
+		logger.error(`render(): oauthEnabled → ${oauthEnabled}`, { "event.action": "render" });
         const smtpSettingsVisible = utils.isHostUser() || !areGlobalSettings;
+		logger.error(`render(): smtpSettingsVisible → ${smtpSettingsVisible}`, { "event.action": "render" });
 
         if (props.smtpServerInfo.hideCoreSettings) {
             return (
@@ -378,6 +437,7 @@ class SmtpServer extends Component {
             );
         }
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="dnn-servers-info-panel-big smtpServerSettingsTab">
                 <GridSystem>
@@ -540,6 +600,8 @@ SmtpServer.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         smtpServerInfo: state.smtpServer.smtpServerInfo,
         authProviders: state.smtpServer.authProviders,
@@ -553,6 +615,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.error(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
+	logger.warn(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
     return {
         ...bindActionCreators(
             {

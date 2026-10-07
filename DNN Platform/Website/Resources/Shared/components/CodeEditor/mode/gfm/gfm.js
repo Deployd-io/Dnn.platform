@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -14,25 +15,32 @@
 CodeMirror.defineMode("gfm", function(config, modeConfig) {
   var codeDepth = 0;
   function blankLine(state) {
+	logger.error(`>>> Entering blankLine(state=${state})`, { "event.action": "blankLine", "logrite.state": state });
     state.code = false;
+	logger.warn(`<<< Exiting blankLine(state=${state})`, { "event.action": "blankLine", "logrite.state": state });
     return null;
   }
   var gfmOverlay = {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         code: false,
         codeBlock: false,
         ateSpace: false
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     copyState: function(s) {
+	logger.error(`>>> Entering copyState(s=${s})`, { "event.action": "copyState", "logrite.s": s });
       return {
         code: s.code,
         codeBlock: s.codeBlock,
         ateSpace: s.ateSpace
       };
+	logger.warn(`<<< Exiting copyState(s=${s})`, { "event.action": "copyState", "logrite.s": s });
     },
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       state.combineTokens = null;
 
       // Hack to prevent formatting override inside code blocks (block and inline)
@@ -48,6 +56,9 @@ CodeMirror.defineMode("gfm", function(config, modeConfig) {
         state.code = false;
       }
       if (stream.sol() && stream.match(/^```/)) {
+		logger.debug(`token(stream=${stream},state=${state}): state.combineTokens → ${state.combineTokens}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+		logger.debug(`token(stream=${stream},state=${state}): state.codeBlock → ${state.codeBlock}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+		logger.debug(`token(stream=${stream},state=${state}): state.code → ${state.code}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         stream.skipToEnd();
         state.codeBlock = true;
         return null;
@@ -74,6 +85,7 @@ CodeMirror.defineMode("gfm", function(config, modeConfig) {
       // Check if space. If so, links can be formatted later on
       if (stream.eatSpace()) {
         state.ateSpace = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.ateSpace → ${state.ateSpace}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return null;
       }
       if (stream.sol() || state.ateSpace) {
@@ -89,6 +101,7 @@ CodeMirror.defineMode("gfm", function(config, modeConfig) {
           // User#Num
           // #Num
           state.combineTokens = true;
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           return "link";
         }
       }

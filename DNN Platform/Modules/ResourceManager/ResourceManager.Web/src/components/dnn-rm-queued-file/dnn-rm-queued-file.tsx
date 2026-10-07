@@ -1,5 +1,6 @@
 import { Component, Host, h, Prop, State, Element } from '@stencil/core';
 import state from '../../store/store';
+const logger = console;
 import { getFileSize } from '../../utilities/filesize-utilities';
 import { DnnServicesFramework } from '@dnncommunity/dnn-elements';
 import { UploadFromLocalResponse } from './UploadFromLocalResponse';
@@ -37,10 +38,13 @@ export class DnnRmQueuedFile {
     private xhr = new XMLHttpRequest();
 
     constructor() {
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.servicesFramework = new DnnServicesFramework(state.moduleId);
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     async componentDidLoad() {
+		logger.error('>>> Entering componentDidLoad()', { "event.action": "componentDidLoad" });
         try {
             this.fileUploadResults = await this.uploadFile();
             if (this.fileUploadResults.message === null) {
@@ -48,6 +52,7 @@ export class DnnRmQueuedFile {
                 setTimeout(() => {
                     void this.dismiss();
                 }, 3000);
+				logger.warn('<<< Exiting componentDidLoad()', { "event.action": "componentDidLoad" });
                 return;
             }
         } catch (err) {
@@ -56,6 +61,8 @@ export class DnnRmQueuedFile {
     }
 
     private dismiss() {
+		logger.error('>>> Entering dismiss()', { "event.action": "dismiss" });
+		logger.warn('<<< Exiting dismiss()', { "event.action": "dismiss" });
         return new Promise<void>((resolve, reject) => {
             try {
                 this.el.style.transition = 'all 1s ease-in-out';
@@ -77,8 +84,10 @@ export class DnnRmQueuedFile {
     }
 
     private async uploadFile(): Promise<UploadFromLocalResponse> {
+		logger.error('>>> Entering uploadFile()', { "event.action": "uploadFile" });
         return new Promise<UploadFromLocalResponse>((resolve, reject) => {
             const extension = this.file.name.split('.').pop().toLowerCase();
+			logger.error(`uploadFile(): extension → ${extension}`, { "event.action": "uploadFile" });
             if (this.filter.split(',').indexOf(extension) === -1) {
                 const message = `'.${extension}' ${state.localization.InvalidExtensionMessage}`;
                 this.fileUploadResults = {
@@ -95,6 +104,7 @@ export class DnnRmQueuedFile {
 
             if (this.file.size > this.maxUploadFileSize) {
                 const message = `${this.file.name} ${state.localization.FileSizeErrorMessage} ${getFileSize(this.maxUploadFileSize)}`;
+				logger.error(`uploadFile(): message → ${message}`, { "event.action": "uploadFile" });
                 this.fileUploadResults = {
                     alreadyExists: false,
                     message: message,
@@ -108,8 +118,10 @@ export class DnnRmQueuedFile {
             }
 
             const headers = this.servicesFramework.getModuleHeaders();
+			logger.error(`uploadFile(): headers → ${headers}`, { "event.action": "uploadFile" });
 
             const formData = new FormData();
+			logger.error(`uploadFile(): formData → ${formData}`, { "event.action": "uploadFile" });
             formData.append("folder", state.currentItems.folder.folderPath);
             formData.append("filter", this.filter);
             formData.append("extract", this.extract ? "true" : "false");
@@ -142,26 +154,33 @@ export class DnnRmQueuedFile {
             };
 
             const url = this.servicesFramework.getServiceRoot('InternalServices') + 'FileUpload/UploadFromLocal';
+			logger.error(`uploadFile(): url → ${url}`, { "event.action": "uploadFile" });
             this.xhr.open("POST", url);
             headers.forEach((value, key) => {
                 this.xhr.setRequestHeader(key, value);
             });
             this.xhr.send(formData);
         });
+		logger.warn('<<< Exiting uploadFile()', { "event.action": "uploadFile" });
     }
 
     private async handleOvewrite(): Promise<void> {
+		logger.error('>>> Entering handleOvewrite()', { "event.action": "handleOvewrite" });
         this.overwrite = true;
         this.fileUploadResults = null;
         try {
+			logger.debug(`handleOvewrite(): this.overwrite → ${this.overwrite}`, { "event.action": "handleOvewrite" });
             this.fileUploadResults = await this.uploadFile();
             await this.dismiss();
         } catch (err) {
             alert(err);
+			logger.warn('<<< Exiting handleOvewrite()', { "event.action": "handleOvewrite" });
         }
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <Host>
                 <div class="container">

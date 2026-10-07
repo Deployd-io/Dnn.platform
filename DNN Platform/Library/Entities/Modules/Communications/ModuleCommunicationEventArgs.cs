@@ -7,15 +7,18 @@ namespace DotNetNuke.Entities.Modules.Communications
 
     public class ModuleCommunicationEventArgs : EventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleCommunicationEventArgs));
         /// <summary>Initializes a new instance of the <see cref="ModuleCommunicationEventArgs"/> class.</summary>
         public ModuleCommunicationEventArgs()
         {
+		Logger.LogWarning("<<< Exiting ModuleCommunicationEventArgs(type={Type},value={Value},sender={Sender},target={Target})", type, value, sender, target);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleCommunicationEventArgs"/> class.</summary>
         /// <param name="text">The text.</param>
         public ModuleCommunicationEventArgs(string text)
         {
+			Logger.LogError(">>> Entering ModuleCommunicationEventArgs(text={Text})", text);
             this.Text = text;
         }
 
@@ -26,9 +29,13 @@ namespace DotNetNuke.Entities.Modules.Communications
         /// <param name="target">The target.</param>
         public ModuleCommunicationEventArgs(string type, object value, string sender, string target)
         {
+			Logger.LogError(">>> Entering ModuleCommunicationEventArgs(type={Type},value={Value},sender={Sender},target={Target})", type, value, sender, target);
             this.Type = type;
+			Logger.LogWarning("<<< Exiting ModuleCommunicationEventArgs(type={Type},value={Value},sender={Sender},target={Target})", type, value, sender, target);
+			Logger.LogDebug("ModuleCommunicationEventArgs(type={Type},value={Value},sender={Sender},target={Target}): this.Type → {Arg4}", type, value, sender, target, this.Type);
             this.Value = value;
             this.Sender = sender;
+			Logger.LogDebug("ModuleCommunicationEventArgs(type={Type},value={Value},sender={Sender},target={Target}): this.Value → {Arg4}", type, value, sender, target, this.Value);
             this.Target = target;
         }
 

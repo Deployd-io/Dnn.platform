@@ -11,24 +11,32 @@ namespace DotNetNuke.Web.Mvc
 
     public class MvcModuleControlFactory : BaseModuleControlFactory
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MvcModuleControlFactory));
         /// <inheritdoc />
         public override int Priority => 100;
 
         /// <inheritdoc />
         public override bool SupportsControl(ModuleInfo moduleConfiguration, string controlSrc)
         {
+			Logger.LogError(">>> Entering SupportsControl(moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", moduleConfiguration, controlSrc);
+            Logger.LogWarning("<<< Exiting SupportsControl(moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", moduleConfiguration, controlSrc);
             return controlSrc.EndsWith(".mvc", System.StringComparison.OrdinalIgnoreCase);
         }
 
         /// <inheritdoc />
         public override Control CreateControl(TemplateControl containerControl, string controlKey, string controlSrc)
         {
+			Logger.LogError(">>> Entering CreateControl(containerControl={ContainerControl},controlKey={ControlKey},controlSrc={ControlSrc})", containerControl, controlKey, controlSrc);
+            Logger.LogWarning("<<< Exiting CreateControl(containerControl={ContainerControl},controlKey={ControlKey},controlSrc={ControlSrc})", containerControl, controlKey, controlSrc);
             return new MvcHostControl(controlKey);
         }
 
         /// <inheritdoc />
         public override Control CreateModuleControl(TemplateControl containerControl, ModuleInfo moduleConfiguration)
         {
+			Logger.LogError(">>> Entering CreateModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration})", containerControl, moduleConfiguration);
+			Logger.LogWarning("<<< Exiting CreateModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration})", containerControl, moduleConfiguration);
+			Logger.LogWarning("<<< Exiting CreateModuleControl(moduleConfiguration={ModuleConfiguration})", moduleConfiguration);
             return new MvcHostControl();
         }
 
@@ -47,6 +55,8 @@ namespace DotNetNuke.Web.Mvc
         /// <inheritdoc />
         public override Control CreateSettingsControl(TemplateControl containerControl, ModuleInfo moduleConfiguration, string controlSrc)
         {
+			Logger.LogError(">>> Entering CreateSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", containerControl, moduleConfiguration, controlSrc);
+            Logger.LogWarning("<<< Exiting CreateSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", containerControl, moduleConfiguration, controlSrc);
             return new MvcSettingsControl();
         }
     }

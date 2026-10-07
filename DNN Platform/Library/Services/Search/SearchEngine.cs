@@ -48,14 +48,18 @@ namespace DotNetNuke.Services.Search
         /// <summary>Indexes content within the given time frame.</summary>
         internal void IndexContent()
         {
+			Logger.LogError(">>> Entering IndexContent()");
             // Index TAB META-DATA
             var tabIndexer = new TabIndexer();
+			Logger.LogError("IndexContent(): tabIndexer → {TabIndexer}", tabIndexer);
             var searchDocsCount = this.GetAndStoreSearchDocuments(tabIndexer);
+			Logger.LogError("IndexContent(): searchDocsCount → {SearchDocsCount}", searchDocsCount);
             var indexedSearchDocumentCount = searchDocsCount;
             this.AddIndexingResults("Tabs Indexed", searchDocsCount);
 
             // Index MODULE META-DATA from modules that inherit from ModuleSearchBase
             var moduleIndexer = new ModuleIndexer(true, this.businessControllerProvider);
+			Logger.LogError("IndexContent(): moduleIndexer → {ModuleIndexer}", moduleIndexer);
             searchDocsCount = this.GetAndStoreModuleMetaData(moduleIndexer);
             indexedSearchDocumentCount += searchDocsCount;
             this.AddIndexingResults("Modules (Metadata) Indexed", searchDocsCount);
@@ -70,17 +74,21 @@ namespace DotNetNuke.Services.Search
             {
                 // Index User data
                 var userIndexer = new UserIndexer();
+				Logger.LogError("IndexContent(): userIndexer → {UserIndexer}", userIndexer);
                 var userIndexed = this.GetAndStoreSearchDocuments(userIndexer);
+				Logger.LogError("IndexContent(): userIndexed → {UserIndexed}", userIndexed);
                 indexedSearchDocumentCount += userIndexed;
                 this.AddIndexingResults("Users", userIndexed);
             }
 
             this.SchedulerItem.AddLogNote("<br/><b>Total Items Indexed: " + indexedSearchDocumentCount + "</b>");
+			Logger.LogWarning("<<< Exiting IndexContent()");
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         internal bool CompactSearchIndexIfNeeded(ScheduleHistoryItem scheduleItem)
         {
+			Logger.LogError(">>> Entering CompactSearchIndexIfNeeded(scheduleItem={ScheduleItem})", scheduleItem);
             var searchHelper = SearchHelper.Instance;
             if (!searchHelper.GetSearchCompactFlag())
             {
@@ -89,6 +97,7 @@ namespace DotNetNuke.Services.Search
 
             searchHelper.SetSearchReindexRequestTime(false);
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+			Logger.LogError("CompactSearchIndexIfNeeded(scheduleItem={ScheduleItem}): stopWatch → {StopWatch}", scheduleItem, stopWatch);
             if (!InternalSearchController.Instance.OptimizeSearchIndex())
             {
                 return false;
@@ -97,35 +106,44 @@ namespace DotNetNuke.Services.Search
             stopWatch.Stop();
             scheduleItem.AddLogNote($"<br/><b>Compacted Index, total time {stopWatch.Elapsed}</b>");
 
+			Logger.LogWarning("<<< Exiting CompactSearchIndexIfNeeded(scheduleItem={ScheduleItem})", scheduleItem);
             return false;
         }
 
         /// <summary>Deletes all old documents when re-index was requested, so we start a fresh search.</summary>
         internal void DeleteOldDocsBeforeReindex()
         {
+			Logger.LogError(">>> Entering DeleteOldDocsBeforeReindex()");
             var controller = InternalSearchController.Instance;
             var moduleSearchTypeId = SearchHelper.Instance.GetSearchTypeByName("module").SearchTypeId;
+			Logger.LogError("DeleteOldDocsBeforeReindex(): moduleSearchTypeId → {ModuleSearchTypeId}", moduleSearchTypeId);
             var tabSearchTypeId = SearchHelper.Instance.GetSearchTypeByName("tab").SearchTypeId;
+			Logger.LogError("DeleteOldDocsBeforeReindex(): tabSearchTypeId → {TabSearchTypeId}", tabSearchTypeId);
             foreach (var portalId in SearchHelper.Instance.GetPortalsToReindex(this.IndexingStartTime))
             {
                 controller.DeleteAllDocuments(portalId, moduleSearchTypeId);
                 controller.DeleteAllDocuments(portalId, tabSearchTypeId);
             }
+			Logger.LogWarning("<<< Exiting DeleteOldDocsBeforeReindex()");
         }
 
         /// <summary>Deletes all deleted items from the system that are added to deletions table.</summary>
         internal void DeleteRemovedObjects()
         {
+			Logger.LogError(">>> Entering DeleteRemovedObjects()");
             var deletedCount = 0;
             var cutoffTime = this.SchedulerItem.StartDate.ToUniversalTime();
+			Logger.LogError("DeleteRemovedObjects(): cutoffTime → {CutoffTime}", cutoffTime);
             var searchController = InternalSearchController.Instance;
             var dataProvider = DataProvider.Instance();
+			Logger.LogError("DeleteRemovedObjects(): dataProvider → {DataProvider}", dataProvider);
             using (var reader = dataProvider.GetSearchDeletedItems(cutoffTime))
             {
                 while (reader.Read())
                 {
                     // Note: we saved this in the DB as SearchDocumentToDelete but retrieve as the descendant SearchDocument class
                     var document = JsonConvert.DeserializeObject<SearchDocument>(reader["document"] as string);
+					Logger.LogError("DeleteRemovedObjects(): document → {Document}", document);
                     searchController.DeleteSearchDocument(document);
                     deletedCount += 1;
                 }
@@ -135,46 +153,60 @@ namespace DotNetNuke.Services.Search
 
             this.AddIndexingResults("Deleted Objects", deletedCount);
             dataProvider.DeleteProcessedSearchDeletedItems(cutoffTime);
+			Logger.LogWarning("<<< Exiting DeleteRemovedObjects()");
         }
 
         /// <summary>Commits (flushes) all added and deleted content to search engine's disk file.</summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         internal void Commit()
         {
+			Logger.LogError(">>> Entering Commit()");
             InternalSearchController.Instance.Commit();
+			Logger.LogWarning("<<< Exiting Commit()");
         }
 
         /// <summary>Ensures all SearchDocuments have a SearchTypeId.</summary>
         private static void StoreSearchDocuments(IEnumerable<SearchDocument> searchDocs)
         {
+			Logger.LogError(">>> Entering StoreSearchDocuments(searchDocs={SearchDocs})", searchDocs);
             var defaultSearchTypeId = SearchHelper.Instance.GetSearchTypeByName("module").SearchTypeId;
 
+			Logger.LogError("StoreSearchDocuments(searchDocs={SearchDocs}): defaultSearchTypeId → {DefaultSearchTypeId}", searchDocs, defaultSearchTypeId);
             var searchDocumentList = searchDocs as IList<SearchDocument> ?? searchDocs.ToList();
+			Logger.LogError("StoreSearchDocuments(searchDocs={SearchDocs}): searchDocumentList → {SearchDocumentList}", searchDocs, searchDocumentList);
             foreach (var searchDocument in searchDocumentList.Where(searchDocument => searchDocument.SearchTypeId <= 0))
             {
                 searchDocument.SearchTypeId = defaultSearchTypeId;
+				Logger.LogDebug("StoreSearchDocuments(searchDocs={SearchDocs}): searchDocument.SearchTypeId → {Arg1}", searchDocs, searchDocument.SearchTypeId);
             }
 
             InternalSearchController.Instance.AddSearchDocuments(searchDocumentList);
+			Logger.LogWarning("<<< Exiting StoreSearchDocuments(searchDocs={SearchDocs})", searchDocs);
         }
 
         private void AddIndexingResults(string description, int count)
         {
+			Logger.LogError(">>> Entering AddIndexingResults(description={Description},count={Count})", description, count);
             this.SchedulerItem.AddLogNote($"<br/>&nbsp;&nbsp;{description}: {count}");
+			Logger.LogWarning("<<< Exiting AddIndexingResults(description={Description},count={Count})", description, count);
         }
 
         /// <summary>Gets all the Search Documents for the given timeframe.</summary>
         private int GetAndStoreSearchDocuments(IndexingProviderBase indexer)
         {
+			Logger.LogError(">>> Entering GetAndStoreSearchDocuments(indexer={Indexer})", indexer);
             var portals = PortalController.Instance.GetPortals();
             DateTime indexSince;
+			Logger.LogError("GetAndStoreSearchDocuments(indexer={Indexer}): portals → {Portals}", indexer, portals);
             var indexedCount = 0;
 
             foreach (var portal in portals.Cast<IPortalInfo>())
             {
                 indexSince = this.FixedIndexingStartDate(portal.PortalId);
+				Logger.LogDebug("GetAndStoreSearchDocuments(indexer={Indexer}): indexSince → {IndexSince}", indexer, indexSince);
                 try
                 {
+					Logger.LogError("GetAndStoreSearchDocuments(indexer={Indexer}): indexSince → {IndexSince}", indexer, indexSince);
                     indexedCount += indexer.IndexSearchDocuments(
                         portal.PortalId, this.SchedulerItem, indexSince, StoreSearchDocuments);
                 }
@@ -196,14 +228,17 @@ namespace DotNetNuke.Services.Search
                 Logger.Warn("Indexer not implemented", exc);
             }
 
+			Logger.LogWarning("<<< Exiting GetAndStoreSearchDocuments(indexer={Indexer})", indexer);
             return indexedCount;
         }
 
         /// <summary>Gets all the Searchable Module MetaData SearchDocuments within the timeframe for all portals.</summary>
         private int GetAndStoreModuleMetaData(ModuleIndexer indexer)
         {
+			Logger.LogError(">>> Entering GetAndStoreModuleMetaData(indexer={Indexer})", indexer);
             IEnumerable<SearchDocument> searchDocs;
             var portals = PortalController.Instance.GetPortals();
+			Logger.LogError("GetAndStoreModuleMetaData(indexer={Indexer}): portals → {Portals}", indexer, portals);
             DateTime indexSince;
             var indexedCount = 0;
 
@@ -211,9 +246,13 @@ namespace DotNetNuke.Services.Search
             foreach (var portal in portals.Cast<IPortalInfo>())
             {
                 indexSince = this.FixedIndexingStartDate(portal.PortalId);
+				Logger.LogError("GetAndStoreModuleMetaData(indexer={Indexer}): indexSince → {IndexSince}", indexer, indexSince);
+				Logger.LogDebug("GetAndStoreModuleMetaData(indexer={Indexer}): indexSince → {IndexSince}", indexer, indexSince);
                 searchDocs = indexer.GetModuleMetaData(portal.PortalId, indexSince);
+				Logger.LogError("GetAndStoreModuleMetaData(indexer={Indexer}): searchDocs → {SearchDocs}", indexer, searchDocs);
                 StoreSearchDocuments(searchDocs);
                 indexedCount += searchDocs.Count();
+				Logger.LogDebug("GetAndStoreModuleMetaData(indexer={Indexer}): searchDocs → {SearchDocs}", indexer, searchDocs);
             }
 
             // Include Host Level Items
@@ -222,18 +261,21 @@ namespace DotNetNuke.Services.Search
             StoreSearchDocuments(searchDocs);
             indexedCount += searchDocs.Count();
 
+			Logger.LogWarning("<<< Exiting GetAndStoreModuleMetaData(indexer={Indexer})", indexer);
             return indexedCount;
         }
 
         /// <summary>Adjusts the re-index date/time to account for the portal reindex value.</summary>
         private DateTime FixedIndexingStartDate(int portalId)
         {
+			Logger.LogError(">>> Entering FixedIndexingStartDate(portalId={PortalId})", portalId);
             var startDate = this.IndexingStartTime;
             if (startDate < SqlDateTime.MinValue.Value || SearchHelper.Instance.IsReindexRequested(portalId, startDate))
             {
                 return SqlDateTime.MinValue.Value.AddDays(1);
             }
 
+			Logger.LogWarning("<<< Exiting FixedIndexingStartDate(portalId={PortalId})", portalId);
             return startDate;
         }
     }

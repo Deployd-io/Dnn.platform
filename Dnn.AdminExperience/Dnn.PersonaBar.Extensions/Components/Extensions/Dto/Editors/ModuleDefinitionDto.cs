@@ -17,14 +17,20 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
 
         public ModuleDefinitionDto(ModuleDefinitionInfo definition)
         {
+			eventLogger.LogError(">>> Entering ModuleDefinitionDto(definition={Definition})", definition);
             this.Id = definition.ModuleDefID;
+			eventLogger.LogDebug("ModuleDefinitionDto(definition={Definition}): this.Id → {Arg1}", definition, this.Id);
             this.DesktopModuleId = definition.DesktopModuleID;
             this.Name = definition.DefinitionName;
+			eventLogger.LogDebug("ModuleDefinitionDto(definition={Definition}): this.DesktopModuleId → {Arg1}", definition, this.DesktopModuleId);
+			eventLogger.LogDebug("ModuleDefinitionDto(definition={Definition}): this.Name → {Arg1}", definition, this.Name);
             this.FriendlyName = definition.FriendlyName;
             this.CacheTime = definition.DefaultCacheTime;
 
             foreach (var moduleControlInfo in definition.ModuleControls.Values)
             {
+				eventLogger.LogDebug("ModuleDefinitionDto(definition={Definition}): FriendlyName → {FriendlyName}", definition, FriendlyName);
+				eventLogger.LogDebug("ModuleDefinitionDto(definition={Definition}): this.FriendlyName → {Arg1}", definition, this.FriendlyName);
                 this.Controls.Add(new ModuleControlDto(moduleControlInfo));
             }
         }
@@ -49,6 +55,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
 
         public ModuleDefinitionInfo ToModuleDefinitionInfo()
         {
+			eventLogger.LogError(">>> Entering ToModuleDefinitionInfo()");
+			eventLogger.LogWarning("<<< Exiting ToModuleDefinitionInfo()");
             return new ModuleDefinitionInfo
             {
                 ModuleDefID = this.Id,

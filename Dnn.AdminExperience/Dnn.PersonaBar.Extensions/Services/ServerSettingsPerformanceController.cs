@@ -49,7 +49,12 @@ namespace Dnn.PersonaBar.Servers.Services
         /// <param name="portalController">The portal controller.</param>
         public ServerSettingsPerformanceController(IHostSettings hostSettings, IHostSettingsService hostSettingsService, IApplicationStatusInfo appStatus, IPortalController portalController)
         {
+			Logger.LogError(">>> Entering ServerSettingsPerformanceController(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},portalController={PortalController})", hostSettings, hostSettingsService, appStatus, portalController);
+			Logger.LogDebug("ServerSettingsPerformanceController(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},portalController={PortalController}): hostSettingsService → {HostSettingsService1}", hostSettings, hostSettingsService, appStatus, portalController, hostSettingsService);
+			Logger.LogDebug("ServerSettingsPerformanceController(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},portalController={PortalController}): appStatus → {AppStatus1}", hostSettings, hostSettingsService, appStatus, portalController, appStatus);
+			Logger.LogDebug("ServerSettingsPerformanceController(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},portalController={PortalController}): portalController → {PortalController1}", hostSettings, hostSettingsService, appStatus, portalController, portalController);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogWarning("<<< Exiting ServerSettingsPerformanceController(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},portalController={PortalController})", hostSettings, hostSettingsService, appStatus, portalController);
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
@@ -61,6 +66,7 @@ namespace Dnn.PersonaBar.Servers.Services
         [HttpGet]
         public HttpResponseMessage GetPerformanceSettings()
         {
+			Logger.LogError(">>> Entering GetPerformanceSettings()");
             try
             {
                 var portalId = PortalSettings.Current.PortalId;
@@ -95,6 +101,7 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetPerformanceSettings()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -106,6 +113,7 @@ namespace Dnn.PersonaBar.Servers.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage IncrementPortalVersion()
         {
+			Logger.LogError(">>> Entering IncrementPortalVersion()");
             try
             {
                 var portalId = PortalSettings.Current.PortalId;
@@ -116,6 +124,7 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting IncrementPortalVersion()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -127,6 +136,7 @@ namespace Dnn.PersonaBar.Servers.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage IncrementHostVersion()
         {
+			Logger.LogError(">>> Entering IncrementHostVersion()");
             try
             {
                 var portalId = PortalSettings.Current.PortalId;
@@ -137,6 +147,7 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting IncrementHostVersion()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -149,6 +160,7 @@ namespace Dnn.PersonaBar.Servers.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdatePerformanceSettings(UpdatePerfSettingsRequest request)
         {
+			Logger.LogError(">>> Entering UpdatePerformanceSettings(request={Request})", request);
             try
             {
                 var portalId = PortalSettings.Current.PortalId;
@@ -182,36 +194,45 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting UpdatePerformanceSettings(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
 
         private int GetPortalVersion(int portalId)
         {
+			Logger.LogError(">>> Entering GetPortalVersion(portalId={PortalId})", portalId);
             var settingValue = PortalController.GetPortalSetting(this.portalController, ClientResourceSettings.VersionKey, portalId, "0");
+			Logger.LogError("GetPortalVersion(portalId={PortalId}): settingValue → {SettingValue}", portalId, settingValue);
             if (int.TryParse(settingValue, out var version))
             {
                 if (version == 0)
                 {
                     version = 1;
+					Logger.LogDebug("GetPortalVersion(portalId={PortalId}): version → {Version}", portalId, version);
                     PortalController.UpdatePortalSetting(this.portalController, portalId, ClientResourceSettings.VersionKey, "1", true);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetPortalVersion(portalId={PortalId})", portalId);
             return version;
         }
 
         private void SaveCachingProvider(string cachingProvider)
         {
+			Logger.LogError(">>> Entering SaveCachingProvider(cachingProvider={CachingProvider})", cachingProvider);
             if (!string.IsNullOrEmpty(cachingProvider))
             {
                 var xmlConfig = Config.Load(this.appStatus);
+				Logger.LogError("SaveCachingProvider(cachingProvider={CachingProvider}): xmlConfig → {XmlConfig}", cachingProvider, xmlConfig);
 
                 var xmlCaching = xmlConfig.SelectSingleNode("configuration/dotnetnuke/caching");
+				Logger.LogError("SaveCachingProvider(cachingProvider={CachingProvider}): xmlCaching → {XmlCaching}", cachingProvider, xmlCaching);
                 XmlUtils.UpdateAttribute(xmlCaching, "defaultProvider", cachingProvider);
 
                 Config.Save(this.appStatus, xmlConfig);
             }
+			Logger.LogWarning("<<< Exiting SaveCachingProvider(cachingProvider={CachingProvider})", cachingProvider);
         }
     }
 }

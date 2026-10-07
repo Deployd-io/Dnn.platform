@@ -29,6 +29,7 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
     /// <summary>The ViewProfile ProfileModuleUserControlBase is used to view a Users Profile.</summary>
     public partial class ViewProfile(INavigationManager navigationManager, IJavaScriptLibraryHelper javaScript, IHostSettings hostSettings, ListController listController) : ProfileModuleUserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ViewProfile.ascx));
         private readonly INavigationManager navigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
         private readonly IJavaScriptLibraryHelper javaScript = javaScript ?? Globals.GetCurrentServiceProvider().GetRequiredService<IJavaScriptLibraryHelper>();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
@@ -39,6 +40,8 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
         public ViewProfile()
             : this(null, null)
         {
+		Logger.LogError(">>> Entering ViewProfile()");
+        Logger.LogWarning("<<< Exiting ViewProfile()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ViewProfile"/> class.</summary>
@@ -74,6 +77,7 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             // throw 404 so that deleted profile is not reindexed
@@ -87,11 +91,13 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
             this.javaScript.RequestRegistration(CommonJs.jQuery);
             this.javaScript.RequestRegistration(CommonJs.jQueryMigrate);
             this.javaScript.RequestRegistration(CommonJs.Knockout);
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             try
@@ -99,17 +105,21 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
                 if (Null.IsNull(this.ProfileUserId))
                 {
                     this.Visible = false;
+					Logger.LogDebug("OnLoad(e={E}): this.Visible → {Arg1}", e, this.Visible);
                     return;
                 }
 
                 var template = Convert.ToString(this.ModuleContext.Settings["ProfileTemplate"]);
+				Logger.LogError("OnLoad(e={E}): template → {Template}", e, template);
                 if (string.IsNullOrEmpty(template))
                 {
                     template = Localization.GetString("DefaultTemplate", this.LocalResourceFile);
                 }
 
                 var editUrl = this.navigationManager.NavigateURL(this.ModuleContext.PortalSettings.ActiveTab.TabID, "Profile", "userId=" + this.ProfileUserId, "pageno=1");
+				Logger.LogError("OnLoad(e={E}): editUrl → {EditUrl}", e, editUrl);
                 var profileUrl = this.navigationManager.NavigateURL(this.ModuleContext.PortalSettings.ActiveTab.TabID, "Profile", "userId=" + this.ProfileUserId, "pageno=2");
+				Logger.LogError("OnLoad(e={E}): profileUrl → {ProfileUrl}", e, profileUrl);
 
                 if (template.Contains("[BUTTON:EDITPROFILE]"))
                 {
@@ -168,18 +178,22 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
                     }
 
                     var token = new TokenReplace { User = this.ProfileUser, AccessingUser = this.ModuleContext.PortalSettings.UserInfo };
+					Logger.LogError("OnLoad(e={E}): token → {Token}", e, token);
                     this.profileOutput.InnerHtml = token.ReplaceEnvironmentTokens(template);
                     this.noPropertiesLabel.Visible = false;
                     this.profileOutput.Visible = true;
                 }
 
                 var propertyAccess = new ProfilePropertyAccess(this.ProfileUser);
+				Logger.LogError("OnLoad(e={E}): propertyAccess → {PropertyAccess}", e, propertyAccess);
                 StringBuilder sb = new StringBuilder();
+				Logger.LogError("OnLoad(e={E}): sb → {Sb}", e, sb);
                 bool propertyNotFound = false;
 
                 foreach (ProfilePropertyDefinition property in this.ProfileUser.Profile.ProfileProperties)
                 {
                     var displayDataType = ProfilePropertyAccess.DisplayDataType(this.listController, property).ToLowerInvariant();
+					Logger.LogError("OnLoad(e={E}): displayDataType → {DisplayDataType}", e, displayDataType);
                     string value = propertyAccess.GetProperty(
                         property.PropertyName,
                         string.Empty,
@@ -189,12 +203,14 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
                         ref propertyNotFound);
 
                     var clientName = Localization.GetSafeJSString(property.PropertyName);
+					Logger.LogError("OnLoad(e={E}): clientName → {ClientName}", e, clientName);
                     sb.Append("self['" + clientName + "'] = ko.observable(");
                     sb.Append("\"");
                     if (!string.IsNullOrEmpty(value))
                     {
                         value = Localization.GetSafeJSString(displayDataType == "richtext" ? value : this.Server.HtmlDecode(value));
                         value = value
+						Logger.LogError("OnLoad(e={E}): value → {Value}", e, value);
                             .Replace("\r", string.Empty)
                             .Replace("\n", " ")
                             .Replace(";", string.Empty)
@@ -218,6 +234,7 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
                 sb.Append("self.Email = ko.observable('");
                 email = Localization.GetSafeJSString(this.Server.HtmlDecode(email));
                 email = email.Replace(";", string.Empty).Replace("//", string.Empty);
+				Logger.LogError("OnLoad(e={E}): email → {Email}", e, email);
                 sb.Append(email + "');");
                 sb.Append('\n');
                 sb.Append("self.EmailText = '");
@@ -228,13 +245,16 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 // Module failed to load
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         private string GetRedirectUrl()
         {
+			Logger.LogError(">>> Entering GetRedirectUrl()");
             // redirect user to default page if not specific the home tab, do this action to prevent loop redirect.
             var homeTabId = this.ModuleContext.PortalSettings.HomeTabId;
             string redirectUrl;
@@ -242,20 +262,25 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
             if (homeTabId > Null.NullInteger)
             {
                 redirectUrl = this.navigationManager.NavigateURL(homeTabId);
+				Logger.LogError("GetRedirectUrl(): redirectUrl → {RedirectUrl}", redirectUrl);
             }
             else
             {
                 redirectUrl = Globals.GetPortalDomainName(this.CurrentPortalAlias.HttpAlias, this.Request, true) +
+				Logger.LogDebug("GetRedirectUrl(): redirectUrl → {RedirectUrl}", redirectUrl);
                               "/" + Globals.glbDefaultPage;
             }
 
+			Logger.LogWarning("<<< Exiting GetRedirectUrl()");
             return redirectUrl;
         }
 
         private void ProcessQuerystring()
         {
+			Logger.LogError(">>> Entering ProcessQuerystring()");
             // in case someone is being redirected to here from an e-mail link action we need to process that here
             var action = this.Request.QueryString["action"];
+			Logger.LogError("ProcessQuerystring(): action → {Action}", action);
 
             if (!this.Request.IsAuthenticated && !string.IsNullOrEmpty(action))
             {
@@ -269,10 +294,12 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
             {
                 // current user, i.e. the one that the request was for
                 var currentUser = UserController.Instance.GetCurrentUserInfo();
+				Logger.LogError("ProcessQuerystring(): currentUser → {CurrentUser}", currentUser);
 
                 // the initiating user,i.e. the one who wanted to be friend
                 // note that in this case here currentUser is visiting the profile of initiatingUser, most likely from a link in the notification e-mail
                 var initiatingUser = UserController.Instance.GetUserById(PortalSettings.Current.PortalId, Convert.ToInt32(this.Request.QueryString["UserID"]));
+				Logger.LogError("ProcessQuerystring(): initiatingUser → {InitiatingUser}", initiatingUser);
 
                 if (initiatingUser.UserID == currentUser.UserID)
                 {
@@ -280,22 +307,26 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
                 }
 
                 var friendRelationship = RelationshipController.Instance.GetFriendRelationship(currentUser, initiatingUser);
+				Logger.LogError("ProcessQuerystring(): friendRelationship → {FriendRelationship}", friendRelationship);
 
                 if (friendRelationship != null)
                 {
                     if (action.Equals("acceptfriend", StringComparison.OrdinalIgnoreCase))
                     {
                         var friend = UserController.GetUserById(this.hostSettings, PortalSettings.Current.PortalId, friendRelationship.UserId);
+						Logger.LogError("ProcessQuerystring(): friend → {Friend}", friend);
                         FriendsController.Instance.AcceptFriend(friend);
                     }
 
                     if (action.Equals("followback", StringComparison.OrdinalIgnoreCase))
                     {
                         var follower = UserController.GetUserById(this.hostSettings, PortalSettings.Current.PortalId, friendRelationship.UserId);
+						Logger.LogError("ProcessQuerystring(): follower → {Follower}", follower);
                         try
                         {
                             FollowersController.Instance.FollowUser(follower);
                             var notifications = NotificationsController.Instance.GetNotificationByContext(3, initiatingUser.UserID.ToString());
+							Logger.LogError("ProcessQuerystring(): notifications → {Notifications}", notifications);
                             if (notifications.Count > 0)
                             {
                                 NotificationsController.Instance.DeleteNotificationRecipient(notifications[0].NotificationID, currentUser.UserID);
@@ -303,6 +334,7 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
                         }
                         catch
                         {
+							Logger.LogError("Exception in ProcessQuerystring(): {Arg0}", exc.Message);
                             // ignore
                         }
                     }
@@ -310,6 +342,7 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
 
                 this.Response.Redirect(Common.Globals.UserProfileURL(initiatingUser.UserID));
             }
+			Logger.LogWarning("<<< Exiting ProcessQuerystring()");
         }
     }
 }

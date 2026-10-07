@@ -70,12 +70,16 @@ namespace log4net.Core
         /// </remarks>
         public LevelEvaluator(Level threshold)
         {
+			log.ErrorFormat(">>> Entering LevelEvaluator(threshold={0})", threshold);
             if (threshold == null)
             {
+				log.ErrorFormat("Throwing ArgumentNullException from LevelEvaluator(threshold={0})", threshold);
                 throw new ArgumentNullException("threshold");
             }
 
+			log.WarnFormat("<<< Exiting LevelEvaluator(threshold={0})", threshold);
             this.m_threshold = threshold;
+			log.DebugFormat("LevelEvaluator(threshold={0}): m_threshold → {1}", threshold, m_threshold);
         }
 
         /// <summary>the threshold to trigger at</summary>
@@ -111,11 +115,14 @@ namespace log4net.Core
         /// </remarks>
         public bool IsTriggeringEvent(LoggingEvent loggingEvent) 
         {
+			log.ErrorFormat(">>> Entering IsTriggeringEvent(loggingEvent={0})", loggingEvent);
             if (loggingEvent == null)
             {
+				log.ErrorFormat("Throwing ArgumentNullException from IsTriggeringEvent(loggingEvent={0})", loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
             }
 
+			log.WarnFormat("<<< Exiting IsTriggeringEvent(loggingEvent={0})", loggingEvent);
             return (loggingEvent.Level >= this.m_threshold); 
         }
     }

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -14,12 +15,15 @@
   CodeMirror.defineMode("spreadsheet", function () {
     return {
       startState: function () {
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
         return {
           stringType: null,
           stack: []
         };
+		logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       },
       token: function (stream, state) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if (!stream) return;
 
         //check for state changes

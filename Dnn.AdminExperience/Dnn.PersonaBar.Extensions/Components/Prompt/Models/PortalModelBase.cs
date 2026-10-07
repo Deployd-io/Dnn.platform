@@ -10,23 +10,33 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
     {
         public PortalModelBase()
         {
+		eventLogger.LogError(">>> Entering PortalModelBase()");
+		eventLogger.LogWarning("<<< Exiting PortalModelBase()");
         }
 
         public PortalModelBase(DotNetNuke.Entities.Portals.PortalInfo portal)
         {
+			eventLogger.LogError(">>> Entering PortalModelBase(portal={Portal})", portal);
             this.PortalId = portal.PortalID;
+			eventLogger.LogWarning("<<< Exiting PortalModelBase(portal={Portal})", portal);
+			eventLogger.LogDebug("PortalModelBase(portal={Portal}): this.PortalId → {Arg1}", portal, this.PortalId);
             this.PortalName = portal.PortalName;
             this.PageCount = portal.Pages;
+			eventLogger.LogDebug("PortalModelBase(portal={Portal}): this.PortalName → {Arg1}", portal, this.PortalName);
+			eventLogger.LogDebug("PortalModelBase(portal={Portal}): this.PageCount → {Arg1}", portal, this.PageCount);
             this.UserCount = portal.Users;
             this.Language = portal.DefaultLanguage;
 
             switch (portal.UserRegistration)
             {
                 case (int)Globals.PortalRegistrationType.NoRegistration:
+					eventLogger.LogDebug("PortalModelBase(portal={Portal}): this.UserCount → {Arg1}", portal, this.UserCount);
+					eventLogger.LogDebug("PortalModelBase(portal={Portal}): this.Language → {Arg1}", portal, this.Language);
                     this.RegistrationMode = "None";
                     break;
                 case (int)Globals.PortalRegistrationType.PrivateRegistration:
                     this.RegistrationMode = "Private";
+					eventLogger.LogDebug("PortalModelBase(portal={Portal}): this.RegistrationMode → {Arg1}", portal, this.RegistrationMode);
                     break;
                 case (int)Globals.PortalRegistrationType.PublicRegistration:
                     this.RegistrationMode = "Public";

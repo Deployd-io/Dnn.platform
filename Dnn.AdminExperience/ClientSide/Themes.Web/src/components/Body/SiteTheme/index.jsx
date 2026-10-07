@@ -13,16 +13,21 @@ import ThemeSettings from "./ThemeSettings";
 import utils from "utils";
 
 import "./style.less";
+const logger = console;
 
 class SiteTheme extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {};
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
         props.dispatch(ThemeActions.getCurrentTheme());
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     hasData() {
@@ -31,6 +36,7 @@ class SiteTheme extends Component {
         let source = props.themes.layouts;
         let isHost = utils.params.settings.isHost;
         let hasData = source.filter(l => {
+		logger.warn('<<< Exiting hasData()', { "event.action": "hasData" });
             return isHost || l.level === 1 || l.level === 2;
         }).length > 0;
 
@@ -38,13 +44,17 @@ class SiteTheme extends Component {
     }
 
     getTabs() {
+		logger.error('>>> Entering getTabs()', { "event.action": "getTabs" });
+		logger.warn('<<< Exiting getTabs()', { "event.action": "getTabs" });
         return this.hasData() ? [Localization.get("Layouts"), Localization.get("Containers"), Localization.get("Settings")]
             : [Localization.get("Layouts"), Localization.get("Containers")];
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className="site-theme">
                 <GridCell columnSize={25}>
@@ -75,6 +85,8 @@ SiteTheme.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         themes: state.theme.themes,
         currentTheme: state.theme.currentTheme

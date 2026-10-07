@@ -34,6 +34,8 @@ namespace DotNetNuke.Modules.Admin.Users
         public DataConsent()
             : this(null, null, null, null)
         {
+		eventLogger.LogError(">>> Entering DataConsent()");
+        eventLogger.LogWarning("<<< Exiting DataConsent()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DataConsent"/> class.</summary>
@@ -42,6 +44,8 @@ namespace DotNetNuke.Modules.Admin.Users
         public DataConsent(INavigationManager navigationManager)
             : this(navigationManager, null, null, null)
         {
+		eventLogger.LogError(">>> Entering DataConsent(navigationManager={NavigationManager})", navigationManager);
+        eventLogger.LogWarning("<<< Exiting DataConsent(navigationManager={NavigationManager})", navigationManager);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DataConsent"/> class.</summary>
@@ -119,12 +123,15 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <param name="e">The details of the action.</param>
         public void OnDataConsentComplete(DataConsentEventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnDataConsentComplete(e={E})", e);
             this.DataConsentCompleted?.Invoke(this, e);
+			eventLogger.LogWarning("<<< Exiting OnDataConsentComplete(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             this.cmdCancel.Click += this.CmdCancel_Click;
             this.cmdSubmit.Click += this.CmdSubmit_Click;
@@ -143,26 +150,33 @@ namespace DotNetNuke.Modules.Admin.Users
             this.cmdDeleteMe.Attributes.Add(
                 "onclick",
                 $"if (!confirm({HttpUtility.JavaScriptStringEncode(this.DeleteMeConfirmString, addDoubleQuotes: true)})) this.preventDefault();");
+				eventLogger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         private void CmdCancel_Click(object sender, EventArgs e)
         {
+			eventLogger.LogError(">>> Entering CmdCancel_Click(sender={Sender},e={E})", sender, e);
             this.OnDataConsentComplete(new DataConsentEventArgs(DataConsentStatus.Cancelled));
+			eventLogger.LogWarning("<<< Exiting CmdCancel_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdSubmit_Click(object sender, EventArgs e)
         {
+			eventLogger.LogError(">>> Entering CmdSubmit_Click(sender={Sender},e={E})", sender, e);
             if (this.chkAgree.Checked)
             {
                 UserController.UserAgreedToTerms(this.User);
                 this.User.HasAgreedToTerms = true;
                 this.OnDataConsentComplete(new DataConsentEventArgs(DataConsentStatus.Consented));
             }
+			eventLogger.LogWarning("<<< Exiting CmdSubmit_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdDeleteMe_Click(object sender, EventArgs e)
         {
+			eventLogger.LogError(">>> Entering CmdDeleteMe_Click(sender={Sender},e={E})", sender, e);
             var success = false;
+			eventLogger.LogError("CmdDeleteMe_Click(sender={Sender},e={E}): success → {Success}", sender, e, success);
             switch (this.PortalSettings.DataConsentUserDeleteAction)
             {
                 case PortalSettings.UserDeleteAction.Manual:
@@ -190,6 +204,7 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.OnDataConsentComplete(new DataConsentEventArgs(DataConsentStatus.FailedToRemoveAccount));
             }
+			eventLogger.LogWarning("<<< Exiting CmdDeleteMe_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>The DataConsentEventArgs class provides a customised EventArgs class for the <see cref="DataConsent.DataConsentCompleted"/> Event.</summary>
@@ -199,6 +214,7 @@ namespace DotNetNuke.Modules.Admin.Users
             /// <param name="status">The Data Consent Status.</param>
             public DataConsentEventArgs(DataConsentStatus status)
             {
+				eventLogger.LogError(">>> Entering DataConsentEventArgs(status={Status})", status);
                 this.Status = status;
             }
 

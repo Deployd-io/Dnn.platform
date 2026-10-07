@@ -29,8 +29,13 @@ namespace DotNetNuke.Services.Installer
         /// </summary>
         public InstallerInfo()
         {
+			Log.LogError(">>> Entering InstallerInfo()");
             this.PhysicalSitePath = Null.NullString;
+			Log.LogDebug("InstallerInfo(): this.PhysicalSitePath → {Arg0}", this.PhysicalSitePath);
             this.Initialize();
+			Log.LogDebug("InstallerInfo(package={Package},sitePath={SitePath}): this.InstallMode → {Arg2}", package, sitePath, this.InstallMode);
+        Log.LogWarning("<<< Exiting InstallerInfo(package={Package},sitePath={SitePath})", package, sitePath);
+			Log.LogWarning("<<< Exiting InstallerInfo(sitePath={SitePath},mode={Mode})", sitePath, mode);
         }
 
         /// <summary>
@@ -42,6 +47,7 @@ namespace DotNetNuke.Services.Installer
         /// <param name="mode">Install Mode.</param>
         public InstallerInfo(string sitePath, InstallMode mode)
         {
+			Log.LogDebug("InstallerInfo(sitePath={SitePath},mode={Mode}): this.PhysicalSitePath → {Arg2}", sitePath, mode, this.PhysicalSitePath);
             this.Initialize();
             this.TempInstallFolder = Globals.InstallMapPath + "Temp\\" + Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
             this.PhysicalSitePath = sitePath;
@@ -60,6 +66,7 @@ namespace DotNetNuke.Services.Installer
             this.Initialize();
             this.TempInstallFolder = Globals.InstallMapPath + "Temp\\" + Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
             this.PhysicalSitePath = sitePath;
+			Log.LogDebug("InstallerInfo(inputStream={InputStream},sitePath={SitePath}): this.PhysicalSitePath → {Arg2}", inputStream, sitePath, this.PhysicalSitePath);
 
             // Read the Zip file into its component entries
             this.ReadZipStream(inputStream, false);
@@ -78,9 +85,11 @@ namespace DotNetNuke.Services.Installer
         {
             this.Initialize();
             this.TempInstallFolder = tempFolder;
+			Log.LogDebug("InstallerInfo(tempFolder={TempFolder},manifest={Manifest},sitePath={SitePath}): this.TempInstallFolder → {Arg3}", tempFolder, manifest, sitePath, this.TempInstallFolder);
             this.PhysicalSitePath = sitePath;
             if (!string.IsNullOrEmpty(manifest))
             {
+				Log.LogDebug("InstallerInfo(tempFolder={TempFolder},manifest={Manifest},sitePath={SitePath}): this.PhysicalSitePath → {Arg3}", tempFolder, manifest, sitePath, this.PhysicalSitePath);
                 this.ManifestFile = new InstallFile(manifest, this);
             }
         }
@@ -93,6 +102,7 @@ namespace DotNetNuke.Services.Installer
         /// <param name="sitePath">The physical path to the root of the site.</param>
         public InstallerInfo(PackageInfo package, string sitePath)
         {
+			Log.LogDebug("InstallerInfo(package={Package},sitePath={SitePath}): this.PhysicalSitePath → {Arg2}", package, sitePath, this.PhysicalSitePath);
             this.Initialize();
             this.PhysicalSitePath = sitePath;
             this.TempInstallFolder = Globals.InstallMapPath + "Temp\\" + Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
@@ -186,13 +196,19 @@ namespace DotNetNuke.Services.Installer
 
         private void Initialize()
         {
+			Log.LogError(">>> Entering Initialize()");
             this.TempInstallFolder = Null.NullString;
+			Log.LogDebug("Initialize(): this.TempInstallFolder → {Arg0}", this.TempInstallFolder);
             this.SecurityAccessLevel = SecurityAccessLevel.Host;
             this.RepairInstall = Null.NullBoolean;
+			Log.LogDebug("Initialize(): this.SecurityAccessLevel → {Arg0}", this.SecurityAccessLevel);
+			Log.LogDebug("Initialize(): this.RepairInstall → {Arg0}", this.RepairInstall);
             this.PortalID = Null.NullInteger;
             this.PackageID = Null.NullInteger;
             this.Log = new Logger();
             this.IsLegacyMode = Null.NullBoolean;
+			Log.LogDebug("Initialize(): this.PortalID → {Arg0}", this.PortalID);
+			Log.LogDebug("Initialize(): this.PackageID → {Arg0}", this.PackageID);
             this.IgnoreWhiteList = Null.NullBoolean;
             this.InstallMode = InstallMode.Install;
             this.Installed = Null.NullBoolean;
@@ -201,6 +217,7 @@ namespace DotNetNuke.Services.Installer
 
         private void ReadZipStream(Stream inputStream, bool isEmbeddedZip)
         {
+			Log.LogError(">>> Entering ReadZipStream(inputStream={InputStream},isEmbeddedZip={IsEmbeddedZip})", inputStream, isEmbeddedZip);
             this.Log.StartJob(Util.FILES_Reading);
             if (inputStream.CanSeek)
             {
@@ -208,10 +225,12 @@ namespace DotNetNuke.Services.Installer
             }
 
             var unzip = new ZipArchive(inputStream);
+			Log.LogError("ReadZipStream(inputStream={InputStream},isEmbeddedZip={IsEmbeddedZip}): unzip → {Unzip}", inputStream, isEmbeddedZip, unzip);
             foreach (var entry in unzip.FileEntries())
             {
                 // Add file to list
                 var file = new InstallFile(entry, this);
+				Log.LogError("ReadZipStream(inputStream={InputStream},isEmbeddedZip={IsEmbeddedZip}): file → {File}", inputStream, isEmbeddedZip, file);
                 if (file.Type == InstallFileType.Resources && (file.Name.Equals("containers.zip", StringComparison.OrdinalIgnoreCase) || file.Name.Equals("skins.zip", StringComparison.OrdinalIgnoreCase)))
                 {
                     // Temporarily save the TempInstallFolder
@@ -229,9 +248,11 @@ namespace DotNetNuke.Services.Installer
 
                     // Restore TempInstallFolder
                     this.TempInstallFolder = tmpInstallFolder;
+					Log.LogDebug("ReadZipStream(inputStream={InputStream},isEmbeddedZip={IsEmbeddedZip}): this.TempInstallFolder → {Arg2}", inputStream, isEmbeddedZip, this.TempInstallFolder);
 
                     // Delete zip file
                     var zipFile = new FileInfo(file.TempFileName);
+					Log.LogError("ReadZipStream(inputStream={InputStream},isEmbeddedZip={IsEmbeddedZip}): zipFile → {ZipFile}", inputStream, isEmbeddedZip, zipFile);
                     zipFile.Delete();
                 }
                 else
@@ -245,6 +266,7 @@ namespace DotNetNuke.Services.Installer
                         }
                         else
                         {
+							Log.LogDebug("ReadZipStream(inputStream={InputStream},isEmbeddedZip={IsEmbeddedZip}): this.ManifestFile → {Arg2}", inputStream, isEmbeddedZip, this.ManifestFile);
                             if (file.Extension == "dnn7" && (this.ManifestFile.Extension == "dnn" || this.ManifestFile.Extension == "dnn5" || this.ManifestFile.Extension == "dnn6"))
                             {
                                 this.ManifestFile = file;
@@ -282,6 +304,7 @@ namespace DotNetNuke.Services.Installer
 
             // Close the Zip Input Stream as we have finished with it
             inputStream.Close();
+			Log.LogWarning("<<< Exiting ReadZipStream(inputStream={InputStream},isEmbeddedZip={IsEmbeddedZip})", inputStream, isEmbeddedZip);
         }
     }
 }

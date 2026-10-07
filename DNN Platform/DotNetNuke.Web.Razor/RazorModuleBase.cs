@@ -10,11 +10,13 @@ namespace DotNetNuke.Web.Razor
     using DotNetNuke.Internal.SourceGenerators;
     using DotNetNuke.Services.Exceptions;
     using DotNetNuke.UI.Modules;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>A base class for razor modules.</summary>
     [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
     public partial class RazorModuleBase : ModuleUserControlBase
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         protected virtual string RazorScriptFile
         {
             get
@@ -42,13 +44,16 @@ namespace DotNetNuke.Web.Razor
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			_logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
             try
             {
                 if (!string.IsNullOrEmpty(this.RazorScriptFile))
                 {
                     var razorEngine = new RazorEngine(this.RazorScriptFile, this.ModuleContext, this.LocalResourceFile);
+					_logger.LogError("OnPreRender(e={E}): razorEngine → {RazorEngine}", e, razorEngine);
                     var writer = new StringWriter();
+					_logger.LogError("OnPreRender(e={E}): writer → {Writer}", e, writer);
                     razorEngine.Render(writer);
 
                     this.Controls.Add(new LiteralControl(writer.ToString()));
@@ -56,8 +61,10 @@ namespace DotNetNuke.Web.Razor
             }
             catch (Exception ex)
             {
+				_logger.LogError("Exception in OnPreRender(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, ex);
             }
+			_logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

@@ -17,12 +17,16 @@ namespace DotNetNuke.Services.Authentication
     [Serializable]
     public class AuthenticationInfo : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AuthenticationInfo));
         /// <summary>Initializes a new instance of the <see cref="AuthenticationInfo"/> class.</summary>
         public AuthenticationInfo()
         {
+			Logger.LogError(">>> Entering AuthenticationInfo()");
             this.LogoffControlSrc = Null.NullString;
+			Logger.LogDebug("AuthenticationInfo(): this.LogoffControlSrc → {Arg0}", this.LogoffControlSrc);
             this.LoginControlSrc = Null.NullString;
             this.SettingsControlSrc = Null.NullString;
+			Logger.LogDebug("AuthenticationInfo(): this.LoginControlSrc → {Arg0}", this.LoginControlSrc);
             this.AuthenticationType = Null.NullString;
             this.AuthenticationID = Null.NullInteger;
         }
@@ -67,6 +71,7 @@ namespace DotNetNuke.Services.Authentication
         /// <param name="dr">The Data Reader to use.</param>
         public virtual void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.AuthenticationID = Null.SetNullInteger(dr["AuthenticationID"]);
             this.PackageID = Null.SetNullInteger(dr["PackageID"]);
             this.IsEnabled = Null.SetNullBoolean(dr["IsEnabled"]);
@@ -77,6 +82,7 @@ namespace DotNetNuke.Services.Authentication
 
             // Fill base class fields
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

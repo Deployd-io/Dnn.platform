@@ -12,6 +12,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The TextColumnTemplate provides a Template for the TextColumn.</summary>
     public class TextColumnTemplate : ITemplate
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TextColumnTemplate));
         private ListItemType mItemType = ListItemType.Item;
 
         /// <summary>Initializes a new instance of the <see cref="TextColumnTemplate"/> class.</summary>
@@ -24,6 +25,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="itemType">The list item type.</param>
         public TextColumnTemplate(ListItemType itemType)
         {
+			Logger.LogError(">>> Entering TextColumnTemplate(itemType={ItemType})", itemType);
             this.ItemType = itemType;
         }
 
@@ -62,19 +64,24 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="container">The parent container (DataGridItem).</param>
         public void InstantiateIn(Control container)
         {
+			Logger.LogError(">>> Entering InstantiateIn(container={Container})", container);
             switch (this.ItemType)
             {
                 case ListItemType.Item:
                 case ListItemType.AlternatingItem:
                 case ListItemType.SelectedItem:
                     var lblText = new Label();
+					Logger.LogError("InstantiateIn(container={Container}): lblText → {LblText}", container, lblText);
                     lblText.Width = this.Width;
+					Logger.LogDebug("InstantiateIn(container={Container}): lblText.Width → {Arg1}", container, lblText.Width);
                     lblText.DataBinding += this.Item_DataBinding;
                     container.Controls.Add(lblText);
                     break;
                 case ListItemType.EditItem:
                     var txtText = new TextBox();
+					Logger.LogError("InstantiateIn(container={Container}): txtText → {TxtText}", container, txtText);
                     txtText.Width = this.Width;
+					Logger.LogDebug("InstantiateIn(container={Container}): txtText.Width → {Arg1}", container, txtText.Width);
                     txtText.DataBinding += this.Item_DataBinding;
                     container.Controls.Add(txtText);
                     break;
@@ -83,13 +90,16 @@ namespace DotNetNuke.UI.WebControls
                     container.Controls.Add(new LiteralControl(this.Text));
                     break;
             }
+			Logger.LogWarning("<<< Exiting InstantiateIn(container={Container})", container);
         }
 
         /// <summary>Gets the value of the Data Field.</summary>
         /// <param name="container">The parent container (DataGridItem).</param>
         private string GetValue(DataGridItem container)
         {
+			Logger.LogError(">>> Entering GetValue(container={Container})", container);
             string itemValue = Null.NullString;
+			Logger.LogError("GetValue(container={Container}): itemValue → {ItemValue}", container, itemValue);
             if (!string.IsNullOrEmpty(this.DataField))
             {
                 if (this.DesignMode)
@@ -101,6 +111,7 @@ namespace DotNetNuke.UI.WebControls
                     if (container.DataItem != null)
                     {
                         object evaluation = DataBinder.Eval(container.DataItem, this.DataField);
+						Logger.LogError("GetValue(container={Container}): evaluation → {Evaluation}", container, evaluation);
                         if (evaluation != null)
                         {
                             itemValue = evaluation.ToString();
@@ -109,6 +120,7 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetValue(container={Container})", container);
             return itemValue;
         }
 
@@ -117,6 +129,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">An EventArgs object.</param>
         private void Item_DataBinding(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering Item_DataBinding(sender={Sender},e={E})", sender, e);
             DataGridItem container;
             int keyValue = Null.NullInteger;
             switch (this.ItemType)
@@ -125,15 +138,20 @@ namespace DotNetNuke.UI.WebControls
                 case ListItemType.AlternatingItem:
                 case ListItemType.SelectedItem:
                     var lblText = (Label)sender;
+					Logger.LogError("Item_DataBinding(sender={Sender},e={E}): lblText → {LblText}", sender, e, lblText);
                     container = (DataGridItem)lblText.NamingContainer;
+					Logger.LogError("Item_DataBinding(sender={Sender},e={E}): container → {Container}", sender, e, container);
+					Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): container → {Container}", sender, e, container);
                     lblText.Text = this.GetValue(container);
                     break;
                 case ListItemType.EditItem:
                     var txtText = (TextBox)sender;
+					Logger.LogError("Item_DataBinding(sender={Sender},e={E}): txtText → {TxtText}", sender, e, txtText);
                     container = (DataGridItem)txtText.NamingContainer;
                     txtText.Text = this.GetValue(container);
                     break;
             }
+			Logger.LogWarning("<<< Exiting Item_DataBinding(sender={Sender},e={E})", sender, e);
         }
     }
 }

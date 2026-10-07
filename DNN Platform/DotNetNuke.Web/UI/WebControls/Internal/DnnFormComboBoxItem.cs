@@ -21,6 +21,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
     /// <summary>This control is only for internal use, please don't reference it in any other place as it may be removed in the future.</summary>
     public class DnnFormComboBoxItem : DnnFormListItemBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFormComboBoxItem));
         private readonly IClientResourceController clientResourceController;
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormComboBoxItem"/> class.</summary>
@@ -28,6 +29,9 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         public DnnFormComboBoxItem()
             : this(null, null, null)
         {
+		Logger.LogError(">>> Entering DnnFormComboBoxItem(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController})", appStatus, eventLogger, clientResourceController);
+		Logger.LogDebug("DnnFormComboBoxItem(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", appStatus, eventLogger, clientResourceController, clientResourceController);
+        Logger.LogWarning("<<< Exiting DnnFormComboBoxItem(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController})", appStatus, eventLogger, clientResourceController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormComboBoxItem"/> class.</summary>
@@ -55,6 +59,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <param name="valueField">The field of the data source that provides the value content of the list items.</param>
         internal static void BindListInternal(DnnComboBox comboBox, object value, IEnumerable listSource, string textField, string valueField)
         {
+			Logger.LogError(">>> Entering BindListInternal(comboBox={ComboBox},value={Value},listSource={ListSource},textField={TextField},valueField={ValueField})", comboBox, value, listSource, textField, valueField);
             if (comboBox != null)
             {
                 string selectedValue = !comboBox.Page.IsPostBack ? Convert.ToString(value, CultureInfo.InvariantCulture) : comboBox.SelectedValue;
@@ -70,7 +75,10 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
                 else
                 {
                     comboBox.DataTextField = textField;
+					Logger.LogDebug("BindListInternal(comboBox={ComboBox},value={Value},listSource={ListSource},textField={TextField},valueField={ValueField}): comboBox.DataTextField → {Arg5}", comboBox, value, listSource, textField, valueField, comboBox.DataTextField);
+					Logger.LogDebug("BindListInternal(comboBox={ComboBox},value={Value},listSource={ListSource},textField={TextField},valueField={ValueField}): comboBox.DataSource → {Arg5}", comboBox, value, listSource, textField, valueField, comboBox.DataSource);
                     comboBox.DataValueField = valueField;
+					Logger.LogDebug("BindListInternal(comboBox={ComboBox},value={Value},listSource={ListSource},textField={TextField},valueField={ValueField}): comboBox.DataValueField → {Arg5}", comboBox, value, listSource, textField, valueField, comboBox.DataValueField);
                     comboBox.DataSource = listSource;
 
                     comboBox.DataBind();
@@ -79,19 +87,24 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
                 // Reset SelectedValue
                 // comboBox.Select(selectedValue);
                 var selectedItem = comboBox.FindItemByValue(selectedValue);
+				Logger.LogError("BindListInternal(comboBox={ComboBox},value={Value},listSource={ListSource},textField={TextField},valueField={ValueField}): selectedItem → {SelectedItem}", comboBox, value, listSource, textField, valueField, selectedItem);
                 selectedItem?.Selected = true;
             }
+			Logger.LogWarning("<<< Exiting BindListInternal(comboBox={ComboBox},value={Value},listSource={ListSource},textField={TextField},valueField={ValueField})", comboBox, value, listSource, textField, valueField);
         }
 
         /// <inheritdoc />
         protected override void BindList()
         {
+			Logger.LogError(">>> Entering BindList()");
             BindListInternal(this.ComboBox, this.Value, this.ListSource, this.ListTextField, this.ListValueField);
+			Logger.LogWarning("<<< Exiting BindList()");
         }
 
         /// <inheritdoc />
         protected override WebControl CreateControlInternal(Control container)
         {
+			Logger.LogError(">>> Entering CreateControlInternal(container={Container})", container);
             ////ComboBox = new DropDownList { ID = ID + "_ComboBox" };
             this.ComboBox = new DnnComboBox(this.AppStatus, this.EventLogger, this.clientResourceController) { ID = this.ID + "_ComboBox", };
             this.ComboBox.SelectedIndexChanged += this.IndexChanged;
@@ -107,7 +120,9 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
 
         private void IndexChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering IndexChanged(sender={Sender},e={E})", sender, e);
             this.UpdateDataSource(this.Value, this.ComboBox.SelectedValue, this.DataField);
+			Logger.LogWarning("<<< Exiting IndexChanged(sender={Sender},e={E})", sender, e);
         }
     }
 }

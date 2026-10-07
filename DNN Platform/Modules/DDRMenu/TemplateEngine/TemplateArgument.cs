@@ -16,7 +16,10 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
         /// <param name="value">The template argument value.</param>
         public TemplateArgument(string name, string value)
         {
+			eventLogger.LogError(">>> Entering TemplateArgument(name={Name},value={Value})", name, value);
             this.Name = name;
+			eventLogger.LogWarning("<<< Exiting TemplateArgument(name={Name},value={Value})", name, value);
+			eventLogger.LogDebug("TemplateArgument(name={Name},value={Value}): this.Name → {Arg2}", name, value, this.Name);
             this.Value = value;
         }
 

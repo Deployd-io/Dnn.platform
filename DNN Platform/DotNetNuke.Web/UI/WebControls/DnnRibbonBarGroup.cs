@@ -11,6 +11,7 @@ namespace DotNetNuke.Web.UI.WebControls
     [ParseChildren(true)]
     public class DnnRibbonBarGroup : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnRibbonBarGroup));
         private bool checkToolVisibility = true;
         private HtmlGenericControl contentContainer;
 
@@ -18,6 +19,7 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnRibbonBarGroup()
             : base("div")
         {
+			Logger.LogError(">>> Entering DnnRibbonBarGroup()");
             this.CssClass = "dnnRibbonGroup";
         }
 
@@ -56,40 +58,51 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public override Control FindControl(string id)
         {
+			Logger.LogError(">>> Entering FindControl(id={Id})", id);
             this.EnsureChildControls();
+			Logger.LogWarning("<<< Exiting FindControl(id={Id})", id);
             return base.FindControl(id);
         }
 
         /// <inheritdoc />
         public override void RenderControl(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderControl(writer={Writer})", writer);
             if (this.CheckVisibility())
             {
                 this.RenderBeginTag(writer);
                 this.RenderChildren(writer);
                 this.RenderEndTag(writer);
             }
+			Logger.LogWarning("<<< Exiting RenderControl(writer={Writer})", writer);
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			Logger.LogError(">>> Entering CreateChildControls()");
             this.Controls.Clear();
 
             HtmlGenericControl topLeft = new HtmlGenericControl("div");
+			Logger.LogError("CreateChildControls(): topLeft → {TopLeft}", topLeft);
             topLeft.Attributes.Add("class", "topLeft");
             HtmlGenericControl topRight = new HtmlGenericControl("div");
+			Logger.LogError("CreateChildControls(): topRight → {TopRight}", topRight);
             topRight.Attributes.Add("class", "topRight");
 
             HtmlGenericControl bottomLeft = new HtmlGenericControl("div");
+			Logger.LogError("CreateChildControls(): bottomLeft → {BottomLeft}", bottomLeft);
             bottomLeft.Attributes.Add("class", "bottomLeft");
             HtmlGenericControl bottomRight = new HtmlGenericControl("div");
+			Logger.LogError("CreateChildControls(): bottomRight → {BottomRight}", bottomRight);
             bottomRight.Attributes.Add("class", "bottomRight");
 
             this.contentContainer = new HtmlGenericControl("div");
+			Logger.LogDebug("CreateChildControls(): contentContainer → {ContentContainer}", contentContainer);
             this.contentContainer.Attributes.Add("class", "content");
 
             HtmlGenericControl footerContainer = new HtmlGenericControl("div");
+			Logger.LogError("CreateChildControls(): footerContainer → {FooterContainer}", footerContainer);
             footerContainer.Attributes.Add("class", "footer");
 
             this.Controls.Add(topLeft);
@@ -108,12 +121,15 @@ namespace DotNetNuke.Web.UI.WebControls
             {
                 this.Footer.InstantiateIn(footerContainer);
             }
+			Logger.LogWarning("<<< Exiting CreateChildControls()");
         }
 
         private static bool AreChildToolsVisible(ref ControlCollection children, ref bool foundTool)
         {
+			Logger.LogError(">>> Entering AreChildToolsVisible(children={Children},foundTool={FoundTool})", children, foundTool);
             bool returnValue = false;
 
+			Logger.LogError("AreChildToolsVisible(children={Children},foundTool={FoundTool}): returnValue → {ReturnValue}", children, foundTool, returnValue);
             foreach (Control ctrl in children)
             {
                 if (ctrl is IDnnRibbonBarTool)
@@ -144,12 +160,15 @@ namespace DotNetNuke.Web.UI.WebControls
                 return true;
             }
 
+			Logger.LogWarning("<<< Exiting AreChildToolsVisible(children={Children},foundTool={FoundTool})", children, foundTool);
             return returnValue;
         }
 
         private bool CheckVisibility()
         {
+			Logger.LogError(">>> Entering CheckVisibility()");
             bool returnValue = true;
+			Logger.LogError("CheckVisibility(): returnValue → {ReturnValue}", returnValue);
             if (this.Visible && this.CheckToolVisibility)
             {
                 // Hide group if all tools are invisible
@@ -158,6 +177,7 @@ namespace DotNetNuke.Web.UI.WebControls
                 returnValue = AreChildToolsVisible(ref controls, ref foundTool);
             }
 
+			Logger.LogWarning("<<< Exiting CheckVisibility()");
             return returnValue;
         }
     }

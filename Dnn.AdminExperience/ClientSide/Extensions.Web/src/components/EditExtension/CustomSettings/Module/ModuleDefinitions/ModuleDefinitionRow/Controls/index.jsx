@@ -9,16 +9,22 @@ import { ModuleDefinitionActions, ExtensionActions } from "actions";
 import ControlFields from "./ControlFields";
 import utils from "utils";
 import "./style.less";
+const logger = console;
 
 function getSourceFolder(str) {
+	logger.error(`>>> Entering getSourceFolder(str=${str})`, { "event.action": "getSourceFolder", "logrite.str": str });
+	logger.warn(`<<< Exiting getSourceFolder(str=${str})`, { "event.action": "getSourceFolder", "logrite.str": str });
     return str.substr(0, str.lastIndexOf("/"));
 }
 function getFileName(str) {
+	logger.error(`>>> Entering getFileName(str=${str})`, { "event.action": "getFileName", "logrite.str": str });
+	logger.warn(`<<< Exiting getFileName(str=${str})`, { "event.action": "getFileName", "logrite.str": str });
     return str.substr(str.lastIndexOf("/") + 1, str.length - 1);
 }
 class Controls extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             editMode: false,
             controlBeingEdited: {},
@@ -28,9 +34,12 @@ class Controls extends Component {
             },
             selectedSourceFolder: "Admin/Skins/"
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
     getNewControlKeys() {
+		logger.error('>>> Entering getNewControlKeys()', { "event.action": "getNewControlKeys" });
         const { props } = this;
+		logger.warn('<<< Exiting getNewControlKeys()', { "event.action": "getNewControlKeys" });
         return {
             id: -1,
             definitionId: props.moduleDefinitionId,
@@ -46,6 +55,7 @@ class Controls extends Component {
         };
     }
     confirmAction(callback) {
+		logger.error(`>>> Entering confirmAction(callback=${callback})`, { "event.action": "confirmAction", "logrite.callback": callback });
         const { props } = this;
         if (props.controlFormIsDirty) {
             utilities.utilities.confirm(Localization.get("UnsavedChanges.HelpText"), Localization.get("UnsavedChanges.Confirm"), Localization.get("UnsavedChanges.Cancel"), () => {
@@ -54,6 +64,7 @@ class Controls extends Component {
             });
         } else {
             callback();
+			logger.warn(`<<< Exiting confirmAction(callback=${callback})`, { "event.action": "confirmAction", "logrite.callback": callback });
         }
     }
     onChange(key, event) {
@@ -82,20 +93,25 @@ class Controls extends Component {
         }
     }
     onDelete(controlId) {
+		logger.error(`>>> Entering onDelete(controlId=${controlId})`, { "event.action": "onDelete", "logrite.controlId": controlId });
         utilities.utilities.confirm("Are you sure you want to delete this module definition?", "Yes", "No", () => {
             const { props } = this;
 
             let extensionBeingUpdated = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+			logger.error(`onDelete(controlId=${controlId}): extensionBeingUpdated → ${extensionBeingUpdated}`, { "event.action": "onDelete", "logrite.controlId": controlId });
 
             let actions = {deletemodulecontrol: controlId.toString()};
+			logger.error(`onDelete(controlId=${controlId}): actions → ${actions}`, { "event.action": "onDelete", "logrite.controlId": controlId });
 
             props.dispatch(ExtensionActions.updateExtension(extensionBeingUpdated, actions, props.extensionBeingEditedIndex,  () => {
                 utils.utilities.notify(Localization.get("UpdateComplete"));
                 props.onControlSave();
+				logger.warn(`<<< Exiting onDelete(controlId=${controlId})`, { "event.action": "onDelete", "logrite.controlId": controlId });
             }));
         });
     }
     onSave() {
+		logger.error('>>> Entering onSave()', { "event.action": "onSave" });
         const { props, state } = this;
         let { error, } = state;
         let triedToSave = true;
@@ -114,7 +130,9 @@ class Controls extends Component {
 
 
         let extensionBeingUpdated = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+		logger.error(`onSave(): extensionBeingUpdated → ${extensionBeingUpdated}`, { "event.action": "onSave" });
         let controls = JSON.parse(JSON.stringify(props.moduleControls));
+		logger.error(`onSave(): controls → ${controls}`, { "event.action": "onSave" });
         if (state.controlBeingEdited.id > -1) {
             controls[state.controlBeingEditedIndex] = state.controlBeingEdited;
         } else {
@@ -124,6 +142,7 @@ class Controls extends Component {
         state.controlBeingEdited.definitionId = props.moduleDefinitionId;
 
         let actions = {savemodulecontrol: JSON.stringify(state.controlBeingEdited)};
+		logger.error(`onSave(): actions → ${actions}`, { "event.action": "onSave" });
 
         props.dispatch(ExtensionActions.updateExtension(extensionBeingUpdated, actions, props.extensionBeingEditedIndex,  () => {
             utils.utilities.notify(Localization.get("UpdateComplete"));
@@ -132,14 +151,18 @@ class Controls extends Component {
                 this.exitEditMode();
             }));
         }));
+		logger.warn('<<< Exiting onSave()', { "event.action": "onSave" });
     }
     onEdit(controlBeingEdited, controlBeingEditedIndex) {
+		logger.error(`>>> Entering onEdit(controlBeingEdited=${controlBeingEdited},controlBeingEditedIndex=${controlBeingEditedIndex})`, { "event.action": "onEdit", "logrite.controlBeingEdited": controlBeingEdited, "logrite.controlBeingEditedIndex": controlBeingEditedIndex });
         this.confirmAction(() => {
             const { props } = this;
             const sourceFolder = getSourceFolder(controlBeingEdited.source) || "Admin/Skins/";
+			logger.error(`onEdit(controlBeingEdited=${controlBeingEdited},controlBeingEditedIndex=${controlBeingEditedIndex}): sourceFolder → ${sourceFolder}`, { "event.action": "onEdit", "logrite.controlBeingEdited": controlBeingEdited, "logrite.controlBeingEditedIndex": controlBeingEditedIndex });
             props.dispatch(ModuleDefinitionActions.getSourceFolders());
             props.dispatch(ModuleDefinitionActions.getSourceFiles(sourceFolder, () => {
                 props.dispatch(ModuleDefinitionActions.getControlIcons(controlBeingEdited.source, () => {
+					logger.warn(`<<< Exiting onEdit(controlBeingEdited=${controlBeingEdited},controlBeingEditedIndex=${controlBeingEditedIndex})`, { "event.action": "onEdit", "logrite.controlBeingEdited": controlBeingEdited, "logrite.controlBeingEditedIndex": controlBeingEditedIndex });
                     this.setState({
                         editMode: true,
                         controlBeingEdited,
@@ -155,6 +178,7 @@ class Controls extends Component {
     }
 
     exitEditMode() {
+		logger.error('>>> Entering exitEditMode()', { "event.action": "exitEditMode" });
         this.confirmAction(() => {
             this.setState({
                 controlBeingEdited: this.getNewControlKeys(),
@@ -166,6 +190,7 @@ class Controls extends Component {
     }
 
     onSelectSourceFolder(option) {
+		logger.error(`>>> Entering onSelectSourceFolder(option=${option})`, { "event.action": "onSelectSourceFolder", "logrite.option": option });
         const { props } = this;
         this.setState({
             selectedSourceFolder: option.value
@@ -173,6 +198,7 @@ class Controls extends Component {
         props.dispatch(ModuleDefinitionActions.getSourceFiles(option.value, () => {
             if (props.sourceFolders.length > 0) {
                 props.dispatch(ModuleDefinitionActions.getControlIcons(option.value), () => {
+					logger.warn(`<<< Exiting onSelectSourceFolder(option=${option})`, { "event.action": "onSelectSourceFolder", "logrite.option": option });
                     this.setState({
                         selectedSourceFolder: option.value
                     });
@@ -183,6 +209,7 @@ class Controls extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
 
         const moduleControls = props.moduleControls && props.moduleControls.map((moduleControl, index) => {
@@ -205,6 +232,7 @@ class Controls extends Component {
                 key={index} />;
         });
         const isAddMode = state.editMode && state.controlBeingEditedIndex === -1;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className="module-controls">
                 <GridCell className="header-container">
@@ -248,6 +276,8 @@ Controls.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         sourceFolders: state.moduleDefinition.sourceFolders,
         sourceFiles: state.moduleDefinition.sourceFiles,

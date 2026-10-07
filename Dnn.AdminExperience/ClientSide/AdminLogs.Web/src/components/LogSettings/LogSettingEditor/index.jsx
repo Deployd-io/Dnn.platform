@@ -8,11 +8,13 @@ import {
 } from "../../../actions";
 import util from "../../../utils";
 import Localization from "localization";
+const logger = console;
 
 /*eslint-disable eqeqeq*/
 class LogSettingEditor extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             logSettingDetail: {
                 KeepMostRecent: "*",
@@ -32,9 +34,11 @@ class LogSettingEditor extends Component {
                 mailToAddress: false
             }
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
         if (props.logTypeSettingId !== "") {
             props.dispatch(LogSettingActions.getLogSettingById({
@@ -45,10 +49,12 @@ class LogSettingEditor extends Component {
                     logSettingDetail
                 });
                 this.SetErrorState();
+				logger.error(`UNSAFE_componentWillMount(): logSettingDetail → ${logSettingDetail}`, { "event.action": "UNSAFE_componentWillMount" });
             }));
         }
     }
     getValue(selectKey) {
+		logger.error(`>>> Entering getValue(selectKey=${selectKey})`, { "event.action": "getValue", "logrite.selectKey": selectKey });
         const {state} = this;
         switch (selectKey) {
             case "LogType":
@@ -70,8 +76,10 @@ class LogSettingEditor extends Component {
             default:
                 break;
         }
+		logger.warn(`<<< Exiting getValue(selectKey=${selectKey})`, { "event.action": "getValue", "logrite.selectKey": selectKey });
     }
     getEnabledStatus(key) {
+		logger.error(`>>> Entering getEnabledStatus(key=${key})`, { "event.action": "getEnabledStatus", "logrite.key": key });
         const {state} = this;
         const toBoolean = (value) => value === true || value === 1 || value === "1" || value === "true";
         switch (key) {
@@ -82,14 +90,20 @@ class LogSettingEditor extends Component {
             default:
                 break;
         }
+		logger.warn(`<<< Exiting getEnabledStatus(key=${key})`, { "event.action": "getEnabledStatus", "logrite.key": key });
     }
     onDropDownChange(key, option) {
+		logger.error(`>>> Entering onDropDownChange(key=${key},option=${option})`, { "event.action": "onDropDownChange", "logrite.key": key, "logrite.option": option });
         this.ProcessChange(key, option.value);
+		logger.warn(`<<< Exiting onDropDownChange(key=${key},option=${option})`, { "event.action": "onDropDownChange", "logrite.key": key, "logrite.option": option });
     }
     onTextChange(key, event) {
+		logger.error(`>>> Entering onTextChange(key=${key},event=${event})`, { "event.action": "onTextChange", "logrite.key": key, "logrite.event": event });
         this.ProcessChange(key, event.target.value);
+		logger.warn(`<<< Exiting onTextChange(key=${key},event=${event})`, { "event.action": "onTextChange", "logrite.key": key, "logrite.event": event });
     }
     ProcessChange(key, value) {
+		logger.error(`>>> Entering ProcessChange(key=${key},value=${value})`, { "event.action": "ProcessChange", "logrite.key": key, "logrite.value": value });
         let {logSettingDetail} = this.state;
         logSettingDetail[key] = value;
         this.setState({
@@ -97,14 +111,17 @@ class LogSettingEditor extends Component {
         });
         this.SetErrorState();
         let {state} = this;
+		logger.warn(`<<< Exiting ProcessChange(key=${key},value=${value})`, { "event.action": "ProcessChange", "logrite.key": key, "logrite.value": value });
         state.formModified = true;
         this.setState({
             state
         });
     }
     SetErrorState() {
+		logger.error('>>> Entering SetErrorState()', { "event.action": "SetErrorState" });
         let {logSettingDetail} = this.state;
         let {state} = this;
+		logger.debug(`SetErrorState(): state.triedToSubmit → ${state.triedToSubmit}`, { "event.action": "SetErrorState" });
         if (logSettingDetail.EmailNotificationIsActive) {
             if (!this.validateEmail(logSettingDetail.MailToAddress)) {
                 state.error["mailToAddress"] = true;
@@ -114,6 +131,7 @@ class LogSettingEditor extends Component {
             }
         } else {
             state.error["mailToAddress"] = false;
+			logger.warn('<<< Exiting SetErrorState()', { "event.action": "SetErrorState" });
         }
         state.triedToSubmit = false;
         this.setState({
@@ -125,6 +143,7 @@ class LogSettingEditor extends Component {
         return re.test(value);
     }
     OnCheckboxChanged(key, status) {
+		logger.error(`>>> Entering OnCheckboxChanged(key=${key},status=${status})`, { "event.action": "OnCheckboxChanged", "logrite.key": key, "logrite.status": status });
         let {logSettingDetail} = this.state;
         logSettingDetail[key] = status;
         this.setState({
@@ -132,12 +151,14 @@ class LogSettingEditor extends Component {
         });
         this.SetErrorState();
         let {state} = this;
+		logger.warn(`<<< Exiting OnCheckboxChanged(key=${key},status=${status})`, { "event.action": "OnCheckboxChanged", "logrite.key": key, "logrite.status": status });
         state.formModified = true;
         this.setState({
             state
         });
     }
     addUpdateLogSetting(event) {
+		logger.error(`>>> Entering addUpdateLogSetting(event=${event})`, { "event.action": "addUpdateLogSetting", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -166,9 +187,11 @@ class LogSettingEditor extends Component {
         } else {
             props.Collapse(event);
         }
+		logger.warn(`<<< Exiting addUpdateLogSetting(event=${event})`, { "event.action": "addUpdateLogSetting", "logrite.event": event });
     }
 
     deleteLogSetting(event) {
+		logger.error(`>>> Entering deleteLogSetting(event=${event})`, { "event.action": "deleteLogSetting", "logrite.event": event });
         const {props} = this;
         if (props.logTypeSettingId !== "") {
             util.utilities.confirm(Localization.get("ConfigDeletedWarning"), Localization.get("yes"), Localization.get("no"), () => {
@@ -185,11 +208,13 @@ class LogSettingEditor extends Component {
         }
         else {
             util.utilities.notifyError(Localization.get("ConfigDeleteInconsistency"));
+			logger.warn(`<<< Exiting deleteLogSetting(event=${event})`, { "event.action": "deleteLogSetting", "logrite.event": event });
         }
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const portalList = this.props.portalList !== undefined && this.props.portalList.map(log => {
             return {
                 label: log.label,
@@ -268,6 +293,7 @@ class LogSettingEditor extends Component {
                     onChange={this.onTextChange.bind(this, "MailToAddress") }/>
             </div>
         </div>;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="log-setting-editor">
                 <Grid numberOfColumns={2}>
@@ -298,6 +324,8 @@ LogSettingEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         logSettingDetail: state.logSettings.logSettingDetail
     };

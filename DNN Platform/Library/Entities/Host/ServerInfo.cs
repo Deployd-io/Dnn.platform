@@ -13,6 +13,7 @@ namespace DotNetNuke.Entities.Host
     [Serializable]
     public class ServerInfo : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ServerInfo));
         /// <summary>Initializes a new instance of the <see cref="ServerInfo"/> class.</summary>
         public ServerInfo()
             : this(DateTime.Now, DateTime.Now)
@@ -24,9 +25,14 @@ namespace DotNetNuke.Entities.Host
         /// <param name="lastactivity">The last activity date for the server.</param>
         public ServerInfo(DateTime created, DateTime lastactivity)
         {
+			Logger.LogError(">>> Entering ServerInfo(created={Created},lastactivity={Lastactivity})", created, lastactivity);
             this.IISAppName = Globals.IISAppName;
+			Logger.LogWarning("<<< Exiting ServerInfo(created={Created},lastactivity={Lastactivity})", created, lastactivity);
+			Logger.LogDebug("ServerInfo(created={Created},lastactivity={Lastactivity}): this.IISAppName → {Arg2}", created, lastactivity, this.IISAppName);
             this.ServerName = Globals.ServerName;
             this.ServerGroup = string.Empty;
+			Logger.LogDebug("ServerInfo(created={Created},lastactivity={Lastactivity}): this.ServerName → {Arg2}", created, lastactivity, this.ServerName);
+			Logger.LogDebug("ServerInfo(created={Created},lastactivity={Lastactivity}): this.ServerGroup → {Arg2}", created, lastactivity, this.ServerGroup);
             this.CreatedDate = created;
             this.LastActivityDate = lastactivity;
             this.Enabled = true;
@@ -71,6 +77,7 @@ namespace DotNetNuke.Entities.Host
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.ServerID = Null.SetNullInteger(dr["ServerID"]);
             this.IISAppName = Null.SetNullString(dr["IISAppName"]);
             this.ServerName = Null.SetNullString(dr["ServerName"]);
@@ -80,6 +87,7 @@ namespace DotNetNuke.Entities.Host
             this.LastActivityDate = Null.SetNullDateTime(dr["LastActivityDate"]);
 
             var schema = dr.GetSchemaTable();
+			Logger.LogError("Fill(dr={Dr}): schema → {Schema}", dr, schema);
             if (schema != null)
             {
                 if (schema.Select("ColumnName = 'PingFailureCount'").Length > 0)
@@ -97,6 +105,7 @@ namespace DotNetNuke.Entities.Host
                     this.UniqueId = Null.SetNullString(dr["UniqueId"]);
                 }
             }
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

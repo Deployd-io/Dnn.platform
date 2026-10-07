@@ -1,4 +1,5 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
 /***
@@ -22,11 +23,21 @@ define(['jquery', 'knockout',
         var DnnPageRecycleBin;
 
         var ModuleInfo = function (requestData) {
+			logger.error(`>>> Entering ModuleInfo(requestData=${requestData})`, { "event.action": "ModuleInfo", "logrite.requestData": requestData });
             var self = this;
 
             // request data
             self.Id = requestData.Id;
+			logger.debug(`ModuleInfo(requestData=${requestData}): self.Id → ${self.Id}`, { "event.action": "ModuleInfo", "logrite.requestData": requestData });
+			logger.debug(`ModuleInfo(requestData=${requestData}): self.Title → ${self.Title}`, { "event.action": "ModuleInfo", "logrite.requestData": requestData });
+			logger.debug(`ModuleInfo(requestData=${requestData}): self.PortalId → ${self.PortalId}`, { "event.action": "ModuleInfo", "logrite.requestData": requestData });
+			logger.debug(`ModuleInfo(requestData=${requestData}): self.TabName → ${self.TabName}`, { "event.action": "ModuleInfo", "logrite.requestData": requestData });
+			logger.debug(`ModuleInfo(requestData=${requestData}): self.TabID → ${self.TabID}`, { "event.action": "ModuleInfo", "logrite.requestData": requestData });
+			logger.debug(`ModuleInfo(requestData=${requestData}): self.TabDeleted → ${self.TabDeleted}`, { "event.action": "ModuleInfo", "logrite.requestData": requestData });
+			logger.debug(`ModuleInfo(requestData=${requestData}): self.LastModifiedOnDate → ${self.LastModifiedOnDate}`, { "event.action": "ModuleInfo", "logrite.requestData": requestData });
+			logger.debug(`ModuleInfo(requestData=${requestData}): self.friendlyLastModifiedOnDate → ${self.friendlyLastModifiedOnDate}`, { "event.action": "ModuleInfo", "logrite.requestData": requestData });
             self.TabModuleId = requestData.TabModuleId;
+			logger.debug(`ModuleInfo(requestData=${requestData}): self.TabModuleId → ${self.TabModuleId}`, { "event.action": "ModuleInfo", "logrite.requestData": requestData });
             self.Title = requestData.Title;
             self.PortalId = requestData.PortalId;
             self.TabName = requestData.TabName;
@@ -38,14 +49,23 @@ define(['jquery', 'knockout',
             // other attributes
             self.selected = ko.observable(false);
             self.mouseOver = ko.observable(false);
+			logger.warn(`<<< Exiting ModuleInfo(requestData=${requestData})`, { "event.action": "ModuleInfo", "logrite.requestData": requestData });
         };
 
         var UserInfo = function (requestData) {
+			logger.error(`>>> Entering UserInfo(requestData=${requestData})`, { "event.action": "UserInfo", "logrite.requestData": requestData });
             var self = this;
 
             // request data
             self.Id = requestData.Id;
+			logger.debug(`UserInfo(requestData=${requestData}): self.Id → ${self.Id}`, { "event.action": "UserInfo", "logrite.requestData": requestData });
+			logger.debug(`UserInfo(requestData=${requestData}): self.PortalId → ${self.PortalId}`, { "event.action": "UserInfo", "logrite.requestData": requestData });
+			logger.debug(`UserInfo(requestData=${requestData}): self.DisplayName → ${self.DisplayName}`, { "event.action": "UserInfo", "logrite.requestData": requestData });
+			logger.debug(`UserInfo(requestData=${requestData}): self.Email → ${self.Email}`, { "event.action": "UserInfo", "logrite.requestData": requestData });
+			logger.debug(`UserInfo(requestData=${requestData}): self.LastModifiedOnDate → ${self.LastModifiedOnDate}`, { "event.action": "UserInfo", "logrite.requestData": requestData });
+			logger.debug(`UserInfo(requestData=${requestData}): self.friendlyLastModifiedOnDate → ${self.friendlyLastModifiedOnDate}`, { "event.action": "UserInfo", "logrite.requestData": requestData });
             self.Username = requestData.Username;
+			logger.debug(`UserInfo(requestData=${requestData}): self.Username → ${self.Username}`, { "event.action": "UserInfo", "logrite.requestData": requestData });
             self.PortalId = requestData.PortalId;
             self.DisplayName = requestData.DisplayName;
             self.Email = requestData.Email;
@@ -55,9 +75,11 @@ define(['jquery', 'knockout',
             // other attributes
             self.selected = ko.observable(false);
             self.mouseOver = ko.observable(false);
+			logger.warn(`<<< Exiting UserInfo(requestData=${requestData})`, { "event.action": "UserInfo", "logrite.requestData": requestData });
         };
 
         var PageInfo = function (requestData) {
+			logger.error(`>>> Entering PageInfo(requestData=${requestData})`, { "event.action": "PageInfo", "logrite.requestData": requestData });
             var PAGES_TREE_LEFT_PADDING = 50;
 
             var self = this;
@@ -68,15 +90,18 @@ define(['jquery', 'knockout',
 
             // private methods implementation
             calculateDepthOfNode = function (node) {
+				logger.error(`>>> Entering calculateDepthOfNode(node=${node})`, { "event.action": "calculateDepthOfNode", "logrite.node": node });
                 if (node.parent) {
                     self.depth(1 + calculateDepthOfNode(node.parent));
                 } else {
                     self.depth(0);
                 }
+				logger.warn(`<<< Exiting calculateDepthOfNode(node=${node})`, { "event.action": "calculateDepthOfNode", "logrite.node": node });
                 return self.depth();
             };
 
             calculateNumberOfAllChildrenTree = function (children) {
+				logger.error(`>>> Entering calculateNumberOfAllChildrenTree(children=${children})`, { "event.action": "calculateNumberOfAllChildrenTree", "logrite.children": children });
                 var numberOfNestedChildren = 0;
 
                 if (!children || children.length === 0) {
@@ -91,6 +116,7 @@ define(['jquery', 'knockout',
             };
 
             hasUnselectedChildren = function (children) {
+				logger.error(`>>> Entering hasUnselectedChildren(children=${children})`, { "event.action": "hasUnselectedChildren" });
                 for (var i = 0; i < children.length; i++) {
                     var child = children[i];
                     if (!child.selected()) {
@@ -101,10 +127,13 @@ define(['jquery', 'knockout',
                         return true;
                     }
                 }
+				logger.warn(`<<< Exiting hasUnselectedChildren(children=${children})`, { "event.action": "hasUnselectedChildren" });
+				logger.warn('<<< Exiting hasUnselectedChildren()', { "event.action": "hasUnselectedChildren" });
                 return false;
             };
 
             selectAllChildren = function (children, newValue) {
+				logger.error(`>>> Entering selectAllChildren(children=${children},newValue=${newValue})`, { "event.action": "selectAllChildren", "logrite.children": children, "logrite.newValue": newValue });
                 if (!self.children) {
                     return;
                 }
@@ -112,9 +141,11 @@ define(['jquery', 'knockout',
                 children().forEach(function (child) {
                     child.selected(newValue);
                 });
+				logger.warn(`<<< Exiting selectAllChildren(children=${children},newValue=${newValue})`, { "event.action": "selectAllChildren", "logrite.children": children, "logrite.newValue": newValue });
             };
 
             setOddEvenInChildren = function (children, newValue) {
+				logger.error(`>>> Entering setOddEvenInChildren(children=${children},newValue=${newValue})`, { "event.action": "setOddEvenInChildren", "logrite.children": children, "logrite.newValue": newValue });
                 if (!self.children) {
                     return;
                 }
@@ -122,18 +153,34 @@ define(['jquery', 'knockout',
                 children().forEach(function (child) {
                     child.even(newValue);
                 });
+				logger.warn(`<<< Exiting setOddEvenInChildren(children=${children},newValue=${newValue})`, { "event.action": "setOddEvenInChildren", "logrite.children": children, "logrite.newValue": newValue });
             };
 
             isItsRootElementEven = function (node) {
+				logger.error(`>>> Entering isItsRootElementEven(node=${node})`, { "event.action": "isItsRootElementEven", "logrite.node": node });
                 if (node.parent) {
                     return isItsRootElementEven(node.parent);
                 }
+				logger.warn(`<<< Exiting isItsRootElementEven(node=${node})`, { "event.action": "isItsRootElementEven", "logrite.node": node });
                 return node.even();
             };
 
             // request data
             self.id = requestData.id;
+			logger.debug(`PageInfo(requestData=${requestData}): self.id → ${self.id}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
+			logger.debug(`PageInfo(requestData=${requestData}): self.childCount → ${self.childCount}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
+			logger.debug(`PageInfo(requestData=${requestData}): self.url → ${self.url}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
+			logger.debug(`PageInfo(requestData=${requestData}): self.publishDate → ${self.publishDate}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
+			logger.debug(`PageInfo(requestData=${requestData}): self.status → ${self.status}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
+			logger.debug(`PageInfo(requestData=${requestData}): self.parentId → ${self.parentId}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
+			logger.debug(`PageInfo(requestData=${requestData}): self.level → ${self.level}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
+			logger.debug(`PageInfo(requestData=${requestData}): self.tabpath → ${self.tabpath}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
+			logger.debug(`PageInfo(requestData=${requestData}): self.isspecial → ${self.isspecial}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
+			logger.debug(`PageInfo(requestData=${requestData}): self.useDefaultSkin → ${self.useDefaultSkin}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
+			logger.debug(`PageInfo(requestData=${requestData}): self.lastModifiedOnDate → ${self.lastModifiedOnDate}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
+			logger.debug(`PageInfo(requestData=${requestData}): self.friendlyLastModifiedOnDate → ${self.friendlyLastModifiedOnDate}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
             self.name = requestData.name;
+			logger.debug(`PageInfo(requestData=${requestData}): self.name → ${self.name}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
             self.childCount = requestData.childCount;
             self.url = requestData.url;
             self.publishDate = requestData.publishDate;
@@ -157,6 +204,7 @@ define(['jquery', 'knockout',
             self.depth = ko.observable(0);
 
             self.parent = null;
+			logger.debug(`PageInfo(requestData=${requestData}): self.parent → ${self.parent}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
             self.children = ko.observableArray([]);
 
             // computed attributes
@@ -167,6 +215,8 @@ define(['jquery', 'knockout',
             self.cellWidth = ko.computed(function () {
                 var separatorWidth = 19;
                 var labelWidth = 160;
+			logger.debug(`PageInfo(requestData=${requestData}): childrenWithEdge → ${childrenWithEdge}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
+			logger.debug(`PageInfo(requestData=${requestData}): childrenHeight → ${childrenHeight}`, { "event.action": "PageInfo", "logrite.requestData": requestData });
                 return (self.numberOfNestedChildren() * separatorWidth) + labelWidth;
             });
 
@@ -205,9 +255,12 @@ define(['jquery', 'knockout',
                 setOddEvenInChildren(self.children, newValue);
             });
 
+			logger.warn(`<<< Exiting PageInfo(requestData=${requestData})`, { "event.action": "PageInfo", "logrite.requestData": requestData });
             // API methods
             self.calculateDepth = function () {
+				logger.error('>>> Entering calculateDepth()', { "event.action": "calculateDepth" });
                 calculateDepthOfNode(self);
+				logger.warn('<<< Exiting calculateDepth()', { "event.action": "calculateDepth" });
             };
             self.hasUnselectedChildren = function () {
                 return hasUnselectedChildren(self.children());
@@ -243,10 +296,12 @@ define(['jquery', 'knockout',
 
             /* Constructor */
             function DnnPageRecycleBin(resx, serviceController, utility, options, settings) {
+				logger.error(`>>> Entering DnnPageRecycleBin(resx=${resx},serviceController=${serviceController},utility=${utility},options=${options},settings=${settings})`, { "event.action": "DnnPageRecycleBin", "logrite.resx": resx, "logrite.serviceController": serviceController, "logrite.utility": utility, "logrite.options": options, "logrite.settings": settings });
                 _resx = resx;
                 _serviceController = serviceController;
                 _utility = utility;
                 _options = options;
+				logger.warn(`<<< Exiting DnnPageRecycleBin(resx=${resx},serviceController=${serviceController},utility=${utility},options=${options},settings=${settings})`, { "event.action": "DnnPageRecycleBin", "logrite.resx": resx, "logrite.serviceController": serviceController, "logrite.utility": utility, "logrite.options": options, "logrite.settings": settings });
                 _settings = {
                     canViewPages: settings.isHost || settings.isAdmin || settings.permissions.RECYCLEBIN_PAGES_VIEW,
                     canViewModules: settings.isHost || settings.isAdmin || settings.permissions.RECYCLEBIN_MODULES_VIEW,
@@ -264,9 +319,11 @@ define(['jquery', 'knockout',
             // ex: method = function () {};
             changeElementSelectedStatus = function (page) {
                 page.selected(!page.selected());
+				logger.warn(`<<< Exiting changeElementSelectedStatus(page=${page})`, { "event.action": "changeElementSelectedStatus", "logrite.page": page });
             };
 
             getSelectedElements = function (collection) {
+				logger.error(`>>> Entering getSelectedElements(collection=${collection})`, { "event.action": "getSelectedElements", "logrite.collection": collection });
                 var selectedElements = [];
 
                 if (!collection) {
@@ -286,6 +343,7 @@ define(['jquery', 'knockout',
             };
 
             markAllElementsAs = function (collection, value) {
+				logger.error(`>>> Entering markAllElementsAs(collection=${collection},value=${value})`, { "event.action": "markAllElementsAs", "logrite.collection": collection, "logrite.value": value });
                 if (!collection) {
                     return;
                 }
@@ -293,9 +351,11 @@ define(['jquery', 'knockout',
                 collection.forEach(function (element) {
                     element.selected(value);
                 });
+				logger.warn(`<<< Exiting markAllElementsAs(collection=${collection},value=${value})`, { "event.action": "markAllElementsAs", "logrite.collection": collection, "logrite.value": value });
             };
 
             markAllModulesAsIfPossible = function (modules, newValue) {
+				logger.error(`>>> Entering markAllModulesAsIfPossible(modules=${modules},newValue=${newValue})`, { "event.action": "markAllModulesAsIfPossible", "logrite.modules": modules, "logrite.newValue": newValue });
                 if (!modules) {
                     return;
                 }
@@ -310,32 +370,41 @@ define(['jquery', 'knockout',
                 });
                 if (isAnyModuleInDeletedPage && viewModel.selectAllModules())
                     _utility.notifyError(_resx.recyclebin_UnableToSelectAllModules);
+					logger.warn(`<<< Exiting markAllModulesAsIfPossible(modules=${modules},newValue=${newValue})`, { "event.action": "markAllModulesAsIfPossible", "logrite.modules": modules, "logrite.newValue": newValue });
             }
 
             restoreSelectedPagesHandler = function () {
+				logger.error('>>> Entering restoreSelectedPagesHandler()', { "event.action": "restoreSelectedPagesHandler" });
                 if (_settings.canViewPages && _settings.canManagePages) {
                     var pagesList, viewModel;
 
                     viewModel = getViewModel();
                     pagesList = getSelectedElements(viewModel.deletedpagesList());
+					logger.error(`restoreSelectedPagesHandler(): pagesList → ${pagesList}`, { "event.action": "restoreSelectedPagesHandler" });
 
                     if (pagesList.length > 0) {
                         var confirmText, yesText, noText;
                         confirmText = pagesList.length > 1 ? _resx.recyclebin_RestorePagesConfirm : _resx.recyclebin_RestorePageConfirm;
+						logger.debug(`restoreSelectedPagesHandler(): confirmText → ${confirmText}`, { "event.action": "restoreSelectedPagesHandler" });
                         yesText = _resx.recyclebin_YesConfirm;
                         noText = _resx.recyclebin_NoConfirm;
 
                         _utility.confirm(confirmText, yesText, noText, function () {
                             getService().post('RestorePage', pagesList, pageRestoreRevomeOperationsCallback);
                         });
+						logger.warn('<<< Exiting restoreSelectedPagesHandler()', { "event.action": "restoreSelectedPagesHandler" });
                     }
                 }
             };
 
             canBeDeleted = function (selectedPages) {
+				logger.error(`>>> Entering canBeDeleted(selectedPages=${selectedPages})`, { "event.action": "canBeDeleted", "logrite.selectedPages": selectedPages });
                 var result = {};
                 result.value = true;
+				logger.error(`canBeDeleted(selectedPages=${selectedPages}): result → ${result}`, { "event.action": "canBeDeleted", "logrite.selectedPages": selectedPages });
+				logger.debug(`canBeDeleted(selectedPages=${selectedPages}): result.value → ${result.value}`, { "event.action": "canBeDeleted", "logrite.selectedPages": selectedPages });
                 result.errors = "";
+				logger.debug(`canBeDeleted(selectedPages=${selectedPages}): result.errors → ${result.errors}`, { "event.action": "canBeDeleted", "logrite.selectedPages": selectedPages });
 
                 selectedPages.forEach(function (page) {
                     if (page.hasUnselectedChildren()) {
@@ -349,15 +418,18 @@ define(['jquery', 'knockout',
             };
 
             removeSelectedPagesHandler = function () {
+				logger.error('>>> Entering removeSelectedPagesHandler()', { "event.action": "removeSelectedPagesHandler" });
                 if (_settings.canViewPages && _settings.canManagePages) {
                     var pagesList, viewModel;
 
                     viewModel = getViewModel();
                     pagesList = getSelectedElements(viewModel.deletedpagesList());
+					logger.error(`removeSelectedPagesHandler(): pagesList → ${pagesList}`, { "event.action": "removeSelectedPagesHandler" });
 
                     if (pagesList.length > 0) {
                         var confirmText, yesText, noText;
                         confirmText = pagesList.length > 1 ? _resx.recyclebin_RemovePagesConfirm : _resx.recyclebin_RemovePageConfirm;
+						logger.debug(`removeSelectedPagesHandler(): confirmText → ${confirmText}`, { "event.action": "removeSelectedPagesHandler" });
                         yesText = _resx.recyclebin_YesConfirm;
                         noText = _resx.recyclebin_NoConfirm;
 
@@ -371,18 +443,22 @@ define(['jquery', 'knockout',
                         });
                     }
                 }
+				logger.warn('<<< Exiting removeSelectedPagesHandler()', { "event.action": "removeSelectedPagesHandler" });
             };
 
             restoreSelectedModulesHandler = function () {
+				logger.error('>>> Entering restoreSelectedModulesHandler()', { "event.action": "restoreSelectedModulesHandler" });
                 if (_settings.canViewModules && _settings.canManageModules) {
                     var viewModel, modulesList;
 
                     viewModel = getViewModel();
+					logger.error(`restoreSelectedModulesHandler(): viewModel → ${viewModel}`, { "event.action": "restoreSelectedModulesHandler" });
                     modulesList = getSelectedElements(viewModel.deletedmodulesList());
 
                     if (modulesList.length > 0) {
                         var confirmText, yesText, noText;
                         confirmText = modulesList.length > 1 ? _resx.recyclebin_RestoreModulesConfirm : _resx.recyclebin_RestoreModuleConfirm;
+						logger.debug(`restoreSelectedModulesHandler(): confirmText → ${confirmText}`, { "event.action": "restoreSelectedModulesHandler" });
                         yesText = _resx.recyclebin_YesConfirm;
                         noText = _resx.recyclebin_NoConfirm;
 
@@ -392,22 +468,27 @@ define(['jquery', 'knockout',
                                     viewModel.deletedmodulesList.remove(modulesList[i]);
                                 }
                                 viewModel.selectAllModules(false);
+								logger.warn('<<< Exiting getService()', { "event.action": "getService" });
                             });
                         });
                     }
+					logger.warn('<<< Exiting restoreSelectedModulesHandler()', { "event.action": "restoreSelectedModulesHandler" });
                 }
             };
 
             removeSelectedModulesHandler = function () {
+				logger.error('>>> Entering removeSelectedModulesHandler()', { "event.action": "removeSelectedModulesHandler" });
                 if (_settings.canViewModules && _settings.canManageModules) {
                     var viewModel, modulesList;
 
                     viewModel = getViewModel();
+					logger.error(`removeSelectedModulesHandler(): viewModel → ${viewModel}`, { "event.action": "removeSelectedModulesHandler" });
                     modulesList = getSelectedElements(viewModel.deletedmodulesList());
 
                     if (modulesList.length > 0) {
                         var confirmText, yesText, noText;
                         confirmText = modulesList.length > 1 ? _resx.recyclebin_RemoveModulesConfirm : _resx.recyclebin_RemoveModuleConfirm;
+						logger.debug(`removeSelectedModulesHandler(): confirmText → ${confirmText}`, { "event.action": "removeSelectedModulesHandler" });
                         yesText = _resx.recyclebin_YesConfirm;
                         noText = _resx.recyclebin_NoConfirm;
 
@@ -420,39 +501,47 @@ define(['jquery', 'knockout',
                             });
                         });
                     }
+					logger.warn('<<< Exiting removeSelectedModulesHandler()', { "event.action": "removeSelectedModulesHandler" });
                 }
             };
 
             restoreSelectedUsersHandler = function () {
+				logger.error('>>> Entering restoreSelectedUsersHandler()', { "event.action": "restoreSelectedUsersHandler" });
                 if (_settings.canViewUsers && _settings.canManageUsers) {
                     var usersList, viewModel;
 
                     viewModel = getViewModel();
                     usersList = getSelectedElements(viewModel.deletedusersList());
+					logger.error(`restoreSelectedUsersHandler(): usersList → ${usersList}`, { "event.action": "restoreSelectedUsersHandler" });
 
                     if (usersList.length > 0) {
                         var confirmText, yesText, noText;
                         confirmText = usersList.length > 1 ? _resx.recyclebin_RestoreUsersConfirm : _resx.recyclebin_RestoreUserConfirm;
+						logger.debug(`restoreSelectedUsersHandler(): confirmText → ${confirmText}`, { "event.action": "restoreSelectedUsersHandler" });
                         yesText = _resx.recyclebin_YesConfirm;
                         noText = _resx.recyclebin_NoConfirm;
 
                         _utility.confirm(confirmText, yesText, noText, function () {
                             getService().post('RestoreUser', usersList, userRestoreRevomeOperationsCallback);
                         });
+						logger.warn('<<< Exiting restoreSelectedUsersHandler()', { "event.action": "restoreSelectedUsersHandler" });
                     }
                 }
             };
 
             removeSelectedUsersHandler = function () {
+				logger.error('>>> Entering removeSelectedUsersHandler()', { "event.action": "removeSelectedUsersHandler" });
                 if (_settings.canViewUsers && _settings.canManageUsers) {
                     var viewModel, usersList;
 
                     viewModel = getViewModel();
+					logger.error(`removeSelectedUsersHandler(): viewModel → ${viewModel}`, { "event.action": "removeSelectedUsersHandler" });
                     usersList = getSelectedElements(viewModel.deletedusersList());
 
                     if (usersList.length > 0) {
                         var confirmText, yesText, noText;
                         confirmText = usersList.length > 1 ? _resx.recyclebin_RemoveUsersConfirm : _resx.recyclebin_RemoveUserConfirm;
+						logger.debug(`removeSelectedUsersHandler(): confirmText → ${confirmText}`, { "event.action": "removeSelectedUsersHandler" });
                         yesText = _resx.recyclebin_YesConfirm;
                         noText = _resx.recyclebin_NoConfirm;
 
@@ -465,10 +554,12 @@ define(['jquery', 'knockout',
                             });
                         });
                     }
+					logger.warn('<<< Exiting removeSelectedUsersHandler()', { "event.action": "removeSelectedUsersHandler" });
                 }
             };
 
             userRestoreRevomeOperationsCallback = function (data) {
+				logger.error(`>>> Entering userRestoreRevomeOperationsCallback(data=${data})`, { "event.action": "userRestoreRevomeOperationsCallback", "logrite.data": data });
                 if (data.Status > 0) {
                     // Error: inform
                     _utility.notifyError(data.Message);
@@ -476,9 +567,11 @@ define(['jquery', 'knockout',
                 getDeletedUserList();
                 //CONTENT-4010 - call refresh in person bar
                 $("#showsite").data('need-refresh', true);
+				logger.warn(`<<< Exiting userRestoreRevomeOperationsCallback(data=${data})`, { "event.action": "userRestoreRevomeOperationsCallback", "logrite.data": data });
             };
 
             pageRestoreRevomeOperationsCallback = function (data) {
+				logger.error(`>>> Entering pageRestoreRevomeOperationsCallback(data=${data})`, { "event.action": "pageRestoreRevomeOperationsCallback", "logrite.data": data });
                 if (data.Status > 0) {
                     // Error: inform
                     _utility.notifyError(data.Message);
@@ -486,13 +579,16 @@ define(['jquery', 'knockout',
                 getDeletedPageList();
                 //CONTENT-4010 - call refresh in person bar
                 $("#showsite").data('need-refresh', true);
+				logger.warn(`<<< Exiting pageRestoreRevomeOperationsCallback(data=${data})`, { "event.action": "pageRestoreRevomeOperationsCallback", "logrite.data": data });
             };
 
             restorePageHandler = function (pageData) {
+				logger.error(`>>> Entering restorePageHandler(pageData=${pageData})`, { "event.action": "restorePageHandler", "logrite.pageData": pageData });
                 if (_settings.canViewPages && _settings.canManagePages) {
                     var confirmText, yesText, noText;
 
                     confirmText = _resx.recyclebin_RestorePageConfirm;
+					logger.debug(`restorePageHandler(pageData=${pageData}): confirmText → ${confirmText}`, { "event.action": "restorePageHandler", "logrite.pageData": pageData });
                     yesText = _resx.recyclebin_YesConfirm;
                     noText = _resx.recyclebin_NoConfirm;
 
@@ -501,15 +597,18 @@ define(['jquery', 'knockout',
                         pagesList.push({ id: pageData.id });
                         getService().post('RestorePage', pagesList, pageRestoreRevomeOperationsCallback);
                     });
+					logger.warn(`<<< Exiting restorePageHandler(pageData=${pageData})`, { "event.action": "restorePageHandler", "logrite.pageData": pageData });
                 }
             };
 
             restoreUserHandler = function (userData) {
+				logger.error(`>>> Entering restoreUserHandler(userData=${userData})`, { "event.action": "restoreUserHandler", "logrite.userData": userData });
                 if (_settings.canViewUsers && _settings.canManageUsers) {
 
                     var confirmText, yesText, noText;
 
                     confirmText = _resx.recyclebin_RestoreUserConfirm;
+					logger.debug(`restoreUserHandler(userData=${userData}): confirmText → ${confirmText}`, { "event.action": "restoreUserHandler", "logrite.userData": userData });
                     yesText = _resx.recyclebin_YesConfirm;
                     noText = _resx.recyclebin_NoConfirm;
 
@@ -518,14 +617,17 @@ define(['jquery', 'knockout',
                         usersList.push({ id: userData.Id });
                         getService().post('RestoreUser', usersList, userRestoreRevomeOperationsCallback);
                     });
+					logger.warn(`<<< Exiting restoreUserHandler(userData=${userData})`, { "event.action": "restoreUserHandler", "logrite.userData": userData });
                 }
             };
 
             removePageHandler = function (pageData) {
+				logger.error(`>>> Entering removePageHandler(pageData=${pageData})`, { "event.action": "removePageHandler", "logrite.pageData": pageData });
                 if (_settings.canViewPages && _settings.canManagePages) {
                     var confirmText, yesText, noText;
 
                     confirmText = _resx.recyclebin_RemovePageConfirm;
+					logger.debug(`removePageHandler(pageData=${pageData}): confirmText → ${confirmText}`, { "event.action": "removePageHandler", "logrite.pageData": pageData });
                     yesText = _resx.recyclebin_YesConfirm;
                     noText = _resx.recyclebin_NoConfirm;
 
@@ -539,12 +641,15 @@ define(['jquery', 'knockout',
                         getService().post('RemovePage', pagesList, pageRestoreRevomeOperationsCallback);
                     });
                 }
+				logger.warn(`<<< Exiting removePageHandler(pageData=${pageData})`, { "event.action": "removePageHandler", "logrite.pageData": pageData });
             };
 
             removeUserHandler = function (userData) {
+				logger.error(`>>> Entering removeUserHandler(userData=${userData})`, { "event.action": "removeUserHandler", "logrite.userData": userData });
                 if (_settings.canViewUsers && _settings.canManageUsers) {
                     var viewModel, confirmText, yesText, noText;
                     viewModel = getViewModel();
+					logger.error(`removeUserHandler(userData=${userData}): viewModel → ${viewModel}`, { "event.action": "removeUserHandler", "logrite.userData": userData });
                     confirmText = _resx.recyclebin_RemoveUserConfirm;
                     yesText = _resx.recyclebin_YesConfirm;
                     noText = _resx.recyclebin_NoConfirm;
@@ -558,13 +663,16 @@ define(['jquery', 'knockout',
                             viewModel.deletedusersList.remove(userData);
                         });
                     });
+					logger.warn(`<<< Exiting removeUserHandler(userData=${userData})`, { "event.action": "removeUserHandler", "logrite.userData": userData });
                 }
             };
 
             restoreModuleHandler = function (moduleData, e) {
+				logger.error(`>>> Entering restoreModuleHandler(moduleData=${moduleData},e=${e})`, { "event.action": "restoreModuleHandler", "logrite.moduleData": moduleData, "logrite.e": e });
                 if (_settings.canViewModules && _settings.canManageModules) {
                     var viewModel, confirmText, yesText, noText;
                     viewModel = getViewModel();
+					logger.error(`restoreModuleHandler(moduleData=${moduleData},e=${e}): viewModel → ${viewModel}`, { "event.action": "restoreModuleHandler", "logrite.moduleData": moduleData, "logrite.e": e });
                     confirmText = _resx.recyclebin_RestoreModuleConfirm;
                     yesText = _resx.recyclebin_YesConfirm;
                     noText = _resx.recyclebin_NoConfirm;
@@ -580,13 +688,16 @@ define(['jquery', 'knockout',
                             viewModel.deletedmodulesList.remove(moduleData);
                         });
                     });
+					logger.warn(`<<< Exiting restoreModuleHandler(moduleData=${moduleData},e=${e})`, { "event.action": "restoreModuleHandler", "logrite.moduleData": moduleData, "logrite.e": e });
                 }
             };
 
             removeModuleHandler = function (moduleData, e) {
+				logger.error(`>>> Entering removeModuleHandler(moduleData=${moduleData},e=${e})`, { "event.action": "removeModuleHandler", "logrite.moduleData": moduleData, "logrite.e": e });
                 if (_settings.canViewModules && _settings.canManageModules) {
                     var viewModel, confirmText, yesText, noText;
                     viewModel = getViewModel();
+					logger.error(`removeModuleHandler(moduleData=${moduleData},e=${e}): viewModel → ${viewModel}`, { "event.action": "removeModuleHandler", "logrite.moduleData": moduleData, "logrite.e": e });
                     confirmText = _resx.recyclebin_RemoveModuleConfirm;
                     yesText = _resx.recyclebin_YesConfirm;
                     noText = _resx.recyclebin_NoConfirm;
@@ -602,12 +713,15 @@ define(['jquery', 'knockout',
                             viewModel.deletedmodulesList.remove(moduleData);
                         });
                     });
+					logger.warn(`<<< Exiting removeModuleHandler(moduleData=${moduleData},e=${e})`, { "event.action": "removeModuleHandler", "logrite.moduleData": moduleData, "logrite.e": e });
                 }
             };
 
             emptyRecycleBinHandler = function () {
+				logger.error('>>> Entering emptyRecycleBinHandler()', { "event.action": "emptyRecycleBinHandler" });
                 if (_settings.canEmptyRecycleBin) {
                     var viewModel = getViewModel();
+					logger.error(`emptyRecycleBinHandler(): viewModel → ${viewModel}`, { "event.action": "emptyRecycleBinHandler" });
                     var confirmText = _resx.recyclebin_EmptyRecycleBinConfirm;
                     var deleteText = _resx.recyclebin_DeleteConfirm;
                     var cancelText = _resx.recyclebin_CancelConfirm;
@@ -619,18 +733,22 @@ define(['jquery', 'knockout',
                             viewModel.deletedusersList.removeAll();
                         });
                     });
+					logger.warn('<<< Exiting emptyRecycleBinHandler()', { "event.action": "emptyRecycleBinHandler" });
                 }
             };
 
             setOddEvenOrderInRoots = function (roots) {
+				logger.error(`>>> Entering setOddEvenOrderInRoots(roots=${roots})`, { "event.action": "setOddEvenOrderInRoots", "logrite.roots": roots });
                 var isPreviousElementEven = false;
                 roots.forEach(function (root) {
                     root.even(isPreviousElementEven);
                     isPreviousElementEven = !isPreviousElementEven;
                 });
+				logger.warn(`<<< Exiting setOddEvenOrderInRoots(roots=${roots})`, { "event.action": "setOddEvenOrderInRoots", "logrite.roots": roots });
             };
 
             calculateDepthOfPages = function (pages) {
+				logger.error(`>>> Entering calculateDepthOfPages(pages=${pages})`, { "event.action": "calculateDepthOfPages", "logrite.pages": pages });
                 if (typeof pages === "undefined") {
                     return;
                 }
@@ -638,11 +756,14 @@ define(['jquery', 'knockout',
                 pages.forEach(function (page) {
                     page.calculateDepth();
                 });
+				logger.warn(`<<< Exiting calculateDepthOfPages(pages=${pages})`, { "event.action": "calculateDepthOfPages", "logrite.pages": pages });
             };
 
             getTreesOfPages = function (pages) {
+				logger.error(`>>> Entering getTreesOfPages(pages=${pages})`, { "event.action": "getTreesOfPages", "logrite.pages": pages });
                 var roots, idToNodeMap, parentNode;
                 roots = [];
+				logger.debug(`getTreesOfPages(pages=${pages}): roots → ${roots}`, { "event.action": "getTreesOfPages", "logrite.pages": pages });
                 idToNodeMap = {};
 
                 pages.forEach(function (page) {
@@ -674,16 +795,23 @@ define(['jquery', 'knockout',
             var pageSize=20;
 
             Paginate = function(API_METHOD, viewModelProp, elementId){
+				logger.error(`>>> Entering Paginate(API_METHOD=${API_METHOD},viewModelProp=${viewModelProp},elementId=${elementId})`, { "event.action": "Paginate", "logrite.API_METHOD": API_METHOD, "logrite.viewModelProp": viewModelProp, "logrite.elementId": elementId });
                 var element = $(elementId).jScrollPane();
                 var api = element.data("jsp");
+				logger.error(`Paginate(API_METHOD=${API_METHOD},viewModelProp=${viewModelProp},elementId=${elementId}): element → ${element}`, { "event.action": "Paginate", "logrite.API_METHOD": API_METHOD, "logrite.viewModelProp": viewModelProp, "logrite.elementId": elementId });
+				logger.error(`Paginate(API_METHOD=${API_METHOD},viewModelProp=${viewModelProp},elementId=${elementId}): api → ${api}`, { "event.action": "Paginate", "logrite.API_METHOD": API_METHOD, "logrite.viewModelProp": viewModelProp, "logrite.elementId": elementId });
                 var viewModel = getViewModel();
 
+				logger.error(`Paginate(API_METHOD=${API_METHOD},viewModelProp=${viewModelProp},elementId=${elementId}): viewModel → ${viewModel}`, { "event.action": "Paginate", "logrite.API_METHOD": API_METHOD, "logrite.viewModelProp": viewModelProp, "logrite.elementId": elementId });
                 var compare = TotalResults.hasOwnProperty(viewModelProp)==true
+				logger.error(`Paginate(API_METHOD=${API_METHOD},viewModelProp=${viewModelProp},elementId=${elementId}): compare → ${compare}`, { "event.action": "Paginate", "logrite.API_METHOD": API_METHOD, "logrite.viewModelProp": viewModelProp, "logrite.elementId": elementId });
 
                 TotalResults[viewModelProp] = (compare) ? TotalResults[viewModelProp] : {modelName:viewModelProp, paginationRequestCount:1};
 
                 var currentResultsLessThanTotal = function(){
+					logger.error('>>> Entering currentResultsLessThanTotal()', { "event.action": "currentResultsLessThanTotal" });
                     var comparator = TotalResults[viewModelProp].remainingPages > 0;
+					logger.warn('<<< Exiting currentResultsLessThanTotal()', { "event.action": "currentResultsLessThanTotal" });
                     return comparator;
                 };
 
@@ -744,9 +872,11 @@ define(['jquery', 'knockout',
                         }
                     }
                 });
+				logger.warn(`<<< Exiting Paginate(API_METHOD=${API_METHOD},viewModelProp=${viewModelProp},elementId=${elementId})`, { "event.action": "Paginate", "logrite.API_METHOD": API_METHOD, "logrite.viewModelProp": viewModelProp, "logrite.elementId": elementId });
             };
 
             var initPagination = function() {
+				logger.error('>>> Entering initPagination()', { "event.action": "initPagination" });
                 var tabs = [
                     {apiMethod: "GetDeletedPageList", viewModelProp: "deletedpagesList", elementId:"#pageList" },
                     {apiMethod: "GetDeletedUserList", viewModelProp: "deletedusersList", elementId: "#userList"},
@@ -757,16 +887,21 @@ define(['jquery', 'knockout',
                 tabs.forEach(function(tab){
                     Paginate(tab.apiMethod, tab.viewModelProp, tab.elementId );
                 });
+				logger.warn('<<< Exiting initPagination()', { "event.action": "initPagination" });
             };
 
             getDeletedPageList = function () {
+				logger.error('>>> Entering getDeletedPageList()', { "event.action": "getDeletedPageList" });
                 if (_settings.canViewPages) {
                     var listOfPages, viewModel;
                     var element = $('#pageList').jScrollPane();
+					logger.error(`getDeletedPageList(): element → ${element}`, { "event.action": "getDeletedPageList" });
                     var api = element.data("jsp");
+					logger.error(`getDeletedPageList(): api → ${api}`, { "event.action": "getDeletedPageList" });
 
                     api.scrollToPercentY(0);
                     listOfPages = [];
+					logger.debug(`getDeletedPageList(): listOfPages → ${listOfPages}`, { "event.action": "getDeletedPageList" });
                     viewModel = getViewModel();
                     viewModel.deletedPagesReady(false);
                     viewModel.deletedpagesList.removeAll();
@@ -789,18 +924,23 @@ define(['jquery', 'knockout',
                         viewModel.deletedpagesList(getTreesOfPages(_listOfPages));
                         viewModel.deletedPagesReady(true);
                     });
+				logger.warn('<<< Exiting getDeletedPageList()', { "event.action": "getDeletedPageList" });
                 }
 
             };
 
             getDeletedModuleList = function (isInitCall) {
+				logger.error(`>>> Entering getDeletedModuleList(isInitCall=${isInitCall})`, { "event.action": "getDeletedModuleList", "logrite.isInitCall": isInitCall });
                 if (_settings.canViewModules) {
                     var viewModel = getViewModel();
+					logger.error(`getDeletedModuleList(isInitCall=${isInitCall}): viewModel → ${viewModel}`, { "event.action": "getDeletedModuleList", "logrite.isInitCall": isInitCall });
                     if ((typeof (isInitCall) !== "boolean" || typeof (isInitCall) === "boolean" && !isInitCall) && !viewModel.deletedModulesReady()) {
                         return;
                     }
                     var element = $('#moduleList').jScrollPane();
+					logger.error(`getDeletedModuleList(isInitCall=${isInitCall}): element → ${element}`, { "event.action": "getDeletedModuleList", "logrite.isInitCall": isInitCall });
                     var api = element.data("jsp");
+					logger.error(`getDeletedModuleList(isInitCall=${isInitCall}): api → ${api}`, { "event.action": "getDeletedModuleList", "logrite.isInitCall": isInitCall });
 
                     api.scrollToPercentY(0);
                     viewModel.deletedModulesReady(false);
@@ -824,17 +964,22 @@ define(['jquery', 'knockout',
 
                     });
                 }
+				logger.warn(`<<< Exiting getDeletedModuleList(isInitCall=${isInitCall})`, { "event.action": "getDeletedModuleList", "logrite.isInitCall": isInitCall });
             };
 
 
             getDeletedUserList = function (isInitCall) {
+				logger.error(`>>> Entering getDeletedUserList(isInitCall=${isInitCall})`, { "event.action": "getDeletedUserList", "logrite.isInitCall": isInitCall });
                 if (_settings.canViewUsers) {
                     var viewModel = getViewModel();
+					logger.error(`getDeletedUserList(isInitCall=${isInitCall}): viewModel → ${viewModel}`, { "event.action": "getDeletedUserList", "logrite.isInitCall": isInitCall });
                     if ((typeof (isInitCall) !== "boolean" || typeof (isInitCall) === "boolean" && !isInitCall) && !viewModel.deletedUsersReady()) {
                         return;
                     }
                     var element = $('#userList').jScrollPane();
+					logger.error(`getDeletedUserList(isInitCall=${isInitCall}): element → ${element}`, { "event.action": "getDeletedUserList", "logrite.isInitCall": isInitCall });
                     var api = element.data("jsp");
+					logger.error(`getDeletedUserList(isInitCall=${isInitCall}): api → ${api}`, { "event.action": "getDeletedUserList", "logrite.isInitCall": isInitCall });
 
                     api.scrollToPercentY(0);
 
@@ -855,16 +1000,21 @@ define(['jquery', 'knockout',
                         viewModel.selectAllUsers(false);
                         viewModel.deletedUsersReady(true);
 
+					logger.error('>>> Entering getService()', { "event.action": "getService" });
+					logger.warn('<<< Exiting getService()', { "event.action": "getService" });
                     });
                 }
+				logger.warn(`<<< Exiting getDeletedUserList(isInitCall=${isInitCall})`, { "event.action": "getDeletedUserList", "logrite.isInitCall": isInitCall });
             };
 
             tabActivated = function (event, ui) {
+				logger.error(`>>> Entering tabActivated(event=${event},ui=${ui})`, { "event.action": "tabActivated", "logrite.event": event, "logrite.ui": ui });
                 var panelId = ui.newPanel.attr('id');
                 var activeTab = 0;
                 switch (panelId) {
                     case 'pages':
                         activeTab = 0;
+						logger.error(`tabActivated(event=${event},ui=${ui}): panelId → ${panelId}`, { "event.action": "tabActivated", "logrite.event": event, "logrite.ui": ui });
                         break;
                     case 'modules':
                         activeTab = 1;
@@ -877,9 +1027,11 @@ define(['jquery', 'knockout',
                         break;
                 }
                 getViewModel().activeTab(activeTab);
+				logger.warn(`<<< Exiting tabActivated(event=${event},ui=${ui})`, { "event.action": "tabActivated", "logrite.event": event, "logrite.ui": ui });
             };
 
             sortBy = function (section, type, direction) {
+				logger.error(`>>> Entering sortBy(section=${section},type=${type},direction=${direction})`, { "event.action": "sortBy", "logrite.section": section, "logrite.type": type, "logrite.direction": direction });
                 getViewModel().sortDirection(direction);
                 getViewModel().sortType(type);
                 switch (section) {
@@ -891,11 +1043,13 @@ define(['jquery', 'knockout',
                         break;
                     case "users":
                         getDeletedUserList(false);
+						logger.warn(`<<< Exiting sortBy(section=${section},type=${type},direction=${direction})`, { "event.action": "sortBy", "logrite.section": section, "logrite.type": type, "logrite.direction": direction });
                         break;
                 }
             }
 
             getViewModel = function () {
+				logger.error('>>> Entering getViewModel()', { "event.action": "getViewModel" });
                 if (!_viewModel) {
                     _viewModel = {
                         resx: _resx,
@@ -963,10 +1117,12 @@ define(['jquery', 'knockout',
                     }
                 }
 
+				logger.warn('<<< Exiting getViewModel()', { "event.action": "getViewModel" });
                 return _viewModel;
             };
 
             getService = function () {
+				logger.error('>>> Entering getService()', { "event.action": "getService" });
                 _utility.sf.moduleRoot = "personaBar";
                 _utility.sf.controller = "Recyclebin";
 
@@ -974,15 +1130,20 @@ define(['jquery', 'knockout',
             };
 
             DnnPageRecycleBin.prototype.init = function (wrapper) {
+				logger.error(`>>> Entering init(wrapper=${wrapper})`, { "event.action": "init", "logrite.wrapper": wrapper });
                 _options = $.extend({}, RECYCLE_BIN_DEFAULT_OPTIONS, _options);
                 var viewModel = getViewModel();
                 ko.applyBindings(viewModel, wrapper[0]);
+				logger.error(`init(wrapper=${wrapper}): viewModel → ${viewModel}`, { "event.action": "init", "logrite.wrapper": wrapper });
                 initPagination();
+				logger.warn(`<<< Exiting init(wrapper=${wrapper})`, { "event.action": "init", "logrite.wrapper": wrapper });
             };
 
             DnnPageRecycleBin.prototype.show = function () {
+				logger.error('>>> Entering show()', { "event.action": "show" });
                 getDeletedPageList();
                 getDeletedModuleList(true);
+				logger.warn('<<< Exiting show()', { "event.action": "show" });
                 getDeletedUserList(true);
 
             };

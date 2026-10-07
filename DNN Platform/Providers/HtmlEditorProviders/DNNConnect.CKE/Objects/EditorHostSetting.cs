@@ -15,7 +15,10 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <param name="settingValue">The setting value.</param>
         public EditorHostSetting(string settingName, string settingValue)
         {
+			eventLogger.LogError(">>> Entering EditorHostSetting(settingName={SettingName},settingValue={SettingValue})", settingName, settingValue);
             this.Name = settingName;
+			eventLogger.LogDebug("EditorHostSetting(settingName={SettingName},settingValue={SettingValue}): this.Name → {Arg2}", settingName, settingValue, this.Name);
+        eventLogger.LogWarning("<<< Exiting EditorHostSetting(settingName={SettingName},settingValue={SettingValue})", settingName, settingValue);
             this.Value = settingValue;
         }
 

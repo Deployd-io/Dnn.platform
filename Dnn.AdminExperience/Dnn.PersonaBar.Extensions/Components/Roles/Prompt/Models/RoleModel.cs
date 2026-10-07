@@ -21,9 +21,12 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Models
         public RoleModel(RoleInfo role)
             : base(role)
         {
+			eventLogger.LogError(">>> Entering RoleModel(role={Role})", role);
             this.ModifiedDate = role.LastModifiedOnDate.ToPromptLongDateString();
             this.CreatedDate = role.CreatedOnDate.ToPromptLongDateString();
             this.CreatedBy = role.CreatedByUserID;
+			eventLogger.LogDebug("RoleModel(role={Role}): this.CreatedBy → {Arg1}", role, this.CreatedBy);
+			eventLogger.LogWarning("<<< Exiting RoleModel(role={Role})", role);
             this.Description = role.Description;
         }
 

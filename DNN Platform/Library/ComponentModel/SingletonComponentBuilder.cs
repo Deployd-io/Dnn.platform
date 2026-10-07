@@ -9,6 +9,7 @@ namespace DotNetNuke.ComponentModel
 
     internal class SingletonComponentBuilder : IComponentBuilder
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SingletonComponentBuilder));
         private readonly IServiceProvider serviceProvider;
         private readonly Type type;
         private object instance;
@@ -19,7 +20,11 @@ namespace DotNetNuke.ComponentModel
         /// <param name="type">The type of the component.</param>
         public SingletonComponentBuilder(IServiceProvider serviceProvider, string name, Type type)
         {
+			Logger.LogError(">>> Entering SingletonComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type})", serviceProvider, name, type);
+			Logger.LogDebug("SingletonComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type}): serviceProvider → {ServiceProvider1}", serviceProvider, name, type, serviceProvider);
+        Logger.LogWarning("<<< Exiting SingletonComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type})", serviceProvider, name, type);
             this.Name = name;
+			Logger.LogDebug("SingletonComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type}): this.Name → {Arg3}", serviceProvider, name, type, this.Name);
             this.serviceProvider = serviceProvider;
             this.type = type;
         }
@@ -30,6 +35,8 @@ namespace DotNetNuke.ComponentModel
         /// <inheritdoc />
         public object BuildComponent()
         {
+			Logger.LogError(">>> Entering BuildComponent()");
+            Logger.LogWarning("<<< Exiting BuildComponent()");
             return this.instance ??= Reflection.CreateObject(this.serviceProvider, this.type);
         }
     }

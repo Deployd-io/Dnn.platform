@@ -5,30 +5,42 @@ Imports Microsoft.VisualBasic.CompilerServices
 Imports System
 Imports System.ComponentModel
 Imports System.Web.UI
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     Public Class DNNTabLabel
         Implements IStateManager, IUrlResolutionService
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Protected Sub LoadViewState(ByVal state As Object) Implements IStateManager.LoadViewState
+			_logger.LogError(">>> Entering LoadViewState(state={State})", state)
             If (Not state Is Nothing) Then
                 DirectCast(Me.ViewState, IStateManager).LoadViewState(state)
             End If
+			_logger.LogWarning("<<< Exiting LoadViewState(state={State})", state)
         End Sub
 
         Public Function ResolveClientUrl(ByVal Url As String) As String Implements IUrlResolutionService.ResolveClientUrl
+			_logger.LogError(">>> Entering ResolveClientUrl(Url={Url})", Url)
+			_logger.LogWarning("<<< Exiting ResolveClientUrl(Url={Url})", Url)
             Return Url
         End Function
 
         Protected Function SaveViewState() As Object Implements IStateManager.SaveViewState
+			_logger.LogError(">>> Entering SaveViewState()")
             Dim obj2 As Object = Nothing
             If Not Object.ReferenceEquals(Me.m_oState, Nothing) Then
                 obj2 = DirectCast(Me.m_oState, IStateManager).SaveViewState
+				_logger.LogDebug("SaveViewState(): obj2 → {Obj2}", obj2)
             End If
+			_logger.LogWarning("<<< Exiting SaveViewState()")
             Return obj2
         End Function
 
         Protected Sub TrackViewState() Implements IStateManager.TrackViewState
+			_logger.LogError(">>> Entering TrackViewState()")
+			_logger.LogDebug("TrackViewState(): Me.m_bMarked → {Arg0}", Me.m_bMarked)
+        _logger.LogWarning("<<< Exiting TrackViewState()")
             Me.m_bMarked = True
         End Sub
 

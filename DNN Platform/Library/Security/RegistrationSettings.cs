@@ -12,16 +12,25 @@ namespace DotNetNuke.Security
 
     public class RegistrationSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RegistrationSettings));
         /// <summary>Initializes a new instance of the <see cref="RegistrationSettings"/> class.</summary>
         public RegistrationSettings()
         {
+			Logger.LogError(">>> Entering RegistrationSettings()");
             this.RandomPassword = false;
+			Logger.LogDebug("RegistrationSettings(): this.RandomPassword → {Arg0}", this.RandomPassword);
             this.RedirectAfterRegistration = -1;
             this.RedirectAfterLogout = -1;
+			Logger.LogDebug("RegistrationSettings(): this.RedirectAfterRegistration → {Arg0}", this.RedirectAfterRegistration);
+			Logger.LogDebug("RegistrationSettings(): this.RedirectAfterLogout → {Arg0}", this.RedirectAfterLogout);
             this.RedirectAfterLogin = -1;
             this.RegistrationFields = string.Empty;
             this.ExcludeTerms = string.Empty;
             this.ExcludeTermsRegex = Null.NullString;
+			Logger.LogDebug("RegistrationSettings(): this.RedirectAfterLogin → {Arg0}", this.RedirectAfterLogin);
+			Logger.LogDebug("RegistrationSettings(): this.RegistrationFields → {Arg0}", this.RegistrationFields);
+			Logger.LogDebug("RegistrationSettings(): this.ExcludeTerms → {Arg0}", this.ExcludeTerms);
+			Logger.LogDebug("RegistrationSettings(): this.ExcludeTermsRegex → {Arg0}", this.ExcludeTermsRegex);
             this.RegistrationFormType = 0;
             this.RequirePasswordConfirm = true;
             this.RequireUniqueDisplayName = false;
@@ -30,10 +39,20 @@ namespace DotNetNuke.Security
             this.UseProfanityFilter = false;
             this.RequireValidProfile = false;
             this.RequireValidProfileAtLogin = true;
+			Logger.LogDebug("RegistrationSettings(): this.RegistrationFormType → {Arg0}", this.RegistrationFormType);
+			Logger.LogDebug("RegistrationSettings(): this.RequirePasswordConfirm → {Arg0}", this.RequirePasswordConfirm);
             this.UseCaptcha = false;
             this.UserNameValidator = Globals.glbUserNameRegEx;
             this.DisplayNameFormat = string.Empty;
             this.EmailValidator = Globals.glbEmailRegEx;
+			Logger.LogDebug("RegistrationSettings(): this.UseEmailAsUserName → {Arg0}", this.UseEmailAsUserName);
+			Logger.LogDebug("RegistrationSettings(): this.UseProfanityFilter → {Arg0}", this.UseProfanityFilter);
+			Logger.LogDebug("RegistrationSettings(): this.RequireValidProfile → {Arg0}", this.RequireValidProfile);
+			Logger.LogDebug("RegistrationSettings(): this.RequireValidProfileAtLogin → {Arg0}", this.RequireValidProfileAtLogin);
+			Logger.LogDebug("RegistrationSettings(): this.UseCaptcha → {Arg0}", this.UseCaptcha);
+			Logger.LogDebug("RegistrationSettings(): this.UserNameValidator → {Arg0}", this.UserNameValidator);
+			Logger.LogDebug("RegistrationSettings(): this.DisplayNameFormat → {Arg0}", this.DisplayNameFormat);
+			Logger.LogDebug("RegistrationSettings(): this.EmailValidator → {Arg0}", this.EmailValidator);
         }
 
         /// <summary>Initializes a new instance of the <see cref="RegistrationSettings"/> class.</summary>

@@ -28,13 +28,17 @@ namespace Dnn.PersonaBar.Styles.Services
         [HttpGet]
         public IHttpActionResult GetStyles()
         {
+			eventLogger.LogError(">>> Entering GetStyles()");
             if (!this.CanEdit())
             {
                 return this.Unauthorized();
             }
 
             var repo = new PortalStylesRepository();
+			eventLogger.LogError("GetStyles(): repo → {Repo}", repo);
             var settings = repo.GetSettings(this.PortalId);
+			eventLogger.LogError("GetStyles(): settings → {Settings}", settings);
+			eventLogger.LogWarning("<<< Exiting GetStyles()");
             return this.Ok(settings);
         }
 
@@ -47,6 +51,7 @@ namespace Dnn.PersonaBar.Styles.Services
         [ValidateAntiForgeryToken]
         public IHttpActionResult SaveStyles(PortalStyles settings)
         {
+			eventLogger.LogError(">>> Entering SaveStyles(settings={Settings})", settings);
             if (!this.CanEdit())
             {
                 return this.Unauthorized();
@@ -54,17 +59,24 @@ namespace Dnn.PersonaBar.Styles.Services
 
             // Save to database
             var repo = new PortalStylesRepository();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             repo.SaveSettings(this.PortalId, settings);
 
+			eventLogger.LogError("SaveStyles(settings)={Settings}: save query executed in {Arg1} ms", settings, __logStart.ElapsedMilliseconds);
+			eventLogger.LogError("SaveStyles(settings={Settings}): repo → {Repo}", settings, repo);
             // Clear cache
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.PortalStylesCacheKey, this.PortalId);
+			eventLogger.LogError("SaveStyles(settings={Settings}): cacheKey → {CacheKey}", settings, cacheKey);
             DataCache.RemoveCache(cacheKey);
 
             // Overwrite the file
             var path = $"{this.PortalSettings.HomeSystemDirectoryMapPath}{settings.FileName}";
+			eventLogger.LogError("SaveStyles(settings={Settings}): path → {Path}", settings, path);
             var styles = settings.ToString();
+			eventLogger.LogError("SaveStyles(settings={Settings}): styles → {Styles}", settings, styles);
             File.WriteAllText(path, styles);
 
+			eventLogger.LogWarning("<<< Exiting SaveStyles(settings={Settings})", settings);
             return this.Ok();
         }
 
@@ -76,30 +88,39 @@ namespace Dnn.PersonaBar.Styles.Services
         [ValidateAntiForgeryToken]
         public IHttpActionResult RestoreStyles()
         {
+			eventLogger.LogError(">>> Entering RestoreStyles()");
             if (!this.CanEdit())
             {
                 return this.Unauthorized();
             }
 
             var repo = new PortalStylesRepository();
+			eventLogger.LogError("RestoreStyles(): repo → {Repo}", repo);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var styles = new PortalStyles();
             repo.SaveSettings(this.PortalId, styles);
+			eventLogger.LogError("RestoreStyles(): styles → {Styles}", styles);
+			eventLogger.LogError("RestoreStyles(): save query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
+			eventLogger.LogWarning("<<< Exiting RestoreStyles()");
             return this.Ok(styles);
         }
 
         private bool CanEdit()
         {
+			eventLogger.LogError(">>> Entering CanEdit()");
             if (this.UserInfo.IsSuperUser)
             {
                 return true;
             }
 
             var allowAdminEdits = PortalController.Instance.GetCurrentSettings().GetStyles().AllowAdminEdits;
+			eventLogger.LogError("CanEdit(): allowAdminEdits → {AllowAdminEdits}", allowAdminEdits);
             if (this.UserInfo.IsAdmin && allowAdminEdits)
             {
                 return true;
             }
 
+			eventLogger.LogWarning("<<< Exiting CanEdit()");
             return false;
         }
     }

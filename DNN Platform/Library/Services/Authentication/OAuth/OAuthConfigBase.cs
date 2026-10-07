@@ -15,6 +15,7 @@ namespace DotNetNuke.Services.Authentication.OAuth
     [Serializable]
     public class OAuthConfigBase : AuthenticationConfigBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(OAuthConfigBase));
         private const string CacheKey = "Authentication";
 
         /// <summary>Initializes a new instance of the <see cref="OAuthConfigBase"/> class.</summary>
@@ -23,10 +24,14 @@ namespace DotNetNuke.Services.Authentication.OAuth
         protected OAuthConfigBase(string service, int portalId)
             : base(portalId)
         {
+			Logger.LogError(">>> Entering OAuthConfigBase(service={Service},portalId={PortalId})", service, portalId);
             this.Service = service;
 
+			Logger.LogDebug("OAuthConfigBase(service={Service},portalId={PortalId}): this.Service → {Arg2}", service, portalId, this.Service);
             var portalApiKey = PortalController.GetPortalSetting(this.Service + "_APIKey", portalId, string.Empty);
+			Logger.LogError("OAuthConfigBase(service={Service},portalId={PortalId}): portalApiKey → {PortalApiKey}", service, portalId, portalApiKey);
             var hostApiKey = string.Empty;
+			Logger.LogError("OAuthConfigBase(service={Service},portalId={PortalId}): hostApiKey → {HostApiKey}", service, portalId, hostApiKey);
 
             if (string.IsNullOrEmpty(portalApiKey))
             {
@@ -37,10 +42,13 @@ namespace DotNetNuke.Services.Authentication.OAuth
             {
                 this.HostConfig = false;
             }
+			Logger.LogDebug("OAuthConfigBase(service={Service},portalId={PortalId}): this.HostConfig → {Arg2}", service, portalId, this.HostConfig);
 
             if (this.HostConfig)
             {
+				Logger.LogWarning("<<< Exiting OAuthConfigBase(service={Service},portalId={PortalId})", service, portalId);
                 this.APIKey = hostApiKey;
+				Logger.LogDebug("OAuthConfigBase(service={Service},portalId={PortalId}): this.APIKey → {Arg2}", service, portalId, this.APIKey);
                 this.APISecret = HostController.Instance.GetString(this.Service + "_APISecret", string.Empty);
                 this.Enabled = HostController.Instance.GetBoolean(this.Service + "_Enabled", false);
             }
@@ -64,24 +72,30 @@ namespace DotNetNuke.Services.Authentication.OAuth
 
         public static void ClearConfig(string service, int portalId)
         {
+			Logger.LogError(">>> Entering ClearConfig(service={Service},portalId={PortalId})", service, portalId);
             DataCache.RemoveCache(GetCacheKey(service, portalId));
+			Logger.LogWarning("<<< Exiting ClearConfig(service={Service},portalId={PortalId})", service, portalId);
         }
 
         public static OAuthConfigBase GetConfig(string service, int portalId)
         {
+			Logger.LogError(">>> Entering GetConfig(service={Service},portalId={PortalId})", service, portalId);
             string key = GetCacheKey(service, portalId);
             var config = (OAuthConfigBase)DataCache.GetCache(key);
             if (config == null)
             {
                 config = new OAuthConfigBase(service, portalId);
+				Logger.LogError("GetConfig(service={Service},portalId={PortalId}): config → {Config}", service, portalId, config);
                 DataCache.SetCache(key, config);
             }
 
+			Logger.LogWarning("<<< Exiting GetConfig(service={Service},portalId={PortalId})", service, portalId);
             return config;
         }
 
         public static void UpdateConfig(OAuthConfigBase config)
         {
+			Logger.LogError(">>> Entering UpdateConfig(config={Config})", config);
             if (config.HostConfig)
             {
                 HostController.Instance.Update(config.Service + "_APIKey", config.APIKey, true);
@@ -99,10 +113,13 @@ namespace DotNetNuke.Services.Authentication.OAuth
             }
 
             ClearConfig(config.Service, config.PortalID);
+			Logger.LogWarning("<<< Exiting UpdateConfig(config={Config})", config);
         }
 
         private static string GetCacheKey(string service, int portalId)
         {
+			Logger.LogError(">>> Entering GetCacheKey(service={Service},portalId={PortalId})", service, portalId);
+            Logger.LogWarning("<<< Exiting GetCacheKey(service={Service},portalId={PortalId})", service, portalId);
             return CacheKey + "." + service + "_" + portalId;
         }
     }

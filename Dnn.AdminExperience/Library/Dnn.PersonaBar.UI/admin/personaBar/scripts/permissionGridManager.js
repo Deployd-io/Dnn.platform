@@ -1,4 +1,5 @@
-﻿/*
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+/*
 * @depend jquery.tokeninput
 */
 
@@ -7,55 +8,75 @@
     if (dnn.permissionGridManager) return;
 
     dnn.permissionGridManager = function (serviceUrl, scopeId) {
+		logger.error(`>>> Entering permissionGridManager(serviceUrl=${serviceUrl},scopeId=${scopeId})`, { "event.action": "permissionGridManager", "logrite.serviceUrl": serviceUrl, "logrite.scopeId": scopeId });
         var inputBox = $('#' + scopeId + '_txtUser');
         var userIdsField = $('#' + scopeId + '_hiddenUserIds');
+		logger.error(`permissionGridManager(serviceUrl=${serviceUrl},scopeId=${scopeId}): inputBox → ${inputBox}`, { "event.action": "permissionGridManager", "logrite.serviceUrl": serviceUrl, "logrite.scopeId": scopeId });
+		logger.error(`permissionGridManager(serviceUrl=${serviceUrl},scopeId=${scopeId}): userIdsField → ${userIdsField}`, { "event.action": "permissionGridManager", "logrite.serviceUrl": serviceUrl, "logrite.scopeId": scopeId });
         var init = function () {
             inputBox.tokenInput(serviceUrl, {
 				theme: "facebook",
 				resultsFormatter: function (item) {
+					logger.error(`>>> Entering resultsFormatter(item=${item})`, { "event.action": "resultsFormatter", "logrite.item": item });
+					logger.warn(`<<< Exiting resultsFormatter(item=${item})`, { "event.action": "resultsFormatter", "logrite.item": item });
 				    return "<li class='user'><img src='" + item.iconfile + "' title='" + item.name + "' alt='" + item.name + "' style='width:25px;height:25px;' /><span>" + item.name + "</span></li>";
 				},
 				minChars: 2,
 				preventDuplicates: true,
 				hintText: '',
 				onAdd: function (item) {
+					logger.error(`>>> Entering onAdd(item=${item})`, { "event.action": "onAdd", "logrite.item": item });
 					if (userIdsField.val() === '') {
 					    userIdsField.val(item.id);
 					} else {
 					    var array = userIdsField.val().split(','),
 						index = $.inArray(item.id, array);
+						logger.error(`onAdd(item=${item}): array → ${array}`, { "event.action": "onAdd", "logrite.item": item });
 					    if (index == -1) {
 					        userIdsField.val(userIdsField.val() + ',' + item.id);
+							logger.warn(`<<< Exiting onAdd(item=${item})`, { "event.action": "onAdd", "logrite.item": item });
 					    }
 					}
 				},
 				onDelete: function (item) {
+					logger.error(`>>> Entering onDelete(item=${item})`, { "event.action": "onDelete", "logrite.item": item });
 					var array = userIdsField.val().split(','),
 						id = item.id,
 						index = $.inArray(id, array);
+						logger.error(`onDelete(item=${item}): array → ${array}`, { "event.action": "onDelete", "logrite.item": item });
 					if (index !== -1) {
 					    array.splice(index, 1);
 					    userIdsField.val(array.join(','));
+						logger.warn(`<<< Exiting onDelete(item=${item})`, { "event.action": "onDelete", "logrite.item": item });
 					}
 				},
 				onError: function (xhr, status) {
+					logger.error(`>>> Entering onError(xhr=${xhr},status=${status})`, { "event.action": "onError", "logrite.xhr": xhr, "logrite.status": status });
 					//displayMessage(composeMessageDialog, opts.autoSuggestErrorText + status);
+					logger.warn(`<<< Exiting onError(xhr=${xhr},status=${status})`, { "event.action": "onError", "logrite.xhr": xhr, "logrite.status": status });
 				},
                 onReady: function() {
+					logger.error('>>> Entering onReady()', { "event.action": "onReady" });
                     $('#token-input-' + inputBox.attr('id')).attr('aria-label', 'Token Input');
+					logger.warn('<<< Exiting onReady()', { "event.action": "onReady" });
+				logger.warn('<<< Exiting init()', { "event.action": "init" });
                 }
             });
 
             var roleId = $('#' + scopeId + '_roleField');
+			logger.error(`init(): roleId → ${roleId}`, { "event.action": "init" });
             var roleSelector = $('#' + scopeId + '_cboSelectRole');
+			logger.error(`init(): roleSelector → ${roleSelector}`, { "event.action": "init" });
             roleSelector.change(function () {
                 updateHiddenField();
             });
             updateHiddenField();
 
             function updateHiddenField() {
+				logger.error('>>> Entering updateHiddenField()', { "event.action": "updateHiddenField" });
                 var Id = roleSelector.val();
                 roleId.val(Id);
+				logger.error(`updateHiddenField(): Id → ${Id}`, { "event.action": "updateHiddenField" });
             }
         };
 

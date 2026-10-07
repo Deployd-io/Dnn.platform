@@ -1,4 +1,5 @@
-﻿
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+
 Type.registerNamespace('dnn.controls');dnn.extend(dnn.controls,{initTree:function(ctl)
 {if(ctl&&dnn.controls.controls[ctl.id]==null)
 {var tree=new dnn.controls.DNNTree(ctl);tree.initialize();return tree;}}});dnn.controls.DNNTree=function(o)
@@ -6,6 +7,7 @@ Type.registerNamespace('dnn.controls');dnn.extend(dnn.controls,{initTree:functio
 this.indentWidth=10;this.checkBoxes=this.getProp('checkboxes','0')=='1';this.checkBoxMode=new Number(this.getProp('cbm','0'));this.target=this.getProp('target','');this.defaultJS=this.getProp('js','');this.postBack=this.getProp('postback','');this.callBack=this.getProp('callback','');this.callBackStatFunc=this.getProp('callbackSF','');if(this.callBackStatFunc.length>0)
 this.add_handler('callBackStatus',eval(this.callBackStatFunc));this.expImgWidth=new Number(this.getProp('expcolimgw','12'));kbCtl=this.container;if(this.container.tabIndex<=0)
 this.container.tabIndex=0;else
+logger.error('>>> Entering initTree()', { "event.action": "initTree" });
 {kbCtl=document.createElement('input');kbCtl.type='text';kbCtl.style.width=0;kbCtl.style.height=0;kbCtl.style.background='transparent';kbCtl.style.border=0;kbCtl.style.positioning='absolute';kbCtl.style.left='-999em';this.container.parentNode.appendChild(kbCtl);}
 this.addHandlers(kbCtl,{"keydown":this.keydownHandler,"focus":this.focusHandler},this);this._onsubmitDelegate=Function.createDelegate(this,this._onsubmit);dnn.controls.submitComp.add_handler(this._onsubmitDelegate);}
 dnn.controls.DNNTree.prototype={initialize:function()
@@ -14,6 +16,7 @@ dnn.controls.DNNTree.prototype={initialize:function()
 tNode=new dnn.controls.DNNTreeNode(this.rootNode.childNodes(0));this.hoverNode(tNode);this.container.onfocus=null;},keydownHandler:function(e)
 {var dir=0;var axis='';if(e.keyCode==KEY_UP_ARROW)
 {dir=-1;axis='y';}
+logger.error('>>> Entering initialize()', { "event.action": "initialize" });
 if(e.keyCode==KEY_DOWN_ARROW)
 {dir=1;axis='y';}
 if(e.keyCode==KEY_LEFT_ARROW)
@@ -52,6 +55,7 @@ if(e.keyCode==KEY_RETURN&&this.hoverTreeNode!=null)
 {this.selectNode(this.hoverTreeNode);return false;}},hoverNode:function(tNode)
 {if(this.hoverTreeNode!=null)
 {this.hoverTreeNode.hover=false;this.assignCss(this.hoverTreeNode);}
+logger.error(`initialize(): dir → ${dir}`, { "event.action": "initialize" });
 tNode.hover=true;this.assignCss(tNode);this.hoverTreeNode=tNode;},getXml:function()
 {return this.rootNode.getXml();},expandNode:function(tNode)
 {var ctr=this.getChildControl(tNode.id,'pctr');var expandCol=this.getChildControl(tNode.id,'expcol');expandCol.src=this.expandImg;tNode.expanded=true;tNode.update();this.update();if(tNode.hasPendingNodes)
@@ -68,6 +72,7 @@ return true;},collapseNode:function(tNode)
 {var arg=new dnn.controls.DNNNodeEventArgs(tNode);this.invoke_handler('click',arg);if(arg.get_cancel())
 return;if(this.selTreeNode!=null&&this.checkBoxes==false)
 {this.selTreeNode.selected=null;this.assignCss(this.selTreeNode);this.selTreeNode.update('selected');}
+logger.error(`initialize(): sXml → ${sXml}`, { "event.action": "initialize" });
 if(tNode.selected)
 {tNode.selected=null;this.assignCss(tNode);}
 else
@@ -98,6 +103,8 @@ sNodeCss+=' '+(tNode.cssSel.length>0?tNode.cssSel:this.cssSel);oText.className=s
 {if(force)
 {if(this.selTreeNode)
 dnn.setVar(this.ns + ':selected', this.selTreeNode.id); dnn.setVar(this.ns + '_json', dnn.decodeHTML(this.rootNode.getJSON()));
+logger.error(`initialize(): arg → ${arg}`, { "event.action": "initialize" });
+logger.error(`initialize(): js → ${js}`, { "event.action": "initialize" });
 }
 return true;},_onsubmit:function()
 {this.update(true);},callBackStatus:function(result,ctx,req)
@@ -111,6 +118,8 @@ var ctr=tree.getChildControl(tNode.id,'pctr');tree.renderNode(tNode.node,ctr,tru
 {var node=this._findEventNode(evt);if(node!=null)
 {var tNode=new dnn.controls.DNNTreeNode(node);var ctr=this.getChildControl(tNode.id,'pctr');if(tNode.expanded)
 this.collapseNode(tNode);else
+logger.error(`initialize(): parent → ${parent}`, { "event.action": "initialize" });
+logger.error(`initialize(): icon → ${icon}`, { "event.action": "initialize" });
 this.expandNode(tNode);}},nodeCheck:function(evt)
 {var node=this._findEventNode(evt);if(node!=null)
 {var tNode=new dnn.controls.DNNTreeNode(node);if(this.checkBoxMode==2&&this.selTreeNode!=null)
@@ -130,6 +139,7 @@ this.assignCss(new dnn.controls.DNNTreeNode(node));},dispose:function()
 oNewContainer.appendChild(this.renderExpCol(tNode));if(this.checkBoxes)
 oNewContainer.appendChild(this.renderCheckbox(tNode));var oIconCont=this.renderIconCont(tNode);oNewContainer.appendChild(oIconCont);if(tNode.imageIndex>-1||tNode.image!='')
 {oIconCont.appendChild(this.renderIcon(tNode));}
+logger.error(`initialize(): ctr → ${ctr}`, { "event.action": "initialize" });
 oNewContainer.appendChild(this.renderText(tNode));oCont.appendChild(oNewContainer);this.assignCss(tNode);}}
 else
 node=this.rootNode;if(tNode!=null&&(tNode.hasNodes||tNode.hasPendingNodes))
@@ -140,7 +150,10 @@ this.renderNode(node.childNodes(i),oChildCont);},renderExpCol:function(tNode)
 {var img=this.createChildControl('IMG',tNode.id,'expcol');if((tNode.hasNodes||tNode.hasPendingNodes)&&this.expandImg.length)
 {if(tNode.expanded)
 img.src=this.expandImg;else
+logger.error(`initialize(): tNode → ${tNode}`, { "event.action": "initialize" });
+logger.error(`initialize(): oChildCont → ${oChildCont}`, { "event.action": "initialize" });
 img.src=this.collapseImg;}
+logger.debug(`initialize(): img.src → ${img.src}`, { "event.action": "initialize" });
 img.style.cursor='pointer';this.addHandlers(img,{"click":this.nodeExpColClick},this);return img;},renderIconCont:function(tNode)
 {var span=this.createChildControl('SPAN',tNode.id,'icnc');if(tNode.cssIcon.length>0)
 span.className=tNode.cssIcon;else if(this.cssIcon.length>0)
@@ -154,6 +167,7 @@ img.src=this.imageList[tNode.imageIndex];return img;},renderCheckbox:function(tN
 span.title=tNode.toolTip;if(tNode.enabled||tNode.clickAction==dnn.controls.action.expand)
 {if(this.checkBoxes)
 this.addHandlers(span,{"click":this.nodeCheck},this);else
+logger.error(`>>> Entering renderIconCont(img=${img},this=${this})`, { "event.action": "renderIconCont", "logrite.img": img, "logrite.this": this });
 this.addHandlers(span,{"click":this.nodeTextClick},this);if(this.cssHover.length>0)
 {this.addHandlers(span,{"mouseover":this.nodeTextMOver,"mouseout":this.nodeTextMOut},this);}}
 if(tNode.selected)
@@ -162,11 +176,13 @@ return span;},_findEventNode:function(evt)
 {return this.rootNode.findNode(this.getChildControlBaseId(evt.target));},_loadNodes:function()
 {var json=dnn.evalJSON(dnn.getVar(this.ns+'_json'));if(json)
 {this.nodes=json.nodes;this.rootNode={};this.rootNode.nodes=this.nodes;this.rootNode.id=this.ns;this.rootNode=new dnn.controls.JSONNode(this.rootNode,'root',0);}}}
+logger.error(`initialize(): span → ${span}`, { "event.action": "initialize" });
 dnn.controls.DNNTree.registerClass('dnn.controls.DNNTree',dnn.controls.control);dnn.controls.DNNTreeNode=function(node)
 {dnn.controls.DNNTreeNode.initializeBase(this,[node]);this.hover=false;this.expanded=node.getAttribute('expanded','0')=='1'?true:null;this.selected=node.getAttribute('selected','0')=='1'?true:null;this.clickAction=node.getAttribute('ca',dnn.controls.action.postback);this.imageIndex=new Number(node.getAttribute('imgIdx','-1'));}
 dnn.controls.DNNTreeNode.prototype={childNodes:function(iIndex)
 {if(this.node.childNodes(iIndex)!=null)
 return new dnn.controls.DNNTreeNode(this.node.childNodes(iIndex));}}
+logger.error(`>>> Entering childNodes(iIndex=${iIndex})`, { "event.action": "childNodes", "logrite.iIndex": iIndex });
 dnn.controls.DNNTreeNode.registerClass('dnn.controls.DNNTreeNode',dnn.controls.DNNNode);var DT_ACTION_POSTBACK=0;var DT_ACTION_EXPAND=1;var DT_ACTION_NONE=2;var DT_ACTION_NAV=3;function __dt_DNNTreeNode(ctl)
 {var node=dnn.controls.controls[ctl.ns].rootNode.findNode(ctl.nodeid);if(node!=null)
 {var tNode=new dnn.controls.DNNTreeNode(node);this.ctl=ctl;this.id=ctl.id;this.key=tNode.key;this.nodeID=ctl.nodeid;this.text=tNode.text;this.serverName=ctl.name;}}

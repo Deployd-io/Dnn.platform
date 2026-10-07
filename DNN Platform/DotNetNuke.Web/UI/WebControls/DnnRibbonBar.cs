@@ -17,6 +17,7 @@ namespace DotNetNuke.Web.UI.WebControls
     [ParseChildren(true)]
     public class DnnRibbonBar : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnRibbonBar));
         private readonly IClientResourceController clientResourceController;
 
         /// <summary>Initializes a new instance of the <see cref="DnnRibbonBar"/> class.</summary>
@@ -24,6 +25,7 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnRibbonBar()
             : this(null)
         {
+		Logger.LogError(">>> Entering DnnRibbonBar()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnRibbonBar"/> class.</summary>
@@ -32,8 +34,11 @@ namespace DotNetNuke.Web.UI.WebControls
             : base("div")
         {
             this.clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
+			Logger.LogWarning("<<< Exiting DnnRibbonBar(clientResourceController={ClientResourceController})", clientResourceController);
+			Logger.LogDebug("DnnRibbonBar(clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", clientResourceController, clientResourceController);
 
             this.CssClass = "dnnRibbon";
+			Logger.LogDebug("DnnRibbonBar(clientResourceController={ClientResourceController}): this.CssClass → {Arg1}", clientResourceController, this.CssClass);
             Control control = this;
             Utilities.ApplyControlSkin(this.clientResourceController, control, "RibbonBar", "RibbonBar");
         }
@@ -47,12 +52,15 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void AddParsedSubObject(object obj)
         {
+			Logger.LogError(">>> Entering AddParsedSubObject(obj={Obj})", obj);
             if (obj is DnnRibbonBarGroup)
             {
                 base.AddParsedSubObject(obj);
             }
             else
             {
+				Logger.LogError("Throwing NotSupportedException from AddParsedSubObject(obj={Obj})", obj);
+			Logger.LogWarning("<<< Exiting AddParsedSubObject(obj={Obj})", obj);
                 throw new NotSupportedException("DnnRibbonBarGroupCollection must contain controls of type DnnRibbonBarGroup");
             }
         }
@@ -60,22 +68,27 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override ControlCollection CreateControlCollection()
         {
+			Logger.LogError(">>> Entering CreateControlCollection()");
+            Logger.LogWarning("<<< Exiting CreateControlCollection()");
             return new DnnRibbonBarGroupCollection(this);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
             if (this.Visible)
             {
                 Utilities.ApplyControlSkin(this.clientResourceController, this, "RibbonBar", "RibbonBar");
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering Render(writer={Writer})", writer);
             if (this.Groups.Count > 0)
             {
                 var firstGroup = this.Groups[0];
@@ -124,6 +137,7 @@ namespace DotNetNuke.Web.UI.WebControls
             writer.RenderEndTag();
 
             this.RenderEndTag(writer);
+			Logger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

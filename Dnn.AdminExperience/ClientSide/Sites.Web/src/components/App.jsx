@@ -9,24 +9,30 @@ import {
 import { PersonaBarPage } from "@dnnsoftware/dnn-react-common";
 import { ExportPortal } from "dnn-sites-common-components";
 import CreatePortal from "./CreatePortal";
+const logger = console;
 
 class App extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             editMode: false,
             portalBeingExported: {}
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     onAddNewSite(event) {
+		logger.error(`>>> Entering onAddNewSite(event=${event})`, { "event.action": "onAddNewSite", "logrite.event": event });
         event.preventDefault();
         this.navigateMap(1);
+		logger.warn(`<<< Exiting onAddNewSite(event=${event})`, { "event.action": "onAddNewSite", "logrite.event": event });
     }
 
     onEditSite() {}
 
     onExportPortal(portalBeingExported) {
+		logger.error(`>>> Entering onExportPortal(portalBeingExported=${portalBeingExported})`, { "event.action": "onExportPortal", "logrite.portalBeingExported": portalBeingExported });
         const { props } = this;
         props.dispatch(
             CommonExportPortalActions.setPortalBeingExported(
@@ -34,23 +40,30 @@ class App extends Component {
                 this.navigateMap.bind(this, 2)
             )
         );
+		logger.warn(`<<< Exiting onExportPortal(portalBeingExported=${portalBeingExported})`, { "event.action": "onExportPortal", "logrite.portalBeingExported": portalBeingExported });
     }
 
     navigateMap(page) {
+		logger.error(`>>> Entering navigateMap(page=${page})`, { "event.action": "navigateMap", "logrite.page": page });
         const { props } = this;
         props.dispatch(CommonVisiblePanelActions.selectPanel(page));
+		logger.warn(`<<< Exiting navigateMap(page=${page})`, { "event.action": "navigateMap", "logrite.page": page });
     }
 
     cancelExport(event) {
+		logger.error(`>>> Entering cancelExport(event=${event})`, { "event.action": "cancelExport", "logrite.event": event });
         if (event !== undefined) event.preventDefault();
         this.setState({
             portalBeingExported: {}
         });
         this.navigateMap(0);
+		logger.warn(`<<< Exiting cancelExport(event=${event})`, { "event.action": "cancelExport", "logrite.event": event });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="sites-Root">
                 <PersonaBarPage
@@ -83,6 +96,8 @@ App.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         selectedPage: state.visiblePanel.selectedPage,
         selectedPageVisibleIndex: state.visiblePanel.selectedPageVisibleIndex,

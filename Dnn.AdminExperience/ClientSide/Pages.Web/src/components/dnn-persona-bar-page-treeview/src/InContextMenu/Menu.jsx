@@ -1,9 +1,12 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import "./style.less";
+const logger = console;
 
 class Menu extends Component {
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <ul className="dnn-in-context-menu menu">
                 {this.props.children}

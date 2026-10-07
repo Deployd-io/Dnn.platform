@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -33,9 +34,11 @@
 
     var result = [];
     function add(keywords) {
+	logger.error(`>>> Entering add(keywords=${keywords})`, { "event.action": "add", "logrite.keywords": keywords });
       for (var name in keywords)
         if (!word || name.lastIndexOf(word, 0) == 0)
           result.push(name);
+		logger.warn(`<<< Exiting add(keywords=${keywords})`, { "event.action": "add", "logrite.keywords": keywords });
     }
 
     var st = inner.state.state;

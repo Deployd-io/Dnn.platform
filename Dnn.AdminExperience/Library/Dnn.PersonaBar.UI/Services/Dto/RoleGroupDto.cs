@@ -14,10 +14,15 @@ namespace Dnn.PersonaBar.UI.Services.DTO
     [Serializable]
     public class RoleGroupDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RoleGroupDto));
         /// <summary>Initializes a new instance of the <see cref="RoleGroupDto"/> class.</summary>
         public RoleGroupDto()
         {
+			Logger.LogError(">>> Entering RoleGroupDto()");
             this.Id = -2;
+			Logger.LogDebug("RoleGroupDto(): Id → {Id}", Id);
+        Logger.LogDebug("RoleGroupDto(): this.Id → {Arg0}", this.Id);
+        Logger.LogWarning("<<< Exiting RoleGroupDto()");
         }
 
         /// <summary>Gets or sets the role group ID.</summary>
@@ -41,6 +46,7 @@ namespace Dnn.PersonaBar.UI.Services.DTO
         /// <returns>A new <see cref="RoleGroupDto"/> instance.</returns>
         public static RoleGroupDto FromRoleGroupInfo(RoleGroupInfo roleGroup)
         {
+			Logger.LogError(">>> Entering FromRoleGroupInfo(roleGroup={RoleGroup})", roleGroup);
             return new RoleGroupDto()
             {
                 Id = roleGroup.RoleGroupID,
@@ -54,6 +60,8 @@ namespace Dnn.PersonaBar.UI.Services.DTO
         /// <returns>A new <see cref="RoleGroupInfo"/> instance.</returns>
         public RoleGroupInfo ToRoleGroupInfo()
         {
+			Logger.LogError(">>> Entering ToRoleGroupInfo()");
+			Logger.LogWarning("<<< Exiting ToRoleGroupInfo()");
             return new RoleGroupInfo()
             {
                 RoleGroupID = this.Id,

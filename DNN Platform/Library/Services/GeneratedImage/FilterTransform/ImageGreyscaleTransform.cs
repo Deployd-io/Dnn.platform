@@ -10,12 +10,17 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
     /// <summary>Grey Scale ImageTransform class.</summary>
     public class ImageGreyScaleTransform : ImageTransform
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImageGreyscaleTransform));
         /// <summary>Initializes a new instance of the <see cref="ImageGreyScaleTransform"/> class.</summary>
         public ImageGreyScaleTransform()
         {
+			Logger.LogError(">>> Entering ImageGreyScaleTransform()");
             this.InterpolationMode = InterpolationMode.HighQualityBicubic;
+			Logger.LogDebug("ImageGreyScaleTransform(): this.InterpolationMode → {Arg0}", this.InterpolationMode);
             this.SmoothingMode = SmoothingMode.HighQuality;
             this.PixelOffsetMode = PixelOffsetMode.HighQuality;
+			Logger.LogDebug("ImageGreyScaleTransform(): this.SmoothingMode → {Arg0}", this.SmoothingMode);
+        Logger.LogWarning("<<< Exiting ImageGreyScaleTransform()");
             this.CompositingQuality = CompositingQuality.HighQuality;
         }
 
@@ -24,20 +29,25 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
         /// <returns>Image result after image transformation.</returns>
         public override Image ProcessImage(Image image)
         {
+			Logger.LogError(">>> Entering ProcessImage(image={Image})", image);
             var temp = (Bitmap)image;
             var bmap = (Bitmap)temp.Clone();
+			Logger.LogError("ProcessImage(image={Image}): bmap → {Bmap}", image, bmap);
             Color c;
             for (int i = 0; i < bmap.Width; i++)
             {
                 for (int j = 0; j < bmap.Height; j++)
                 {
                     c = bmap.GetPixel(i, j);
+					Logger.LogError("ProcessImage(image={Image}): c → {C}", image, c);
                     byte gray = (byte)((.299 * c.R) + (.587 * c.G) + (.114 * c.B));
+					Logger.LogError("ProcessImage(image={Image}): gray → {Gray}", image, gray);
 
                     bmap.SetPixel(i, j, Color.FromArgb(gray, gray, gray));
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ProcessImage(image={Image})", image);
             return (Bitmap)bmap.Clone();
         }
     }

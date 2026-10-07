@@ -41,6 +41,8 @@ namespace log4net.DateFormatter
         /// </remarks>
         public Iso8601DateFormatter()
         {
+		value.LogError(">>> Entering Iso8601DateFormatter()");
+        value.LogWarning("<<< Exiting Iso8601DateFormatter()");
         }
 
         /// <summary>Formats the date without the milliseconds part</summary>
@@ -57,6 +59,7 @@ namespace log4net.DateFormatter
         /// </remarks>
         protected override void FormatDateWithoutMillis(DateTime dateToFormat, StringBuilder buffer)
         {
+			value.LogError(">>> Entering FormatDateWithoutMillis(dateToFormat={DateToFormat},buffer={Buffer})", dateToFormat, buffer);
             buffer.Append(dateToFormat.Year);
 
             buffer.Append('-');
@@ -78,6 +81,7 @@ namespace log4net.DateFormatter
 
             // Append the 'HH:mm:ss'
             base.FormatDateWithoutMillis(dateToFormat, buffer);
+			value.LogWarning("<<< Exiting FormatDateWithoutMillis(dateToFormat={DateToFormat},buffer={Buffer})", dateToFormat, buffer);
         }
     }
 }

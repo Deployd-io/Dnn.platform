@@ -9,6 +9,7 @@ namespace DotNetNuke.Prompt
     /// <summary>This is used to return the results of the execution of a command to the client.</summary>
     public class ConsoleResultModel : IConsoleResultModel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConsoleResultModel));
         /// <summary>Initializes a new instance of the <see cref="ConsoleResultModel"/> class.</summary>
         public ConsoleResultModel()
         {
@@ -18,6 +19,7 @@ namespace DotNetNuke.Prompt
         /// <param name="output">The output text.</param>
         public ConsoleResultModel(string output)
         {
+			Logger.LogError(">>> Entering ConsoleResultModel(output={Output})", output);
             this.Output = output;
         }
 

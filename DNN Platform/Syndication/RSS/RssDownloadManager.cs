@@ -25,12 +25,17 @@ namespace DotNetNuke.Services.Syndication
 
         private RssDownloadManager()
         {
+			Logger.LogError(">>> Entering RssDownloadManager()");
             // create in-memory cache
             this.cache = new Dictionary<string, RssChannelDom>();
+			Logger.LogDebug("RssDownloadManager(): cache → {Cache}", cache);
 
             this.defaultTtlMinutes = 2;
+			Logger.LogDebug("RssDownloadManager(): defaultTtlMinutes → {DefaultTtlMinutes}", defaultTtlMinutes);
+			Logger.LogDebug("RssDownloadManager(): this.defaultTtlMinutes → {Arg0}", this.defaultTtlMinutes);
 
             // prepare disk directory
+			Logger.LogWarning("<<< Exiting RssDownloadManager()");
             this.directoryOnDisk = PrepareTempDir();
         }
 
@@ -39,11 +44,14 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>The RSS feed, or an empty RSS feed if there's an error loading it.</returns>
         public static RssChannelDom GetChannel(string url)
         {
+			Logger.LogError(">>> Entering GetChannel(url={Url})", url);
+            Logger.LogWarning("<<< Exiting GetChannel(url={Url})", url);
             return TheManager.GetChannelDom(url);
         }
 
         private static int GetTtlFromString(string ttlString, int defaultTtlMinutes)
         {
+			Logger.LogError(">>> Entering GetTtlFromString(ttlString={TtlString},defaultTtlMinutes={DefaultTtlMinutes})", ttlString, defaultTtlMinutes);
             if (!string.IsNullOrEmpty(ttlString))
             {
                 int ttlMinutes;
@@ -56,13 +64,16 @@ namespace DotNetNuke.Services.Syndication
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetTtlFromString(ttlString={TtlString},defaultTtlMinutes={DefaultTtlMinutes})", ttlString, defaultTtlMinutes);
             return defaultTtlMinutes;
         }
 
         private static string PrepareTempDir()
         {
+			Logger.LogError(">>> Entering PrepareTempDir()");
             string tempDir = null;
 
+			Logger.LogError("PrepareTempDir(): tempDir → {TempDir}", tempDir);
             try
             {
                 string d = HttpContext.Current.Server.MapPath(Settings.CacheRoot + RSSDir);
@@ -76,29 +87,38 @@ namespace DotNetNuke.Services.Syndication
             }
             catch
             {
+				Logger.LogError("Exception in PrepareTempDir(): {Arg0}", ex.Message);
                 // don't cache on disk if can't do it
             }
 
+			Logger.LogWarning("<<< Exiting PrepareTempDir()");
             return tempDir;
         }
 
         private static string GetTempFileNamePrefixFromUrl(string url)
         {
+			Logger.LogError(">>> Entering GetTempFileNamePrefixFromUrl(url={Url})", url);
             try
             {
                 var uri = new Uri(url);
+				Logger.LogError("GetTempFileNamePrefixFromUrl(url={Url}): uri → {Uri}", url, uri);
                 return $"{uri.Host.Replace('.', '_')}_{uri.AbsolutePath.GetHashCode():x8}";
             }
             catch
             {
+				Logger.LogError("Exception in GetTempFileNamePrefixFromUrl(url={Url}): {Arg1}", url, ex.Message);
+				Logger.LogWarning("<<< Exiting GetTempFileNamePrefixFromUrl(url={Url})", url);
                 return "rss";
             }
         }
 
         private RssChannelDom DownloadChannelDom(string url)
         {
+			Logger.LogError(">>> Entering DownloadChannelDom(url={Url})", url);
+            var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // look for disk cache first
             RssChannelDom dom = this.TryLoadFromDisk(url);
+			Logger.LogError("DownloadChannelDom(url={Url}): dom → {Dom}", url, dom);
 
             if (dom != null)
             {
@@ -122,17 +142,22 @@ namespace DotNetNuke.Services.Syndication
             string ttlString = null;
             dom.Channel.TryGetValue("ttl", out ttlString);
             int ttlMinutes = GetTtlFromString(ttlString, this.defaultTtlMinutes);
+			Logger.LogError("DownloadChannelDom(url={Url}): ttlMinutes → {TtlMinutes}", url, ttlMinutes);
             DateTime utcExpiry = DateTime.UtcNow.AddMinutes(ttlMinutes);
+			Logger.LogError("DownloadChannelDom(url={Url}): utcExpiry → {UtcExpiry}", url, utcExpiry);
             dom.SetExpiry(utcExpiry);
 
             // save to disk
             this.TrySaveToDisk(doc, url, utcExpiry);
 
+			Logger.LogError("DownloadChannelDom(url)={Url}: external service call {Url1} took {Arg2} ms", url, url, __logStart.ElapsedMilliseconds);
+			Logger.LogWarning("<<< Exiting DownloadChannelDom(url={Url})", url);
             return dom;
         }
 
         private RssChannelDom TryLoadFromDisk(string url)
         {
+			Logger.LogError(">>> Entering TryLoadFromDisk(url={Url})", url);
             if (this.directoryOnDisk == null)
             {
                 return null; // no place to cache
@@ -147,9 +172,13 @@ namespace DotNetNuke.Services.Syndication
             foreach (string rssFilename in files)
             {
                 XmlDocument rssDoc = null;
+				Logger.LogError("TryLoadFromDisk(url={Url}): rssDoc → {RssDoc}", url, rssDoc);
                 bool isRssFileValid = false;
+				Logger.LogError("TryLoadFromDisk(url={Url}): isRssFileValid → {IsRssFileValid}", url, isRssFileValid);
                 DateTime utcExpiryFromRssFile = DateTime.MinValue;
+				Logger.LogError("TryLoadFromDisk(url={Url}): utcExpiryFromRssFile → {UtcExpiryFromRssFile}", url, utcExpiryFromRssFile);
                 string urlFromRssFile = null;
+				Logger.LogError("TryLoadFromDisk(url={Url}): urlFromRssFile → {UrlFromRssFile}", url, urlFromRssFile);
 
                 try
                 {
@@ -179,6 +208,7 @@ namespace DotNetNuke.Services.Syndication
                 }
                 catch
                 {
+					Logger.LogError("Exception in TryLoadFromDisk(url={Url}): {Arg1}", url, ex.Message);
                     // error processing one file shouldn't stop processing other files
                 }
 
@@ -203,17 +233,20 @@ namespace DotNetNuke.Services.Syndication
                 {
                     // found a good one - create DOM and set expiry (as found on disk)
                     RssChannelDom dom = RssXmlHelper.ParseChannelXml(rssDoc);
+					Logger.LogError("TryLoadFromDisk(url={Url}): dom → {Dom}", url, dom);
                     dom.SetExpiry(utcExpiryFromRssFile);
                     return dom;
                 }
             }
 
             // not found
+			Logger.LogWarning("<<< Exiting TryLoadFromDisk(url={Url})", url);
             return null;
         }
 
         private void TrySaveToDisk(XmlDocument doc, string url, DateTime utcExpiry)
         {
+			Logger.LogError(">>> Entering TrySaveToDisk(doc={Doc},url={Url},utcExpiry={UtcExpiry})", doc, url, utcExpiry);
             if (this.directoryOnDisk == null)
             {
                 return;
@@ -229,14 +262,18 @@ namespace DotNetNuke.Services.Syndication
             }
             catch
             {
+				Logger.LogError("Exception in TrySaveToDisk(doc={Doc},url={Url},utcExpiry={UtcExpiry}): {Arg3}", doc, url, utcExpiry, ex.Message);
                 // can't save to disk - not a problem
             }
+			Logger.LogWarning("<<< Exiting TrySaveToDisk(doc={Doc},url={Url},utcExpiry={UtcExpiry})", doc, url, utcExpiry);
         }
 
         private RssChannelDom GetChannelDom(string url)
         {
+			Logger.LogError(">>> Entering GetChannelDom(url={Url})", url);
             RssChannelDom dom = null;
 
+			Logger.LogError("GetChannelDom(url={Url}): dom → {Dom}", url, dom);
             lock (this.cache)
             {
                 if (this.cache.TryGetValue(url, out dom))
@@ -259,6 +296,7 @@ namespace DotNetNuke.Services.Syndication
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetChannelDom(url={Url})", url);
             return dom;
         }
     }

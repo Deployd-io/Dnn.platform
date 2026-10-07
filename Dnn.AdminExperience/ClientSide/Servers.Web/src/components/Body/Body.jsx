@@ -18,11 +18,14 @@ import PerformanceTab from "../Tabs/Performance/Index";
 import LogsTab from "../Tabs/Logs";
 import application from "../../globals/application";
 import utils from "../../utils";
+const logger = console;
 
 class Body extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.handleSelect = this.handleSelect.bind(this);
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     handleSelect(index) {
@@ -47,19 +50,24 @@ class Body extends Component {
     }
 
     getInteger(value) {
+		logger.error(`>>> Entering getInteger(value=${value})`, { "event.action": "getInteger", "logrite.value": value });
         if (value === 0) {
             return 0;
         }
         if (value) {
             return parseInt(value.toString());
         }
+		logger.warn(`<<< Exiting getInteger(value=${value})`, { "event.action": "getInteger", "logrite.value": value });
         return value;
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
         const isHost = utils.isHostUser();
+		logger.error(`render(): isHost → ${isHost}`, { "event.action": "render" });
         let registeredTabs = application.getRegisteredServerTabs();
+		logger.error(`render(): registeredTabs → ${registeredTabs}`, { "event.action": "render" });
         if (!isHost) {
             registeredTabs = registeredTabs.filter(function (tab) {
                 return !tab.isHostOnlyVisible;
@@ -156,6 +164,7 @@ class Body extends Component {
         this.insertElementsInArray(
             serverSettingsTabBody,
             registeredTabs.filter(function (tab) {
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
                 return tab.parentIndex === 1;
             }),
             "order",
@@ -184,6 +193,8 @@ Body.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         applicationInfo: state.applicationTab.applicationInfo,
         tabIndex: state.pagination.tabIndex,

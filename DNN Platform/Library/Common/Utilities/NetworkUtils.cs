@@ -26,6 +26,7 @@ namespace DotNetNuke.Common.Utils
     /// <summary>Utility functions for network information.</summary>
     public class NetworkUtils
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NetworkUtils));
         /// <summary>Gets the address.</summary>
         /// <param name="host">The host.</param>
         /// <param name="addressFormat">The address format.</param>
@@ -33,7 +34,9 @@ namespace DotNetNuke.Common.Utils
         /// <seealso cref="AddressType" />
         public static string GetAddress(string host, AddressType addressFormat)
         {
+			Logger.LogError(">>> Entering GetAddress(host={Host},addressFormat={AddressFormat})", host, addressFormat);
             AddressFamily addrFamily = AddressFamily.InterNetwork;
+			Logger.LogError("GetAddress(host={Host},addressFormat={AddressFormat}): addrFamily → {AddrFamily}", host, addressFormat, addrFamily);
             switch (addressFormat)
             {
                 case AddressType.IPv4:
@@ -45,6 +48,7 @@ namespace DotNetNuke.Common.Utils
             }
 
             IPHostEntry entry = Dns.GetHostEntry(host);
+			Logger.LogError("GetAddress(host={Host},addressFormat={AddressFormat}): entry → {Entry}", host, addressFormat, entry);
             if (host != entry.HostName)
             {
                 entry = Dns.GetHostEntry(entry.HostName);
@@ -58,6 +62,7 @@ namespace DotNetNuke.Common.Utils
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetAddress(host={Host},addressFormat={AddressFormat})", host, addressFormat);
             return string.Empty;
         }
 
@@ -66,11 +71,13 @@ namespace DotNetNuke.Common.Utils
         /// <returns>IP Address in long.</returns>
         public static long IPtoLong(IPAddress ip)
         {
+			Logger.LogError(">>> Entering IPtoLong(ip={Ip})", ip);
             // convert IP to number
             byte[] addressBytes = ip.GetAddressBytes();
 
             // get the octets
             long addr = 0;
+			Logger.LogError("IPtoLong(ip={Ip}): addr → {Addr}", ip, addr);
 
             // accumulator for address
             for (int x = 0; x <= 3; x++)
@@ -78,6 +85,7 @@ namespace DotNetNuke.Common.Utils
                 addr = addr | (Convert.ToInt64(addressBytes[x]) << ((3 - x) * 8));
             }
 
+			Logger.LogWarning("<<< Exiting IPtoLong(ip={Ip})", ip);
             return addr;
         }
 
@@ -86,6 +94,7 @@ namespace DotNetNuke.Common.Utils
         /// <returns>IP Number as formatted string.</returns>
         public static string LongToIp(long ip)
         {
+			Logger.LogError(">>> Entering LongToIp(ip={Ip})", ip);
             // convert number back to IP
             var ipByte = new byte[4];
 
@@ -94,6 +103,7 @@ namespace DotNetNuke.Common.Utils
 
             // accumulator for address
             long mask8 = MaskFromCidr(8);
+			Logger.LogError("LongToIp(ip={Ip}): mask8 → {Mask8}", ip, mask8);
 
             // create eight bit mask
 
@@ -107,6 +117,7 @@ namespace DotNetNuke.Common.Utils
                 // add current octet to string
             }
 
+			Logger.LogWarning("<<< Exiting LongToIp(ip={Ip})", ip);
             return addr.TrimEnd('.');
         }
 
@@ -116,19 +127,25 @@ namespace DotNetNuke.Common.Utils
         /// <returns>Classless Inter-Domain Routing.</returns>
         public static string FormatAsCidr(string startIP, string subnetMask)
         {
+			Logger.LogError(">>> Entering FormatAsCidr(startIP={StartIP},subnetMask={SubnetMask})", startIP, subnetMask);
             if (string.IsNullOrEmpty(subnetMask))
             {
                 return startIP;
             }
 
             IPAddress ipAddress = IPAddress.Parse(startIP);
+			Logger.LogError("FormatAsCidr(startIP={StartIP},subnetMask={SubnetMask}): ipAddress → {IpAddress}", startIP, subnetMask, ipAddress);
             IPAddress mask = IPAddress.Parse(subnetMask);
+			Logger.LogError("FormatAsCidr(startIP={StartIP},subnetMask={SubnetMask}): mask → {Mask}", startIP, subnetMask, mask);
 
             long ipL = IPtoLong(ipAddress);
+			Logger.LogError("FormatAsCidr(startIP={StartIP},subnetMask={SubnetMask}): ipL → {IpL}", startIP, subnetMask, ipL);
             long maskL = IPtoLong(mask);
+			Logger.LogError("FormatAsCidr(startIP={StartIP},subnetMask={SubnetMask}): maskL → {MaskL}", startIP, subnetMask, maskL);
 
             // Convert  Mask to CIDR(1-30)
             long oneBit = 0x80000000L;
+			Logger.LogError("FormatAsCidr(startIP={StartIP},subnetMask={SubnetMask}): oneBit → {OneBit}", startIP, subnetMask, oneBit);
             int cidr = 0;
 
             for (int x = 31; x >= 0; x += -1)
@@ -146,6 +163,7 @@ namespace DotNetNuke.Common.Utils
             }
 
             string answer = $"{LongToIp(ipL & maskL)} /{cidr.ToString(CultureInfo.InvariantCulture)}";
+			Logger.LogWarning("<<< Exiting FormatAsCidr(startIP={StartIP},subnetMask={SubnetMask})", startIP, subnetMask);
             return answer;
         }
 
@@ -157,33 +175,42 @@ namespace DotNetNuke.Common.Utils
         public static void Network2IpRange(string sNetwork, out uint startIP, out uint endIP)
 #pragma warning restore CS3001
         {
+			Logger.LogError(">>> Entering Network2IpRange(sNetwork={SNetwork})", sNetwork);
             try
             {
                 string[] elements = sNetwork.Split('/');
 
                 uint ip = IP2Int(elements[0]);
+				Logger.LogError("Network2IpRange(sNetwork={SNetwork}): ip → {Ip}", sNetwork, ip);
                 int bits = Convert.ToInt32(elements[1], CultureInfo.InvariantCulture);
+				Logger.LogError("Network2IpRange(sNetwork={SNetwork}): bits → {Bits}", sNetwork, bits);
 
                 uint mask = ~(0xffffffff >> bits);
+				Logger.LogError("Network2IpRange(sNetwork={SNetwork}): mask → {Mask}", sNetwork, mask);
 
                 uint network = ip & mask;
                 uint broadcast = network + ~mask;
 
+				Logger.LogWarning("<<< Exiting Network2IpRange(sNetwork={SNetwork})", sNetwork);
                 uint usableIps = (bits > 30) ? 0 : (broadcast - network - 1);
 
                 if (usableIps <= 0)
                 {
                     startIP = endIP = 0;
+					Logger.LogDebug("Network2IpRange(sNetwork={SNetwork}): startIP → {StartIP}", sNetwork, startIP);
                 }
                 else
                 {
                     startIP = network + 1;
+					Logger.LogError("Network2IpRange(sNetwork={SNetwork}): startIP → {StartIP}", sNetwork, startIP);
                     endIP = broadcast - 1;
+					Logger.LogError("Network2IpRange(sNetwork={SNetwork}): endIP → {EndIP}", sNetwork, endIP);
                 }
             }
             catch (Exception)
             {
                 // catch case where IP cannot be resolved such as when debugger is attached
+				Logger.LogError("Exception in Network2IpRange(sNetwork={SNetwork}): {Arg1}", sNetwork, Exception.Message);
                 startIP = 0;
                 endIP = 0;
             }
@@ -196,8 +223,10 @@ namespace DotNetNuke.Common.Utils
         public static uint IP2Int(string ipNumber)
 #pragma warning restore CS3002
         {
+			Logger.LogError(">>> Entering IP2Int(ipNumber={IpNumber})", ipNumber);
             uint ip = 0;
             string[] elements = ipNumber.Split('.');
+			Logger.LogError("IP2Int(ipNumber={IpNumber}): ip → {Ip}", ipNumber, ip);
             if (elements.Length == 4)
             {
                 ip = Convert.ToUInt32(elements[0], CultureInfo.InvariantCulture) << 24;
@@ -206,6 +235,7 @@ namespace DotNetNuke.Common.Utils
                 ip += Convert.ToUInt32(elements[3], CultureInfo.InvariantCulture);
             }
 
+			Logger.LogWarning("<<< Exiting IP2Int(ipNumber={IpNumber})", ipNumber);
             return ip;
         }
 
@@ -216,12 +246,14 @@ namespace DotNetNuke.Common.Utils
         /// <returns>True or False.</returns>
         public static bool IsIPInRange(string currentIP, string startIP, string subnetmask)
         {
+			Logger.LogError(">>> Entering IsIPInRange(currentIP={CurrentIP},startIP={StartIP},subnetmask={Subnetmask})", currentIP, startIP, subnetmask);
             try
             {
                 // handle case where local adapter is localhost
                 if (currentIP == "::1")
                 {
                     currentIP = "127.0.0.1";
+					Logger.LogError("IsIPInRange(currentIP={CurrentIP},startIP={StartIP},subnetmask={Subnetmask}): currentIP → {CurrentIP1}", currentIP, startIP, subnetmask, currentIP);
                 }
 
                 // handle case where we are matching on a single IP
@@ -235,10 +267,13 @@ namespace DotNetNuke.Common.Utils
 
                 // handle case where we have to build a CIDR, convert to an IP range and compare
                 string cidr = FormatAsCidr(startIP, subnetmask);
+				Logger.LogError("IsIPInRange(currentIP={CurrentIP},startIP={StartIP},subnetmask={Subnetmask}): cidr → {Cidr}", currentIP, startIP, subnetmask, cidr);
                 uint fromIP, toIP;
                 Network2IpRange(cidr, out fromIP, out toIP);
                 IPAddress currentIPAsInt = IPAddress.Parse(currentIP);
+				Logger.LogError("IsIPInRange(currentIP={CurrentIP},startIP={StartIP},subnetmask={Subnetmask}): currentIPAsInt → {CurrentIPAsInt}", currentIP, startIP, subnetmask, currentIPAsInt);
                 long myip = IPtoLong(currentIPAsInt);
+				Logger.LogError("IsIPInRange(currentIP={CurrentIP},startIP={StartIP},subnetmask={Subnetmask}): myip → {Myip}", currentIP, startIP, subnetmask, myip);
                 if (myip >= fromIP & myip <= toIP)
                 {
                     return true;
@@ -246,7 +281,9 @@ namespace DotNetNuke.Common.Utils
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in IsIPInRange(currentIP={CurrentIP},startIP={StartIP},subnetmask={Subnetmask}): {Arg3}", currentIP, startIP, subnetmask, Exception.Message);
                 // catch case where IP cannot be resolved such as when debugger is attached
+			Logger.LogWarning("<<< Exiting IsIPInRange(currentIP={CurrentIP},startIP={StartIP},subnetmask={Subnetmask})", currentIP, startIP, subnetmask);
                 return false;
             }
 
@@ -258,8 +295,10 @@ namespace DotNetNuke.Common.Utils
         /// <returns>The current client ip address.</returns>
         public static string GetClientIpAddress(HttpRequest request)
         {
+			Logger.LogError(">>> Entering GetClientIpAddress(request={Request})", request);
             var userRequestIpAddressController = UserRequestIPAddressController.Instance;
             var ipAddress = userRequestIpAddressController.GetUserRequestIPAddress(new HttpRequestWrapper(request));
+			Logger.LogError("GetClientIpAddress(request={Request}): ipAddress → {IpAddress}", request, ipAddress);
 
             // If there is no proxy, get the standard remote address
             if (string.IsNullOrWhiteSpace(ipAddress) || ipAddress.Equals("unknown", StringComparison.OrdinalIgnoreCase))
@@ -267,6 +306,7 @@ namespace DotNetNuke.Common.Utils
                 ipAddress = request.UserHostAddress;
             }
 
+			Logger.LogWarning("<<< Exiting GetClientIpAddress(request={Request})", request);
             return ipAddress;
         }
 
@@ -275,6 +315,8 @@ namespace DotNetNuke.Common.Utils
         /// <returns>The mask value.</returns>
         private static long MaskFromCidr(int cidr)
         {
+			Logger.LogError(">>> Entering MaskFromCidr(cidr={Cidr})", cidr);
+            Logger.LogWarning("<<< Exiting MaskFromCidr(cidr={Cidr})", cidr);
             return Convert.ToInt64(Math.Pow(2, 32 - cidr) - 1) ^ 4294967295L;
         }
     }

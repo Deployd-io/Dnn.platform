@@ -44,11 +44,18 @@ namespace DotNetNuke.UI.Skins.Controls
         public Toast(INavigationManager navigationManager, IJavaScriptLibraryHelper javaScript, IClientResourceController clientResourceController)
             : this(navigationManager, javaScript, clientResourceController, null)
         {
+		Logger.LogError(">>> Entering Toast(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController})", navigationManager, javaScript, clientResourceController);
+		Logger.LogWarning("<<< Exiting Toast(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework})", navigationManager, javaScript, clientResourceController, servicesFramework);
         }
 
         public Toast(INavigationManager navigationManager, IJavaScriptLibraryHelper javaScript, IClientResourceController clientResourceController, IServicesFramework servicesFramework)
         {
+			Logger.LogError(">>> Entering Toast(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework})", navigationManager, javaScript, clientResourceController, servicesFramework);
+			Logger.LogDebug("Toast(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): javaScript → {JavaScript1}", navigationManager, javaScript, clientResourceController, servicesFramework, javaScript);
+			Logger.LogDebug("Toast(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): clientResourceController → {ClientResourceController1}", navigationManager, javaScript, clientResourceController, servicesFramework, clientResourceController);
+			Logger.LogDebug("Toast(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", navigationManager, javaScript, clientResourceController, servicesFramework, servicesFramework);
             this.navigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
+			Logger.LogWarning("<<< Exiting Toast(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework})", navigationManager, javaScript, clientResourceController, servicesFramework);
             this.javaScript = javaScript ?? Globals.GetCurrentServiceProvider().GetRequiredService<IJavaScriptLibraryHelper>();
             this.clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
             this.servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
@@ -60,33 +67,45 @@ namespace DotNetNuke.UI.Skins.Controls
 
         public bool IsOnline()
         {
+			Logger.LogError(">>> Entering IsOnline()");
             var userInfo = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogError("IsOnline(): userInfo → {UserInfo}", userInfo);
+			Logger.LogWarning("<<< Exiting IsOnline()");
             return userInfo.UserID != -1;
         }
 
         public string GetNotificationLink()
         {
+			Logger.LogError(">>> Entering GetNotificationLink()");
+            Logger.LogWarning("<<< Exiting GetNotificationLink()");
             return this.GetMessageLink() + "?view=notifications&action=notifications";
         }
 
         public string GetMessageLink()
         {
+			Logger.LogError(">>> Entering GetMessageLink()");
+            Logger.LogWarning("<<< Exiting GetMessageLink()");
             return this.navigationManager.NavigateURL(this.GetMessageTab(), string.Empty, string.Format("userId={0}", this.PortalSettings.UserId));
         }
 
         public string GetMessageLabel()
         {
+			Logger.LogError(">>> Entering GetMessageLabel()");
+            Logger.LogWarning("<<< Exiting GetMessageLabel()");
             return Localization.GetString("SeeAllMessage", Localization.GetResourceFile(this, MyFileName));
         }
 
         public string GetNotificationLabel()
         {
+			Logger.LogError(">>> Entering GetNotificationLabel()");
+            Logger.LogWarning("<<< Exiting GetNotificationLabel()");
             return Localization.GetString("SeeAllNotification", Localization.GetResourceFile(this, MyFileName));
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.javaScript.RequestRegistration(CommonJs.jQueryUI);
@@ -96,15 +115,19 @@ namespace DotNetNuke.UI.Skins.Controls
             this.clientResourceController.RegisterStylesheet("~/Resources/Shared/components/Toast/jquery.toastmessage.css", FileOrder.Css.DefaultCss);
 
             this.InitializeConfig();
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         // This method is copied from user skin object
         private int GetMessageTab()
         {
+			Logger.LogError(">>> Entering GetMessageTab()");
             var cacheKey = string.Format("MessageCenterTab:{0}:{1}", this.PortalSettings.PortalId, this.PortalSettings.CultureCode);
             var messageTabId = DataCache.GetCache<int>(cacheKey);
+			Logger.LogError("GetMessageTab(): cacheKey → {CacheKey}", cacheKey);
             if (messageTabId > 0)
             {
+				Logger.LogError("GetMessageTab(): messageTabId → {MessageTabId}", messageTabId);
                 return messageTabId;
             }
 
@@ -115,18 +138,22 @@ namespace DotNetNuke.UI.Skins.Controls
             // NOTE - This cache is not being cleared. There is no easy way to clear this, except Tools->Clear Cache
             DataCache.SetCache(cacheKey, messageTabId, TimeSpan.FromMinutes(20));
 
+			Logger.LogWarning("<<< Exiting GetMessageTab()");
             return messageTabId;
         }
 
         // This method is copied from user skin object
         private int FindMessageTab()
         {
+			Logger.LogError(">>> Entering FindMessageTab()");
             // On brand new install the new Message Center Module is on the child page of User Profile Page
             // On Upgrade to 6.2.0, the Message Center module is on the User Profile Page
             var profileTab = TabController.Instance.GetTab(this.PortalSettings.UserTabId, this.PortalSettings.PortalId, false);
+			Logger.LogError("FindMessageTab(): profileTab → {ProfileTab}", profileTab);
             if (profileTab != null)
             {
                 var childTabs = TabController.Instance.GetTabsByPortal(profileTab.PortalID).DescendentsOf(profileTab.TabID);
+				Logger.LogError("FindMessageTab(): childTabs → {ChildTabs}", childTabs);
                 foreach (TabInfo tab in childTabs)
                 {
                     foreach (KeyValuePair<int, ModuleInfo> kvp in ModuleController.Instance.GetTabModules(tab.TabID))
@@ -141,20 +168,26 @@ namespace DotNetNuke.UI.Skins.Controls
             }
 
             // default to User Profile Page
+			Logger.LogWarning("<<< Exiting FindMessageTab()");
             return this.PortalSettings.UserTabId;
         }
 
         private void InitializeConfig()
         {
+			Logger.LogError(">>> Entering InitializeConfig()");
             this.ServiceModuleName = "InternalServices";
             this.ServiceAction = "NotificationsService/GetToasts";
+			Logger.LogDebug("InitializeConfig(): this.ServiceModuleName → {Arg0}", this.ServiceModuleName);
 
             try
             {
+				Logger.LogDebug("InitializeConfig(): this.ServiceAction → {Arg0}", this.ServiceAction);
                 var toastConfig = DataCache.GetCache<IDictionary<string, string>>(ToastCacheKey);
                 if (toastConfig == null)
                 {
+					Logger.LogError("InitializeConfig(): toastConfig → {ToastConfig}", toastConfig);
                     var configFile = this.Server.MapPath(Path.Combine(this.TemplateSourceDirectory, "Toast.config"));
+					Logger.LogError("InitializeConfig(): configFile → {ConfigFile}", configFile);
 
                     if (File.Exists(configFile))
                     {
@@ -165,8 +198,11 @@ namespace DotNetNuke.UI.Skins.Controls
                         }
 
                         var moduleNameNode = xmlDocument.DocumentElement?.SelectSingleNode("moduleName");
+						Logger.LogError("InitializeConfig(): moduleNameNode → {ModuleNameNode}", moduleNameNode);
                         var actionNode = xmlDocument.DocumentElement?.SelectSingleNode("action");
+						Logger.LogError("InitializeConfig(): actionNode → {ActionNode}", actionNode);
                         var scriptsNode = xmlDocument.DocumentElement?.SelectSingleNode("scripts");
+						Logger.LogError("InitializeConfig(): scriptsNode → {ScriptsNode}", scriptsNode);
 
                         if (moduleNameNode != null && !string.IsNullOrEmpty(moduleNameNode.InnerText))
                         {
@@ -216,6 +252,7 @@ namespace DotNetNuke.UI.Skins.Controls
             {
                 Logger.Error(ex);
             }
+			Logger.LogWarning("<<< Exiting InitializeConfig()");
         }
     }
 }

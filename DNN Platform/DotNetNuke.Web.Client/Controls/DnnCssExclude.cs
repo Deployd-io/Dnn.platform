@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
     /// <summary>Excludes a CSS resource.</summary>
     public class DnnCssExclude : ClientResourceExclude
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnCssExclude));
         /// <summary>Initializes a new instance of the <see cref="DnnCssExclude"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.1. Use overload with IClientResourceController. Scheduled removal in v12.0.0.")]
         public DnnCssExclude()
@@ -25,6 +26,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         public DnnCssExclude(IClientResourceController clientResourceController)
             : base(clientResourceController)
         {
+			Logger.LogError(">>> Entering DnnCssExclude(clientResourceController={ClientResourceController})", clientResourceController);
             this.DependencyType = ClientDependencyType.Css;
         }
     }

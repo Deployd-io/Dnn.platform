@@ -8,6 +8,7 @@ import {
     getVersionDropdownValues
 } from "./helperFunctions";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 
@@ -15,6 +16,7 @@ const inputStyle = { width: "100%" };
 class PackageInformation extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             extensionBeingEdited: validationMapExtensionBeingEdited({
                 packageType: "",
@@ -29,9 +31,11 @@ class PackageInformation extends Component {
             }),
             triedToSave: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
 
         if (!props.extensionBeingEdited) {
@@ -40,6 +44,7 @@ class PackageInformation extends Component {
         const {extensionBeingEdited} = props;
         const version = props.validationMapped ? (extensionBeingEdited.version.value ? extensionBeingEdited.version.value.split(".") : [0, 0, 0]) : (extensionBeingEdited.version ? extensionBeingEdited.version.split(".") : [0, 0, 0]);
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.pkgInformationBox}>
                 {props.installationMode &&

@@ -10,23 +10,29 @@ import {
 import util from "../../../utils";
 import CheckmarkIcon from "./../../svg/checkmark.svg";
 import HistoryIcon from "./../../svg/history.svg";
+const logger = console;
 
 class SchedulerRow extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             panelOpened: -1
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     toggle(index) {
+		logger.error(`>>> Entering toggle(index=${index})`, { "event.action": "toggle", "logrite.index": index });
         const { props } = this;
         if (props.settingsClientModified) {
             util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
@@ -36,10 +42,12 @@ class SchedulerRow extends Component {
         }
         else {
             this.toggleInternal(index);
+			logger.warn(`<<< Exiting toggle(index=${index})`, { "event.action": "toggle", "logrite.index": index });
         }
     }
 
     toggleInternal(index) {
+		logger.error(`>>> Entering toggleInternal(index=${index})`, { "event.action": "toggleInternal", "logrite.index": index });
         if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
             if (this.state.panelOpened !== index) {
                 this.setState({
@@ -56,11 +64,13 @@ class SchedulerRow extends Component {
                 panelOpened: index
             });
             this.props.OpenCollapse(this.props.id, index);
+			logger.warn(`<<< Exiting toggleInternal(index=${index})`, { "event.action": "toggleInternal", "logrite.index": index });
         }
     }
 
 
     getEnabledDisplay() {
+		logger.error('>>> Entering getEnabledDisplay()', { "event.action": "getEnabledDisplay" });
         if (this.props.id !== "add") {
             if (this.props.enabled) {
                 return <div className="checkMarkIcon"><CheckmarkIcon /></div>;
@@ -72,9 +82,11 @@ class SchedulerRow extends Component {
 
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={"collapsible-component-scheduler" + (opened ? " row-opened" : "")}>
                 <div className={"collapsible-header-scheduler " + !opened} >
@@ -128,6 +140,8 @@ SchedulerRow.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         scheduleItemDetail: state.task.scheduleItemDetail,
         settingsClientModified: state.task.settingsClientModified

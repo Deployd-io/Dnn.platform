@@ -1,5 +1,7 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 (function($, win) {
     win.ShowNotificationBar = function(text, notificationType, imagePath) {
+		logger.error(`>>> Entering ShowNotificationBar(text=${text},notificationType=${notificationType},imagePath=${imagePath})`, { "event.action": "ShowNotificationBar", "logrite.text": text, "logrite.notificationType": notificationType, "logrite.imagePath": imagePath });
         showNotification({
             type: notificationType,
             message: text,
@@ -7,9 +9,11 @@
             duration: 20,
             imagepath: imagePath
         });
+		logger.warn(`<<< Exiting ShowNotificationBar(text=${text},notificationType=${notificationType},imagePath=${imagePath})`, { "event.action": "ShowNotificationBar", "logrite.text": text, "logrite.notificationType": notificationType, "logrite.imagePath": imagePath });
     }
 
     win.pageLoad = function() {
+		logger.error('>>> Entering pageLoad()', { "event.action": "pageLoad" });
         $('.panelLoading').show();
         $(".copyButton").button({ icons: { primary: "ui-icon-copy" } });
         $(".removeButton").button({ icons: { primary: "ui-icon-trash" } });
@@ -49,8 +53,10 @@
 
         $('#SettingsTabs').tabs({
             activate: function () {
+				logger.error('>>> Entering activate()', { "event.action": "activate" });
                 var sel = $('#SettingsTabs').tabs('option', 'active');
                 $('[id*="CKEditor_Options_LastTabId"]').val(sel);
+				logger.error(`activate(): sel → ${sel}`, { "event.action": "activate" });
             },
             active: $('[id*="CKEditor_Options_LastTabId"]').val()
         });
@@ -67,14 +73,18 @@
             resizable: false,
             buttons: {
                 "Cancel": function () {
+					logger.error('>>> Entering Cancel()', { "event.action": "Cancel" });
                     $(this).dialog("close");
+					logger.warn('<<< Exiting Cancel()', { "event.action": "Cancel" });
                 }, 
                 "Export Now": function() {
                     window.location = $(".ExportHidden").attr("href"); $(this).dialog("close");
                 }
             },
             open: function () {
+				logger.error('>>> Entering open()', { "event.action": "open" });
                 $(this).parent().appendTo("form");
+				logger.warn('<<< Exiting open()', { "event.action": "open" });
             }
         });
 
@@ -102,7 +112,9 @@
             autoOpen: false,
             buttons: {
                 "OK": function() {
+					logger.error('>>> Entering OK()', { "event.action": "OK" });
                     $(this).dialog("close");
+					logger.warn('<<< Exiting OK()', { "event.action": "OK" });
                 }
             },
             open: function () {
@@ -120,13 +132,17 @@
 
         $("#CKEditor_Options_rBlSetMode input").button();
         $("#CKEditor_Options_rBlSetMode").controlgroup();
+		logger.warn('<<< Exiting pageLoad()', { "event.action": "pageLoad" });
     }
 
     win.showDialog = function (id) {
+		logger.error(`>>> Entering showDialog(id=${id})`, { "event.action": "showDialog", "logrite.id": id });
         $('#' + id).dialog("open");
+		logger.warn(`<<< Exiting showDialog(id=${id})`, { "event.action": "showDialog", "logrite.id": id });
     }
 
     win.EnableSorting = function() {
+		logger.error('>>> Entering EnableSorting()', { "event.action": "EnableSorting" });
         if ($(".rowBreakItem .rowBreak").parent("ul").length) {
             $(".rowBreakItem .rowBreak").parent("ul").removeClass("groupButtons");
         }
@@ -135,7 +151,9 @@
             connectWith: ".groups, .availableButtons",
             placeholder: "ui-state-highlight",
             update: function () {
+				logger.error('>>> Entering update()', { "event.action": "update", "logrite.e": e, "logrite.ui": ui });
                 $('[id*="Options_ToolbarSet"]').val($('.groups').SerializeToolbars());
+				logger.warn('<<< Exiting update()', { "event.action": "update", "logrite.e": e, "logrite.ui": ui });
             }
         });
 
@@ -143,8 +161,10 @@
             connectWith: ".groupButtons, .availableButtons",
             placeholder: "ui-state-highlight",
             start: function (e, ui) {
+				logger.error(`>>> Entering start(e=${e},ui=${ui})`, { "event.action": "start", "logrite.e": e, "logrite.ui": ui });
                 $('.groupButtons').css('min-height', '50px');
                 $('.groupButtons').sortable('refreshPositions');
+				logger.warn(`<<< Exiting start(e=${e},ui=${ui})`, { "event.action": "start", "logrite.e": e, "logrite.ui": ui });
             },
             update: function () {
                 $('[id*="Options_ToolbarSet"]').val($('.groups').SerializeToolbars());
@@ -159,6 +179,7 @@
                 $('.groupButtons').sortable('refreshPositions');
             },
             remove: function (e, ui) {
+				logger.error(`>>> Entering remove(e=${e},ui=${ui})`, { "event.action": "remove", "logrite.e": e, "logrite.ui": ui });
                 if (ui.item.attr('class').indexOf('separator') != -1) {
                     var $separator = ui.item.clone(true);
                     $separator.children(".ui-icon").remove();
@@ -167,9 +188,12 @@
                 ui.item.prepend('<span class="ui-icon ui-icon-cancel" title="Delete this Toolbar"></span>');
                 EnableSorting();
                 $('[id*="Options_ToolbarSet"]').val($('.groups').SerializeToolbars());
+				logger.warn(`<<< Exiting remove(e=${e},ui=${ui})`, { "event.action": "remove", "logrite.e": e, "logrite.ui": ui });
             },
             update: function (e, ui) {
+			logger.error(`>>> Entering update(e=${e},ui=${ui})`, { "event.action": "update", "logrite.e": e, "logrite.ui": ui });
 
+			logger.warn(`<<< Exiting update(e=${e},ui=${ui})`, { "event.action": "update", "logrite.e": e, "logrite.ui": ui });
             }
         });
 
@@ -249,9 +273,11 @@
         });
 
         $('.panelLoading').hide();
+		logger.warn('<<< Exiting EnableSorting()', { "event.action": "EnableSorting" });
     }
 
     $.fn.SerializeToolbars = function () {
+		logger.error('>>> Entering SerializeToolbars()', { "event.action": "SerializeToolbars" });
         var items = [];
         this.children().each(function () {
             var $this = $(this);
@@ -271,6 +297,7 @@
         });
 
         var json = JSON.stringify(items);
+		logger.error(`SerializeToolbars(): json → ${json}`, { "event.action": "SerializeToolbars" });
         return json.substring(1, json.length - 1).replaceAll("\"name\"", "name").replaceAll("\"items\"", "items");
     };
 

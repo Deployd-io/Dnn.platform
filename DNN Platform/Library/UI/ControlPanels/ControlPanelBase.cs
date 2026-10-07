@@ -45,7 +45,10 @@ namespace DotNetNuke.UI.ControlPanels
         /// <param name="permissionDefinitionService">The permission definition service.</param>
         public ControlPanelBase(IEventLogger eventLogger, IPermissionDefinitionService permissionDefinitionService)
         {
+			eventLogger.LogError(">>> Entering ControlPanelBase(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService})", eventLogger, permissionDefinitionService);
+			eventLogger.LogDebug("ControlPanelBase(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService}): permissionDefinitionService → {PermissionDefinitionService1}", eventLogger, permissionDefinitionService, permissionDefinitionService);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogWarning("<<< Exiting ControlPanelBase(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService})", eventLogger, permissionDefinitionService);
             this.permissionDefinitionService = permissionDefinitionService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPermissionDefinitionService>();
         }
 
@@ -105,7 +108,9 @@ namespace DotNetNuke.UI.ControlPanels
 
         internal static bool IsModuleAdminInternal()
         {
+			eventLogger.LogError(">>> Entering IsModuleAdminInternal()");
             bool isModuleAdmin = Null.NullBoolean;
+			eventLogger.LogError("IsModuleAdminInternal(): isModuleAdmin → {IsModuleAdmin}", isModuleAdmin);
             foreach (ModuleInfo objModule in TabController.CurrentPage.Modules)
             {
                 if (!objModule.IsDeleted)
@@ -119,18 +124,22 @@ namespace DotNetNuke.UI.ControlPanels
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting IsModuleAdminInternal()");
             return PortalSettings.Current.ControlPanelSecurity == PortalSettings.ControlPanelPermission.ModuleEditor && isModuleAdmin;
         }
 
         internal static bool IsPageAdminInternal()
         {
+			eventLogger.LogError(">>> Entering IsPageAdminInternal()");
             bool isPageAdmin = Null.NullBoolean;
             if (TabPermissionController.CanAddContentToPage() || TabPermissionController.CanAddPage() || TabPermissionController.CanAdminPage() || TabPermissionController.CanCopyPage() ||
                 TabPermissionController.CanDeletePage() || TabPermissionController.CanExportPage() || TabPermissionController.CanImportPage() || TabPermissionController.CanManagePage())
             {
+				eventLogger.LogError("IsPageAdminInternal(): isPageAdmin → {IsPageAdmin}", isPageAdmin);
                 isPageAdmin = true;
             }
 
+			eventLogger.LogWarning("<<< Exiting IsPageAdminInternal()");
             return isPageAdmin;
         }
 
@@ -148,20 +157,30 @@ namespace DotNetNuke.UI.ControlPanels
         /// <param name="align">The alignment for the Module.</param>
         protected void AddExistingModule(int moduleId, int tabId, string paneName, int position, string align)
         {
+			eventLogger.LogError(">>> Entering AddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align})", moduleId, tabId, paneName, position, align);
             ModuleInfo objModule;
 
             int userId = -1;
+			eventLogger.LogError("AddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align}): userId → {UserId}", moduleId, tabId, paneName, position, align, userId);
             if (this.Request.IsAuthenticated)
             {
                 UserInfo objUserInfo = UserController.Instance.GetCurrentUserInfo();
+				eventLogger.LogError("AddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align}): objUserInfo → {ObjUserInfo}", moduleId, tabId, paneName, position, align, objUserInfo);
                 userId = objUserInfo.UserID;
             }
 
             objModule = ModuleController.Instance.GetModule(moduleId, tabId, false);
+			eventLogger.LogDebug("AddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align}): objModule → {ObjModule}", moduleId, tabId, paneName, position, align, objModule);
             if (objModule != null)
             {
+				eventLogger.LogError("AddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align}): objModule → {ObjModule}", moduleId, tabId, paneName, position, align, objModule);
                 // clone the module object ( to avoid creating an object reference to the data cache )
                 ModuleInfo objClone = objModule.Clone();
+				eventLogger.LogError("AddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align}): objClone → {ObjClone}", moduleId, tabId, paneName, position, align, objClone);
+				eventLogger.LogDebug("AddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align}): objClone.TabID → {Arg5}", moduleId, tabId, paneName, position, align, objClone.TabID);
+				eventLogger.LogDebug("AddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align}): objClone.ModuleOrder → {Arg5}", moduleId, tabId, paneName, position, align, objClone.ModuleOrder);
+				eventLogger.LogDebug("AddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align}): objClone.PaneName → {Arg5}", moduleId, tabId, paneName, position, align, objClone.PaneName);
+				eventLogger.LogDebug("AddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align}): objClone.Alignment → {Arg5}", moduleId, tabId, paneName, position, align, objClone.Alignment);
                 objClone.TabID = this.PortalSettings.ActiveTab.TabID;
                 objClone.ModuleOrder = position;
                 objClone.PaneName = paneName;
@@ -169,6 +188,7 @@ namespace DotNetNuke.UI.ControlPanels
                 ModuleController.Instance.AddModule(objClone);
                 this.eventLogger.AddLog(objClone, this.PortalSettings, userId, string.Empty, EventLogType.MODULE_CREATED);
             }
+			eventLogger.LogWarning("<<< Exiting AddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align})", moduleId, tabId, paneName, position, align);
         }
 
         /// <summary>Adds a New Module to a Pane. </summary>
@@ -180,29 +200,37 @@ namespace DotNetNuke.UI.ControlPanels
         /// <param name="align">The alignment for the Module.</param>
         protected void AddNewModule(string title, int desktopModuleId, string paneName, int position, ViewPermissionType permissionType, string align)
         {
+			eventLogger.LogError(">>> Entering AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align})", title, desktopModuleId, paneName, position, permissionType, align);
             TabPermissionCollection objTabPermissions = this.PortalSettings.ActiveTab.TabPermissions;
             try
             {
                 if (!DesktopModuleController.GetDesktopModules(this.PortalSettings.PortalId).TryGetValue(desktopModuleId, out _))
                 {
+					eventLogger.LogError("Throwing ArgumentException from AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align})", title, desktopModuleId, paneName, position, permissionType, align);
                     throw new ArgumentException($"Could not find desktop module with given ID: {desktopModuleId}", nameof(desktopModuleId));
                 }
             }
             catch (Exception ex)
             {
+				eventLogger.LogError("Exception in AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): {Arg6}", title, desktopModuleId, paneName, position, permissionType, align, ex.Message);
                 Exceptions.LogException(ex);
             }
 
             foreach (var objModuleDefinition in ModuleDefinitionController.GetModuleDefinitionsByDesktopModuleID(desktopModuleId).Values)
             {
                 var objModule = new ModuleInfo();
+				eventLogger.LogError("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule → {ObjModule}", title, desktopModuleId, paneName, position, permissionType, align, objModule);
                 objModule.Initialize(this.PortalSettings.PortalId);
                 objModule.PortalID = this.PortalSettings.PortalId;
+				eventLogger.LogDebug("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.PortalID → {Arg6}", title, desktopModuleId, paneName, position, permissionType, align, objModule.PortalID);
+				eventLogger.LogDebug("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.TabID → {Arg6}", title, desktopModuleId, paneName, position, permissionType, align, objModule.TabID);
+				eventLogger.LogDebug("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.ModuleOrder → {Arg6}", title, desktopModuleId, paneName, position, permissionType, align, objModule.ModuleOrder);
                 objModule.TabID = this.PortalSettings.ActiveTab.TabID;
                 objModule.ModuleOrder = position;
                 if (string.IsNullOrEmpty(title))
                 {
                     objModule.ModuleTitle = objModuleDefinition.FriendlyName;
+					eventLogger.LogDebug("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.ModuleTitle → {Arg6}", title, desktopModuleId, paneName, position, permissionType, align, objModule.ModuleTitle);
                 }
                 else
                 {
@@ -210,13 +238,17 @@ namespace DotNetNuke.UI.ControlPanels
                 }
 
                 objModule.PaneName = paneName;
+				eventLogger.LogDebug("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.PaneName → {Arg6}", title, desktopModuleId, paneName, position, permissionType, align, objModule.PaneName);
+				eventLogger.LogDebug("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.ModuleDefID → {Arg6}", title, desktopModuleId, paneName, position, permissionType, align, objModule.ModuleDefID);
                 objModule.ModuleDefID = objModuleDefinition.ModuleDefID;
                 if (objModuleDefinition.DefaultCacheTime > 0)
                 {
                     objModule.CacheTime = objModuleDefinition.DefaultCacheTime;
+					eventLogger.LogDebug("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.CacheTime → {Arg6}", title, desktopModuleId, paneName, position, permissionType, align, objModule.CacheTime);
                     if (PortalSettings.Current.DefaultModuleId > Null.NullInteger && PortalSettings.Current.DefaultTabId > Null.NullInteger)
                     {
                         ModuleInfo defaultModule = ModuleController.Instance.GetModule(PortalSettings.Current.DefaultModuleId, PortalSettings.Current.DefaultTabId, true);
+						eventLogger.LogError("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): defaultModule → {DefaultModule}", title, desktopModuleId, paneName, position, permissionType, align, defaultModule);
                         if (defaultModule != null)
                         {
                             objModule.CacheTime = defaultModule.CacheTime;
@@ -228,6 +260,7 @@ namespace DotNetNuke.UI.ControlPanels
                 {
                     case ViewPermissionType.View:
                         objModule.InheritViewPermissions = true;
+						eventLogger.LogDebug("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.InheritViewPermissions → {Arg6}", title, desktopModuleId, paneName, position, permissionType, align, objModule.InheritViewPermissions);
                         break;
                     case ViewPermissionType.Edit:
                         objModule.InheritViewPermissions = false;
@@ -236,6 +269,7 @@ namespace DotNetNuke.UI.ControlPanels
 
                 // get the default module view permissions
                 var systemModuleViewPermission = this.permissionDefinitionService.GetDefinitionsByCodeAndKey("SYSTEM_MODULE_DEFINITION", "VIEW").FirstOrDefault();
+				eventLogger.LogError("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): systemModuleViewPermission → {SystemModuleViewPermission}", title, desktopModuleId, paneName, position, permissionType, align, systemModuleViewPermission);
 
                 // get the permissions from the page
                 foreach (IPermissionInfo objTabPermission in objTabPermissions)
@@ -248,6 +282,7 @@ namespace DotNetNuke.UI.ControlPanels
 
                     // get the system module permissions for the permission key
                     var systemModulePermissions = this.permissionDefinitionService.GetDefinitionsByCodeAndKey("SYSTEM_MODULE_DEFINITION", objTabPermission.PermissionKey);
+					eventLogger.LogError("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): systemModulePermissions → {SystemModulePermissions}", title, desktopModuleId, paneName, position, permissionType, align, systemModulePermissions);
 
                     // loop through the system module permissions
                     foreach (var objSystemModulePermission in systemModulePermissions)
@@ -293,20 +328,26 @@ namespace DotNetNuke.UI.ControlPanels
                 if (PortalSettings.Current.ContentLocalizationEnabled)
                 {
                     Locale defaultLocale = LocaleController.Instance.GetDefaultLocale(PortalSettings.Current.PortalId);
+					eventLogger.LogError("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): defaultLocale → {DefaultLocale}", title, desktopModuleId, paneName, position, permissionType, align, defaultLocale);
 
                     // set the culture of the module to that of the tab
                     var tabInfo = TabController.Instance.GetTab(objModule.TabID, PortalSettings.Current.PortalId, false);
+					eventLogger.LogError("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): tabInfo → {TabInfo}", title, desktopModuleId, paneName, position, permissionType, align, tabInfo);
                     objModule.CultureCode = tabInfo != null ? tabInfo.CultureCode : defaultLocale.Code;
                 }
                 else
                 {
                     objModule.CultureCode = Null.NullString;
+					eventLogger.LogDebug("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.CultureCode → {Arg6}", title, desktopModuleId, paneName, position, permissionType, align, objModule.CultureCode);
                 }
 
                 objModule.AllTabs = false;
+				eventLogger.LogDebug("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.AllTabs → {Arg6}", title, desktopModuleId, paneName, position, permissionType, align, objModule.AllTabs);
+				eventLogger.LogDebug("AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.Alignment → {Arg6}", title, desktopModuleId, paneName, position, permissionType, align, objModule.Alignment);
                 objModule.Alignment = align;
                 ModuleController.Instance.AddModule(objModule);
             }
+			eventLogger.LogWarning("<<< Exiting AddNewModule(title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align})", title, desktopModuleId, paneName, position, permissionType, align);
         }
 
         /// <summary>Builds a URL to a page with a module matching the given definition <paramref name="friendlyName"/>.</summary>
@@ -316,10 +357,13 @@ namespace DotNetNuke.UI.ControlPanels
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected string BuildURL(int portalID, string friendlyName)
         {
+			eventLogger.LogError(">>> Entering BuildURL(portalID={PortalID},friendlyName={FriendlyName})", portalID, friendlyName);
             string strURL = "~/" + Globals.glbDefaultPage;
             ModuleInfo objModule = ModuleController.Instance.GetModuleByDefinition(portalID, friendlyName);
+			eventLogger.LogError("BuildURL(portalID={PortalID},friendlyName={FriendlyName}): strURL → {StrURL}", portalID, friendlyName, strURL);
             if (objModule != null)
             {
+				eventLogger.LogError("BuildURL(portalID={PortalID},friendlyName={FriendlyName}): objModule → {ObjModule}", portalID, friendlyName, objModule);
                 if (portalID == Null.NullInteger)
                 {
                     strURL = TestableGlobals.Instance.NavigateURL(objModule.TabID, true);
@@ -330,19 +374,24 @@ namespace DotNetNuke.UI.ControlPanels
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting BuildURL(portalID={PortalID},friendlyName={FriendlyName})", portalID, friendlyName);
             return strURL;
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected bool GetModulePermission(int portalID, string friendlyName)
         {
+			eventLogger.LogError(">>> Entering GetModulePermission(portalID={PortalID},friendlyName={FriendlyName})", portalID, friendlyName);
             bool allowAccess = Null.NullBoolean;
             ModuleInfo objModule = ModuleController.Instance.GetModuleByDefinition(portalID, friendlyName);
+			eventLogger.LogError("GetModulePermission(portalID={PortalID},friendlyName={FriendlyName}): allowAccess → {AllowAccess}", portalID, friendlyName, allowAccess);
             if (objModule != null)
             {
+				eventLogger.LogError("GetModulePermission(portalID={PortalID},friendlyName={FriendlyName}): objModule → {ObjModule}", portalID, friendlyName, objModule);
                 allowAccess = ModulePermissionController.CanViewModule(objModule);
             }
 
+			eventLogger.LogWarning("<<< Exiting GetModulePermission(portalID={PortalID},friendlyName={FriendlyName})", portalID, friendlyName);
             return allowAccess;
         }
 
@@ -350,19 +399,24 @@ namespace DotNetNuke.UI.ControlPanels
         /// <param name="userMode">The userMode to set.</param>
         protected void SetUserMode(string userMode)
         {
+			eventLogger.LogError(">>> Entering SetUserMode(userMode={UserMode})", userMode);
             Personalization.SetProfile("Usability", "UserMode" + this.PortalSettings.PortalId, userMode.ToUpperInvariant());
+			eventLogger.LogWarning("<<< Exiting SetUserMode(userMode={UserMode})", userMode);
         }
 
         /// <summary>Sets the current Visible Mode.</summary>
         /// <param name="isVisible">A flag indicating whether the Control Panel should be visible.</param>
         protected void SetVisibleMode(bool isVisible)
         {
+			eventLogger.LogError(">>> Entering SetVisibleMode(isVisible={IsVisible})", isVisible);
             Personalization.SetProfile("Usability", "ControlPanelVisible" + this.PortalSettings.PortalId, isVisible.ToString());
+			eventLogger.LogWarning("<<< Exiting SetVisibleMode(isVisible={IsVisible})", isVisible);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnInit(e={E})", e);
             if (this.Page.Items.Contains(typeof(ControlPanelBase)) && this.Page.Items[typeof(ControlPanelBase)] is ControlPanelBase)
             {
                 this.Parent.Controls.Remove(this);
@@ -372,6 +426,7 @@ namespace DotNetNuke.UI.ControlPanels
                 this.Page.Items[typeof(ControlPanelBase)] = this;
                 base.OnInit(e);
             }
+			eventLogger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>Adds a Module Permission.</summary>
@@ -382,6 +437,7 @@ namespace DotNetNuke.UI.ControlPanels
         /// <param name="allowAccess">Whether allow to access the module.</param>
         private static ModulePermissionInfo AddModulePermission(ModuleInfo objModule, IPermissionDefinitionInfo permission, int roleId, int userId, bool allowAccess)
         {
+			eventLogger.LogError(">>> Entering AddModulePermission(objModule={ObjModule},permission={Permission},roleId={RoleId},userId={UserId},allowAccess={AllowAccess})", objModule, permission, roleId, userId, allowAccess);
             var objModulePermission = new ModulePermissionInfo
             {
                 ModuleID = objModule.ModuleID,
@@ -398,6 +454,7 @@ namespace DotNetNuke.UI.ControlPanels
                 objModule.ModulePermissions.Add(objModulePermission);
             }
 
+			eventLogger.LogWarning("<<< Exiting AddModulePermission(objModule={ObjModule},permission={Permission},roleId={RoleId},userId={UserId},allowAccess={AllowAccess})", objModule, permission, roleId, userId, allowAccess);
             return objModulePermission;
         }
     }

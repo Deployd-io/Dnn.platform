@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 // ********************
 // Begin Popup Calendar
 // ********************
@@ -19,10 +20,14 @@ var popCalWin;
 // ******************************
 function popupCal()
 {
+	logger.error('>>> Entering popupCal()', { "event.action": "popupCal" });
 	//debugger;			//remove slashes to activate debugging in Visual Studio
 	var tmpDate         = new Date();
+	logger.error(`popupCal(): tmpDate → ${tmpDate}`, { "event.action": "popupCal" });
 	var tmpString       = "";
+	logger.error(`popupCal(): tmpString → ${tmpString}`, { "event.action": "popupCal" });
 	var tmpNum          = 0;
+	logger.error(`popupCal(): tmpNum → ${tmpNum}`, { "event.action": "popupCal" });
 	var popCalDateVal;
 	var dstWindowName   = "";
 
@@ -106,32 +111,41 @@ function popupCal()
 	{
 		popCalDateVal = new Date();
 		popCalDstFld.value = "";
+		logger.error(`popupCal(): popCalDateVal → ${popCalDateVal}`, { "event.action": "popupCal" });
 	}
 			
+			logger.debug(`popupCal(): popCalDateVal → ${popCalDateVal}`, { "event.action": "popupCal" });
 	//Set the base date to midnight of the first day of the specified month, 
 	//this makes things easier?
  	var dateString = String(popCalDateVal.getMonth()+1) + "/" + String(popCalDateVal.getDate()) + "/" + String(popCalDateVal.getFullYear());
+	logger.error(`popupCal(): dateString → ${dateString}`, { "event.action": "popupCal" });
 
 	//Call the routine to draw the initial calendar
 	reloadCalPopup(dateString, dstWindowName);
 	
+	logger.warn('<<< Exiting popupCal()', { "event.action": "popupCal" });
 	return void(0);
 }
  
 function closeCalPopup()
 {
+	logger.error('>>> Entering closeCalPopup()', { "event.action": "closeCalPopup" });
 	//Can't tell the child window to close itself, the parent window has to 
 	//tell it to close.
 	popCalWin.close();
+	logger.warn('<<< Exiting closeCalPopup()', { "event.action": "closeCalPopup" });
 	return void(0);
 }
  
 function reloadCalPopup() //[0]dateString, [1]dstWindowName
 {
+	logger.error('>>> Entering reloadCalPopup()', { "event.action": "reloadCalPopup" });
 	//Set the window's features here
 
 	var windowFeatures = "toolbar=no, location=no, status=no, menubar=no, scrollbars=no, resizable=no, height=270, width=270, top=" + ((screen.height - 270)/2).toString()+",left="+((screen.width - 270)/2).toString();
+	logger.error(`reloadCalPopup(): windowFeatures → ${windowFeatures}`, { "event.action": "reloadCalPopup" });
 	var tmpDate = new Date( reloadCalPopup.arguments[0] );
+	logger.error(`reloadCalPopup(): tmpDate → ${tmpDate}`, { "event.action": "reloadCalPopup" });
 	
 	if (tmpDate.toString() == "Invalid Date")
 	    tmpDate = new Date();
@@ -140,6 +154,7 @@ function reloadCalPopup() //[0]dateString, [1]dstWindowName
 	
 	//Get the calendar data
 	var popCalData = calPopupSetData(tmpDate,reloadCalPopup.arguments[1]);
+	logger.error(`reloadCalPopup(): popCalData → ${popCalData}`, { "event.action": "reloadCalPopup" });
  
 	//Check to see if the window has been initialized, create it if it hasn't been
 	if( popCalWin.toString() == "[object Object]" )
@@ -157,29 +172,47 @@ function reloadCalPopup() //[0]dateString, [1]dstWindowName
 	
 	//this is the line with the big problem
     popCalWin.document.write(popCalData);
+	logger.warn('<<< Exiting reloadCalPopup()', { "event.action": "reloadCalPopup" });
     return void(1);
 }
  
 function calPopupSetData(firstDay,dstWindowName)
 {
+	logger.error(`>>> Entering calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName})`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var popCalData = "";
     var lastDate = 0;
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): popCalData → ${popCalData}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): lastDate → ${lastDate}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var fnt = new Array( "<FONT SIZE=\"1\">", "<B><FONT SIZE=\"2\">", "<FONT SIZE=\"2\" COLOR=\"#EF741D\"><B>");
 	var dtToday = new Date();
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): fnt → ${fnt}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): dtToday → ${dtToday}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var thisMonth = firstDay.getMonth();
 	var thisYear = firstDay.getFullYear();
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): thisMonth → ${thisMonth}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): thisYear → ${thisYear}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var nPrevMonth = (thisMonth == 0 ) ? 11 : (thisMonth - 1);
 	var nNextMonth = (thisMonth == 11 ) ? 0 : (thisMonth + 1);
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): nPrevMonth → ${nPrevMonth}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): nNextMonth → ${nNextMonth}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var nPrevMonthYear = (nPrevMonth == 11) ? (thisYear - 1): thisYear;
 	var nNextMonthYear = (nNextMonth == 0) ? (thisYear + 1): thisYear;
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): nPrevMonthYear → ${nPrevMonthYear}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): nNextMonthYear → ${nNextMonthYear}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var sToday = String((dtToday.getMonth()+1) + "/01/" + dtToday.getFullYear());
 	var sPrevMonth = String((nPrevMonth+1) + "/01/" + nPrevMonthYear);
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): sToday → ${sToday}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): sPrevMonth → ${sPrevMonth}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var sNextMonth = String((nNextMonth+1) + "/01/" + nNextMonthYear);
 	var sPrevYear1 = String((thisMonth+1) + "/01/" + (thisYear - 1));
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): sNextMonth → ${sNextMonth}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): sPrevYear1 → ${sPrevYear1}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var sNextYear1 = String((thisMonth+1) + "/01/" + (thisYear + 1));
  	var tmpDate = new Date( sNextMonth );
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): sNextYear1 → ${sNextYear1}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	
 	tmpDate = new Date( tmpDate.valueOf() - 1001 );
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): tmpDate → ${tmpDate}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	lastDate = tmpDate.getDate();
 
 	if (this.popCalMonths.split) // javascript 1.1 defensive code
@@ -190,20 +223,33 @@ function calPopupSetData(firstDay,dstWindowName)
 	else  // Need to build a js 1.0 split algorithm, default English for now
 	{
 		var monthNames = new Array("January","February","March","April","May","June","July","August","September","October","November","December");
+		logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): monthNames → ${monthNames}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 		var dayNames = new Array("Sun","Mon","Tue","Wed","Thu","Fri","Sat")
+		logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): dayNames → ${dayNames}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	}
 
  	var styles = "<style><!-- body{font-family:Arial,Helvetica,sans-serif;font-size:9pt}; td {  font-family: Arial, Helvetica, sans-serif; font-size: 9pt; color: #666666}; A { text-decoration: none; };TD.day { border-bottom: solid black; border-width: 0px; }--></style>"
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): styles → ${styles}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var cellAttribs = "align=\"center\" class=\"day\" BGCOLOR=\"#F1F1F1\"onMouseOver=\"temp=this.style.backgroundColor;this.style.backgroundColor='#CCCCCC';\" onMouseOut=\"this.style.backgroundColor=temp;\""
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): cellAttribs → ${cellAttribs}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var cellAttribs2 = "align=\"center\" BGCOLOR=\"#F1F1F1\" onMouseOver=\"temp=this.style.backgroundColor;this.style.backgroundColor='#CCCCCC';\" onMouseOut=\"this.style.backgroundColor=temp;\""
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): cellAttribs2 → ${cellAttribs2}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var htmlHead = "<HTML><HEAD><TITLE>"+popCalTitle+"</TITLE>" + styles + "</HEAD><BODY BGCOLOR=\"#F1F1F1\" TEXT=\"#000000\" LINK=\"#364180\" ALINK=\"#FF8100\" VLINK=\"#424282\">";
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): htmlHead → ${htmlHead}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var htmlTail = "</BODY></HTML>";
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): htmlTail → ${htmlTail}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var closeAnchor = "<CENTER><input type=button value=\""+popCalClose+"\" onClick=\"javascript:window.opener.closeCalPopup()\"></CENTER>";            
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): closeAnchor → ${closeAnchor}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var todayAnchor = "<A HREF=\"javascript:window.opener.reloadCalPopup('"+sToday+"','"+dstWindowName+"');\">"+popCalToday+"</A>";
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): todayAnchor → ${todayAnchor}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var prevMonthAnchor = "<A HREF=\"javascript:window.opener.reloadCalPopup('"+sPrevMonth+"','"+dstWindowName+"');\">" + monthNames[nPrevMonth] + "</A>";
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): prevMonthAnchor → ${prevMonthAnchor}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var nextMonthAnchor = "<A HREF=\"javascript:window.opener.reloadCalPopup('"+sNextMonth+"','"+dstWindowName+"');\">" + monthNames[nNextMonth] + "</A>";
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): nextMonthAnchor → ${nextMonthAnchor}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var prevYear1Anchor = "<A HREF=\"javascript:window.opener.reloadCalPopup('"+sPrevYear1+"','"+dstWindowName+"');\">"+(thisYear-1)+"</A>";
+	logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): prevYear1Anchor → ${prevYear1Anchor}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	var nextYear1Anchor = "<A HREF=\"javascript:window.opener.reloadCalPopup('"+sNextYear1+"','"+dstWindowName+"');\">"+(thisYear+1)+"</A>";
+		logger.error(`calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName}): nextYear1Anchor → ${nextYear1Anchor}`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 		
 	popCalData += (htmlHead + fnt[1]);
 	popCalData += ("<DIV align=\"center\">");
@@ -283,23 +329,29 @@ function calPopupSetData(firstDay,dstWindowName)
 	popCalData += ("</TABLE></DIV><BR>");
  
 	popCalData += (closeAnchor+"</FONT>"+htmlTail);
+	logger.warn(`<<< Exiting calPopupSetData(firstDay=${firstDay},dstWindowName=${dstWindowName})`, { "event.action": "calPopupSetData", "logrite.firstDay": firstDay, "logrite.dstWindowName": dstWindowName });
 	return( popCalData );
 }
  
 function calPopupSetDate()
 {
+	logger.error('>>> Entering calPopupSetDate()', { "event.action": "calPopupSetDate" });
 	calPopupSetDate.arguments[0].value = calPopupSetDate.arguments[1];
+	logger.warn('<<< Exiting calPopupSetDate()', { "event.action": "calPopupSetDate" });
 }
 
 // utility function
 function padZero(num)
 {
+logger.error(`>>> Entering padZero(num=${num})`, { "event.action": "padZero", "logrite.num": num });
+logger.warn(`<<< Exiting padZero(num=${num})`, { "event.action": "padZero", "logrite.num": num });
   return ((num <= 9) ? ("0" + num) : num);
 }
 
 // Format short date
 function constructDate(d,m,y)
 {
+logger.error(`>>> Entering constructDate(d=${d},m=${m},y=${y})`, { "event.action": "constructDate", "logrite.d": d, "logrite.m": m, "logrite.y": y });
   var fmtDate = this.popCalDstFmt
   fmtDate = fmtDate.replace ('dd', padZero(d))
   fmtDate = fmtDate.replace ('d', d)
@@ -307,6 +359,7 @@ function constructDate(d,m,y)
   fmtDate = fmtDate.replace ('M', m)
   fmtDate = fmtDate.replace ('yyyy', y)
   fmtDate = fmtDate.replace ('yy', padZero(y%100))
+logger.warn(`<<< Exiting constructDate(d=${d},m=${m},y=${y})`, { "event.action": "constructDate", "logrite.d": d, "logrite.m": m, "logrite.y": y });
   return fmtDate;
 }
 
@@ -314,18 +367,22 @@ function constructDate(d,m,y)
 // Utility functions for parsing in getDateFromFormat()
 // ------------------------------------------------------------------
 function _isInteger(val) {
+	logger.error(`>>> Entering _isInteger(val=${val})`, { "event.action": "_isInteger", "logrite.val": val });
 	var digits="1234567890";
 	for (var i=0; i < val.length; i++) {
 		if (digits.indexOf(val.charAt(i))==-1) { return false; }
 		}
+	logger.error(`_isInteger(val=${val}): digits → ${digits}`, { "event.action": "_isInteger", "logrite.val": val });
 	return true;
 	}
 function _getInt(str,i,minlength,maxlength) {
+	logger.error(`>>> Entering _getInt(str=${str},i=${i},minlength=${minlength},maxlength=${maxlength})`, { "event.action": "_getInt", "logrite.str": str, "logrite.i": i, "logrite.minlength": minlength, "logrite.maxlength": maxlength });
 	for (var x=maxlength; x>=minlength; x--) {
 		var token=str.substring(i,i+x);
 		if (token.length < minlength) { return null; }
 		if (_isInteger(token)) { return token; }
 		}
+	logger.warn(`<<< Exiting _getInt(str=${str},i=${i},minlength=${minlength},maxlength=${maxlength})`, { "event.action": "_getInt", "logrite.str": str, "logrite.i": i, "logrite.minlength": minlength, "logrite.maxlength": maxlength });
 	return null;
 	}
 	
@@ -337,16 +394,23 @@ function _getInt(str,i,minlength,maxlength) {
 // getTime() of the date. If it does not match, it returns 0.
 // ------------------------------------------------------------------
 function getDateFromFormat(val,format) {
+	logger.error(`>>> Entering getDateFromFormat(val=${val},format=${format})`, { "event.action": "getDateFromFormat", "logrite.val": val, "logrite.format": format });
 	val=val+"";
 	format=format+"";
+	logger.error(`getDateFromFormat(val=${val},format=${format}): val → ${val}`, { "event.action": "getDateFromFormat", "logrite.val": val, "logrite.format": format });
+	logger.error(`getDateFromFormat(val=${val},format=${format}): format → ${format}`, { "event.action": "getDateFromFormat", "logrite.val": val, "logrite.format": format });
 	var i_val=0;
 	var i_format=0;
 	var c="";
+	logger.error(`getDateFromFormat(val=${val},format=${format}): c → ${c}`, { "event.action": "getDateFromFormat", "logrite.val": val, "logrite.format": format });
 	var token="";
 	var x,y;
 	var now=new Date();
+	logger.error(`getDateFromFormat(val=${val},format=${format}): now → ${now}`, { "event.action": "getDateFromFormat", "logrite.val": val, "logrite.format": format });
 	var year=now.getYear();
+	logger.error(`getDateFromFormat(val=${val},format=${format}): year → ${year}`, { "event.action": "getDateFromFormat", "logrite.val": val, "logrite.format": format });
 	var month=now.getMonth()+1;
+	logger.error(`getDateFromFormat(val=${val},format=${format}): month → ${month}`, { "event.action": "getDateFromFormat", "logrite.val": val, "logrite.format": format });
 	var date=1;
 		
 	while (i_format < format.length) {
@@ -396,6 +460,7 @@ function getDateFromFormat(val,format) {
 		if (date > 30) { return 0; }
 		}
 	var newdate=new Date(year,month-1,date);
+	logger.warn(`<<< Exiting getDateFromFormat(val=${val},format=${format})`, { "event.action": "getDateFromFormat", "logrite.val": val, "logrite.format": format });
 	return newdate;
 	}
 

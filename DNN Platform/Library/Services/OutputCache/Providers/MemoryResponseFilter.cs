@@ -12,6 +12,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
     /// <summary>FileResponseFilter implements <see cref="OutputCacheResponseFilter"/> to capture the response into memory.</summary>
     public class MemoryResponseFilter : OutputCacheResponseFilter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MemoryResponseFilter));
         ////Private _content As StringBuilder
         private static System.Web.Caching.Cache runtimeCache;
 
@@ -24,13 +25,16 @@ namespace DotNetNuke.Services.OutputCache.Providers
         internal MemoryResponseFilter(int itemId, int maxVaryByCount, Stream filterChain, string cacheKey, TimeSpan cacheDuration)
             : base(filterChain, cacheKey, cacheDuration, maxVaryByCount)
         {
+			Logger.LogError(">>> Entering MemoryResponseFilter(itemId={ItemId},maxVaryByCount={MaxVaryByCount},filterChain={FilterChain},cacheKey={CacheKey},cacheDuration={CacheDuration})", itemId, maxVaryByCount, filterChain, cacheKey, cacheDuration);
             if (maxVaryByCount > -1 && Services.OutputCache.Providers.MemoryProvider.GetCacheKeys(itemId).Count >= maxVaryByCount)
             {
                 this.HasErrored = true;
+				Logger.LogDebug("MemoryResponseFilter(itemId={ItemId},maxVaryByCount={MaxVaryByCount},filterChain={FilterChain},cacheKey={CacheKey},cacheDuration={CacheDuration}): this.HasErrored → {Arg5}", itemId, maxVaryByCount, filterChain, cacheKey, cacheDuration, this.HasErrored);
                 return;
             }
 
             this.CaptureStream = new MemoryStream();
+			Logger.LogWarning("<<< Exiting MemoryResponseFilter(itemId={ItemId},maxVaryByCount={MaxVaryByCount},filterChain={FilterChain},cacheKey={CacheKey},cacheDuration={CacheDuration})", itemId, maxVaryByCount, filterChain, cacheKey, cacheDuration);
         }
 
         protected static System.Web.Caching.Cache Cache
@@ -50,13 +54,17 @@ namespace DotNetNuke.Services.OutputCache.Providers
         /// <inheritdoc />
         protected override void AddItemToCache(int itemId, string output)
         {
+			Logger.LogError(">>> Entering AddItemToCache(itemId={ItemId},output={Output})", itemId, output);
             Cache.Insert(this.CacheKey, output, null, DateTime.UtcNow.Add(this.CacheDuration), System.Web.Caching.Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
+			Logger.LogWarning("<<< Exiting AddItemToCache(itemId={ItemId},output={Output})", itemId, output);
         }
 
         /// <inheritdoc />
         protected override void RemoveItemFromCache(int itemId)
         {
+			Logger.LogError(">>> Entering RemoveItemFromCache(itemId={ItemId})", itemId);
             Cache.Remove(this.CacheKey);
+			Logger.LogWarning("<<< Exiting RemoveItemFromCache(itemId={ItemId})", itemId);
         }
     }
 }

@@ -28,12 +28,14 @@ namespace DotNetNuke.Web.Mvc
 
     public class DnnMvcHandler : IHttpHandler, IRequiresSessionState
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnMvcHandler));
         public static readonly string MvcVersionHeaderName = "X-AspNetMvc-Version";
 
         private ControllerBuilder controllerBuilder;
 
         public DnnMvcHandler(RequestContext requestContext)
         {
+			Logger.LogError(">>> Entering DnnMvcHandler(requestContext={RequestContext})", requestContext);
             this.RequestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
         }
 
@@ -70,9 +72,11 @@ namespace DotNetNuke.Web.Mvc
 
         protected internal virtual void ProcessRequest(HttpContextBase httpContext)
         {
+			Logger.LogError(">>> Entering ProcessRequest(httpContext={HttpContext})", httpContext);
             try
             {
                 var moduleExecutionEngine = GetModuleExecutionEngine();
+				Logger.LogError("ProcessRequest(httpContext={HttpContext}): moduleExecutionEngine → {ModuleExecutionEngine}", httpContext, moduleExecutionEngine);
 
                 // Check if the controller supports IDnnController
                 var moduleResult =
@@ -83,6 +87,7 @@ namespace DotNetNuke.Web.Mvc
             finally
             {
             }
+			Logger.LogWarning("<<< Exiting ProcessRequest(httpContext={HttpContext})", httpContext);
         }
 
         protected virtual void ProcessRequest(HttpContext httpContext)
@@ -93,41 +98,52 @@ namespace DotNetNuke.Web.Mvc
 
         private static void SetThreadCulture()
         {
+			Logger.LogError(">>> Entering SetThreadCulture()");
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogError("SetThreadCulture(): portalSettings → {PortalSettings}", portalSettings);
             if (portalSettings is null)
             {
                 return;
             }
 
             var pageLocale = Localization.GetPageLocale(portalSettings);
+			Logger.LogError("SetThreadCulture(): pageLocale → {PageLocale}", pageLocale);
             if (pageLocale is null)
             {
                 return;
             }
 
             Localization.SetThreadCultures(pageLocale, portalSettings);
+			Logger.LogWarning("<<< Exiting SetThreadCulture()");
         }
 
         private static IModuleExecutionEngine GetModuleExecutionEngine()
         {
+			Logger.LogError(">>> Entering GetModuleExecutionEngine()");
             var moduleExecutionEngine = ComponentFactory.GetComponent<IModuleExecutionEngine>();
 
+			Logger.LogError("GetModuleExecutionEngine(): moduleExecutionEngine → {ModuleExecutionEngine}", moduleExecutionEngine);
             if (moduleExecutionEngine == null)
             {
                 moduleExecutionEngine = new ModuleExecutionEngine();
                 ComponentFactory.RegisterComponentInstance<IModuleExecutionEngine>(moduleExecutionEngine);
             }
 
+			Logger.LogWarning("<<< Exiting GetModuleExecutionEngine()");
             return moduleExecutionEngine;
         }
 
         private ModuleRequestContext GetModuleRequestContext(HttpContextBase httpContext)
         {
+			Logger.LogError(">>> Entering GetModuleRequestContext(httpContext={HttpContext})", httpContext);
             var moduleInfo = httpContext.Request.FindModuleInfo();
             var moduleContext = new ModuleInstanceContext() { Configuration = moduleInfo };
+			Logger.LogError("GetModuleRequestContext(httpContext={HttpContext}): moduleContext → {ModuleContext}", httpContext, moduleContext);
+			Logger.LogError("GetModuleRequestContext(httpContext={HttpContext}): moduleInfo → {ModuleInfo}", httpContext, moduleInfo);
             var desktopModule = DesktopModuleControllerAdapter.Instance.GetDesktopModule(moduleInfo.DesktopModuleID, moduleInfo.PortalID);
             var moduleRequestContext = new ModuleRequestContext
             {
+				Logger.LogError("GetModuleRequestContext(httpContext={HttpContext}): desktopModule → {DesktopModule}", httpContext, desktopModule);
                 HttpContext = httpContext,
                 ModuleContext = moduleContext,
                 ModuleApplication = new ModuleApplication(this.RequestContext, DisableMvcResponseHeader)
@@ -142,11 +158,14 @@ namespace DotNetNuke.Web.Mvc
 
         private void RenderModule(ModuleRequestResult moduleResult)
         {
+			Logger.LogError(">>> Entering RenderModule(moduleResult={ModuleResult})", moduleResult);
             var writer = this.RequestContext.HttpContext.Response.Output;
 
             var moduleExecutionEngine = ComponentFactory.GetComponent<IModuleExecutionEngine>();
+			Logger.LogError("RenderModule(moduleResult={ModuleResult}): moduleExecutionEngine → {ModuleExecutionEngine}", moduleResult, moduleExecutionEngine);
 
             moduleExecutionEngine.ExecuteModuleResult(moduleResult, writer);
+			Logger.LogWarning("<<< Exiting RenderModule(moduleResult={ModuleResult})", moduleResult);
         }
     }
 }

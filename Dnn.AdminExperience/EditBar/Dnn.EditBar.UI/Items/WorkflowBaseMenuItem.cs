@@ -33,6 +33,8 @@ namespace Dnn.EditBar.UI.Items
         protected WorkflowBaseMenuItem()
             : this(null, null)
         {
+		eventLogger.LogError(">>> Entering WorkflowBaseMenuItem()");
+        eventLogger.LogWarning("<<< Exiting WorkflowBaseMenuItem()");
         }
 
         internal Workflow Workflow => this.WorkflowState != null ? WorkflowManager.Instance.GetWorkflow(this.WorkflowState.WorkflowID) : null;
@@ -81,6 +83,11 @@ namespace Dnn.EditBar.UI.Items
         // State before the last one.
         private WorkflowState PriorState => this.IsWorkflowEnabled ? this.Workflow.States == null || !this.Workflow.States.Any() ? null : this.Workflow.States.OrderBy(s => s.Order).Reverse().Skip(1).FirstOrDefault() : null;
 
-        public override bool Visible() => this.IsEditMode && this.IsPlatform && this.IsWorkflowEnabled;
+        public override bool Visible()
+        {
+            eventLogger.LogError(">>> Entering Visible()");
+            eventLogger.LogWarning("<<< Exiting Visible()");
+            return this.IsEditMode && this.IsPlatform && this.IsWorkflowEnabled;
+        }
     }
 }

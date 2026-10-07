@@ -22,12 +22,15 @@ namespace Dnn.PersonaBar.Library.Helper
     /// <summary>Helpers methods for permissions.</summary>
     public static partial class PermissionHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PermissionHelper));
         public static void AddUserPermission(this Dto.Permissions dto, PermissionInfoBase permissionInfo)
             => dto.AddUserPermission((IPermissionInfo)permissionInfo);
 
         public static void AddUserPermission(this Dto.Permissions dto, IPermissionInfo permissionInfo)
         {
+			Logger.LogError(">>> Entering AddUserPermission(dto={Dto},permissionInfo={PermissionInfo})", dto, permissionInfo);
             var userPermission = dto.UserPermissions.FirstOrDefault(p => p.UserId == permissionInfo.UserId);
+			Logger.LogError("AddUserPermission(dto={Dto},permissionInfo={PermissionInfo}): userPermission → {UserPermission}", dto, permissionInfo, userPermission);
             if (userPermission == null)
             {
                 userPermission = new UserPermission
@@ -54,7 +57,9 @@ namespace Dnn.PersonaBar.Library.Helper
 
         public static void AddRolePermission(this Dto.Permissions dto, IPermissionInfo permissionInfo)
         {
+			Logger.LogError(">>> Entering AddRolePermission(dto={Dto},permissionInfo={PermissionInfo})", dto, permissionInfo);
             var rolePermission = dto.RolePermissions.FirstOrDefault(p => p.RoleId == permissionInfo.RoleId);
+			Logger.LogError("AddRolePermission(dto={Dto},permissionInfo={PermissionInfo}): rolePermission → {RolePermission}", dto, permissionInfo, rolePermission);
             if (rolePermission == null)
             {
                 rolePermission = new RolePermission
@@ -78,28 +83,36 @@ namespace Dnn.PersonaBar.Library.Helper
 
         public static void EnsureDefaultRoles(this Dto.Permissions dto)
         {
+			Logger.LogError(">>> Entering EnsureDefaultRoles(dto={Dto})", dto);
             // Administrators Role always has implicit permissions, then it should be always in
             dto.EnsureRole(RoleController.Instance.GetRoleById(PortalSettings.Current.PortalId, PortalSettings.Current.AdministratorRoleId), true, true);
 
             // Show also default roles
             dto.EnsureRole(RoleController.Instance.GetRoleById(PortalSettings.Current.PortalId, PortalSettings.Current.RegisteredRoleId), false, true);
             dto.EnsureRole(new RoleInfo { RoleID = int.Parse(Globals.glbRoleAllUsers, CultureInfo.InvariantCulture), RoleName = Globals.glbRoleAllUsersName, }, false, true);
+			Logger.LogWarning("<<< Exiting EnsureDefaultRoles(dto={Dto})", dto);
         }
 
         public static void EnsureRole(this Dto.Permissions dto, RoleInfo role)
         {
+			Logger.LogError(">>> Entering EnsureRole(dto={Dto},role={Role})", dto, role);
             dto.EnsureRole(role, false);
+			Logger.LogWarning("<<< Exiting EnsureRole(dto={Dto},role={Role})", dto, role);
         }
 
         public static void EnsureRole(this Dto.Permissions dto, RoleInfo role, bool locked)
         {
+			Logger.LogError(">>> Entering EnsureRole(dto={Dto},role={Role},locked={Locked})", dto, role, locked);
             dto.EnsureRole(role, locked, false);
+			Logger.LogWarning("<<< Exiting EnsureRole(dto={Dto},role={Role},locked={Locked})", dto, role, locked);
         }
 
         public static void EnsureRole(this Dto.Permissions dto, RoleInfo role, bool locked, bool isDefault)
         {
+			Logger.LogError(">>> Entering EnsureRole(dto={Dto},role={Role},locked={Locked},isDefault={IsDefault})", dto, role, locked, isDefault);
             if (dto.RolePermissions.All(r => r.RoleId != role.RoleID))
             {
+				Logger.LogWarning("<<< Exiting EnsureRole(dto={Dto},role={Role},locked={Locked})", dto, role, locked);
                 dto.RolePermissions.Add(new RolePermission
                 {
                     RoleId = role.RoleID,
@@ -122,6 +135,7 @@ namespace Dnn.PersonaBar.Library.Helper
         /// <returns><see langword="true"/> if it's the full control permission, otherwise <see langword="false"/>.</returns>
         public static bool IsFullControl(IPermissionDefinitionInfo permissionDefinition)
         {
+			Logger.LogError(">>> Entering IsFullControl(permissionInfo={PermissionInfo})", permissionInfo);
             return permissionDefinition.PermissionKey == "EDIT" && PermissionProvider.Instance().SupportsFullControl();
         }
 
@@ -137,6 +151,8 @@ namespace Dnn.PersonaBar.Library.Helper
         /// <returns><see langword="true"/> if it's the view permission, otherwise <see langword="false"/>.</returns>
         public static bool IsViewPermission(IPermissionDefinitionInfo permissionDefinition)
         {
+			Logger.LogError(">>> Entering IsViewPermission(permissionDefinition={PermissionDefinition})", permissionDefinition);
+			Logger.LogWarning("<<< Exiting IsViewPermission(permissionDefinition={PermissionDefinition})", permissionDefinition);
             return permissionDefinition.PermissionKey == "VIEW";
         }
 
@@ -153,9 +169,12 @@ namespace Dnn.PersonaBar.Library.Helper
         /// <returns>An object with <c>Groups</c> and <c>Roles</c> fields.</returns>
         public static object GetRoles(RoleProvider roleProvider, int portalId)
         {
+			Logger.LogError(">>> Entering GetRoles(portalId={PortalId})", portalId);
             var data = new { Groups = new List<object>(), Roles = new List<object>() };
 
             // retrieve role groups info
+			Logger.LogError("GetRoles(roleProvider={RoleProvider},portalId={PortalId}): data → {Data}", roleProvider, portalId, data);
+			Logger.LogError("GetRoles(portalId={PortalId}): data → {Data}", portalId, data);
             data.Groups.Add(new { GroupId = -2, Name = "AllRoles" });
             data.Groups.Add(new { GroupId = -1, Name = "GlobalRoles", Selected = true });
 
@@ -172,6 +191,7 @@ namespace Dnn.PersonaBar.Library.Helper
                 data.Roles.Add(new { GroupId = role.RoleGroupID, RoleId = role.RoleID, Name = role.RoleName });
             }
 
+			Logger.LogWarning("<<< Exiting GetRoles(roleProvider={RoleProvider},portalId={PortalId})", roleProvider, portalId);
             return data;
         }
     }

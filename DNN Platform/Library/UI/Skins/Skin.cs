@@ -54,6 +54,7 @@ namespace DotNetNuke.UI.Skins
     /// <summary>Skin is the base for the Skins.</summary>
     public partial class Skin : UserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Skin));
         public const string OnInitMessage = "Skin_InitMessage";
         public const string OnInitMessageType = "Skin_InitMessageType";
 
@@ -100,6 +101,8 @@ namespace DotNetNuke.UI.Skins
         public Skin(IModuleControlPipeline moduleControlPipeline, INavigationManager navigationManager)
             : this(moduleControlPipeline, navigationManager, null, null, null)
         {
+		Logger.LogError(">>> Entering Skin(moduleControlPipeline={ModuleControlPipeline},navigationManager={NavigationManager})", moduleControlPipeline, navigationManager);
+        Logger.LogWarning("<<< Exiting Skin(moduleControlPipeline={ModuleControlPipeline},navigationManager={NavigationManager})", moduleControlPipeline, navigationManager);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Skin"/> class.</summary>
@@ -112,6 +115,8 @@ namespace DotNetNuke.UI.Skins
         public Skin(IModuleControlPipeline moduleControlPipeline, INavigationManager navigationManager, IHostSettings hostSettings, IHostSettingsService hostSettingsService, IJavaScriptLibraryHelper javaScript)
             : this(moduleControlPipeline, navigationManager, hostSettings, hostSettingsService, javaScript, null)
         {
+		Logger.LogError(">>> Entering Skin(moduleControlPipeline={ModuleControlPipeline},navigationManager={NavigationManager},hostSettings={HostSettings},hostSettingsService={HostSettingsService},javaScript={JavaScript})", moduleControlPipeline, navigationManager, hostSettings, hostSettingsService, javaScript);
+        Logger.LogWarning("<<< Exiting Skin(moduleControlPipeline={ModuleControlPipeline},navigationManager={NavigationManager},hostSettings={HostSettings},hostSettingsService={HostSettingsService},javaScript={JavaScript})", moduleControlPipeline, navigationManager, hostSettings, hostSettingsService, javaScript);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Skin"/> class.</summary>
@@ -125,6 +130,8 @@ namespace DotNetNuke.UI.Skins
         internal Skin(IModuleControlPipeline moduleControlPipeline, INavigationManager navigationManager, IHostSettings hostSettings, IHostSettingsService hostSettingsService, IJavaScriptLibraryHelper javaScript, ModuleInjectionManager moduleInjectionManager)
             : this(moduleControlPipeline, navigationManager, hostSettings, hostSettingsService, javaScript, moduleInjectionManager, null)
         {
+		Logger.LogError(">>> Entering Skin(moduleControlPipeline={ModuleControlPipeline},navigationManager={NavigationManager},hostSettings={HostSettings},hostSettingsService={HostSettingsService},javaScript={JavaScript},moduleInjectionManager={ModuleInjectionManager})", moduleControlPipeline, navigationManager, hostSettings, hostSettingsService, javaScript, moduleInjectionManager);
+        Logger.LogWarning("<<< Exiting Skin(moduleControlPipeline={ModuleControlPipeline},navigationManager={NavigationManager},hostSettings={HostSettings},hostSettingsService={HostSettingsService},javaScript={JavaScript},moduleInjectionManager={ModuleInjectionManager})", moduleControlPipeline, navigationManager, hostSettings, hostSettingsService, javaScript, moduleInjectionManager);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Skin"/> class.</summary>
@@ -137,6 +144,11 @@ namespace DotNetNuke.UI.Skins
         /// <param name="servicesFramework">The web API service framework.</param>
         internal Skin(IModuleControlPipeline moduleControlPipeline, INavigationManager navigationManager, IHostSettings hostSettings, IHostSettingsService hostSettingsService, IJavaScriptLibraryHelper javaScript, ModuleInjectionManager moduleInjectionManager, IServicesFramework servicesFramework)
         {
+			Logger.LogDebug("Skin(moduleControlPipeline={ModuleControlPipeline},navigationManager={NavigationManager},hostSettings={HostSettings},hostSettingsService={HostSettingsService},javaScript={JavaScript},moduleInjectionManager={ModuleInjectionManager},servicesFramework={ServicesFramework}): hostSettings → {HostSettings1}", moduleControlPipeline, navigationManager, hostSettings, hostSettingsService, javaScript, moduleInjectionManager, servicesFramework, hostSettings);
+			Logger.LogDebug("Skin(moduleControlPipeline={ModuleControlPipeline},navigationManager={NavigationManager},hostSettings={HostSettings},hostSettingsService={HostSettingsService},javaScript={JavaScript},moduleInjectionManager={ModuleInjectionManager},servicesFramework={ServicesFramework}): hostSettingsService → {HostSettingsService1}", moduleControlPipeline, navigationManager, hostSettings, hostSettingsService, javaScript, moduleInjectionManager, servicesFramework, hostSettingsService);
+			Logger.LogDebug("Skin(moduleControlPipeline={ModuleControlPipeline},navigationManager={NavigationManager},hostSettings={HostSettings},hostSettingsService={HostSettingsService},javaScript={JavaScript},moduleInjectionManager={ModuleInjectionManager},servicesFramework={ServicesFramework}): javaScript → {JavaScript1}", moduleControlPipeline, navigationManager, hostSettings, hostSettingsService, javaScript, moduleInjectionManager, servicesFramework, javaScript);
+			Logger.LogDebug("Skin(moduleControlPipeline={ModuleControlPipeline},navigationManager={NavigationManager},hostSettings={HostSettings},hostSettingsService={HostSettingsService},javaScript={JavaScript},moduleInjectionManager={ModuleInjectionManager},servicesFramework={ServicesFramework}): moduleInjectionManager → {ModuleInjectionManager1}", moduleControlPipeline, navigationManager, hostSettings, hostSettingsService, javaScript, moduleInjectionManager, servicesFramework, moduleInjectionManager);
+			Logger.LogDebug("Skin(moduleControlPipeline={ModuleControlPipeline},navigationManager={NavigationManager},hostSettings={HostSettings},hostSettingsService={HostSettingsService},javaScript={JavaScript},moduleInjectionManager={ModuleInjectionManager},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", moduleControlPipeline, navigationManager, hostSettings, hostSettingsService, javaScript, moduleInjectionManager, servicesFramework, servicesFramework);
             this.ModuleControlPipeline = moduleControlPipeline ?? Globals.GetCurrentServiceProvider().GetRequiredService<IModuleControlPipeline>();
             this.NavigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
@@ -205,12 +217,16 @@ namespace DotNetNuke.UI.Skins
 
         public static void AddModuleMessage(PortalModuleBase control, string message, ModuleMessage.ModuleMessageType moduleMessageType)
         {
+			Logger.LogError(">>> Entering AddModuleMessage(control={Control},message={Message},moduleMessageType={ModuleMessageType})", control, message, moduleMessageType);
             AddModuleMessage(control, string.Empty, message, moduleMessageType, Null.NullString);
+			Logger.LogWarning("<<< Exiting AddModuleMessage(control={Control},message={Message},moduleMessageType={ModuleMessageType})", control, message, moduleMessageType);
         }
 
         public static void AddModuleMessage(PortalModuleBase control, string heading, string message, ModuleMessage.ModuleMessageType moduleMessageType)
         {
+			Logger.LogError(">>> Entering AddModuleMessage(control={Control},heading={Heading},message={Message},moduleMessageType={ModuleMessageType})", control, heading, message, moduleMessageType);
             AddModuleMessage(control, heading, message, moduleMessageType, Null.NullString);
+			Logger.LogWarning("<<< Exiting AddModuleMessage(control={Control},heading={Heading},message={Message},moduleMessageType={ModuleMessageType})", control, heading, message, moduleMessageType);
         }
 
         /// <summary>AddModuleMessage adds a Module Message control to the Skin.</summary>
@@ -240,7 +256,9 @@ namespace DotNetNuke.UI.Skins
         [DnnDeprecated(10, 2, 0, "Please use IPageService.AddMessage")]
         public static partial void AddPageMessage(Page page, string heading, string message, string iconSrc)
         {
+			Logger.LogError(">>> Entering AddPageMessage(page={Page},heading={Heading},message={Message},iconSrc={IconSrc})", page, heading, message, iconSrc);
             AddPageMessage(page, heading, message, ModuleMessage.ModuleMessageType.GreenSuccess, iconSrc);
+			Logger.LogWarning("<<< Exiting AddPageMessage(page={Page},heading={Heading},message={Message},iconSrc={IconSrc})", page, heading, message, iconSrc);
         }
 
         /// <summary>AddPageMessage adds a Page Message control to the Skin.</summary>
@@ -251,7 +269,9 @@ namespace DotNetNuke.UI.Skins
         [DnnDeprecated(10, 2, 0, "Please use IPageService.AddMessage")]
         public static partial void AddPageMessage(Skin skin, string heading, string message, string iconSrc)
         {
+			Logger.LogError(">>> Entering AddPageMessage(skin={Skin},heading={Heading},message={Message},iconSrc={IconSrc})", skin, heading, message, iconSrc);
             AddPageMessage(skin, heading, message, ModuleMessage.ModuleMessageType.GreenSuccess, iconSrc);
+			Logger.LogWarning("<<< Exiting AddPageMessage(skin={Skin},heading={Heading},message={Message},iconSrc={IconSrc})", skin, heading, message, iconSrc);
         }
 
         /// <summary>AddPageMessage adds a Page Message control to the Skin.</summary>
@@ -262,7 +282,9 @@ namespace DotNetNuke.UI.Skins
         [DnnDeprecated(10, 2, 0, "Please use IPageService.AddMessage")]
         public static partial void AddPageMessage(Skin skin, string heading, string message, ModuleMessage.ModuleMessageType moduleMessageType)
         {
+			Logger.LogError(">>> Entering AddPageMessage(skin={Skin},heading={Heading},message={Message},moduleMessageType={ModuleMessageType})", skin, heading, message, moduleMessageType);
             AddPageMessage(skin, heading, message, moduleMessageType, Null.NullString);
+			Logger.LogWarning("<<< Exiting AddPageMessage(skin={Skin},heading={Heading},message={Message},moduleMessageType={ModuleMessageType})", skin, heading, message, moduleMessageType);
         }
 
         /// <summary>AddPageMessage adds a Page Message control to the Skin.</summary>
@@ -273,7 +295,9 @@ namespace DotNetNuke.UI.Skins
         [DnnDeprecated(10, 2, 0, "Please use IPageService.AddMessage")]
         public static partial void AddPageMessage(Page page, string heading, string message, ModuleMessage.ModuleMessageType moduleMessageType)
         {
+			Logger.LogError(">>> Entering AddPageMessage(page={Page},heading={Heading},message={Message},moduleMessageType={ModuleMessageType})", page, heading, message, moduleMessageType);
             AddPageMessage(page, heading, message, moduleMessageType, Null.NullString);
+			Logger.LogWarning("<<< Exiting AddPageMessage(page={Page},heading={Heading},message={Message},moduleMessageType={ModuleMessageType})", page, heading, message, moduleMessageType);
         }
 
         /// <summary>GetModuleMessageControl gets an existing Message Control and sets its properties.</summary>
@@ -283,6 +307,9 @@ namespace DotNetNuke.UI.Skins
         /// <returns>The <see cref="ModuleMessage"/> control.</returns>
         public static ModuleMessage GetModuleMessageControl(string heading, string message, string iconImage)
         {
+			Logger.LogError(">>> Entering GetModuleMessageControl(heading={Heading},message={Message},iconImage={IconImage})", heading, message, iconImage);
+            Logger.LogWarning("<<< Exiting GetModuleMessageControl(heading={Heading},message={Message},iconImage={IconImage})", heading, message, iconImage);
+			Logger.LogWarning("<<< Exiting GetModuleMessageControl(heading={Heading},message={Message},moduleMessageType={ModuleMessageType},iconImage={IconImage})", heading, message, moduleMessageType, iconImage);
             return GetModuleMessageControl(heading, message, ModuleMessage.ModuleMessageType.GreenSuccess, iconImage);
         }
 
@@ -320,6 +347,8 @@ namespace DotNetNuke.UI.Skins
         /// <returns>A <see cref="Skin"/> instance or <see langword="null"/>.</returns>
         public static Skin GetParentSkin(PortalModuleBase module)
         {
+			Logger.LogError(">>> Entering GetParentSkin(module={Module})", module);
+            Logger.LogWarning("<<< Exiting GetParentSkin(module={Module})", module);
             return GetParentSkin(module as Control);
         }
 
@@ -336,10 +365,13 @@ namespace DotNetNuke.UI.Skins
         /// <returns>A <see cref="Skin"/> instance.</returns>
         public static Skin GetPopUpSkin(PageBase page)
         {
+			Logger.LogError(">>> Entering GetPopUpSkin(page={Page})", page);
             Skin skin = null;
 
+			Logger.LogError("GetPopUpSkin(page={Page}): skin → {Skin}", page, skin);
             // attempt to find and load a popup skin from the assigned skinned source
             string skinSource = Globals.IsAdminSkin() ? SkinController.FormatSkinSrc(page.PortalSettings.DefaultAdminSkin, page.PortalSettings) : page.PortalSettings.ActiveTab.SkinSrc;
+			Logger.LogError("GetPopUpSkin(page={Page}): skinSource → {SkinSource}", page, skinSource);
             if (!string.IsNullOrEmpty(skinSource))
             {
                 skinSource = SkinController.FormatSkinSrc(SkinController.FormatSkinPath(skinSource) + "popUpSkin.ascx", page.PortalSettings);
@@ -362,7 +394,9 @@ namespace DotNetNuke.UI.Skins
 
             // set skin id to an explicit short name to reduce page payload and make it standards compliant
             skin.ID = "dnn";
+			Logger.LogDebug("GetPopUpSkin(page={Page}): skin.ID → {Arg1}", page, skin.ID);
 
+			Logger.LogWarning("<<< Exiting GetPopUpSkin(page={Page})", page);
             return skin;
         }
 
@@ -379,12 +413,17 @@ namespace DotNetNuke.UI.Skins
         /// <returns>A <see cref="Skin"/> instance.</returns>
         public static Skin GetSkin(IHostSettings hostSettings, PageBase page)
         {
+			Logger.LogError(">>> Entering GetSkin(page={Page})", page);
             Skin skin = null;
             string skinSource = Null.NullString;
 
+			Logger.LogError("GetSkin(hostSettings={HostSettings},page={Page}): skin → {Skin}", hostSettings, page, skin);
+			Logger.LogError("GetSkin(page={Page}): skinSource → {SkinSource}", page, skinSource);
             // skin preview
             if (page.Request.QueryString["SkinSrc"] != null)
             {
+				Logger.LogError("GetSkin(hostSettings={HostSettings},page={Page}): skinSource → {SkinSource}", hostSettings, page, skinSource);
+				Logger.LogError("GetSkin(page={Page}): skin → {Skin}", page, skin);
                 hostSettings ??= Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
 
                 if (hostSettings.AllowOverrideThemeViaQueryString || TabPermissionController.CanManagePage())
@@ -398,8 +437,10 @@ namespace DotNetNuke.UI.Skins
             if (skin == null)
             {
                 HttpCookie skinCookie = page.Request.Cookies["_SkinSrc" + page.PortalSettings.PortalId];
+				Logger.LogError("GetSkin(page={Page}): skinCookie → {SkinCookie}", page, skinCookie);
                 if (skinCookie != null)
                 {
+					Logger.LogError("GetSkin(hostSettings={HostSettings},page={Page}): skinCookie → {SkinCookie}", hostSettings, page, skinCookie);
                     if (!string.IsNullOrEmpty(skinCookie.Value))
                     {
                         skinSource = SkinController.FormatSkinSrc(skinCookie.Value + ".ascx", page.PortalSettings);
@@ -435,24 +476,30 @@ namespace DotNetNuke.UI.Skins
 
             // set skin id to an explicit short name to reduce page payload and make it standards compliant
             skin.ID = "dnn";
+			Logger.LogDebug("GetSkin(hostSettings={HostSettings},page={Page}): skin.ID → {Arg2}", hostSettings, page, skin.ID);
 
+			Logger.LogWarning("<<< Exiting GetSkin(hostSettings={HostSettings},page={Page})", hostSettings, page);
             return skin;
         }
 
         public static List<InstalledSkinInfo> GetInstalledSkins()
         {
+			Logger.LogError(">>> Entering GetInstalledSkins()");
             var list = new List<InstalledSkinInfo>();
+			Logger.LogError("GetInstalledSkins(): list → {List}", list);
             foreach (string folder in Directory.GetDirectories(Path.Combine(Globals.HostMapPath, "Skins")))
             {
                 if (!folder.EndsWith(Globals.glbHostSkinFolder, StringComparison.OrdinalIgnoreCase))
                 {
                     var skin = new InstalledSkinInfo();
+					Logger.LogError("GetInstalledSkins(): skin → {Skin}", skin);
                     skin.SkinName = folder.Substring(folder.LastIndexOf(@"\", StringComparison.Ordinal) + 1);
                     skin.InUse = IsFallbackSkin(folder) || !SkinController.CanDeleteSkin(folder, string.Empty);
                     list.Add(skin);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetInstalledSkins()");
             return list;
         }
 
@@ -462,14 +509,17 @@ namespace DotNetNuke.UI.Skins
         /// <returns><see langword="true"/> if the module is successfully injected, otherwise <see langword="false"/>.</returns>
         public bool InjectModule(Pane pane, ModuleInfo module)
         {
+			Logger.LogError(">>> Entering InjectModule(pane={Pane},module={Module})", pane, module);
             bool bSuccess = true;
 
+			Logger.LogError("InjectModule(pane={Pane},module={Module}): bSuccess → {BSuccess}", pane, module, bSuccess);
             // try to inject the module into the pane
             try
             {
                 if (this.PortalSettings.ActiveTab.TabID == this.PortalSettings.UserTabId || this.PortalSettings.ActiveTab.ParentId == this.PortalSettings.UserTabId)
                 {
                     var profileModule = this.ModuleControlPipeline.LoadModuleControl(this.Page, module) as IProfileModule;
+					Logger.LogError("InjectModule(pane={Pane},module={Module}): profileModule → {ProfileModule}", pane, module, profileModule);
                     if (profileModule == null || profileModule.DisplayModule)
                     {
                         pane.InjectModule(module);
@@ -482,14 +532,17 @@ namespace DotNetNuke.UI.Skins
             }
             catch (ThreadAbortException)
             {
+				Logger.LogError("Exception in InjectModule(pane={Pane},module={Module}): {Arg2}", pane, module, ThreadAbortException.Message);
                 // Response.Redirect may be called in module control's OnInit method, so it will cause ThreadAbortException, no need any action here.
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in InjectModule(pane={Pane},module={Module}): {Arg2}", pane, module, ex.Message);
                 Exceptions.LogException(ex);
                 bSuccess = false;
             }
 
+			Logger.LogWarning("<<< Exiting InjectModule(pane={Pane},module={Module})", pane, module);
             return bSuccess;
         }
 
@@ -498,7 +551,9 @@ namespace DotNetNuke.UI.Skins
         /// <param name="e">An Action Event Handler.</param>
         public void RegisterModuleActionEvent(int moduleId, ActionEventHandler e)
         {
+			Logger.LogError(">>> Entering RegisterModuleActionEvent(moduleId={ModuleId},e={E})", moduleId, e);
             this.ActionEventListeners.Add(new ModuleActionEventListener(moduleId, e));
+			Logger.LogWarning("<<< Exiting RegisterModuleActionEvent(moduleId={ModuleId},e={E})", moduleId, e);
         }
 
         /// <summary>AddPageMessage adds a Page Message control to the Skin.</summary>
@@ -509,21 +564,26 @@ namespace DotNetNuke.UI.Skins
         /// <param name="iconSrc">The Icon to display.</param>
         internal static void AddPageMessage(Control control, string heading, string message, ModuleMessage.ModuleMessageType moduleMessageType, string iconSrc)
         {
+			Logger.LogError(">>> Entering AddPageMessage(control={Control},heading={Heading},message={Message},moduleMessageType={ModuleMessageType},iconSrc={IconSrc})", control, heading, message, moduleMessageType, iconSrc);
             if (!string.IsNullOrEmpty(message))
             {
                 Control contentPane = FindControlRecursive(control, Globals.glbDefaultPane);
+				Logger.LogError("AddPageMessage(control={Control},heading={Heading},message={Message},moduleMessageType={ModuleMessageType},iconSrc={IconSrc}): contentPane → {ContentPane}", control, heading, message, moduleMessageType, iconSrc, contentPane);
 
                 if (contentPane != null)
                 {
                     ModuleMessage moduleMessage = GetModuleMessageControl(heading, message, moduleMessageType, iconSrc);
+					Logger.LogError("AddPageMessage(control={Control},heading={Heading},message={Message},moduleMessageType={ModuleMessageType},iconSrc={IconSrc}): moduleMessage → {ModuleMessage}", control, heading, message, moduleMessageType, iconSrc, moduleMessage);
                     contentPane.Controls.AddAt(0, moduleMessage);
                 }
             }
+			Logger.LogWarning("<<< Exiting AddPageMessage(control={Control},heading={Heading},message={Message},moduleMessageType={ModuleMessageType},iconSrc={IconSrc})", control, heading, message, moduleMessageType, iconSrc);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             // Load the Panes
@@ -531,6 +591,7 @@ namespace DotNetNuke.UI.Skins
 
             // Load the Module Control(s)
             bool success = Globals.IsAdminControl() ? this.ProcessSlaveModule() : this.ProcessMasterModules();
+			Logger.LogError("OnInit(e={E}): success → {Success}", e, success);
 
             // Load the Control Panel
             this.InjectControlPanel();
@@ -562,6 +623,7 @@ namespace DotNetNuke.UI.Skins
             if (HttpContextSource.Current != null && HttpContextSource.Current.Items.Contains(OnInitMessage))
             {
                 var messageType = ModuleMessage.ModuleMessageType.YellowWarning;
+				Logger.LogError("OnInit(e={E}): messageType → {MessageType}", e, messageType);
                 if (HttpContextSource.Current.Items.Contains(OnInitMessageType))
                 {
                     messageType = (ModuleMessage.ModuleMessageType)Enum.Parse(typeof(ModuleMessage.ModuleMessageType), HttpContextSource.Current.Items[OnInitMessageType].ToString(), true);
@@ -575,23 +637,28 @@ namespace DotNetNuke.UI.Skins
 
             // Process the Panes attributes
             this.ProcessPanes();
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.InvokeSkinEvents(SkinEventType.OnSkinLoad);
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             this.InvokeSkinEvents(SkinEventType.OnSkinPreRender);
             var isSpecialPageMode = UrlUtils.InPopUp() || this.Request.QueryString["dnnprintmode"] == "true";
+			Logger.LogError("OnPreRender(e={E}): isSpecialPageMode → {IsSpecialPageMode}", e, isSpecialPageMode);
             if (TabPermissionController.CanAddContentToPage() && Globals.IsEditMode() && !isSpecialPageMode)
             {
                 // Register Drag and Drop plugin
@@ -601,6 +668,7 @@ namespace DotNetNuke.UI.Skins
 
                 // Register Client Script
                 var sb = new StringBuilder();
+				Logger.LogError("OnPreRender(e={E}): sb → {Sb}", e, sb);
                 sb.AppendLine(" (function ($) {");
                 sb.AppendLine("     $(document).ready(function () {");
                 sb.AppendLine("         $('.dnnSortable').dnnModuleDragDrop({");
@@ -614,6 +682,7 @@ namespace DotNetNuke.UI.Skins
                 sb.AppendLine(" } (jQuery));");
 
                 var script = sb.ToString();
+				Logger.LogError("OnPreRender(e={E}): script → {Script}", e, script);
                 if (ScriptManager.GetCurrent(this.Page) != null)
                 {
                     // respect MS AJAX
@@ -624,35 +693,44 @@ namespace DotNetNuke.UI.Skins
                     this.Page.ClientScript.RegisterStartupScript(this.GetType(), "DragAndDrop", script, true);
                 }
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnUnload(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnUnload(e={E})", e);
             base.OnUnload(e);
 
             this.InvokeSkinEvents(SkinEventType.OnSkinUnLoad);
+			Logger.LogWarning("<<< Exiting OnUnload(e={E})", e);
         }
 
         private static void AddModuleMessage(Control control, string heading, string message, ModuleMessage.ModuleMessageType moduleMessageType, string iconSrc)
         {
+			Logger.LogError(">>> Entering AddModuleMessage(control={Control},heading={Heading},message={Message},moduleMessageType={ModuleMessageType},iconSrc={IconSrc})", control, heading, message, moduleMessageType, iconSrc);
             if (control != null)
             {
                 if (!string.IsNullOrEmpty(message))
                 {
                     var messagePlaceHolder = ControlUtilities.FindControl<PlaceHolder>(control, "MessagePlaceHolder", true);
+					Logger.LogError("AddModuleMessage(control={Control},heading={Heading},message={Message},moduleMessageType={ModuleMessageType},iconSrc={IconSrc}): messagePlaceHolder → {MessagePlaceHolder}", control, heading, message, moduleMessageType, iconSrc, messagePlaceHolder);
                     if (messagePlaceHolder != null)
                     {
                         messagePlaceHolder.Visible = true;
+						Logger.LogDebug("AddModuleMessage(control={Control},heading={Heading},message={Message},moduleMessageType={ModuleMessageType},iconSrc={IconSrc}): messagePlaceHolder.Visible → {Arg5}", control, heading, message, moduleMessageType, iconSrc, messagePlaceHolder.Visible);
                         ModuleMessage moduleMessage = GetModuleMessageControl(heading, message, moduleMessageType, iconSrc);
+						Logger.LogError("AddModuleMessage(control={Control},heading={Heading},message={Message},moduleMessageType={ModuleMessageType},iconSrc={IconSrc}): moduleMessage → {ModuleMessage}", control, heading, message, moduleMessageType, iconSrc, moduleMessage);
                         messagePlaceHolder.Controls.Add(moduleMessage);
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting AddModuleMessage(control={Control},heading={Heading},message={Message},moduleMessageType={ModuleMessageType},iconSrc={IconSrc})", control, heading, message, moduleMessageType, iconSrc);
         }
 
         private static Control FindControlRecursive(Control rootControl, string controlId)
         {
+			Logger.LogError(">>> Entering FindControlRecursive(rootControl={RootControl},controlId={ControlId})", rootControl, controlId);
             if (rootControl.ID == controlId)
             {
                 return rootControl;
@@ -661,57 +739,71 @@ namespace DotNetNuke.UI.Skins
             foreach (Control controlToSearch in rootControl.Controls)
             {
                 Control controlToReturn = FindControlRecursive(controlToSearch, controlId);
+				Logger.LogError("FindControlRecursive(rootControl={RootControl},controlId={ControlId}): controlToReturn → {ControlToReturn}", rootControl, controlId, controlToReturn);
                 if (controlToReturn != null)
                 {
                     return controlToReturn;
                 }
             }
 
+			Logger.LogWarning("<<< Exiting FindControlRecursive(rootControl={RootControl},controlId={ControlId})", rootControl, controlId);
             return null;
         }
 
         private static Skin LoadSkin(PageBase page, string skinPath)
         {
+			Logger.LogError(">>> Entering LoadSkin(page={Page},skinPath={SkinPath})", page, skinPath);
             Skin ctlSkin = null;
+			Logger.LogError("LoadSkin(page={Page},skinPath={SkinPath}): ctlSkin → {CtlSkin}", page, skinPath, ctlSkin);
             try
             {
                 string skinSrc = skinPath;
                 if (skinPath.IndexOf(Globals.ApplicationPath, StringComparison.OrdinalIgnoreCase) != -1)
                 {
                     skinPath = skinPath.Remove(0, Globals.ApplicationPath.Length);
+					Logger.LogError("LoadSkin(page={Page},skinPath={SkinPath}): skinPath → {SkinPath1}", page, skinPath, skinPath);
                 }
 
                 ctlSkin = ControlUtilities.LoadControl<Skin>(page, skinPath);
                 ctlSkin.SkinSrc = skinSrc;
+				Logger.LogDebug("LoadSkin(page={Page},skinPath={SkinPath}): ctlSkin.SkinSrc → {Arg2}", page, skinPath, ctlSkin.SkinSrc);
 
                 // call databind so that any server logic in the skin is executed
                 ctlSkin.DataBind();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in LoadSkin(page={Page},skinPath={SkinPath}): {Arg2}", page, skinPath, exc.Message);
                 // could not load user control
                 var lex = new PageLoadException("Unhandled error loading page.", exc);
+				Logger.LogError("LoadSkin(page={Page},skinPath={SkinPath}): lex → {Lex}", page, skinPath, lex);
                 if (TabPermissionController.CanAdminPage())
                 {
                     // only display the error to administrators
                     var skinError = (Label)page.FindControl("SkinError");
+					Logger.LogError("LoadSkin(page={Page},skinPath={SkinPath}): skinError → {SkinError}", page, skinPath, skinError);
                     skinError.Text = string.Format(CultureInfo.CurrentCulture, Localization.GetString("SkinLoadError", Localization.GlobalResourceFile), skinPath, page.Server.HtmlEncode(exc.Message));
                     skinError.Visible = true;
+					Logger.LogDebug("LoadSkin(page={Page},skinPath={SkinPath}): skinError.Visible → {Arg2}", page, skinPath, skinError.Visible);
                 }
 
                 Exceptions.LogException(lex);
             }
 
+			Logger.LogWarning("<<< Exiting LoadSkin(page={Page},skinPath={SkinPath})", page, skinPath);
             return ctlSkin;
         }
 
         private static bool IsFallbackSkin(string skinPath)
         {
+			Logger.LogError(">>> Entering IsFallbackSkin(skinPath={SkinPath})", skinPath);
             SkinDefaults defaultSkin = SkinDefaults.GetSkinDefaults(SkinDefaultType.SkinInfo);
+			Logger.LogError("IsFallbackSkin(skinPath={SkinPath}): defaultSkin → {DefaultSkin}", skinPath, defaultSkin);
             string defaultSkinPath = (Globals.HostMapPath + SkinController.RootSkin + defaultSkin.Folder).Replace("/", @"\");
             if (defaultSkinPath.EndsWith(@"\", StringComparison.Ordinal))
             {
                 defaultSkinPath = defaultSkinPath.Substring(0, defaultSkinPath.Length - 1);
+				Logger.LogError("IsFallbackSkin(skinPath={SkinPath}): defaultSkinPath → {DefaultSkinPath}", skinPath, defaultSkinPath);
             }
 
             return skinPath.IndexOf(defaultSkinPath, StringComparison.CurrentCultureIgnoreCase) != -1;
@@ -719,27 +811,33 @@ namespace DotNetNuke.UI.Skins
 
         private static void EnsureContentItemForTab(Entities.Tabs.TabInfo tabInfo)
         {
+			Logger.LogError(">>> Entering EnsureContentItemForTab(tabInfo={TabInfo})", tabInfo);
             // If tab exists but ContentItem not, then we create it
             if (tabInfo.ContentItemId == Null.NullInteger && tabInfo.TabID != Null.NullInteger)
             {
                 TabController.Instance.CreateContentItem(tabInfo);
                 TabController.Instance.UpdateTab(tabInfo);
             }
+			Logger.LogWarning("<<< Exiting EnsureContentItemForTab(tabInfo={TabInfo})", tabInfo);
         }
 
         private static void EnsureContentItemForModule(ModuleInfo module)
         {
+			Logger.LogError(">>> Entering EnsureContentItemForModule(module={Module})", module);
             // If module exists but ContentItem not, then we create it
             if (module.ContentItemId == Null.NullInteger && module.ModuleID != Null.NullInteger)
             {
                 ModuleController.Instance.CreateContentItem(module);
                 ModuleController.Instance.UpdateModule(module);
             }
+			Logger.LogWarning("<<< Exiting EnsureContentItemForModule(module={Module})", module);
         }
 
         private bool CheckExpired()
         {
+			Logger.LogError(">>> Entering CheckExpired()");
             bool blnExpired = false;
+			Logger.LogError("CheckExpired(): blnExpired → {BlnExpired}", blnExpired);
             if (this.PortalSettings.ExpiryDate != Null.NullDate)
             {
                 if (Convert.ToDateTime(this.PortalSettings.ExpiryDate) < DateTime.Now && !Globals.IsHostTab(this.PortalSettings.ActiveTab.TabID))
@@ -748,11 +846,13 @@ namespace DotNetNuke.UI.Skins
                 }
             }
 
+			Logger.LogWarning("<<< Exiting CheckExpired()");
             return blnExpired;
         }
 
         private Pane GetPane(ModuleInfo module)
         {
+			Logger.LogError(">>> Entering GetPane(module={Module})", module);
             Pane pane;
             bool found = this.Panes.TryGetValue(module.PaneName.ToLowerInvariant(), out pane);
 
@@ -761,11 +861,13 @@ namespace DotNetNuke.UI.Skins
                 this.Panes.TryGetValue(Globals.glbDefaultPane.ToLowerInvariant(), out pane);
             }
 
+			Logger.LogWarning("<<< Exiting GetPane(module={Module})", module);
             return pane;
         }
 
         private void InjectControlPanel()
         {
+			Logger.LogError(">>> Entering InjectControlPanel()");
             // if querystring dnnprintmode=true, controlpanel will not be shown
             if (this.Request.QueryString["dnnprintmode"] != "true" && !UrlUtils.InPopUp() && this.Request.QueryString["hidecommandbar"] != "true")
             {
@@ -773,7 +875,9 @@ namespace DotNetNuke.UI.Skins
                 {
                     // ControlPanel processing
                     var controlPanel = ControlUtilities.LoadControl<ControlPanelBase>(this, this.hostSettings.ControlPanel);
+					Logger.LogError("InjectControlPanel(): controlPanel → {ControlPanel}", controlPanel);
                     var form = (HtmlForm)this.Parent.FindControl("Form");
+					Logger.LogError("InjectControlPanel(): form → {Form}", form);
 
                     if (controlPanel.IncludeInControlHierarchy)
                     {
@@ -799,12 +903,15 @@ namespace DotNetNuke.UI.Skins
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting InjectControlPanel()");
         }
 
         private void InvokeSkinEvents(SkinEventType skinEventType)
         {
+			Logger.LogError(">>> Entering InvokeSkinEvents(skinEventType={SkinEventType})", skinEventType);
             SharedList<SkinEventListener> list = ((NaiveLockingList<SkinEventListener>)DotNetNukeContext.Current.SkinEventListeners).SharedList;
 
+			Logger.LogError("InvokeSkinEvents(skinEventType={SkinEventType}): list → {List}", skinEventType, list);
             using (list.GetReadLock())
             {
                 foreach (var listener in list.Where(x => x.EventType == skinEventType))
@@ -812,10 +919,12 @@ namespace DotNetNuke.UI.Skins
                     listener.SkinEvent.Invoke(this, new SkinEventArgs(this));
                 }
             }
+			Logger.LogWarning("<<< Exiting InvokeSkinEvents(skinEventType={SkinEventType})", skinEventType);
         }
 
         private void LoadPanes()
         {
+			Logger.LogError(">>> Entering LoadPanes()");
             // iterate page controls
             foreach (Control ctlControl in this.Controls)
             {
@@ -848,16 +957,20 @@ namespace DotNetNuke.UI.Skins
                             {
                                 // Control Panel pane
                                 this.controlPanel = objPaneControl;
+								Logger.LogDebug("LoadPanes(): controlPanel → {ControlPanel}", controlPanel);
+								Logger.LogDebug("LoadPanes(): this.controlPanel → {Arg0}", this.controlPanel);
                             }
 
                             break;
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting LoadPanes()");
         }
 
         private bool ProcessModule(ModuleInfo module)
         {
+			Logger.LogError(">>> Entering ProcessModule(module={Module})", module);
             if (!this.moduleInjectionManager.CanInjectModule(module, this.PortalSettings))
             {
                 return true;
@@ -867,14 +980,17 @@ namespace DotNetNuke.UI.Skins
             EnsureContentItemForModule(module);
 
             var pane = this.GetPane(module);
+			Logger.LogError("ProcessModule(module={Module}): pane → {Pane}", module, pane);
             if (pane != null)
             {
                 return this.InjectModule(pane, module);
             }
 
             var lex = new ModuleLoadException(Localization.GetString("PaneNotFound.Error"));
+			Logger.LogError("ProcessModule(module={Module}): lex → {Lex}", module, lex);
             this.Controls.Add(new ErrorContainer(this.PortalSettings, MODULELOAD_ERROR, lex).Container);
             Exceptions.LogException(lex);
+			Logger.LogWarning("<<< Exiting ProcessModule(module={Module})", module);
             return true;
         }
 
@@ -882,21 +998,27 @@ namespace DotNetNuke.UI.Skins
         /// <param name="redirect"><see langword="true"/> to redirect to the access denied page, <see langword="false"/> (the default behavior) to display an Access Denied message on this page.</param>
         private void HandleAccessDenied(bool redirect = false)
         {
+			Logger.LogError(">>> Entering HandleAccessDenied(redirect={Redirect})", redirect);
             var message = Localization.GetString("TabAccess.Error");
+			Logger.LogError("HandleAccessDenied(redirect={Redirect}): message → {Message}", redirect, message);
             if (redirect)
             {
                 var redirectUrl = Globals.AccessDeniedURL(message);
+				Logger.LogError("HandleAccessDenied(redirect={Redirect}): redirectUrl → {RedirectUrl}", redirect, redirectUrl);
                 this.Response.Redirect(redirectUrl, true);
             }
             else
             {
                 AddPageMessage(this, string.Empty, message, ModuleMessage.ModuleMessageType.YellowWarning, string.Empty);
             }
+			Logger.LogWarning("<<< Exiting HandleAccessDenied(redirect={Redirect})", redirect);
         }
 
         private bool ProcessMasterModules()
         {
+			Logger.LogError(">>> Entering ProcessMasterModules()");
             bool success = true;
+			Logger.LogError("ProcessMasterModules(): success → {Success}", success);
             if (TabPermissionController.CanViewPage())
             {
                 // We need to ensure that Content Item exists since in old versions Content Items are not needed for tabs
@@ -952,9 +1074,11 @@ namespace DotNetNuke.UI.Skins
             {
                 // If request localized page which haven't complete translate yet, redirect to default language version.
                 var redirectUrl = Globals.AccessDeniedURL(Localization.GetString("TabAccess.Error"));
+				Logger.LogError("ProcessMasterModules(): redirectUrl → {RedirectUrl}", redirectUrl);
 
                 // Current locale will use default if didn't find any
                 Locale currentLocale = LocaleController.Instance.GetCurrentLocale(this.PortalSettings.PortalId);
+				Logger.LogError("ProcessMasterModules(): currentLocale → {CurrentLocale}", currentLocale);
                 if (this.PortalSettings.ContentLocalizationEnabled &&
                     TabController.CurrentPage.CultureCode != currentLocale.Code)
                 {
@@ -964,28 +1088,38 @@ namespace DotNetNuke.UI.Skins
                 this.Response.Redirect(redirectUrl, true);
             }
 
+			Logger.LogWarning("<<< Exiting ProcessMasterModules()");
             return success;
         }
 
         private void ProcessPanes()
         {
+			Logger.LogError(">>> Entering ProcessPanes()");
             foreach (KeyValuePair<string, Pane> kvp in this.Panes)
             {
                 kvp.Value.ProcessPane();
             }
+			Logger.LogWarning("<<< Exiting ProcessPanes()");
         }
 
         private bool ProcessSlaveModule()
         {
+			Logger.LogError(">>> Entering ProcessSlaveModule()");
             var success = true;
             var key = UIUtilities.GetControlKey();
+			Logger.LogError("ProcessSlaveModule(): key → {Key}", key);
             var moduleId = UIUtilities.GetModuleId(key);
+			Logger.LogError("ProcessSlaveModule(): moduleId → {ModuleId}", moduleId);
             var slaveModule = UIUtilities.GetSlaveModule(moduleId, key, this.PortalSettings.ActiveTab.TabID);
+			Logger.LogError("ProcessSlaveModule(): slaveModule → {SlaveModule}", slaveModule);
+			Logger.LogError("ProcessSlaveModule(): success → {Success}", success);
 
             Pane pane;
             this.Panes.TryGetValue(Globals.glbDefaultPane.ToLowerInvariant(), out pane);
             slaveModule.PaneName = Globals.glbDefaultPane;
+			Logger.LogDebug("ProcessSlaveModule(): slaveModule.PaneName → {Arg0}", slaveModule.PaneName);
             slaveModule.ContainerSrc = this.PortalSettings.ActiveTab.ContainerSrc;
+			Logger.LogDebug("ProcessSlaveModule(): slaveModule.ContainerSrc → {Arg0}", slaveModule.ContainerSrc);
             if (string.IsNullOrEmpty(slaveModule.ContainerSrc))
             {
                 slaveModule.ContainerSrc = this.PortalSettings.DefaultPortalContainer;
@@ -995,16 +1129,21 @@ namespace DotNetNuke.UI.Skins
             slaveModule.ContainerPath = SkinController.FormatSkinPath(slaveModule.ContainerSrc);
 
             var moduleControl = ModuleControlController.GetModuleControlByControlKey(key, slaveModule.ModuleDefID);
+			Logger.LogError("ProcessSlaveModule(): moduleControl → {ModuleControl}", moduleControl);
             if (moduleControl != null)
             {
                 slaveModule.ModuleControlId = moduleControl.ModuleControlID;
+				Logger.LogDebug("ProcessSlaveModule(): slaveModule.ModuleControlId → {Arg0}", slaveModule.ModuleControlId);
                 slaveModule.IconFile = moduleControl.IconFile;
+				Logger.LogDebug("ProcessSlaveModule(): slaveModule.IconFile → {Arg0}", slaveModule.IconFile);
 
                 string permissionKey;
                 switch (slaveModule.ModuleControl.ControlSrc)
                 {
                     case "Admin/Modules/ModuleSettings.ascx":
                         permissionKey = "MANAGE";
+						Logger.LogError("ProcessSlaveModule(): permissionKey → {PermissionKey}", permissionKey);
+						Logger.LogDebug("ProcessSlaveModule(): permissionKey → {PermissionKey}", permissionKey);
                         break;
                     case "Admin/Modules/Import.ascx":
                         permissionKey = "IMPORT";
@@ -1027,6 +1166,7 @@ namespace DotNetNuke.UI.Skins
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ProcessSlaveModule()");
             return success;
         }
     }

@@ -29,6 +29,7 @@ namespace Dnn.PersonaBar.Servers.Services
 
         public ServerController(INavigationManager navigationManager)
         {
+			Logger.LogError(">>> Entering ServerController(navigationManager={NavigationManager})", navigationManager);
             this.NavigationManager = navigationManager;
         }
 
@@ -40,9 +41,11 @@ namespace Dnn.PersonaBar.Servers.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage RestartApplication()
         {
+			Logger.LogError(">>> Entering RestartApplication()");
             try
             {
                 var log = new LogInfo { BypassBuffering = true, LogTypeKey = nameof(EventLogType.HOST_ALERT) };
+				Logger.LogError("RestartApplication(): log → {Log}", log);
                 log.AddProperty("Message", Localization.GetString("UserRestart", LocalResourceFile));
                 LogController.Instance.AddLog(log);
                 Config.Touch();
@@ -51,6 +54,7 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting RestartApplication()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -59,6 +63,7 @@ namespace Dnn.PersonaBar.Servers.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage ClearCache()
         {
+			Logger.LogError(">>> Entering ClearCache()");
             try
             {
                 DataCache.ClearCache();
@@ -68,6 +73,7 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting ClearCache()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

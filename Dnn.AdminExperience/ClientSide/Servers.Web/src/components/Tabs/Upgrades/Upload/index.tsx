@@ -5,6 +5,7 @@ import "./style.less";
 import { ChunkToUpload } from "models/ChunkToUpload";
 import upgradeService from "services/upgradeService";
 import UploadIcon from "./img/upload.svg";
+const logger = console;
 
 interface ErrorData {
   responseJSON: {
@@ -19,27 +20,36 @@ interface FileUploadProps {
 }
 
 const FileUpload: React.FC<FileUploadProps> = (props) => {
+logger.error(`>>> Entering FileUpload(props=${props})`, { "event.action": "FileUpload", "logrite.props": props });
   const [text, setText] = useState(
     Localization.get("UploadPackage_FileUploadDefault")
   );
   const [draggedOver, setDraggedOver] = useState(false);
   const [fileName, setFileName] = useState("");
+logger.debug(`FileUpload(props=${props}): fileName → ${fileName}`, { "event.action": "FileUpload", "logrite.props": props });
   const [uploading, setUploading] = useState(false);
   const [uploadComplete, setUploadComplete] = useState(false);
   const [errorText, setErrorText] = useState("");
+logger.debug(`FileUpload(props=${props}): errorText → ${errorText}`, { "event.action": "FileUpload", "logrite.props": props });
+logger.debug(`FileUpload(props=${props}): errorInPackage → ${errorInPackage}`, { "event.action": "FileUpload", "logrite.props": props });
+logger.debug(`FileUpload(props=${props}): percent → ${percent}`, { "event.action": "FileUpload", "logrite.props": props });
   const [errorInPackage, setErrorInPackage] = useState(false);
   const [percent, setPercent] = useState(0);
 
   const prevent = useCallback((e: Event) => {
+	logger.error('>>> Entering FileUpload useCallback()');
     e.preventDefault();
   }, []);
+logger.warn('<<< Exiting FileUpload useCallback()');
 
   useEffect(() => {
+	logger.error('>>> Entering FileUpload useEffect()');
     window.addEventListener("dragover", prevent);
     window.addEventListener("drop", prevent);
 
     return () => {
       window.removeEventListener("dragover", prevent);
+	logger.warn('<<< Exiting FileUpload useEffect()');
       window.removeEventListener("drop", prevent);
     };
   }, [prevent]);
@@ -140,6 +150,7 @@ const FileUpload: React.FC<FileUploadProps> = (props) => {
   const onFileUpload = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files[0]) {
+		logger.error(`Exception in FileUpload(props=${props}): ${(error as Error).message}`, error, { "event.action": "FileUpload", "event.category": "process", "logrite.props": props });
         uploadFile(e.target.files[0]);
       }
     },
@@ -204,6 +215,7 @@ const FileUpload: React.FC<FileUploadProps> = (props) => {
           errorInPackage={errorInPackage}
           fileName={fileName}
           onTryAgain={() => {
+			logger.warn(`<<< Exiting FileUpload(props=${props})`, { "event.action": "FileUpload", "logrite.props": props });
             setFileName("");
             setErrorText("");
             setErrorInPackage(true);

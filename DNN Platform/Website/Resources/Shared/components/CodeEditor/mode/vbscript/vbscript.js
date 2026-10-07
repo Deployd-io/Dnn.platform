@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -26,6 +27,8 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
     var ERRORCLASS = 'error';
 
     function wordRegexp(words) {
+		logger.error(`>>> Entering wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
+		logger.warn(`<<< Exiting wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
         return new RegExp("^((" + words.join(")|(") + "))\\b", "i");
     }
 
@@ -106,20 +109,26 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
 
 
     function indent(_stream, state) {
+	logger.error(`>>> Entering indent(_stream=${_stream},state=${state})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       state.currentIndent++;
+	logger.warn(`<<< Exiting indent(_stream=${_stream},state=${state})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
     }
 
     function dedent(_stream, state) {
+	logger.error(`>>> Entering dedent(_stream=${_stream},state=${state})`, { "event.action": "dedent", "logrite._stream": _stream, "logrite.state": state });
       state.currentIndent--;
+	logger.warn(`<<< Exiting dedent(_stream=${_stream},state=${state})`, { "event.action": "dedent", "logrite._stream": _stream, "logrite.state": state });
     }
     // tokenizers
     function tokenBase(stream, state) {
+		logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         if (stream.eatSpace()) {
             return 'space';
             //return null;
         }
 
         var ch = stream.peek();
+		logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
 
         // Handle Comments
         if (ch === "'") {
@@ -189,6 +198,7 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
 
         if (stream.match(noIndentWords)) {
             state.doInCurrentLine = true;
+			logger.debug(`tokenBase(stream=${stream},state=${state}): state.doInCurrentLine → ${state.doInCurrentLine}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
 
             return 'keyword';
         }
@@ -253,12 +263,15 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
 
         // Handle non-detected items
         stream.next();
+		logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         return ERRORCLASS;
     }
 
     function tokenStringFactory(delimiter) {
+		logger.error(`>>> Entering tokenStringFactory(delimiter=${delimiter})`, { "event.action": "tokenStringFactory", "logrite.delimiter": delimiter });
         var singleline = delimiter.length == 1;
         var OUTCLASS = 'string';
+		logger.error(`tokenStringFactory(delimiter=${delimiter}): OUTCLASS → ${OUTCLASS}`, { "event.action": "tokenStringFactory", "logrite.delimiter": delimiter });
 
         return function(stream, state) {
             while (!stream.eol()) {
@@ -283,8 +296,11 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
 
 
     function tokenLexer(stream, state) {
+		logger.error(`>>> Entering tokenLexer(stream=${stream},state=${state})`, { "event.action": "tokenLexer", "logrite.stream": stream, "logrite.state": state });
         var style = state.tokenize(stream, state);
         var current = stream.current();
+		logger.error(`tokenLexer(stream=${stream},state=${state}): style → ${style}`, { "event.action": "tokenLexer", "logrite.stream": stream, "logrite.state": state });
+		logger.error(`tokenLexer(stream=${stream},state=${state}): current → ${current}`, { "event.action": "tokenLexer", "logrite.stream": stream, "logrite.state": state });
 
         // Handle '.' connected identifiers
         if (current === '.') {
@@ -301,12 +317,14 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
             }
         }
 
+		logger.warn(`<<< Exiting tokenLexer(stream=${stream},state=${state})`, { "event.action": "tokenLexer", "logrite.stream": stream, "logrite.state": state });
         return style;
     }
 
     var external = {
         electricChars:"dDpPtTfFeE ",
         startState: function() {
+			logger.error('>>> Entering startState()', { "event.action": "startState" });
             return {
               tokenize: tokenBase,
               lastToken: null,
@@ -320,10 +338,13 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
         },
 
         token: function(stream, state) {
+			logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
             if (stream.sol()) {
               state.currentIndent += state.nextLineIndent;
               state.nextLineIndent = 0;
+			logger.debug(`token(stream=${stream},state=${state}): state.nextLineIndent → ${state.nextLineIndent}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
               state.doInCurrentLine = 0;
+			logger.debug(`token(stream=${stream},state=${state}): state.doInCurrentLine → ${state.doInCurrentLine}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
             }
             var style = tokenLexer(stream, state);
 
@@ -331,13 +352,18 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
 
             if (style==='space') style=null;
 
+			logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+			logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
             return style;
         },
 
         indent: function(state, textAfter) {
+			logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
             var trueText = textAfter.replace(/^\s+|\s+$/g, '') ;
             if (trueText.match(closing) || trueText.match(doubleClosing) || trueText.match(middle)) return conf.indentUnit*(state.currentIndent-1);
+			logger.error(`indent(state=${state},textAfter=${textAfter}): trueText → ${trueText}`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
             if(state.currentIndent < 0) return 0;
+			logger.warn(`<<< Exiting indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
             return state.currentIndent * conf.indentUnit;
         }
 

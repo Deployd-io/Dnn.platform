@@ -1,5 +1,6 @@
 import { Component, Host, h, State } from '@stencil/core';
 import state from '../../store/store';
+const logger = console;
 import { sortField, SortFieldInfo } from "../../enums/SortField";
 import { sortOrder } from "../../enums/SortOrder";
 import { InternalServicesClient } from '../../services/InternalServicesClient';
@@ -18,20 +19,26 @@ export class DnnRmActionsBar {
   private itemsClient: ItemsClient;
 
   constructor(){
+	logger.error('>>> Entering constructor()', { "event.action": "constructor" });
     this.internalServicesClient = new InternalServicesClient(state.moduleId);
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
   }
 
   private changeLayout(): void {
+	logger.error('>>> Entering changeLayout()', { "event.action": "changeLayout" });
     if (state.layout == "card"){
       state.layout = "list";
       return;
     }
 
     state.layout = "card";
+	logger.warn('<<< Exiting changeLayout()', { "event.action": "changeLayout" });
   }
 
   private renderSortButton(sortOption: SortFieldInfo){
+	logger.error(`>>> Entering renderSortButton(sortOption=${sortOption})`, { "event.action": "renderSortButton", "logrite.sortOption": sortOption });
+	logger.warn(`<<< Exiting renderSortButton(sortOption=${sortOption})`, { "event.action": "renderSortButton", "logrite.sortOption": sortOption });
     return(
       <button
         onClick={() =>
@@ -48,24 +55,29 @@ export class DnnRmActionsBar {
   }
 
   private renderRadioButton(checked = false){
+	logger.error(`>>> Entering renderRadioButton(checked=${checked})`, { "event.action": "renderRadioButton", "logrite.checked": checked });
     if (checked){
       return <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
     }
     else{
+	logger.warn(`<<< Exiting renderRadioButton(checked=${checked})`, { "event.action": "renderRadioButton", "logrite.checked": checked });
       return <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
     }
   }
 
   private renderSortOrderButtonIcon(){
+	logger.error('>>> Entering renderSortOrderButtonIcon()', { "event.action": "renderSortOrderButtonIcon" });
     if (state.sortOrder.sortOrderKey == sortOrder.ascending.sortOrderKey) {
       return <path d="M10 6h4v2h-4v-2zm-2 5h8v2h-8v-2zm-2 5h12v2h-12v-2z"/>
     }
     else {
+	logger.warn('<<< Exiting renderSortOrderButtonIcon()', { "event.action": "renderSortOrderButtonIcon" });
       return <path d="M6 6h12v2h-12v-2zm2 5h8v2h-8v-2zm2 5h4v2h-4v-2z"/>
     }
   }
 
   private async syncFolderContent(recursive: boolean = false) {
+	logger.error(`>>> Entering syncFolderContent(recursive=${recursive})`, { "event.action": "syncFolderContent", "logrite.recursive": recursive });
     try {
       await this.itemsClient.syncFolderContent(
         state.currentItems.folder.folderId,
@@ -75,11 +87,13 @@ export class DnnRmActionsBar {
       await this.getFolderContent();
     } catch (error) {
       alert(error);
+	logger.warn(`<<< Exiting syncFolderContent(recursive=${recursive})`, { "event.action": "syncFolderContent", "logrite.recursive": recursive });
     }
   }
 
 
   private async getFolderContent() {
+	logger.error('>>> Entering getFolderContent()', { "event.action": "getFolderContent" });
     try {
       await this.getFolders();
       state.currentItems = await this.itemsClient.getFolderContent(
@@ -91,22 +105,29 @@ export class DnnRmActionsBar {
       
     } catch (error) {
       alert(error);
+	logger.warn('<<< Exiting getFolderContent()', { "event.action": "getFolderContent" });
     }
   }
 
   private async getFolders() {
+	logger.error('>>> Entering getFolders()', { "event.action": "getFolders" });
     try {
       state.rootFolders = await this.internalServicesClient.getFolders(state.settings.HomeFolderId);
     } catch (error) {
       alert(error);
+	logger.warn('<<< Exiting getFolders()', { "event.action": "getFolders" });
     }
   }
 
   private toggleSortOrder() {
+	logger.error('>>> Entering toggleSortOrder()', { "event.action": "toggleSortOrder" });
     state.sortOrder = (state.sortOrder.sortOrderKey == sortOrder.ascending.sortOrderKey) ? sortOrder.descending : sortOrder.ascending;
+	logger.warn('<<< Exiting toggleSortOrder()', { "event.action": "toggleSortOrder" });
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         <dnn-vertical-overflow-menu>

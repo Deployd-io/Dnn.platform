@@ -16,6 +16,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A button control.</summary>
     public class DnnButton : Button, ILocalizable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnButton));
         private readonly IClientResourceController clientResourceController;
         private bool localize = true;
 
@@ -30,9 +31,13 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <param name="clientResourceController">The client resource controller.</param>
         public DnnButton(IClientResourceController clientResourceController)
         {
+			Logger.LogError(">>> Entering DnnButton(clientResourceController={ClientResourceController})", clientResourceController);
             this.clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
+			Logger.LogWarning("<<< Exiting DnnButton(clientResourceController={ClientResourceController})", clientResourceController);
+			Logger.LogDebug("DnnButton(clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", clientResourceController, clientResourceController);
 
             this.CssClass = "CommandButton";
+			Logger.LogDebug("DnnButton(clientResourceController={ClientResourceController}): this.CssClass → {Arg1}", clientResourceController, this.CssClass);
             this.DisabledCssClass = "CommandButtonDisabled";
         }
 
@@ -71,6 +76,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public virtual void LocalizeStrings()
         {
+			Logger.LogError(">>> Entering LocalizeStrings()");
             if (this.Localize)
             {
                 if (!string.IsNullOrEmpty(this.ToolTip))
@@ -86,6 +92,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     {
                         this.Text = unlocalizedText;
                     }
+					Logger.LogDebug("LocalizeStrings(): this.Text → {Arg0}", this.Text);
 
                     if (string.IsNullOrEmpty(this.ToolTip))
                     {
@@ -94,24 +101,29 @@ namespace DotNetNuke.Web.UI.WebControls
                         {
                             this.ToolTip = unlocalizedText;
                         }
+						Logger.LogDebug("LocalizeStrings(): this.ToolTip → {Arg0}", this.ToolTip);
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting LocalizeStrings()");
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (!this.Enabled)
             {
                 this.CssClass = this.DisabledCssClass;
+				Logger.LogDebug("OnPreRender(e={E}): this.CssClass → {Arg1}", e, this.CssClass);
             }
 
             if (!string.IsNullOrEmpty(this.ConfirmMessage))
             {
                 string msg = this.ConfirmMessage;
+				Logger.LogError("OnPreRender(e={E}): msg → {Msg}", e, msg);
                 if (this.Localize)
                 {
                     msg = Utilities.GetLocalizedStringFromParent(this.ConfirmMessage, this);
@@ -120,13 +132,16 @@ namespace DotNetNuke.Web.UI.WebControls
                 // must be done before render
                 this.OnClientClick = Utilities.GetOnClientClickConfirm(this.clientResourceController, this, msg);
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering Render(writer={Writer})", writer);
             this.LocalizeStrings();
             base.Render(writer);
+			Logger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

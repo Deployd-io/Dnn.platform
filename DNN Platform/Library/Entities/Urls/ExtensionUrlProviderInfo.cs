@@ -14,10 +14,13 @@ namespace DotNetNuke.Entities.Urls
     [Serializable]
     public class ExtensionUrlProviderInfo : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExtensionUrlProviderInfo));
         /// <summary>Initializes a new instance of the <see cref="ExtensionUrlProviderInfo"/> class.</summary>
         public ExtensionUrlProviderInfo()
         {
+			Logger.LogError(">>> Entering ExtensionUrlProviderInfo()");
             this.ExtensionUrlProviderId = -1;
+			Logger.LogDebug("ExtensionUrlProviderInfo(): this.ExtensionUrlProviderId → {Arg0}", this.ExtensionUrlProviderId);
             this.Settings = new Dictionary<string, string>();
             this.TabIds = new List<int>();
         }
@@ -76,6 +79,7 @@ namespace DotNetNuke.Entities.Urls
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.ExtensionUrlProviderId = Null.SetNullInteger(dr["ExtensionUrlProviderId"]);
             this.PortalId = Null.SetNullInteger(dr["PortalId"]);
             this.DesktopModuleId = Null.SetNullInteger(dr["DesktopModuleId"]);

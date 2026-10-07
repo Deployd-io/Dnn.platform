@@ -24,6 +24,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
         public PermissionsDto(bool needDefinitions)
             : this(null, needDefinitions)
         {
+		eventLogger.LogError(">>> Entering PermissionsDto(needDefinitions={NeedDefinitions})", needDefinitions);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PermissionsDto"/> class.</summary>
@@ -34,6 +35,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
         {
             foreach (var role in PermissionProvider.Instance().ImplicitRolesForPages(PortalSettings.Current.PortalId))
             {
+				eventLogger.LogWarning("<<< Exiting PermissionsDto(needDefinitions={NeedDefinitions})", needDefinitions);
                 this.EnsureRole(role, true, true);
             }
         }
@@ -50,6 +52,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
         /// <inheritdoc />
         protected override void LoadPermissionDefinitions()
         {
+			eventLogger.LogError(">>> Entering LoadPermissionDefinitions()");
             foreach (var permission in this.PermissionDefinitionService.GetDefinitionsByPortalDesktopModule())
             {
                 this.PermissionDefinitions.Add(new Permission
@@ -60,6 +63,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
                     View = PermissionHelper.IsViewPermission(permission),
                 });
             }
+			eventLogger.LogWarning("<<< Exiting LoadPermissionDefinitions()");
         }
     }
 }

@@ -12,19 +12,28 @@ namespace DotNetNuke.Security.Roles
 
     public abstract class RoleProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RoleProvider));
         // return the provider
         public static RoleProvider Instance()
         {
+			Logger.LogError(">>> Entering Instance()");
+            Logger.LogWarning("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<RoleProvider>();
         }
 
         public virtual bool CreateRole(RoleInfo role)
         {
+			Logger.LogError(">>> Entering CreateRole(role={Role})", role);
+			Logger.LogError("Throwing NotImplementedException from CreateRole(role={Role})", role);
+        Logger.LogWarning("<<< Exiting CreateRole(role={Role})", role);
             throw new NotImplementedException();
         }
 
         public virtual void DeleteRole(RoleInfo role)
         {
+			Logger.LogError(">>> Entering DeleteRole(role={Role})", role);
+			Logger.LogError("Throwing NotImplementedException from DeleteRole(role={Role})", role);
+        Logger.LogWarning("<<< Exiting DeleteRole(role={Role})", role);
             throw new NotImplementedException();
         }
 
@@ -41,6 +50,8 @@ namespace DotNetNuke.Security.Roles
 
         public virtual void UpdateRoleSettings(RoleInfo role)
         {
+		Logger.LogError(">>> Entering UpdateRoleSettings(role={Role})", role);
+        Logger.LogWarning("<<< Exiting UpdateRoleSettings(role={Role})", role);
         }
 
         // Role Groups
@@ -68,11 +79,16 @@ namespace DotNetNuke.Security.Roles
 
         public virtual RoleGroupInfo GetRoleGroupByName(int portalID, string roleGroupName)
         {
+			Logger.LogError(">>> Entering GetRoleGroupByName(portalID={PortalID},roleGroupName={RoleGroupName})", portalID, roleGroupName);
+			Logger.LogWarning("<<< Exiting GetRoleGroupByName(portalID={PortalID},roleGroupName={RoleGroupName})", portalID, roleGroupName);
             return null;
         }
 
         public virtual IList<UserRoleInfo> GetUserRoles(UserInfo user, bool includePrivate)
         {
+			Logger.LogError(">>> Entering GetUserRoles(user={User},includePrivate={IncludePrivate})", user, includePrivate);
+			Logger.LogError("Throwing NotImplementedException from GetUserRoles(user={User},includePrivate={IncludePrivate})", user, includePrivate);
+        Logger.LogWarning("<<< Exiting GetUserRoles(user={User},includePrivate={IncludePrivate})", user, includePrivate);
             throw new NotImplementedException();
         }
     }

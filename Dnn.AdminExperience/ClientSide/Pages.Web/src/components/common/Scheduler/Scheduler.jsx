@@ -2,26 +2,33 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import Localization from "../../../localization";
 import styles from "./style.module.less";
+const logger = console;
 import { Switch, Label, DatePicker } from "@dnnsoftware/dnn-react-common";
 
 class Scheduler extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             schedulingEnabled: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     onChangeScheduling(enabled) {
+		logger.error(`>>> Entering onChangeScheduling(enabled=${enabled})`, { "event.action": "onChangeScheduling", "logrite.enabled": enabled });
         this.setState({
             schedulingEnabled: enabled
         });
+		logger.warn(`<<< Exiting onChangeScheduling(enabled=${enabled})`, { "event.action": "onChangeScheduling", "logrite.enabled": enabled });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {schedulingEnabled} = this.state;
         const {startDate, endDate, onChange} = this.props;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.scheduler}>
                 <Label

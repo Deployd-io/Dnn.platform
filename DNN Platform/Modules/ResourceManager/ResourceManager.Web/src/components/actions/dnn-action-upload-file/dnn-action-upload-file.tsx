@@ -1,5 +1,6 @@
 import { Component, Host, h, Event, EventEmitter, Prop } from '@stencil/core';
 import state from "../../../store/store";
+const logger = console;
 
 @Component({
   tag: 'dnn-action-upload-file',
@@ -18,15 +19,21 @@ export class DnnActionUploadFile {
    @Event() dnnRmFoldersChanged: EventEmitter<void>;
 
    private async handleClick() {
+	logger.error('>>> Entering handleClick()', { "event.action": "handleClick" });
     await this.showModal();
+	logger.warn('<<< Exiting handleClick()', { "event.action": "handleClick" });
   }
 
   private async showModal(){
+	logger.error('>>> Entering showModal()', { "event.action": "showModal" });
     const modal = document.createElement("dnn-modal");
     const container = document.createElement("div");
+	logger.error(`showModal(): modal → ${modal}`, { "event.action": "showModal" });
+	logger.error(`showModal(): container → ${container}`, { "event.action": "showModal" });
     container.style.overflowY = "auto";
     container.style.maxHeight = "70vh";
     const editor = document.createElement("dnn-rm-upload-file");
+	logger.error(`showModal(): editor → ${editor}`, { "event.action": "showModal" });
     container.appendChild(editor);
     modal.appendChild(container);
     document.body.appendChild(modal);
@@ -34,9 +41,12 @@ export class DnnActionUploadFile {
     modal.addEventListener('dismissed', () => {
       this.dnnRmFoldersChanged.emit();
     });
+	logger.warn('<<< Exiting showModal()', { "event.action": "showModal" });
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         <button onClick={() => void this.handleClick()}>

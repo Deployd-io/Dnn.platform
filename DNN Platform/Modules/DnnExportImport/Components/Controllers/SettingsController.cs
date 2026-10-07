@@ -23,6 +23,7 @@ namespace Dnn.ExportImport.Components.Controllers
     /// <seealso cref="ServiceLocator{TContract,TSelf}"/>
     public class SettingsController : ServiceLocator<ISettingsController, SettingsController>, ISettingsController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SettingsController));
         private const string CacheKey = "ExportImport_Settings";
         private const int CacheDuration = 120;
         private readonly IHostSettings hostSettings;
@@ -32,18 +33,25 @@ namespace Dnn.ExportImport.Components.Controllers
         public SettingsController()
             : this(null)
         {
+		Logger.LogError(">>> Entering SettingsController()");
+        Logger.LogWarning("<<< Exiting SettingsController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="SettingsController"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
         public SettingsController(IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering SettingsController(hostSettings={HostSettings})", hostSettings);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("SettingsController(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
+        Logger.LogWarning("<<< Exiting SettingsController(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <inheritdoc />
         public IEnumerable<ExportImportSetting> GetAllSettings()
         {
+			Logger.LogError(">>> Entering GetAllSettings()");
+			Logger.LogWarning("<<< Exiting GetAllSettings()");
             return CBO.GetCachedObject<List<ExportImportSetting>>(
                 this.hostSettings,
                 new CacheItemArgs(CacheKey, CacheDuration, CacheItemPriority.Normal),
@@ -53,19 +61,25 @@ namespace Dnn.ExportImport.Components.Controllers
         /// <inheritdoc />
         public ExportImportSetting GetSetting(string settingName)
         {
+			Logger.LogError(">>> Entering GetSetting(settingName={SettingName})", settingName);
+			Logger.LogWarning("<<< Exiting GetSetting(settingName={SettingName})", settingName);
             return this.GetAllSettings().ToList().FirstOrDefault(x => x.SettingName == settingName);
         }
 
         /// <inheritdoc />
         public void AddSetting(ExportImportSetting exportImportSetting)
         {
+			Logger.LogError(">>> Entering AddSetting(exportImportSetting={ExportImportSetting})", exportImportSetting);
             DataProvider.Instance().AddExportImportSetting(exportImportSetting);
             DataCache.RemoveCache(CacheKey);
+			Logger.LogWarning("<<< Exiting AddSetting(exportImportSetting={ExportImportSetting})", exportImportSetting);
         }
 
         /// <inheritdoc />
         protected override Func<ISettingsController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<ISettingsController>;
         }
     }

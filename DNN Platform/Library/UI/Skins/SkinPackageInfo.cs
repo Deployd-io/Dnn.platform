@@ -17,6 +17,7 @@ namespace DotNetNuke.UI.Skins
     [Serializable]
     public class SkinPackageInfo : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinPackageInfo));
         private int packageID = Null.NullInteger;
         private int portalID = Null.NullInteger;
         private string skinName;
@@ -121,6 +122,7 @@ namespace DotNetNuke.UI.Skins
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.SkinPackageID = Null.SetNullInteger(dr["SkinPackageID"]);
             this.PackageID = Null.SetNullInteger(dr["PackageID"]);
             this.SkinName = Null.SetNullString(dr["SkinName"]);
@@ -134,12 +136,14 @@ namespace DotNetNuke.UI.Skins
                 while (dr.Read())
                 {
                     int skinID = Null.SetNullInteger(dr["SkinID"]);
+					Logger.LogError("Fill(dr={Dr}): skinID → {SkinID}", dr, skinID);
                     if (skinID > Null.NullInteger)
                     {
                         this.skins[skinID] = Null.SetNullString(dr["SkinSrc"]);
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

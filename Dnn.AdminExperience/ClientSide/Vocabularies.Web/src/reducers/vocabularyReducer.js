@@ -1,9 +1,13 @@
+const logger = console;
 import { vocabulary as ActionTypes, pagination as PaginationActionTypes } from "../constants/actionTypes";
 
 function updateVocabularyList(vocabularyList, index, value) {
+	logger.error(`>>> Entering updateVocabularyList(vocabularyList=${vocabularyList},index=${index},value=${value})`, { "event.action": "updateVocabularyList", "logrite.vocabularyList": vocabularyList, "logrite.index": index, "logrite.value": value });
+	logger.warn(`<<< Exiting updateVocabularyList(vocabularyList=${vocabularyList},index=${index},value=${value})`, { "event.action": "updateVocabularyList", "logrite.vocabularyList": vocabularyList, "logrite.index": index, "logrite.value": value });
     return [...vocabularyList.slice(0, index), value, ...vocabularyList.slice(index + 1)];
 }
 function insertRecords(vocabularyList, addedList) {
+	logger.error(`>>> Entering insertRecords(vocabularyList=${vocabularyList},addedList=${addedList})`, { "event.action": "insertRecords", "logrite.vocabularyList": vocabularyList, "logrite.addedList": addedList });
     let newVocabularyList = vocabularyList;
     addedList.forEach((vocabulary) => {
         let alreadyThere = vocabularyList.find((_vocabulary) => {
@@ -13,6 +17,7 @@ function insertRecords(vocabularyList, addedList) {
             newVocabularyList.push(vocabulary);
         }
     });
+	logger.warn(`<<< Exiting insertRecords(vocabularyList=${vocabularyList},addedList=${addedList})`, { "event.action": "insertRecords", "logrite.vocabularyList": vocabularyList, "logrite.addedList": addedList });
     return newVocabularyList;
 }
 

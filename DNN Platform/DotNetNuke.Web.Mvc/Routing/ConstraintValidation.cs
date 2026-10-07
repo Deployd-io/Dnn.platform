@@ -22,8 +22,10 @@ namespace DotNetNuke.Web.Mvc.Routing
     /// </remarks>
     internal static class ConstraintValidation
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConstraintValidation));
         public static void Validate(Route route)
         {
+			Logger.LogError(">>> Entering Validate(route={Route})", route);
             Contract.Assert(route != null);
             Contract.Assert(route.Url != null);
 
@@ -34,8 +36,10 @@ namespace DotNetNuke.Web.Mvc.Routing
 
             foreach (var kvp in route.Constraints.Where(kvp => kvp.Value is not string).Where(kvp => kvp.Value is not IRouteConstraint))
             {
+				Logger.LogError("Throwing InvalidOperationException from Validate(route={Route})", route);
                 throw new InvalidOperationException("Invalid Constraint", new RouteConstraintNameException(typeof(IRouteConstraint).FullName));
             }
+			Logger.LogWarning("<<< Exiting Validate(route={Route})", route);
         }
 
         private class RouteConstraintNameException : Exception
@@ -44,6 +48,8 @@ namespace DotNetNuke.Web.Mvc.Routing
             public RouteConstraintNameException(string message)
                 : base(message)
             {
+			Logger.LogError(">>> Entering RouteConstraintNameException(message={Message})", message);
+            Logger.LogWarning("<<< Exiting RouteConstraintNameException(message={Message})", message);
             }
         }
     }

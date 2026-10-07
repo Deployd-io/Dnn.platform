@@ -27,12 +27,14 @@ namespace DotNetNuke.UI.Skins
     [Serializable]
     public partial class SkinDefaults
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinDefaults));
         private string adminDefaultName;
         private string defaultName;
         private string folder;
 
         private SkinDefaults(SkinDefaultType defaultType)
         {
+			Logger.LogError(">>> Entering SkinDefaults(defaultType={DefaultType})", defaultType);
             string nodename = Enum.GetName(defaultType.GetType(), defaultType).ToLowerInvariant();
             string filePath = Config.GetPathToFile(Config.ConfigFileType.DotNetNuke);
             var dnndoc = new XmlDocument { XmlResolver = null, };
@@ -40,9 +42,12 @@ namespace DotNetNuke.UI.Skins
             {
                 dnndoc.Load(xmlReader);
             }
+			Logger.LogWarning("<<< Exiting SkinDefaults(defaultType={DefaultType})", defaultType);
 
             XmlNode defaultElement = dnndoc.SelectSingleNode("/configuration/skinningdefaults/" + nodename);
+			Logger.LogError("SkinDefaults(defaultType={DefaultType}): defaultElement → {DefaultElement}", defaultType, defaultElement);
             this.folder = defaultElement.Attributes["folder"].Value;
+			Logger.LogDebug("SkinDefaults(defaultType={DefaultType}): this.folder → {Arg1}", defaultType, this.folder);
             this.defaultName = defaultElement.Attributes["default"].Value;
             this.adminDefaultName = defaultElement.Attributes["admindefault"].Value;
         }
@@ -78,6 +83,7 @@ namespace DotNetNuke.UI.Skins
         /// <returns>A <see cref="SkinDefaults"/> instance.</returns>
         public static SkinDefaults GetSkinDefaults(IHostSettings hostSettings, SkinDefaultType defaultType)
         {
+			Logger.LogError(">>> Entering GetSkinDefaults(defaultType={DefaultType})", defaultType);
             return
                 CBO.GetCachedObject<SkinDefaults>(
                     hostSettings,
@@ -87,7 +93,10 @@ namespace DotNetNuke.UI.Skins
 
         private static object GetSkinDefaultsCallback(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogError(">>> Entering GetSkinDefaultsCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var defaultType = (SkinDefaultType)cacheItemArgs.ParamList[0];
+			Logger.LogError("GetSkinDefaultsCallback(cacheItemArgs={CacheItemArgs}): defaultType → {DefaultType}", cacheItemArgs, defaultType);
+			Logger.LogWarning("<<< Exiting GetSkinDefaultsCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return new SkinDefaults(defaultType);
         }
     }

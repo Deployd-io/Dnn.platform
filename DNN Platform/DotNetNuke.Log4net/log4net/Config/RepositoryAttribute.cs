@@ -73,6 +73,7 @@ namespace log4net.Config
         /// </remarks>
         public RepositoryAttribute(string name)
         {
+			value.LogError(">>> Entering RepositoryAttribute(name={Name})", name);
             this.m_name = name;
         }
 

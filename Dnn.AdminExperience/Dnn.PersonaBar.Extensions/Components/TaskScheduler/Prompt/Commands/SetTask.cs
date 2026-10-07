@@ -36,16 +36,20 @@ namespace Dnn.PersonaBar.TaskScheduler.Components.Prompt.Commands
 
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.TaskId = this.GetFlagValue(FlagId, "Task Id", -1, true, true, true);
             this.Enabled = this.GetFlagValue(FlagEnabled, "Enabled", true, true);
         }
 
         public override ConsoleResultModel Run()
         {
+			Logger.LogError(">>> Entering Run()");
             try
             {
                 var taskToUpdate = SchedulingProvider.Instance().GetSchedule(this.TaskId);
+				Logger.LogError("Run(): taskToUpdate → {TaskToUpdate}", taskToUpdate);
                 var tasks = new List<TaskModel>();
+				Logger.LogError("Run(): tasks → {Tasks}", tasks);
 
                 if (taskToUpdate == null)
                 {
@@ -58,6 +62,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Components.Prompt.Commands
                 }
 
                 taskToUpdate.Enabled = this.Enabled;
+				Logger.LogDebug("Run(): taskToUpdate.Enabled → {Arg0}", taskToUpdate.Enabled);
                 SchedulingProvider.Instance().UpdateSchedule(taskToUpdate);
                 tasks.Add(new TaskModel(taskToUpdate));
                 return new ConsoleResultModel(this.LocalizeString("Prompt_TaskUpdated"))
@@ -69,6 +74,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Components.Prompt.Commands
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(this.LocalizeString("Prompt_TaskUpdateFailed"));
             }
         }

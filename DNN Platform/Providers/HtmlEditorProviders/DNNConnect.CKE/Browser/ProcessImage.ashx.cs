@@ -32,6 +32,8 @@ namespace DNNConnect.CKEditorProvider.Browser
         /// </returns>
         public bool GetThumbAbort()
         {
+			eventLogger.LogError(">>> Entering GetThumbAbort()");
+			eventLogger.LogWarning("<<< Exiting GetThumbAbort()");
             return false;
         }
 
@@ -41,31 +43,48 @@ namespace DNNConnect.CKEditorProvider.Browser
         /// </param>
         public void ProcessRequest(HttpContext context)
         {
+			eventLogger.LogError(">>> Entering ProcessRequest(context={Context})", context);
             float imageH = float.Parse(context.Request["imageH"]);
             float imageW = float.Parse(context.Request["imageW"]);
+			eventLogger.LogError("ProcessRequest(context={Context}): imageW → {ImageW}", context, imageW);
             float angle = float.Parse(context.Request["imageRotate"]);
+			eventLogger.LogError("ProcessRequest(context={Context}): angle → {Angle}", context, angle);
             int sourceImageId = int.Parse(context.Request["fileId"]);
+			eventLogger.LogError("ProcessRequest(context={Context}): sourceImageId → {SourceImageId}", context, sourceImageId);
             float imageX = float.Parse(context.Request["imageX"]);
+			eventLogger.LogError("ProcessRequest(context={Context}): imageX → {ImageX}", context, imageX);
             float imageY = float.Parse(context.Request["imageY"]);
+			eventLogger.LogError("ProcessRequest(context={Context}): imageY → {ImageY}", context, imageY);
             float selectorH = float.Parse(context.Request["selectorH"]);
+			eventLogger.LogError("ProcessRequest(context={Context}): selectorH → {SelectorH}", context, selectorH);
             float selectorW = float.Parse(context.Request["selectorW"]);
+			eventLogger.LogError("ProcessRequest(context={Context}): selectorW → {SelectorW}", context, selectorW);
             float selectorX = float.Parse(context.Request["selectorX"]);
+			eventLogger.LogError("ProcessRequest(context={Context}): selectorX → {SelectorX}", context, selectorX);
             float selectorY = float.Parse(context.Request["selectorY"]);
+			eventLogger.LogError("ProcessRequest(context={Context}): selectorY → {SelectorY}", context, selectorY);
             float viewPortH = float.Parse(context.Request["viewPortH"]);
+			eventLogger.LogError("ProcessRequest(context={Context}): viewPortH → {ViewPortH}", context, viewPortH);
             float viewPortW = float.Parse(context.Request["viewPortW"]);
+			eventLogger.LogError("ProcessRequest(context={Context}): viewPortW → {ViewPortW}", context, viewPortW);
+			eventLogger.LogError("ProcessRequest(context={Context}): imageH → {ImageH}", context, imageH);
 
             bool bSaveFile;
 
             try
             {
                 bSaveFile = bool.Parse(context.Request["saveFile"]);
+				eventLogger.LogError("ProcessRequest(context={Context}): bSaveFile → {BSaveFile}", context, bSaveFile);
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in ProcessRequest(context={Context}): {Arg1}", context, Exception.Message);
                 bSaveFile = false;
+				eventLogger.LogDebug("ProcessRequest(context={Context}): bSaveFile → {BSaveFile}", context, bSaveFile);
             }
 
             string sNewFileName = null;
+			eventLogger.LogError("ProcessRequest(context={Context}): sNewFileName → {SNewFileName}", context, sNewFileName);
 
             if (!string.IsNullOrEmpty(context.Request["newFileName"]))
             {
@@ -73,18 +92,23 @@ namespace DNNConnect.CKEditorProvider.Browser
             }
 
             float pWidth = imageW;
+			eventLogger.LogError("ProcessRequest(context={Context}): pWidth → {PWidth}", context, pWidth);
             float pHeight = imageH;
+			eventLogger.LogError("ProcessRequest(context={Context}): pHeight → {PHeight}", context, pHeight);
 
             var file = FileManager.Instance.GetFile(sourceImageId);
+			eventLogger.LogError("ProcessRequest(context={Context}): file → {File}", context, file);
             if (file == null)
             {
                 return;
             }
 
             Bitmap img = (Bitmap)Image.FromStream(FileManager.Instance.GetFileContent(file));
+			eventLogger.LogError("ProcessRequest(context={Context}): img → {Img}", context, img);
 
             // Resize
             Bitmap imageP = this.ResizeImage(img, Convert.ToInt32(pWidth), Convert.ToInt32(pHeight));
+			eventLogger.LogError("ProcessRequest(context={Context}): imageP → {ImageP}", context, imageP);
 
             // Rotate if angle is not 0.00 or 360
             if (angle > 0.0F && angle < 360.00F)
@@ -103,22 +127,30 @@ namespace DNNConnect.CKEditorProvider.Browser
             if (pWidth > viewPortW)
             {
                 srcX = Math.Abs(imageX - Math.Abs((imageW - pWidth) / 2));
+				eventLogger.LogError("ProcessRequest(context={Context}): srcX → {SrcX}", context, srcX);
                 dstX = 0;
+				eventLogger.LogDebug("ProcessRequest(context={Context}): dstX → {DstX}", context, dstX);
             }
             else
             {
+				eventLogger.LogError("ProcessRequest(context={Context}): dstX → {DstX}", context, dstX);
                 srcX = 0;
+				eventLogger.LogDebug("ProcessRequest(context={Context}): srcX → {SrcX}", context, srcX);
                 dstX = imageX + ((imageW - pWidth) / 2);
             }
 
             if (pHeight > viewPortH)
             {
                 srcY = Math.Abs(imageY - Math.Abs((imageH - pHeight) / 2));
+				eventLogger.LogError("ProcessRequest(context={Context}): srcY → {SrcY}", context, srcY);
                 dstY = 0;
+				eventLogger.LogDebug("ProcessRequest(context={Context}): dstY → {DstY}", context, dstY);
             }
             else
             {
+				eventLogger.LogError("ProcessRequest(context={Context}): dstY → {DstY}", context, dstY);
                 srcY = 0;
+				eventLogger.LogDebug("ProcessRequest(context={Context}): srcY → {SrcY}", context, srcY);
                 dstY = imageY + ((imageH - pHeight) / 2);
             }
 
@@ -133,14 +165,18 @@ namespace DNNConnect.CKEditorProvider.Browser
                 context.Response.ContentType = "text/plain";
 
                 var sourceFolder = FolderManager.Instance.GetFolder(file.FolderId);
+				eventLogger.LogError("ProcessRequest(context={Context}): sourceFolder → {SourceFolder}", context, sourceFolder);
                 if (PortalSettings.Current != null
                         && !this.HasWritePermission(sourceFolder.FolderPath))
                 {
+					eventLogger.LogError("Throwing SecurityException from ProcessRequest(context={Context})", context);
                     throw new SecurityException("You don't have write permission to save files under this folder.");
                 }
 
                 using var stream = new MemoryStream();
+				eventLogger.LogError("ProcessRequest(context={Context}): stream → {Stream}", context, stream);
                 var fileName = GenerateName(file, sNewFileName);
+				eventLogger.LogError("ProcessRequest(context={Context}): fileName → {FileName}", context, fileName);
                 imageP.Save(stream, img.RawFormat);
 
                 const bool alreadyCheckedPermissions = true;
@@ -154,6 +190,7 @@ namespace DNNConnect.CKEditorProvider.Browser
 
             imageP.Dispose();
             img.Dispose();
+			eventLogger.LogWarning("<<< Exiting ProcessRequest(context={Context})", context);
         }
 
         /// <summary>Generates the New File Path.</summary>
@@ -168,6 +205,7 @@ namespace DNNConnect.CKEditorProvider.Browser
         /// </returns>
         private static string GenerateName(IFileInfo file, string sNewFileName)
         {
+			eventLogger.LogError(">>> Entering GenerateName(file={File},sNewFileName={SNewFileName})", file, sNewFileName);
             string sNewFilePath = !string.IsNullOrEmpty(sNewFileName)
                                       ? $"{CleanName(sNewFileName)}.{file.Extension}"
                                       : $"{Path.GetFileNameWithoutExtension(sNewFileName)}_crop.{file.Extension}";
@@ -175,14 +213,17 @@ namespace DNNConnect.CKEditorProvider.Browser
             int iCounter = 0;
 
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
+			eventLogger.LogError("GenerateName(file={File},sNewFileName={SNewFileName}): folder → {Folder}", file, sNewFileName, folder);
             while (FileManager.Instance.FileExists(folder, sNewFilePath))
             {
                 iCounter++;
 
                 string sFileNameNoExt = Path.GetFileNameWithoutExtension(sNewFilePath);
                 sNewFilePath = $"{sFileNameNoExt}_{iCounter}.{file.Extension}";
+				eventLogger.LogError("GenerateName(file={File},sNewFileName={SNewFileName}): sNewFilePath → {SNewFilePath}", file, sNewFileName, sNewFilePath);
             }
 
+			eventLogger.LogWarning("<<< Exiting GenerateName(file={File},sNewFileName={SNewFileName})", file, sNewFileName);
             return sNewFilePath;
         }
 
@@ -214,15 +255,21 @@ namespace DNNConnect.CKEditorProvider.Browser
         private static Bitmap ImageCopy(
             Image srcBitmap, float dstX, float dstY, float srcX, float srcY, float dstWidth, float dstHeight)
         {
+			eventLogger.LogError(">>> Entering ImageCopy(srcBitmap={SrcBitmap},dstX={DstX},dstY={DstY},srcX={SrcX},srcY={SrcY},dstWidth={DstWidth},dstHeight={DstHeight})", srcBitmap, dstX, dstY, srcX, srcY, dstWidth, dstHeight);
             // Create the new bitmap and associated graphics object
             RectangleF sourceRec = new RectangleF(srcX, srcY, dstWidth, dstHeight);
+			eventLogger.LogError("ImageCopy(srcBitmap={SrcBitmap},dstX={DstX},dstY={DstY},srcX={SrcX},srcY={SrcY},dstWidth={DstWidth},dstHeight={DstHeight}): sourceRec → {SourceRec}", srcBitmap, dstX, dstY, srcX, srcY, dstWidth, dstHeight, sourceRec);
             RectangleF destRec = new RectangleF(dstX, dstY, dstWidth, dstHeight);
+			eventLogger.LogError("ImageCopy(srcBitmap={SrcBitmap},dstX={DstX},dstY={DstY},srcX={SrcX},srcY={SrcY},dstWidth={DstWidth},dstHeight={DstHeight}): destRec → {DestRec}", srcBitmap, dstX, dstY, srcX, srcY, dstWidth, dstHeight, destRec);
             Bitmap bmp = new Bitmap(Convert.ToInt32(dstWidth), Convert.ToInt32(dstHeight));
+			eventLogger.LogError("ImageCopy(srcBitmap={SrcBitmap},dstX={DstX},dstY={DstY},srcX={SrcX},srcY={SrcY},dstWidth={DstWidth},dstHeight={DstHeight}): bmp → {Bmp}", srcBitmap, dstX, dstY, srcX, srcY, dstWidth, dstHeight, bmp);
             Graphics g = Graphics.FromImage(bmp);
+			eventLogger.LogError("ImageCopy(srcBitmap={SrcBitmap},dstX={DstX},dstY={DstY},srcX={SrcX},srcY={SrcY},dstWidth={DstWidth},dstHeight={DstHeight}): g → {G}", srcBitmap, dstX, dstY, srcX, srcY, dstWidth, dstHeight, g);
 
             g.DrawImage(srcBitmap, destRec, sourceRec, GraphicsUnit.Pixel);
             g.Dispose();
 
+			eventLogger.LogWarning("<<< Exiting ImageCopy(srcBitmap={SrcBitmap},dstX={DstX},dstY={DstY},srcX={SrcX},srcY={SrcY},dstWidth={DstWidth},dstHeight={DstHeight})", srcBitmap, dstX, dstY, srcX, srcY, dstWidth, dstHeight);
             return bmp;
         }
 
@@ -240,9 +287,12 @@ namespace DNNConnect.CKEditorProvider.Browser
         /// </returns>
         private static Image RotateImage(Image img, double rotationAngle)
         {
+			eventLogger.LogError(">>> Entering RotateImage(img={Img},rotationAngle={RotationAngle})", img, rotationAngle);
             Bitmap returnBitmap = new Bitmap(img.Width, img.Height + 1);
 
+			eventLogger.LogError("RotateImage(img={Img},rotationAngle={RotationAngle}): returnBitmap → {ReturnBitmap}", img, rotationAngle, returnBitmap);
             Graphics g = Graphics.FromImage(returnBitmap);
+			eventLogger.LogError("RotateImage(img={Img},rotationAngle={RotationAngle}): g → {G}", img, rotationAngle, g);
 
             g.TranslateTransform((float)img.Width / 2, (float)img.Height / 2);
             g.RotateTransform((float)rotationAngle);
@@ -250,15 +300,19 @@ namespace DNNConnect.CKEditorProvider.Browser
 
             g.DrawImage(img, (img.Width / 2) - (img.Height / 2), (img.Height / 2) - (img.Width / 2), img.Height, img.Width);
 
+			eventLogger.LogWarning("<<< Exiting RotateImage(img={Img},rotationAngle={RotationAngle})", img, rotationAngle);
             return returnBitmap;
         }
 
         private static string CleanName(string name)
         {
+			eventLogger.LogError(">>> Entering CleanName(name={Name})", name);
             name = name.Replace(@"\", "/");
             if (name.Contains("/"))
             {
                 name = name.Substring(name.LastIndexOf('/') + 1);
+				eventLogger.LogError("CleanName(name={Name}): name → {Name1}", name, name);
+            eventLogger.LogWarning("<<< Exiting CleanName(name={Name})", name);
             }
 
             return name;
@@ -266,7 +320,9 @@ namespace DNNConnect.CKEditorProvider.Browser
 
         private bool HasWritePermission(string relativePath)
         {
+			eventLogger.LogError(">>> Entering HasWritePermission(relativePath={RelativePath})", relativePath);
             var portalId = PortalSettings.Current.PortalId;
+			eventLogger.LogWarning("<<< Exiting HasWritePermission(relativePath={RelativePath})", relativePath);
             return FolderPermissionController.HasFolderPermission(portalId, relativePath, "WRITE");
         }
 
@@ -285,7 +341,9 @@ namespace DNNConnect.CKEditorProvider.Browser
         /// </returns>
         private Bitmap ResizeImage(Image img, int width, int height)
         {
+			eventLogger.LogError(">>> Entering ResizeImage(img={Img},width={Width},height={Height})", img, width, height);
             Image.GetThumbnailImageAbort callback = this.GetThumbAbort;
+			eventLogger.LogWarning("<<< Exiting ResizeImage(img={Img},width={Width},height={Height})", img, width, height);
             return (Bitmap)img.GetThumbnailImage(width, height, callback, IntPtr.Zero);
         }
     }

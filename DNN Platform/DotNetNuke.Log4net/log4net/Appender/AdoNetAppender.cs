@@ -138,9 +138,12 @@ namespace log4net.Appender
         /// </remarks>
         public AdoNetAppender()
         {
+			value.LogError(">>> Entering AdoNetAppender()");
             this.ConnectionType = "System.Data.OleDb.OleDbConnection, System.Data, Version=1.0.3300.0, Culture=neutral, PublicKeyToken=b77a5c561934e089";
+			value.LogDebug("AdoNetAppender(): this.ConnectionType → {Arg0}", this.ConnectionType);
             this.UseTransactions = true;
             this.CommandType = CommandType.Text;
+			value.LogDebug("AdoNetAppender(): this.UseTransactions → {Arg0}", this.UseTransactions);
             this.m_parameters = new ArrayList();
             this.ReconnectOnError = false;
         }
@@ -396,6 +399,7 @@ namespace log4net.Appender
         /// </remarks>
         public override void ActivateOptions()
         {
+			value.LogError(">>> Entering ActivateOptions()");
             base.ActivateOptions();
 
             if (this.SecurityContext == null)
@@ -404,6 +408,7 @@ namespace log4net.Appender
             }
 
             this.InitializeDatabaseConnection();
+			value.LogWarning("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>
@@ -416,8 +421,10 @@ namespace log4net.Appender
         /// </remarks>
         protected override void OnClose()
         {
+			value.LogError(">>> Entering OnClose()");
             base.OnClose();
             this.DiposeConnection();
+			value.LogWarning("<<< Exiting OnClose()");
         }
 
         /// <summary>
@@ -432,6 +439,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void SendBuffer(LoggingEvent[] events)
         {
+			value.LogError(">>> Entering SendBuffer(events={Events})", events);
             if (this.ReconnectOnError && (this.Connection == null || this.Connection.State != ConnectionState.Open))
             {
                 LogLog.Debug(declaringType, "Attempting to reconnect to database. Current Connection State: " + ((this.Connection == null) ? SystemInfo.NullText : this.Connection.State.ToString()));
@@ -457,6 +465,7 @@ namespace log4net.Appender
                         }
                         catch (Exception ex)
                         {
+							value.LogError("Exception in SendBuffer(events={Events}): {Arg1}", events, ex.Message);
                             // rollback the transaction
                             try
                             {
@@ -464,6 +473,7 @@ namespace log4net.Appender
                             }
                             catch (Exception)
                             {
+								value.LogError("Exception in SendBuffer(events={Events}): {Arg1}", events, Exception.Message);
                                 // Ignore exception
                             }
 
@@ -477,6 +487,7 @@ namespace log4net.Appender
                     // Send without transaction
                     this.SendBuffer(null, events);
                 }
+				value.LogWarning("<<< Exiting SendBuffer(events={Events})", events);
             }
         }
 
@@ -491,7 +502,9 @@ namespace log4net.Appender
         /// </remarks>
         public void AddParameter(AdoNetAppenderParameter parameter)
         {
+			value.LogError(">>> Entering AddParameter(parameter={Parameter})", parameter);
             this.m_parameters.Add(parameter);
+			value.LogWarning("<<< Exiting AddParameter(parameter={Parameter})", parameter);
         }
 
 
@@ -509,6 +522,7 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void SendBuffer(IDbTransaction dbTran, LoggingEvent[] events)
         {
+			value.LogError(">>> Entering SendBuffer(dbTran={DbTran},events={Events})", dbTran, events);
             // string.IsNotNullOrWhiteSpace() does not exist in ancient .NET frameworks
             if (this.CommandText != null && this.CommandText.Trim() != string.Empty)
             {
@@ -516,13 +530,16 @@ namespace log4net.Appender
                 {
                     // Set the command string
                     dbCmd.CommandText = this.CommandText;
+					value.LogDebug("SendBuffer(dbTran={DbTran},events={Events}): dbCmd.CommandText → {Arg2}", dbTran, events, dbCmd.CommandText);
 
                     // Set the command type
                     dbCmd.CommandType = this.CommandType;
+					value.LogDebug("SendBuffer(dbTran={DbTran},events={Events}): dbCmd.CommandType → {Arg2}", dbTran, events, dbCmd.CommandType);
                     // Send buffer using the prepared command object
                     if (dbTran != null)
                     {
                         dbCmd.Transaction = dbTran;
+						value.LogDebug("SendBuffer(dbTran={DbTran},events={Events}): dbCmd.Transaction → {Arg2}", dbTran, events, dbCmd.Transaction);
                     }
 
                     try
@@ -532,6 +549,7 @@ namespace log4net.Appender
                     }
                     catch (Exception)
                     {
+						value.LogError("Exception in SendBuffer(dbTran={DbTran},events={Events}): {Arg2}", dbTran, events, Exception.Message);
                         if (dbTran != null)
                         {
                             // rethrow exception in transaction mode, cuz now transaction is in failed state
@@ -578,6 +596,7 @@ namespace log4net.Appender
                     }
                 }
             }
+			value.LogWarning("<<< Exiting SendBuffer(dbTran={DbTran},events={Events})", dbTran, events);
         }
 
         /// <summary>
@@ -586,6 +605,7 @@ namespace log4net.Appender
         /// <param name="dbCmd">The command to prepare.</param>
         protected virtual void Prepare(IDbCommand dbCmd)
         {
+			value.LogError(">>> Entering Prepare(dbCmd={DbCmd})", dbCmd);
             // npgsql require parameters to prepare command
             foreach (AdoNetAppenderParameter parameter in this.m_parameters)
             {
@@ -593,6 +613,7 @@ namespace log4net.Appender
             }
 
             dbCmd.Prepare();
+			value.LogWarning("<<< Exiting Prepare(dbCmd={DbCmd})", dbCmd);
         }
 
         /// <summary>
@@ -608,6 +629,7 @@ namespace log4net.Appender
         /// </returns>
         protected virtual string GetLogStatement(LoggingEvent logEvent)
         {
+			value.LogError(">>> Entering GetLogStatement(logEvent={LogEvent})", logEvent);
             if (this.Layout == null)
             {
                 this.ErrorHandler.Error("AdoNetAppender: No Layout specified.");
@@ -618,6 +640,7 @@ namespace log4net.Appender
                 using (var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture))
                 {
                     this.Layout.Format(writer, logEvent);
+					value.LogWarning("<<< Exiting GetLogStatement(logEvent={LogEvent})", logEvent);
                     return writer.ToString();
                 }
             }
@@ -634,8 +657,12 @@ namespace log4net.Appender
         /// <returns>An <see cref="IDbConnection"/> instance with a valid connection string.</returns>
         protected virtual IDbConnection CreateConnection(Type connectionType, string connectionString)
         {
+			value.LogError(">>> Entering CreateConnection(connectionType={ConnectionType},connectionString={ConnectionString})", connectionType, connectionString);
             IDbConnection connection = (IDbConnection)Activator.CreateInstance(connectionType);
             connection.ConnectionString = connectionString;
+			value.LogDebug("CreateConnection(connectionType={ConnectionType},connectionString={ConnectionString}): connection.ConnectionString → {Arg2}", connectionType, connectionString, connection.ConnectionString);
+			value.LogError("CreateConnection(connectionType={ConnectionType},connectionString={ConnectionString}): connection → {Connection}", connectionType, connectionString, connection);
+			value.LogWarning("<<< Exiting CreateConnection(connectionType={ConnectionType},connectionString={ConnectionString})", connectionType, connectionString);
             return connection;
         }
 
@@ -650,10 +677,14 @@ namespace log4net.Appender
         /// <returns>A connection string used to connect to the database.</returns>
         protected virtual string ResolveConnectionString(out string connectionStringContext)
         {
+			value.LogError(">>> Entering ResolveConnectionString()");
             if (this.ConnectionString != null && this.ConnectionString.Length > 0)
             {
                 connectionStringContext = "ConnectionString";
+				value.LogError("ResolveConnectionString(): connectionStringContext → {ConnectionStringContext}", connectionStringContext);
+				value.LogDebug("ResolveConnectionString(): connectionStringContext → {ConnectionStringContext}", connectionStringContext);
                 return this.ConnectionString;
+			value.LogWarning("<<< Exiting ResolveConnectionString()");
             }
 
 #if !NETSTANDARD1_3
@@ -667,6 +698,7 @@ namespace log4net.Appender
                 }
                 else
                 {
+					value.LogError("Throwing LogException from ResolveConnectionString()");
                     throw new LogException("Unable to find [" + this.ConnectionStringName + "] ConfigurationManager.ConnectionStrings item");
                 }
             }
@@ -704,7 +736,9 @@ namespace log4net.Appender
         /// <returns>The <see cref="Type"/> of the ADO.NET provider</returns>
         protected virtual Type ResolveConnectionType()
         {
+			value.LogError(">>> Entering ResolveConnectionType()");
             try
+			value.LogWarning("<<< Exiting ResolveConnectionType()");
             {
 #if NETSTANDARD1_3
                 // NETSTANDARD1_3 requires comma separated ConnectionType like `System.Data.SqlClient.SqlConnection, System.Data` to work properly.
@@ -725,8 +759,11 @@ namespace log4net.Appender
         /// </summary>		
         private void InitializeDatabaseConnection()
         {
+			value.LogError(">>> Entering InitializeDatabaseConnection()");
             string connectionStringContext = "Unable to determine connection string context.";
             string resolvedConnectionString = string.Empty;
+			value.LogError("InitializeDatabaseConnection(): resolvedConnectionString → {ResolvedConnectionString}", resolvedConnectionString);
+			value.LogError("InitializeDatabaseConnection(): connectionStringContext → {ConnectionStringContext}", connectionStringContext);
 
             try
             {
@@ -745,11 +782,14 @@ namespace log4net.Appender
             }
             catch (Exception e)
             {
+				value.LogError("Exception in InitializeDatabaseConnection(): {Arg0}", e.Message);
                 // Sadly, your connection string is bad.
                 this.ErrorHandler.Error("Could not open database connection [" + resolvedConnectionString + "]. Connection string context [" + connectionStringContext + "].", e);
 
+				value.LogWarning("<<< Exiting InitializeDatabaseConnection()");
                 this.Connection = null;
             }
+			value.LogDebug("InitializeDatabaseConnection(): this.Connection → {Arg0}", this.Connection);
         }
 
         /// <summary>
@@ -760,6 +800,7 @@ namespace log4net.Appender
         /// </remarks>
         private void DiposeConnection()
         {
+			value.LogError(">>> Entering DiposeConnection()");
             if (this.Connection != null)
             {
                 try
@@ -771,7 +812,9 @@ namespace log4net.Appender
                     LogLog.Warn(declaringType, "Exception while disposing cached connection object", ex);
                 }
 
+				value.LogWarning("<<< Exiting DiposeConnection()");
                 this.Connection = null;
+				value.LogDebug("DiposeConnection(): this.Connection → {Arg0}", this.Connection);
             }
         }
 
@@ -869,7 +912,9 @@ namespace log4net.Appender
         /// </remarks>
         public AdoNetAppenderParameter()
         {
+			value.LogError(">>> Entering AdoNetAppenderParameter()");
             this.Precision = 0;
+			value.LogDebug("AdoNetAppenderParameter(): this.Precision → {Arg0}", this.Precision);
             this.Scale = 0;
             this.Size = 0;
         }
@@ -1028,31 +1073,39 @@ namespace log4net.Appender
         /// </remarks>
         public virtual void Prepare(IDbCommand command)
         {
+			value.LogError(">>> Entering Prepare(command={Command})", command);
             // Create a new parameter
             IDbDataParameter param = command.CreateParameter();
+			value.LogError("Prepare(command={Command}): param → {Param}", command, param);
 
             // Set the parameter properties
             param.ParameterName = this.ParameterName;
+			value.LogDebug("Prepare(command={Command}): param.ParameterName → {Arg1}", command, param.ParameterName);
 
             if (!this.m_inferType)
             {
                 param.DbType = this.DbType;
+				value.LogDebug("Prepare(command={Command}): param.DbType → {Arg1}", command, param.DbType);
             }
             if (this.Precision != 0)
             {
                 param.Precision = this.Precision;
+				value.LogDebug("Prepare(command={Command}): param.Precision → {Arg1}", command, param.Precision);
             }
             if (this.Scale != 0)
             {
                 param.Scale = this.Scale;
+				value.LogDebug("Prepare(command={Command}): param.Scale → {Arg1}", command, param.Scale);
             }
             if (this.Size != 0)
             {
                 param.Size = this.Size;
+				value.LogDebug("Prepare(command={Command}): param.Size → {Arg1}", command, param.Size);
             }
 
             // Add the parameter to the collection of params
             command.Parameters.Add(param);
+			value.LogWarning("<<< Exiting Prepare(command={Command})", command);
         }
 
         /// <summary>
@@ -1068,11 +1121,14 @@ namespace log4net.Appender
         /// </remarks>
         public virtual void FormatValue(IDbCommand command, LoggingEvent loggingEvent)
         {
+			value.LogError(">>> Entering FormatValue(command={Command},loggingEvent={LoggingEvent})", command, loggingEvent);
             // Lookup the parameter
             IDbDataParameter param = (IDbDataParameter)command.Parameters[this.ParameterName];
+			value.LogError("FormatValue(command={Command},loggingEvent={LoggingEvent}): param → {Param}", command, loggingEvent, param);
 
             // Format the value
             object formattedValue = this.Layout.Format(loggingEvent);
+			value.LogError("FormatValue(command={Command},loggingEvent={LoggingEvent}): formattedValue → {FormattedValue}", command, loggingEvent, formattedValue);
 
             // If the value is null then convert to a DBNull
             if (formattedValue == null)
@@ -1080,6 +1136,8 @@ namespace log4net.Appender
                 formattedValue = DBNull.Value;
             }
 
+			value.LogWarning("<<< Exiting FormatValue(command={Command},loggingEvent={LoggingEvent})", command, loggingEvent);
+			value.LogDebug("FormatValue(command={Command},loggingEvent={LoggingEvent}): param.Value → {Arg2}", command, loggingEvent, param.Value);
             param.Value = formattedValue;
         }
 

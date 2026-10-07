@@ -14,6 +14,7 @@ namespace DotNetNuke.Entities.Urls
 
     public static class CollectionExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CollectionExtensions));
         public static void LoadFromXmlFile(this Dictionary<int, List<ParameterReplaceAction>> actions, string fileName, int portalId, bool portalSpecific, ref List<string> messages)
         {
             if (messages == null)
@@ -114,9 +115,11 @@ namespace DotNetNuke.Entities.Urls
         /// <remarks>807 : change to allow specification of assumption that all rules belong to the supplied portal.</remarks>
         public static void LoadFromXmlFile(this Dictionary<int, List<ParameterRedirectAction>> actions, string fileName, int portalId, bool portalSpecific, ref List<string> messages)
         {
+			Logger.LogError(">>> Entering LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages})", actions, fileName, portalId, portalSpecific, messages);
             if (messages == null)
             {
                 messages = new List<string>();
+				Logger.LogError("LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages}): messages → {Messages1}", actions, fileName, portalId, portalSpecific, messages, messages);
             }
 
             if (File.Exists(fileName))
@@ -134,16 +137,19 @@ namespace DotNetNuke.Entities.Urls
                             if (rdr.Name == "parameterRedirect")
                             {
                                 var tabMessages = new List<string>();
+								Logger.LogError("LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages}): tabMessages → {TabMessages}", actions, fileName, portalId, portalSpecific, messages, tabMessages);
                                 int actionCount = 0;
 
                                 // now set up the action
                                 string portalIdRaw = rdr.GetAttribute("rulePortalId");
+								Logger.LogError("LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages}): portalIdRaw → {PortalIdRaw}", actions, fileName, portalId, portalSpecific, messages, portalIdRaw);
                                 if (string.IsNullOrEmpty(portalIdRaw))
                                 {
                                     portalIdRaw = rdr.GetAttribute("portalId");
                                 }
 
                                 int rulePortalId = -1;
+								Logger.LogError("LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages}): rulePortalId → {RulePortalId}", actions, fileName, portalId, portalSpecific, messages, rulePortalId);
                                 if (portalIdRaw != null)
                                 {
                                     if (!int.TryParse(portalIdRaw, out rulePortalId))
@@ -162,21 +168,25 @@ namespace DotNetNuke.Entities.Urls
                                     if (!bool.TryParse(fromDefaultRaw, out var fromDefault))
                                     {
                                         fromDefault = false;
+										Logger.LogDebug("LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages}): fromDefault → {FromDefault}", actions, fileName, portalId, portalSpecific, messages, fromDefault);
                                     }
 
                                     string fromSiteRootRaw = rdr.GetAttribute("fromSiteRoot");
                                     if (!bool.TryParse(fromSiteRootRaw, out var fromSiteRoot))
                                     {
                                         fromSiteRoot = false;
+										Logger.LogDebug("LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages}): fromSiteRoot → {FromSiteRoot}", actions, fileName, portalId, portalSpecific, messages, fromSiteRoot);
                                     }
 
                                     string changeToSiteRootRaw = rdr.GetAttribute("changeToSiteRoot");
                                     if (!bool.TryParse(changeToSiteRootRaw, out var changeToSiteRoot))
                                     {
                                         changeToSiteRoot = false;
+										Logger.LogDebug("LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages}): changeToSiteRoot → {ChangeToSiteRoot}", actions, fileName, portalId, portalSpecific, messages, changeToSiteRoot);
                                     }
 
                                     List<int> tabIds = XmlHelpers.TabIdsFromAttributes(tabIdRaw, tabNames, portalId, ref tabMessages);
+									Logger.LogError("LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages}): tabIds → {TabIds}", actions, fileName, portalId, portalSpecific, messages, tabIds);
                                     foreach (int tabId in tabIds)
                                     {
                                         var action = new ParameterRedirectAction
@@ -193,7 +203,9 @@ namespace DotNetNuke.Entities.Urls
                                         {
                                             // check for 'fromDefault' attribute
                                             action.ForDefaultPage = true;
+											Logger.LogDebug("LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages}): action.ForDefaultPage → {Arg5}", actions, fileName, portalId, portalSpecific, messages, action.ForDefaultPage);
                                             action.TabId = -2;
+											Logger.LogDebug("LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages}): action.TabId → {Arg5}", actions, fileName, portalId, portalSpecific, messages, action.TabId);
                                         }
                                         else
                                         {
@@ -210,10 +222,12 @@ namespace DotNetNuke.Entities.Urls
                                         if (actions.TryGetValue(action.TabId, out var parameterRedirectActions))
                                         {
                                             tabActionCol = parameterRedirectActions;
+											Logger.LogError("LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages}): tabActionCol → {TabActionCol}", actions, fileName, portalId, portalSpecific, messages, tabActionCol);
                                         }
                                         else
                                         {
                                             tabActionCol = [];
+											Logger.LogDebug("LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages}): tabActionCol → {TabActionCol}", actions, fileName, portalId, portalSpecific, messages, tabActionCol);
                                             actions.Add(action.TabId, tabActionCol);
                                         }
 
@@ -238,6 +252,7 @@ namespace DotNetNuke.Entities.Urls
                 }
 
                 rdr.Close();
+			Logger.LogWarning("<<< Exiting LoadFromXmlFile(actions={Actions},fileName={FileName},portalId={PortalId},portalSpecific={PortalSpecific},messages={Messages})", actions, fileName, portalId, portalSpecific, messages);
             }
         }
 

@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A text button control.</summary>
     public class DnnTextButton : LinkButton, ILocalizable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnTextButton));
         private bool localize = true;
 
         /// <summary>Gets or sets a confirmation message to display when the button is clicked.</summary>
@@ -107,6 +108,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public virtual void LocalizeStrings()
         {
+			Logger.LogError(">>> Entering LocalizeStrings()");
             if (this.Localize)
             {
                 if (!string.IsNullOrEmpty(this.ToolTip))
@@ -127,29 +129,36 @@ namespace DotNetNuke.Web.UI.WebControls
                     {
                         this.ToolTip = this.Text;
                     }
+					Logger.LogDebug("LocalizeStrings(): this.ToolTip → {Arg0}", this.ToolTip);
                 }
             }
+			Logger.LogWarning("<<< Exiting LocalizeStrings()");
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
             this.LocalResourceFile = Utilities.GetLocalResourceFile(this);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering Render(writer={Writer})", writer);
             this.LocalizeStrings();
             if (!this.Enabled && !string.IsNullOrEmpty(this.DisabledCssClass))
             {
                 this.CssClass = this.DisabledCssClass;
+				Logger.LogDebug("Render(writer={Writer}): this.CssClass → {Arg1}", writer, this.CssClass);
             }
 
             writer.AddAttribute("class", this.CssClass.Trim());
             base.Render(writer);
+			Logger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

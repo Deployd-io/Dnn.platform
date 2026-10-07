@@ -17,6 +17,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A literal control.</summary>
     public class DnnFormLiteralItem : DnnFormItemBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFormLiteralItem));
         /// <summary>Initializes a new instance of the <see cref="DnnFormLiteralItem"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IApplicationStatusInfo. Scheduled removal in v12.0.0.")]
         public DnnFormLiteralItem()
@@ -30,14 +31,18 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnFormLiteralItem(IApplicationStatusInfo appStatus, IEventLogger eventLogger)
             : base(appStatus, eventLogger)
         {
+			Logger.LogError(">>> Entering DnnFormLiteralItem(appStatus={AppStatus},eventLogger={EventLogger})", appStatus, eventLogger);
             this.ViewStateMode = ViewStateMode.Disabled;
         }
 
         /// <inheritdoc />
         protected override WebControl CreateControlInternal(Control container)
         {
+			Logger.LogError(">>> Entering CreateControlInternal(container={Container})", container);
             var literal = new Label { ID = this.ID + "_Label", Text = Convert.ToString(this.Value, CultureInfo.InvariantCulture), };
             container.Controls.Add(literal);
+			Logger.LogError("CreateControlInternal(container={Container}): literal → {Literal}", container, literal);
+			Logger.LogWarning("<<< Exiting CreateControlInternal(container={Container})", container);
             return literal;
         }
     }

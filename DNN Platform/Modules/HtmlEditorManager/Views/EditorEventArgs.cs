@@ -5,14 +5,17 @@
 namespace DotNetNuke.Modules.HtmlEditorManager.Views
 {
     using System;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>Contains information about the selected editor when saving.</summary>
     public class EditorEventArgs : EventArgs
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>Initializes a new instance of the <see cref="EditorEventArgs" /> class.</summary>
         /// <param name="editor">The editor.</param>
         public EditorEventArgs(string editor)
         {
+			_logger.LogError(">>> Entering EditorEventArgs(editor={Editor})", editor);
             this.Editor = editor;
         }
 

@@ -28,13 +28,18 @@ namespace Dnn.EditBar.UI.Items
         public PageSettingsMenu()
             : this(null)
         {
+		eventLogger.LogError(">>> Entering PageSettingsMenu()");
+        eventLogger.LogWarning("<<< Exiting PageSettingsMenu()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PageSettingsMenu"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
         public PageSettingsMenu(IHostSettings hostSettings)
         {
+			eventLogger.LogError(">>> Entering PageSettingsMenu(hostSettings={HostSettings})", hostSettings);
             this.hostSettings = hostSettings ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("PageSettingsMenu(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
+        eventLogger.LogWarning("<<< Exiting PageSettingsMenu(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <inheritdoc />
@@ -55,15 +60,22 @@ namespace Dnn.EditBar.UI.Items
         /// <inheritdoc />
         public override bool Visible()
         {
+			eventLogger.LogError(">>> Entering Visible()");
             var isInEditMode = Personalization.GetUserMode() == PortalSettings.Mode.Edit;
             var isCurrentControlPanel = this.hostSettings.ControlPanel.EndsWith("PersonaBarContainer.ascx", StringComparison.InvariantCultureIgnoreCase);
+			eventLogger.LogError("Visible(): isCurrentControlPanel → {IsCurrentControlPanel}", isCurrentControlPanel);
             var canEditPageSettings = CanEditPageSettings();
+			eventLogger.LogError("Visible(): canEditPageSettings → {CanEditPageSettings}", canEditPageSettings);
+			eventLogger.LogError("Visible(): isInEditMode → {IsInEditMode}", isInEditMode);
 
+			eventLogger.LogWarning("<<< Exiting Visible()");
             return isInEditMode && isCurrentControlPanel && canEditPageSettings;
         }
 
         private static bool CanEditPageSettings()
         {
+			eventLogger.LogError(">>> Entering CanEditPageSettings()");
+				eventLogger.LogWarning("<<< Exiting CanEditPageSettings()");
             return
                 TabPermissionController.CanAddPage() ||
                 TabPermissionController.CanAdminPage() ||

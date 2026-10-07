@@ -17,6 +17,7 @@ namespace DotNetNuke.ExtensionPoints
     [ToolboxData("<{0}:ToolBarButtonExtensionControl runat=server></{0}:ToolBarButtonExtensionControl>")]
     public class ToolBarButtonExtensionControl : DefaultExtensionControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ToolBarButtonExtensionControl));
         private IExtensionControlRenderer btnRenderer;
 
         [Bindable(true)]
@@ -27,9 +28,12 @@ namespace DotNetNuke.ExtensionPoints
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         protected override void RenderContents(HtmlTextWriter output)
         {
+			Logger.LogError(">>> Entering RenderContents(output={Output})", output);
             var extensionPointManager = new ExtensionPointManager();
 
+			Logger.LogError("RenderContents(output={Output}): extensionPointManager → {ExtensionPointManager}", output, extensionPointManager);
             var str = new StringBuilder();
+			Logger.LogError("RenderContents(output={Output}): str → {Str}", output, str);
 
             var filter = new CompositeFilter()
                 .And(new FilterByHostMenu(this.IsHost))
@@ -40,10 +44,12 @@ namespace DotNetNuke.ExtensionPoints
                 if (extension is IToolBarMenuButtonExtensionPoint)
                 {
                     this.btnRenderer = new ToolBarMenuButtonRenderer();
+					Logger.LogDebug("RenderContents(output={Output}): btnRenderer → {BtnRenderer}", output, btnRenderer);
                 }
                 else
                 {
                     extension.ModuleContext = this.ModuleContext;
+					Logger.LogDebug("RenderContents(output={Output}): extension.ModuleContext → {Arg1}", output, extension.ModuleContext);
                     this.btnRenderer = new ToolBarButtonRenderer();
                 }
 
@@ -51,12 +57,15 @@ namespace DotNetNuke.ExtensionPoints
             }
 
             output.Write(str.ToString());
+			Logger.LogWarning("<<< Exiting RenderContents(output={Output})", output);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering Render(writer={Writer})", writer);
             this.RenderContents(writer);
+			Logger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

@@ -54,6 +54,7 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state)
         {
+			value.LogError(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             try
             {
                 if (this.Option != null && this.Option.Length > 0)
@@ -79,6 +80,7 @@ namespace log4net.Util.PatternStringConverters
             {
                 LogLog.Error(declaringType, "Error occurred while converting environment variable.", ex);
             }
+			value.LogWarning("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
 
         /// <summary>

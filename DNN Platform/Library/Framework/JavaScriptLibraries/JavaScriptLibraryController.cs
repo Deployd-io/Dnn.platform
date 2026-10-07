@@ -16,6 +16,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
 
     public class JavaScriptLibraryController(IHostSettings hostSettings) : ServiceLocator<IJavaScriptLibraryController, JavaScriptLibraryController>, IJavaScriptLibraryController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JavaScriptLibraryController));
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
 
         /// <summary>Initializes a new instance of the <see cref="JavaScriptLibraryController"/> class.</summary>
@@ -23,14 +24,20 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         public JavaScriptLibraryController()
             : this(null)
         {
+		Logger.LogError(">>> Entering JavaScriptLibraryController()");
+        Logger.LogWarning("<<< Exiting JavaScriptLibraryController()");
         }
 
         /// <summary>Delete the library reference from the database.</summary>
         /// <param name="library">Library to be deleted.</param>
         public void DeleteLibrary(JavaScriptLibrary library)
         {
+			Logger.LogError(">>> Entering DeleteLibrary(library={Library})", library);
+            var __logStart = System.Diagnostics.Stopwatch.StartNew();
             DataProvider.Instance().ExecuteNonQuery("DeleteJavaScriptLibrary", library.JavaScriptLibraryID);
             ClearCache();
+			Logger.LogError("DeleteLibrary(library)={Library}: database query executed in {Arg1} ms", library, __logStart.ElapsedMilliseconds);
+        Logger.LogWarning("<<< Exiting DeleteLibrary(library={Library})", library);
         }
 
         /// <summary>Get information about the latest version of a <see cref="JavaScriptLibrary"/> that matches the given <paramref name="predicate"/>.</summary>
@@ -41,6 +48,8 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         /// <returns>The highest version <see cref="JavaScriptLibrary"/> instance that matches the <paramref name="predicate"/>, or <c>null</c> if no library matches.</returns>
         public JavaScriptLibrary GetLibrary(Func<JavaScriptLibrary, bool> predicate)
         {
+			Logger.LogError(">>> Entering GetLibrary(predicate={Predicate})", predicate);
+			Logger.LogWarning("<<< Exiting GetLibrary(predicate={Predicate})", predicate);
             return this.GetLibraries(predicate).OrderByDescending(l => l.Version).FirstOrDefault();
         }
 
@@ -52,6 +61,8 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         /// <returns>A sequence of <see cref="JavaScriptLibrary"/> instances.</returns>
         public IEnumerable<JavaScriptLibrary> GetLibraries(Func<JavaScriptLibrary, bool> predicate)
         {
+			Logger.LogError(">>> Entering GetLibraries(predicate={Predicate})", predicate);
+            Logger.LogWarning("<<< Exiting GetLibraries(predicate={Predicate})", predicate);
             return this.GetLibraries().Where(predicate);
         }
 
@@ -72,6 +83,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         /// <param name="library">Library to be saved.</param>
         public void SaveLibrary(JavaScriptLibrary library)
         {
+			Logger.LogError(">>> Entering SaveLibrary(library={Library})", library);
             library.JavaScriptLibraryID = DataProvider.Instance().ExecuteScalar<int>(
                 "SaveJavaScriptLibrary",
                 library.JavaScriptLibraryID,
@@ -83,17 +95,22 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                 library.PreferredScriptLocation,
                 library.CDNPath);
             ClearCache();
+			Logger.LogWarning("<<< Exiting SaveLibrary(library={Library})", library);
         }
 
         /// <inheritdoc />
         protected override Func<IJavaScriptLibraryController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<IJavaScriptLibraryController>();
         }
 
         private static void ClearCache()
         {
+			Logger.LogError(">>> Entering ClearCache()");
             DataCache.RemoveCache(DataCache.JavaScriptLibrariesCacheKey);
+			Logger.LogWarning("<<< Exiting ClearCache()");
         }
     }
 }

@@ -17,6 +17,7 @@ namespace DotNetNuke.Entities.Urls
     [Serializable]
     public class FriendlyUrlSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FriendlyUrlSettings));
         public const string ReplaceSpaceWithNothing = "None";
         public const string SpaceEncodingPlus = "+";
         public const string SpaceEncodingHex = "%20";
@@ -118,6 +119,8 @@ namespace DotNetNuke.Entities.Urls
         public FriendlyUrlSettings(int portalId)
             : this(null, null, null, portalId)
         {
+		Logger.LogError(">>> Entering FriendlyUrlSettings(portalId={PortalId})", portalId);
+        Logger.LogWarning("<<< Exiting FriendlyUrlSettings(portalId={PortalId})", portalId);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FriendlyUrlSettings"/> class.</summary>
@@ -127,6 +130,8 @@ namespace DotNetNuke.Entities.Urls
         public FriendlyUrlSettings(IPortalController portalController, int portalId)
             : this(null, null, null, portalId)
         {
+		Logger.LogError(">>> Entering FriendlyUrlSettings(portalController={PortalController},portalId={PortalId})", portalController, portalId);
+        Logger.LogWarning("<<< Exiting FriendlyUrlSettings(portalController={PortalController},portalId={PortalId})", portalController, portalId);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FriendlyUrlSettings"/> class.</summary>
@@ -138,11 +143,17 @@ namespace DotNetNuke.Entities.Urls
         {
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): hostSettings → {HostSettings1}", portalController, hostSettings, hostSettingsService, portalId, hostSettings);
+			Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): portalController → {PortalController1}", portalController, hostSettings, hostSettingsService, portalId, portalController);
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+			Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): hostSettingsService → {HostSettingsService1}", portalController, hostSettings, hostSettingsService, portalId, hostSettingsService);
 
             this.PortalId = portalId < -1 ? -1 : portalId;
+			Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): this.PortalId → {Arg4}", portalController, hostSettings, hostSettingsService, portalId, this.PortalId);
             this.IsDirty = false;
             this.IsLoading = false;
+			Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): this.IsDirty → {Arg4}", portalController, hostSettings, hostSettingsService, portalId, this.IsDirty);
+			Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): this.IsLoading → {Arg4}", portalController, hostSettings, hostSettingsService, portalId, this.IsLoading);
 
             this.PortalValues = new List<string>();
 
@@ -150,7 +161,9 @@ namespace DotNetNuke.Entities.Urls
 
             if (portalId > -1)
             {
+				Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): this.TabId500 → {Arg4}", portalController, hostSettings, hostSettingsService, portalId, this.TabId500);
                 var portal = this.portalController.GetPortal(portalId);
+				Logger.LogError("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): portal → {Portal}", portalController, hostSettings, hostSettingsService, portalId, portal);
                 this.TabId500 = this.TabId404 = portal.Custom404TabId;
 
                 if (this.TabId500 == -1)
@@ -799,8 +812,10 @@ namespace DotNetNuke.Entities.Urls
 
         private bool GetBooleanSetting(string key, bool defaultValue)
         {
+			Logger.LogError(">>> Entering GetBooleanSetting(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             // First Get the Host Value using the passed in value as default
             var returnValue = this.hostSettingsService.GetBoolean(key, defaultValue);
+			Logger.LogError("GetBooleanSetting(key={Key},defaultValue={DefaultValue}): returnValue → {ReturnValue}", key, defaultValue, returnValue);
 
             if (this.PortalId > -1)
             {
@@ -808,13 +823,16 @@ namespace DotNetNuke.Entities.Urls
                 returnValue = PortalController.GetPortalSettingAsBoolean(this.portalController, key, this.PortalId, returnValue);
             }
 
+			Logger.LogWarning("<<< Exiting GetBooleanSetting(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return returnValue;
         }
 
         private int GetIntegerSetting(string key, int defaultValue)
         {
+			Logger.LogError(">>> Entering GetIntegerSetting(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             // First Get the Host Value using the passed in value as default
             var returnValue = this.hostSettingsService.GetInteger(key, defaultValue);
+			Logger.LogError("GetIntegerSetting(key={Key},defaultValue={DefaultValue}): returnValue → {ReturnValue}", key, defaultValue, returnValue);
 
             if (this.PortalId > -1)
             {
@@ -822,13 +840,16 @@ namespace DotNetNuke.Entities.Urls
                 returnValue = PortalController.GetPortalSettingAsInteger(this.portalController, key, this.PortalId, returnValue);
             }
 
+			Logger.LogWarning("<<< Exiting GetIntegerSetting(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return returnValue;
         }
 
         private string GetStringSetting(string key, string defaultValue)
         {
+			Logger.LogError(">>> Entering GetStringSetting(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             // First Get the Host Value using the passed in value as default
             var returnValue = this.hostSettingsService.GetString(key, defaultValue);
+			Logger.LogError("GetStringSetting(key={Key},defaultValue={DefaultValue}): returnValue → {ReturnValue}", key, defaultValue, returnValue);
 
             if (this.PortalId > -1)
             {
@@ -836,15 +857,18 @@ namespace DotNetNuke.Entities.Urls
                 returnValue = PortalController.GetPortalSetting(this.portalController, key, this.PortalId, returnValue);
             }
 
+			Logger.LogWarning("<<< Exiting GetStringSetting(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return returnValue;
         }
 
         private void ParseInternalAliases()
         {
+			Logger.LogError(">>> Entering ParseInternalAliases()");
             if (!string.IsNullOrEmpty(this.internalAliases))
             {
                 this.InternalAliasList = new List<InternalAlias>();
                 var raw = this.internalAliases.Split(';');
+				Logger.LogError("ParseInternalAliases(): raw → {Raw}", raw);
                 foreach (var rawVal in raw)
                 {
                     if (rawVal.Length > 0)
@@ -857,6 +881,7 @@ namespace DotNetNuke.Entities.Urls
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting ParseInternalAliases()");
         }
     }
 }

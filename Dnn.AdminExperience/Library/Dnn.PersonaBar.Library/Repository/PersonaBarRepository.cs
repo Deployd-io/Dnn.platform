@@ -17,6 +17,7 @@ namespace Dnn.PersonaBar.Library.Repository
     public class PersonaBarRepository : ServiceLocator<IPersonaBarRepository, PersonaBarRepository>,
         IPersonaBarRepository
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PersonaBarRepository));
         private const string PersonaBarMenuCacheKey = "PersonaBarMenu";
         private static readonly object ThreadLocker = new object();
         private readonly DataService dataService = new DataService();
@@ -24,7 +25,9 @@ namespace Dnn.PersonaBar.Library.Repository
         /// <inheritdoc />
         public PersonaBarMenu GetMenu()
         {
+			Logger.LogError(">>> Entering GetMenu()");
             var menu = DataCache.GetCache<PersonaBarMenu>(PersonaBarMenuCacheKey);
+			Logger.LogError("GetMenu(): menu → {Menu}", menu);
             if (menu == null)
             {
                 lock (ThreadLocker)
@@ -47,12 +50,16 @@ namespace Dnn.PersonaBar.Library.Repository
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetMenu()");
             return menu;
         }
 
         /// <inheritdoc />
         public MenuItem GetMenuItem(string identifier)
         {
+			Logger.LogError(">>> Entering GetMenuItem(identifier={Identifier})", identifier);
+			Logger.LogWarning("<<< Exiting GetMenuItem(identifier={Identifier})", identifier);
+			Logger.LogWarning("<<< Exiting GetMenuItem(menuId={MenuId})", menuId);
             return this.GetMenu().AllItems.ToList().FirstOrDefault(m => m.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase));
         }
 
@@ -65,8 +72,10 @@ namespace Dnn.PersonaBar.Library.Repository
         /// <inheritdoc />
         public void SaveMenuItem(MenuItem item)
         {
+			Logger.LogError(">>> Entering SaveMenuItem(item={Item})", item);
             var user = UserController.Instance.GetCurrentUserInfo();
 
+			Logger.LogError("SaveMenuItem(item={Item}): user → {User}", item, user);
             item.MenuId = this.dataService.SavePersonaBarMenu(
                 item.Identifier,
                 item.ModuleName,
@@ -84,54 +93,70 @@ namespace Dnn.PersonaBar.Library.Repository
                 user.UserID);
 
             ClearCache();
+			Logger.LogWarning("<<< Exiting SaveMenuItem(item={Item})", item);
         }
 
         /// <inheritdoc />
         public void DeleteMenuItem(string identifier)
         {
+			Logger.LogError(">>> Entering DeleteMenuItem(identifier={Identifier})", identifier);
             this.dataService.DeletePersonaBarMenuByIdentifier(identifier);
 
             ClearCache();
+			Logger.LogWarning("<<< Exiting DeleteMenuItem(identifier={Identifier})", identifier);
         }
 
         /// <inheritdoc />
         public string GetMenuDefaultPermissions(int menuId)
         {
+			Logger.LogError(">>> Entering GetMenuDefaultPermissions(menuId={MenuId})", menuId);
+            Logger.LogWarning("<<< Exiting GetMenuDefaultPermissions(menuId={MenuId})", menuId);
             return this.dataService.GetPersonaBarMenuDefaultPermissions(menuId);
         }
 
         /// <inheritdoc />
         public void SaveMenuDefaultPermissions(MenuItem menuItem, string roleNames)
         {
+			Logger.LogError(">>> Entering SaveMenuDefaultPermissions(menuItem={MenuItem},roleNames={RoleNames})", menuItem, roleNames);
             this.dataService.SavePersonaBarMenuDefaultPermissions(menuItem.MenuId, roleNames);
+			Logger.LogWarning("<<< Exiting SaveMenuDefaultPermissions(menuItem={MenuItem},roleNames={RoleNames})", menuItem, roleNames);
         }
 
         /// <inheritdoc />
         public void UpdateMenuController(string identifier, string controller)
         {
+			Logger.LogError(">>> Entering UpdateMenuController(identifier={Identifier},controller={Controller})", identifier, controller);
             var user = UserController.Instance.GetCurrentUserInfo();
             this.dataService.UpdateMenuController(identifier, controller, user.UserID);
+			Logger.LogError("UpdateMenuController(identifier={Identifier},controller={Controller}): user → {User}", identifier, controller, user);
             ClearCache();
+			Logger.LogWarning("<<< Exiting UpdateMenuController(identifier={Identifier},controller={Controller})", identifier, controller);
         }
 
         /// <inheritdoc />
         protected override Func<IPersonaBarRepository> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new PersonaBarRepository();
         }
 
         private static void InjectMenuItems(MenuItem parent, IList<MenuItem> menuItems)
         {
+			Logger.LogError(">>> Entering InjectMenuItems(parent={Parent},menuItems={MenuItems})", parent, menuItems);
             foreach (var menuItem in menuItems.Where(m => m.ParentId == parent.MenuId))
             {
                 parent.Children.Add(menuItem);
                 InjectMenuItems(menuItem, menuItems);
             }
+			Logger.LogWarning("<<< Exiting InjectMenuItems(parent={Parent},menuItems={MenuItems})", parent, menuItems);
         }
 
         private static void ClearCache()
         {
+			Logger.LogError(">>> Entering ClearCache()");
             DataCache.RemoveCache(PersonaBarMenuCacheKey);
+			Logger.LogWarning("<<< Exiting ClearCache()");
         }
     }
 }

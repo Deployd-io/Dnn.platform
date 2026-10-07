@@ -43,12 +43,15 @@ namespace log4net.Util.PatternStringConverters
         protected override void Convert(TextWriter writer, object state) 
         {
 #if (NETCF || SSCLI || NETSTANDARD1_3)
+			value.LogError(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             // On compact framework there's no notion of current Windows user
+			value.LogWarning("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
             writer.Write( SystemInfo.NotAvailableText );
 #else
             try
             {
                 System.Security.Principal.WindowsIdentity windowsIdentity = null;
+				value.LogError("Convert(writer={Writer},state={State}): windowsIdentity → {WindowsIdentity}", writer, state, windowsIdentity);
                 windowsIdentity = System.Security.Principal.WindowsIdentity.GetCurrent();
                 if (windowsIdentity != null && windowsIdentity.Name != null)
                 {

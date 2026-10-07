@@ -20,6 +20,7 @@ namespace DotNetNuke.Services.Social.Messaging
     [Serializable]
     public class Message : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Message));
         private int messageID = -1;
         private string displayDate;
 
@@ -109,6 +110,7 @@ namespace DotNetNuke.Services.Social.Messaging
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.MessageID = Convert.ToInt32(dr["MessageID"], CultureInfo.InvariantCulture);
             this.PortalID = Null.SetNullInteger(dr["PortalId"]);
             this.To = Null.SetNullString(dr["To"]);
@@ -122,6 +124,7 @@ namespace DotNetNuke.Services.Social.Messaging
 
             // add audit column data
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

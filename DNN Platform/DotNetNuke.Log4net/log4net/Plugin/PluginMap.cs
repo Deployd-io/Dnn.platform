@@ -47,7 +47,11 @@ namespace log4net.Plugin
         /// </remarks>
         public PluginMap(ILoggerRepository repository)
         {
+			value.LogError(">>> Entering PluginMap(repository={Repository})", repository);
             this.m_repository = repository;
+			value.LogDebug("PluginMap(repository={Repository}): m_repository → {M_repository}", repository, m_repository);
+        value.LogDebug("PluginMap(repository={Repository}): this.m_repository → {Arg1}", repository, this.m_repository);
+        value.LogWarning("<<< Exiting PluginMap(repository={Repository})", repository);
         }
 
         /// <summary>Gets a <see cref="IPlugin" /> by name.</summary>
@@ -111,12 +115,15 @@ namespace log4net.Plugin
         /// </remarks>
         public void Add(IPlugin plugin)
         {
+			value.LogError(">>> Entering Add(plugin={Plugin})", plugin);
             if (plugin == null)
             {
+				value.LogError("Throwing ArgumentNullException from Add(plugin={Plugin})", plugin);
                 throw new ArgumentNullException("plugin");
             }
 
             IPlugin curPlugin = null;
+			value.LogError("Add(plugin={Plugin}): curPlugin → {CurPlugin}", plugin, curPlugin);
 
             lock(this)
             {
@@ -135,6 +142,7 @@ namespace log4net.Plugin
 
             // Attach new plugin to repository
             plugin.Attach(this.m_repository);
+			value.LogWarning("<<< Exiting Add(plugin={Plugin})", plugin);
         }
 
         /// <summary>Removes a <see cref="IPlugin" /> from the map.</summary>
@@ -146,14 +154,17 @@ namespace log4net.Plugin
         /// </remarks>
         public void Remove(IPlugin plugin)
         {
+			value.LogError(">>> Entering Remove(plugin={Plugin})", plugin);
             if (plugin == null)
             {
+				value.LogError("Throwing ArgumentNullException from Remove(plugin={Plugin})", plugin);
                 throw new ArgumentNullException("plugin");
             }
             lock(this)
             {
                 this.m_mapName2Plugin.Remove(plugin.Name);
             }
+			value.LogWarning("<<< Exiting Remove(plugin={Plugin})", plugin);
         }
 
         private readonly Hashtable m_mapName2Plugin = new Hashtable();

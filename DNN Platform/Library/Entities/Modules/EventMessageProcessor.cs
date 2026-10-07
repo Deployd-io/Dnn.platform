@@ -40,7 +40,10 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="eventLogger">The event logger.</param>
         public EventMessageProcessor(IBusinessControllerProvider businessControllerProvider, IEventLogger eventLogger)
         {
+			Logger.LogError(">>> Entering EventMessageProcessor(businessControllerProvider={BusinessControllerProvider},eventLogger={EventLogger})", businessControllerProvider, eventLogger);
+			Logger.LogDebug("EventMessageProcessor(businessControllerProvider={BusinessControllerProvider},eventLogger={EventLogger}): eventLogger → {EventLogger1}", businessControllerProvider, eventLogger, eventLogger);
             this.businessControllerProvider = businessControllerProvider ?? Globals.DependencyProvider.GetRequiredService<IBusinessControllerProvider>();
+			Logger.LogWarning("<<< Exiting EventMessageProcessor(businessControllerProvider={BusinessControllerProvider},eventLogger={EventLogger})", businessControllerProvider, eventLogger);
             this.eventLogger = eventLogger ?? Globals.DependencyProvider.GetRequiredService<IEventLogger>();
         }
 
@@ -51,6 +54,7 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="userId">The user ID.</param>
         public static void CreateImportModuleMessage(ModuleInfo objModule, string content, string version, int userId)
         {
+			Logger.LogError(">>> Entering CreateImportModuleMessage(objModule={ObjModule},content={Content},version={Version},userId={UserId})", objModule, content, version, userId);
             var appStartMessage = new EventMessage
             {
                 Priority = MessagePriority.High,
@@ -70,11 +74,13 @@ namespace DotNetNuke.Entities.Modules
 
             // send it to occur on next App_Start Event
             EventQueueController.SendMessage(appStartMessage, "Application_Start_FirstRequest");
+			Logger.LogWarning("<<< Exiting CreateImportModuleMessage(objModule={ObjModule},content={Content},version={Version},userId={UserId})", objModule, content, version, userId);
         }
 
         /// <inheritdoc />
         public override bool ProcessMessage(EventMessage message)
         {
+			Logger.LogError(">>> Entering ProcessMessage(message={Message})", message);
             try
             {
                 switch (message.ProcessorCommand)
@@ -97,6 +103,8 @@ namespace DotNetNuke.Entities.Modules
             {
                 Logger.Error(ex);
                 message.ExceptionMessage = ex.Message;
+				Logger.LogDebug("ProcessMessage(message={Message}): message.ExceptionMessage → {Arg1}", message, message.ExceptionMessage);
+			Logger.LogWarning("<<< Exiting ProcessMessage(message={Message})", message);
                 return false;
             }
 
@@ -105,16 +113,23 @@ namespace DotNetNuke.Entities.Modules
 
         private static void UpdateSupportedFeatures(IEventLogger eventLogger, EventMessage message)
         {
+			Logger.LogError(">>> Entering UpdateSupportedFeatures(eventLogger={EventLogger},message={Message})", eventLogger, message);
             var businessControllerClass = message.Attributes["BusinessControllerClass"];
             var controllerType = Reflection.CreateType(businessControllerClass);
+			Logger.LogError("UpdateSupportedFeatures(eventLogger={EventLogger},message={Message}): controllerType → {ControllerType}", eventLogger, message, controllerType);
+			Logger.LogError("UpdateSupportedFeatures(eventLogger={EventLogger},message={Message}): businessControllerClass → {BusinessControllerClass}", eventLogger, message, businessControllerClass);
             UpdateSupportedFeatures(eventLogger, controllerType, Convert.ToInt32(message.Attributes["DesktopModuleId"], CultureInfo.InvariantCulture));
+			Logger.LogWarning("<<< Exiting UpdateSupportedFeatures(eventLogger={EventLogger},message={Message})", eventLogger, message);
         }
 
         private static void UpdateSupportedFeatures(IEventLogger eventLogger, Type controllerType, int desktopModuleId)
         {
+			Logger.LogError(">>> Entering UpdateSupportedFeatures(eventLogger={EventLogger},controllerType={ControllerType},desktopModuleId={DesktopModuleId})", eventLogger, controllerType, desktopModuleId);
             try
             {
+				Logger.LogWarning("<<< Exiting UpdateSupportedFeatures(eventLogger={EventLogger},message={Message})", eventLogger, message);
                 var desktopModule = DesktopModuleController.GetDesktopModule(desktopModuleId, Null.NullInteger);
+				Logger.LogError("UpdateSupportedFeatures(eventLogger={EventLogger},controllerType={ControllerType},desktopModuleId={DesktopModuleId}): desktopModule → {DesktopModule}", eventLogger, controllerType, desktopModuleId, desktopModule);
                 if (desktopModule == null)
                 {
                     return;
@@ -122,6 +137,7 @@ namespace DotNetNuke.Entities.Modules
 
                 // Initialise the SupportedFeatures
                 desktopModule.SupportedFeatures = 0;
+				Logger.LogDebug("UpdateSupportedFeatures(eventLogger={EventLogger},controllerType={ControllerType},desktopModuleId={DesktopModuleId}): desktopModule.SupportedFeatures → {Arg3}", eventLogger, controllerType, desktopModuleId, desktopModule.SupportedFeatures);
 
                 // Test the interfaces
                 desktopModule.IsPortable = typeof(IPortable).IsAssignableFrom(controllerType);
@@ -137,24 +153,31 @@ namespace DotNetNuke.Entities.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in UpdateSupportedFeatures(eventLogger={EventLogger},controllerType={ControllerType},desktopModuleId={DesktopModuleId}): {Arg3}", eventLogger, controllerType, desktopModuleId, exc.Message);
                 Exceptions.LogException(exc);
             }
         }
 
         private void ImportModule(EventMessage message)
         {
+			Logger.LogError(">>> Entering ImportModule(message={Message})", message);
             try
             {
                 var controller = this.businessControllerProvider.GetInstance<IPortable>(message.Attributes["BusinessControllerClass"]);
+				Logger.LogError("ImportModule(message={Message}): controller → {Controller}", message, controller);
                 if (controller is null)
                 {
                     return;
                 }
 
                 var moduleId = Convert.ToInt32(message.Attributes["ModuleId"], CultureInfo.InvariantCulture);
+				Logger.LogError("ImportModule(message={Message}): moduleId → {ModuleId}", message, moduleId);
                 var content = HttpUtility.HtmlDecode(message.Attributes["Content"]);
+				Logger.LogError("ImportModule(message={Message}): content → {Content}", message, content);
                 var version = message.Attributes["Version"];
+				Logger.LogError("ImportModule(message={Message}): version → {Version}", message, version);
                 var userId = Convert.ToInt32(message.Attributes["UserId"], CultureInfo.InvariantCulture);
+				Logger.LogError("ImportModule(message={Message}): userId → {UserId}", message, userId);
 
                 // call the IPortable interface for the module/version
                 controller.ImportModule(moduleId, content, version, userId);
@@ -164,28 +187,37 @@ namespace DotNetNuke.Entities.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in ImportModule(message={Message}): {Arg1}", message, exc.Message);
                 Exceptions.LogException(exc);
             }
+			Logger.LogWarning("<<< Exiting ImportModule(message={Message})", message);
         }
 
         private void UpgradeModule(EventMessage message)
         {
+			Logger.LogError(">>> Entering UpgradeModule(message={Message})", message);
             try
             {
                 var businessControllerClass = message.Attributes["BusinessControllerClass"];
+				Logger.LogError("UpgradeModule(message={Message}): businessControllerClass → {BusinessControllerClass}", message, businessControllerClass);
                 var businessControllerType = Reflection.CreateType(businessControllerClass);
+				Logger.LogError("UpgradeModule(message={Message}): businessControllerType → {BusinessControllerType}", message, businessControllerType);
                 var controller = this.businessControllerProvider.GetInstance<IUpgradeable>(businessControllerClass);
+				Logger.LogError("UpgradeModule(message={Message}): controller → {Controller}", message, controller);
                 if (controller is not null)
                 {
                     // get the list of applicable versions
                     var upgradeVersions = message.Attributes["UpgradeVersionsList"].Split(',');
+					Logger.LogError("UpgradeModule(message={Message}): upgradeVersions → {UpgradeVersions}", message, upgradeVersions);
                     foreach (var version in upgradeVersions)
                     {
                         // call the IUpgradeable interface for the module/version
                         var results = controller.UpgradeModule(version);
+						Logger.LogError("UpgradeModule(message={Message}): results → {Results}", message, results);
 
                         // log the upgrade results
                         var log = new LogInfo { LogTypeKey = nameof(EventLogType.MODULE_UPDATED), };
+						Logger.LogError("UpgradeModule(message={Message}): log → {Log}", message, log);
                         log.AddProperty("Module Upgraded", businessControllerClass);
                         log.AddProperty("Version", version);
                         if (!string.IsNullOrEmpty(results))
@@ -198,12 +230,15 @@ namespace DotNetNuke.Entities.Modules
                 }
 
                 var desktopModuleId = Convert.ToInt32(message.Attributes["DesktopModuleId"], CultureInfo.InvariantCulture);
+				Logger.LogError("UpgradeModule(message={Message}): desktopModuleId → {DesktopModuleId}", message, desktopModuleId);
                 UpdateSupportedFeatures(this.eventLogger, businessControllerType, desktopModuleId);
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in UpgradeModule(message={Message}): {Arg1}", message, exc.Message);
                 Exceptions.LogException(exc);
             }
+			Logger.LogWarning("<<< Exiting UpgradeModule(message={Message})", message);
         }
     }
 }

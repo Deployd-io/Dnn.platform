@@ -35,15 +35,21 @@ namespace DotNetNuke.Services.Scheduling
 
         public void Run(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogError(">>> Entering Run(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             IServiceScope serviceScope = null;
             SchedulerClient process = null;
+			Logger.LogError("Run(objScheduleHistoryItem={ObjScheduleHistoryItem}): serviceScope → {ServiceScope}", objScheduleHistoryItem, serviceScope);
             try
             {
+				Logger.LogError("Run(objScheduleHistoryItem={ObjScheduleHistoryItem}): process → {Process}", objScheduleHistoryItem, process);
                 // This is called from RunPooledThread()
                 GetTicksElapsed = Environment.TickCount - GetTicksElapsed;
+				Logger.LogError("Run(objScheduleHistoryItem={ObjScheduleHistoryItem}): GetTicksElapsed → {GetTicksElapsed}", objScheduleHistoryItem, GetTicksElapsed);
                 serviceScope = Globals.DependencyProvider.CreateScope();
                 process = GetSchedulerClient(serviceScope.ServiceProvider, objScheduleHistoryItem.TypeFullName, objScheduleHistoryItem);
                 process.ScheduleHistoryItem = objScheduleHistoryItem;
+				Logger.LogDebug("Run(objScheduleHistoryItem={ObjScheduleHistoryItem}): GetTicksElapsed → {GetTicksElapsed}", objScheduleHistoryItem, GetTicksElapsed);
+				Logger.LogDebug("Run(objScheduleHistoryItem={ObjScheduleHistoryItem}): process.ScheduleHistoryItem → {Arg1}", objScheduleHistoryItem, process.ScheduleHistoryItem);
 
                 // Set up the handlers for the CoreScheduler
                 process.ProcessStarted += Scheduler.CoreScheduler.WorkStarted;
@@ -102,6 +108,7 @@ namespace DotNetNuke.Services.Scheduling
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in Run(objScheduleHistoryItem={ObjScheduleHistoryItem}): {Arg1}", objScheduleHistoryItem, exc.Message);
                 // in case the scheduler client
                 // didn't have proper exception handling
                 // make sure we fire the Errored event
@@ -120,6 +127,7 @@ namespace DotNetNuke.Services.Scheduling
                     // we need also trigger work errored event so that the schedule can remove from inprogress and inqueue list to prevent endless loop.
                     Scheduler.CoreScheduler.WorkStarted(objScheduleHistoryItem);
                     objScheduleHistoryItem.Succeeded = false;
+					Logger.LogDebug("Run(objScheduleHistoryItem={ObjScheduleHistoryItem}): objScheduleHistoryItem.Succeeded → {Arg1}", objScheduleHistoryItem, objScheduleHistoryItem.Succeeded);
                     Scheduler.CoreScheduler.WorkErrored(objScheduleHistoryItem, exc);
                 }
             }
@@ -132,15 +140,18 @@ namespace DotNetNuke.Services.Scheduling
                 GetProcessesInQueue -= 1;
                 GetProcessesCompleted += 1;
             }
+			Logger.LogWarning("<<< Exiting Run(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
         }
 
         // Add a queue request to Threadpool with a
         // callback to RunPooledThread which calls Run()
         public void AddQueueUserWorkItem(ScheduleItem s)
         {
+			Logger.LogError(">>> Entering AddQueueUserWorkItem(s={S})", s);
             GetProcessesInQueue += 1;
             numberOfProcesses += 1;
             var obj = new ScheduleHistoryItem(s);
+			Logger.LogError("AddQueueUserWorkItem(s={S}): obj → {Obj}", s, obj);
             try
             {
                 // Create a callback to subroutine RunPooledThread
@@ -151,15 +162,20 @@ namespace DotNetNuke.Services.Scheduling
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in AddQueueUserWorkItem(s={S}): {Arg1}", s, exc.Message);
                 Exceptions.Exceptions.ProcessSchedulerException(exc);
             }
+			Logger.LogWarning("<<< Exiting AddQueueUserWorkItem(s={S})", s);
         }
 
         private static SchedulerClient GetSchedulerClient(IServiceProvider services, string strProcess, ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogError(">>> Entering GetSchedulerClient(services={Services},strProcess={StrProcess},objScheduleHistoryItem={ObjScheduleHistoryItem})", services, strProcess, objScheduleHistoryItem);
             // This is a method to encapsulate returning
             // an object whose class inherits SchedulerClient.
             Type t = BuildManager.GetType(strProcess, true, true);
+			Logger.LogError("GetSchedulerClient(services={Services},strProcess={StrProcess},objScheduleHistoryItem={ObjScheduleHistoryItem}): t → {T}", services, strProcess, objScheduleHistoryItem, t);
+			Logger.LogWarning("<<< Exiting GetSchedulerClient(services={Services},strProcess={StrProcess},objScheduleHistoryItem={ObjScheduleHistoryItem})", services, strProcess, objScheduleHistoryItem);
             return (SchedulerClient)ActivatorUtilities.CreateInstance(services, t, objScheduleHistoryItem);
         }
 
@@ -168,7 +184,9 @@ namespace DotNetNuke.Services.Scheduling
         // so the two subroutines cannot be combined, so instead just call Run from here.
         private void RunPooledThread(object objScheduleHistoryItem)
         {
+			Logger.LogError(">>> Entering RunPooledThread(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             this.Run((ScheduleHistoryItem)objScheduleHistoryItem);
+			Logger.LogWarning("<<< Exiting RunPooledThread(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
         }
     }
 }

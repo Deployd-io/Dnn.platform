@@ -56,6 +56,8 @@ namespace DotNetNuke.UI.WebControls
         public DNNRegionEditControl(IServicesFramework servicesFramework)
             : this(servicesFramework, null, null, null, null, null, null)
         {
+		eventLogger.LogError(">>> Entering DNNRegionEditControl(servicesFramework={ServicesFramework})", servicesFramework);
+        eventLogger.LogWarning("<<< Exiting DNNRegionEditControl(servicesFramework={ServicesFramework})", servicesFramework);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DNNRegionEditControl"/> class.</summary>
@@ -68,7 +70,15 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="clientResourceController">The client resource controller.</param>
         public DNNRegionEditControl(IServicesFramework servicesFramework, ListController listController, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, IEventLogger eventLogger, IClientResourceController clientResourceController)
         {
+			eventLogger.LogError(">>> Entering DNNRegionEditControl(servicesFramework={ServicesFramework},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},clientResourceController={ClientResourceController})", servicesFramework, listController, portalController, appStatus, portalGroupController, eventLogger, clientResourceController);
+			eventLogger.LogDebug("DNNRegionEditControl(servicesFramework={ServicesFramework},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},clientResourceController={ClientResourceController}): listController → {ListController1}", servicesFramework, listController, portalController, appStatus, portalGroupController, eventLogger, clientResourceController, listController);
+			eventLogger.LogDebug("DNNRegionEditControl(servicesFramework={ServicesFramework},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},clientResourceController={ClientResourceController}): portalController → {PortalController1}", servicesFramework, listController, portalController, appStatus, portalGroupController, eventLogger, clientResourceController, portalController);
+			eventLogger.LogDebug("DNNRegionEditControl(servicesFramework={ServicesFramework},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},clientResourceController={ClientResourceController}): appStatus → {AppStatus1}", servicesFramework, listController, portalController, appStatus, portalGroupController, eventLogger, clientResourceController, appStatus);
+			eventLogger.LogDebug("DNNRegionEditControl(servicesFramework={ServicesFramework},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},clientResourceController={ClientResourceController}): portalGroupController → {PortalGroupController1}", servicesFramework, listController, portalController, appStatus, portalGroupController, eventLogger, clientResourceController, portalGroupController);
+			eventLogger.LogDebug("DNNRegionEditControl(servicesFramework={ServicesFramework},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},clientResourceController={ClientResourceController}): eventLogger → {EventLogger1}", servicesFramework, listController, portalController, appStatus, portalGroupController, eventLogger, clientResourceController, eventLogger);
+			eventLogger.LogDebug("DNNRegionEditControl(servicesFramework={ServicesFramework},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", servicesFramework, listController, portalController, appStatus, portalGroupController, eventLogger, clientResourceController, clientResourceController);
             this.servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
+			eventLogger.LogWarning("<<< Exiting DNNRegionEditControl(servicesFramework={ServicesFramework},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},clientResourceController={ClientResourceController})", servicesFramework, listController, portalController, appStatus, portalGroupController, eventLogger, clientResourceController);
             this.listController = listController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
@@ -76,6 +86,7 @@ namespace DotNetNuke.UI.WebControls
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
             this.Init += this.DnnRegionControl_Init;
+			eventLogger.LogDebug("DNNRegionEditControl(servicesFramework={ServicesFramework},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger},clientResourceController={ClientResourceController}): servicesFramework → {ServicesFramework1}", servicesFramework, listController, portalController, appStatus, portalGroupController, eventLogger, clientResourceController, servicesFramework);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DNNRegionEditControl"/> class.</summary>
@@ -84,6 +95,8 @@ namespace DotNetNuke.UI.WebControls
         public DNNRegionEditControl(string type)
             : this(type, null, null, null, null, null, null, null)
         {
+		eventLogger.LogError(">>> Entering DNNRegionEditControl(type={Type})", type);
+        eventLogger.LogWarning("<<< Exiting DNNRegionEditControl(type={Type})", type);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DNNRegionEditControl"/> class.</summary>
@@ -194,21 +207,27 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         public override bool LoadPostData(string postDataKey, System.Collections.Specialized.NameValueCollection postCollection)
         {
+			eventLogger.LogError(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             bool dataChanged = false;
             string presentValue = this.StringValue;
+			eventLogger.LogError("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): dataChanged → {DataChanged}", postDataKey, postCollection, dataChanged);
             string postedValue = postCollection[postDataKey + "_value"];
             if (!presentValue.Equals(postedValue, StringComparison.Ordinal))
             {
                 this.Value = postedValue;
+				eventLogger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): Value → {Value}", postDataKey, postCollection, Value);
                 dataChanged = true;
             }
+			eventLogger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): this.Value → {Arg2}", postDataKey, postCollection, this.Value);
 
+			eventLogger.LogWarning("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             return dataChanged;
         }
 
         /// <summary>OnAttributesChanged runs when the CustomAttributes property has changed.</summary>
         protected override void OnAttributesChanged()
         {
+			eventLogger.LogError(">>> Entering OnAttributesChanged()");
             // Get the List settings out of the "Attributes"
             if (this.CustomAttributes != null)
             {
@@ -217,16 +236,21 @@ namespace DotNetNuke.UI.WebControls
                     if (attribute is ListAttribute listAtt)
                     {
                         this.ParentKey = listAtt.ParentKey;
+						eventLogger.LogDebug("OnAttributesChanged(): this.ParentKey → {Arg0}", this.ParentKey);
                         this.listEntries = null;
+						eventLogger.LogDebug("OnAttributesChanged(): listEntries → {ListEntries}", listEntries);
+						eventLogger.LogDebug("OnAttributesChanged(): this.listEntries → {Arg0}", this.listEntries);
                         break;
                     }
                 }
             }
+			eventLogger.LogWarning("<<< Exiting OnAttributesChanged()");
         }
 
         /// <inheritdoc />
         protected override void OnDataChanged(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnDataChanged(e={E})", e);
             PropertyEditorEventArgs args = new PropertyEditorEventArgs(this.Name)
             {
                 Value = this.StringValue,
@@ -234,11 +258,13 @@ namespace DotNetNuke.UI.WebControls
                 StringValue = this.StringValue,
             };
             this.OnValueChanged(args);
+			eventLogger.LogWarning("<<< Exiting OnDataChanged(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			eventLogger.LogError(">>> Entering CreateChildControls()");
             base.CreateChildControls();
 
             this.Regions.ControlStyle.CopyFrom(this.ControlStyle);
@@ -256,11 +282,13 @@ namespace DotNetNuke.UI.WebControls
             this.RegionCode.ID = $"{this.ID}_value";
             this.RegionCode.Attributes.Add("data-editor", "DNNRegionEditControl_Hidden");
             this.Controls.Add(this.RegionCode);
+			eventLogger.LogWarning("<<< Exiting CreateChildControls()");
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             this.LoadControls();
@@ -270,11 +298,13 @@ namespace DotNetNuke.UI.WebControls
                 this.Page.RegisterRequiresPostBack(this);
                 this.Page.RegisterRequiresPostBack(this.RegionCode);
             }
+			eventLogger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			eventLogger.LogError(">>> Entering RenderEditMode(writer={Writer})", writer);
             if (this.ListEntries != null && this.ListEntries.Any())
             {
                 foreach (ListEntryInfo item in this.ListEntries)
@@ -291,10 +321,12 @@ namespace DotNetNuke.UI.WebControls
             writer.RenderBeginTag(HtmlTextWriterTag.Div);
             this.RenderChildren(writer);
             writer.RenderEndTag();
+			eventLogger.LogWarning("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
 
         private void DnnRegionControl_Init(object sender, EventArgs e)
         {
+			eventLogger.LogError(">>> Entering DnnRegionControl_Init(sender={Sender},e={E})", sender, e);
             this.servicesFramework.RequestAjaxAntiForgerySupport();
             this.clientResourceController.RegisterScript("~/Resources/Shared/components/CountriesRegions/dnn.CountriesRegions.js");
             this.clientResourceController
@@ -303,11 +335,14 @@ namespace DotNetNuke.UI.WebControls
                 .Register();
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.portalController.GetCurrentSettings(), CommonJs.jQuery);
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.portalController.GetCurrentSettings(), CommonJs.jQueryUI);
+			eventLogger.LogWarning("<<< Exiting DnnRegionControl_Init(sender={Sender},e={E})", sender, e);
         }
 
         private void LoadControls()
         {
+			eventLogger.LogError(">>> Entering LoadControls()");
             this.RegionCode.Value = this.StringValue;
+			eventLogger.LogWarning("<<< Exiting LoadControls()");
         }
     }
 }

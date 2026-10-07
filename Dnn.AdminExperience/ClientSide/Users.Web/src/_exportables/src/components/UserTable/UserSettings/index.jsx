@@ -7,6 +7,7 @@ import {formatDate, validateEmail} from "../../../helpers";
 import utilities from "utils";
 import styles from "./style.module.less";
 import ChangePassword from "../ChangePassword";
+const logger = console;
 import {canManagePassword, canEditSettings} from "../../permissionHelpers.js";
 import { GridCell, GridSystem, SingleLineInputWithError, Button } from "@dnnsoftware/dnn-react-common";
 
@@ -21,6 +22,7 @@ const blankAccountSettings = {
 class UserSettings extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             accountSettings: Object.assign(blankAccountSettings),
             userDetails: props.userDetails,
@@ -35,8 +37,10 @@ class UserSettings extends Component {
             },
             ChangePasswordVisible: false
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
     componentWillMount() {
+		logger.error('>>> Entering componentWillMount()', { "event.action": "componentWillMount" });
         let {props} = this;
         if (props.userDetails === undefined || props.userDetails.userId !== props.userId) {
             this.getUserDetails(props, props.userId);
@@ -44,41 +48,55 @@ class UserSettings extends Component {
         else
         {
             this.updateUserDetailsState(props.userDetails);
+			logger.warn('<<< Exiting componentWillMount()', { "event.action": "componentWillMount" });
         }
     }
     componentWillReceiveProps(newProps) {
+		logger.error(`>>> Entering componentWillReceiveProps(newProps=${newProps})`, { "event.action": "componentWillReceiveProps", "logrite.newProps": newProps });
         if (newProps.userDetails === undefined && newProps.userDetails.userId !== newProps.userId) {
             this.getUserDetails(newProps, newProps.userId);
         }
         else
         {
             this.updateUserDetailsState(newProps.userDetails);
+			logger.warn(`<<< Exiting componentWillReceiveProps(newProps=${newProps})`, { "event.action": "componentWillReceiveProps", "logrite.newProps": newProps });
         }
     }
 
     makeBlankObj(obj) {
+		logger.error(`>>> Entering makeBlankObj(obj=${obj})`, { "event.action": "makeBlankObj", "logrite.obj": obj });
         let newObject = Object.assign({}, obj);
         const keys = Object.keys(newObject);
+		logger.error(`makeBlankObj(obj=${obj}): newObject → ${newObject}`, { "event.action": "makeBlankObj", "logrite.obj": obj });
+		logger.error(`makeBlankObj(obj=${obj}): keys → ${keys}`, { "event.action": "makeBlankObj", "logrite.obj": obj });
         keys.forEach(key => newObject[key] = "");
+		logger.warn(`<<< Exiting makeBlankObj(obj=${obj})`, { "event.action": "makeBlankObj", "logrite.obj": obj });
         return newObject; 
     }
 
     getUserDetails(props, userId) {
+		logger.error(`>>> Entering getUserDetails(props=${props},userId=${userId})`, { "event.action": "getUserDetails", "logrite.props": props, "user.name": String(userId) });
         const accountSettings = this.makeBlankObj(this.state.accountSettings);
         const userDetails = this.makeBlankObj(this.state.userDetails);
+		logger.error(`getUserDetails(props=${props},userId=${userId}): accountSettings → ${accountSettings}`, { "event.action": "getUserDetails", "logrite.props": props, "user.name": String(userId) });
+		logger.error(`getUserDetails(props=${props},userId=${userId}): userDetails → ${userDetails}`, { "event.action": "getUserDetails", "logrite.props": props, "user.name": String(userId) });
         this.setState({accountSettings, userDetails, loading: true});
         props.dispatch(CommonUsersActions.getUserDetails({ userId: userId }, (data) => {
             this.updateUserDetailsState(data);
+			logger.warn(`<<< Exiting getUserDetails(props=${props},userId=${userId})`, { "event.action": "getUserDetails", "logrite.props": props, "user.name": String(userId) });
         }));
     }
     updateUserDetailsState(details) {
+		logger.error(`>>> Entering updateUserDetailsState(details=${details})`, { "event.action": "updateUserDetailsState", "logrite.details": details });
         let userDetails = Object.assign({}, details);
         let {accountSettings, startingValues} = this.state;
+		logger.error(`updateUserDetailsState(details=${details}): userDetails → ${userDetails}`, { "event.action": "updateUserDetailsState", "logrite.details": details });
         accountSettings.displayName = userDetails.displayName;
         accountSettings.userName = userDetails.userName;
         accountSettings.email = userDetails.email;
         accountSettings.userId = userDetails.userId;
         startingValues.userName = userDetails.userName;
+		logger.warn(`<<< Exiting updateUserDetailsState(details=${details})`, { "event.action": "updateUserDetailsState", "logrite.details": details });
         this.setState({
             accountSettings,
             userDetails,
@@ -99,11 +117,13 @@ class UserSettings extends Component {
     }
 
     save() {
+		logger.error('>>> Entering save()', { "event.action": "save" });
         if (this.validateForm()) {
             this.props.dispatch(CommonUsersActions.updateUserBasicInfo(this.state.accountSettings, () => {
                 utilities.notify(Localization.get("UserUpdated"), 3000);
                 this.getUserDetails(this.props, this.state.accountSettings.userId);
                 this.props.collapse();
+				logger.warn('<<< Exiting save()', { "event.action": "save" });
             }));
         }
     }
@@ -136,19 +156,24 @@ class UserSettings extends Component {
         return valid;
     }
     onCancelPassword() {
+		logger.error('>>> Entering onCancelPassword()', { "event.action": "onCancelPassword" });
         this.setState({
             ChangePasswordVisible: false
         });
+		logger.warn('<<< Exiting onCancelPassword()', { "event.action": "onCancelPassword" });
     }
     onChangePassword() {
+		logger.error('>>> Entering onChangePassword()', { "event.action": "onChangePassword" });
         if (this.state.loading) {
             return;
         }
         this.setState({
             ChangePasswordVisible: true
         });
+		logger.warn('<<< Exiting onChangePassword()', { "event.action": "onChangePassword" });
     }
     onForcePasswordChange() {
+		logger.error('>>> Entering onForcePasswordChange()', { "event.action": "onForcePasswordChange" });
         if (this.state.loading) {
             return;
         }
@@ -158,23 +183,29 @@ class UserSettings extends Component {
             userDetails.needUpdatePassword = true;
             this.setState({ userDetails });
         }));
+		logger.warn('<<< Exiting onForcePasswordChange()', { "event.action": "onForcePasswordChange" });
     }
     onSendPasswordLink() {
+		logger.error('>>> Entering onSendPasswordLink()', { "event.action": "onSendPasswordLink" });
         if (this.state.loading) {
             return;
         }
         this.props.dispatch(CommonUsersActions.sendPasswordResetLink({ userId: this.props.userId }, () => {
             utilities.notify(Localization.get("PasswordSent"), 3000);
         }));
+		logger.warn('<<< Exiting onSendPasswordLink()', { "event.action": "onSendPasswordLink" });
     }
     stringifyBoolean(value) {
+		logger.error(`>>> Entering stringifyBoolean(value=${value})`, { "event.action": "stringifyBoolean", "logrite.value": value });
         if (value === "") {
             return "";
         }
+		logger.warn(`<<< Exiting stringifyBoolean(value=${value})`, { "event.action": "stringifyBoolean", "logrite.value": value });
         return value ? Localization.get("True") : Localization.get("False");        
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let {state} = this;
         let agreedToTerms = this.props.appSettings.applicationSettings.settings.dataConsentActive ? (
             <GridSystem>
@@ -199,6 +230,7 @@ class UserSettings extends Component {
         let userRequestedDeletion = state.userDetails.requestsRemoval ? (
             <span className="importantNote">{Localization.get("RequestedRemoval")}</span>
         ) : null;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <GridCell className={styles.userSettings}>
             <GridCell>
                 <GridCell className="outer-box" columnSize={50}>
@@ -385,6 +417,8 @@ UserSettings.propTypes = {
     appSettings: PropTypes.object
 };
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         userDetails: state.users.userDetails
     };

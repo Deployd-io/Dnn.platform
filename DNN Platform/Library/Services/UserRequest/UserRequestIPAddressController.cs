@@ -20,6 +20,7 @@ namespace DotNetNuke.Services.UserRequest
     /// <summary>Utilities to handle IP address of user making request to application.</summary>
     public class UserRequestIPAddressController : ServiceLocator<IUserRequestIPAddressController, UserRequestIPAddressController>, IUserRequestIPAddressController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserRequestIPAddressController));
         private readonly IHostSettingsService hostSettingsService;
 
         /// <summary>Initializes a new instance of the <see cref="UserRequestIPAddressController"/> class.</summary>
@@ -32,12 +33,18 @@ namespace DotNetNuke.Services.UserRequest
         /// <param name="hostSettingsService">Provides access to host settings.</param>
         public UserRequestIPAddressController(IHostSettingsService hostSettingsService)
         {
+			Logger.LogError(">>> Entering UserRequestIPAddressController(hostSettingsService={HostSettingsService})", hostSettingsService);
             this.hostSettingsService = hostSettingsService;
+			Logger.LogDebug("UserRequestIPAddressController(hostSettingsService={HostSettingsService}): hostSettingsService → {HostSettingsService1}", hostSettingsService, hostSettingsService);
+        Logger.LogWarning("<<< Exiting UserRequestIPAddressController(hostSettingsService={HostSettingsService})", hostSettingsService);
         }
 
         /// <inheritdoc />
         public string GetUserRequestIPAddress(HttpRequestBase request)
         {
+			Logger.LogError(">>> Entering GetUserRequestIPAddress(request={Request})", request);
+			Logger.LogWarning("<<< Exiting GetUserRequestIPAddress(request={Request})", request);
+			Logger.LogWarning("<<< Exiting GetUserRequestIPAddress(request={Request},ipFamily={IpFamily})", request, ipFamily);
             return this.GetUserRequestIPAddress(request, IPAddressFamily.IPv4);
         }
 
@@ -92,11 +99,14 @@ namespace DotNetNuke.Services.UserRequest
         /// <inheritdoc />
         protected override Func<IUserRequestIPAddressController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new UserRequestIPAddressController();
         }
 
         private static bool ValidateIp(string ipString, IPAddressFamily ipFamily)
         {
+			Logger.LogError(">>> Entering ValidateIp(ipString={IpString},ipFamily={IpFamily})", ipString, ipFamily);
             if (IPAddress.TryParse(ipString, out var address))
             {
                 if (ipFamily == IPAddressFamily.IPv4 &&
@@ -113,6 +123,7 @@ namespace DotNetNuke.Services.UserRequest
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ValidateIp(ipString={IpString},ipFamily={IpFamily})", ipString, ipFamily);
             return false;
         }
     }

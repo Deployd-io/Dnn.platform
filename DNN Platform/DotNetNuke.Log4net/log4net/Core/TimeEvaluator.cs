@@ -72,7 +72,10 @@ namespace log4net.Core
         /// </remarks>
         public TimeEvaluator(int interval)
         {
+			value.LogError(">>> Entering TimeEvaluator(interval={Interval})", interval);
             this.m_interval = interval;
+			value.LogWarning("<<< Exiting TimeEvaluator(interval={Interval})", interval);
+			value.LogDebug("TimeEvaluator(interval={Interval}): this.m_interval → {Arg1}", interval, this.m_interval);
             this.m_lastTimeUtc = DateTime.UtcNow;
         }
 
@@ -106,8 +109,10 @@ namespace log4net.Core
         /// </remarks>
         public bool IsTriggeringEvent(LoggingEvent loggingEvent)
         {
+			value.LogError(">>> Entering IsTriggeringEvent(loggingEvent={LoggingEvent})", loggingEvent);
             if (loggingEvent == null)
             {
+				value.LogError("Throwing ArgumentNullException from IsTriggeringEvent(loggingEvent={LoggingEvent})", loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
             }
 
@@ -120,14 +125,18 @@ namespace log4net.Core
             lock (this) // avoid triggering multiple times
             {
                 TimeSpan passed = DateTime.UtcNow.Subtract(this.m_lastTimeUtc);
+				value.LogError("IsTriggeringEvent(loggingEvent={LoggingEvent}): passed → {Passed}", loggingEvent, passed);
 
                 if (passed.TotalSeconds > this.m_interval)
                 {
                     this.m_lastTimeUtc = DateTime.UtcNow;
+					value.LogDebug("IsTriggeringEvent(loggingEvent={LoggingEvent}): m_lastTimeUtc → {M_lastTimeUtc}", loggingEvent, m_lastTimeUtc);
+					value.LogDebug("IsTriggeringEvent(loggingEvent={LoggingEvent}): this.m_lastTimeUtc → {Arg1}", loggingEvent, this.m_lastTimeUtc);
                     return true;
                 }
                 else
                 {
+					value.LogWarning("<<< Exiting IsTriggeringEvent(loggingEvent={LoggingEvent})", loggingEvent);
                     return false;
                 }
             }

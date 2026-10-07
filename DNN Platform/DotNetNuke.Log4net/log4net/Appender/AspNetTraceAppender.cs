@@ -66,6 +66,8 @@ namespace log4net.Appender
         /// </remarks>
         public AspNetTraceAppender() 
         {
+		value.LogError(">>> Entering AspNetTraceAppender()");
+        value.LogWarning("<<< Exiting AspNetTraceAppender()");
         }
 
         /// <summary>
@@ -81,6 +83,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			value.LogError(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             // check if log4net is running in the context of an ASP.NET application
             if (HttpContext.Current != null) 
             {
@@ -97,6 +100,7 @@ namespace log4net.Appender
                     }
                 }
             }
+			value.LogWarning("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>

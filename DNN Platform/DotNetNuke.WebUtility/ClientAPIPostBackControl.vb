@@ -3,6 +3,7 @@
 
 Imports System.Diagnostics.CodeAnalysis
 Imports System.Web.UI
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.Utilities
 
@@ -23,6 +24,7 @@ Namespace DotNetNuke.UI.Utilities
     ''' </history>
     ''' -----------------------------------------------------------------------------
     Public Class ClientAPIPostBackControl : Inherits Control : Implements IPostBackEventHandler
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         Delegate Sub PostBackEvent(ByVal Args As ClientAPIPostBackEventArgs)
         Private m_oEventHandlers As Hashtable = New Hashtable
 
@@ -61,11 +63,13 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Sub AddEventHandler(ByVal strEventName As String, ByVal objDelegate As PostBackEvent)
+			_logger.LogError(">>> Entering AddEventHandler(strEventName={StrEventName},objDelegate={ObjDelegate})", strEventName, objDelegate)
             If m_oEventHandlers.Contains(strEventName) = False Then
                 m_oEventHandlers.Add(strEventName, objDelegate)
             Else
                 m_oEventHandlers(strEventName) = CType(System.Delegate.Combine(CType(m_oEventHandlers(strEventName), ClientAPIPostBackControl.PostBackEvent), objDelegate), ClientAPIPostBackControl.PostBackEvent)
             End If
+			_logger.LogWarning("<<< Exiting AddEventHandler(strEventName={StrEventName},objDelegate={ObjDelegate})", strEventName, objDelegate)
         End Sub
 
         ''' -----------------------------------------------------------------------------
@@ -82,8 +86,12 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Sub New(ByVal objPage As Page, ByVal strEventName As String, ByVal objDelegate As PostBackEvent)
+			_logger.LogError(">>> Entering New(objPage={ObjPage},strEventName={StrEventName},objDelegate={ObjDelegate})", objPage, strEventName, objDelegate)
             ClientAPI.GetPostBackClientEvent(objPage, Me, "")
             AddEventHandler(strEventName, objDelegate)
+			_logger.LogWarning("<<< Exiting New(objPage={ObjPage},strEventName={StrEventName},objDelegate={ObjDelegate})", objPage, strEventName, objDelegate)
+			_logger.LogError(">>> Entering New()")
+			_logger.LogWarning("<<< Exiting New()")
         End Sub
         Public Sub New()
 
@@ -102,10 +110,13 @@ Namespace DotNetNuke.UI.Utilities
         ''' -----------------------------------------------------------------------------
         <SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification := "Breaking change")>
         Public Sub RaisePostBackEvent(ByVal strEventArgument As String) Implements System.Web.UI.IPostBackEventHandler.RaisePostBackEvent
+			_logger.LogError(">>> Entering RaisePostBackEvent(strEventArgument={StrEventArgument})", strEventArgument)
+			_logger.LogError("RaisePostBackEvent(strEventArgument={StrEventArgument}): objArg → {ObjArg}", strEventArgument, objArg)
             Dim objArg As ClientAPIPostBackEventArgs = New ClientAPIPostBackEventArgs(strEventArgument)
             If Not EventHandlers(objArg.EventName) Is Nothing Then
                 EventHandlers(objArg.EventName)(objArg)
             End If
+			_logger.LogWarning("<<< Exiting RaisePostBackEvent(strEventArgument={StrEventArgument})", strEventArgument)
         End Sub
     End Class
 

@@ -17,6 +17,7 @@ import ProviderEditor from "./providerEditor";
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let daysToCacheOptions = [];
 let priorityOptions = [];
@@ -27,6 +28,7 @@ const re = /[^].html$/;
 class SitemapSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             sitemapSettings: undefined,
             searchEngine: "Google",
@@ -38,9 +40,11 @@ class SitemapSettingsPanelBody extends Component {
                 verificationValidity: true
             }
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
         if (props.sitemapSettings) {
             this.setState({
@@ -88,19 +92,24 @@ class SitemapSettingsPanelBody extends Component {
                 sitemapProviders: Object.assign({}, data.Providers)
             });
         }));
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         this.setState({
             sitemapSettings: Object.assign({}, props.sitemapSettings),
             triedToSubmit: false,
             triedToCreate: false
         });
+		logger.warn(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {state, props} = this;
         let sitemapSettings = Object.assign({}, state.sitemapSettings);
+		logger.error(`onSettingChange(key=${key},event=${event}): sitemapSettings → ${sitemapSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
 
         if (key === "SitemapExcludePriority" || key === "SitemapCacheDays" || key === "SitemapMinPriority") {
             sitemapSettings[key] = event.value;
@@ -115,19 +124,23 @@ class SitemapSettingsPanelBody extends Component {
         });
 
         props.dispatch(SeoActions.sitemapSettingsClientModified(sitemapSettings));
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     }
 
     searchEngineListToOptions(list) {
+		logger.error(`>>> Entering searchEngineListToOptions(list=${list})`, { "event.action": "searchEngineListToOptions", "logrite.list": list });
         let options = [];
         if (list !== undefined) {
             options = list.map((item) => {
                 return { label: item.Key, value: item.Key };
             });
         }
+		logger.warn(`<<< Exiting searchEngineListToOptions(list=${list})`, { "event.action": "searchEngineListToOptions", "logrite.list": list });
         return options;
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -138,13 +151,16 @@ class SitemapSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         }));
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SeoActions.getSitemapSettings((data) => {
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
                 this.setState({
                     sitemapSettings: Object.assign({}, data.Settings)
                 });
@@ -153,11 +169,14 @@ class SitemapSettingsPanelBody extends Component {
     }
 
     onClearCache() {
+		logger.error('>>> Entering onClearCache()', { "event.action": "onClearCache" });
         const {props} = this;
         props.dispatch(SeoActions.clearCache());
+		logger.warn('<<< Exiting onClearCache()', { "event.action": "onClearCache" });
     }
 
     onUpdateProvider(settings) {
+		logger.error(`>>> Entering onUpdateProvider(settings=${settings})`, { "event.action": "onUpdateProvider", "logrite.settings": settings });
         const {props} = this;
 
         props.dispatch(SeoActions.updateSitemapProvider(settings, () => {
@@ -170,43 +189,54 @@ class SitemapSettingsPanelBody extends Component {
             this.collapse();
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.warn(`<<< Exiting onUpdateProvider(settings=${settings})`, { "event.action": "onUpdateProvider", "logrite.settings": settings });
         }));
     }
 
     uncollapse(id) {
+		logger.error(`>>> Entering uncollapse(id=${id})`, { "event.action": "uncollapse", "logrite.id": id });
         setTimeout(() => {
             this.setState({
                 openId: id
             });
         }, this.timeout);
+		logger.warn(`<<< Exiting uncollapse(id=${id})`, { "event.action": "uncollapse", "logrite.id": id });
     }
     collapse() {
+		logger.error('>>> Entering collapse()', { "event.action": "collapse" });
         if (this.state.openId !== "") {
             this.setState({
                 openId: ""
             });
+			logger.warn('<<< Exiting collapse()', { "event.action": "collapse" });
         }
     }
     toggle(openId) {
+		logger.error(`>>> Entering toggle(openId=${openId})`, { "event.action": "toggle", "logrite.openId": openId });
         if (openId !== "") {
             this.uncollapse(openId);
         } else {
             this.collapse();
+			logger.warn(`<<< Exiting toggle(openId=${openId})`, { "event.action": "toggle", "logrite.openId": openId });
         }
     }
 
     renderProvidersHeader() {
+		logger.error('>>> Entering renderProvidersHeader()', { "event.action": "renderProvidersHeader" });
         let tableHeaders = tableFields.map((field) => {
             let className = "provider-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}</span>
             </div>;
         });
+		logger.warn('<<< Exiting renderProvidersHeader()', { "event.action": "renderProvidersHeader" });
         return <div className="header-row">{tableHeaders}</div>;
     }
 
     renderedProviders() {
+		logger.error('>>> Entering renderedProviders()', { "event.action": "renderedProviders" });
         if (this.props.providers) {
+			logger.warn('<<< Exiting renderedProviders()', { "event.action": "renderedProviders" });
             return this.props.providers.map((item, index) => {
                 return (
                     <ProviderRow
@@ -232,25 +262,32 @@ class SitemapSettingsPanelBody extends Component {
     }
 
     onSearchEngineChange(event) {
+		logger.error(`>>> Entering onSearchEngineChange(event=${event})`, { "event.action": "onSearchEngineChange", "logrite.event": event });
         this.setState({
             searchEngine: event.value
         });
+		logger.warn(`<<< Exiting onSearchEngineChange(event=${event})`, { "event.action": "onSearchEngineChange", "logrite.event": event });
     }
 
     onSearchEngineSubmit() {
+		logger.error('>>> Entering onSearchEngineSubmit()', { "event.action": "onSearchEngineSubmit" });
         let {state, props} = this;
         let url = props.searchEngineUrls.filter((item) => item.Key === state.searchEngine)[0].Value;
         window.open(url, "_blank");
+		logger.error(`onSearchEngineSubmit(): url → ${url}`, { "event.action": "onSearchEngineSubmit" });
     }
 
     onVerificationChange(event) {
+		logger.error(`>>> Entering onVerificationChange(event=${event})`, { "event.action": "onVerificationChange", "logrite.event": event });
         let {state} = this;
         let verification = typeof (event) === "object" ? event.target.value : event;
+		logger.error(`onVerificationChange(event=${event}): verification → ${verification}`, { "event.action": "onVerificationChange", "logrite.event": event });
         if (verification === "" || !re.test(verification)) {
             state.error["verificationValidity"] = true;
         }
         else if (verification !== "" && re.test(verification)) {
             state.error["verificationValidity"] = false;
+			logger.warn(`<<< Exiting onVerificationChange(event=${event})`, { "event.action": "onVerificationChange", "logrite.event": event });
         }
 
         this.setState({
@@ -261,6 +298,7 @@ class SitemapSettingsPanelBody extends Component {
     }
 
     onCreateVerification() {
+		logger.error('>>> Entering onCreateVerification()', { "event.action": "onCreateVerification" });
         let {state, props} = this;
         this.setState({
             triedToCreate: true
@@ -271,10 +309,12 @@ class SitemapSettingsPanelBody extends Component {
         }
 
         props.dispatch(SeoActions.createVerification(state.verification));
+		logger.warn('<<< Exiting onCreateVerification()', { "event.action": "onCreateVerification" });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         if (state.sitemapSettings) {
             const columnOne = <div className="left-column" key="columnOne">
@@ -441,6 +481,8 @@ SitemapSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         sitemapSettings: state.seo.sitemapSettings,

@@ -22,6 +22,7 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class FolderInfo : BaseEntityInfo, IHydratable, IFolderInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FolderInfo));
         // local property declarations
         private string displayName;
         private string displayPath;
@@ -32,20 +33,27 @@ namespace DotNetNuke.Services.FileSystem
         public FolderInfo()
             : this(false)
         {
+		Logger.LogError(">>> Entering FolderInfo()");
+        Logger.LogWarning("<<< Exiting FolderInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FolderInfo"/> class.</summary>
         /// <param name="initialiseEmptyPermissions">Whether to initialize the permissions to an empty collection.</param>
         internal FolderInfo(bool initialiseEmptyPermissions)
         {
+			Logger.LogError(">>> Entering FolderInfo(initialiseEmptyPermissions={InitialiseEmptyPermissions})", initialiseEmptyPermissions);
             this.FolderID = Null.NullInteger;
+			Logger.LogDebug("FolderInfo(initialiseEmptyPermissions={InitialiseEmptyPermissions}): this.FolderID → {Arg1}", initialiseEmptyPermissions, this.FolderID);
             this.UniqueId = Guid.NewGuid();
             this.VersionGuid = Guid.NewGuid();
             this.WorkflowID = Null.NullInteger;
             if (initialiseEmptyPermissions)
             {
+				Logger.LogDebug("FolderInfo(initialiseEmptyPermissions={InitialiseEmptyPermissions}): this.WorkflowID → {Arg1}", initialiseEmptyPermissions, this.WorkflowID);
                 this.folderPermissions = new FolderPermissionCollection();
             }
+			Logger.LogDebug("FolderInfo(initialiseEmptyPermissions={InitialiseEmptyPermissions}): folderPermissions → {FolderPermissions}", initialiseEmptyPermissions, folderPermissions);
+        Logger.LogWarning("<<< Exiting FolderInfo(initialiseEmptyPermissions={InitialiseEmptyPermissions})", initialiseEmptyPermissions);
         }
 
         /// <inheritdoc />
@@ -277,7 +285,9 @@ namespace DotNetNuke.Services.FileSystem
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.FolderID = Null.SetNullInteger(dr["FolderID"]);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
             this.UniqueId = Null.SetNullGuid(dr["UniqueId"]);
             this.VersionGuid = Null.SetNullGuid(dr["VersionGuid"]);
             this.PortalID = Null.SetNullInteger(dr["PortalID"]);

@@ -496,6 +496,7 @@ namespace DotNetNuke.Common
         /// <param name="endResponse">if set to <see langword="true"/> [end response].</param>
         public static void Redirect(string url, bool endResponse)
         {
+			Logger.LogError(">>> Entering Redirect(url={Url},endResponse={EndResponse})", url, endResponse);
             try
             {
                 HttpContext.Current.Response.Redirect(url, endResponse);
@@ -509,6 +510,7 @@ namespace DotNetNuke.Common
             {
                 Logger.Error(ex);
             }
+			Logger.LogWarning("<<< Exiting Redirect(url={Url},endResponse={EndResponse})", url, endResponse);
         }
 
         /// <summary>Checks if incremental sqlDataProvider files exist.</summary>
@@ -541,6 +543,7 @@ namespace DotNetNuke.Common
             string stringValueColumn,
             string numericValueColumn)
         {
+			Logger.LogWarning("<<< Exiting BuildCrossTabDataSet(dataSetName={DataSetName},result={Result},fixedColumns={FixedColumns},variableColumns={VariableColumns},keyColumn={KeyColumn},fieldColumn={FieldColumn},fieldTypeColumn={FieldTypeColumn},stringValueColumn={StringValueColumn},numericValueColumn={NumericValueColumn},culture={Culture})", dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, culture);
             return BuildCrossTabDataSet(dataSetName, result, fixedColumns, variableColumns, keyColumn, fieldColumn, fieldTypeColumn, stringValueColumn, numericValueColumn, CultureInfo.CurrentCulture);
         }
 
@@ -718,8 +721,10 @@ namespace DotNetNuke.Common
         /// <returns>the dataset instance.</returns>
         public static DataSet ConvertDataReaderToDataSet(IDataReader reader)
         {
+			Logger.LogError(">>> Entering ConvertDataReaderToDataSet(reader={Reader})", reader);
             // add datatable to dataset
             var objDataSet = new DataSet();
+			Logger.LogError("ConvertDataReaderToDataSet(reader={Reader}): objDataSet → {ObjDataSet}", reader, objDataSet);
 
             try
             {
@@ -734,6 +739,7 @@ namespace DotNetNuke.Common
                 reader.Close();
             }
 
+			Logger.LogWarning("<<< Exiting ConvertDataReaderToDataSet(reader={Reader})", reader);
             return objDataSet;
         }
 
@@ -742,6 +748,9 @@ namespace DotNetNuke.Common
         /// <returns>the datatable instance.</returns>
         public static DataTable ConvertDataReaderToDataTable(IDataReader reader)
         {
+			Logger.LogError(">>> Entering ConvertDataReaderToDataTable(reader={Reader})", reader);
+			Logger.LogWarning("<<< Exiting ConvertDataReaderToDataTable(reader={Reader})", reader);
+			Logger.LogWarning("<<< Exiting ConvertDataReaderToDataTable(reader={Reader},closeReader={CloseReader})", reader, closeReader);
             return ConvertDataReaderToDataTable(reader, true);
         }
 
@@ -788,7 +797,9 @@ namespace DotNetNuke.Common
         /// <returns>absolute server path.</returns>
         public static string GetAbsoluteServerPath(HttpRequest request)
         {
+			Logger.LogError(">>> Entering GetAbsoluteServerPath(request={Request})", request);
             var strServerPath = request.MapPath(request.ApplicationPath);
+			Logger.LogError("GetAbsoluteServerPath(request={Request}): strServerPath → {StrServerPath}", request, strServerPath);
             if (!strServerPath.EndsWith(@"\", StringComparison.Ordinal))
             {
                 strServerPath += @"\";
@@ -807,17 +818,21 @@ namespace DotNetNuke.Common
         /// <returns>A string representing the application name.</returns>
         public static string GetApplicationName()
         {
+			Logger.LogError(">>> Entering GetApplicationName()");
             string appName;
             if (HttpContext.Current.Items["ApplicationName"] == null || string.IsNullOrEmpty(HttpContext.Current.Items["ApplicationName"].ToString()))
             {
                 var portalSettings = PortalController.Instance.GetCurrentSettings();
+				Logger.LogError("GetApplicationName(): portalSettings → {PortalSettings}", portalSettings);
                 if (portalSettings == null)
                 {
                     appName = "/";
+					Logger.LogError("GetApplicationName(): appName → {AppName}", appName);
                 }
                 else
                 {
                     appName = GetApplicationName(portalSettings.PortalId);
+					Logger.LogDebug("GetApplicationName(): appName → {AppName}", appName);
                 }
             }
             else
@@ -825,6 +840,8 @@ namespace DotNetNuke.Common
                 appName = Convert.ToString(HttpContext.Current.Items["ApplicationName"], CultureInfo.InvariantCulture);
             }
 
+			Logger.LogWarning("<<< Exiting GetApplicationName()");
+			Logger.LogWarning("<<< Exiting GetApplicationName(portalID={PortalID})", portalID);
             return appName;
         }
 
@@ -859,11 +876,14 @@ namespace DotNetNuke.Common
         /// <returns>return <see langword="true"/> if can find the specific version, otherwise will return <see langword="false"/>.</returns>
         public static bool FindDatabaseVersion(int major, int minor, int build)
         {
+			Logger.LogError(">>> Entering FindDatabaseVersion(major={Major},minor={Minor},build={Build})", major, minor, build);
             bool version = false;
             IDataReader dr = null;
+			Logger.LogError("FindDatabaseVersion(major={Major},minor={Minor},build={Build}): version → {Version}", major, minor, build, version);
             try
             {
                 dr = DataProvider.Instance().FindDatabaseVersion(major, minor, build);
+				Logger.LogError("FindDatabaseVersion(major={Major},minor={Minor},build={Build}): dr → {Dr}", major, minor, build, dr);
                 if (dr.Read())
                 {
                     version = true;
@@ -871,6 +891,7 @@ namespace DotNetNuke.Common
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in FindDatabaseVersion(major={Major},minor={Minor},build={Build}): {Arg3}", major, minor, build, ex.Message);
                 Exceptions.LogException(ex);
             }
             finally
@@ -878,6 +899,7 @@ namespace DotNetNuke.Common
                 CBO.CloseDataReader(dr, true);
             }
 
+			Logger.LogWarning("<<< Exiting FindDatabaseVersion(major={Major},minor={Minor},build={Build})", major, minor, build);
             return version;
         }
 
@@ -909,11 +931,13 @@ namespace DotNetNuke.Common
             var uri = new Uri(originalUrl);
             var aliasUri = new Uri(httpAlias);
 
+			Logger.LogError(">>> Entering AddPort(httpAlias={HttpAlias},originalUrl={OriginalUrl})", httpAlias, originalUrl);
             if (!uri.IsDefaultPort)
             {
                 httpAlias = AddHTTP(aliasUri.Host + ":" + uri.Port + aliasUri.LocalPath);
             }
 
+			Logger.LogWarning("<<< Exiting AddPort(httpAlias={HttpAlias},originalUrl={OriginalUrl})", httpAlias, originalUrl);
             return httpAlias;
         }
 
@@ -922,6 +946,8 @@ namespace DotNetNuke.Common
         /// <returns>domain name.</returns>
         public static string GetDomainName(HttpRequest request)
         {
+			Logger.LogError(">>> Entering GetDomainName(request={Request})", request);
+            Logger.LogWarning("<<< Exiting GetDomainName(request={Request})", request);
             return GetDomainName(new HttpRequestWrapper(request), false);
         }
 
@@ -957,12 +983,15 @@ namespace DotNetNuke.Common
         /// </returns>
         public static bool UsePortNumber()
         {
+			Logger.LogError(">>> Entering UsePortNumber()");
             bool usePort = true;
+			Logger.LogError("UsePortNumber(): usePort → {UsePort}", usePort);
             if (Config.GetSetting("UsePortNumber") != null)
             {
                 usePort = bool.Parse(Config.GetSetting("UsePortNumber"));
             }
 
+			Logger.LogWarning("<<< Exiting UsePortNumber()");
             return usePort;
         }
 
@@ -970,6 +999,10 @@ namespace DotNetNuke.Common
         /// <returns>file list.</returns>
         public static ArrayList GetFileList()
         {
+			Logger.LogError(">>> Entering GetFileList()");
+            Logger.LogWarning("<<< Exiting GetFileList()");
+			Logger.LogWarning("<<< Exiting GetFileList(currentDirectory={CurrentDirectory},strExtensions={StrExtensions},noneSpecified={NoneSpecified})", currentDirectory, strExtensions, noneSpecified);
+			Logger.LogWarning("<<< Exiting GetFileList(portalId={PortalId},strExtensions={StrExtensions},noneSpecified={NoneSpecified},folder={Folder},includeHidden={IncludeHidden})", portalId, strExtensions, noneSpecified, folder, includeHidden);
             return GetFileList(-1, string.Empty, true, string.Empty, false);
         }
 
@@ -1086,21 +1119,28 @@ namespace DotNetNuke.Common
         /// <returns>Host portal settings.</returns>
         public static PortalSettings GetHostPortalSettings(IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering GetHostPortalSettings()");
             int tabId = -1;
             int portalId = -1;
             IPortalAliasInfo objPortalAliasInfo = null;
+			Logger.LogError("GetHostPortalSettings(hostSettings={HostSettings}): portalId → {PortalId}", hostSettings, portalId);
+			Logger.LogError("GetHostPortalSettings(): objPortalAliasInfo → {ObjPortalAliasInfo}", objPortalAliasInfo);
+			Logger.LogError("GetHostPortalSettings(): portalId → {PortalId}", portalId);
 
             // if the portal alias exists
             if (hostSettings.HostPortalId > Null.NullInteger)
             {
+				Logger.LogError("GetHostPortalSettings(hostSettings={HostSettings}): objPortalAliasInfo → {ObjPortalAliasInfo}", hostSettings, objPortalAliasInfo);
                 portalId = hostSettings.HostPortalId;
 
                 // use the host portal
                 objPortalAliasInfo = new PortalAliasInfo();
                 objPortalAliasInfo.PortalId = portalId;
             }
+			Logger.LogDebug("GetHostPortalSettings(hostSettings={HostSettings}): objPortalAliasInfo.PortalId → {Arg1}", hostSettings, objPortalAliasInfo.PortalId);
 
             // load the PortalSettings into current context
+			Logger.LogWarning("<<< Exiting GetHostPortalSettings(hostSettings={HostSettings})", hostSettings);
             return new PortalSettings(tabId, objPortalAliasInfo as PortalAliasInfo);
         }
 
@@ -1111,8 +1151,11 @@ namespace DotNetNuke.Common
         /// <returns>domain name.</returns>
         public static string GetPortalDomainName(string strPortalAlias, HttpRequest request, bool blnAddHTTP)
         {
+			Logger.LogError(">>> Entering GetPortalDomainName(strPortalAlias={StrPortalAlias},request={Request},blnAddHTTP={BlnAddHTTP})", strPortalAlias, request, blnAddHTTP);
             string strDomainName = string.Empty;
             string strURL = string.Empty;
+			Logger.LogError("GetPortalDomainName(strPortalAlias={StrPortalAlias},request={Request},blnAddHTTP={BlnAddHTTP}): strURL → {StrURL}", strPortalAlias, request, blnAddHTTP, strURL);
+			Logger.LogError("GetPortalDomainName(strPortalAlias={StrPortalAlias},request={Request},blnAddHTTP={BlnAddHTTP}): strDomainName → {StrDomainName}", strPortalAlias, request, blnAddHTTP, strDomainName);
             int intAlias;
             if (request != null)
             {
@@ -1138,6 +1181,7 @@ namespace DotNetNuke.Common
                 strDomainName = AddHTTP(strDomainName);
             }
 
+			Logger.LogWarning("<<< Exiting GetPortalDomainName(strPortalAlias={StrPortalAlias},request={Request},blnAddHTTP={BlnAddHTTP})", strPortalAlias, request, blnAddHTTP);
             return strDomainName;
         }
 
@@ -1152,12 +1196,15 @@ namespace DotNetNuke.Common
         /// <returns>Portal settings.</returns>
         public static PortalSettings GetPortalSettings(IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering GetPortalSettings()");
             PortalSettings portalSettings = null;
 
             // Try getting the settings from the Context
+			Logger.LogError("GetPortalSettings(): portalSettings → {PortalSettings}", portalSettings);
             if (HttpContext.Current != null)
             {
                 portalSettings = (PortalSettings)HttpContext.Current.Items["PortalSettings"];
+				Logger.LogError("GetPortalSettings(hostSettings={HostSettings}): portalSettings → {PortalSettings}", hostSettings, portalSettings);
             }
 
             // If nothing then try getting the Host Settings
@@ -1166,6 +1213,7 @@ namespace DotNetNuke.Common
                 portalSettings = GetHostPortalSettings(hostSettings);
             }
 
+			Logger.LogWarning("<<< Exiting GetPortalSettings(hostSettings={HostSettings})", hostSettings);
             return portalSettings;
         }
 
@@ -1175,6 +1223,7 @@ namespace DotNetNuke.Common
         /// <returns>A string containing the subfolder path.</returns>
         public static string GetSubFolderPath(string strFileNamePath, int portalId)
         {
+			Logger.LogError(">>> Entering GetSubFolderPath(strFileNamePath={StrFileNamePath},portalId={PortalId})", strFileNamePath, portalId);
             string parentFolderName;
             if (portalId == Null.NullInteger)
             {
@@ -1195,7 +1244,9 @@ namespace DotNetNuke.Common
         /// <returns>The total number of records in the data reader.</returns>
         public static int GetTotalRecords(ref IDataReader dr)
         {
+			Logger.LogError(">>> Entering GetTotalRecords(dr={Dr})", dr);
             int total = 0;
+			Logger.LogError("GetTotalRecords(dr={Dr}): total → {Total}", dr, total);
             if (dr.Read())
             {
                 try
@@ -1209,6 +1260,7 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetTotalRecords(dr={Dr})", dr);
             return total;
         }
 
@@ -1228,6 +1280,7 @@ namespace DotNetNuke.Common
         public static string ImportFile(int portalId, string url)
         {
             string strUrl = url;
+			Logger.LogError(">>> Entering ImportFile(portalId={PortalId},url={Url})", portalId, url);
             if (GetURLType(url) == TabType.File)
             {
                 var fileName = Path.GetFileName(url);
@@ -1235,16 +1288,21 @@ namespace DotNetNuke.Common
                 var folderPath = url.Substring(0, url.LastIndexOf(fileName, StringComparison.OrdinalIgnoreCase));
                 var folder = FolderManager.Instance.GetFolder(portalId, folderPath);
 
+				Logger.LogError("ImportFile(portalId={PortalId},url={Url}): fileName → {FileName}", portalId, url, fileName);
                 if (folder != null)
                 {
+					Logger.LogError("ImportFile(portalId={PortalId},url={Url}): folderPath → {FolderPath}", portalId, url, folderPath);
+					Logger.LogError("ImportFile(portalId={PortalId},url={Url}): folder → {Folder}", portalId, url, folder);
                     var file = FileManager.Instance.GetFile(folder, fileName);
                     if (file != null)
                     {
+						Logger.LogError("ImportFile(portalId={PortalId},url={Url}): file → {File}", portalId, url, file);
                         strUrl = "FileID=" + file.FileId;
                     }
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ImportFile(portalId={PortalId},url={Url})", portalId, url);
             return strUrl;
         }
 
@@ -1266,7 +1324,9 @@ namespace DotNetNuke.Common
         /// <param name="portalId">The Portal ID.</param>
         public static void SetApplicationName(int portalId)
         {
+			Logger.LogError(">>> Entering SetApplicationName(portalId={PortalId})", portalId);
             HttpContext.Current.Items["ApplicationName"] = GetApplicationName(portalId);
+			Logger.LogWarning("<<< Exiting SetApplicationName(portalId={PortalId})", portalId);
         }
 
         /// <summary>Sets the ApplicationName for the MemberRole API.</summary>
@@ -1276,7 +1336,9 @@ namespace DotNetNuke.Common
         /// <param name="applicationName">The Application Name to set.</param>
         public static void SetApplicationName(string applicationName)
         {
+			Logger.LogError(">>> Entering SetApplicationName(applicationName={ApplicationName})", applicationName);
             HttpContext.Current.Items["ApplicationName"] = applicationName;
+			Logger.LogWarning("<<< Exiting SetApplicationName(applicationName={ApplicationName})", applicationName);
         }
 
         /// <summary>Formats the address on a single line ( ie. Unit, Street, City, Region, Country, PostalCode ).</summary>
@@ -1289,7 +1351,9 @@ namespace DotNetNuke.Common
         /// <returns>A string containing the whole address on a single line.</returns>
         public static string FormatAddress(object unit, object street, object city, object region, object country, object postalCode)
         {
+			Logger.LogError(">>> Entering FormatAddress(unit={Unit},street={Street},city={City},region={Region},country={Country},postalCode={PostalCode})", unit, street, city, region, country, postalCode);
             string strAddress = string.Empty;
+			Logger.LogError("FormatAddress(unit={Unit},street={Street},city={City},region={Region},country={Country},postalCode={PostalCode}): strAddress → {StrAddress}", unit, street, city, region, country, postalCode, strAddress);
             if (unit != null)
             {
                 if (!string.IsNullOrEmpty(unit.ToString().Trim()))
@@ -1343,6 +1407,7 @@ namespace DotNetNuke.Common
                 strAddress = strAddress.Substring(2);
             }
 
+			Logger.LogWarning("<<< Exiting FormatAddress(unit={Unit},street={Street},city={City},region={Region},country={Country},postalCode={PostalCode})", unit, street, city, region, country, postalCode);
             return strAddress;
         }
 
@@ -1351,6 +1416,8 @@ namespace DotNetNuke.Common
         /// <returns>Formatted  version as string.</returns>
         public static string FormatVersion(Version version)
         {
+			Logger.LogError(">>> Entering FormatVersion(version={Version})", version);
+            Logger.LogWarning("<<< Exiting FormatVersion(version={Version})", version);
             return FormatVersion(version, false);
         }
 
@@ -1447,12 +1514,15 @@ namespace DotNetNuke.Common
         /// <returns>obfuscated sensitive data by hustling ASCII characters.</returns>
         public static string CloakText(string personalInfo)
         {
+			Logger.LogError(">>> Entering CloakText(personalInfo={PersonalInfo})", personalInfo);
             if (personalInfo == null)
             {
                 return Null.NullString;
             }
 
             var characterCodes = personalInfo.Select(ch => ((int)ch).ToString(CultureInfo.InvariantCulture));
+			Logger.LogError("CloakText(personalInfo={PersonalInfo}): characterCodes → {CharacterCodes}", personalInfo, characterCodes);
+			Logger.LogWarning("<<< Exiting CloakText(personalInfo={PersonalInfo})", personalInfo);
             return $"""
                     <script type="text/javascript">
                         //<![CDATA[
@@ -1472,13 +1542,17 @@ namespace DotNetNuke.Common
         /// </example>
         public static string GetMediumDate(string strDate)
         {
+			Logger.LogError(">>> Entering GetMediumDate(strDate={StrDate})", strDate);
             if (!string.IsNullOrEmpty(strDate))
             {
                 DateTime datDate = Convert.ToDateTime(strDate, CultureInfo.CurrentCulture);
+				Logger.LogError("GetMediumDate(strDate={StrDate}): datDate → {DatDate}", strDate, datDate);
                 string strMonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(datDate.Month);
                 strDate = $"{datDate.Day}-{strMonth}-{datDate.Year}";
+				Logger.LogError("GetMediumDate(strDate={StrDate}): strDate → {StrDate1}", strDate, strDate);
             }
 
+			Logger.LogWarning("<<< Exiting GetMediumDate(strDate={StrDate})", strDate);
             return strDate;
         }
 
@@ -1487,12 +1561,16 @@ namespace DotNetNuke.Common
         /// <returns>short date content of the input.</returns>
         public static string GetShortDate(string strDate)
         {
+			Logger.LogError(">>> Entering GetShortDate(strDate={StrDate})", strDate);
             if (!string.IsNullOrEmpty(strDate))
             {
                 var datDate = Convert.ToDateTime(strDate, CultureInfo.CurrentCulture);
+				Logger.LogError("GetShortDate(strDate={StrDate}): datDate → {DatDate}", strDate, datDate);
                 strDate = $"{datDate.Month}/{datDate.Day}/{datDate.Year}";
+				Logger.LogError("GetShortDate(strDate={StrDate}): strDate → {StrDate1}", strDate, strDate);
             }
 
+			Logger.LogWarning("<<< Exiting GetShortDate(strDate={StrDate})", strDate);
             return strDate;
         }
 
@@ -1502,12 +1580,14 @@ namespace DotNetNuke.Common
         /// </returns>
         public static bool IsAdminControl()
         {
+			Logger.LogError(">>> Entering IsAdminControl()");
             // This is needed to avoid an exception if there is no Context.  This will occur if code is called from the Scheduler
             if (HttpContext.Current == null)
             {
                 return false;
             }
 
+			Logger.LogWarning("<<< Exiting IsAdminControl()");
             return (!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["mid"])) || (!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["ctl"]));
         }
 
@@ -1517,16 +1597,19 @@ namespace DotNetNuke.Common
         /// </returns>
         public static bool IsAdminSkin()
         {
+			Logger.LogError(">>> Entering IsAdminSkin()");
             bool isAdminSkin = Null.NullBoolean;
             if (HttpContext.Current != null)
             {
                 string controlKey = string.Empty;
+				Logger.LogError("IsAdminSkin(): controlKey → {ControlKey}", controlKey);
                 if (HttpContext.Current.Request.QueryString["ctl"] != null)
                 {
                     controlKey = HttpContext.Current.Request.QueryString["ctl"].ToLowerInvariant();
                 }
 
                 int moduleID = -1;
+				Logger.LogError("IsAdminSkin(): moduleID → {ModuleID}", moduleID);
                 if (HttpContext.Current.Request.QueryString["mid"] != null)
                 {
                     if (!int.TryParse(HttpContext.Current.Request.QueryString["mid"], out moduleID))
@@ -1539,6 +1622,7 @@ namespace DotNetNuke.Common
                                (!string.IsNullOrEmpty(controlKey) && AdminControlKeys.Contains(controlKey) && moduleID == -1);
             }
 
+			Logger.LogWarning("<<< Exiting IsAdminSkin()");
             return isAdminSkin;
         }
 
@@ -1546,6 +1630,8 @@ namespace DotNetNuke.Common
         /// <returns><see langword="true"/> if the tab is in Edit mode; otherwise <see langword="false"/>.</returns>
         public static bool IsEditMode()
         {
+			Logger.LogError(">>> Entering IsEditMode()");
+            Logger.LogWarning("<<< Exiting IsEditMode()");
             return Personalization.GetUserMode() == PortalSettings.Mode.Edit && TabPermissionController.CanAddContentToPage();
         }
 
@@ -1553,6 +1639,8 @@ namespace DotNetNuke.Common
         /// <returns><see langword="true"/> if the current tab is in layout mode; otherwise <see langword="false"/>.</returns>
         public static bool IsLayoutMode()
         {
+			Logger.LogError(">>> Entering IsLayoutMode()");
+            Logger.LogWarning("<<< Exiting IsLayoutMode()");
             return TabPermissionController.CanAddContentToPage() && Personalization.GetUserMode() == PortalSettings.Mode.Layout;
         }
 
@@ -1611,6 +1699,7 @@ namespace DotNetNuke.Common
 
                     strRSS.AppendLine("  <description>" + portalSettings.PortalName + " " + GetMediumDate(dr[createdDateField].ToString()) + "</description>");
                     strRSS.AppendLine(" </item>");
+					Logger.LogWarning("<<< Exiting CreateRSS(dr={Dr},titleField={TitleField},urlField={UrlField},createdDateField={CreatedDateField},syndicateField={SyndicateField},domainName={DomainName},fileName={FileName})", dr, titleField, urlField, createdDateField, syndicateField, domainName, fileName);
                 }
             }
             catch (Exception ex)
@@ -1678,7 +1767,10 @@ namespace DotNetNuke.Common
         /// <returns>HTML with paths for images and background corrected.</returns>
         public static string ManageUploadDirectory(string strHTML, string strUploadDirectory)
         {
+			Logger.LogError(">>> Entering ManageUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory})", strHTML, strUploadDirectory);
             strHTML = ManageTokenUploadDirectory(strHTML, strUploadDirectory, "src");
+			Logger.LogError("ManageUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory}): strHTML → {StrHTML1}", strHTML, strUploadDirectory, strHTML);
+			Logger.LogWarning("<<< Exiting ManageUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory})", strHTML, strUploadDirectory);
             return ManageTokenUploadDirectory(strHTML, strUploadDirectory, "background");
         }
 
@@ -1692,23 +1784,29 @@ namespace DotNetNuke.Common
         /// </remarks>
         public static string ManageTokenUploadDirectory(string strHTML, string strUploadDirectory, string strToken)
         {
+			Logger.LogError(">>> Entering ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>)", strHTML, strUploadDirectory);
             int urlStartPosition = 0;
             var sbBuff = new StringBuilder(string.Empty);
+			Logger.LogError("ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>): urlStartPosition → {UrlStartPosition}", strHTML, strUploadDirectory, urlStartPosition);
             if (!string.IsNullOrEmpty(strHTML))
             {
+				Logger.LogError("ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>): sbBuff → {SbBuff}", strHTML, strUploadDirectory, sbBuff);
                 var tokenLength = strToken.Length + 2;
                 string uploadDirectory = strUploadDirectory.ToLowerInvariant();
 
                 var tokenStartPosition = strHTML.IndexOf(strToken + "=\"", StringComparison.OrdinalIgnoreCase);
+				Logger.LogError("ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>): tokenStartPosition → {TokenStartPosition}", strHTML, strUploadDirectory, tokenStartPosition);
                 while (tokenStartPosition != -1)
                 {
                     sbBuff.Append(strHTML.Substring(urlStartPosition, tokenStartPosition - urlStartPosition + tokenLength)); // keep characters left of URL
                     urlStartPosition = tokenStartPosition + tokenLength;
                     var endOfUrl = strHTML.IndexOf("\"", urlStartPosition, StringComparison.Ordinal);
+					Logger.LogError("ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>): endOfUrl → {EndOfUrl}", strHTML, strUploadDirectory, endOfUrl);
                     string strUrl;
                     if (endOfUrl >= 0)
                     {
                         strUrl = strHTML.Substring(urlStartPosition, endOfUrl - urlStartPosition).ToLowerInvariant();
+						Logger.LogError("ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>): strUrl → {StrUrl}", strHTML, strUploadDirectory, strUrl);
                     }
                     else
                     {
@@ -1731,6 +1829,7 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ManageTokenUploadDirectory(strHTML={StrHTML},strUploadDirectory={StrUploadDirectory},strToken=<redacted>)", strHTML, strUploadDirectory);
             return sbBuff.ToString();
         }
 
@@ -1740,6 +1839,7 @@ namespace DotNetNuke.Common
         /// <returns>control which'name is strControlName, or else return null if didn't match any control.</returns>
         public static Control FindControlRecursive(Control objControl, string strControlName)
         {
+			Logger.LogError(">>> Entering FindControlRecursive(objControl={ObjControl},strControlName={StrControlName})", objControl, strControlName);
             if (objControl.Parent == null)
             {
                 return null;
@@ -1752,6 +1852,7 @@ namespace DotNetNuke.Common
                 }
                 else
                 {
+					Logger.LogWarning("<<< Exiting FindControlRecursive(objControl={ObjControl},strControlName={StrControlName})", objControl, strControlName);
                     return FindControlRecursive(objControl.Parent, strControlName);
                 }
             }
@@ -1768,10 +1869,13 @@ namespace DotNetNuke.Common
         /// </remarks>
         public static Control FindControlRecursiveDown(Control objParent, string strControlName)
         {
+			Logger.LogError(">>> Entering FindControlRecursiveDown(objParent={ObjParent},strControlName={StrControlName})", objParent, strControlName);
             Control objCtl;
             objCtl = objParent.FindControl(strControlName);
+			Logger.LogDebug("FindControlRecursiveDown(objParent={ObjParent},strControlName={StrControlName}): objCtl → {ObjCtl}", objParent, strControlName, objCtl);
             if (objCtl == null)
             {
+				Logger.LogError("FindControlRecursiveDown(objParent={ObjParent},strControlName={StrControlName}): objCtl → {ObjCtl}", objParent, strControlName, objCtl);
                 foreach (Control objChild in objParent.Controls)
                 {
                     objCtl = FindControlRecursiveDown(objChild, strControlName);
@@ -1782,6 +1886,7 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogWarning("<<< Exiting FindControlRecursiveDown(objParent={ObjParent},strControlName={StrControlName})", objParent, strControlName);
             return objCtl;
         }
 
@@ -1789,6 +1894,7 @@ namespace DotNetNuke.Common
         /// <param name="control">The control.</param>
         public static void SetFormFocus(Control control)
         {
+			Logger.LogError(">>> Entering SetFormFocus(control={Control})", control);
             if (control.Page != null && control.Visible)
             {
                 if (control.Page.Request.Browser.EcmaScriptVersion.Major >= 1)
@@ -1803,6 +1909,7 @@ namespace DotNetNuke.Common
                     {
                         // Create JavaScript
                         var sb = new StringBuilder();
+						Logger.LogError("SetFormFocus(control={Control}): sb → {Sb}", control, sb);
                         sb.Append("<script type=\"text/javascript\">");
                         sb.Append("<!--");
                         sb.Append(Environment.NewLine);
@@ -1812,6 +1919,7 @@ namespace DotNetNuke.Common
 
                         // Find the Form
                         Control objParent = control.Parent;
+						Logger.LogError("SetFormFocus(control={Control}): objParent → {ObjParent}", control, objParent);
                         while (!(objParent is HtmlForm))
                         {
                             objParent = objParent.Parent;
@@ -1832,6 +1940,7 @@ namespace DotNetNuke.Common
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting SetFormFocus(control={Control})", control);
         }
 
         /// <summary>Gets the external request.</summary>
@@ -1847,14 +1956,20 @@ namespace DotNetNuke.Common
         /// <returns>Web request.</returns>
         public static HttpWebRequest GetExternalRequest(IHostSettings hostSettings, string address)
         {
+			Logger.LogError(">>> Entering GetExternalRequest(address={Address})", address);
+            var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // Create the request object
+			Logger.LogError(">>> Entering GetExternalRequest(hostSettings={HostSettings},address={Address})", hostSettings, address);
             var objRequest = (HttpWebRequest)WebRequest.Create(address);
 
+			Logger.LogError("GetExternalRequest(address={Address}): objRequest → {ObjRequest}", address, objRequest);
+			Logger.LogError("GetExternalRequest(hostSettings={HostSettings},address={Address}): objRequest → {ObjRequest}", hostSettings, address, objRequest);
             // Set a time-out to the request ... 10 seconds
             objRequest.Timeout = (int)hostSettings.WebRequestTimeout.TotalMilliseconds;
 
             // Attach a User Agent to the request
             objRequest.UserAgent = "DotNetNuke";
+			Logger.LogDebug("GetExternalRequest(hostSettings={HostSettings},address={Address}): objRequest.UserAgent → {Arg2}", hostSettings, address, objRequest.UserAgent);
 
             // If there is Proxy info, apply it to the request
             if (!string.IsNullOrEmpty(hostSettings.ProxyServer))
@@ -1867,10 +1982,17 @@ namespace DotNetNuke.Common
 
                 // Fill Proxy info from host settings
                 proxy = new WebProxy(hostSettings.ProxyServer, hostSettings.ProxyPort);
+				Logger.LogError("GetExternalRequest(address={Address}): proxy → {Proxy}", address, proxy);
                 if (!string.IsNullOrEmpty(hostSettings.ProxyUsername))
                 {
+					Logger.LogError("GetExternalRequest(hostSettings={HostSettings},address={Address}): proxy → {Proxy}", hostSettings, address, proxy);
+					Logger.LogDebug("GetExternalRequest(hostSettings={HostSettings},address={Address}): proxy → {Proxy}", hostSettings, address, proxy);
+					Logger.LogDebug("GetExternalRequest(hostSettings={HostSettings},address={Address}): proxy.Credentials → {Arg2}", hostSettings, address, proxy.Credentials);
                     // Fill the credential info from host settings
                     proxyCredentials = new NetworkCredential(hostSettings.ProxyUsername, hostSettings.ProxyPassword);
+					Logger.LogError("GetExternalRequest(address={Address}): proxyCredentials → {ProxyCredentials}", address, proxyCredentials);
+					Logger.LogError("GetExternalRequest(hostSettings={HostSettings},address={Address}): proxyCredentials → {ProxyCredentials}", hostSettings, address, proxyCredentials);
+					Logger.LogDebug("GetExternalRequest(hostSettings={HostSettings},address={Address}): proxyCredentials → {ProxyCredentials}", hostSettings, address, proxyCredentials);
 
                     // Apply credentials to proxy
                     proxy.Credentials = proxyCredentials;
@@ -1878,8 +2000,11 @@ namespace DotNetNuke.Common
 
                 // Apply Proxy to request
                 objRequest.Proxy = proxy;
+				Logger.LogDebug("GetExternalRequest(hostSettings={HostSettings},address={Address}): objRequest.Proxy → {Arg2}", hostSettings, address, objRequest.Proxy);
             }
 
+			Logger.LogError("GetExternalRequest(hostSettings,address)={HostSettings},{Address}: external service call {HostSettings1} took {Arg3} ms", hostSettings, address, hostSettings, __logStart.ElapsedMilliseconds);
+			Logger.LogWarning("<<< Exiting GetExternalRequest(hostSettings={HostSettings},address={Address})", hostSettings, address);
             return objRequest;
         }
 
@@ -1936,6 +2061,7 @@ namespace DotNetNuke.Common
                 objRequest.Proxy = proxy;
             }
 
+			Logger.LogWarning("<<< Exiting GetExternalRequest(hostSettings={HostSettings},address={Address},credentials=<redacted>)", hostSettings, address);
             return objRequest;
         }
 
@@ -1979,6 +2105,9 @@ namespace DotNetNuke.Common
         /// <returns>clean name.</returns>
         public static string CleanFileName(string fileName, string badChars)
         {
+			Logger.LogError(">>> Entering CleanFileName(fileName={FileName},badChars={BadChars})", fileName, badChars);
+        Logger.LogWarning("<<< Exiting CleanFileName(fileName={FileName},badChars={BadChars})", fileName, badChars);
+			Logger.LogWarning("<<< Exiting CleanFileName(fileName={FileName},badChars={BadChars},replaceChar={ReplaceChar})", fileName, badChars, replaceChar);
             return CleanFileName(fileName, badChars, string.Empty);
         }
 
@@ -2017,14 +2146,17 @@ namespace DotNetNuke.Common
         /// <returns>A cleaned string.</returns>
         public static string CleanName(string name)
         {
+			Logger.LogError(">>> Entering CleanName(name={Name})", name);
             string strName = name;
             string strBadChars = ". ~`!@#$%^&*()-_+={[}]|\\:;<,>?/" + ((char)34) + ((char)39);
+			Logger.LogError("CleanName(name={Name}): strName → {StrName}", name, strName);
             int intCounter;
             for (intCounter = 0; intCounter <= strBadChars.Length - 1; intCounter++)
             {
                 strName = strName.Replace(strBadChars.Substring(intCounter, 1), string.Empty);
             }
 
+			Logger.LogWarning("<<< Exiting CleanName(name={Name})", name);
             return strName;
         }
 
@@ -2057,17 +2189,22 @@ namespace DotNetNuke.Common
         /// <returns>A string suitable for use as a class value.</returns>
         public static string CreateValidClass(IHostSettings hostSettings, string inputValue, bool validateFirstChar)
         {
+			Logger.LogError(">>> Entering CreateValidClass(inputValue={InputValue},validateFirstChar={ValidateFirstChar})", inputValue, validateFirstChar);
             string returnValue = Null.NullString;
 
             // Regex is expensive so we will cache the results in a lookup table
+			Logger.LogError("CreateValidClass(hostSettings={HostSettings},inputValue={InputValue},validateFirstChar={ValidateFirstChar}): returnValue → {ReturnValue}", hostSettings, inputValue, validateFirstChar, returnValue);
             var validClassLookupDictionary = CBO.GetCachedObject<SharedDictionary<string, string>>(
                 hostSettings,
                 new CacheItemArgs("ValidClassLookup", 200, CacheItemPriority.NotRemovable),
                 _ => new SharedDictionary<string, string>());
+				Logger.LogError("CreateValidClass(inputValue={InputValue},validateFirstChar={ValidateFirstChar}): returnValue → {ReturnValue}", inputValue, validateFirstChar, returnValue);
 
             bool idFound = Null.NullBoolean;
+			Logger.LogError("CreateValidClass(inputValue={InputValue},validateFirstChar={ValidateFirstChar}): idFound → {IdFound}", inputValue, validateFirstChar, idFound);
             using (validClassLookupDictionary.GetReadLock())
             {
+				Logger.LogError("CreateValidClass(hostSettings={HostSettings},inputValue={InputValue},validateFirstChar={ValidateFirstChar}): idFound → {IdFound}", hostSettings, inputValue, validateFirstChar, idFound);
                 if (validClassLookupDictionary.TryGetValue(inputValue, out var className))
                 {
                     // Return value
@@ -2105,6 +2242,7 @@ namespace DotNetNuke.Common
             }
 
             // Return Value
+			Logger.LogWarning("<<< Exiting CreateValidClass(hostSettings={HostSettings},inputValue={InputValue},validateFirstChar={ValidateFirstChar})", hostSettings, inputValue, validateFirstChar);
             return returnValue;
         }
 
@@ -2121,17 +2259,22 @@ namespace DotNetNuke.Common
         /// <returns>String with a valid ID.</returns>
         public static string CreateValidID(IHostSettings hostSettings, string inputValue)
         {
+			Logger.LogError(">>> Entering CreateValidID(inputValue={InputValue})", inputValue);
             string returnValue = Null.NullString;
 
             // Regex is expensive so we will cache the results in a lookup table
+			Logger.LogError("CreateValidID(hostSettings={HostSettings},inputValue={InputValue}): returnValue → {ReturnValue}", hostSettings, inputValue, returnValue);
             var validIDLookupDictionary = CBO.GetCachedObject<SharedDictionary<string, string>>(
                 hostSettings,
                 new CacheItemArgs("ValidIDLookup", 200, CacheItemPriority.NotRemovable),
                 _ => new SharedDictionary<string, string>());
+				Logger.LogError("CreateValidID(inputValue={InputValue}): returnValue → {ReturnValue}", inputValue, returnValue);
 
             bool idFound = Null.NullBoolean;
+			Logger.LogError("CreateValidID(inputValue={InputValue}): idFound → {IdFound}", inputValue, idFound);
             using (validIDLookupDictionary.GetReadLock())
             {
+				Logger.LogError("CreateValidID(hostSettings={HostSettings},inputValue={InputValue}): idFound → {IdFound}", hostSettings, inputValue, idFound);
                 if (validIDLookupDictionary.TryGetValue(inputValue, out var id))
                 {
                     // Return value
@@ -2162,6 +2305,7 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogWarning("<<< Exiting CreateValidID(hostSettings={HostSettings},inputValue={InputValue})", hostSettings, inputValue);
             return returnValue;
         }
 
@@ -2169,6 +2313,9 @@ namespace DotNetNuke.Common
         /// <returns>URL to access denied view.</returns>
         public static string AccessDeniedURL()
         {
+			Logger.LogError(">>> Entering AccessDeniedURL()");
+			Logger.LogWarning("<<< Exiting AccessDeniedURL()");
+			Logger.LogWarning("<<< Exiting AccessDeniedURL(message={Message})", message);
             return AccessDeniedURL(string.Empty);
         }
 
@@ -2209,6 +2356,7 @@ namespace DotNetNuke.Common
         /// <returns>The formatted URL.</returns>
         public static string AddHTTP(string strURL)
         {
+			Logger.LogError(">>> Entering AddHTTP(strURL={StrURL})", strURL);
             if (!string.IsNullOrEmpty(strURL))
             {
                 if (!strURL.Contains("mailto:", StringComparison.OrdinalIgnoreCase)
@@ -2217,8 +2365,11 @@ namespace DotNetNuke.Common
                     && !strURL.Contains(@"\\", StringComparison.Ordinal))
                 {
                     var secure = HttpContext.Current != null && UrlUtils.IsSecureConnectionOrSslOffload(HttpContext.Current.Request);
+					Logger.LogError("AddHTTP(strURL={StrURL}): secure → {Secure}", strURL, secure);
                     strURL = (secure ? "https://" : "http://") + strURL;
+					Logger.LogError("AddHTTP(strURL={StrURL}): strURL → {StrURL1}", strURL, strURL);
                 }
+				Logger.LogWarning("<<< Exiting AddHTTP(strURL={StrURL})", strURL);
             }
 
             return strURL;
@@ -2231,12 +2382,15 @@ namespace DotNetNuke.Common
         /// <returns>The formatted root url.</returns>
         public static string ApplicationURL()
         {
+			Logger.LogError(">>> Entering ApplicationURL()");
             var currentPage = TabController.CurrentPage;
             if (currentPage != null && currentPage.HasAVisibleVersion)
             {
                 return ApplicationURL(currentPage.TabID);
             }
 
+			Logger.LogWarning("<<< Exiting ApplicationURL()");
+			Logger.LogWarning("<<< Exiting ApplicationURL(tabID={TabID})", tabID);
             return ApplicationURL(-1);
         }
 
@@ -2264,6 +2418,9 @@ namespace DotNetNuke.Common
         /// <returns>Formatted URL.</returns>
         public static string FormatHelpUrl(string helpUrl, PortalSettings objPortalSettings, string name)
         {
+			Logger.LogError(">>> Entering FormatHelpUrl(helpUrl={HelpUrl},objPortalSettings={ObjPortalSettings},name={Name})", helpUrl, objPortalSettings, name);
+			Logger.LogWarning("<<< Exiting FormatHelpUrl(helpUrl={HelpUrl},objPortalSettings={ObjPortalSettings},name={Name})", helpUrl, objPortalSettings, name);
+			Logger.LogWarning("<<< Exiting FormatHelpUrl(helpUrl={HelpUrl},objPortalSettings={ObjPortalSettings},name={Name},version={Version})", helpUrl, objPortalSettings, name, version);
             return FormatHelpUrl(helpUrl, objPortalSettings, name, string.Empty);
         }
 
@@ -2316,6 +2473,9 @@ namespace DotNetNuke.Common
         /// <returns>The formatted (friendly) URL.</returns>
         public static string FriendlyUrl(TabInfo tab, string path)
         {
+			Logger.LogError(">>> Entering FriendlyUrl(tab={Tab},path={Path})", tab, path);
+            Logger.LogWarning("<<< Exiting FriendlyUrl(tab={Tab},path={Path})", tab, path);
+			Logger.LogWarning("<<< Exiting FriendlyUrl(tab={Tab},path={Path},pageName={PageName})", tab, path, pageName);
             return FriendlyUrl(tab, path, glbDefaultPage);
         }
 
@@ -2330,6 +2490,7 @@ namespace DotNetNuke.Common
         public static string FriendlyUrl(TabInfo tab, string path, string pageName)
         {
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogError("FriendlyUrl(tab={Tab},path={Path},pageName={PageName}): portalSettings → {PortalSettings}", tab, path, pageName, portalSettings);
             return FriendlyUrl(tab, path, pageName, portalSettings);
         }
 
@@ -2411,6 +2572,7 @@ namespace DotNetNuke.Common
         /// <returns>The url type.</returns>
         public static TabType GetURLType(string url)
         {
+			Logger.LogError(">>> Entering GetURLType(url={Url})", url);
             if (string.IsNullOrEmpty(url))
             {
                 return TabType.Normal;
@@ -2432,6 +2594,7 @@ namespace DotNetNuke.Common
                     return TabType.Member;
                 }
 
+			Logger.LogWarning("<<< Exiting GetURLType(url={Url})", url);
                 return TabType.File;
             }
 
@@ -2450,6 +2613,9 @@ namespace DotNetNuke.Common
         [DnnDeprecated(9, 8, 1, "moduleId is not used in the method, use the overload that takes only the url")]
         public static partial string ImportUrl(int moduleId, string url)
         {
+			Logger.LogError(">>> Entering ImportUrl(moduleId={ModuleId},url={Url})", moduleId, url);
+            Logger.LogWarning("<<< Exiting ImportUrl(moduleId={ModuleId},url={Url})", moduleId, url);
+			Logger.LogWarning("<<< Exiting ImportUrl(hostSettings={HostSettings},url={Url})", hostSettings, url);
             return ImportUrl(url);
         }
 
@@ -2542,6 +2708,9 @@ namespace DotNetNuke.Common
         /// <returns>Formatted URL.</returns>
         public static string LoginURL(string returnUrl, bool overrideSetting)
         {
+			Logger.LogError(">>> Entering LoginURL(returnUrl={ReturnUrl},overrideSetting={OverrideSetting})", returnUrl, overrideSetting);
+            Logger.LogWarning("<<< Exiting LoginURL(returnUrl={ReturnUrl},overrideSetting={OverrideSetting})", returnUrl, overrideSetting);
+			Logger.LogWarning("<<< Exiting LoginURL(returnUrl={ReturnUrl},overrideSetting={OverrideSetting},portalSettings={PortalSettings})", returnUrl, overrideSetting, portalSettings);
             return LoginURL(returnUrl, overrideSetting, PortalController.Instance.GetCurrentSettings());
         }
 
@@ -2612,11 +2781,15 @@ namespace DotNetNuke.Common
         /// <returns>Formatted url.</returns>
         public static string UserProfileURL(int userId)
         {
+			Logger.LogError(">>> Entering UserProfileURL(userId={UserId})", userId);
             string strURL = string.Empty;
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogError("UserProfileURL(userId={UserId}): portalSettings → {PortalSettings}", userId, portalSettings);
 
             strURL = navigationManager.NavigateURL(portalSettings.UserTabId, string.Empty, $"userId={userId}");
+			Logger.LogError("UserProfileURL(userId={UserId}): strURL → {StrURL}", userId, strURL);
 
+			Logger.LogWarning("<<< Exiting UserProfileURL(userId={UserId})", userId);
             return strURL;
         }
 
@@ -2627,6 +2800,8 @@ namespace DotNetNuke.Common
         [DnnDeprecated(9, 4, 2, "Use INavigationManager via dependency injection")]
         public static partial string NavigateURL()
         {
+			Logger.LogError(">>> Entering NavigateURL()");
+            Logger.LogWarning("<<< Exiting NavigateURL()");
             return navigationManager.NavigateURL();
         }
 
@@ -2764,7 +2939,10 @@ namespace DotNetNuke.Common
         /// <returns>Encoded content.</returns>
         public static string QueryStringEncode(string queryString)
         {
+			Logger.LogError(">>> Entering QueryStringEncode(queryString={QueryString})", queryString);
             queryString = HttpUtility.UrlEncode(queryString);
+			Logger.LogError("QueryStringEncode(queryString={QueryString}): queryString → {QueryString1}", queryString, queryString);
+			Logger.LogWarning("<<< Exiting QueryStringEncode(queryString={QueryString})", queryString);
             return queryString;
         }
 
@@ -2773,14 +2951,19 @@ namespace DotNetNuke.Common
         /// <returns>Decoded content.</returns>
         public static string QueryStringDecode(string queryString)
         {
+			Logger.LogError(">>> Entering QueryStringDecode(queryString={QueryString})", queryString);
             queryString = HttpUtility.UrlDecode(queryString);
             string fullPath;
+			Logger.LogError("QueryStringDecode(queryString={QueryString}): queryString → {QueryString1}", queryString, queryString);
             try
             {
                 fullPath = HttpContext.Current.Request.MapPath(queryString, HttpContext.Current.Request.ApplicationPath, false);
+				Logger.LogError("QueryStringDecode(queryString={QueryString}): fullPath → {FullPath}", queryString, fullPath);
             }
             catch (HttpException exc)
             {
+				Logger.LogError("Exception in QueryStringDecode(queryString={QueryString}): {Arg1}", queryString, exc.Message);
+				Logger.LogDebug("QueryStringDecode(queryString={QueryString}): fullPath → {FullPath}", queryString, fullPath);
                 Exceptions.ProcessHttpException(exc);
             }
 
@@ -2790,6 +2973,7 @@ namespace DotNetNuke.Common
                 Exceptions.ProcessHttpException();
             }
 
+			Logger.LogWarning("<<< Exiting QueryStringDecode(queryString={QueryString})", queryString);
             return queryString;
         }
 
@@ -2799,9 +2983,11 @@ namespace DotNetNuke.Common
         /// <returns>Formatted url.</returns>
         public static string RegisterURL(string returnURL, string originalURL)
         {
+			Logger.LogError(">>> Entering RegisterURL(returnURL={ReturnURL},originalURL={OriginalURL})", returnURL, originalURL);
             string strURL;
 
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogError("RegisterURL(returnURL={ReturnURL},originalURL={OriginalURL}): portalSettings → {PortalSettings}", returnURL, originalURL, portalSettings);
             string extraParams = string.Empty;
             if (!string.IsNullOrEmpty(returnURL))
             {
@@ -2817,12 +3003,14 @@ namespace DotNetNuke.Common
             {
                 // user defined tab
                 strURL = navigationManager.NavigateURL(portalSettings.RegisterTabId, string.Empty, extraParams);
+				Logger.LogError("RegisterURL(returnURL={ReturnURL},originalURL={OriginalURL}): strURL → {StrURL}", returnURL, originalURL, strURL);
             }
             else
             {
                 strURL = navigationManager.NavigateURL(TabController.CurrentPage.TabID, "Register", extraParams);
             }
 
+			Logger.LogWarning("<<< Exiting RegisterURL(returnURL={ReturnURL},originalURL={OriginalURL})", returnURL, originalURL);
             return strURL;
         }
 
@@ -2831,6 +3019,7 @@ namespace DotNetNuke.Common
         /// <returns>The formatted (resolved) url.</returns>
         public static string ResolveUrl(string url)
         {
+			Logger.LogError(">>> Entering ResolveUrl(url={Url})", url);
             // String is Empty, just return Url
             if (string.IsNullOrEmpty(url))
             {
@@ -2870,6 +3059,7 @@ namespace DotNetNuke.Common
                 }
                 else
                 {
+					Logger.LogWarning("<<< Exiting ResolveUrl(url={Url})", url);
                     return ApplicationPath + url.Substring(1);
                 }
             }
@@ -2881,6 +3071,7 @@ namespace DotNetNuke.Common
         [DnnDeprecated(9, 8, 1, "Use System.Net.WebUtility.UrlEncode instead")]
         public static partial string EncodeReservedCharacters(string queryString)
         {
+			Logger.LogError(">>> Entering EncodeReservedCharacters(queryString={QueryString})", queryString);
             queryString = queryString.Replace("$", "%24");
             queryString = queryString.Replace("&", "%26");
             queryString = queryString.Replace("+", "%2B");
@@ -2891,6 +3082,8 @@ namespace DotNetNuke.Common
             queryString = queryString.Replace("=", "%3D");
             queryString = queryString.Replace("?", "%3F");
             queryString = queryString.Replace("@", "%40");
+			Logger.LogError("EncodeReservedCharacters(queryString={QueryString}): queryString → {QueryString1}", queryString, queryString);
+			Logger.LogWarning("<<< Exiting EncodeReservedCharacters(queryString={QueryString})", queryString);
             return queryString;
         }
 
@@ -2900,6 +3093,7 @@ namespace DotNetNuke.Common
         [DnnDeprecated(9, 8, 1, @"Use DateTime.ToString(""s"") instead")]
         public static partial string DateToString(DateTime dateValue)
         {
+			Logger.LogError(">>> Entering DateToString(dateValue={DateValue})", dateValue);
             try
             {
                 if (!Null.IsNull(dateValue))
@@ -2915,6 +3109,7 @@ namespace DotNetNuke.Common
             {
                 Logger.Error(exc);
 
+				Logger.LogWarning("<<< Exiting DateToString(dateValue={DateValue})", dateValue);
                 return Null.NullString;
             }
         }
@@ -2926,6 +3121,7 @@ namespace DotNetNuke.Common
         [DnnDeprecated(9, 8, 1, "No replacement")]
         public static partial string GetHashValue(object hashObject, string defaultValue)
         {
+			Logger.LogError(">>> Entering GetHashValue(hashObject=<redacted>,defaultValue={DefaultValue})", defaultValue);
             if (hashObject != null)
             {
                 if (!string.IsNullOrEmpty(hashObject.ToString()))
@@ -2939,6 +3135,7 @@ namespace DotNetNuke.Common
             }
             else
             {
+				Logger.LogWarning("<<< Exiting GetHashValue(hashObject=<redacted>,defaultValue={DefaultValue})", defaultValue);
                 return defaultValue;
             }
         }
@@ -2950,6 +3147,9 @@ namespace DotNetNuke.Common
         /// <returns>Formatted url.</returns>
         public static string LinkClick(string link, int tabId, int moduleId)
         {
+			Logger.LogError(">>> Entering LinkClick(link={Link},tabId={TabId},moduleId={ModuleId})", link, tabId, moduleId);
+            Logger.LogWarning("<<< Exiting LinkClick(link={Link},tabId={TabId},moduleId={ModuleId})", link, tabId, moduleId);
+			Logger.LogWarning("<<< Exiting LinkClick(link={Link},tabId={TabId},moduleId={ModuleId},trackClicks={TrackClicks},forceDownload={ForceDownload})", link, tabId, moduleId, trackClicks, forceDownload);
             return LinkClick(link, tabId, moduleId, true, string.Empty);
         }
 
@@ -2986,6 +3186,7 @@ namespace DotNetNuke.Common
         public static string LinkClick(string link, int tabId, int moduleId, bool trackClicks, bool forceDownload)
         {
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogError("LinkClick(link={Link},tabId={TabId},moduleId={ModuleId},trackClicks={TrackClicks},forceDownload={ForceDownload}): portalSettings → {PortalSettings}", link, tabId, moduleId, trackClicks, forceDownload, portalSettings);
             return LinkClick(link, tabId, moduleId, trackClicks, forceDownload, portalSettings.PortalId, portalSettings.EnableUrlLanguage, portalSettings.GUID.ToString());
         }
 
@@ -3092,6 +3293,7 @@ namespace DotNetNuke.Common
         /// <returns>Role Name.</returns>
         public static string GetRoleName(IHostSettings hostSettings, int roleId)
         {
+			Logger.LogError(">>> Entering GetRoleName(roleId={RoleId})", roleId);
             switch (Convert.ToString(roleId, CultureInfo.InvariantCulture))
             {
                 case glbRoleAllUsers:
@@ -3101,14 +3303,18 @@ namespace DotNetNuke.Common
             }
 
             Hashtable htRoles = null;
+			Logger.LogError("GetRoleName(roleId={RoleId}): htRoles → {HtRoles}", roleId, htRoles);
             if (hostSettings.PerformanceSetting != DotNetNuke.Abstractions.Application.PerformanceSettings.NoCaching)
             {
                 htRoles = (Hashtable)DataCache.GetCache("GetRoles");
+				Logger.LogError("GetRoleName(hostSettings={HostSettings},roleId={RoleId}): htRoles → {HtRoles}", hostSettings, roleId, htRoles);
             }
 
             if (htRoles == null)
             {
                 var roles = RoleController.Instance.GetRoles(Null.NullInteger, r => r.SecurityMode != SecurityMode.SocialGroup);
+				Logger.LogError("GetRoleName(roleId={RoleId}): roles → {Roles}", roleId, roles);
+				Logger.LogError("GetRoleName(hostSettings={HostSettings},roleId={RoleId}): roles → {Roles}", hostSettings, roleId, roles);
                 htRoles = new Hashtable();
                 int i;
                 for (i = 0; i <= roles.Count - 1; i++)
@@ -3123,6 +3329,7 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetRoleName(hostSettings={HostSettings},roleId={RoleId})", hostSettings, roleId);
             return Convert.ToString(htRoles[roleId], CultureInfo.InvariantCulture);
         }
 
@@ -3132,6 +3339,7 @@ namespace DotNetNuke.Common
         /// <returns>specific node by content type of the whole document.</returns>
         public static XmlNode GetContent(string content, string contentType)
         {
+			Logger.LogError(">>> Entering GetContent(content={Content},contentType={ContentType})", content, contentType);
             var xmlDoc = new XmlDocument { XmlResolver = null };
             using (var xmlReader = XmlReader.Create(new StringReader(content), new XmlReaderSettings { XmlResolver = null, }))
             {
@@ -3144,6 +3352,7 @@ namespace DotNetNuke.Common
             }
             else
             {
+				Logger.LogWarning("<<< Exiting GetContent(content={Content},contentType={ContentType})", content, contentType);
                 return xmlDoc.SelectSingleNode(contentType);
             }
         }
@@ -3154,14 +3363,18 @@ namespace DotNetNuke.Common
         /// <returns>The TabPath.</returns>
         public static string GenerateTabPath(int parentId, string tabName)
         {
+			Logger.LogError(">>> Entering GenerateTabPath(parentId={ParentId},tabName={TabName})", parentId, tabName);
             var strTabPath = Null.NullString;
 
+			Logger.LogError("GenerateTabPath(parentId={ParentId},tabName={TabName}): strTabPath → {StrTabPath}", parentId, tabName, strTabPath);
             if (!Null.IsNull(parentId))
             {
                 var objTab = TabController.Instance.GetTab(parentId, Null.NullInteger, false);
+				Logger.LogError("GenerateTabPath(parentId={ParentId},tabName={TabName}): objTab → {ObjTab}", parentId, tabName, objTab);
                 while (objTab != null)
                 {
                     var strTabName = TabPathInvalidCharsRx.Replace(objTab.TabName, string.Empty);
+					Logger.LogError("GenerateTabPath(parentId={ParentId},tabName={TabName}): strTabName → {StrTabName}", parentId, tabName, strTabName);
                     strTabPath = "//" + strTabName + strTabPath;
                     objTab = Null.IsNull(objTab.ParentId)
                         ? null
@@ -3170,6 +3383,7 @@ namespace DotNetNuke.Common
             }
 
             strTabPath = strTabPath + "//" + TabPathInvalidCharsRx.Replace(tabName, string.Empty);
+			Logger.LogWarning("<<< Exiting GenerateTabPath(parentId={ParentId},tabName={TabName})", parentId, tabName);
             return strTabPath;
         }
 
@@ -3178,11 +3392,15 @@ namespace DotNetNuke.Common
         /// <returns>help text.</returns>
         public static string GetHelpText(int moduleControlId)
         {
+			Logger.LogError(">>> Entering GetHelpText(moduleControlId={ModuleControlId})", moduleControlId);
             string helpText = Null.NullString;
             ModuleControlInfo objModuleControl = ModuleControlController.GetModuleControl(moduleControlId);
+			Logger.LogError("GetHelpText(moduleControlId={ModuleControlId}): helpText → {HelpText}", moduleControlId, helpText);
             if (objModuleControl != null)
             {
+				Logger.LogError("GetHelpText(moduleControlId={ModuleControlId}): objModuleControl → {ObjModuleControl}", moduleControlId, objModuleControl);
                 string fileName = Path.GetFileName(objModuleControl.ControlSrc);
+				Logger.LogError("GetHelpText(moduleControlId={ModuleControlId}): fileName → {FileName}", moduleControlId, fileName);
                 string localResourceFile = objModuleControl.ControlSrc.Replace(fileName, Localization.LocalResourceDirectory + "/" + fileName);
                 if (!string.IsNullOrEmpty(Localization.GetString(ModuleActionType.HelpText, localResourceFile)))
                 {
@@ -3190,6 +3408,7 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetHelpText(moduleControlId={ModuleControlId})", moduleControlId);
             return helpText;
         }
 
@@ -3200,6 +3419,9 @@ namespace DotNetNuke.Common
         [DnnDeprecated(9, 8, 1, "ModuleInfo is unused, use the overload that does not take a ModuleInfo")]
         public static partial string GetOnLineHelp(string helpUrl, ModuleInfo moduleConfig)
         {
+			Logger.LogError(">>> Entering GetOnLineHelp(helpUrl={HelpUrl},moduleConfig={ModuleConfig})", helpUrl, moduleConfig);
+            Logger.LogWarning("<<< Exiting GetOnLineHelp(helpUrl={HelpUrl},moduleConfig={ModuleConfig})", helpUrl, moduleConfig);
+			Logger.LogWarning("<<< Exiting GetOnLineHelp(hostSettings={HostSettings},helpUrl={HelpUrl})", hostSettings, helpUrl);
             return GetOnLineHelp(helpUrl);
         }
 
@@ -3229,6 +3451,8 @@ namespace DotNetNuke.Common
         /// <returns><see langword="true"/> if the tab contains "Account Login" module, otherwise, <see langword="false"/>.</returns>
         public static bool ValidateLoginTabID(int tabId)
         {
+			Logger.LogError(">>> Entering ValidateLoginTabID(tabId={TabId})", tabId);
+            Logger.LogWarning("<<< Exiting ValidateLoginTabID(tabId={TabId})", tabId);
             return ValidateModuleInTab(tabId, "Account Login");
         }
 
@@ -3238,13 +3462,16 @@ namespace DotNetNuke.Common
         /// <returns><see langword="true"/> if the tab contains the module, otherwise, <see langword="false"/>.</returns>
         public static bool ValidateModuleInTab(int tabId, string moduleName)
         {
+			Logger.LogError(">>> Entering ValidateModuleInTab(tabId={TabId},moduleName={ModuleName})", tabId, moduleName);
             bool hasModule = Null.NullBoolean;
+			Logger.LogError("ValidateModuleInTab(tabId={TabId},moduleName={ModuleName}): hasModule → {HasModule}", tabId, moduleName, hasModule);
             foreach (ModuleInfo objModule in ModuleController.Instance.GetTabModules(tabId).Values)
             {
                 if (objModule.ModuleDefinition.FriendlyName == moduleName)
                 {
                     // We need to ensure that Anonymous Users or All Users have View permissions to the login page
                     TabInfo tab = TabController.Instance.GetTab(tabId, objModule.PortalID, false);
+					Logger.LogError("ValidateModuleInTab(tabId={TabId},moduleName={ModuleName}): tab → {Tab}", tabId, moduleName, tab);
                     if (TabPermissionController.CanViewPage(tab))
                     {
                         hasModule = true;
@@ -3253,6 +3480,7 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ValidateModuleInTab(tabId={TabId},moduleName={ModuleName})", tabId, moduleName);
             return hasModule;
         }
 
@@ -3266,6 +3494,7 @@ namespace DotNetNuke.Common
         [DnnDeprecated(9, 8, 1, "No replacement")]
         public static partial Hashtable DeserializeHashTableBase64(string source)
         {
+			Logger.LogError(">>> Entering DeserializeHashTableBase64(source={Source})", source);
             Hashtable objHashTable;
             if (!string.IsNullOrEmpty(source))
             {
@@ -3276,6 +3505,7 @@ namespace DotNetNuke.Common
                     try
                     {
                         objHashTable = (Hashtable)bin.Deserialize(mem);
+						Logger.LogError("DeserializeHashTableBase64(source={Source}): objHashTable → {ObjHashTable}", source, objHashTable);
                     }
                     catch (Exception exc)
                     {
@@ -3291,7 +3521,9 @@ namespace DotNetNuke.Common
             {
                 objHashTable = new Hashtable();
             }
+			Logger.LogDebug("DeserializeHashTableBase64(source={Source}): objHashTable → {ObjHashTable}", source, objHashTable);
 
+			Logger.LogWarning("<<< Exiting DeserializeHashTableBase64(source={Source})", source);
             return objHashTable;
         }
 
@@ -3304,6 +3536,8 @@ namespace DotNetNuke.Common
         [DnnDeprecated(9, 8, 1, "This API was not meant to be public and only deserializes xml with a root of 'profile'")]
         public static partial Hashtable DeserializeHashTableXml(string source)
         {
+			Logger.LogError(">>> Entering DeserializeHashTableXml(source={Source})", source);
+            Logger.LogWarning("<<< Exiting DeserializeHashTableXml(source={Source})", source);
             return XmlUtils.DeSerializeHashtable(source, "profile");
         }
 
@@ -3317,18 +3551,23 @@ namespace DotNetNuke.Common
         [DnnDeprecated(9, 8, 1, "No replacement")]
         public static partial string SerializeHashTableBase64(Hashtable source)
         {
+			Logger.LogError(">>> Entering SerializeHashTableBase64(source={Source})", source);
             string strString;
             if (source.Count != 0)
             {
                 var bin = new BinaryFormatter();
+				Logger.LogError("SerializeHashTableBase64(source={Source}): bin → {Bin}", source, bin);
                 var mem = new MemoryStream();
+				Logger.LogError("SerializeHashTableBase64(source={Source}): mem → {Mem}", source, mem);
                 try
                 {
                     bin.Serialize(mem, source);
                     strString = Convert.ToBase64String(mem.GetBuffer(), 0, Convert.ToInt32(mem.Length));
+					Logger.LogError("SerializeHashTableBase64(source={Source}): strString → {StrString}", source, strString);
                 }
                 catch (Exception exc)
                 {
+					Logger.LogDebug("SerializeHashTableBase64(source={Source}): strString → {StrString}", source, strString);
                     Logger.Error(exc);
 
                     strString = string.Empty;
@@ -3343,6 +3582,7 @@ namespace DotNetNuke.Common
                 strString = string.Empty;
             }
 
+			Logger.LogWarning("<<< Exiting SerializeHashTableBase64(source={Source})", source);
             return strString;
         }
 
@@ -3355,6 +3595,8 @@ namespace DotNetNuke.Common
         [DnnDeprecated(9, 8, 1, "This method was never meant to be public and only works for 'profile' root namespace")]
         public static partial string SerializeHashTableXml(Hashtable source)
         {
+			Logger.LogError(">>> Entering SerializeHashTableXml(source={Source})", source);
+            Logger.LogWarning("<<< Exiting SerializeHashTableXml(source={Source})", source);
             return XmlUtils.SerializeDictionary(source, "profile");
         }
 
@@ -3363,14 +3605,17 @@ namespace DotNetNuke.Common
         /// <returns>if <see langword="true"/> the tab is a host page; otherwise, it is not a host page.</returns>
         public static bool IsHostTab(int tabId)
         {
+			Logger.LogError(">>> Entering IsHostTab(tabId={TabId})", tabId);
             bool isHostTab = false;
             TabCollection hostTabs = TabController.Instance.GetTabsByPortal(Null.NullInteger);
+			Logger.LogError("IsHostTab(tabId={TabId}): hostTabs → {HostTabs}", tabId, hostTabs);
 
             if (hostTabs != null)
             {
                 isHostTab = hostTabs.Any(t => t.Value.TabID == tabId);
             }
 
+			Logger.LogWarning("<<< Exiting IsHostTab(tabId={TabId})", tabId);
             return isHostTab;
         }
 
@@ -3383,18 +3628,23 @@ namespace DotNetNuke.Common
         [DnnDeprecated(7, 3, 0, "It causes issues in SSL-offloading scenarios - please use UserProfilePicRelativeUrl instead", RemovalVersion = 11)]
         public static partial string UserProfilePicFormattedUrl()
         {
+			Logger.LogError(">>> Entering UserProfilePicFormattedUrl()");
             var avatarUrl = PortalController.Instance.GetCurrentSettings().DefaultPortalAlias;
+			Logger.LogError("UserProfilePicFormattedUrl(): avatarUrl → {AvatarUrl}", avatarUrl);
             if (string.IsNullOrEmpty(avatarUrl))
             {
                 avatarUrl = HttpContext.Current.Request.Url.Host;
             }
 
             var protocol = UrlUtils.IsSecureConnectionOrSslOffload(HttpContext.Current.Request) ? "https" : "http";
+			Logger.LogError("UserProfilePicFormattedUrl(): protocol → {Protocol}", protocol);
             var port = !HttpContext.Current.Request.Url.IsDefaultPort && !avatarUrl.Contains(":") ? ":" + HttpContext.Current.Request.Url.Port : string.Empty;
+			Logger.LogError("UserProfilePicFormattedUrl(): port → {Port}", port);
             avatarUrl = $"{protocol}://{avatarUrl}{port}";
 
             avatarUrl += "/DnnImageHandler.ashx?mode=profilepic&userId={0}&h={1}&w={2}";
 
+			Logger.LogWarning("<<< Exiting UserProfilePicFormattedUrl()");
             return avatarUrl;
         }
 
@@ -3407,6 +3657,9 @@ namespace DotNetNuke.Common
         [DnnDeprecated(8, 0, 0, "Please use UserController.Instance.GetUserProfilePictureUrl", RemovalVersion = 11)]
         public static partial string UserProfilePicRelativeUrl()
         {
+			Logger.LogError(">>> Entering UserProfilePicRelativeUrl()");
+            Logger.LogWarning("<<< Exiting UserProfilePicRelativeUrl()");
+			Logger.LogWarning("<<< Exiting UserProfilePicRelativeUrl(includeCdv={IncludeCdv})", includeCdv);
             return UserProfilePicRelativeUrl(true);
         }
 
@@ -3445,6 +3698,8 @@ namespace DotNetNuke.Common
         [DnnDeprecated(7, 0, 0, "This function has been replaced by DotNetNuke.Common.Utilities.HtmlUtils.FormatEmail", RemovalVersion = 11)]
         public static partial string FormatEmail(string email)
         {
+			Logger.LogError(">>> Entering FormatEmail(email={Email})", email);
+            Logger.LogWarning("<<< Exiting FormatEmail(email={Email})", email);
             return HtmlUtils.FormatEmail(email);
         }
 
@@ -3454,6 +3709,8 @@ namespace DotNetNuke.Common
         [DnnDeprecated(7, 0, 0, "This function has been replaced by DotNetNuke.Common.Utilities.HtmlUtils.FormatWebsite", RemovalVersion = 11)]
         public static partial string FormatWebsite(object website)
         {
+			Logger.LogError(">>> Entering FormatWebsite(website={Website})", website);
+            Logger.LogWarning("<<< Exiting FormatWebsite(website={Website})", website);
             return HtmlUtils.FormatWebsite(website);
         }
 
@@ -3463,6 +3720,8 @@ namespace DotNetNuke.Common
         [DnnDeprecated(7, 0, 0, "This function has been replaced by DotNetNuke.Common.Utilities.XmlUtils.XMLEncode", RemovalVersion = 11)]
         public static partial string XMLEncode(string html)
         {
+			Logger.LogError(">>> Entering XMLEncode(html={Html})", html);
+            Logger.LogWarning("<<< Exiting XMLEncode(html={Html})", html);
             return XmlUtils.XMLEncode(html);
         }
 
@@ -3471,6 +3730,8 @@ namespace DotNetNuke.Common
         [DnnDeprecated(7, 0, 0, "This function has been replaced by DotNetNuke.Common.Utilities.Config.GetConnectionString", RemovalVersion = 11)]
         public static partial string GetDBConnectionString()
         {
+			Logger.LogError(">>> Entering GetDBConnectionString()");
+            Logger.LogWarning("<<< Exiting GetDBConnectionString()");
             return Config.GetConnectionString();
         }
 
@@ -3544,6 +3805,8 @@ namespace DotNetNuke.Common
         [DnnDeprecated(7, 0, 0, "Use Common.Globals.LinkClick() for proper handling of URLs", RemovalVersion = 11)]
         public static partial string LinkClickURL(string link)
         {
+			Logger.LogError(">>> Entering LinkClickURL(link={Link})", link);
+            Logger.LogWarning("<<< Exiting LinkClickURL(link={Link})", link);
             return LinkClick(link, TabController.CurrentPage.TabID, -1, false);
         }
 
@@ -3554,6 +3817,8 @@ namespace DotNetNuke.Common
         [DnnDeprecated(7, 0, 0, "Use Security Filter functions in the PortalSecurity class", RemovalVersion = 11)]
         public static partial string PreventSQLInjection(string strSQL)
         {
+			Logger.LogError(">>> Entering PreventSQLInjection(strSQL={StrSQL})", strSQL);
+            Logger.LogWarning("<<< Exiting PreventSQLInjection(strSQL={StrSQL})", strSQL);
             return PortalSecurity.Instance.InputFilter(strSQL, PortalSecurity.FilterFlag.NoSQL);
         }
 
@@ -3575,10 +3840,13 @@ namespace DotNetNuke.Common
         /// <returns>return the tab's culture code, if ths tab doesn't exist, it will return current culture name.</returns>
         internal static string GetCultureCode(int tabId, bool isSuperTab, IPortalSettings settings)
         {
+			Logger.LogError(">>> Entering GetCultureCode(tabId={TabId},isSuperTab={IsSuperTab},settings={Settings})", tabId, isSuperTab, settings);
             string cultureCode = Null.NullString;
+			Logger.LogError("GetCultureCode(tabId={TabId},isSuperTab={IsSuperTab},settings={Settings}): cultureCode → {CultureCode}", tabId, isSuperTab, settings, cultureCode);
             if (settings != null)
             {
                 TabInfo linkTab = TabController.Instance.GetTab(tabId, isSuperTab ? Null.NullInteger : settings.PortalId, false);
+				Logger.LogError("GetCultureCode(tabId={TabId},isSuperTab={IsSuperTab},settings={Settings}): linkTab → {LinkTab}", tabId, isSuperTab, settings, linkTab);
                 if (linkTab != null)
                 {
                     cultureCode = linkTab.CultureCode;
@@ -3590,19 +3858,24 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetCultureCode(tabId={TabId},isSuperTab={IsSuperTab},settings={Settings})", tabId, isSuperTab, settings);
             return cultureCode;
         }
 
         /// <summary>Resets the application started timer.</summary>
         internal static void ResetAppStartElapseTime()
         {
+			Logger.LogError(">>> Entering ResetAppStartElapseTime()");
             AppStopwatch.Restart();
+			Logger.LogWarning("<<< Exiting ResetAppStartElapseTime()");
         }
 
         /// <summary>Gets an <see cref="IServiceScope"/> that should be disposed, trying to find the current request scope if possible.</summary>
         /// <returns>An <see cref="IServiceScope"/> instance that should be disposed (but which can be disposed without prematurely disposing the current request scope).</returns>
         internal static IServiceScope GetOrCreateServiceScope()
         {
+			Logger.LogError(">>> Entering GetOrCreateServiceScope()");
+            Logger.LogWarning("<<< Exiting GetOrCreateServiceScope()");
             return new MaybeDisposableServiceScope(
                 HttpContextSource.Current?.GetScope(),
                 DependencyProvider.CreateScope);
@@ -3612,6 +3885,8 @@ namespace DotNetNuke.Common
         /// <returns>An <see cref="IServiceProvider"/> instance.</returns>
         internal static IServiceProvider GetCurrentServiceProvider()
         {
+			Logger.LogError(">>> Entering GetCurrentServiceProvider()");
+            Logger.LogWarning("<<< Exiting GetCurrentServiceProvider()");
             return HttpContextSource.Current?.GetScope()?.ServiceProvider ?? DependencyProvider;
         }
 
@@ -3621,12 +3896,15 @@ namespace DotNetNuke.Common
         /// <returns><see langword="true"/> if the Filename matches extensions, otherwise, <see langword="false"/>.</returns>
         private static bool FilenameMatchesExtensions(string filename, string strExtensions)
         {
+			Logger.LogError(">>> Entering FilenameMatchesExtensions(filename={Filename},strExtensions={StrExtensions})", filename, strExtensions);
             bool result = string.IsNullOrEmpty(strExtensions);
+			Logger.LogError("FilenameMatchesExtensions(filename={Filename},strExtensions={StrExtensions}): result → {Result}", filename, strExtensions, result);
             if (!result)
             {
                 foreach (string extension in strExtensions.Split(','))
                 {
                     string ext = extension.Trim();
+					Logger.LogError("FilenameMatchesExtensions(filename={Filename},strExtensions={StrExtensions}): ext → {Ext}", filename, strExtensions, ext);
                     if (!ext.StartsWith(".", StringComparison.Ordinal))
                     {
                         ext = "." + extension;
@@ -3640,6 +3918,7 @@ namespace DotNetNuke.Common
                 }
             }
 
+			Logger.LogWarning("<<< Exiting FilenameMatchesExtensions(filename={Filename},strExtensions={StrExtensions})", filename, strExtensions);
             return result;
         }
 
@@ -3650,8 +3929,10 @@ namespace DotNetNuke.Common
         /// </summary>
         private static void OnDependencyProviderChanged(object sender, PropertyChangedEventArgs eventArguments)
         {
+			Logger.LogError(">>> Entering OnDependencyProviderChanged(sender={Sender},eventArguments={EventArguments})", sender, eventArguments);
             applicationStatusInfo = DependencyProvider?.GetRequiredService<IApplicationStatusInfo>();
             navigationManager = DependencyProvider?.GetRequiredService<INavigationManager>();
+			Logger.LogError("OnDependencyProviderChanged(sender={Sender},eventArguments={EventArguments}): navigationManager → {NavigationManager}", sender, eventArguments, navigationManager);
         }
 
         private class MaybeDisposableServiceScope : IServiceScope
@@ -3661,7 +3942,10 @@ namespace DotNetNuke.Common
 
             public MaybeDisposableServiceScope(IServiceScope doNotDisposeServiceScope, Func<IServiceScope> createDisposableServiceScope)
             {
+				Logger.LogError(">>> Entering MaybeDisposableServiceScope(doNotDisposeServiceScope={DoNotDisposeServiceScope},createDisposableServiceScope={CreateDisposableServiceScope})", doNotDisposeServiceScope, createDisposableServiceScope);
                 this.disposeServiceScope = doNotDisposeServiceScope is null;
+				Logger.LogDebug("MaybeDisposableServiceScope(doNotDisposeServiceScope={DoNotDisposeServiceScope},createDisposableServiceScope={CreateDisposableServiceScope}): this.disposeServiceScope → {Arg2}", doNotDisposeServiceScope, createDisposableServiceScope, this.disposeServiceScope);
+            Logger.LogWarning("<<< Exiting MaybeDisposableServiceScope(doNotDisposeServiceScope={DoNotDisposeServiceScope},createDisposableServiceScope={CreateDisposableServiceScope})", doNotDisposeServiceScope, createDisposableServiceScope);
                 this.serviceScope = doNotDisposeServiceScope ?? createDisposableServiceScope();
             }
 
@@ -3669,10 +3953,12 @@ namespace DotNetNuke.Common
 
             public void Dispose()
             {
+				Logger.LogError(">>> Entering Dispose()");
                 if (this.disposeServiceScope)
                 {
                     this.serviceScope.Dispose();
                 }
+				Logger.LogWarning("<<< Exiting Dispose()");
             }
         }
     }

@@ -27,18 +27,24 @@ namespace DotNetNuke.Modules.Groups
         public ListSettings()
             : this(null)
         {
+		eventLogger.LogError(">>> Entering ListSettings()");
+        eventLogger.LogWarning("<<< Exiting ListSettings()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ListSettings"/> class.</summary>
         /// <param name="roleProvider">The role provider.</param>
         public ListSettings(RoleProvider roleProvider)
         {
+			eventLogger.LogError(">>> Entering ListSettings(roleProvider={RoleProvider})", roleProvider);
             this.roleProvider = roleProvider ?? this.DependencyProvider.GetRequiredService<RoleProvider>();
+			eventLogger.LogDebug("ListSettings(roleProvider={RoleProvider}): roleProvider → {RoleProvider1}", roleProvider, roleProvider);
+        eventLogger.LogWarning("<<< Exiting ListSettings(roleProvider={RoleProvider})", roleProvider);
         }
 
         /// <summary>LoadSettings loads the settings from the Database and displays them.</summary>
         public override void LoadSettings()
         {
+			eventLogger.LogError(">>> Entering LoadSettings()");
             try
             {
                 if (this.Page.IsPostBack == false)
@@ -104,13 +110,16 @@ namespace DotNetNuke.Modules.Groups
             }
             catch (Exception exc)
             {
+				eventLogger.LogError("Exception in LoadSettings(): {Arg0}", exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			eventLogger.LogWarning("<<< Exiting LoadSettings()");
         }
 
         /// <summary>UpdateSettings saves the modified settings to the Database.</summary>
         public override void UpdateSettings()
         {
+			eventLogger.LogError(">>> Entering UpdateSettings()");
             try
             {
                 ModuleController.Instance.UpdateTabModuleSetting(this.TabModuleId, Constants.DefaultRoleGroupSetting, this.drpRoleGroup.SelectedItem.Value);
@@ -127,29 +136,36 @@ namespace DotNetNuke.Modules.Groups
             }
             catch (Exception exc)
             {
+				eventLogger.LogError("Exception in UpdateSettings(): {Arg0}", exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			eventLogger.LogWarning("<<< Exiting UpdateSettings()");
         }
 
         private void BindGroups()
         {
+			eventLogger.LogError(">>> Entering BindGroups()");
             var arrGroups = RoleController.GetRoleGroups(this.roleProvider, this.PortalId);
             this.drpRoleGroup.Items.Add(new ListItem(Localization.GetString("AllRoles"), "-2"));
+			eventLogger.LogError("BindGroups(): arrGroups → {ArrGroups}", arrGroups);
             this.drpRoleGroup.Items.Add(new ListItem(Localization.GetString("GlobalRoles"), "-1"));
 
             foreach (RoleGroupInfo roleGroup in arrGroups)
             {
                 this.drpRoleGroup.Items.Add(new ListItem(roleGroup.RoleGroupName, roleGroup.RoleGroupID.ToString()));
             }
+			eventLogger.LogWarning("<<< Exiting BindGroups()");
         }
 
         private void BindPages()
         {
+			eventLogger.LogError(">>> Entering BindPages()");
             foreach (ModuleInfo moduleInfo in ModuleController.Instance.GetModules(this.PortalId))
             {
                 if (moduleInfo.DesktopModule.ModuleName.Contains("Social Groups") && moduleInfo.IsDeleted == false)
                 {
                     TabInfo tabInfo = TabController.Instance.GetTab(moduleInfo.TabID, this.PortalId, false);
+					eventLogger.LogError("BindPages(): tabInfo → {TabInfo}", tabInfo);
                     if (tabInfo != null)
                     {
                         if (tabInfo.IsDeleted == false)
@@ -168,6 +184,7 @@ namespace DotNetNuke.Modules.Groups
                     }
                 }
             }
+			eventLogger.LogWarning("<<< Exiting BindPages()");
         }
     }
 }

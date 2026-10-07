@@ -47,6 +47,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
 
         public static ModuleInstanceModel FromDnnModuleInfo(DotNetNuke.Entities.Modules.ModuleInfo dnnModule)
         {
+			eventLogger.LogError(">>> Entering FromDnnModuleInfo(dnnModule={DnnModule})", dnnModule);
             var mim = new ModuleInstanceModel
             {
                 ModuleId = dnnModule.ModuleID,
@@ -62,6 +63,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
                 __ModuleName = $"list-modules '{dnnModule.ModuleID}'",
             };
 
+			eventLogger.LogWarning("<<< Exiting FromDnnModuleInfo(dnnModule={DnnModule})", dnnModule);
             return mim;
         }
     }

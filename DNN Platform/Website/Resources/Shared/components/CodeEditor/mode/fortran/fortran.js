@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -13,10 +14,12 @@
 
 CodeMirror.defineMode("fortran", function() {
   function words(array) {
+	logger.error(`>>> Entering words(array=${array})`, { "event.action": "words", "logrite.array": array });
     var keys = {};
     for (var i = 0; i < array.length; ++i) {
       keys[array[i]] = true;
     }
+	logger.warn(`<<< Exiting words(array=${array})`, { "event.action": "words", "logrite.array": array });
     return keys;
   }
 
@@ -115,12 +118,14 @@ CodeMirror.defineMode("fortran", function() {
   var litOperator = new RegExp("(\.and\.|\.or\.|\.eq\.|\.lt\.|\.le\.|\.gt\.|\.ge\.|\.ne\.|\.not\.|\.eqv\.|\.neqv\.)", "i");
 
   function tokenBase(stream, state) {
+logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
 
     if (stream.match(litOperator)){
         return 'operator';
     }
 
     var ch = stream.next();
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     if (ch == "!") {
       stream.skipToEnd();
       return "comment";
@@ -142,6 +147,7 @@ CodeMirror.defineMode("fortran", function() {
     }
     stream.eatWhile(/[\w\$_]/);
     var word = stream.current().toLowerCase();
+	logger.error(`tokenBase(stream=${stream},state=${state}): word → ${word}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
 
     if (keywords.hasOwnProperty(word)){
             return 'keyword';
@@ -149,10 +155,12 @@ CodeMirror.defineMode("fortran", function() {
     if (builtins.hasOwnProperty(word) || dataTypes.hasOwnProperty(word)) {
             return 'builtin';
     }
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     return "variable";
   }
 
   function tokenString(quote) {
+	logger.error(`>>> Entering tokenString(quote=${quote})`, { "event.action": "tokenString", "logrite.quote": quote });
     return function(stream, state) {
       var escaped = false, next, end = false;
       while ((next = stream.next()) != null) {
@@ -171,13 +179,18 @@ CodeMirror.defineMode("fortran", function() {
 
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       return {tokenize: null};
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.eatSpace()) return null;
       var style = (state.tokenize || tokenBase)(stream, state);
+	logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (style == "comment" || style == "meta") return style;
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return style;
     }
   };

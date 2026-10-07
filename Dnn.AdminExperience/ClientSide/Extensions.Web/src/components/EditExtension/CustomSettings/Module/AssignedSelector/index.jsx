@@ -4,12 +4,17 @@ import { GridCell, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import { Scrollbars } from "react-custom-scrollbars";
 import Localization from "localization";
 import styles from "./style.module.less";
+const logger = console;
 class AssignedSelector extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
     getPortalList(list, type) {
+		logger.error(`>>> Entering getPortalList(list=${list},type=${type})`, { "event.action": "getPortalList", "logrite.list": list, "logrite.type": type });
         const { props } = this;
+		logger.warn(`<<< Exiting getPortalList(list=${list},type=${type})`, { "event.action": "getPortalList", "logrite.list": list, "logrite.type": type });
         return list.map((portal, index) => {
             return <li className={portal.selected ? "selected" : ""}
                 onClick={props.onClickOnPortal.bind(this, index, type)}
@@ -20,9 +25,12 @@ class AssignedSelector extends Component {
     }
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         const assignedPortals = this.getPortalList(props.assignedPortals, "assignedPortals");
+		logger.error(`render(): assignedPortals → ${assignedPortals}`, { "event.action": "render" });
         const unassignedPortals = this.getPortalList(props.unassignedPortals, "unassignedPortals");
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.assignedSelector}>
                 <GridCell columnSize={45} className="selector-box">

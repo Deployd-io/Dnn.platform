@@ -13,7 +13,10 @@ namespace Dnn.PersonaBar.Users.Components.Contracts
     {
         public GetUsersContract()
         {
+			eventLogger.LogError(">>> Entering GetUsersContract()");
             this.SortColumn = "Joined";
+			eventLogger.LogDebug("GetUsersContract(): this.SortColumn → {Arg0}", this.SortColumn);
+        eventLogger.LogWarning("<<< Exiting GetUsersContract()");
             this.SortAscending = false;
         }
 

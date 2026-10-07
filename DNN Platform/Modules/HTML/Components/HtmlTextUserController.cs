@@ -7,15 +7,19 @@ namespace DotNetNuke.Modules.Html
 
     using DotNetNuke.Common.Utilities;
     using DotNetNuke.Modules.Html.Components;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>The HtmlTextUserController is the Controller class for managing User information the HtmlText module.</summary>
     public class HtmlTextUserController
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>GetHtmlTextUser retrieves a collection of HtmlTextUserInfo objects for an Item.</summary>
         /// <param name="userID">The Id of the User.</param>
         /// <returns>An <see cref="ArrayList"/> of <see cref="HtmlTextUserInfo"/> instances.</returns>
         public ArrayList GetHtmlTextUser(int userID)
         {
+			_logger.LogError(">>> Entering GetHtmlTextUser(userID={UserID})", userID);
+            _logger.LogWarning("<<< Exiting GetHtmlTextUser(userID={UserID})", userID);
             return CBO.FillCollection(DataProvider.Instance().GetHtmlTextUser(userID), typeof(HtmlTextUserInfo));
         }
 
@@ -23,13 +27,17 @@ namespace DotNetNuke.Modules.Html
         /// <param name="objHtmlTextUser">An HtmlTextUserInfo object.</param>
         public void AddHtmlTextUser(HtmlTextUserInfo objHtmlTextUser)
         {
+			_logger.LogError(">>> Entering AddHtmlTextUser(objHtmlTextUser={ObjHtmlTextUser})", objHtmlTextUser);
             DataProvider.Instance().AddHtmlTextUser(objHtmlTextUser.ItemID, objHtmlTextUser.StateID, objHtmlTextUser.ModuleID, objHtmlTextUser.TabID, objHtmlTextUser.UserID);
+			_logger.LogWarning("<<< Exiting AddHtmlTextUser(objHtmlTextUser={ObjHtmlTextUser})", objHtmlTextUser);
         }
 
         /// <summary>DeleteHtmlTextUsers cleans up old HtmlTextUser records.</summary>
         public void DeleteHtmlTextUsers()
         {
+			_logger.LogError(">>> Entering DeleteHtmlTextUsers()");
             DataProvider.Instance().DeleteHtmlTextUsers();
+			_logger.LogWarning("<<< Exiting DeleteHtmlTextUsers()");
         }
     }
 }

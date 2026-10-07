@@ -15,9 +15,13 @@ namespace Dnn.PersonaBar.TaskScheduler.Components.Prompt.Models
 
         public TaskModelBase(ScheduleItem item)
         {
+			eventLogger.LogError(">>> Entering TaskModelBase(item={Item})", item);
             this.Enabled = item.Enabled;
+			eventLogger.LogWarning("<<< Exiting TaskModelBase(item={Item})", item);
+			eventLogger.LogDebug("TaskModelBase(item={Item}): this.Enabled → {Arg1}", item, this.Enabled);
             this.FriendlyName = item.FriendlyName;
             this.NextStart = item.NextStart.ToPromptShortDateAndTimeString();
+			eventLogger.LogDebug("TaskModelBase(item={Item}): this.FriendlyName → {Arg1}", item, this.FriendlyName);
             this.ScheduleId = item.ScheduleID;
         }
 

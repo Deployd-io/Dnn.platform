@@ -14,14 +14,17 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 function getError(errors) {
+	logger.error(`>>> Entering getError(errors=${errors})`, { "event.action": "getError", "logrite.errors": errors });
     let hasError = false;
     Object.keys(errors).forEach((key) => {
         if (errors[key] === true) {
             hasError = true;
         }
     });
+	logger.warn(`<<< Exiting getError(errors=${errors})`, { "event.action": "getError", "logrite.errors": errors });
     return hasError;
 }
 
@@ -30,6 +33,7 @@ let isHost = false;
 class MoreSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             otherSettings: undefined,
             siteBehaviorExtrasRendered: true,
@@ -37,9 +41,11 @@ class MoreSettingsPanelBody extends Component {
             whitelistOption: 0,
         };
         isHost = util.settings.isHost;
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     loadData() {
+		logger.error('>>> Entering loadData()', { "event.action": "loadData" });
         const { props } = this;
         props.dispatch(
             SiteBehaviorActions.getOtherSettings(props.portalId, (data) => {
@@ -48,6 +54,7 @@ class MoreSettingsPanelBody extends Component {
                     whitelistOption = 0;
                 } else if (data.Settings.AllowedExtensionsWhitelist === data.Settings.ImageExtensionsList) {
                     whitelistOption = 2;
+					logger.warn('<<< Exiting loadData()', { "event.action": "loadData" });
                 }
                 this.setState({
                     otherSettings: Object.assign({}, data.Settings),
@@ -59,6 +66,7 @@ class MoreSettingsPanelBody extends Component {
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const { props } = this;
         if (props.otherSettings) {
             this.setState({
@@ -71,9 +79,11 @@ class MoreSettingsPanelBody extends Component {
             whitelistOption: 0,
         });
         this.loadData();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         const { props } = this;
         if (props.otherSettings) {
             let portalIdChanged = props.portalId !== undefined && prevProps.portalId !== props.portalId;
@@ -81,15 +91,19 @@ class MoreSettingsPanelBody extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
             }
         }
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let { state, props } = this;
         let otherSettings = Object.assign({}, state.otherSettings);
 
+		logger.error(`onSettingChange(key=${key},event=${event}): otherSettings → ${otherSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         otherSettings[key] = typeof event === "object" ? event.target.value : event;
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
 
         this.setState({
             otherSettings: otherSettings,
@@ -101,8 +115,10 @@ class MoreSettingsPanelBody extends Component {
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         if (event) {
             event.preventDefault();
+			logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         }
         const { props, state } = this;
 
@@ -120,6 +136,7 @@ class MoreSettingsPanelBody extends Component {
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const { props } = this;
         util.utilities.confirm(
             resx.get("SettingsRestoreWarning"),
@@ -145,9 +162,11 @@ class MoreSettingsPanelBody extends Component {
                 );
             }
         );
+		logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
     }
 
     renderSiteBehaviorExtensions() {
+		logger.error('>>> Entering renderSiteBehaviorExtensions()', { "event.action": "renderSiteBehaviorExtensions" });
         const SiteBehaviorExtras =
             window.dnn.SiteSettings && window.dnn.SiteSettings.SiteBehaviorExtras;
         if (!SiteBehaviorExtras || SiteBehaviorExtras.length === 0) {
@@ -158,11 +177,13 @@ class MoreSettingsPanelBody extends Component {
             if (a.RenderOrder > b.RenderOrder) return 1;
             return 0;
         }).map((data) => {
+		logger.warn('<<< Exiting renderSiteBehaviorExtensions()', { "event.action": "renderSiteBehaviorExtensions" });
             return data.Component;
         });
     }
 
     onSaveMoreSettings() {
+		logger.error('>>> Entering onSaveMoreSettings()', { "event.action": "onSaveMoreSettings" });
         const SiteBehaviorExtras =
             window.dnn.SiteSettings && window.dnn.SiteSettings.SiteBehaviorExtras;
         let _errorInSave = false;
@@ -221,9 +242,11 @@ class MoreSettingsPanelBody extends Component {
         } else {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }
+		logger.warn('<<< Exiting onSaveMoreSettings()', { "event.action": "onSaveMoreSettings" });
     }
 
     getOverallFormDirty() {
+		logger.error('>>> Entering getOverallFormDirty()', { "event.action": "getOverallFormDirty" });
         let formDirty = false;
         const SiteBehaviorExtras =
             window.dnn.SiteSettings && window.dnn.SiteSettings.SiteBehaviorExtras;
@@ -240,10 +263,13 @@ class MoreSettingsPanelBody extends Component {
         if (this.props.otherSettingsClientModified) {
             formDirty = true;
         }
+		logger.warn('<<< Exiting getOverallFormDirty()', { "event.action": "getOverallFormDirty" });
         return formDirty;
     }
 
     getWhiteListOptions() {
+		logger.error('>>> Entering getWhiteListOptions()', { "event.action": "getWhiteListOptions" });
+		logger.warn('<<< Exiting getWhiteListOptions()', { "event.action": "getWhiteListOptions" });
         return [
             { label: resx.get("Default"), value: 0 },
             { label: resx.get("Custom"), value: 1 },
@@ -252,6 +278,7 @@ class MoreSettingsPanelBody extends Component {
     }
 
     onWhitelistOptionChange(e) {
+		logger.error(`>>> Entering onWhitelistOptionChange(e=${e})`, { "event.action": "onWhitelistOptionChange", "logrite.e": e });
         let newState = this.state;
         switch (e.value) {
             case 0:
@@ -262,21 +289,26 @@ class MoreSettingsPanelBody extends Component {
                 break;
         }
         newState.whitelistOption = e.value;
+		logger.debug(`onWhitelistOptionChange(e=${e}): newState.whitelistOption → ${newState.whitelistOption}`, { "event.action": "onWhitelistOptionChange", "logrite.e": e });
         this.setState(newState);
+		logger.warn(`<<< Exiting onWhitelistOptionChange(e=${e})`, { "event.action": "onWhitelistOptionChange", "logrite.e": e });
         this.props.dispatch(
             SiteBehaviorActions.otherSettingsClientModified(newState.otherSettings)
         );
     }
 
     getMaxNumberOfVersionsOptions(maxValue) {
+		logger.error(`>>> Entering getMaxNumberOfVersionsOptions(maxValue=${maxValue})`, { "event.action": "getMaxNumberOfVersionsOptions", "logrite.maxValue": maxValue });
         const maxNumberOfVersionsOptions = [];
         for (let i = 0; i <= maxValue; i++) {
             maxNumberOfVersionsOptions.push({ "value": i, "label": i.toString() });
         }
+		logger.warn(`<<< Exiting getMaxNumberOfVersionsOptions(maxValue=${maxValue})`, { "event.action": "getMaxNumberOfVersionsOptions", "logrite.maxValue": maxValue });
         return maxNumberOfVersionsOptions;
     }
 
     getWorkflowsOptions() {
+		logger.error('>>> Entering getWorkflowsOptions()', { "event.action": "getWorkflowsOptions" });
         let options = [];
         const { props } = this;
         if (props.workflows !== undefined) {
@@ -284,14 +316,18 @@ class MoreSettingsPanelBody extends Component {
                 return { label: item.label, value: item.value };
             });
         }
+		logger.warn('<<< Exiting getWorkflowsOptions()', { "event.action": "getWorkflowsOptions" });
         return options;
     }
     
     onDropDownChange(key, option) {
+		logger.error(`>>> Entering onDropDownChange(key=${key},option=${option})`, { "event.action": "onDropDownChange", "logrite.key": key, "logrite.option": option });
         let { state, props } = this;
         let otherSettings = Object.assign({}, state.otherSettings);
 
+		logger.error(`onDropDownChange(key=${key},option=${option}): otherSettings → ${otherSettings}`, { "event.action": "onDropDownChange", "logrite.key": key, "logrite.option": option });
         otherSettings[key] = typeof option === "object" ? option.value : option;
+		logger.warn(`<<< Exiting onDropDownChange(key=${key},option=${option})`, { "event.action": "onDropDownChange", "logrite.key": key, "logrite.option": option });
 
         this.setState({
             otherSettings: otherSettings,
@@ -304,6 +340,7 @@ class MoreSettingsPanelBody extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props, state } = this;
         let htmlEditor = isHost ? (
             <div>
@@ -552,6 +589,8 @@ MoreSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         ...state,
         otherSettings: state.siteBehavior.otherSettings,

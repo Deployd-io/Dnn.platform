@@ -58,22 +58,44 @@ namespace DotNetNuke.Entities.Portals.Templates
 
         internal PortalTemplateImporter(IPermissionDefinitionService permissionDefinitionService, IBusinessControllerProvider businessControllerProvider, ListController listController, IEventLogger eventLogger, IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, IUserController userController, IFileContentTypeManager fileContentTypeManager, RoleProvider roleProvider, IRoleController roleController, IPortalTemplateInfo templateToLoad)
         {
+			Logger.LogError(">>> Entering PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad})", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): roleProvider → {RoleProvider1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, roleProvider);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): businessControllerProvider → {BusinessControllerProvider1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, businessControllerProvider);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): listController → {ListController1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, listController);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): eventLogger → {EventLogger1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, eventLogger);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): hostSettings → {HostSettings1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, hostSettings);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): portalController → {PortalController1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, portalController);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): appStatus → {AppStatus1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, appStatus);
             this.permissionDefinitionService = permissionDefinitionService;
             this.businessControllerProvider = businessControllerProvider;
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): this.permissionDefinitionService → {Arg13}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, this.permissionDefinitionService);
             this.listController = listController;
             this.eventLogger = eventLogger;
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): this.businessControllerProvider → {Arg13}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, this.businessControllerProvider);
             this.hostSettings = hostSettings;
             this.portalController = portalController;
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): this.listController → {Arg13}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, this.listController);
             this.appStatus = appStatus;
             this.portalGroupController = portalGroupController;
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): this.eventLogger → {Arg13}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, this.eventLogger);
             this.userController = userController;
             this.fileContentTypeManager = fileContentTypeManager;
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): this.hostSettings → {Arg13}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, this.hostSettings);
             this.roleProvider = roleProvider;
             this.roleController = roleController;
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): this.portalController → {Arg13}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, this.portalController);
             var buffer = new StringBuilder(File.ReadAllText(templateToLoad.TemplateFilePath));
+			Logger.LogError("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): buffer → {Buffer}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, buffer);
 
             if (!string.IsNullOrEmpty(templateToLoad.LanguageFilePath))
             {
+				Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): this.appStatus → {Arg13}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, this.appStatus);
+				Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): portalGroupController → {PortalGroupController1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, portalGroupController);
+				Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): this.portalGroupController → {Arg13}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, this.portalGroupController);
+				Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): userController → {UserController1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, userController);
+				Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): this.userController → {Arg13}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, this.userController);
+				Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): fileContentTypeManager → {FileContentTypeManager1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, fileContentTypeManager);
+				Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): this.fileContentTypeManager → {Arg13}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, this.fileContentTypeManager);
                 ReplaceTemplateTokens(templateToLoad, buffer);
             }
 
@@ -81,11 +103,32 @@ namespace DotNetNuke.Entities.Portals.Templates
             this.Template = new XmlDocument { XmlResolver = null };
             using var templateReader = XmlReader.Create(new StringReader(buffer.ToString()), new XmlReaderSettings { XmlResolver = null, });
             this.Template.Load(templateReader);
+			Logger.LogError("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): templateReader → {TemplateReader}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, templateReader);
+        Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): appStatus → {AppStatus1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, appStatus);
+        Logger.LogWarning("<<< Exiting PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad})", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): permissionDefinitionService → {PermissionDefinitionService1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, permissionDefinitionService);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): this.roleProvider → {Arg13}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, this.roleProvider);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templateToLoad={TemplateToLoad}): this.Template → {Arg13}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templateToLoad, this.Template);
         }
 
         internal PortalTemplateImporter(IPermissionDefinitionService permissionDefinitionService, IBusinessControllerProvider businessControllerProvider, ListController listController, IEventLogger eventLogger, IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, IUserController userController, IFileContentTypeManager fileContentTypeManager, RoleProvider roleProvider, IRoleController roleController, string templatePath, string templateFile)
         {
+			Logger.LogError(">>> Entering PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile})", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): businessControllerProvider → {BusinessControllerProvider1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, businessControllerProvider);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): this.businessControllerProvider → {Arg14}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, this.businessControllerProvider);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): listController → {ListController1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, listController);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): this.listController → {Arg14}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, this.listController);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): eventLogger → {EventLogger1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, eventLogger);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): this.eventLogger → {Arg14}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, this.eventLogger);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): hostSettings → {HostSettings1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, hostSettings);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): this.hostSettings → {Arg14}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, this.hostSettings);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): portalController → {PortalController1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, portalController);
+			Logger.LogError("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): templateReader → {TemplateReader}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, templateReader);
+        Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): this.portalController → {Arg14}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, this.portalController);
+        Logger.LogWarning("<<< Exiting PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile})", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile);
             this.permissionDefinitionService = permissionDefinitionService;
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): permissionDefinitionService → {PermissionDefinitionService1}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, permissionDefinitionService);
+			Logger.LogDebug("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): this.permissionDefinitionService → {Arg14}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, this.permissionDefinitionService);
             this.businessControllerProvider = businessControllerProvider;
             this.listController = listController;
             this.eventLogger = eventLogger;
@@ -99,6 +142,7 @@ namespace DotNetNuke.Entities.Portals.Templates
             this.roleController = roleController;
             var buffer = new StringBuilder(File.ReadAllText(Path.Combine(templatePath, templateFile)));
 
+			Logger.LogError("PortalTemplateImporter(permissionDefinitionService={PermissionDefinitionService},businessControllerProvider={BusinessControllerProvider},listController={ListController},eventLogger={EventLogger},hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},userController={UserController},fileContentTypeManager={FileContentTypeManager},roleProvider={RoleProvider},roleController={RoleController},templatePath={TemplatePath},templateFile={TemplateFile}): buffer → {Buffer}", permissionDefinitionService, businessControllerProvider, listController, eventLogger, hostSettings, portalController, appStatus, portalGroupController, userController, fileContentTypeManager, roleProvider, roleController, templatePath, templateFile, buffer);
             this.TemplatePath = templatePath;
             this.Template = new XmlDocument { XmlResolver = null };
             using var templateReader = XmlReader.Create(new StringReader(buffer.ToString()), new XmlReaderSettings { XmlResolver = null, });
@@ -111,12 +155,17 @@ namespace DotNetNuke.Entities.Portals.Templates
 
         internal void ParseTemplate(int portalId, int administratorId, PortalTemplateModuleAction mergeTabs, bool isNewPortal)
         {
+			Logger.LogError(">>> Entering ParseTemplate(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal})", portalId, administratorId, mergeTabs, isNewPortal);
             this.ParseTemplateInternal(portalId, administratorId, mergeTabs, isNewPortal);
+			Logger.LogWarning("<<< Exiting ParseTemplate(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal})", portalId, administratorId, mergeTabs, isNewPortal);
         }
 
         internal void ParseTemplateInternal(int portalId, int administratorId, PortalTemplateModuleAction mergeTabs, bool isNewPortal)
         {
             this.ParseTemplateInternal(portalId, administratorId, mergeTabs, isNewPortal, out _);
+			Logger.LogError(">>> Entering ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal})", portalId, administratorId, mergeTabs, isNewPortal);
+			Logger.LogDebug("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): objFolder.IsProtected → {Arg4}", portalId, administratorId, mergeTabs, isNewPortal, objFolder.IsProtected);
+			Logger.LogWarning("<<< Exiting ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal})", portalId, administratorId, mergeTabs, isNewPortal);
         }
 
         internal void ParseTemplateInternal(int portalId, int administratorId, PortalTemplateModuleAction mergeTabs, bool isNewPortal, out LocaleCollection localeCollection)
@@ -126,6 +175,7 @@ namespace DotNetNuke.Entities.Portals.Templates
             IFolderInfo objFolder;
 
             var node = this.Template.SelectSingleNode("//portal/settings");
+			Logger.LogError("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): node → {Node}", portalId, administratorId, mergeTabs, isNewPortal, node);
             if (node != null && isNewPortal)
             {
                 HtmlUtils.WriteKeepAlive();
@@ -137,11 +187,15 @@ namespace DotNetNuke.Entities.Portals.Templates
             {
                 HtmlUtils.WriteKeepAlive();
                 localeCollection = this.ParseEnabledLocales(node, portalId);
+				Logger.LogError("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): localeCollection → {LocaleCollection}", portalId, administratorId, mergeTabs, isNewPortal, localeCollection);
             }
             else
             {
+				Logger.LogDebug("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): localeCollection → {LocaleCollection}", portalId, administratorId, mergeTabs, isNewPortal, localeCollection);
                 var portalInfo = PortalController.Instance.GetPortal(portalId);
+				Logger.LogError("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): portalInfo → {PortalInfo}", portalId, administratorId, mergeTabs, isNewPortal, portalInfo);
                 var defaultLocale = LocaleController.Instance.GetLocale(portalInfo.DefaultLanguage);
+				Logger.LogError("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): defaultLocale → {DefaultLocale}", portalId, administratorId, mergeTabs, isNewPortal, defaultLocale);
                 if (defaultLocale == null)
                 {
                     defaultLocale = new Locale { Code = portalInfo.DefaultLanguage, Fallback = Localization.SystemLocale, Text = CultureInfo.GetCultureInfo(portalInfo.DefaultLanguage).NativeName };
@@ -182,10 +236,13 @@ namespace DotNetNuke.Entities.Portals.Templates
             }
 
             var defaultFolderMapping = FolderMappingController.Instance.GetDefaultFolderMapping(portalId);
+			Logger.LogError("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): defaultFolderMapping → {DefaultFolderMapping}", portalId, administratorId, mergeTabs, isNewPortal, defaultFolderMapping);
 
             if (FolderManager.Instance.GetFolder(portalId, string.Empty) == null)
             {
                 objFolder = FolderManager.Instance.AddFolder(defaultFolderMapping, string.Empty);
+				Logger.LogError("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): objFolder → {ObjFolder}", portalId, administratorId, mergeTabs, isNewPortal, objFolder);
+				Logger.LogDebug("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): objFolder → {ObjFolder}", portalId, administratorId, mergeTabs, isNewPortal, objFolder);
                 objFolder.IsProtected = true;
                 FolderManager.Instance.UpdateFolder(objFolder);
 
@@ -195,6 +252,7 @@ namespace DotNetNuke.Entities.Portals.Templates
             if (FolderManager.Instance.GetFolder(portalId, "Templates/") == null)
             {
                 var folderMapping = FolderMappingsConfigController.Instance.GetFolderMapping(portalId, "Templates/") ?? defaultFolderMapping;
+				Logger.LogError("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): folderMapping → {FolderMapping}", portalId, administratorId, mergeTabs, isNewPortal, folderMapping);
                 objFolder = FolderManager.Instance.AddFolder(folderMapping, "Templates/");
                 objFolder.IsProtected = true;
                 FolderManager.Instance.UpdateFolder(objFolder);
@@ -219,8 +277,10 @@ namespace DotNetNuke.Entities.Portals.Templates
                 {
                     var objTab = tabPair.Value;
                     objTab.TabName = objTab.TabName + "_old";
+					Logger.LogDebug("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): objTab.TabName → {Arg4}", portalId, administratorId, mergeTabs, isNewPortal, objTab.TabName);
                     objTab.TabPath = Globals.GenerateTabPath(objTab.ParentId, objTab.TabName);
                     objTab.IsDeleted = true;
+					Logger.LogDebug("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): objTab.IsDeleted → {Arg4}", portalId, administratorId, mergeTabs, isNewPortal, objTab.IsDeleted);
                     TabController.Instance.UpdateTab(objTab);
                     foreach (KeyValuePair<int, ModuleInfo> modulePair in ModuleController.Instance.GetTabModules(objTab.TabID))
                     {
@@ -240,6 +300,7 @@ namespace DotNetNuke.Entities.Portals.Templates
                     try
                     {
                         string path = Path.Combine(this.TemplatePath, "admin.template");
+						Logger.LogError("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): path → {Path}", portalId, administratorId, mergeTabs, isNewPortal, path);
                         if (!File.Exists(path))
                         {
                             // if the template is a merged copy of a localized template the
@@ -253,6 +314,7 @@ namespace DotNetNuke.Entities.Portals.Templates
                         }
 
                         XmlNode adminNode = xmlAdmin.SelectSingleNode("//portal/tabs");
+						Logger.LogError("ParseTemplateInternal(portalId={PortalId},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): adminNode → {AdminNode}", portalId, administratorId, mergeTabs, isNewPortal, adminNode);
                         foreach (XmlNode adminTabNode in adminNode.ChildNodes)
                         {
                             node.AppendChild(this.Template.ImportNode(adminTabNode, true));
@@ -272,11 +334,14 @@ namespace DotNetNuke.Entities.Portals.Templates
 
         internal string CreateProfileDefinitions(int portalId)
         {
+			Logger.LogError(">>> Entering CreateProfileDefinitions(portalId={PortalId})", portalId);
             string strMessage = Null.NullString;
+			Logger.LogError("CreateProfileDefinitions(portalId={PortalId}): strMessage → {StrMessage}", portalId, strMessage);
             try
             {
                 // parse profile definitions if available
                 var node = this.Template.SelectSingleNode("//portal/profiledefinitions");
+				Logger.LogError("CreateProfileDefinitions(portalId={PortalId}): node → {Node}", portalId, node);
                 if (node != null)
                 {
                     this.ParseProfileDefinitions(node, portalId);
@@ -289,19 +354,24 @@ namespace DotNetNuke.Entities.Portals.Templates
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in CreateProfileDefinitions(portalId={PortalId}): {Arg1}", portalId, ex.Message);
                 strMessage = Localization.GetString("CreateProfileDefinitions.Error");
                 Exceptions.LogException(ex);
             }
 
+			Logger.LogWarning("<<< Exiting CreateProfileDefinitions(portalId={PortalId})", portalId);
             return strMessage;
         }
 
         private static void ReplaceTemplateTokens(IPortalTemplateInfo templateToLoad, StringBuilder buffer)
         {
+			Logger.LogError(">>> Entering ReplaceTemplateTokens(templateToLoad={TemplateToLoad},buffer={Buffer})", templateToLoad, buffer);
             XDocument languageDoc;
             using (var reader = PortalTemplateIO.Instance.OpenTextReader(templateToLoad.LanguageFilePath))
             {
                 languageDoc = XDocument.Load(reader);
+				Logger.LogError("ReplaceTemplateTokens(templateToLoad={TemplateToLoad},buffer={Buffer}): languageDoc → {LanguageDoc}", templateToLoad, buffer, languageDoc);
+				Logger.LogDebug("ReplaceTemplateTokens(templateToLoad={TemplateToLoad},buffer={Buffer}): languageDoc → {LanguageDoc}", templateToLoad, buffer, languageDoc);
             }
 
             var localizedData = languageDoc.Descendants("data")
@@ -317,23 +387,28 @@ namespace DotNetNuke.Entities.Portals.Templates
             foreach (var node in localizedData.Values)
             {
                 var name = node.Attribute("name")?.Value;
+				Logger.LogError("ReplaceTemplateTokens(templateToLoad={TemplateToLoad},buffer={Buffer}): name → {Name}", templateToLoad, buffer, name);
                 if (string.IsNullOrEmpty(name))
                 {
                     continue;
                 }
 
                 var valueElement = node.Element("value");
+				Logger.LogError("ReplaceTemplateTokens(templateToLoad={TemplateToLoad},buffer={Buffer}): valueElement → {ValueElement}", templateToLoad, buffer, valueElement);
                 if (valueElement != null)
                 {
                     var value = valueElement.Value;
                     buffer.Replace($"[{name}]", value);
                 }
             }
+			Logger.LogWarning("<<< Exiting ReplaceTemplateTokens(templateToLoad={TemplateToLoad},buffer={Buffer})", templateToLoad, buffer);
         }
 
         private static void AddMissingDefaultResources(IPortalTemplateInfo templateToLoad, Dictionary<string, XElement> localizedData)
         {
+			Logger.LogError(">>> Entering AddMissingDefaultResources(templateToLoad={TemplateToLoad},localizedData={LocalizedData})", templateToLoad, localizedData);
             var defaultLangFilePath = PortalTemplateIO.Instance.GetLanguageFilePath(templateToLoad.TemplateFilePath, "en-US");
+			Logger.LogError("AddMissingDefaultResources(templateToLoad={TemplateToLoad},localizedData={LocalizedData}): defaultLangFilePath → {DefaultLangFilePath}", templateToLoad, localizedData, defaultLangFilePath);
             if (string.IsNullOrEmpty(defaultLangFilePath))
             {
                 return;
@@ -343,12 +418,16 @@ namespace DotNetNuke.Entities.Portals.Templates
             using (var reader = PortalTemplateIO.Instance.OpenTextReader(defaultLangFilePath))
             {
                 defaultLanguageDoc = XDocument.Load(reader);
+				Logger.LogError("AddMissingDefaultResources(templateToLoad={TemplateToLoad},localizedData={LocalizedData}): defaultLanguageDoc → {DefaultLanguageDoc}", templateToLoad, localizedData, defaultLanguageDoc);
+				Logger.LogDebug("AddMissingDefaultResources(templateToLoad={TemplateToLoad},localizedData={LocalizedData}): defaultLanguageDoc → {DefaultLanguageDoc}", templateToLoad, localizedData, defaultLanguageDoc);
             }
 
             var defaultData = defaultLanguageDoc.Descendants("data");
+			Logger.LogError("AddMissingDefaultResources(templateToLoad={TemplateToLoad},localizedData={LocalizedData}): defaultData → {DefaultData}", templateToLoad, localizedData, defaultData);
             foreach (var defaultNode in defaultData)
             {
                 var key = defaultNode.Attribute("name")?.Value;
+				Logger.LogError("AddMissingDefaultResources(templateToLoad={TemplateToLoad},localizedData={LocalizedData}): key → {Key}", templateToLoad, localizedData, key);
                 if (string.IsNullOrEmpty(key))
                 {
                     continue;
@@ -359,22 +438,28 @@ namespace DotNetNuke.Entities.Portals.Templates
                     localizedData.Add(key, defaultNode);
                 }
             }
+			Logger.LogWarning("<<< Exiting AddMissingDefaultResources(templateToLoad={TemplateToLoad},localizedData={LocalizedData})", templateToLoad, localizedData);
         }
 
         private static void ParseExtensionUrlProviders(XPathNavigator providersNavigator, int portalId)
         {
+			Logger.LogError(">>> Entering ParseExtensionUrlProviders(providersNavigator={ProvidersNavigator},portalId={PortalId})", providersNavigator, portalId);
             var providers = ExtensionUrlProviderController.GetProviders(portalId);
+			Logger.LogError("ParseExtensionUrlProviders(providersNavigator={ProvidersNavigator},portalId={PortalId}): providers → {Providers}", providersNavigator, portalId, providers);
             foreach (XPathNavigator providerNavigator in providersNavigator.Select("extensionUrlProvider"))
             {
                 HtmlUtils.WriteKeepAlive();
                 var providerName = XmlUtils.GetNodeValue(providerNavigator, "name");
+				Logger.LogError("ParseExtensionUrlProviders(providersNavigator={ProvidersNavigator},portalId={PortalId}): providerName → {ProviderName}", providersNavigator, portalId, providerName);
                 var provider = providers.SingleOrDefault(p => p.ProviderName.Equals(providerName, StringComparison.OrdinalIgnoreCase));
+				Logger.LogError("ParseExtensionUrlProviders(providersNavigator={ProvidersNavigator},portalId={PortalId}): provider → {Provider}", providersNavigator, portalId, provider);
                 if (provider == null)
                 {
                     continue;
                 }
 
                 var active = XmlUtils.GetNodeValueBoolean(providerNavigator, "active");
+				Logger.LogError("ParseExtensionUrlProviders(providersNavigator={ProvidersNavigator},portalId={PortalId}): active → {Active}", providersNavigator, portalId, active);
                 if (active)
                 {
                     ExtensionUrlProviderController.EnableProvider(provider.ExtensionUrlProviderId, portalId);
@@ -385,22 +470,28 @@ namespace DotNetNuke.Entities.Portals.Templates
                 }
 
                 var settingsNavigator = providerNavigator.SelectSingleNode("settings");
+				Logger.LogError("ParseExtensionUrlProviders(providersNavigator={ProvidersNavigator},portalId={PortalId}): settingsNavigator → {SettingsNavigator}", providersNavigator, portalId, settingsNavigator);
                 if (settingsNavigator != null)
                 {
                     foreach (XPathNavigator settingNavigator in settingsNavigator.Select("setting"))
                     {
                         var name = XmlUtils.GetAttributeValue(settingNavigator, "name");
+						Logger.LogError("ParseExtensionUrlProviders(providersNavigator={ProvidersNavigator},portalId={PortalId}): name → {Name}", providersNavigator, portalId, name);
                         var value = XmlUtils.GetAttributeValue(settingNavigator, "value");
+						Logger.LogError("ParseExtensionUrlProviders(providersNavigator={ProvidersNavigator},portalId={PortalId}): value → {Value}", providersNavigator, portalId, value);
                         ExtensionUrlProviderController.SaveSetting(provider.ExtensionUrlProviderId, portalId, name, value);
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting ParseExtensionUrlProviders(providersNavigator={ProvidersNavigator},portalId={PortalId})", providersNavigator, portalId);
         }
 
         private static FolderMappingInfo GetFolderMappingFromStorageLocation(int portalId, XmlNode folderNode)
         {
+			Logger.LogError(">>> Entering GetFolderMappingFromStorageLocation(portalId={PortalId},folderNode={FolderNode})", portalId, folderNode);
             var storageLocation = Convert.ToInt32(XmlUtils.GetNodeValue(folderNode, "storagelocation", "0"), CultureInfo.InvariantCulture);
 
+			Logger.LogError("GetFolderMappingFromStorageLocation(portalId={PortalId},folderNode={FolderNode}): storageLocation → {StorageLocation}", portalId, folderNode, storageLocation);
             switch (storageLocation)
             {
                 case (int)FolderController.StorageLocationTypes.SecureFileSystem:
@@ -408,23 +499,28 @@ namespace DotNetNuke.Entities.Portals.Templates
                 case (int)FolderController.StorageLocationTypes.DatabaseSecure:
                     return FolderMappingController.Instance.GetFolderMapping(portalId, "Database");
                 default:
+					Logger.LogWarning("<<< Exiting GetFolderMappingFromStorageLocation(portalId={PortalId},folderNode={FolderNode})", portalId, folderNode);
                     return FolderMappingController.Instance.GetDefaultFolderMapping(portalId);
             }
         }
 
         private void ParseProfileDefinitions(XmlNode nodeProfileDefinitions, int portalId)
         {
+			Logger.LogError(">>> Entering ParseProfileDefinitions(nodeProfileDefinitions={NodeProfileDefinitions},portalId={PortalId})", nodeProfileDefinitions, portalId);
             Dictionary<string, ListEntryInfo> colDataTypes = this.listController.GetListEntryInfoDictionary("DataType");
 
+			Logger.LogError("ParseProfileDefinitions(nodeProfileDefinitions={NodeProfileDefinitions},portalId={PortalId}): colDataTypes → {ColDataTypes}", nodeProfileDefinitions, portalId, colDataTypes);
             int orderCounter = -1;
             ProfilePropertyDefinition objProfileDefinition;
             bool preferredTimeZoneFound = false;
+			Logger.LogError("ParseProfileDefinitions(nodeProfileDefinitions={NodeProfileDefinitions},portalId={PortalId}): preferredTimeZoneFound → {PreferredTimeZoneFound}", nodeProfileDefinitions, portalId, preferredTimeZoneFound);
             foreach (XmlNode node in nodeProfileDefinitions.SelectNodes("//profiledefinition"))
             {
                 orderCounter += 2;
                 if (!colDataTypes.TryGetValue("DataType:" + XmlUtils.GetNodeValue(node.CreateNavigator(), "datatype"), out var typeInfo))
                 {
                     typeInfo = colDataTypes["DataType:Unknown"];
+					Logger.LogError("ParseProfileDefinitions(nodeProfileDefinitions={NodeProfileDefinitions},portalId={PortalId}): typeInfo → {TypeInfo}", nodeProfileDefinitions, portalId, typeInfo);
                 }
 
                 objProfileDefinition = new ProfilePropertyDefinition(portalId)
@@ -444,6 +540,7 @@ namespace DotNetNuke.Entities.Portals.Templates
                 {
                     case 0:
                         objProfileDefinition.DefaultVisibility = UserVisibilityMode.AllUsers;
+						Logger.LogDebug("ParseProfileDefinitions(nodeProfileDefinitions={NodeProfileDefinitions},portalId={PortalId}): objProfileDefinition.DefaultVisibility → {Arg2}", nodeProfileDefinitions, portalId, objProfileDefinition.DefaultVisibility);
                         break;
                     case 1:
                         objProfileDefinition.DefaultVisibility = UserVisibilityMode.MembersOnly;
@@ -463,6 +560,7 @@ namespace DotNetNuke.Entities.Portals.Templates
 
             // 6.0 requires the old TimeZone property to be marked as Deleted
             ProfilePropertyDefinition timeZoneProperty = ProfileController.GetPropertyDefinitionByName(this.hostSettings, this.portalController, this.appStatus, this.portalGroupController, portalId, "TimeZone");
+			Logger.LogError("ParseProfileDefinitions(nodeProfileDefinitions={NodeProfileDefinitions},portalId={PortalId}): timeZoneProperty → {TimeZoneProperty}", nodeProfileDefinitions, portalId, timeZoneProperty);
             if (timeZoneProperty != null)
             {
                 ProfileController.DeletePropertyDefinition(this.eventLogger, this.portalController, this.appStatus, this.portalGroupController, timeZoneProperty);
@@ -495,28 +593,36 @@ namespace DotNetNuke.Entities.Portals.Templates
                 };
                 ProfileController.AddPropertyDefinition(this.eventLogger, this.portalController, this.appStatus, this.portalGroupController, objProfileDefinition);
             }
+			Logger.LogWarning("<<< Exiting ParseProfileDefinitions(nodeProfileDefinitions={NodeProfileDefinitions},portalId={PortalId})", nodeProfileDefinitions, portalId);
         }
 
         private void ParsePortalDesktopModules(XPathNavigator nav, int portalId)
         {
+			Logger.LogError(">>> Entering ParsePortalDesktopModules(nav={Nav},portalId={PortalId})", nav, portalId);
             foreach (XPathNavigator desktopModuleNav in nav.Select("portalDesktopModule"))
             {
                 HtmlUtils.WriteKeepAlive();
                 var friendlyName = XmlUtils.GetNodeValue(desktopModuleNav, "friendlyname");
+				Logger.LogError("ParsePortalDesktopModules(nav={Nav},portalId={PortalId}): friendlyName → {FriendlyName}", nav, portalId, friendlyName);
                 if (!string.IsNullOrEmpty(friendlyName))
                 {
                     var desktopModule = DesktopModuleController.GetDesktopModuleByFriendlyName(this.hostSettings, friendlyName);
+					Logger.LogError("ParsePortalDesktopModules(nav={Nav},portalId={PortalId}): desktopModule → {DesktopModule}", nav, portalId, desktopModule);
                     if (desktopModule != null)
                     {
                         // Parse the permissions
                         DesktopModulePermissionCollection permissions = new DesktopModulePermissionCollection();
+						Logger.LogError("ParsePortalDesktopModules(nav={Nav},portalId={PortalId}): permissions → {Permissions}", nav, portalId, permissions);
                         foreach (XPathNavigator permissionNav in
                                  desktopModuleNav.Select("portalDesktopModulePermissions/portalDesktopModulePermission"))
                         {
                             string code = XmlUtils.GetNodeValue(permissionNav, "permissioncode");
                             string key = XmlUtils.GetNodeValue(permissionNav, "permissionkey");
+							Logger.LogError("ParsePortalDesktopModules(nav={Nav},portalId={PortalId}): key → {Key}", nav, portalId, key);
                             DesktopModulePermissionInfo desktopModulePermission = null;
+							Logger.LogError("ParsePortalDesktopModules(nav={Nav},portalId={PortalId}): desktopModulePermission → {DesktopModulePermission}", nav, portalId, desktopModulePermission);
                             var permission = this.permissionDefinitionService.GetDefinitionsByCodeAndKey(code, key).FirstOrDefault();
+							Logger.LogError("ParsePortalDesktopModules(nav={Nav},portalId={PortalId}): permission → {Permission}", nav, portalId, permission);
                             if (permission != null)
                             {
                                 desktopModulePermission = new DesktopModulePermissionInfo(permission);
@@ -527,6 +633,7 @@ namespace DotNetNuke.Entities.Portals.Templates
                             if (!string.IsNullOrEmpty(rolename))
                             {
                                 RoleInfo role = RoleController.Instance.GetRole(portalId, r => r.RoleName == rolename);
+								Logger.LogError("ParsePortalDesktopModules(nav={Nav},portalId={PortalId}): role → {Role}", nav, portalId, role);
                                 if (role != null)
                                 {
                                     ((IPermissionInfo)desktopModulePermission).RoleId = role.RoleID;
@@ -540,12 +647,15 @@ namespace DotNetNuke.Entities.Portals.Templates
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting ParsePortalDesktopModules(nav={Nav},portalId={PortalId})", nav, portalId);
         }
 
         private void ParseFolderPermissions(XmlNodeList nodeFolderPermissions, int portalId, FolderInfo folder)
         {
+			Logger.LogError(">>> Entering ParseFolderPermissions(nodeFolderPermissions={NodeFolderPermissions},portalId={PortalId},folder={Folder})", nodeFolderPermissions, portalId, folder);
             int permissionId = 0;
 
+			Logger.LogError("ParseFolderPermissions(nodeFolderPermissions={NodeFolderPermissions},portalId={PortalId},folder={Folder}): permissionId → {PermissionId}", nodeFolderPermissions, portalId, folder, permissionId);
             // Clear the current folder permissions
             folder.FolderPermissions.Clear();
             foreach (XmlNode xmlFolderPermission in nodeFolderPermissions)
@@ -560,6 +670,7 @@ namespace DotNetNuke.Entities.Portals.Templates
                 }
 
                 int roleId = int.MinValue;
+				Logger.LogError("ParseFolderPermissions(nodeFolderPermissions={NodeFolderPermissions},portalId={PortalId},folder={Folder}): roleId → {RoleId}", nodeFolderPermissions, portalId, folder, roleId);
                 switch (roleName)
                 {
                     case Globals.glbRoleAllUsersName:
@@ -570,6 +681,7 @@ namespace DotNetNuke.Entities.Portals.Templates
                         break;
                     default:
                         RoleInfo objRole = RoleController.Instance.GetRole(portalId, r => r.RoleName == roleName);
+						Logger.LogError("ParseFolderPermissions(nodeFolderPermissions={NodeFolderPermissions},portalId={PortalId},folder={Folder}): objRole → {ObjRole}", nodeFolderPermissions, portalId, folder, objRole);
                         if (objRole != null)
                         {
                             roleId = objRole.RoleID;
@@ -583,7 +695,11 @@ namespace DotNetNuke.Entities.Portals.Templates
                 {
                     IFolderPermissionInfo folderPermission = new FolderPermissionInfo { AllowAccess = allowAccess, };
                     folderPermission.FolderId = folder.FolderID;
+					Logger.LogDebug("ParseFolderPermissions(nodeFolderPermissions={NodeFolderPermissions},portalId={PortalId},folder={Folder}): folderPermission.FolderId → {Arg3}", nodeFolderPermissions, portalId, folder, folderPermission.FolderId);
+					Logger.LogDebug("ParseFolderPermissions(nodeFolderPermissions={NodeFolderPermissions},portalId={PortalId},folder={Folder}): folderPermission.RoleId → {Arg3}", nodeFolderPermissions, portalId, folder, folderPermission.RoleId);
+					Logger.LogDebug("ParseFolderPermissions(nodeFolderPermissions={NodeFolderPermissions},portalId={PortalId},folder={Folder}): folderPermission.UserId → {Arg3}", nodeFolderPermissions, portalId, folder, folderPermission.UserId);
                     folderPermission.PermissionId = permissionId;
+					Logger.LogDebug("ParseFolderPermissions(nodeFolderPermissions={NodeFolderPermissions},portalId={PortalId},folder={Folder}): folderPermission.PermissionId → {Arg3}", nodeFolderPermissions, portalId, folder, folderPermission.PermissionId);
                     folderPermission.RoleId = roleId;
                     folderPermission.UserId = Null.NullInteger;
 
@@ -600,18 +716,22 @@ namespace DotNetNuke.Entities.Portals.Templates
             }
 
             FolderPermissionController.SaveFolderPermissions(folder);
+			Logger.LogWarning("<<< Exiting ParseFolderPermissions(nodeFolderPermissions={NodeFolderPermissions},portalId={PortalId},folder={Folder})", nodeFolderPermissions, portalId, folder);
         }
 
         private void ParseFiles(XmlNodeList nodeFiles, int portalId, FolderInfo folder)
         {
+			Logger.LogError(">>> Entering ParseFiles(nodeFiles={NodeFiles},portalId={PortalId},folder={Folder})", nodeFiles, portalId, folder);
             var fileManager = FileManager.Instance;
 
             foreach (XmlNode node in nodeFiles)
             {
                 var fileName = XmlUtils.GetNodeValue(node.CreateNavigator(), "filename");
+				Logger.LogError("ParseFiles(nodeFiles={NodeFiles},portalId={PortalId},folder={Folder}): fileName → {FileName}", nodeFiles, portalId, folder, fileName);
 
                 // First check if the file exists
                 var file = fileManager.GetFile(folder, fileName);
+				Logger.LogError("ParseFiles(nodeFiles={NodeFiles},portalId={PortalId},folder={Folder}): file → {File}", nodeFiles, portalId, folder, file);
 
                 if (file != null)
                 {
@@ -644,7 +764,9 @@ namespace DotNetNuke.Entities.Portals.Templates
                     using (var fileContent = FolderProvider.Instance("StandardFolderProvider").GetFileStream(file))
                     {
                         var contentType = this.fileContentTypeManager.GetContentType(Path.GetExtension(fileName));
+						Logger.LogError("ParseFiles(nodeFiles={NodeFiles},portalId={PortalId},folder={Folder}): contentType → {ContentType}", nodeFiles, portalId, folder, contentType);
                         var userId = this.userController.GetCurrentUserInfo().UserID;
+						Logger.LogError("ParseFiles(nodeFiles={NodeFiles},portalId={PortalId},folder={Folder}): userId → {UserId}", nodeFiles, portalId, folder, userId);
                         file.FileId = fileManager.AddFile(folder, fileName, fileContent, false, false, true, contentType, userId).FileId;
                     }
 
@@ -656,12 +778,15 @@ namespace DotNetNuke.Entities.Portals.Templates
                     Logger.Error(ex.Message);
                 }
             }
+			Logger.LogWarning("<<< Exiting ParseFiles(nodeFiles={NodeFiles},portalId={PortalId},folder={Folder})", nodeFiles, portalId, folder);
         }
 
         private void CreateRoleGroup(RoleGroupInfo roleGroup)
         {
+			Logger.LogError(">>> Entering CreateRoleGroup(roleGroup={RoleGroup})", roleGroup);
             // First check if the role exists
             var objRoleGroupInfo = RoleController.GetRoleGroupByName(this.roleProvider, roleGroup.PortalID, roleGroup.RoleGroupName);
+			Logger.LogError("CreateRoleGroup(roleGroup={RoleGroup}): objRoleGroupInfo → {ObjRoleGroupInfo}", roleGroup, objRoleGroupInfo);
 
             if (objRoleGroupInfo == null)
             {
@@ -670,24 +795,31 @@ namespace DotNetNuke.Entities.Portals.Templates
             else
             {
                 roleGroup.RoleGroupID = objRoleGroupInfo.RoleGroupID;
+				Logger.LogDebug("CreateRoleGroup(roleGroup={RoleGroup}): roleGroup.RoleGroupID → {Arg1}", roleGroup, roleGroup.RoleGroupID);
             }
+			Logger.LogWarning("<<< Exiting CreateRoleGroup(roleGroup={RoleGroup})", roleGroup);
         }
 
         private int CreateRole(RoleInfo role)
         {
+			Logger.LogError(">>> Entering CreateRole(role={Role})", role);
             int roleId;
 
             // First check if the role exists
             var objRoleInfo = this.roleController.GetRole(role.PortalID, r => r.RoleName == role.RoleName);
+			Logger.LogError("CreateRole(role={Role}): objRoleInfo → {ObjRoleInfo}", role, objRoleInfo);
             if (objRoleInfo == null)
             {
                 roleId = this.roleController.AddRole(role);
+				Logger.LogError("CreateRole(role={Role}): roleId → {RoleId}", role, roleId);
             }
             else
             {
                 roleId = objRoleInfo.RoleID;
             }
 
+			Logger.LogWarning("<<< Exiting CreateRole(role={Role})", role);
+			Logger.LogWarning("<<< Exiting CreateRole(portalId={PortalId},roleName={RoleName},description={Description},serviceFee={ServiceFee},billingPeriod={BillingPeriod},billingFrequency={BillingFrequency},trialFee={TrialFee},trialPeriod={TrialPeriod},trialFrequency={TrialFrequency},isPublic={IsPublic},isAuto={IsAuto})", portalId, roleName, description, serviceFee, billingPeriod, billingFrequency, trialFee, trialPeriod, trialFrequency, isPublic, isAuto);
             return roleId;
         }
 
@@ -709,20 +841,24 @@ namespace DotNetNuke.Entities.Portals.Templates
 
         private void CreateDefaultPortalRoles(int portalId, int administratorId, ref int administratorRoleId, ref int registeredRoleId, ref int subscriberRoleId, int unverifiedRoleId)
         {
+			Logger.LogError(">>> Entering CreateDefaultPortalRoles(portalId={PortalId},administratorId={AdministratorId},administratorRoleId={AdministratorRoleId},registeredRoleId={RegisteredRoleId},subscriberRoleId={SubscriberRoleId},unverifiedRoleId={UnverifiedRoleId})", portalId, administratorId, administratorRoleId, registeredRoleId, subscriberRoleId, unverifiedRoleId);
             // create required roles if not already created
             if (administratorRoleId == -1)
             {
                 administratorRoleId = this.CreateRole(portalId, "Administrators", "Administrators of this Website", 0, 0, "M", 0, 0, "N", false, false);
+				Logger.LogError("CreateDefaultPortalRoles(portalId={PortalId},administratorId={AdministratorId},administratorRoleId={AdministratorRoleId},registeredRoleId={RegisteredRoleId},subscriberRoleId={SubscriberRoleId},unverifiedRoleId={UnverifiedRoleId}): administratorRoleId → {AdministratorRoleId1}", portalId, administratorId, administratorRoleId, registeredRoleId, subscriberRoleId, unverifiedRoleId, administratorRoleId);
             }
 
             if (registeredRoleId == -1)
             {
                 registeredRoleId = this.CreateRole(portalId, "Registered Users", "Registered Users", 0, 0, "M", 0, 0, "N", false, true);
+				Logger.LogError("CreateDefaultPortalRoles(portalId={PortalId},administratorId={AdministratorId},administratorRoleId={AdministratorRoleId},registeredRoleId={RegisteredRoleId},subscriberRoleId={SubscriberRoleId},unverifiedRoleId={UnverifiedRoleId}): registeredRoleId → {RegisteredRoleId1}", portalId, administratorId, administratorRoleId, registeredRoleId, subscriberRoleId, unverifiedRoleId, registeredRoleId);
             }
 
             if (subscriberRoleId == -1)
             {
                 subscriberRoleId = this.CreateRole(portalId, "Subscribers", "A public role for site subscriptions", 0, 0, "M", 0, 0, "N", true, true);
+				Logger.LogError("CreateDefaultPortalRoles(portalId={PortalId},administratorId={AdministratorId},administratorRoleId={AdministratorRoleId},registeredRoleId={RegisteredRoleId},subscriberRoleId={SubscriberRoleId},unverifiedRoleId={UnverifiedRoleId}): subscriberRoleId → {SubscriberRoleId1}", portalId, administratorId, administratorRoleId, registeredRoleId, subscriberRoleId, unverifiedRoleId, subscriberRoleId);
             }
 
             if (unverifiedRoleId == -1)
@@ -733,17 +869,22 @@ namespace DotNetNuke.Entities.Portals.Templates
             RoleController.Instance.AddUserRole(portalId, administratorId, administratorRoleId, RoleStatus.Approved, false, Null.NullDate, Null.NullDate);
             RoleController.Instance.AddUserRole(portalId, administratorId, registeredRoleId, RoleStatus.Approved, false, Null.NullDate, Null.NullDate);
             RoleController.Instance.AddUserRole(portalId, administratorId, subscriberRoleId, RoleStatus.Approved, false, Null.NullDate, Null.NullDate);
+			Logger.LogWarning("<<< Exiting CreateDefaultPortalRoles(portalId={PortalId},administratorId={AdministratorId},administratorRoleId={AdministratorRoleId},registeredRoleId={RegisteredRoleId},subscriberRoleId={SubscriberRoleId},unverifiedRoleId={UnverifiedRoleId})", portalId, administratorId, administratorRoleId, registeredRoleId, subscriberRoleId, unverifiedRoleId);
         }
 
         private LocaleCollection ParseEnabledLocales(XmlNode nodeEnabledLocales, int portalId)
         {
+			Logger.LogError(">>> Entering ParseEnabledLocales(nodeEnabledLocales={NodeEnabledLocales},portalId={PortalId})", nodeEnabledLocales, portalId);
             var defaultLocale = LocaleController.Instance.GetDefaultLocale(portalId);
             var returnCollection = new LocaleCollection { { defaultLocale.Code, defaultLocale } };
+			Logger.LogError("ParseEnabledLocales(nodeEnabledLocales={NodeEnabledLocales},portalId={PortalId}): defaultLocale → {DefaultLocale}", nodeEnabledLocales, portalId, defaultLocale);
             var clearCache = false;
+			Logger.LogError("ParseEnabledLocales(nodeEnabledLocales={NodeEnabledLocales},portalId={PortalId}): clearCache → {ClearCache}", nodeEnabledLocales, portalId, clearCache);
             foreach (XmlNode node in nodeEnabledLocales.SelectNodes("//locale"))
             {
                 var cultureCode = node.InnerText;
                 var locale = LocaleController.Instance.GetLocale(cultureCode);
+				Logger.LogError("ParseEnabledLocales(nodeEnabledLocales={NodeEnabledLocales},portalId={PortalId}): locale → {Locale}", nodeEnabledLocales, portalId, locale);
                 if (locale == null)
                 {
                     // if language does not exist in the installation, create it
@@ -763,23 +904,28 @@ namespace DotNetNuke.Entities.Portals.Templates
                 DataCache.ClearHostCache(true);
             }
 
+			Logger.LogWarning("<<< Exiting ParseEnabledLocales(nodeEnabledLocales={NodeEnabledLocales},portalId={PortalId})", nodeEnabledLocales, portalId);
             return returnCollection;
         }
 
         private void ParseFolders(XmlNode nodeFolders, int portalId)
         {
+			Logger.LogError(">>> Entering ParseFolders(nodeFolders={NodeFolders},portalId={PortalId})", nodeFolders, portalId);
             var folderManager = FolderManager.Instance;
             var folderMappingController = FolderMappingController.Instance;
             var xmlNodeList = nodeFolders.SelectNodes("//folder");
+			Logger.LogError("ParseFolders(nodeFolders={NodeFolders},portalId={PortalId}): xmlNodeList → {XmlNodeList}", nodeFolders, portalId, xmlNodeList);
             if (xmlNodeList != null)
             {
                 foreach (XmlNode node in xmlNodeList)
                 {
                     HtmlUtils.WriteKeepAlive();
                     var folderPath = XmlUtils.GetNodeValue(node.CreateNavigator(), "folderpath");
+					Logger.LogError("ParseFolders(nodeFolders={NodeFolders},portalId={PortalId}): folderPath → {FolderPath}", nodeFolders, portalId, folderPath);
 
                     // First check if the folder exists
                     var objInfo = folderManager.GetFolder(portalId, folderPath);
+					Logger.LogError("ParseFolders(nodeFolders={NodeFolders},portalId={PortalId}): objInfo → {ObjInfo}", nodeFolders, portalId, objInfo);
 
                     if (objInfo == null)
                     {
@@ -793,9 +939,11 @@ namespace DotNetNuke.Entities.Portals.Templates
                         {
                             Logger.Error(ex);
                             folderMapping = folderMappingController.GetDefaultFolderMapping(portalId);
+							Logger.LogError("ParseFolders(nodeFolders={NodeFolders},portalId={PortalId}): folderMapping → {FolderMapping}", nodeFolders, portalId, folderMapping);
                         }
 
                         var isProtected = XmlUtils.GetNodeValueBoolean(node, "isprotected");
+						Logger.LogError("ParseFolders(nodeFolders={NodeFolders},portalId={PortalId}): isProtected → {IsProtected}", nodeFolders, portalId, isProtected);
 
                         try
                         {
@@ -808,6 +956,7 @@ namespace DotNetNuke.Entities.Portals.Templates
 
                             // Retry with default folderMapping
                             var defaultFolderMapping = folderMappingController.GetDefaultFolderMapping(portalId);
+							Logger.LogError("ParseFolders(nodeFolders={NodeFolders},portalId={PortalId}): defaultFolderMapping → {DefaultFolderMapping}", nodeFolders, portalId, defaultFolderMapping);
                             if (folderMapping.FolderMappingID != defaultFolderMapping.FolderMappingID)
                             {
                                 objInfo = folderManager.AddFolder(defaultFolderMapping, folderPath);
@@ -819,24 +968,30 @@ namespace DotNetNuke.Entities.Portals.Templates
                         }
 
                         objInfo.IsProtected = isProtected;
+						Logger.LogDebug("ParseFolders(nodeFolders={NodeFolders},portalId={PortalId}): objInfo.IsProtected → {Arg2}", nodeFolders, portalId, objInfo.IsProtected);
 
                         folderManager.UpdateFolder(objInfo);
                     }
 
                     var nodeFolderPermissions = node.SelectNodes("folderpermissions/permission");
+					Logger.LogError("ParseFolders(nodeFolders={NodeFolders},portalId={PortalId}): nodeFolderPermissions → {NodeFolderPermissions}", nodeFolders, portalId, nodeFolderPermissions);
                     this.ParseFolderPermissions(nodeFolderPermissions, portalId, (FolderInfo)objInfo);
 
                     var nodeFiles = node.SelectNodes("files/file");
+					Logger.LogError("ParseFolders(nodeFolders={NodeFolders},portalId={PortalId}): nodeFiles → {NodeFiles}", nodeFolders, portalId, nodeFiles);
 
                     this.ParseFiles(nodeFiles, portalId, (FolderInfo)objInfo);
                 }
             }
+			Logger.LogWarning("<<< Exiting ParseFolders(nodeFolders={NodeFolders},portalId={PortalId})", nodeFolders, portalId);
         }
 
         private void ParsePortalSettings(XmlNode nodeSettings, int portalId)
         {
+			Logger.LogError(">>> Entering ParsePortalSettings(nodeSettings={NodeSettings},portalId={PortalId})", nodeSettings, portalId);
             string currentCulture = PortalController.GetActivePortalLanguage(this.hostSettings, this.appStatus, portalId);
             var objPortal = PortalController.Instance.GetPortal(portalId);
+			Logger.LogError("ParsePortalSettings(nodeSettings={NodeSettings},portalId={PortalId}): objPortal → {ObjPortal}", nodeSettings, portalId, objPortal);
             objPortal.LogoFile = Globals.ImportFile(portalId, XmlUtils.GetNodeValue(nodeSettings.CreateNavigator(), "logofile"));
             objPortal.FooterText = XmlUtils.GetNodeValue(nodeSettings.CreateNavigator(), "footertext");
             if (nodeSettings.SelectSingleNode("expirydate") != null)
@@ -1066,22 +1221,30 @@ namespace DotNetNuke.Entities.Portals.Templates
             {
                 PortalController.UpdatePortalSetting(portalId, "AllowJsInModuleFooters", XmlUtils.GetNodeValue(nodeSettings, "allowjsinmodulefooters", string.Empty));
             }
+			Logger.LogWarning("<<< Exiting ParsePortalSettings(nodeSettings={NodeSettings},portalId={PortalId})", nodeSettings, portalId);
         }
 
         private void ParseRoleGroups(XPathNavigator nav, int portalId, int administratorId)
         {
+			Logger.LogError(">>> Entering ParseRoleGroups(nav={Nav},portalId={PortalId},administratorId={AdministratorId})", nav, portalId, administratorId);
             var administratorRoleId = -1;
             var registeredRoleId = -1;
+			Logger.LogError("ParseRoleGroups(nav={Nav},portalId={PortalId},administratorId={AdministratorId}): registeredRoleId → {RegisteredRoleId}", nav, portalId, administratorId, registeredRoleId);
             var subscriberRoleId = -1;
+			Logger.LogError("ParseRoleGroups(nav={Nav},portalId={PortalId},administratorId={AdministratorId}): subscriberRoleId → {SubscriberRoleId}", nav, portalId, administratorId, subscriberRoleId);
             var unverifiedRoleId = -1;
+			Logger.LogError("ParseRoleGroups(nav={Nav},portalId={PortalId},administratorId={AdministratorId}): unverifiedRoleId → {UnverifiedRoleId}", nav, portalId, administratorId, unverifiedRoleId);
+			Logger.LogError("ParseRoleGroups(nav={Nav},portalId={PortalId},administratorId={AdministratorId}): administratorRoleId → {AdministratorRoleId}", nav, portalId, administratorId, administratorRoleId);
 
             foreach (XPathNavigator roleGroupNav in nav.Select("rolegroup"))
             {
                 HtmlUtils.WriteKeepAlive();
                 var roleGroup = CBO.DeserializeObject<RoleGroupInfo>(new StringReader(roleGroupNav.OuterXml));
+				Logger.LogError("ParseRoleGroups(nav={Nav},portalId={PortalId},administratorId={AdministratorId}): roleGroup → {RoleGroup}", nav, portalId, administratorId, roleGroup);
                 if (roleGroup.RoleGroupName != "GlobalRoles")
                 {
                     roleGroup.PortalID = portalId;
+					Logger.LogDebug("ParseRoleGroups(nav={Nav},portalId={PortalId},administratorId={AdministratorId}): roleGroup.PortalID → {Arg3}", nav, portalId, administratorId, roleGroup.PortalID);
                     this.CreateRoleGroup(roleGroup);
                 }
 
@@ -1115,6 +1278,7 @@ namespace DotNetNuke.Entities.Portals.Templates
 
             // update portal setup
             var portal = PortalController.Instance.GetPortal(portalId);
+			Logger.LogError("ParseRoleGroups(nav={Nav},portalId={PortalId},administratorId={AdministratorId}): portal → {Portal}", nav, portalId, administratorId, portal);
             this.UpdatePortalSetup(
                 portalId,
                 administratorId,
@@ -1132,20 +1296,29 @@ namespace DotNetNuke.Entities.Portals.Templates
                 portal.PrivacyTabId,
                 portal.AdminTabId,
                 PortalController.GetActivePortalLanguage(this.hostSettings, this.appStatus, portalId));
+				Logger.LogWarning("<<< Exiting ParseRoleGroups(nav={Nav},portalId={PortalId},administratorId={AdministratorId})", nav, portalId, administratorId);
         }
 
         private void ParseRoles(XPathNavigator nav, int portalID, int administratorId)
         {
+			Logger.LogError(">>> Entering ParseRoles(nav={Nav},portalID={PortalID},administratorId={AdministratorId})", nav, portalID, administratorId);
             var administratorRoleId = -1;
             var registeredRoleId = -1;
+			Logger.LogError("ParseRoles(nav={Nav},portalID={PortalID},administratorId={AdministratorId}): registeredRoleId → {RegisteredRoleId}", nav, portalID, administratorId, registeredRoleId);
             var subscriberRoleId = -1;
+			Logger.LogError("ParseRoles(nav={Nav},portalID={PortalID},administratorId={AdministratorId}): subscriberRoleId → {SubscriberRoleId}", nav, portalID, administratorId, subscriberRoleId);
             var unverifiedRoleId = -1;
+			Logger.LogError("ParseRoles(nav={Nav},portalID={PortalID},administratorId={AdministratorId}): unverifiedRoleId → {UnverifiedRoleId}", nav, portalID, administratorId, unverifiedRoleId);
+			Logger.LogError("ParseRoles(nav={Nav},portalID={PortalID},administratorId={AdministratorId}): administratorRoleId → {AdministratorRoleId}", nav, portalID, administratorId, administratorRoleId);
 
             foreach (XPathNavigator roleNav in nav.Select("role"))
             {
                 HtmlUtils.WriteKeepAlive();
                 var role = CBO.DeserializeObject<RoleInfo>(new StringReader(roleNav.OuterXml));
+				Logger.LogError("ParseRoles(nav={Nav},portalID={PortalID},administratorId={AdministratorId}): role → {Role}", nav, portalID, administratorId, role);
+				Logger.LogDebug("ParseRoles(nav={Nav},portalID={PortalID},administratorId={AdministratorId}): role.RoleGroupID → {Arg3}", nav, portalID, administratorId, role.RoleGroupID);
                 role.PortalID = portalID;
+				Logger.LogDebug("ParseRoles(nav={Nav},portalID={PortalID},administratorId={AdministratorId}): role.PortalID → {Arg3}", nav, portalID, administratorId, role.PortalID);
                 role.RoleGroupID = Null.NullInteger;
                 switch (role.RoleType)
                 {
@@ -1172,6 +1345,7 @@ namespace DotNetNuke.Entities.Portals.Templates
 
             // update portal setup
             var portal = PortalController.Instance.GetPortal(portalID);
+			Logger.LogError("ParseRoles(nav={Nav},portalID={PortalID},administratorId={AdministratorId}): portal → {Portal}", nav, portalID, administratorId, portal);
             this.UpdatePortalSetup(
                 portalID,
                 administratorId,
@@ -1189,19 +1363,24 @@ namespace DotNetNuke.Entities.Portals.Templates
                 portal.PrivacyTabId,
                 portal.AdminTabId,
                 PortalController.GetActivePortalLanguage(this.hostSettings, this.appStatus, portalID));
+				Logger.LogWarning("<<< Exiting ParseRoles(nav={Nav},portalID={PortalID},administratorId={AdministratorId})", nav, portalID, administratorId);
         }
 
         private void ParseTab(XmlNode nodeTab, int portalId, bool isAdminTemplate, PortalTemplateModuleAction mergeTabs, ref Hashtable hModules, ref Hashtable hTabs, bool isNewPortal)
         {
+			Logger.LogError(">>> Entering ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal})", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal);
             TabInfo tab = null;
             string strName = XmlUtils.GetNodeValue(nodeTab.CreateNavigator(), "name");
+			Logger.LogError("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): tab → {Tab}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, tab);
             var portal = PortalController.Instance.GetPortal(portalId);
             if (!string.IsNullOrEmpty(strName))
             {
+				Logger.LogError("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): portal → {Portal}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, portal);
                 if (!isNewPortal)
                 {
                     // running from wizard: try to find the tab by path
                     string parentTabName = string.Empty;
+					Logger.LogError("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): parentTabName → {ParentTabName}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, parentTabName);
                     if (!string.IsNullOrEmpty(XmlUtils.GetNodeValue(nodeTab.CreateNavigator(), "parent")))
                     {
                         parentTabName = XmlUtils.GetNodeValue(nodeTab.CreateNavigator(), "parent") + "/";
@@ -1220,9 +1399,11 @@ namespace DotNetNuke.Entities.Portals.Templates
 
                 // when processing the template we should try and identify the Admin tab
                 var logType = "AdminTab";
+				Logger.LogError("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): logType → {LogType}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, logType);
                 if (tab.TabName == "Admin")
                 {
                     portal.AdminTabId = tab.TabID;
+					Logger.LogDebug("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): portal.AdminTabId → {Arg7}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, portal.AdminTabId);
                 }
 
                 // when processing the template we can find: hometab, usertab, logintab
@@ -1230,38 +1411,47 @@ namespace DotNetNuke.Entities.Portals.Templates
                 {
                     case "splashtab":
                         portal.SplashTabId = tab.TabID;
+						Logger.LogDebug("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): portal.SplashTabId → {Arg7}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, portal.SplashTabId);
                         logType = "SplashTab";
                         break;
                     case "hometab":
                         portal.HomeTabId = tab.TabID;
+						Logger.LogDebug("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): portal.HomeTabId → {Arg7}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, portal.HomeTabId);
                         logType = "HomeTab";
                         break;
                     case "logintab":
                         portal.LoginTabId = tab.TabID;
+						Logger.LogDebug("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): portal.LoginTabId → {Arg7}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, portal.LoginTabId);
                         logType = "LoginTab";
                         break;
                     case "usertab":
                         portal.UserTabId = tab.TabID;
+						Logger.LogDebug("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): portal.UserTabId → {Arg7}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, portal.UserTabId);
                         logType = "UserTab";
                         break;
                     case "searchtab":
                         portal.SearchTabId = tab.TabID;
+						Logger.LogDebug("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): portal.SearchTabId → {Arg7}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, portal.SearchTabId);
                         logType = "SearchTab";
                         break;
                     case "404tab":
                         portal.Custom404TabId = tab.TabID;
+						Logger.LogDebug("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): portal.Custom404TabId → {Arg7}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, portal.Custom404TabId);
                         logType = "Custom404Tab";
                         break;
                     case "500tab":
                         portal.Custom500TabId = tab.TabID;
+						Logger.LogDebug("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): portal.Custom500TabId → {Arg7}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, portal.Custom500TabId);
                         logType = "Custom500Tab";
                         break;
                     case "termstab":
                         portal.TermsTabId = tab.TabID;
+						Logger.LogDebug("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): portal.TermsTabId → {Arg7}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, portal.TermsTabId);
                         logType = "TermsTabId";
                         break;
                     case "privacytab":
                         portal.PrivacyTabId = tab.TabID;
+						Logger.LogDebug("ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal}): portal.PrivacyTabId → {Arg7}", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal, portal.PrivacyTabId);
                         logType = "PrivacyTabId";
                         break;
                 }
@@ -1290,25 +1480,31 @@ namespace DotNetNuke.Entities.Portals.Templates
                     UserController.Instance.GetCurrentUserInfo().UserID,
                     EventLogType.PORTAL_SETTING_UPDATED);
             }
+			Logger.LogWarning("<<< Exiting ParseTab(nodeTab={NodeTab},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},hModules={HModules},hTabs={HTabs},isNewPortal={IsNewPortal})", nodeTab, portalId, isAdminTemplate, mergeTabs, hModules, hTabs, isNewPortal);
         }
 
         private void ParseTabs(XmlNode nodeTabs, int portalId, bool isAdminTemplate, PortalTemplateModuleAction mergeTabs, bool isNewPortal)
         {
+			Logger.LogError(">>> Entering ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal})", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal);
             // used to control if modules are true modules or instances
             // will hold module ID from template / new module ID so new instances can reference right moduleid
             // only first one from the template will be created as a true module,
             // others will be moduleinstances (tabmodules)
             Hashtable hModules = new Hashtable();
+			Logger.LogError("ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): hModules → {HModules}", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal, hModules);
             Hashtable hTabs = new Hashtable();
+			Logger.LogError("ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): hTabs → {HTabs}", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal, hTabs);
 
             // if running from wizard we need to pre-populate htabs with existing tabs so ParseTab
             // can find all existing ones
             if (!isNewPortal)
             {
                 Hashtable hTabNames = new Hashtable();
+				Logger.LogError("ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): hTabNames → {HTabNames}", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal, hTabNames);
                 foreach (var tabPair in TabController.Instance.GetTabsByPortal(portalId))
                 {
                     TabInfo objTab = tabPair.Value;
+					Logger.LogError("ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): objTab → {ObjTab}", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal, objTab);
                     if (!objTab.IsDeleted)
                     {
                         var tabName = objTab.TabName;
@@ -1345,6 +1541,7 @@ namespace DotNetNuke.Entities.Portals.Templates
             {
                 HtmlUtils.WriteKeepAlive();
                 int tabId = XmlUtils.GetNodeValueInt(nodeTab, "tabid", Null.NullInteger);
+				Logger.LogError("ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): tabId → {TabId}", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal, tabId);
                 string tabPath = XmlUtils.GetNodeValue(nodeTab, "url", Null.NullString);
                 if (tabId > Null.NullInteger)
                 {
@@ -1363,25 +1560,33 @@ namespace DotNetNuke.Entities.Portals.Templates
                 HtmlUtils.WriteKeepAlive();
                 var tabId = XmlUtils.GetNodeValueInt(nodeTab, "tabid", Null.NullInteger);
                 var filePath = XmlUtils.GetNodeValue(nodeTab, "url", Null.NullString);
+				Logger.LogError("ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): filePath → {FilePath}", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal, filePath);
                 if (tabId > Null.NullInteger)
                 {
                     var objTab = TabController.Instance.GetTab(tabId, portalId, false);
 
                     var fileName = Path.GetFileName(filePath);
+					Logger.LogError("ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): fileName → {FileName}", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal, fileName);
 
                     var folderPath = filePath.Substring(0, filePath.LastIndexOf(fileName, StringComparison.OrdinalIgnoreCase));
+					Logger.LogError("ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): folderPath → {FolderPath}", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal, folderPath);
                     var folder = folderManager.GetFolder(portalId, folderPath);
+					Logger.LogError("ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): folder → {Folder}", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal, folder);
 
                     var file = fileManager.GetFile(folder, fileName);
+					Logger.LogError("ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): file → {File}", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal, file);
 
                     objTab.Url = "FileID=" + file.FileId;
+					Logger.LogDebug("ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal}): objTab.Url → {Arg5}", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal, objTab.Url);
                     TabController.Instance.UpdateTab(objTab);
                 }
             }
+			Logger.LogWarning("<<< Exiting ParseTabs(nodeTabs={NodeTabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},isNewPortal={IsNewPortal})", nodeTabs, portalId, isAdminTemplate, mergeTabs, isNewPortal);
         }
 
         private void UpdatePortalSetup(int portalId, int administratorId, int administratorRoleId, int registeredRoleId, int splashTabId, int homeTabId, int loginTabId, int registerTabId, int userTabId, int searchTabId, int custom404TabId, int custom500TabId, int termsTabId, int privacyTabId, int adminTabId, string cultureCode)
         {
+			Logger.LogError(">>> Entering UpdatePortalSetup(portalId={PortalId},administratorId={AdministratorId},administratorRoleId={AdministratorRoleId},registeredRoleId={RegisteredRoleId},splashTabId={SplashTabId},homeTabId={HomeTabId},loginTabId={LoginTabId},registerTabId={RegisterTabId},userTabId={UserTabId},searchTabId={SearchTabId},custom404TabId={Custom404TabId},custom500TabId={Custom500TabId},termsTabId={TermsTabId},privacyTabId={PrivacyTabId},adminTabId={AdminTabId},cultureCode={CultureCode})", portalId, administratorId, administratorRoleId, registeredRoleId, splashTabId, homeTabId, loginTabId, registerTabId, userTabId, searchTabId, custom404TabId, custom500TabId, termsTabId, privacyTabId, adminTabId, cultureCode);
             DataProvider.Instance().UpdatePortalSetup(
                 portalId,
                 administratorId,
@@ -1401,13 +1606,17 @@ namespace DotNetNuke.Entities.Portals.Templates
                 cultureCode);
             this.eventLogger.AddLog("PortalId", portalId.ToString(CultureInfo.InvariantCulture), PortalSettings.Current, UserController.Instance.GetCurrentUserInfo().UserID, EventLogType.PORTALINFO_UPDATED);
             DataCache.ClearHostCache(true);
+			Logger.LogWarning("<<< Exiting UpdatePortalSetup(portalId={PortalId},administratorId={AdministratorId},administratorRoleId={AdministratorRoleId},registeredRoleId={RegisteredRoleId},splashTabId={SplashTabId},homeTabId={HomeTabId},loginTabId={LoginTabId},registerTabId={RegisterTabId},userTabId={UserTabId},searchTabId={SearchTabId},custom404TabId={Custom404TabId},custom500TabId={Custom500TabId},termsTabId={TermsTabId},privacyTabId={PrivacyTabId},adminTabId={AdminTabId},cultureCode={CultureCode})", portalId, administratorId, administratorRoleId, registeredRoleId, splashTabId, homeTabId, loginTabId, registerTabId, userTabId, searchTabId, custom404TabId, custom500TabId, termsTabId, privacyTabId, adminTabId, cultureCode);
         }
 
         private void AddFolderPermissions(int portalId, int folderId)
         {
+			Logger.LogError(">>> Entering AddFolderPermissions(portalId={PortalId},folderId={FolderId})", portalId, folderId);
             var portal = PortalController.Instance.GetPortal(portalId);
             var folderManager = FolderManager.Instance;
+			Logger.LogError("AddFolderPermissions(portalId={PortalId},folderId={FolderId}): portal → {Portal}", portalId, folderId, portal);
             var folder = folderManager.GetFolder(folderId);
+			Logger.LogError("AddFolderPermissions(portalId={PortalId},folderId={FolderId}): folder → {Folder}", portalId, folderId, folder);
             foreach (var permission in this.permissionDefinitionService.GetDefinitionsByCodeAndKey("SYSTEM_FOLDER", string.Empty))
             {
                 var folderPermission = new FolderPermissionInfo(permission)
@@ -1445,6 +1654,7 @@ namespace DotNetNuke.Entities.Portals.Templates
             }
 
             FolderPermissionController.SaveFolderPermissions((FolderInfo)folder);
+			Logger.LogWarning("<<< Exiting AddFolderPermissions(portalId={PortalId},folderId={FolderId})", portalId, folderId);
         }
     }
 }

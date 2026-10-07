@@ -15,6 +15,7 @@ namespace DotNetNuke.Common.Utilities
     /// </summary>
     public class CacheItemArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CacheItemArgs));
         private ArrayList paramList;
 
         /// <summary>Initializes a new instance of the <see cref="CacheItemArgs"/> class.</summary>
@@ -22,6 +23,7 @@ namespace DotNetNuke.Common.Utilities
         public CacheItemArgs(string key)
             : this(key, 20, CacheItemPriority.Default, null)
         {
+		Logger.LogWarning("<<< Exiting CacheItemArgs(key={Key},timeout={Timeout},priority={Priority},parameters={Parameters})", key, timeout, priority, parameters);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CacheItemArgs"/> class.</summary>
@@ -30,6 +32,8 @@ namespace DotNetNuke.Common.Utilities
         public CacheItemArgs(string key, int timeout)
             : this(key, timeout, CacheItemPriority.Default, null)
         {
+		Logger.LogError(">>> Entering CacheItemArgs(key={Key},timeout={Timeout})", key, timeout);
+        Logger.LogWarning("<<< Exiting CacheItemArgs(key={Key},timeout={Timeout})", key, timeout);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CacheItemArgs"/> class.</summary>
@@ -38,6 +42,8 @@ namespace DotNetNuke.Common.Utilities
         public CacheItemArgs(string key, CacheItemPriority priority)
             : this(key, 20, priority, null)
         {
+		Logger.LogError(">>> Entering CacheItemArgs(key={Key},priority={Priority})", key, priority);
+        Logger.LogWarning("<<< Exiting CacheItemArgs(key={Key},priority={Priority})", key, priority);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CacheItemArgs"/> class.</summary>
@@ -47,6 +53,8 @@ namespace DotNetNuke.Common.Utilities
         public CacheItemArgs(string key, int timeout, CacheItemPriority priority)
             : this(key, timeout, priority, null)
         {
+		Logger.LogError(">>> Entering CacheItemArgs(key={Key},timeout={Timeout},priority={Priority})", key, timeout, priority);
+        Logger.LogWarning("<<< Exiting CacheItemArgs(key={Key},timeout={Timeout},priority={Priority})", key, timeout, priority);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CacheItemArgs"/> class.</summary>
@@ -57,8 +65,10 @@ namespace DotNetNuke.Common.Utilities
         public CacheItemArgs(string key, int timeout, CacheItemPriority priority, params object[] parameters)
         {
             this.CacheKey = key;
+			Logger.LogDebug("CacheItemArgs(key={Key},timeout={Timeout},priority={Priority},parameters={Parameters}): this.CacheKey → {Arg4}", key, timeout, priority, parameters, this.CacheKey);
             this.CacheTimeOut = timeout;
             this.CachePriority = priority;
+			Logger.LogDebug("CacheItemArgs(key={Key},timeout={Timeout},priority={Priority},parameters={Parameters}): this.CacheTimeOut → {Arg4}", key, timeout, priority, parameters, this.CacheTimeOut);
             this.Params = parameters;
         }
 

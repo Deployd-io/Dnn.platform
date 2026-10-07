@@ -20,12 +20,15 @@ namespace Dnn.PersonaBar.Security.Attributes
         /// <inheritdoc />
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+			eventLogger.LogError(">>> Entering IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             var propertyName = validationContext.DisplayName;
 
             if (int.TryParse(value.ToString(), out var userId))
             {
                 var portalSetting = PortalController.Instance.GetCurrentSettings();
+				eventLogger.LogError("IsValid(value={Value},validationContext={ValidationContext}): portalSetting → {PortalSetting}", value, validationContext, portalSetting);
                 var user = UserController.Instance.GetUserById(portalSetting.PortalId, userId);
+				eventLogger.LogError("IsValid(value={Value},validationContext={ValidationContext}): user → {User}", value, validationContext, user);
 
                 if (user != null)
                 {
@@ -41,6 +44,7 @@ namespace Dnn.PersonaBar.Security.Attributes
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             return new ValidationResult(string.Format(CultureInfo.CurrentCulture, Localization.GetString(Components.Constants.NotValid, Components.Constants.LocalResourcesFile), propertyName, value.ToString()));
         }
     }

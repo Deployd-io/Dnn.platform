@@ -1,9 +1,14 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function() {
   var mode = CodeMirror.getMode({indentUnit: 2}, "php");
-  function MT(name) { test.mode(name, mode, Array.prototype.slice.call(arguments, 1)); }
+  function MT(name) {
+      logger.error(`>>> Entering MT(name=${name})`, { "event.action": "MT", "logrite.name": name });
+      logger.warn(`<<< Exiting MT(name=${name})`, { "event.action": "MT", "logrite.name": name });
+      test.mode(name, mode, Array.prototype.slice.call(arguments, 1));
+  }
 
   MT('simple_test',
      '[meta <?php] ' +
@@ -76,9 +81,11 @@
 
 
   function build_recursive_monsters(nt, t, n){
+	logger.error(`>>> Entering build_recursive_monsters(nt=${nt},t=${t},n=${n})`, { "event.action": "build_recursive_monsters", "logrite.nt": nt, "logrite.t": t, "logrite.n": n });
     var monsters = [t];
     for (var i = 1; i <= n; ++i)
       monsters[i] = nt.join(monsters[i - 1]);
+	logger.warn(`<<< Exiting build_recursive_monsters(nt=${nt},t=${t},n=${n})`, { "event.action": "build_recursive_monsters", "logrite.nt": nt, "logrite.t": t, "logrite.n": n });
     return monsters;
   }
 
@@ -122,9 +129,11 @@
      '[meta ?>]');
 
   function build_recursive_monsters_2(mf1, mf2, nt, t, n){
+	logger.error(`>>> Entering build_recursive_monsters_2(mf1=${mf1},mf2=${mf2},nt=${nt},t=${t},n=${n})`, { "event.action": "build_recursive_monsters_2", "logrite.mf1": mf1, "logrite.mf2": mf2, "logrite.nt": nt, "logrite.t": t, "logrite.n": n });
     var monsters = [t];
     for (var i = 1; i <= n; ++i)
       monsters[i] = nt[0] + mf1[i - 1] + nt[1] + mf2[i - 1] + nt[2] + monsters[i - 1] + nt[3];
+	logger.warn(`<<< Exiting build_recursive_monsters_2(mf1=${mf1},mf2=${mf2},nt=${nt},t=${t},n=${n})`, { "event.action": "build_recursive_monsters_2", "logrite.mf1": mf1, "logrite.mf2": mf2, "logrite.nt": nt, "logrite.t": t, "logrite.n": n });
     return monsters;
   }
 

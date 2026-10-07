@@ -11,10 +11,12 @@ namespace DotNetNuke.HttpModules.Compression
     [SuppressMessage("Microsoft.Design", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "Breaking change")]
     public abstract class HttpOutputFilter : Stream
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HttpOutputFilter));
         /// <summary>Initializes a new instance of the <see cref="HttpOutputFilter"/> class.</summary>
         /// <param name="baseStream">The base stream.</param>
         protected HttpOutputFilter(Stream baseStream)
         {
+			Logger.LogError(">>> Entering HttpOutputFilter(baseStream={BaseStream})", baseStream);
             this.BaseStream = baseStream;
         }
 
@@ -42,19 +44,44 @@ namespace DotNetNuke.HttpModules.Compression
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
-        public override long Seek(long offset, SeekOrigin direction) => throw new NotSupportedException();
+        public override long Seek(long offset, SeekOrigin direction)
+        {
+            Logger.LogError(">>> Entering Seek(offset={Offset},direction={Direction})", offset, direction);
+            Logger.LogWarning("<<< Exiting Seek(offset={Offset},direction={Direction})", offset, direction);
+            throw new NotSupportedException();
+        }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
-        public override void SetLength(long length) => throw new NotSupportedException();
+        public override void SetLength(long length)
+        {
+            Logger.LogError(">>> Entering SetLength(length={Length})", length);
+            Logger.LogWarning("<<< Exiting SetLength(length={Length})", length);
+            throw new NotSupportedException();
+        }
 
         /// <inheritdoc />
-        public override void Close() => this.BaseStream.Close();
+        public override void Close()
+        {
+            Logger.LogError(">>> Entering Close()");
+            Logger.LogWarning("<<< Exiting Close()");
+            this.BaseStream.Close();
+        }
 
         /// <inheritdoc />
-        public override void Flush() => this.BaseStream.Flush();
+        public override void Flush()
+        {
+            Logger.LogError(">>> Entering Flush()");
+            Logger.LogWarning("<<< Exiting Flush()");
+            this.BaseStream.Flush();
+        }
 
         /// <inheritdoc />
-        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            Logger.LogError(">>> Entering Read(buffer={Buffer},offset={Offset},count={Count})", buffer, offset, count);
+            Logger.LogWarning("<<< Exiting Read(buffer={Buffer},offset={Offset},count={Count})", buffer, offset, count);
+            throw new NotSupportedException();
+        }
     }
 }

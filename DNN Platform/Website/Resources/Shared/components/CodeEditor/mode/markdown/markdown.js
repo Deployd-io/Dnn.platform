@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -17,11 +18,14 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
   var htmlMode = CodeMirror.getMode(cmCfg, htmlFound ? {name: "xml", htmlMode: true} : "text/plain");
 
   function getMode(name) {
+	logger.error(`>>> Entering getMode(name=${name})`, { "event.action": "getMode", "logrite.name": name });
     if (CodeMirror.findModeByName) {
       var found = CodeMirror.findModeByName(name);
+	logger.error(`getMode(name=${name}): found → ${found}`, { "event.action": "getMode", "logrite.name": name });
       if (found) name = found.mime || found.mimes[0];
     }
     var mode = CodeMirror.getMode(cmCfg, name);
+	logger.error(`getMode(name=${name}): mode → ${mode}`, { "event.action": "getMode", "logrite.name": name });
     return mode.name == "null" ? null : mode;
   }
 
@@ -77,12 +81,16 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
   ,   textRE = /^[^#!\[\]*_\\<>` "'(~]+/;
 
   function switchInline(stream, state, f) {
+	logger.error(`>>> Entering switchInline(stream=${stream},state=${state},f=${f})`, { "event.action": "switchInline", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
     state.f = state.inline = f;
+	logger.warn(`<<< Exiting switchInline(stream=${stream},state=${state},f=${f})`, { "event.action": "switchInline", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
     return f(stream, state);
   }
 
   function switchBlock(stream, state, f) {
+	logger.error(`>>> Entering switchBlock(stream=${stream},state=${state},f=${f})`, { "event.action": "switchBlock", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
     state.f = state.block = f;
+	logger.warn(`<<< Exiting switchBlock(stream=${stream},state=${state},f=${f})`, { "event.action": "switchBlock", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
     return f(stream, state);
   }
 
@@ -90,38 +98,54 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
   // Blocks
 
   function blankLine(state) {
+	logger.error(`>>> Entering blankLine(state=${state})`, { "event.action": "blankLine", "logrite.state": state });
     // Reset linkTitle state
     state.linkTitle = false;
+	logger.debug(`blankLine(state=${state}): state.linkTitle → ${state.linkTitle}`, { "event.action": "blankLine", "logrite.state": state });
     // Reset EM state
     state.em = false;
+	logger.debug(`blankLine(state=${state}): state.em → ${state.em}`, { "event.action": "blankLine", "logrite.state": state });
     // Reset STRONG state
     state.strong = false;
+	logger.debug(`blankLine(state=${state}): state.strong → ${state.strong}`, { "event.action": "blankLine", "logrite.state": state });
     // Reset strikethrough state
     state.strikethrough = false;
+	logger.debug(`blankLine(state=${state}): state.strikethrough → ${state.strikethrough}`, { "event.action": "blankLine", "logrite.state": state });
     // Reset state.quote
     state.quote = 0;
+	logger.debug(`blankLine(state=${state}): state.quote → ${state.quote}`, { "event.action": "blankLine", "logrite.state": state });
     // Reset state.indentedCode
     state.indentedCode = false;
+	logger.debug(`blankLine(state=${state}): state.indentedCode → ${state.indentedCode}`, { "event.action": "blankLine", "logrite.state": state });
     if (!htmlFound && state.f == htmlBlock) {
       state.f = inlineNormal;
+	logger.debug(`blankLine(state=${state}): state.f → ${state.f}`, { "event.action": "blankLine", "logrite.state": state });
       state.block = blockNormal;
+	logger.debug(`blankLine(state=${state}): state.block → ${state.block}`, { "event.action": "blankLine", "logrite.state": state });
     }
     // Reset state.trailingSpace
     state.trailingSpace = 0;
+	logger.debug(`blankLine(state=${state}): state.trailingSpace → ${state.trailingSpace}`, { "event.action": "blankLine", "logrite.state": state });
     state.trailingSpaceNewLine = false;
+	logger.debug(`blankLine(state=${state}): state.trailingSpaceNewLine → ${state.trailingSpaceNewLine}`, { "event.action": "blankLine", "logrite.state": state });
     // Mark this line as blank
     state.thisLineHasContent = false;
+	logger.debug(`blankLine(state=${state}): state.thisLineHasContent → ${state.thisLineHasContent}`, { "event.action": "blankLine", "logrite.state": state });
+	logger.warn(`<<< Exiting blankLine(state=${state})`, { "event.action": "blankLine", "logrite.state": state });
     return null;
   }
 
   function blockNormal(stream, state) {
+logger.error(`>>> Entering blockNormal(stream=${stream},state=${state})`, { "event.action": "blockNormal", "logrite.stream": stream, "logrite.state": state });
 
     var sol = stream.sol();
+	logger.error(`blockNormal(stream=${stream},state=${state}): sol → ${sol}`, { "event.action": "blockNormal", "logrite.stream": stream, "logrite.state": state });
 
     var prevLineIsList = state.list !== false,
         prevLineIsIndentedCode = state.indentedCode;
 
     state.indentedCode = false;
+	logger.debug(`blockNormal(stream=${stream},state=${state}): state.indentedCode → ${state.indentedCode}`, { "event.action": "blockNormal", "logrite.stream": stream, "logrite.state": state });
 
     if (prevLineIsList) {
       if (state.indentationDiff >= 0) { // Continued list
@@ -135,6 +159,7 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       } else { // No longer a list
         state.list = false;
         state.listDepth = 0;
+		logger.debug(`blockNormal(stream=${stream},state=${state}): state.listDepth → ${state.listDepth}`, { "event.action": "blockNormal", "logrite.stream": stream, "logrite.state": state });
       }
     }
 
@@ -161,7 +186,10 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       state.f = state.inline;
       return getType(state);
     } else if (stream.eat('>')) {
+	logger.debug(`blockNormal(stream=${stream},state=${state}): state.f → ${state.f}`, { "event.action": "blockNormal", "logrite.stream": stream, "logrite.state": state });
+	logger.debug(`blockNormal(stream=${stream},state=${state}): state.header → ${state.header}`, { "event.action": "blockNormal", "logrite.stream": stream, "logrite.state": state });
       state.quote = sol ? 1 : state.quote + 1;
+	logger.debug(`blockNormal(stream=${stream},state=${state}): state.quote → ${state.quote}`, { "event.action": "blockNormal", "logrite.stream": stream, "logrite.state": state });
       if (modeCfg.highlightFormatting) state.formatting = "quote";
       stream.eatSpace();
       return getType(state);
@@ -169,9 +197,11 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       return switchInline(stream, state, footnoteLink);
     } else if (stream.match(hrRE, true)) {
       state.hr = true;
+	logger.debug(`blockNormal(stream=${stream},state=${state}): state.hr → ${state.hr}`, { "event.action": "blockNormal", "logrite.stream": stream, "logrite.state": state });
       return hr;
     } else if ((!state.prevLineHasContent || prevLineIsList) && (stream.match(ulRE, false) || stream.match(olRE, false))) {
       var listType = null;
+	logger.error(`blockNormal(stream=${stream},state=${state}): listType → ${listType}`, { "event.action": "blockNormal", "logrite.stream": stream, "logrite.state": state });
       if (stream.match(ulRE, true)) {
         listType = 'ul';
       } else {
@@ -183,6 +213,7 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       state.listDepth++;
       if (modeCfg.taskLists && stream.match(taskListRE, false)) {
         state.taskList = true;
+		logger.debug(`blockNormal(stream=${stream},state=${state}): state.taskList → ${state.taskList}`, { "event.action": "blockNormal", "logrite.stream": stream, "logrite.state": state });
       }
       state.f = state.inline;
       if (modeCfg.highlightFormatting) state.formatting = ["list", "list-" + listType];
@@ -214,18 +245,23 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
 
   function local(stream, state) {
     if (stream.sol() && stream.match("```", false)) {
+	logger.error(`>>> Entering local(stream=${stream},state=${state})`, { "event.action": "local", "logrite.stream": stream, "logrite.state": state });
       state.localMode = state.localState = null;
       state.f = state.block = leavingLocal;
+	logger.debug(`local(stream=${stream},state=${state}): state.localMode → ${state.localMode}`, { "event.action": "local", "logrite.stream": stream, "logrite.state": state });
+	logger.debug(`local(stream=${stream},state=${state}): state.f → ${state.f}`, { "event.action": "local", "logrite.stream": stream, "logrite.state": state });
       return null;
     } else if (state.localMode) {
       return state.localMode.token(stream, state.localState);
     } else {
       stream.skipToEnd();
+	logger.warn(`<<< Exiting local(stream=${stream},state=${state})`, { "event.action": "local", "logrite.stream": stream, "logrite.state": state });
       return code;
     }
   }
 
   function leavingLocal(stream, state) {
+	logger.error(`>>> Entering leavingLocal(stream=${stream},state=${state})`, { "event.action": "leavingLocal", "logrite.stream": stream, "logrite.state": state });
     stream.match("```");
     state.block = blockNormal;
     state.f = inlineNormal;

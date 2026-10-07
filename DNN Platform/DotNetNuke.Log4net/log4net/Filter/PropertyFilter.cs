@@ -43,6 +43,8 @@ namespace log4net.Filter
         /// <summary>Default constructor</summary>
         public PropertyFilter()
         {
+		log.ErrorFormat(">>> Entering PropertyFilter()");
+        log.WarnFormat("<<< Exiting PropertyFilter()");
         }
 
         /// <summary>The key to lookup in the event properties and then match against.</summary>
@@ -77,8 +79,10 @@ namespace log4net.Filter
         /// </remarks>
         public override FilterDecision Decide(LoggingEvent loggingEvent) 
         {
+			log.ErrorFormat(">>> Entering Decide(loggingEvent={0})", loggingEvent);
             if (loggingEvent == null)
             {
+				log.ErrorFormat("Throwing ArgumentNullException from Decide(loggingEvent={0})", loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
             }
 
@@ -93,6 +97,7 @@ namespace log4net.Filter
             // Lookup the string to match in from the properties using 
             // the key specified.
             object msgObj = loggingEvent.LookupProperty(this.m_key);
+			log.ErrorFormat("Decide(loggingEvent={0}): msgObj → {1}", loggingEvent, msgObj);
 
             // Use an ObjectRenderer to convert the property value to a string
             string msg = loggingEvent.Repository.RendererMap.FindAndRender(msgObj);
@@ -138,6 +143,7 @@ namespace log4net.Filter
                 } 
                 return FilterDecision.Deny;
             }
+			log.WarnFormat("<<< Exiting Decide(loggingEvent={0})", loggingEvent);
             return FilterDecision.Neutral;
         }
     }

@@ -1,4 +1,5 @@
-﻿/// <reference name="MicrosoftAjax.js" />
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+/// <reference name="MicrosoftAjax.js" />
 /// <reference name="dnn.js" assembly="DotNetNuke.WebUtility" />
 
 /*add browser detect for chrome*/
@@ -16,12 +17,16 @@ if (typeof (Sys.Browser.Chrome) == "undefined") {
 else if (Sys.Browser.agent === Sys.Browser.InternetExplorer && Sys.Browser.version > 10) {
     // when browse in IE11, we need add attachEvent/detachEvent handler to make it works with MS AJAX library.
     HTMLAnchorElement.prototype.attachEvent = function (eventName, handler) {
+		logger.error(`>>> Entering attachEvent(eventName=${eventName},handler=${handler})`, { "event.action": "attachEvent", "logrite.ctl": ctl, "logrite.type": type, "logrite.fHandler": fHandler });
         if (eventName.substr(0, 2) == "on") eventName = eventName.substr(2);
         this.addEventListener(eventName, handler, false);
+		logger.warn(`<<< Exiting attachEvent(eventName=${eventName},handler=${handler})`, { "event.action": "attachEvent", "logrite.ctl": ctl, "logrite.type": type, "logrite.fHandler": fHandler });
     }
     HTMLAnchorElement.prototype.detachEvent = function (eventName, handler) {
+		logger.error(`>>> Entering detachEvent(eventName=${eventName},handler=${handler})`, { "event.action": "detachEvent", "logrite.eventName": eventName, "logrite.handler": handler });
         if (eventName.substr(0, 2) == "on") eventName = eventName.substr(2);
         this.removeEventListener(eventName, handler, false);
+		logger.warn(`<<< Exiting detachEvent(eventName=${eventName},handler=${handler})`, { "event.action": "detachEvent", "logrite.eventName": eventName, "logrite.handler": handler });
     }
 }
 
@@ -38,8 +43,10 @@ var KEY_ESCAPE = 27;
 
 Type.registerNamespace('dnn');
 dnn.extend = function (dest, src) {
+	logger.error(`>>> Entering extend(dest=${dest},src=${src})`, { "event.action": "extend", "logrite.dest": dest, "logrite.src": src });
     for (s in src)
         dest[s] = src[s];
+	logger.warn(`<<< Exiting extend(dest=${dest},src=${src})`, { "event.action": "extend", "logrite.dest": dest, "logrite.src": src });
     return dest;
 }
 
@@ -55,6 +62,7 @@ dnn.extend(dnn, {
     _delayedSet: null,  //used to delay setting variable until page is loaded - perf
 
     getVars: function () {
+		logger.error('>>> Entering getVars()', { "event.action": "getVars" });
         /// <summary>
         /// Gets array of name value pairs set on the server side by the RegisterClientVariable method.
         /// </summary>
@@ -64,11 +72,13 @@ dnn.extend(dnn, {
             var ctl = dnn.dom.getById('__dnnVariable');
 
             if (ctl != null) {
+				logger.error(`getVars(): ctl → ${ctl}`, { "event.action": "getVars" });
                 if (ctl.value.indexOf('`') == 0)
                     ctl.value = ctl.value.substring(1).replace(/`/g, '"');
 
                 if (ctl.value.indexOf('__scdoff') != -1) //back compat
                 {
+					logger.debug(`getVars(): this.vars → ${this.vars}`, { "event.action": "getVars" });
                     COL_DELIMITER = '~|~';
                     ROW_DELIMITER = '~`~';
                     QUOTE_REPLACEMENT = '~!~';

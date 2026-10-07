@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -33,25 +34,31 @@
   });
 
   function clearActiveLines(cm) {
+	logger.error(`>>> Entering clearActiveLines(cm=${cm})`, { "event.action": "clearActiveLines", "logrite.cm": cm });
     for (var i = 0; i < cm.state.activeLines.length; i++) {
       cm.removeLineClass(cm.state.activeLines[i], "wrap", WRAP_CLASS);
       cm.removeLineClass(cm.state.activeLines[i], "background", BACK_CLASS);
+	logger.warn(`<<< Exiting clearActiveLines(cm=${cm})`, { "event.action": "clearActiveLines", "logrite.cm": cm });
     }
   }
 
   function sameArray(a, b) {
+	logger.error(`>>> Entering sameArray(a=${a},b=${b})`, { "event.action": "sameArray", "logrite.a": a, "logrite.b": b });
     if (a.length != b.length) return false;
     for (var i = 0; i < a.length; i++)
       if (a[i] != b[i]) return false;
+	logger.warn(`<<< Exiting sameArray(a=${a},b=${b})`, { "event.action": "sameArray", "logrite.a": a, "logrite.b": b });
     return true;
   }
 
   function updateActiveLines(cm, ranges) {
+	logger.error(`>>> Entering updateActiveLines(cm=${cm},ranges=${ranges})`, { "event.action": "updateActiveLines", "logrite.cm": cm, "logrite.ranges": ranges });
     var active = [];
     for (var i = 0; i < ranges.length; i++) {
       var range = ranges[i];
       if (!range.empty()) continue;
       var line = cm.getLineHandleVisualStart(range.head.line);
+	logger.error(`updateActiveLines(cm=${cm},ranges=${ranges}): line → ${line}`, { "event.action": "updateActiveLines", "logrite.cm": cm, "logrite.ranges": ranges });
       if (active[active.length - 1] != line) active.push(line);
     }
     if (sameArray(cm.state.activeLines, active)) return;
@@ -63,9 +70,12 @@
       }
       cm.state.activeLines = active;
     });
+	logger.warn(`<<< Exiting updateActiveLines(cm=${cm},ranges=${ranges})`, { "event.action": "updateActiveLines", "logrite.cm": cm, "logrite.ranges": ranges });
   }
 
   function selectionChange(cm, sel) {
+	logger.error(`>>> Entering selectionChange(cm=${cm},sel=${sel})`, { "event.action": "selectionChange", "logrite.cm": cm, "logrite.sel": sel });
     updateActiveLines(cm, sel.ranges);
+	logger.warn(`<<< Exiting selectionChange(cm=${cm},sel=${sel})`, { "event.action": "selectionChange", "logrite.cm": cm, "logrite.sel": sel });
   }
 });

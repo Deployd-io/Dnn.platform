@@ -57,6 +57,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public XmlHierarchyConfigurator(Hierarchy hierarchy) 
         {
+			log.LogError(">>> Entering XmlHierarchyConfigurator(hierarchy={Hierarchy})", hierarchy);
             this.m_hierarchy = hierarchy;
             this.m_appenderBag = new Hashtable();
         }
@@ -70,6 +71,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public void Configure(XmlElement element) 
         {
+			log.LogError(">>> Entering Configure(element={Element})", element);
             if (element == null || this.m_hierarchy == null)
             {
                 return;
@@ -125,6 +127,7 @@ namespace log4net.Repository.Hierarchy
 
             // Default mode is merge
             ConfigUpdateMode configUpdateMode = ConfigUpdateMode.Merge;
+			log.LogError("Configure(element={Element}): configUpdateMode → {ConfigUpdateMode}", element, configUpdateMode);
 
             // Look for the config update attribute
             string configUpdateModeAttribute = element.GetAttribute(CONFIG_UPDATE_MODE_ATTR);
@@ -162,6 +165,7 @@ namespace log4net.Repository.Hierarchy
                 if (currentNode.NodeType == XmlNodeType.Element) 
                 {
                     XmlElement currentElement = (XmlElement)currentNode;
+					log.LogError("Configure(element={Element}): currentElement → {CurrentElement}", element, currentElement);
 
                     if (currentElement.LocalName == LOGGER_TAG)
                     {
@@ -199,6 +203,7 @@ namespace log4net.Repository.Hierarchy
             if (thresholdStr.Length > 0 && thresholdStr != "null") 
             {
                 Level thresholdLevel = (Level)this.ConvertStringTo(typeof(Level), thresholdStr);
+				log.LogError("Configure(element={Element}): thresholdLevel → {ThresholdLevel}", element, thresholdLevel);
                 if (thresholdLevel != null)
                 {
                     this.m_hierarchy.Threshold = thresholdLevel;
@@ -210,6 +215,7 @@ namespace log4net.Repository.Hierarchy
             }
 
             // Done reading config
+			log.LogWarning("<<< Exiting Configure(element={Element})", element);
         }
 
         /// <summary>Parse appenders by IDREF.</summary>
@@ -223,9 +229,11 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected IAppender FindAppenderByReference(XmlElement appenderRef) 
         {	
+			log.LogError(">>> Entering FindAppenderByReference(appenderRef={AppenderRef})", appenderRef);
             string appenderName = appenderRef.GetAttribute(REF_ATTR);
 
             IAppender appender = (IAppender)this.m_appenderBag[appenderName];
+			log.LogError("FindAppenderByReference(appenderRef={AppenderRef}): appender → {Appender}", appenderRef, appender);
             if (appender != null) 
             {
                 return appender;
@@ -234,6 +242,7 @@ namespace log4net.Repository.Hierarchy
             {
                 // Find the element with that id
                 XmlElement element = null;
+				log.LogError("FindAppenderByReference(appenderRef={AppenderRef}): element → {Element}", appenderRef, element);
 
                 if (appenderName != null && appenderName.Length > 0)
                 {
@@ -259,6 +268,7 @@ namespace log4net.Repository.Hierarchy
                     {
                         this.m_appenderBag[appenderName] = appender;
                     }
+					log.LogWarning("<<< Exiting FindAppenderByReference(appenderRef={AppenderRef})", appenderRef);
                     return appender;
                 }
             } 
@@ -275,18 +285,22 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected IAppender ParseAppender(XmlElement appenderElement) 
         {
+			log.LogError(">>> Entering ParseAppender(appenderElement={AppenderElement})", appenderElement);
             string appenderName = appenderElement.GetAttribute(NAME_ATTR);
             string typeName = appenderElement.GetAttribute(TYPE_ATTR);
 
             LogLog.Debug(declaringType, "Loading Appender [" + appenderName + "] type: [" + typeName + "]");
             try 
+			log.LogWarning("<<< Exiting ParseAppender(appenderElement={AppenderElement})", appenderElement);
             {
 #if NETSTANDARD1_3
                 IAppender appender = (IAppender)Activator.CreateInstance(SystemInfo.GetTypeFromString(this.GetType().GetTypeInfo().Assembly, typeName, true, true));
+				log.LogError("ParseAppender(appenderElement={AppenderElement}): appender → {Appender}", appenderElement, appender);
 #else
                 IAppender appender = (IAppender)Activator.CreateInstance(SystemInfo.GetTypeFromString(typeName, true, true));
 #endif
                 appender.Name = appenderName;
+				log.LogDebug("ParseAppender(appenderElement={AppenderElement}): appender.Name → {Arg1}", appenderElement, appender.Name);
 
                 foreach (XmlNode currentNode in appenderElement.ChildNodes)
                 {
@@ -294,6 +308,7 @@ namespace log4net.Repository.Hierarchy
                     if (currentNode.NodeType == XmlNodeType.Element) 
                     {
                         XmlElement currentElement = (XmlElement)currentNode;
+						log.LogError("ParseAppender(appenderElement={AppenderElement}): currentElement → {CurrentElement}", appenderElement, currentElement);
 
                         // Look for the appender ref tag
                         if (currentElement.LocalName == APPENDER_REF_TAG)
@@ -306,6 +321,7 @@ namespace log4net.Repository.Hierarchy
                                 LogLog.Debug(declaringType, "Attaching appender named [" + refName + "] to appender named [" + appender.Name + "].");
 
                                 IAppender referencedAppender = this.FindAppenderByReference(currentElement);
+								log.LogError("ParseAppender(appenderElement={AppenderElement}): referencedAppender → {ReferencedAppender}", appenderElement, referencedAppender);
                                 if (referencedAppender != null)
                                 {
                                     appenderContainer.AddAppender(referencedAppender);
@@ -351,11 +367,14 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected void ParseLogger(XmlElement loggerElement) 
         {
+			log.LogError(">>> Entering ParseLogger(loggerElement={LoggerElement})", loggerElement);
             // Create a new log4net.Logger object from the <logger> element.
             string loggerName = loggerElement.GetAttribute(NAME_ATTR);
+			log.LogError("ParseLogger(loggerElement={LoggerElement}): loggerName → {LoggerName}", loggerElement, loggerName);
 
             LogLog.Debug(declaringType, "Retrieving an instance of log4net.Repository.Logger for logger [" + loggerName + "].");
             Logger log = this.m_hierarchy.GetLogger(loggerName) as Logger;
+			log.LogError("ParseLogger(loggerElement={LoggerElement}): log → {Log}", loggerElement, log);
 
             // Setting up a logger needs to be an atomic operation, in order
             // to protect potential log operations while logger
@@ -366,8 +385,10 @@ namespace log4net.Repository.Hierarchy
     
                 LogLog.Debug(declaringType, "Setting [" + log.Name + "] additivity to [" + additivity + "].");
                 log.Additivity = additivity;
+				log.LogDebug("ParseLogger(loggerElement={LoggerElement}): log.Additivity → {Arg1}", loggerElement, log.Additivity);
                 this.ParseChildrenOfLoggerElement(loggerElement, log, false);
             }
+			log.LogWarning("<<< Exiting ParseLogger(loggerElement={LoggerElement})", loggerElement);
         }
 
         /// <summary>Parses the root logger element.</summary>
@@ -379,12 +400,14 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected void ParseRoot(XmlElement rootElement) 
         {
+			log.LogError(">>> Entering ParseRoot(rootElement={RootElement})", rootElement);
             Logger root = this.m_hierarchy.Root;
             // logger configuration needs to be atomic
             lock(root) 
             {
                 this.ParseChildrenOfLoggerElement(rootElement, root, true);
             }
+			log.LogWarning("<<< Exiting ParseRoot(rootElement={RootElement})", rootElement);
         }
 
         /// <summary>Parses the children of a logger element.</summary>
@@ -398,6 +421,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected void ParseChildrenOfLoggerElement(XmlElement catElement, Logger log, bool isRoot) 
         {
+			log.LogError(">>> Entering ParseChildrenOfLoggerElement(catElement={CatElement},log={Log},isRoot={IsRoot})", catElement, log, isRoot);
             // Remove all existing appenders from log. They will be
             // reconstructed if need be.
             log.RemoveAllAppenders();
@@ -407,10 +431,12 @@ namespace log4net.Repository.Hierarchy
                 if (currentNode.NodeType == XmlNodeType.Element) 
                 {
                     XmlElement currentElement = (XmlElement) currentNode;
+					log.LogError("ParseChildrenOfLoggerElement(catElement={CatElement},log={Log},isRoot={IsRoot}): currentElement → {CurrentElement}", catElement, log, isRoot, currentElement);
     
                     if (currentElement.LocalName == APPENDER_REF_TAG)
                     {
                         IAppender appender = this.FindAppenderByReference(currentElement);
+						log.LogError("ParseChildrenOfLoggerElement(catElement={CatElement},log={Log},isRoot={IsRoot}): appender → {Appender}", catElement, log, isRoot, appender);
                         string refName = currentElement.GetAttribute(REF_ATTR);
                         if (appender != null)
                         {
@@ -438,6 +464,7 @@ namespace log4net.Repository.Hierarchy
             {
                 optionHandler.ActivateOptions();
             }
+			log.LogWarning("<<< Exiting ParseChildrenOfLoggerElement(catElement={CatElement},log={Log},isRoot={IsRoot})", catElement, log, isRoot);
         }
 
         /// <summary>Parses an object renderer.</summary>
@@ -449,11 +476,13 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected void ParseRenderer(XmlElement element) 
         {
+			log.LogError(">>> Entering ParseRenderer(element={Element})", element);
             string renderingClassName = element.GetAttribute(RENDERING_TYPE_ATTR);
             string renderedClassName = element.GetAttribute(RENDERED_TYPE_ATTR);
 
             LogLog.Debug(declaringType, "Rendering class [" + renderingClassName + "], Rendered class [" + renderedClassName + "].");
             IObjectRenderer renderer = (IObjectRenderer)OptionConverter.InstantiateByClassName(renderingClassName, typeof(IObjectRenderer), null);
+			log.LogError("ParseRenderer(element={Element}): renderer → {Renderer}", element, renderer);
             if (renderer == null) 
             {
                 LogLog.Error(declaringType, "Could not instantiate renderer [" + renderingClassName + "].");
@@ -462,6 +491,7 @@ namespace log4net.Repository.Hierarchy
             else 
             {
                 try 
+			log.LogWarning("<<< Exiting ParseRenderer(element={Element})", element);
                 {
 #if NETSTANDARD1_3
                     m_hierarchy.RendererMap.Put(SystemInfo.GetTypeFromString(this.GetType().GetTypeInfo().Assembly, renderedClassName, true, true), renderer);
@@ -487,7 +517,9 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected void ParseLevel(XmlElement element, Logger log, bool isRoot) 
         {
+			log.LogError(">>> Entering ParseLevel(element={Element},log={Log},isRoot={IsRoot})", element, log, isRoot);
             string loggerName = log.Name;
+			log.LogError("ParseLevel(element={Element},log={Log},isRoot={IsRoot}): loggerName → {LoggerName}", element, log, isRoot, loggerName);
             if (isRoot) 
             {
                 loggerName = "root";
@@ -506,6 +538,7 @@ namespace log4net.Repository.Hierarchy
                 {
                     LogLog.Debug(declaringType, "Logger [" + loggerName + "] level set to inherit from parent.");	
                     log.Level = null;
+					log.LogDebug("ParseLevel(element={Element},log={Log},isRoot={IsRoot}): log.Level → {Arg3}", element, log, isRoot, log.Level);
                 }
             } 
             else 
@@ -520,6 +553,7 @@ namespace log4net.Repository.Hierarchy
                     LogLog.Debug(declaringType, "Logger [" + loggerName + "] level set to [name=\"" + log.Level.Name + "\",value=" + log.Level.Value + "].");	
                 }
             }
+			log.LogWarning("<<< Exiting ParseLevel(element={Element},log={Log},isRoot={IsRoot})", element, log, isRoot);
         }
 
         /// <summary>Sets a parameter on an object.</summary>
@@ -538,8 +572,10 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected void SetParameter(XmlElement element, object target) 
         {
+			log.LogError(">>> Entering SetParameter(element={Element},target={Target})", element, target);
             // Get the property name
             string name = element.GetAttribute(NAME_ATTR);
+			log.LogError("SetParameter(element={Element},target={Target}): name → {Name}", element, target, name);
 
             // If the name attribute does not exist then use the name of the element
             if (element.LocalName != PARAM_TAG || name == null || name.Length == 0)
@@ -549,10 +585,14 @@ namespace log4net.Repository.Hierarchy
 
             // Look for the property on the target object
             Type targetType = target.GetType();
+			log.LogError("SetParameter(element={Element},target={Target}): targetType → {TargetType}", element, target, targetType);
             Type propertyType = null;
+			log.LogError("SetParameter(element={Element},target={Target}): propertyType → {PropertyType}", element, target, propertyType);
 
             PropertyInfo propInfo = null;
+			log.LogError("SetParameter(element={Element},target={Target}): propInfo → {PropInfo}", element, target, propInfo);
             MethodInfo methInfo = null;
+			log.LogError("SetParameter(element={Element},target={Target}): methInfo → {MethInfo}", element, target, methInfo);
 
             // Try to find a writable property
             propInfo = targetType.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase);
@@ -580,7 +620,9 @@ namespace log4net.Repository.Hierarchy
             }
             else
             {
+                var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 string propertyValue = null;
+				log.LogError("SetParameter(element={Element},target={Target}): propertyValue → {PropertyValue}", element, target, propertyValue);
 
                 if (element.GetAttributeNode(VALUE_ATTR) != null)
                 {
@@ -612,6 +654,7 @@ namespace log4net.Repository.Hierarchy
                     {
                         // Expand environment variables in the string.
                         IDictionary environmentVariables = Environment.GetEnvironmentVariables();
+						log.LogError("SetParameter(element={Element},target={Target}): environmentVariables → {EnvironmentVariables}", element, target, environmentVariables);
                         if (this.HasCaseInsensitiveEnvironment) 
                         {
                             environmentVariables = this.CreateCaseInsensitiveWrapper(environmentVariables);
@@ -628,6 +671,7 @@ namespace log4net.Repository.Hierarchy
 #endif
 
                     Type parsedObjectConversionTargetType = null;
+					log.LogError("SetParameter(element={Element},target={Target}): parsedObjectConversionTargetType → {ParsedObjectConversionTargetType}", element, target, parsedObjectConversionTargetType);
 
                     // Check if a specific subtype is specified on the element using the 'type' attribute
                     string subTypeString = element.GetAttribute(TYPE_ATTR);
@@ -638,6 +682,7 @@ namespace log4net.Repository.Hierarchy
                         {
 #if NETSTANDARD1_3
                             Type subType = SystemInfo.GetTypeFromString(this.GetType().GetTypeInfo().Assembly, subTypeString, true, true);
+							log.LogError("SetParameter(element={Element},target={Target}): subType → {SubType}", element, target, subType);
 #else
                             Type subType = SystemInfo.GetTypeFromString(subTypeString, true, true);
 #endif
@@ -677,6 +722,7 @@ namespace log4net.Repository.Hierarchy
                     // to pass to this property.
 
                     object convertedValue = this.ConvertStringTo(propertyType, propertyValue);
+					log.LogError("SetParameter(element={Element},target={Target}): convertedValue → {ConvertedValue}", element, target, convertedValue);
                     
                     // Check if we need to do an additional conversion
                     if (convertedValue != null && parsedObjectConversionTargetType != null)
@@ -734,6 +780,7 @@ namespace log4net.Repository.Hierarchy
                 else
                 {
                     object createdObject = null;
+					log.LogError("SetParameter(element={Element},target={Target}): createdObject → {CreatedObject}", element, target, createdObject);
 
                     if (propertyType == typeof(string) && !this.HasAttributesOrElements(element))
                     {
@@ -748,6 +795,7 @@ namespace log4net.Repository.Hierarchy
                     {
                         // No value specified
                         Type defaultObjectType = null;
+						log.LogError("SetParameter(element={Element},target={Target}): defaultObjectType → {DefaultObjectType}", element, target, defaultObjectType);
                         if (IsTypeConstructible(propertyType))
                         {
                             defaultObjectType = propertyType;
@@ -810,6 +858,7 @@ namespace log4net.Repository.Hierarchy
         /// <returns><c>true</c> if the element has any attributes or child elements, <c>false</c> otherwise</returns>
         private bool HasAttributesOrElements(XmlElement element)
         {
+			log.LogError(">>> Entering HasAttributesOrElements(element={Element})", element);
             foreach(XmlNode node in element.ChildNodes)
             {
                 if (node.NodeType == XmlNodeType.Attribute || node.NodeType == XmlNodeType.Element)
@@ -817,6 +866,7 @@ namespace log4net.Repository.Hierarchy
                     return true;
                 }
             }
+			log.LogWarning("<<< Exiting HasAttributesOrElements(element={Element})", element);
             return false;
         }
 
@@ -832,10 +882,13 @@ namespace log4net.Repository.Hierarchy
             if (type.IsClass && !type.IsAbstract)
 #endif
             {
+				log.LogError(">>> Entering IsTypeConstructible(type={Type})", type);
                 ConstructorInfo defaultConstructor = type.GetConstructor(new Type[0]);
                 if (defaultConstructor != null && !defaultConstructor.IsAbstract && !defaultConstructor.IsPrivate)
                 {
+					log.LogError("IsTypeConstructible(type={Type}): defaultConstructor → {DefaultConstructor}", type, defaultConstructor);
                     return true;
+				log.LogWarning("<<< Exiting IsTypeConstructible(type={Type})", type);
                 }
             }
             return false;
@@ -854,6 +907,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         private MethodInfo FindMethodInfo(Type targetType, string name)
         {
+			log.LogError(">>> Entering FindMethodInfo(targetType={TargetType},name={Name})", targetType, name);
             string requiredMethodNameA = name;
             string requiredMethodNameB = "Add" + name;
 
@@ -879,6 +933,7 @@ namespace log4net.Repository.Hierarchy
                     }
                 }
             }
+			log.LogWarning("<<< Exiting FindMethodInfo(targetType={TargetType},name={Name})", targetType, name);
             return null;
         }
 
@@ -893,6 +948,7 @@ namespace log4net.Repository.Hierarchy
         /// </returns>
         protected object ConvertStringTo(Type type, string value)
         {
+			log.LogError(">>> Entering ConvertStringTo(type={Type},value={Value})", type, value);
             // Hack to allow use of Level in property
             if (typeof(Level) == type)
             {
@@ -906,6 +962,7 @@ namespace log4net.Repository.Hierarchy
 
                 return levelValue;
             }
+			log.LogWarning("<<< Exiting ConvertStringTo(type={Type},value={Value})", type, value);
             return OptionConverter.ConvertStringTo(type, value);
         }
 
@@ -928,8 +985,10 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected object CreateObjectFromXml(XmlElement element, Type defaultTargetType, Type typeConstraint) 
         {
+			log.LogError(">>> Entering CreateObjectFromXml(element={Element},defaultTargetType={DefaultTargetType},typeConstraint={TypeConstraint})", element, defaultTargetType, typeConstraint);
             Type objectType = null;
 
+			log.LogError("CreateObjectFromXml(element={Element},defaultTargetType={DefaultTargetType},typeConstraint={TypeConstraint}): objectType → {ObjectType}", element, defaultTargetType, typeConstraint, objectType);
             // Get the object type
             string objectTypeString = element.GetAttribute(TYPE_ATTR);
             if (objectTypeString == null || objectTypeString.Length == 0)
@@ -949,6 +1008,7 @@ namespace log4net.Repository.Hierarchy
             {
                 // Read the explicit object type
                 try
+			log.LogWarning("<<< Exiting CreateObjectFromXml(element={Element},defaultTargetType={DefaultTargetType},typeConstraint={TypeConstraint})", element, defaultTargetType, typeConstraint);
                 {
 #if NETSTANDARD1_3
                     objectType = SystemInfo.GetTypeFromString(this.GetType().GetTypeInfo().Assembly, objectTypeString, true, true);
@@ -964,6 +1024,7 @@ namespace log4net.Repository.Hierarchy
             }
 
             bool requiresConversion = false;
+			log.LogError("CreateObjectFromXml(element={Element},defaultTargetType={DefaultTargetType},typeConstraint={TypeConstraint}): requiresConversion → {RequiresConversion}", element, defaultTargetType, typeConstraint, requiresConversion);
 
             // Got the object type. Check that it meets the typeConstraint
             if (typeConstraint != null)
@@ -985,6 +1046,7 @@ namespace log4net.Repository.Hierarchy
 
             // Create using the default constructor
             object createdObject = null;
+			log.LogError("CreateObjectFromXml(element={Element},defaultTargetType={DefaultTargetType},typeConstraint={TypeConstraint}): createdObject → {CreatedObject}", element, defaultTargetType, typeConstraint, createdObject);
             try
             {
                 createdObject = Activator.CreateInstance(objectType);
@@ -1044,14 +1106,17 @@ namespace log4net.Repository.Hierarchy
 
             private IDictionary CreateCaseInsensitiveWrapper(IDictionary dict)
             {
+			log.LogError(">>> Entering CreateCaseInsensitiveWrapper(dict={Dict})", dict);
             if (dict == null)
             {
             return dict;
             }
             Hashtable hash = SystemInfo.CreateCaseInsensitiveHashtable();
+			log.LogError("CreateCaseInsensitiveWrapper(dict={Dict}): hash → {Hash}", dict, hash);
             foreach (DictionaryEntry entry in dict) {
             hash[entry.Key] = entry.Value;
             }
+			log.LogWarning("<<< Exiting CreateCaseInsensitiveWrapper(dict={Dict})", dict);
             return hash;
         }
 #endif

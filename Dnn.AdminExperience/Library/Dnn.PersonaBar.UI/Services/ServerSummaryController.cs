@@ -31,6 +31,7 @@ namespace Dnn.PersonaBar.UI.Services
     [MenuPermission(Scope = ServiceScope.Regular)]
     public class ServerSummaryController : PersonaBarApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ServerSummaryController));
         private readonly IHostSettings hostSettings;
         private readonly IApplicationInfo application;
 
@@ -46,7 +47,10 @@ namespace Dnn.PersonaBar.UI.Services
         /// <param name="application">The application.</param>
         public ServerSummaryController(IHostSettings hostSettings, IApplicationInfo application)
         {
+			Logger.LogError(">>> Entering ServerSummaryController(hostSettings={HostSettings},application={Application})", hostSettings, application);
+			Logger.LogDebug("ServerSummaryController(hostSettings={HostSettings},application={Application}): application → {Application1}", hostSettings, application, application);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogWarning("<<< Exiting ServerSummaryController(hostSettings={HostSettings},application={Application})", hostSettings, application);
             this.application = application ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationInfo>();
         }
 
@@ -56,9 +60,11 @@ namespace Dnn.PersonaBar.UI.Services
         [HttpGet]
         public HttpResponseMessage GetServerInfo(CancellationToken cancellationToken)
         {
+			Logger.LogError(">>> Entering GetServerInfo(cancellationToken=<redacted>)");
             try
             {
                 var isHost = UserController.Instance.GetCurrentUserInfo().IsSuperUser;
+				Logger.LogError("GetServerInfo(cancellationToken=<redacted>): isHost → {IsHost}", isHost);
                 var response = new
                 {
                     ProductName = this.application.Description,
@@ -74,7 +80,9 @@ namespace Dnn.PersonaBar.UI.Services
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetServerInfo(cancellationToken=<redacted>): {Arg1}", ex.Message);
                 Exceptions.LogException(ex);
+				Logger.LogWarning("<<< Exiting GetServerInfo(cancellationToken=<redacted>)");
                 return this.Request.CreateErrorResponse(HttpStatusCode.NotFound, ex.Message);
             }
         }
@@ -85,12 +93,18 @@ namespace Dnn.PersonaBar.UI.Services
         [HttpGet]
         public HttpResponseMessage GetUpdateInfo(CancellationToken cancellationToken)
         {
+			Logger.LogError(">>> Entering GetUpdateInfo(cancellationToken=<redacted>)");
+            Logger.LogWarning("<<< Exiting GetUpdateInfo(cancellationToken=<redacted>)");
+			Logger.LogError(">>> Entering UpdateInfo(cancellationToken=<redacted>)");
             return this.Request.CreateResponse(HttpStatusCode.OK, this.UpdateInfo(cancellationToken));
         }
 
         private bool GetVisibleSetting(string settingName)
         {
+			Logger.LogError(">>> Entering GetVisibleSetting(settingName={SettingName})", settingName);
             var portalSettings = PortalController.Instance.GetPortalSettings(this.PortalId);
+			Logger.LogError("GetVisibleSetting(settingName={SettingName}): portalSettings → {PortalSettings}", settingName, portalSettings);
+			Logger.LogWarning("<<< Exiting GetVisibleSetting(settingName={SettingName})", settingName);
             return !portalSettings.ContainsKey(settingName)
                    || string.IsNullOrEmpty(portalSettings[settingName])
                    || portalSettings[settingName] == "true";
@@ -117,15 +131,23 @@ namespace Dnn.PersonaBar.UI.Services
 
         private FrameworkQueryDTO RetrieveUpdateUrl(CacheItemArgs args)
         {
+			Logger.LogError(">>> Entering RetrieveUpdateUrl(args={Args})", args);
             try
             {
                 var coreVersion = Globals.FormatVersion(this.application.Version, "00", 3, string.Empty);
+				Logger.LogError("RetrieveUpdateUrl(args={Args}): coreVersion → {CoreVersion}", args, coreVersion);
                 var portalCount = PortalController.Instance.GetPortals().Count;
+				Logger.LogError("RetrieveUpdateUrl(args={Args}): portalCount → {PortalCount}", args, portalCount);
                 var osVersion = Globals.FormatVersion(Globals.OperatingSystemVersion, "00", 2, string.Empty);
+				Logger.LogError("RetrieveUpdateUrl(args={Args}): osVersion → {OsVersion}", args, osVersion);
                 var netVersion = Globals.FormatVersion(Globals.NETFrameworkVersion, "00", 2, string.Empty);
+				Logger.LogError("RetrieveUpdateUrl(args={Args}): netVersion → {NetVersion}", args, netVersion);
                 var dbVersion = Globals.FormatVersion(Globals.DatabaseEngineVersion, "00", 2, string.Empty);
+				Logger.LogError("RetrieveUpdateUrl(args={Args}): dbVersion → {DbVersion}", args, dbVersion);
                 var url = $"{this.application.UpgradeUrl}/Update/FrameworkStatus?core={coreVersion}&type={this.application.Type}&name={this.application.Name}&id={this.hostSettings.Guid}&no={portalCount}&os={osVersion}&net={netVersion}&db={dbVersion}";
+				Logger.LogError("RetrieveUpdateUrl(args={Args}): url → {Url}", args, url);
                 var response = this.GetJsonObject((FrameworkQueryDTO)args.ParamList[0], url);
+				Logger.LogError("RetrieveUpdateUrl(args={Args}): response → {Response}", args, response);
                 if (response.Version.Length == 6)
                 {
                     response.Version = $"v. {response.Version.Substring(0, 2)}.{response.Version.Substring(2, 2)}.{response.Version.Substring(4, 2)}";
@@ -135,9 +157,11 @@ namespace Dnn.PersonaBar.UI.Services
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in RetrieveUpdateUrl(args={Args}): {Arg1}", args, ex.Message);
                 Exceptions.LogException(ex);
             }
 
+			Logger.LogWarning("<<< Exiting RetrieveUpdateUrl(args={Args})", args);
             return new FrameworkQueryDTO();
         }
 

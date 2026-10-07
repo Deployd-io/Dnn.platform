@@ -5,6 +5,7 @@ import { Collapsible as Collapse, Switch, DropdownWithError, RadioButtons, Butto
 import { CommonPortalListActions } from "dnn-sites-common-actions";
 import Localization from "localization";
 import "./style.less";
+const logger = console;
 
 const emptyNewPortal = {
     SiteTemplate: "",
@@ -23,15 +24,18 @@ const emptyNewPortal = {
     PasswordConfirm: ""
 };
 function extractDomain(url) {
+	logger.error(`>>> Entering extractDomain(url=${url})`, { "event.action": "extractDomain", "logrite.url": url });
     let domain, port;
     //find & remove protocol (http, ftp, etc.) and get domain
     if (url.indexOf("://") > -1) {
         domain = url.split("/")[2];
+		logger.error(`extractDomain(url=${url}): domain → ${domain}`, { "event.action": "extractDomain", "logrite.url": url });
     }
     else {
         domain = url.split("/")[0];
     }
     [domain, port] = domain.split(":");
+	logger.warn(`<<< Exiting extractDomain(url=${url})`, { "event.action": "extractDomain", "logrite.url": url });
     return port !== undefined && port !== 80 && port !== 443 ? `${domain}:${port}` : domain;
 }
 
@@ -41,12 +45,15 @@ function validateEmail(email) {
 }
 
 function getUniqueId() {
+	logger.error('>>> Entering getUniqueId()', { "event.action": "getUniqueId" });
+	logger.warn('<<< Exiting getUniqueId()', { "event.action": "getUniqueId" });
     return Math.random() * Date.now();
 }
 
 class CreatePortal extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             defaultTemplate: "",
             newPortal: Object.assign({}, emptyNewPortal),
@@ -62,18 +69,23 @@ class CreatePortal extends Component {
             },
             triedToSave: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     resetNewPortal() {
+		logger.error('>>> Entering resetNewPortal()', { "event.action": "resetNewPortal" });
         this.setState({
             newPortal: Object.assign({}, emptyNewPortal)
         });
+		logger.warn('<<< Exiting resetNewPortal()', { "event.action": "resetNewPortal" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const { props, state } = this;
         props.dispatch(CommonPortalListActions.getPortalTemplates((data) => {
             let {newPortal} = state;
+			logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
             newPortal.SiteTemplate = data.Results.DefaultTemplate;
             this.setState({
                 defaultTemplate: data.Results.DefaultTemplate,
@@ -82,6 +94,7 @@ class CreatePortal extends Component {
         }));
     }
     resolveSiteUrl(isChildSite) {
+		logger.error(`>>> Entering resolveSiteUrl(isChildSite=${isChildSite})`, { "event.action": "resolveSiteUrl", "logrite.isChildSite": isChildSite });
         let rootDomain = extractDomain(window.location.href);
         if (isChildSite) {
             let { newPortal, error } = this.state;
@@ -95,13 +108,17 @@ class CreatePortal extends Component {
         } else {
             let { newPortal } = this.state;
             newPortal.SiteAlias = newPortal.SiteAlias.replace(rootDomain + "/", "");
+			logger.debug(`resolveSiteUrl(isChildSite=${isChildSite}): newPortal.SiteAlias → ${newPortal.SiteAlias}`, { "event.action": "resolveSiteUrl", "logrite.isChildSite": isChildSite });
             this.setState({ newPortal });
+			logger.warn(`<<< Exiting resolveSiteUrl(isChildSite=${isChildSite})`, { "event.action": "resolveSiteUrl", "logrite.isChildSite": isChildSite });
         }
     }
 
     resolveSiteAliasError(value, isChildSite) {
+		logger.error(`>>> Entering resolveSiteAliasError(value=${value},isChildSite=${isChildSite})`, { "event.action": "resolveSiteAliasError", "logrite.value": value, "logrite.isChildSite": isChildSite });
         let rootDomain = extractDomain(window.location.href);
         let subUrl = value.replace(rootDomain + "/", "");
+		logger.error(`resolveSiteAliasError(value=${value},isChildSite=${isChildSite}): rootDomain → ${rootDomain}`, { "event.action": "resolveSiteAliasError", "logrite.value": value, "logrite.isChildSite": isChildSite });
         if (!isChildSite) {
             let regex = /[^\/a-z0-9-.:]/i;
             return value === "" || regex.test(value) || value.indexOf(" ") > 0;
@@ -110,17 +127,22 @@ class CreatePortal extends Component {
             if (((regex.test(subUrl) && subUrl !== "") || (value.indexOf(rootDomain + "/")) === -1) || subUrl === "" || value.indexOf(" ") > 0) {
                 return true;
             }
+			logger.warn(`<<< Exiting resolveSiteAliasError(value=${value},isChildSite=${isChildSite})`, { "event.action": "resolveSiteAliasError", "logrite.value": value, "logrite.isChildSite": isChildSite });
             return false;
         }
     }
 
     resolvePasswordError(value) {
+		logger.error(`>>> Entering resolvePasswordError(value=${value})`, { "event.action": "resolvePasswordError", "logrite.value": value });
         if (value !== this.state.newPortal.Password || value === "" || value.length < 7) {
             return true;
         }
+		logger.warn(`<<< Exiting resolvePasswordError(value=${value})`, { "event.action": "resolvePasswordError", "logrite.value": value });
         return false;
     }
     resolveEmailError(value) {
+		logger.error(`>>> Entering resolveEmailError(value=${value})`, { "event.action": "resolveEmailError", "logrite.value": value });
+		logger.warn(`<<< Exiting resolveEmailError(value=${value})`, { "event.action": "resolveEmailError", "logrite.value": value });
         return !validateEmail(value);
     }
     onChange(key, event) {
@@ -186,16 +208,21 @@ class CreatePortal extends Component {
         });
     }
     checkForError(newPortal, key) {
+		logger.error(`>>> Entering checkForError(newPortal=${newPortal},key=${key})`, { "event.action": "checkForError", "logrite.newPortal": newPortal, "logrite.key": key });
         if (newPortal[key] === "") {
+			logger.warn(`<<< Exiting checkForError(newPortal=${newPortal},key=${key})`, { "event.action": "checkForError", "logrite.newPortal": newPortal, "logrite.key": key });
             return true;
         }
     }
     setCreatingPortal(creatingPortal) {
+		logger.error(`>>> Entering setCreatingPortal(creatingPortal=${creatingPortal})`, { "event.action": "setCreatingPortal", "logrite.creatingPortal": creatingPortal });
         this.setState({
             creatingPortal
         });
+		logger.warn(`<<< Exiting setCreatingPortal(creatingPortal=${creatingPortal})`, { "event.action": "setCreatingPortal", "logrite.creatingPortal": creatingPortal });
     }
     createPortal() {
+		logger.error('>>> Entering createPortal()', { "event.action": "createPortal" });
         const { props, state } = this;
         let triedToSave = true;
         this.setState({
@@ -222,16 +249,20 @@ class CreatePortal extends Component {
                 }, 5200);
             }));
         });
+		logger.warn('<<< Exiting createPortal()', { "event.action": "createPortal" });
     }
 
     onCancel(event) {
+		logger.error(`>>> Entering onCancel(event=${event})`, { "event.action": "onCancel", "logrite.event": event });
         if (event) {
             event.preventDefault();
         }
         this.props.onCancel();
         this.resetNewPortal();
+		logger.warn(`<<< Exiting onCancel(event=${event})`, { "event.action": "onCancel", "logrite.event": event });
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
 
         const templateOptions = props.portalTemplates.map(template => {
@@ -413,6 +444,8 @@ CreatePortal.propTypes = {
 
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         portalTemplates: state.exportPortal.templates
     };

@@ -6,18 +6,22 @@ import { InputGroup, Dropdown, Switch, Label, Button, SingleLineInput, Tooltip }
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let canEdit = false;
 class BasicSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             basicLoginSettings: undefined
         };
         canEdit = util.settings.isHost || util.settings.isAdmin || util.settings.permissions.BASIC_LOGIN_SETTINGS_EDIT;
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
         if (props.basicLoginSettings) {
             this.setState({
@@ -31,9 +35,11 @@ class BasicSettingsPanelBody extends Component {
                 basicLoginSettings
             });
         }));
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     getAuthProviderOptions() {
+		logger.error('>>> Entering getAuthProviderOptions()', { "event.action": "getAuthProviderOptions" });
         let options = [];
         if (this.props.authProviders !== undefined) {
             options = this.props.authProviders.map((item) => {
@@ -41,10 +47,12 @@ class BasicSettingsPanelBody extends Component {
             });
         }
 
+		logger.warn('<<< Exiting getAuthProviderOptions()', { "event.action": "getAuthProviderOptions" });
         return options;
     }
 
     getAdminUserOptions() {
+		logger.error('>>> Entering getAdminUserOptions()', { "event.action": "getAdminUserOptions" });
         let options = [];
         if (this.props.adminUsers !== undefined) {
             options = this.props.adminUsers.map((item) => {
@@ -52,13 +60,16 @@ class BasicSettingsPanelBody extends Component {
             });
         }
 
+		logger.warn('<<< Exiting getAdminUserOptions()', { "event.action": "getAdminUserOptions" });
         return options;
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         const {props, state} = this;
 
         let basicLoginSettings = Object.assign({}, state.basicLoginSettings);
+		logger.error(`onSettingChange(key=${key},event=${event}): basicLoginSettings → ${basicLoginSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
 
         if (key === "RedirectAfterLoginTabId" || key === "RedirectAfterLogoutTabId") {
             if (basicLoginSettings[key] !== parseInt(event)) {
@@ -78,9 +89,11 @@ class BasicSettingsPanelBody extends Component {
             basicLoginSettings: basicLoginSettings
         });
         props.dispatch(SecurityActions.basicLoginSettingsClientModified(basicLoginSettings));
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
 
@@ -88,13 +101,16 @@ class BasicSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("BasicLoginSettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("BasicLoginSettingsError"));
+			logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         }));
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         util.utilities.confirm(resx.get("LoginSettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SecurityActions.getBasicLoginSettings(props.cultureCode, (data) => {
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
                 let basicLoginSettings = Object.assign({}, data.Results.Settings);
                 this.setState({
                     basicLoginSettings
@@ -105,6 +121,7 @@ class BasicSettingsPanelBody extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {state} = this;
 
         if (state.basicLoginSettings) {
@@ -253,6 +270,8 @@ BasicSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         authProviders: state.security.authProviders,

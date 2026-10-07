@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -12,13 +13,17 @@
   "use strict";
 
   function keywords(str) {
+	logger.error(`>>> Entering keywords(str=${str})`, { "event.action": "keywords", "logrite.str": str });
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.error(`keywords(str=${str}): obj → ${obj}`, { "event.action": "keywords", "logrite.str": str });
+	logger.warn(`<<< Exiting keywords(str=${str})`, { "event.action": "keywords", "logrite.str": str });
     return obj;
   }
 
   // Helper for phpString
   function matchSequence(list, end, escapes) {
+	logger.error(`>>> Entering matchSequence(list=${list},end=${end},escapes=${escapes})`, { "event.action": "matchSequence", "logrite.list": list, "logrite.end": end, "logrite.escapes": escapes });
     if (list.length == 0) return phpString(end);
     return function (stream, state) {
       var patterns = list[0];
@@ -31,12 +36,14 @@
     };
   }
   function phpString(closing, escapes) {
+	logger.error(`>>> Entering phpString(closing=${closing},escapes=${escapes})`, { "event.action": "phpString", "logrite.closing": closing, "logrite.escapes": escapes });
     return function(stream, state) { return phpString_(stream, state, closing, escapes); };
   }
   function phpString_(stream, state, closing, escapes) {
     // "Complex" syntax
     if (escapes !== false && stream.match("${", false) || stream.match("{$", false)) {
       state.tokenize = null;
+	logger.debug(`phpString_(stream=${stream},state=${state},closing=${closing},escapes=${escapes}): state.tokenize → ${state.tokenize}`, { "event.action": "phpString_", "logrite.stream": stream, "logrite.state": state, "logrite.closing": closing, "logrite.escapes": escapes });
       return "string";
     }
 
@@ -155,12 +162,15 @@
     var phpMode = CodeMirror.getMode(config, phpConfig);
 
     function dispatch(stream, state) {
+	logger.error(`>>> Entering dispatch(stream=${stream},state=${state})`, { "event.action": "dispatch", "logrite.stream": stream, "logrite.state": state });
       var isPHP = state.curMode == phpMode;
       if (stream.sol() && state.pending && state.pending != '"' && state.pending != "'") state.pending = null;
       if (!isPHP) {
         if (stream.match(/^<\?\w*/)) {
           state.curMode = phpMode;
+		logger.debug(`dispatch(stream=${stream},state=${state}): state.curMode → ${state.curMode}`, { "event.action": "dispatch", "logrite.stream": stream, "logrite.state": state });
           state.curState = state.php;
+		logger.debug(`dispatch(stream=${stream},state=${state}): state.curState → ${state.curState}`, { "event.action": "dispatch", "logrite.stream": stream, "logrite.state": state });
           return "meta";
         }
         if (state.pending == '"' || state.pending == "'") {
@@ -168,12 +178,15 @@
           var style = "string";
         } else if (state.pending && stream.pos < state.pending.end) {
           stream.pos = state.pending.end;
+		logger.debug(`dispatch(stream=${stream},state=${state}): stream.pos → ${stream.pos}`, { "event.action": "dispatch", "logrite.stream": stream, "logrite.state": state });
           var style = state.pending.style;
         } else {
           var style = htmlMode.token(stream, state.curState);
+		logger.error(`dispatch(stream=${stream},state=${state}): style → ${style}`, { "event.action": "dispatch", "logrite.stream": stream, "logrite.state": state });
         }
         if (state.pending) state.pending = null;
         var cur = stream.current(), openPHP = cur.search(/<\?/), m;
+		logger.error(`dispatch(stream=${stream},state=${state}): cur → ${cur}`, { "event.action": "dispatch", "logrite.stream": stream, "logrite.state": state });
         if (openPHP != -1) {
           if (style == "string" && (m = cur.match(/[\'\"]$/)) && !/\?>/.test(cur)) state.pending = m[0];
           else state.pending = {end: stream.pos, style: style};
@@ -185,35 +198,43 @@
         state.curState = state.html;
         return "meta";
       } else {
+		logger.warn(`<<< Exiting dispatch(stream=${stream},state=${state})`, { "event.action": "dispatch", "logrite.stream": stream, "logrite.state": state });
         return phpMode.token(stream, state.curState);
       }
     }
 
     return {
       startState: function() {
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
         var html = CodeMirror.startState(htmlMode), php = CodeMirror.startState(phpMode);
         return {html: html,
                 php: php,
                 curMode: parserConfig.startOpen ? phpMode : htmlMode,
                 curState: parserConfig.startOpen ? php : html,
                 pending: null};
+				logger.error(`startState(): html → ${html}`, { "event.action": "startState" });
       },
 
       copyState: function(state) {
+		logger.error(`>>> Entering copyState(state=${state})`, { "event.action": "copyState", "logrite.state": state });
         var html = state.html, htmlNew = CodeMirror.copyState(htmlMode, html),
             php = state.php, phpNew = CodeMirror.copyState(phpMode, php), cur;
+			logger.error(`copyState(state=${state}): html → ${html}`, { "event.action": "copyState", "logrite.state": state });
         if (state.curMode == htmlMode) cur = htmlNew;
         else cur = phpNew;
         return {html: htmlNew, php: phpNew, curMode: state.curMode, curState: cur,
                 pending: state.pending};
+				logger.warn(`<<< Exiting copyState(state=${state})`, { "event.action": "copyState", "logrite.state": state });
       },
 
       token: dispatch,
 
       indent: function(state, textAfter) {
+		logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
         if ((state.curMode != phpMode && /^\s*<\//.test(textAfter)) ||
             (state.curMode == phpMode && /^\?>/.test(textAfter)))
           return htmlMode.indent(state.html, textAfter);
+		logger.warn(`<<< Exiting indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
         return state.curMode.indent(state.curState, textAfter);
       },
 
@@ -221,7 +242,11 @@
       blockCommentEnd: "*/",
       lineComment: "//",
 
-      innerMode: function(state) { return {state: state.curState, mode: state.curMode}; }
+      innerMode: function(state) {
+          logger.error(`>>> Entering innerMode(state=${state})`, { "event.action": "innerMode", "logrite.state": state });
+          logger.warn(`<<< Exiting innerMode(state=${state})`, { "event.action": "innerMode", "logrite.state": state });
+          return {state: state.curState, mode: state.curMode};
+      }
     };
   }, "htmlmixed", "clike");
 

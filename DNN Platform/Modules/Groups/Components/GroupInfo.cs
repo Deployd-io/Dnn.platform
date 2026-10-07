@@ -24,9 +24,14 @@ namespace DotNetNuke.Entities.Groups
         /// <param name="roleInfo">The role info.</param>
         public GroupInfo(RoleInfo roleInfo)
         {
+			eventLogger.LogError(">>> Entering GroupInfo(roleInfo={RoleInfo})", roleInfo);
             this.RoleID = roleInfo.RoleID;
+			eventLogger.LogWarning("<<< Exiting GroupInfo(roleInfo={RoleInfo})", roleInfo);
+			eventLogger.LogDebug("GroupInfo(roleInfo={RoleInfo}): this.RoleID → {Arg1}", roleInfo, this.RoleID);
             this.RoleName = roleInfo.RoleName;
             this.Description = roleInfo.Description;
+			eventLogger.LogDebug("GroupInfo(roleInfo={RoleInfo}): this.RoleName → {Arg1}", roleInfo, this.RoleName);
+			eventLogger.LogDebug("GroupInfo(roleInfo={RoleInfo}): this.Description → {Arg1}", roleInfo, this.Description);
             this.PortalID = roleInfo.PortalID;
             this.SecurityMode = roleInfo.SecurityMode;
             this.ServiceFee = roleInfo.ServiceFee;
@@ -141,6 +146,7 @@ namespace DotNetNuke.Entities.Groups
 
         private string GetString(string keyName, string defaultValue)
         {
+			eventLogger.LogError(">>> Entering GetString(keyName={KeyName},defaultValue={DefaultValue})", keyName, defaultValue);
             if (this.Settings == null)
             {
                 return defaultValue;
@@ -152,12 +158,14 @@ namespace DotNetNuke.Entities.Groups
             }
             else
             {
+				eventLogger.LogWarning("<<< Exiting GetString(keyName={KeyName},defaultValue={DefaultValue})", keyName, defaultValue);
                 return defaultValue;
             }
         }
 
         private void SetString(string keyName, string value)
         {
+			eventLogger.LogError(">>> Entering SetString(keyName={KeyName},value={Value})", keyName, value);
             if (this.Settings.ContainsKey(keyName))
             {
                 this.Settings[keyName] = value;
@@ -166,6 +174,7 @@ namespace DotNetNuke.Entities.Groups
             {
                 this.Settings.Add(keyName, value);
             }
+			eventLogger.LogWarning("<<< Exiting SetString(keyName={KeyName},value={Value})", keyName, value);
         }
     }
 }

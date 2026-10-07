@@ -4,20 +4,27 @@ import { FileUpload, GridSystem, GridCell, Label } from "@dnnsoftware/dnn-react-
 import Localization from "../../../localization";
 import util from "../../../utils";
 import styles from "./styles.module.less";
+const logger = console;
 
 export default class PageIcons extends Component {            
     constructor(props) {
         super(props);  
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }    
 
     onChangeIcon(key, fileInfo) {        
+		logger.error(`>>> Entering onChangeIcon(key=${key},fileInfo=${fileInfo})`, { "event.action": "onChangeIcon", "logrite.key": key, "logrite.fileInfo": fileInfo });
         const {onChangeField} = this.props;
         onChangeField(key, fileInfo);
+		logger.warn(`<<< Exiting onChangeIcon(key=${key},fileInfo=${fileInfo})`, { "event.action": "onChangeIcon", "logrite.key": key, "logrite.fileInfo": fileInfo });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;  
         util.utilities = util.getUtilities();
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.pageIcons}>
                 <GridSystem>

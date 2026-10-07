@@ -28,11 +28,14 @@ namespace DotNetNuke.Web.UI.WebControls
     [ToolboxData("<{0}:DnnPageDropDownList runat='server'></{0}:DnnPageDropDownList>")]
     public class DnnPageDropDownList : DnnDropDownList
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnPageDropDownList));
         /// <summary>Initializes a new instance of the <see cref="DnnPageDropDownList"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IClientResourceController. Scheduled removal in v12.0.0.")]
         public DnnPageDropDownList()
             : this(Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>(), Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>())
         {
+		Logger.LogError(">>> Entering DnnPageDropDownList()");
+        Logger.LogWarning("<<< Exiting DnnPageDropDownList()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnPageDropDownList"/> class.</summary>
@@ -116,6 +119,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.Roles = new List<int>();
@@ -127,11 +131,13 @@ namespace DotNetNuke.Web.UI.WebControls
             this.Services.GetTreeWithNodeMethod = "ItemListService/GetTreePathForPage";
             this.Services.ServiceRoot = "InternalServices";
             this.Services.SortTreeMethod = "ItemListService/SortPages";
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             this.AddCssClass("page");
             if (this.InternalPortalId.HasValue)
             {
@@ -152,7 +158,9 @@ namespace DotNetNuke.Web.UI.WebControls
             if (selectedPage != null && selectedPage.ParentId > Null.NullInteger)
             {
                 var tabLevel = string.Empty;
+				Logger.LogError("OnPreRender(e={E}): tabLevel → {TabLevel}", e, tabLevel);
                 var parentTab = TabController.Instance.GetTab(selectedPage.ParentId, this.PortalId, false);
+				Logger.LogError("OnPreRender(e={E}): parentTab → {ParentTab}", e, parentTab);
                 while (parentTab != null)
                 {
                     tabLevel = string.Format(CultureInfo.InvariantCulture, "{0},{1}", parentTab.TabID, tabLevel);
@@ -161,6 +169,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
                 this.ExpandPath = tabLevel.TrimEnd(',');
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

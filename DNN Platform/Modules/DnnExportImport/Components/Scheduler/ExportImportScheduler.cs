@@ -58,7 +58,11 @@ namespace Dnn.ExportImport.Components.Scheduler
         /// <param name="engine">The export/import engine.</param>
         public ExportImportScheduler(ScheduleHistoryItem objScheduleHistoryItem, IEntitiesController entitiesController, ExportImportEngine engine)
         {
+			Logger.LogError(">>> Entering ExportImportScheduler(objScheduleHistoryItem={ObjScheduleHistoryItem},entitiesController={EntitiesController},engine={Engine})", objScheduleHistoryItem, entitiesController, engine);
+			Logger.LogDebug("ExportImportScheduler(objScheduleHistoryItem={ObjScheduleHistoryItem},entitiesController={EntitiesController},engine={Engine}): entitiesController → {EntitiesController1}", objScheduleHistoryItem, entitiesController, engine, entitiesController);
             this.ScheduleHistoryItem = objScheduleHistoryItem;
+			Logger.LogWarning("<<< Exiting ExportImportScheduler(objScheduleHistoryItem={ObjScheduleHistoryItem},entitiesController={EntitiesController},engine={Engine})", objScheduleHistoryItem, entitiesController, engine);
+			Logger.LogDebug("ExportImportScheduler(objScheduleHistoryItem={ObjScheduleHistoryItem},entitiesController={EntitiesController},engine={Engine}): this.ScheduleHistoryItem → {Arg3}", objScheduleHistoryItem, entitiesController, engine, this.ScheduleHistoryItem);
             this.entitiesController = entitiesController ?? Globals.DependencyProvider.GetRequiredService<IEntitiesController>();
             this.engine = engine ?? Globals.DependencyProvider.GetRequiredService<ExportImportEngine>();
         }
@@ -70,6 +74,7 @@ namespace Dnn.ExportImport.Components.Scheduler
             {
                 // TODO: do some clean-up for very old import/export jobs/logs
                 var job = this.entitiesController.GetFirstActiveJob();
+				Logger.LogError("DoWork(): job → {Job}", job);
                 if (job == null)
                 {
                     this.ScheduleHistoryItem.Succeeded = true;
@@ -78,6 +83,7 @@ namespace Dnn.ExportImport.Components.Scheduler
                 else if (job.IsCancelled)
                 {
                     job.JobStatus = JobStatus.Cancelled;
+					Logger.LogDebug("DoWork(): job.JobStatus → {Arg0}", job.JobStatus);
                     this.entitiesController.UpdateJobStatus(job);
                     this.ScheduleHistoryItem.Succeeded = true;
                     this.ScheduleHistoryItem.AddLogNote("<br/>Site Export/Import jobs was previously cancelled.");
@@ -91,6 +97,7 @@ namespace Dnn.ExportImport.Components.Scheduler
                         JobId = job.JobId,
                     };
                     var succeeded = true;
+					Logger.LogError("DoWork(): succeeded → {Succeeded}", succeeded);
 
                     switch (job.JobType)
                     {
@@ -101,6 +108,7 @@ namespace Dnn.ExportImport.Components.Scheduler
                             }
                             catch (Exception ex)
                             {
+								Logger.LogError("Exception in DoWork(): {Arg0}", ex.Message);
                                 result.AddLogEntry("EXCEPTION exporting job #" + job.JobId, ex.Message, ReportLevel.Error);
                                 this.engine.AddLogsToDatabase(job.JobId, result.CompleteLog);
                                 throw;
@@ -115,6 +123,7 @@ namespace Dnn.ExportImport.Components.Scheduler
                             }
                             catch (ThreadAbortException)
                             {
+								Logger.LogError("Exception in DoWork(): {Arg0}", ThreadAbortException.Message);
                                 this.ScheduleHistoryItem.TimeLapse = EmergencyScheduleFrequency;
                                 this.ScheduleHistoryItem.TimeLapseMeasurement = EmergencyScheduleFrequencyUnit;
                                 this.ScheduleHistoryItem.RetryTimeLapse = EmergencyScheduleRetry;
@@ -144,6 +153,7 @@ namespace Dnn.ExportImport.Components.Scheduler
 
                             break;
                         default:
+							Logger.LogError("Throwing InvalidOperationException from DoWork()");
                             throw new InvalidOperationException("Unknown job type: " + job.JobType);
                     }
 
@@ -164,8 +174,11 @@ namespace Dnn.ExportImport.Components.Scheduler
                     }
 
                     var sb = new StringBuilder();
+					Logger.LogError("DoWork(): sb → {Sb}", sb);
                     var jobType = Localization.GetString("JobType_" + job.JobType, Constants.SharedResources);
+					Logger.LogError("DoWork(): jobType → {JobType}", jobType);
                     var jobStatus = Localization.GetString("JobStatus_" + job.JobStatus, Constants.SharedResources);
+					Logger.LogError("DoWork(): jobStatus → {JobStatus}", jobStatus);
                     sb.AppendFormat(CultureInfo.InvariantCulture, "<br/><b>{0} {1}</b>", jobType, jobStatus);
                     var summary = result.Summary;
                     if (summary.Count > 0)
@@ -199,6 +212,7 @@ namespace Dnn.ExportImport.Components.Scheduler
                 ////   Exceptions.LogException(ex);
                 ////}
             }
+			Logger.LogWarning("<<< Exiting DoWork()");
         }
     }
 }

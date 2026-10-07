@@ -14,6 +14,7 @@ namespace DotNetNuke.Entities.Urls
 
     internal class FriendlyUrlPathController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FriendlyUrlPathController));
         /// <summary>This method checks the list of rules for parameter replacement and modifies the parameter path accordingly.</summary>
         /// <param name="parameterPath">The path to replace.</param>
         /// <param name="tab">The tab info.</param>
@@ -34,15 +35,23 @@ namespace DotNetNuke.Entities.Urls
             out bool changeToSiteRoot,
             Guid parentTraceId)
         {
+			Logger.LogError(">>> Entering CheckParameterRegexReplacement(parameterPath={ParameterPath},tab={Tab},settings={Settings},portalId={PortalId},messages={Messages},parentTraceId={ParentTraceId})", parameterPath, tab, settings, portalId, messages, parentTraceId);
             bool replaced = false;
             replacedPath = string.Empty;
+			Logger.LogError("CheckParameterRegexReplacement(parameterPath={ParameterPath},tab={Tab},settings={Settings},portalId={PortalId},messages={Messages},parentTraceId={ParentTraceId}): replacedPath → {ReplacedPath}", parameterPath, tab, settings, portalId, messages, parentTraceId, replacedPath);
+			Logger.LogDebug("CheckParameterRegexReplacement(parameterPath={ParameterPath},tab={Tab},settings={Settings},portalId={PortalId},messages={Messages},parentTraceId={ParentTraceId}): replacedPath → {ReplacedPath}", parameterPath, tab, settings, portalId, messages, parentTraceId, replacedPath);
             changeToSiteRoot = false;
             if (messages == null)
             {
+				Logger.LogError("CheckParameterRegexReplacement(parameterPath={ParameterPath},tab={Tab},settings={Settings},portalId={PortalId},messages={Messages},parentTraceId={ParentTraceId}): changeToSiteRoot → {ChangeToSiteRoot}", parameterPath, tab, settings, portalId, messages, parentTraceId, changeToSiteRoot);
+				Logger.LogDebug("CheckParameterRegexReplacement(parameterPath={ParameterPath},tab={Tab},settings={Settings},portalId={PortalId},messages={Messages},parentTraceId={ParentTraceId}): changeToSiteRoot → {ChangeToSiteRoot}", parameterPath, tab, settings, portalId, messages, parentTraceId, changeToSiteRoot);
                 messages = new List<string>();
             }
+			Logger.LogError("CheckParameterRegexReplacement(parameterPath={ParameterPath},tab={Tab},settings={Settings},portalId={PortalId},messages={Messages},parentTraceId={ParentTraceId}): messages → {Messages1}", parameterPath, tab, settings, portalId, messages, parentTraceId, messages);
+			Logger.LogError("CheckParameterRegexReplacement(parameterPath={ParameterPath},tab={Tab},settings={Settings},portalId={PortalId},messages={Messages},parentTraceId={ParentTraceId}): replaced → {Replaced}", parameterPath, tab, settings, portalId, messages, parentTraceId, replaced);
 
             var replaceActions = CacheController.GetParameterReplacements(settings, portalId, ref messages);
+			Logger.LogError("CheckParameterRegexReplacement(parameterPath={ParameterPath},tab={Tab},settings={Settings},portalId={PortalId},messages={Messages},parentTraceId={ParentTraceId}): replaceActions → {ReplaceActions}", parameterPath, tab, settings, portalId, messages, parentTraceId, replaceActions);
             if (replaceActions != null && replaceActions.Count > 0)
             {
                 List<ParameterReplaceAction> parmReplaces = null;
@@ -52,6 +61,7 @@ namespace DotNetNuke.Entities.Urls
                 {
                     // find the right set of replaced actions for this tab
                     parmReplaces = parameterReplaceActions;
+					Logger.LogError("CheckParameterRegexReplacement(parameterPath={ParameterPath},tab={Tab},settings={Settings},portalId={PortalId},messages={Messages},parentTraceId={ParentTraceId}): parmReplaces → {ParmReplaces}", parameterPath, tab, settings, portalId, messages, parentTraceId, parmReplaces);
                 }
 
                 // check for 'all tabs' replace action
@@ -96,6 +106,7 @@ namespace DotNetNuke.Entities.Urls
                     }
                     catch (Exception ex)
                     {
+						Logger.LogError("Exception in CheckParameterRegexReplacement(parameterPath={ParameterPath},tab={Tab},settings={Settings},portalId={PortalId},messages={Messages},parentTraceId={ParentTraceId}): {Arg6}", parameterPath, tab, settings, portalId, messages, parentTraceId, ex.Message);
                         // catch exceptions here because most likely to be related to regular expressions
                         // don't want to kill entire site because of this
                         Services.Exceptions.Exceptions.LogException(ex);
@@ -104,6 +115,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting CheckParameterRegexReplacement(parameterPath={ParameterPath},tab={Tab},settings={Settings},portalId={PortalId},messages={Messages},parentTraceId={ParentTraceId})", parameterPath, tab, settings, portalId, messages, parentTraceId);
             return replaced;
         }
 
@@ -119,23 +131,32 @@ namespace DotNetNuke.Entities.Urls
             ref List<string> meessages,
             Guid parentTraceId)
         {
+			Logger.LogError(">>> Entering CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId})", newPath, tab, portalSettings, settings, options, meessages, parentTraceId);
             if (meessages == null)
             {
                 meessages = new List<string>();
+				Logger.LogError("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): meessages → {Meessages1}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, meessages);
             }
 
             bool urlWasChanged = false;
+			Logger.LogError("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): urlWasChanged → {UrlWasChanged}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, urlWasChanged);
 
             // initialise defaults to always return valid items
             changedPath = newPath;
+			Logger.LogError("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): changedPath → {ChangedPath}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, changedPath);
+			Logger.LogDebug("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): changedPath → {ChangedPath}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, changedPath);
             changeToSiteRoot = false;
+			Logger.LogError("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): changeToSiteRoot → {ChangeToSiteRoot}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, changeToSiteRoot);
             allowOtherParameters = true;
+			Logger.LogError("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): allowOtherParameters → {AllowOtherParameters}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, allowOtherParameters);
 
             // determine if this url should be converted to a userprofile url by checking the saved rules matching the tab/portalid
+			Logger.LogDebug("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): changeToSiteRoot → {ChangeToSiteRoot}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, changeToSiteRoot);
             if (portalSettings != null && tab.PortalID == portalSettings.PortalId &&
                     (tab.TabID == portalSettings.UserTabId || portalSettings.UserTabId == -1 ||
                         tab.ParentId == portalSettings.UserTabId))
             {
+				Logger.LogDebug("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): allowOtherParameters → {AllowOtherParameters}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, allowOtherParameters);
                 // -1 == all tabs in portal
                 int userId;
                 string rawUserId, remainingPath;
@@ -163,10 +184,13 @@ namespace DotNetNuke.Entities.Urls
                 if (!string.IsNullOrEmpty(rawUserId) && int.TryParse(rawUserId, out userId))
                 {
                     bool doReplacement = false;
+					Logger.LogError("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): doReplacement → {DoReplacement}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, doReplacement);
                     string urlName = string.Empty;
+					Logger.LogError("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): urlName → {UrlName}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, urlName);
 
                     // Get the User
                     var user = UserController.GetUserById(portalSettings.PortalId, userId);
+					Logger.LogError("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): user → {User}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, user);
 
                     if (user != null && !string.IsNullOrEmpty(user.VanityUrl))
                     {
@@ -182,10 +206,12 @@ namespace DotNetNuke.Entities.Urls
                         {
                             // replacing for the parent tab id
                             string childTabPath = TabIndexController.GetTabPath(tab, options, parentTraceId);
+							Logger.LogError("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): childTabPath → {ChildTabPath}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, childTabPath);
                             if (!string.IsNullOrEmpty(childTabPath))
                             {
                                 // remove the parent tab path from the child tab path
                                 TabInfo profilePage = TabController.Instance.GetTab(tab.ParentId, tab.PortalID, false);
+								Logger.LogError("CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId}): profilePage → {ProfilePage}", newPath, tab, portalSettings, settings, options, meessages, parentTraceId, profilePage);
                                 string profilePagePath = TabIndexController.GetTabPath(profilePage, options, parentTraceId);
                                 if (childTabPath.Contains(profilePagePath))
                                 {
@@ -226,6 +252,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting CheckUserProfileReplacement(newPath={NewPath},tab={Tab},portalSettings={PortalSettings},settings={Settings},options={Options},meessages={Meessages},parentTraceId={ParentTraceId})", newPath, tab, portalSettings, settings, options, meessages, parentTraceId);
             return urlWasChanged;
         }
 
@@ -242,23 +269,31 @@ namespace DotNetNuke.Entities.Urls
             out string rawUserId,
             out string remainingPath)
         {
+			Logger.LogError(">>> Entering SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath})", urlPath, parmName, otherParametersPath);
             // 688 : allow for other parts to be in the url by capturing more with the regex filters
             string regexPattern;
             rawUserId = null;
+			Logger.LogError("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): rawUserId → {RawUserId}", urlPath, parmName, otherParametersPath, rawUserId);
+			Logger.LogDebug("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): rawUserId → {RawUserId}", urlPath, parmName, otherParametersPath, rawUserId);
             remainingPath = string.Empty;
+			Logger.LogError("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): remainingPath → {RemainingPath}", urlPath, parmName, otherParametersPath, remainingPath);
 
             // generally the path will start with a / and not end with one, but it's possible to get all sorts of things
+			Logger.LogDebug("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): remainingPath → {RemainingPath}", urlPath, parmName, otherParametersPath, remainingPath);
             if (!string.IsNullOrEmpty(otherParametersPath))
             {
                 // remove the trailing slash from otherParamtersPath if it exists, because the other parameters may be anywhere in the path
                 if (otherParametersPath.EndsWith("/", StringComparison.Ordinal))
                 {
                     otherParametersPath = otherParametersPath.Substring(0, otherParametersPath.Length - 1);
+					Logger.LogError("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): otherParametersPath → {OtherParametersPath1}", urlPath, parmName, otherParametersPath, otherParametersPath);
                 }
 
                 const string patternFormatWithParameters = @"/?(?<rem1>.*)(?=_parm_)(?<parm1>(?<=/|^)(?:_parm_)/(?<p1v>[\d\w]+)){0,1}/?(?<op>_otherparm_){0,1}/?(?<parm2>(?<=/)(?:_parm_)/(?<p2v>[\d\w]+)){0,1}(?<rem2>.*)";
                 regexPattern = patternFormatWithParameters.Replace("_parm_", parmName);
                 regexPattern = regexPattern.Replace("_otherparm_", otherParametersPath);
+				Logger.LogError("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): regexPattern → {RegexPattern}", urlPath, parmName, otherParametersPath, regexPattern);
+				Logger.LogDebug("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): regexPattern → {RegexPattern}", urlPath, parmName, otherParametersPath, regexPattern);
             }
             else
             {
@@ -268,14 +303,20 @@ namespace DotNetNuke.Entities.Urls
 
             // check the regex match
             Match parmMatch = Regex.Match(urlPath, regexPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+			Logger.LogError("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): parmMatch → {ParmMatch}", urlPath, parmName, otherParametersPath, parmMatch);
             if (parmMatch.Success)
             {
                 // must be nothing in the op1 and op2 values
                 Group otherParmsGp = parmMatch.Groups["op"];
+				Logger.LogError("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): otherParmsGp → {OtherParmsGp}", urlPath, parmName, otherParametersPath, otherParmsGp);
                 Group parm1ValueGp = parmMatch.Groups["p1v"];
+				Logger.LogError("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): parm1ValueGp → {Parm1ValueGp}", urlPath, parmName, otherParametersPath, parm1ValueGp);
                 Group parm2ValueGp = parmMatch.Groups["p2v"];
+				Logger.LogError("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): parm2ValueGp → {Parm2ValueGp}", urlPath, parmName, otherParametersPath, parm2ValueGp);
                 Group rem1ParmsGp = parmMatch.Groups["rem1"]; // remainder at the start of the match
+				Logger.LogError("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): rem1ParmsGp → {Rem1ParmsGp}", urlPath, parmName, otherParametersPath, rem1ParmsGp);
                 Group rem2ParmsGp = parmMatch.Groups["rem2"]; // remainder at the end of the match
+				Logger.LogError("SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath}): rem2ParmsGp → {Rem2ParmsGp}", urlPath, parmName, otherParametersPath, rem2ParmsGp);
 
                 if (otherParmsGp != null && otherParmsGp.Success && (parm1ValueGp.Success || parm2ValueGp.Success))
                 {
@@ -330,6 +371,7 @@ namespace DotNetNuke.Entities.Urls
                     remainingPath = "/" + remainingPath;
                 }
             }
+			Logger.LogWarning("<<< Exiting SplitUserIdFromFriendlyUrlPath(urlPath={UrlPath},parmName={ParmName},otherParametersPath={OtherParametersPath})", urlPath, parmName, otherParametersPath);
         }
     }
 }

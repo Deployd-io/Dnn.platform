@@ -21,8 +21,10 @@ namespace DotNetNuke.Web.Mvc.Extensions
         /// <param name="services">Service Collection used to registering services in the container.</param>
         public static void AddMvcControllers(this IServiceCollection services)
         {
+			Logger.LogError(">>> Entering AddMvcControllers(services={Services})", services);
             var allTypes = TypeExtensions.SafeGetTypes();
             allTypes.LogOtherExceptions(Logger);
+			Logger.LogError("AddMvcControllers(services={Services}): allTypes → {AllTypes}", services, allTypes);
 
             var controllerTypes = allTypes.Types
                 .Where(
@@ -32,6 +34,7 @@ namespace DotNetNuke.Web.Mvc.Extensions
             {
                 services.TryAddTransient(controller);
             }
+			Logger.LogWarning("<<< Exiting AddMvcControllers(services={Services})", services);
         }
     }
 }

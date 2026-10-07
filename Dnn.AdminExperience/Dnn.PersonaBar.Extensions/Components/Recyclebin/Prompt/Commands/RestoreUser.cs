@@ -36,7 +36,10 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <param name="instance">The recycle bin controller.</param>
         public RestoreUser(IUserValidator userValidator, IRecyclebinController instance)
         {
+			eventLogger.LogError(">>> Entering RestoreUser(userValidator={UserValidator},instance={Instance})", userValidator, instance);
             this.userValidator = userValidator;
+			eventLogger.LogWarning("<<< Exiting RestoreUser(userValidator={UserValidator},instance={Instance})", userValidator, instance);
+			eventLogger.LogDebug("RestoreUser(userValidator={UserValidator},instance={Instance}): this.userValidator → {Arg2}", userValidator, instance, this.userValidator);
             this.recyclebinController = instance;
         }
 
@@ -48,12 +51,14 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.UserId = this.GetFlagValue(FlagId, "User Id", -1, true, true, true);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             this.userValidator.ValidateUser(this.UserId, this.PortalSettings, this.User, out var userInfo);
 
             if (userInfo == null)
@@ -67,6 +72,8 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
             }
 
             var restoredUser = this.recyclebinController.RestoreUser(userInfo, out var message);
+			eventLogger.LogError("Run(): restoredUser → {RestoredUser}", restoredUser);
+			eventLogger.LogWarning("<<< Exiting Run()");
             return restoredUser
                 ? new ConsoleResultModel(this.LocalizeString("UserRestored")) { Records = 1, }
                 : new ConsoleErrorResultModel(message);

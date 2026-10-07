@@ -45,6 +45,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Module
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.ModuleId = this.GetFlagValue(FlagId, "Module Id", -1, true, true, true);
             this.PageId = this.GetFlagValue(FlagPageId, "Page Id", -1, true, false, true);
             this.TargetPageId = this.GetFlagValue(FlagToPageId, "To Page Id", -1, true, false, true);
@@ -54,13 +55,16 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Module
             {
                 this.AddMessage(this.LocalizeString("Prompt_SourceAndTargetPagesAreSame"));
             }
+			eventLogger.LogWarning("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             var modules = new List<ModuleInfoModel>();
             KeyValuePair<HttpStatusCode, string> message;
+			eventLogger.LogError("Run(): modules → {Modules}", modules);
             var movedModule = ModulesControllerLibrary.Instance.CopyModule(
                 this.PortalSettings,
                 this.ModuleId,
@@ -76,6 +80,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Module
             }
 
             modules.Add(ModuleInfoModel.FromDnnModuleInfo(movedModule));
+			eventLogger.LogWarning("<<< Exiting Run()");
             return new ConsoleResultModel(this.LocalizeString("Prompt_ModuleMoved")) { Data = modules, Records = modules.Count };
         }
     }

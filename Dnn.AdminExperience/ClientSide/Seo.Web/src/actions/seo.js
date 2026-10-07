@@ -1,7 +1,10 @@
 import { seo as ActionTypes } from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
+const logger = console;
 const siteInfoActions = {
     getGeneralSettings(callback) {
+		logger.error(`>>> Entering getGeneralSettings(callback=${callback})`, { "event.action": "getGeneralSettings", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getGeneralSettings(callback=${callback})`, { "event.action": "getGeneralSettings", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getGeneralSettings(data => {
                 dispatch({
@@ -21,6 +24,8 @@ const siteInfoActions = {
         };
     },
     updateGeneralSettings(payload, callback, failureCallback) {
+		logger.error(`>>> Entering updateGeneralSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateGeneralSettings", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting updateGeneralSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateGeneralSettings", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.updateGeneralSettings(payload, data => {
                 dispatch({
@@ -40,6 +45,8 @@ const siteInfoActions = {
         };
     },
     generalSettingsClientModified(parameter) {
+		logger.error(`>>> Entering generalSettingsClientModified(parameter=${parameter})`, { "event.action": "generalSettingsClientModified", "logrite.parameter": parameter });
+		logger.warn(`<<< Exiting generalSettingsClientModified(parameter=${parameter})`, { "event.action": "generalSettingsClientModified", "logrite.parameter": parameter });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SEO_GENERAL_SETTINS_CLIENT_MODIFIED,
@@ -51,6 +58,8 @@ const siteInfoActions = {
         };
     },
     getRegexSettings(callback) {
+		logger.error(`>>> Entering getRegexSettings(callback=${callback})`, { "event.action": "getRegexSettings", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getRegexSettings(callback=${callback})`, { "event.action": "getRegexSettings", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getRegexSettings(data => {
                 dispatch({
@@ -67,6 +76,8 @@ const siteInfoActions = {
         };
     },
     updateRegexSettings(payload, callback, failureCallback) {
+		logger.error(`>>> Entering updateRegexSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateRegexSettings", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting updateRegexSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateRegexSettings", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.updateRegexSettings(payload, data => {
                 dispatch({
@@ -86,6 +97,8 @@ const siteInfoActions = {
         };
     },
     regexSettingsClientModified(parameter) {
+		logger.error(`>>> Entering regexSettingsClientModified(parameter=${parameter})`, { "event.action": "regexSettingsClientModified", "logrite.parameter": parameter });
+		logger.warn(`<<< Exiting regexSettingsClientModified(parameter=${parameter})`, { "event.action": "regexSettingsClientModified", "logrite.parameter": parameter });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SEO_REGEX_SETTINS_CLIENT_MODIFIED,
@@ -97,6 +110,8 @@ const siteInfoActions = {
         };
     },
     testUrl(pageId, queryString, customPageName, callback) {
+		logger.error(`>>> Entering testUrl(pageId=${pageId},queryString=${queryString},customPageName=${customPageName},callback=${callback})`, { "event.action": "testUrl", "logrite.pageId": pageId, "logrite.queryString": queryString, "logrite.customPageName": customPageName, "logrite.callback": callback });
+		logger.warn(`<<< Exiting testUrl(pageId=${pageId},queryString=${queryString},customPageName=${customPageName},callback=${callback})`, { "event.action": "testUrl", "logrite.pageId": pageId, "logrite.queryString": queryString, "logrite.customPageName": customPageName, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.testUrl(pageId, queryString, customPageName, data => {
                 dispatch({
@@ -112,6 +127,8 @@ const siteInfoActions = {
         };
     },
     testUrlRewrite(uri, callback) {
+		logger.error(`>>> Entering testUrlRewrite(uri=${uri},callback=${callback})`, { "event.action": "testUrlRewrite", "logrite.uri": uri, "logrite.callback": callback });
+		logger.warn(`<<< Exiting testUrlRewrite(uri=${uri},callback=${callback})`, { "event.action": "testUrlRewrite", "logrite.uri": uri, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.testUrlRewrite(uri, data => {
                 dispatch({
@@ -132,6 +149,8 @@ const siteInfoActions = {
         };
     },
     clearUrlTestResults() {
+		logger.error('>>> Entering clearUrlTestResults()', { "event.action": "clearUrlTestResults" });
+		logger.warn('<<< Exiting clearUrlTestResults()', { "event.action": "clearUrlTestResults" });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CLEARED_SEO_TEST_PAGE_URL_RESULTS,
@@ -142,6 +161,8 @@ const siteInfoActions = {
         };
     },
     clearUrlRewritingTestResults() {
+		logger.error('>>> Entering clearUrlRewritingTestResults()', { "event.action": "clearUrlRewritingTestResults" });
+		logger.warn('<<< Exiting clearUrlRewritingTestResults()', { "event.action": "clearUrlRewritingTestResults" });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CLEARED_SEO_TEST_URL_REWRITING_RESULTS,
@@ -157,6 +178,8 @@ const siteInfoActions = {
         };
     },
     getSitemapSettings(callback) {
+		logger.error(`>>> Entering getSitemapSettings(callback=${callback})`, { "event.action": "getSitemapSettings", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getSitemapSettings(callback=${callback})`, { "event.action": "getSitemapSettings", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getSitemapSettings(data => {
                 dispatch({
@@ -174,6 +197,8 @@ const siteInfoActions = {
         };
     },
     updateSitemapSettings(payload, callback, failureCallback) {
+		logger.error(`>>> Entering updateSitemapSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateSitemapSettings", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting updateSitemapSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateSitemapSettings", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.updateSitemapSettings(payload, data => {
                 dispatch({
@@ -193,6 +218,8 @@ const siteInfoActions = {
         };
     },
     sitemapSettingsClientModified(parameter) {
+		logger.error(`>>> Entering sitemapSettingsClientModified(parameter=${parameter})`, { "event.action": "sitemapSettingsClientModified", "logrite.parameter": parameter });
+		logger.warn(`<<< Exiting sitemapSettingsClientModified(parameter=${parameter})`, { "event.action": "sitemapSettingsClientModified", "logrite.parameter": parameter });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SEO_SITEMAP_SETTINS_CLIENT_MODIFIED,
@@ -204,6 +231,8 @@ const siteInfoActions = {
         };
     },
     clearCache(callback, failureCallback) {
+		logger.error(`>>> Entering clearCache(callback=${callback},failureCallback=${failureCallback})`, { "event.action": "clearCache", "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting clearCache(callback=${callback},failureCallback=${failureCallback})`, { "event.action": "clearCache", "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.clearCache(data => {
                 dispatch({
@@ -223,6 +252,8 @@ const siteInfoActions = {
         };
     },
     getSitemapProviders(callback) {
+		logger.error(`>>> Entering getSitemapProviders(callback=${callback})`, { "event.action": "getSitemapProviders", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getSitemapProviders(callback=${callback})`, { "event.action": "getSitemapProviders", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getSitemapProviders(data => {
                 dispatch({
@@ -238,6 +269,8 @@ const siteInfoActions = {
         };
     },
     updateSitemapProvider(payload, callback, failureCallback) {
+		logger.error(`>>> Entering updateSitemapProvider(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateSitemapProvider", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting updateSitemapProvider(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateSitemapProvider", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.updateSitemapProvider(payload, data => {
                 dispatch({
@@ -257,6 +290,8 @@ const siteInfoActions = {
         };
     },
     getExtensionUrlProviders(callback) {
+		logger.error(`>>> Entering getExtensionUrlProviders(callback=${callback})`, { "event.action": "getExtensionUrlProviders", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getExtensionUrlProviders(callback=${callback})`, { "event.action": "getExtensionUrlProviders", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getExtensionUrlProviders(data => {
                 dispatch({
@@ -272,6 +307,8 @@ const siteInfoActions = {
         };
     },
     updateExtensionUrlProviderStatus(payload, callback, failureCallback) {
+		logger.error(`>>> Entering updateExtensionUrlProviderStatus(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateExtensionUrlProviderStatus", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting updateExtensionUrlProviderStatus(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateExtensionUrlProviderStatus", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.updateExtensionUrlProviderStatus(payload, data => {
                 dispatch({
@@ -291,6 +328,8 @@ const siteInfoActions = {
         };
     },
     createVerification(verification, callback, failureCallback) {
+		logger.error(`>>> Entering createVerification(verification=${verification},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "createVerification", "logrite.verification": verification, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting createVerification(verification=${verification},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "createVerification", "logrite.verification": verification, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.createVerification(verification, data => {
                 dispatch({

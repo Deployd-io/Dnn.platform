@@ -18,6 +18,7 @@ namespace DotNetNuke.Prompt
     /// <summary>The implementation of a Prompt command.</summary>
     public abstract class ConsoleCommand : IConsoleCommand
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConsoleCommand));
         /// <inheritdoc />
         public abstract string LocalResourceFile { get; }
 
@@ -51,9 +52,13 @@ namespace DotNetNuke.Prompt
         /// <inheritdoc />
         public virtual void Initialize(string[] args, IPortalSettings portalSettings, IUserInfo userInfo, int activeTabId)
         {
+			Logger.LogError(">>> Entering Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.Args = args;
+			Logger.LogDebug("Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.Args → {Arg4}", args, portalSettings, userInfo, activeTabId, this.Args);
             this.PortalSettings = portalSettings;
             this.User = userInfo;
+			Logger.LogDebug("Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.PortalSettings → {Arg4}", args, portalSettings, userInfo, activeTabId, this.PortalSettings);
+			Logger.LogDebug("Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.User → {Arg4}", args, portalSettings, userInfo, activeTabId, this.User);
             this.PortalId = portalSettings.PortalId;
             this.TabId = activeTabId;
             this.ValidationMessage = string.Empty;
@@ -66,6 +71,8 @@ namespace DotNetNuke.Prompt
         /// <inheritdoc />
         public virtual bool IsValid()
         {
+			Logger.LogError(">>> Entering IsValid()");
+            Logger.LogWarning("<<< Exiting IsValid()");
             return string.IsNullOrEmpty(this.ValidationMessage);
         }
 
@@ -74,7 +81,10 @@ namespace DotNetNuke.Prompt
         /// <returns>The localized Text.</returns>
         protected string LocalizeString(string key)
         {
+			Logger.LogError(">>> Entering LocalizeString(key={Key})", key);
             var localizedText = Localization.GetString(key, this.LocalResourceFile);
+			Logger.LogError("LocalizeString(key={Key}): localizedText → {LocalizedText}", key, localizedText);
+			Logger.LogWarning("<<< Exiting LocalizeString(key={Key})", key);
             return string.IsNullOrEmpty(localizedText) ? key : localizedText;
         }
 
@@ -82,7 +92,9 @@ namespace DotNetNuke.Prompt
         /// <param name="message">The message to add.</param>
         protected void AddMessage(string message)
         {
+			Logger.LogError(">>> Entering AddMessage(message={Message})", message);
             this.ValidationMessage += message;
+			Logger.LogWarning("<<< Exiting AddMessage(message={Message})", message);
         }
 
         /// <summary>Sets the properties from the values in <see cref="Flags"/>.</summary>
@@ -91,35 +103,45 @@ namespace DotNetNuke.Prompt
         protected void ParseParameters<T>(T myCommand)
             where T : class, new()
         {
+			Logger.LogError(">>> Entering ParseParameters(myCommand={MyCommand})", myCommand);
             ////LoadMapping();
             var mpg = this.CreateMapping();
+			Logger.LogError("ParseParameters(myCommand={MyCommand}): mpg → {Mpg}", myCommand, mpg);
             mpg.ForEach(mapping =>
             {
                 var attribute = mapping.Attribute;
                 var property = mapping.Property;
+				Logger.LogError("ParseParameters(myCommand={MyCommand}): property → {Property}", myCommand, property);
                 var settingValue = this.Flags.TryGetValue(attribute.Name, out var flag) ? flag : null;
+				Logger.LogError("ParseParameters(myCommand={MyCommand}): settingValue → {SettingValue}", myCommand, settingValue);
                 if (settingValue != null && property.CanWrite)
                 {
                     SerializationManager.DeserializeProperty(myCommand, property, settingValue);
                 }
             });
+			Logger.LogWarning("<<< Exiting ParseParameters(myCommand={MyCommand})", myCommand);
         }
 
         /// <summary>Create a mapping of the command parameters to their properties.</summary>
         /// <returns>A list of parameters mapped to their corresponding attributes.</returns>
         protected virtual IList<ParameterMapping> CreateMapping()
         {
+			Logger.LogError(">>> Entering CreateMapping()");
             var mapping = new List<ParameterMapping>();
+			Logger.LogError("CreateMapping(): mapping → {Mapping}", mapping);
             this.GetType().GetProperties().ForEach(property =>
             {
                 var attributes = property.GetCustomAttributes<ConsoleCommandParameterAttribute>(true);
+				Logger.LogError("CreateMapping(): attributes → {Attributes}", attributes);
                 attributes.ForEach(attribute => mapping.Add(new ParameterMapping() { Attribute = attribute, Property = property }));
             });
+			Logger.LogWarning("<<< Exiting CreateMapping()");
             return mapping;
         }
 
         private static string NormalizeFlagName(string flagName)
         {
+			Logger.LogError(">>> Entering NormalizeFlagName(flagName={FlagName})", flagName);
             if (flagName == null)
             {
                 return string.Empty;
@@ -128,13 +150,16 @@ namespace DotNetNuke.Prompt
             if (flagName.StartsWith("--", StringComparison.Ordinal))
             {
                 flagName = flagName.Substring(2);
+				Logger.LogError("NormalizeFlagName(flagName={FlagName}): flagName → {FlagName1}", flagName, flagName);
             }
 
+			Logger.LogWarning("<<< Exiting NormalizeFlagName(flagName={FlagName})", flagName);
             return flagName.ToLowerInvariant().Trim();
         }
 
         private void ParseFlags()
         {
+			Logger.LogError(">>> Entering ParseFlags()");
             this.Flags = new Dictionary<string, string>();
 
             // loop through arguments, skipping the first one (the command)
@@ -147,7 +172,9 @@ namespace DotNetNuke.Prompt
 
                 // found a flag
                 var flagName = NormalizeFlagName(this.Args[i]);
+				Logger.LogError("ParseFlags(): flagName → {FlagName}", flagName);
                 var flagValue = string.Empty;
+				Logger.LogError("ParseFlags(): flagValue → {FlagValue}", flagValue);
                 if (i < this.Args.Length - 1)
                 {
                     if (!string.IsNullOrEmpty(this.Args[i + 1]))
@@ -170,6 +197,7 @@ namespace DotNetNuke.Prompt
 
                 this.Flags.Add(flagName.ToLowerInvariant(), flagValue);
             }
+			Logger.LogWarning("<<< Exiting ParseFlags()");
         }
 
         /// <summary>A mapping between a <see cref="ConsoleCommandParameterAttribute"/> and its corresponding <see cref="PropertyInfo"/>.</summary>

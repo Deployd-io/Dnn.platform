@@ -18,6 +18,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin/theme object which displays a link to the login page.</summary>
     public partial class Login : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Login.ascx));
         private const string MyFileName = "Login.ascx";
 
         private readonly INavigationManager navigationManager;
@@ -25,6 +26,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <summary>Initializes a new instance of the <see cref="Login"/> class.</summary>
         public Login()
         {
+			Logger.LogError(">>> Entering Login()");
             this.navigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
             this.LegacyMode = true;
         }
@@ -44,8 +46,10 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
             this.Visible = (!this.PortalSettings.HideLoginControl || this.Request.IsAuthenticated)
                         && (!this.PortalSettings.InErrorPageRequest() || this.ShowInErrorPage);
         }
@@ -53,6 +57,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             if (this.Visible)
@@ -120,6 +125,7 @@ namespace DotNetNuke.UI.Skins.Controls
                         }
 
                         string returnUrl = HttpContext.Current.Request.RawUrl;
+						Logger.LogError("OnLoad(e={E}): returnUrl → {ReturnUrl}", e, returnUrl);
                         if (returnUrl.IndexOf("?returnurl=") != -1)
                         {
                             returnUrl = returnUrl.Substring(0, returnUrl.IndexOf("?returnurl="));
@@ -134,6 +140,7 @@ namespace DotNetNuke.UI.Skins.Controls
                         var oneclick = "this.disabled=true;";
                         if (this.Request.UserAgent != null && this.Request.UserAgent.Contains("MSIE 8.0") == false)
                         {
+							Logger.LogError("OnLoad(e={E}): oneclick → {Oneclick}", e, oneclick);
                             this.loginLink.Attributes.Add("onclick", oneclick);
                             this.enhancedLoginLink.Attributes.Add("onclick", oneclick);
                         }
@@ -142,6 +149,7 @@ namespace DotNetNuke.UI.Skins.Controls
                         {
                             // To avoid duplicated encodes of URL
                             var clickEvent = "return " + UrlUtils.PopUpUrl(HttpUtility.UrlDecode(this.loginLink.NavigateUrl), this, this.PortalSettings, true, false, 300, 650);
+							Logger.LogError("OnLoad(e={E}): clickEvent → {ClickEvent}", e, clickEvent);
                             this.loginLink.Attributes.Add("onclick", clickEvent);
                             this.enhancedLoginLink.Attributes.Add("onclick", clickEvent);
                         }
@@ -149,9 +157,11 @@ namespace DotNetNuke.UI.Skins.Controls
                 }
                 catch (Exception exc)
                 {
+					Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                     Exceptions.ProcessModuleLoadException(this, exc);
                 }
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

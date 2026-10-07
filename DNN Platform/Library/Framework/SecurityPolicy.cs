@@ -14,6 +14,7 @@ namespace DotNetNuke.Framework
     /// <summary>Provides the ability to get information about CLR permissions.</summary>
     public partial class SecurityPolicy
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SecurityPolicy));
         public const string ReflectionPermission = "ReflectionPermission";
         public const string WebPermission = "WebPermission";
         public const string AspNetHostingPermission = "AspNetHostingPermission";
@@ -55,31 +56,41 @@ namespace DotNetNuke.Framework
 
         public static bool HasAspNetHostingPermission()
         {
+			Logger.LogError(">>> Entering HasAspNetHostingPermission()");
             GetPermissions();
+			Logger.LogWarning("<<< Exiting HasAspNetHostingPermission()");
             return aspNetHostingPermission;
         }
 
         public static bool HasReflectionPermission()
         {
+			Logger.LogError(">>> Entering HasReflectionPermission()");
             GetPermissions();
+			Logger.LogWarning("<<< Exiting HasReflectionPermission()");
             return reflectionPermission;
         }
 
         public static bool HasWebPermission()
         {
+			Logger.LogError(">>> Entering HasWebPermission()");
             GetPermissions();
+			Logger.LogWarning("<<< Exiting HasWebPermission()");
             return webPermission;
         }
 
         public static bool HasUnManagedCodePermission()
         {
+			Logger.LogError(">>> Entering HasUnManagedCodePermission()");
             GetPermissions();
+			Logger.LogWarning("<<< Exiting HasUnManagedCodePermission()");
             return unManagedCodePermission;
         }
 
         public static bool HasPermissions(string permissions, ref string permission)
         {
+			Logger.LogError(">>> Entering HasPermissions(permissions={Permissions},permission={Permission})", permissions, permission);
             bool hasPermission = true;
+			Logger.LogError("HasPermissions(permissions={Permissions},permission={Permission}): hasPermission → {HasPermission}", permissions, permission, hasPermission);
             if (!string.IsNullOrEmpty(permissions))
             {
                 foreach (string per in (permissions + ";").Split(Convert.ToChar(";")))
@@ -122,11 +133,13 @@ namespace DotNetNuke.Framework
                 }
             }
 
+			Logger.LogWarning("<<< Exiting HasPermissions(permissions={Permissions},permission={Permission})", permissions, permission);
             return hasPermission;
         }
 
         private static void GetPermissions()
         {
+			Logger.LogError(">>> Entering GetPermissions()");
             if (!initialized)
             {
                 // test RelectionPermission
@@ -134,11 +147,16 @@ namespace DotNetNuke.Framework
                 try
                 {
                     securityTest = new ReflectionPermission(PermissionState.Unrestricted);
+					Logger.LogError("GetPermissions(): securityTest → {SecurityTest}", securityTest);
+					Logger.LogDebug("GetPermissions(): securityTest → {SecurityTest}", securityTest);
                     securityTest.Demand();
                     reflectionPermission = true;
+					Logger.LogError("GetPermissions(): reflectionPermission → {ReflectionPermission}", reflectionPermission);
                 }
                 catch
                 {
+					Logger.LogError("Exception in GetPermissions(): {Arg0}", ex.Message);
+					Logger.LogDebug("GetPermissions(): reflectionPermission → {ReflectionPermission}", reflectionPermission);
                     // code access security error
                     reflectionPermission = false;
                 }
@@ -149,11 +167,13 @@ namespace DotNetNuke.Framework
                     securityTest = new WebPermission(PermissionState.Unrestricted);
                     securityTest.Demand();
                     webPermission = true;
+					Logger.LogError("GetPermissions(): webPermission → {WebPermission}", webPermission);
                 }
                 catch
                 {
                     // code access security error
                     webPermission = false;
+					Logger.LogDebug("GetPermissions(): webPermission → {WebPermission}", webPermission);
                 }
 
                 // test WebHosting Permission (Full Trust)
@@ -162,25 +182,32 @@ namespace DotNetNuke.Framework
                     securityTest = new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted);
                     securityTest.Demand();
                     aspNetHostingPermission = true;
+					Logger.LogError("GetPermissions(): aspNetHostingPermission → {AspNetHostingPermission}", aspNetHostingPermission);
                 }
                 catch
                 {
                     // code access security error
                     aspNetHostingPermission = false;
+					Logger.LogDebug("GetPermissions(): aspNetHostingPermission → {AspNetHostingPermission}", aspNetHostingPermission);
                 }
 
                 initialized = true;
+				Logger.LogDebug("GetPermissions(): initialized → {Initialized}", initialized);
 
                 // Test for Unmanaged Code permission
                 try
                 {
+					Logger.LogWarning("<<< Exiting GetPermissions()");
                     securityTest = new SecurityPermission(SecurityPermissionFlag.UnmanagedCode);
                     securityTest.Demand();
                     unManagedCodePermission = true;
+					Logger.LogError("GetPermissions(): unManagedCodePermission → {UnManagedCodePermission}", unManagedCodePermission);
                 }
                 catch (Exception)
                 {
+					Logger.LogError("Exception in GetPermissions(): {Arg0}", Exception.Message);
                     unManagedCodePermission = false;
+					Logger.LogDebug("GetPermissions(): unManagedCodePermission → {UnManagedCodePermission}", unManagedCodePermission);
                 }
             }
         }

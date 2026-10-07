@@ -19,6 +19,7 @@ import ApiTokens from "../apiTokens";
 import "./style.less";
 import util from "../../utils";
 import resx from "../../resources";
+const logger = console;
 
 let isHost = false;
 let isAdmin = false;
@@ -29,12 +30,14 @@ let canManageApiTokens = false;
 export class Body extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.handleSelect = this.handleSelect.bind(this);
         isHost = util.settings.isHost;
         isAdmin = isHost || util.settings.isAdmin;
         canViewBasicLoginSettings = isHost || isAdmin || util.settings.permissions.BASIC_LOGIN_SETTINGS_VIEW;
         canViewRegistrationSettings = isHost || isAdmin || util.settings.permissions.REGISTRATION_SETTINGS_VIEW;
         canManageApiTokens = isHost || isAdmin || util.settings.permissions.MANAGE_API_TOKENS;
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     handleSelect(index) {
@@ -43,6 +46,7 @@ export class Body extends Component {
     }
 
     renderTabs() {
+		logger.error('>>> Entering renderTabs()', { "event.action": "renderTabs" });
         let securityTabs = [];
         let tabHeaders = [];
         let loginSettingTabHeaders = [];
@@ -172,6 +176,7 @@ export class Body extends Component {
                 {moreTabs}
             </Tabs>);
         }
+		logger.warn('<<< Exiting renderTabs()', { "event.action": "renderTabs" });
         return <Tabs onSelect={this.handleSelect.bind(this)}
             tabHeaders={tabHeaders}
             type="primary">
@@ -181,6 +186,8 @@ export class Body extends Component {
 
     /*eslint no-mixed-spaces-and-tabs: "error"*/
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <PersonaBarPageBody>
                 {this.renderTabs()}
@@ -196,6 +203,8 @@ Body.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.index
     };

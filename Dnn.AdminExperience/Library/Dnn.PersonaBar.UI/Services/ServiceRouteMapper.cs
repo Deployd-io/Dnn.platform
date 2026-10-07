@@ -17,22 +17,29 @@ namespace Dnn.PersonaBar.UI.Services
     /// <summary>The <see cref="IServiceRouteMapper"/> for the Persona Bar API.</summary>
     public class ServiceRouteMapper : IServiceRouteMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ServiceRouteMapper));
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void RegisterRoutes(IMapRoute routeManager)
         {
+			Logger.LogError(">>> Entering RegisterRoutes(routeManager={RouteManager})", routeManager);
             // get all persona bar services from persona bar modules.
             var services = FindPersonaBarServices();
+			Logger.LogError("RegisterRoutes(routeManager={RouteManager}): services → {Services}", routeManager, services);
 
             if (services.Count > 0)
             {
                 routeManager.MapHttpRoute("PersonaBar", "default", "{controller}/{action}", services.ToArray());
             }
+			Logger.LogWarning("<<< Exiting RegisterRoutes(routeManager={RouteManager})", routeManager);
         }
 
         private static IEnumerable<Type> GetAllApiControllers()
         {
+			Logger.LogError(">>> Entering GetAllApiControllers()");
             var typeLocator = new TypeLocator();
+			Logger.LogError("GetAllApiControllers(): typeLocator → {TypeLocator}", typeLocator);
+			Logger.LogWarning("<<< Exiting GetAllApiControllers()");
             return typeLocator.GetAllMatchingTypes(
                 t => t is { IsClass: true, IsAbstract: false, IsVisible: true, } &&
                      typeof(PersonaBarApiController).IsAssignableFrom(t));
@@ -40,11 +47,15 @@ namespace Dnn.PersonaBar.UI.Services
 
         private static List<string> FindPersonaBarServices()
         {
+			Logger.LogError(">>> Entering FindPersonaBarServices()");
             var controllerTypes = GetAllApiControllers();
             var namespaces = new List<string>();
+			Logger.LogError("FindPersonaBarServices(): controllerTypes → {ControllerTypes}", controllerTypes);
             foreach (var type in controllerTypes)
             {
+				Logger.LogError("FindPersonaBarServices(): namespaces → {Namespaces}", namespaces);
                 var scopeAttr = (MenuPermissionAttribute)type.GetCustomAttributes(false).Cast<Attribute>().FirstOrDefault(a => a is MenuPermissionAttribute);
+				Logger.LogError("FindPersonaBarServices(): scopeAttr → {ScopeAttr}", scopeAttr);
                 if (scopeAttr != null)
                 {
                     if (!namespaces.Contains(type.Namespace))
@@ -54,6 +65,7 @@ namespace Dnn.PersonaBar.UI.Services
                 }
             }
 
+			Logger.LogWarning("<<< Exiting FindPersonaBarServices()");
             return namespaces;
         }
     }

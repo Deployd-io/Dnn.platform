@@ -2,11 +2,13 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import "./style.less";
 import Localization from "localization";
+const logger = console;
 import { Dropdown, SearchBox, GridCell } from "@dnnsoftware/dnn-react-common";
 
 class FiltersBar extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             selectedUserFilter: {
                 label: Localization.get("Authorized"),
@@ -14,6 +16,7 @@ class FiltersBar extends Component {
             },
             searchText: ""
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
     onSelect(option) {
         let { label} = option;
@@ -44,24 +47,30 @@ class FiltersBar extends Component {
     }
 
     onKeywordChanged(text) {
+		logger.error(`>>> Entering onKeywordChanged(text=${text})`, { "event.action": "onKeywordChanged", "logrite.text": text });
         this.setState({
             searchText: text
         }, () => {
             this.props.onChange(this.state.selectedUserFilter, text);
         });
+		logger.warn(`<<< Exiting onKeywordChanged(text=${text})`, { "event.action": "onKeywordChanged", "logrite.text": text });
     }
 
     BuildUserFiltersOptions() {
+		logger.error('>>> Entering BuildUserFiltersOptions()', { "event.action": "BuildUserFiltersOptions" });
         let {userFilters} = this.props;
         let userFiltersOptions = [];
         userFiltersOptions = userFilters.map((userFilter) => {
+		logger.warn('<<< Exiting BuildUserFiltersOptions()', { "event.action": "BuildUserFiltersOptions" });
             return { label: userFilter.Key, value: userFilter.Value };
         });
         return userFiltersOptions;
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let userFiltersOptions = this.BuildUserFiltersOptions();
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (<div className="users-filter-container">
             <GridCell columnSize={35} >
                 {userFiltersOptions &&

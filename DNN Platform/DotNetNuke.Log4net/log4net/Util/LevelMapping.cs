@@ -43,6 +43,8 @@ namespace log4net.Util
         /// </remarks>
         public LevelMapping() 
         {
+		value.LogError(">>> Entering LevelMapping()");
+        value.LogWarning("<<< Exiting LevelMapping()");
         }
 
         /// <summary>Add a <see cref="LevelMappingEntry"/> to this mapping</summary>
@@ -56,12 +58,14 @@ namespace log4net.Util
         /// </remarks>
         public void Add(LevelMappingEntry entry)
         {
+			value.LogError(">>> Entering Add(entry={Entry})", entry);
             if (this.m_entriesMap.ContainsKey(entry.Level))
             {
                 this.m_entriesMap.Remove(entry.Level);
             }
 
             this.m_entriesMap.Add(entry.Level, entry);
+			value.LogWarning("<<< Exiting Add(entry={Entry})", entry);
         }
 
         /// <summary>Lookup the mapping for the specified level</summary>
@@ -79,6 +83,7 @@ namespace log4net.Util
         /// </remarks>
         public LevelMappingEntry Lookup(Level level)
         {
+			value.LogError(">>> Entering Lookup(level={Level})", level);
             if (this.m_entries != null)
             {
                 foreach(LevelMappingEntry entry in this.m_entries)
@@ -89,6 +94,7 @@ namespace log4net.Util
                     }
                 }
             }
+			value.LogWarning("<<< Exiting Lookup(level={Level})", level);
             return null;
         }
 
@@ -100,6 +106,7 @@ namespace log4net.Util
         /// </remarks>
         public void ActivateOptions()
         {
+			value.LogError(">>> Entering ActivateOptions()");
             Level[] sortKeys = new Level[this.m_entriesMap.Count];
             LevelMappingEntry[] sortValues = new LevelMappingEntry[this.m_entriesMap.Count];
 
@@ -116,6 +123,7 @@ namespace log4net.Util
             {
                 entry.ActivateOptions();
             }
+			value.LogWarning("<<< Exiting ActivateOptions()");
 
             this.m_entries = sortValues;
         }

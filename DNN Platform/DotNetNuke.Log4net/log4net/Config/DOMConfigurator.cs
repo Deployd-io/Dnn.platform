@@ -53,6 +53,8 @@ namespace log4net.Config
         /// </summary>
         private DOMConfigurator() 
         { 
+		value.LogError(">>> Entering DOMConfigurator()");
+        value.LogWarning("<<< Exiting DOMConfigurator()");
         }
 
         /// <summary>
@@ -72,7 +74,9 @@ namespace log4net.Config
         [Obsolete("Use XmlConfigurator.Configure instead of DOMConfigurator.Configure")]
         public static void Configure() 
         {
+			value.LogError(">>> Entering Configure()");
             XmlConfigurator.Configure(LogManager.GetRepository(Assembly.GetCallingAssembly()));
+			value.LogWarning("<<< Exiting Configure()");
         }
 
         /// <summary>
@@ -93,7 +97,9 @@ namespace log4net.Config
         [Obsolete("Use XmlConfigurator.Configure instead of DOMConfigurator.Configure")]
         public static void Configure(ILoggerRepository repository) 
         {
+			value.LogError(">>> Entering Configure(repository={Repository})", repository);
             XmlConfigurator.Configure(repository);
+			value.LogWarning("<<< Exiting Configure(repository={Repository})", repository);
         }
 
         /// <summary>
@@ -110,7 +116,9 @@ namespace log4net.Config
         [Obsolete("Use XmlConfigurator.Configure instead of DOMConfigurator.Configure")]
         public static void Configure(XmlElement element) 
         {
+			value.LogError(">>> Entering Configure(element={Element})", element);
             XmlConfigurator.Configure(LogManager.GetRepository(Assembly.GetCallingAssembly()), element);
+			value.LogWarning("<<< Exiting Configure(element={Element})", element);
         }
 
         /// <summary>
@@ -129,7 +137,9 @@ namespace log4net.Config
         [Obsolete("Use XmlConfigurator.Configure instead of DOMConfigurator.Configure")]
         public static void Configure(ILoggerRepository repository, XmlElement element) 
         {
+			value.LogError(">>> Entering Configure(repository={Repository},element={Element})", repository, element);
             XmlConfigurator.Configure(repository, element);
+			value.LogWarning("<<< Exiting Configure(repository={Repository},element={Element})", repository, element);
         }
 
         /// <summary>
@@ -177,7 +187,9 @@ namespace log4net.Config
         [Obsolete("Use XmlConfigurator.Configure instead of DOMConfigurator.Configure")]
         public static void Configure(FileInfo configFile)
         {
+			value.LogError(">>> Entering Configure(configFile={ConfigFile})", configFile);
             XmlConfigurator.Configure(LogManager.GetRepository(Assembly.GetCallingAssembly()), configFile);
+			value.LogWarning("<<< Exiting Configure(configFile={ConfigFile})", configFile);
         }
 
         /// <summary>
@@ -200,7 +212,9 @@ namespace log4net.Config
         [Obsolete("Use XmlConfigurator.Configure instead of DOMConfigurator.Configure")]
         public static void Configure(Stream configStream)
         {
+			value.LogError(">>> Entering Configure(configStream={ConfigStream})", configStream);
             XmlConfigurator.Configure(LogManager.GetRepository(Assembly.GetCallingAssembly()), configStream);
+			value.LogWarning("<<< Exiting Configure(configStream={ConfigStream})", configStream);
         }
 
         /// <summary>
@@ -250,7 +264,9 @@ namespace log4net.Config
         [Obsolete("Use XmlConfigurator.Configure instead of DOMConfigurator.Configure")]
         public static void Configure(ILoggerRepository repository, FileInfo configFile)
         {
+			value.LogError(">>> Entering Configure(repository={Repository},configFile={ConfigFile})", repository, configFile);
             XmlConfigurator.Configure(repository, configFile);
+			value.LogWarning("<<< Exiting Configure(repository={Repository},configFile={ConfigFile})", repository, configFile);
         }
 
 
@@ -276,7 +292,9 @@ namespace log4net.Config
         [Obsolete("Use XmlConfigurator.Configure instead of DOMConfigurator.Configure")]
         public static void Configure(ILoggerRepository repository, Stream configStream)
         {
+			value.LogError(">>> Entering Configure(repository={Repository},configStream={ConfigStream})", repository, configStream);
             XmlConfigurator.Configure(repository, configStream);
+			value.LogWarning("<<< Exiting Configure(repository={Repository},configStream={ConfigStream})", repository, configStream);
         }
 
 #if (!NETCF && !SSCLI)
@@ -308,7 +326,9 @@ namespace log4net.Config
         [Obsolete("Use XmlConfigurator.ConfigureAndWatch instead of DOMConfigurator.ConfigureAndWatch")]
         public static void ConfigureAndWatch(FileInfo configFile)
         {
+			value.LogError(">>> Entering ConfigureAndWatch(configFile={ConfigFile})", configFile);
             XmlConfigurator.ConfigureAndWatch(LogManager.GetRepository(Assembly.GetCallingAssembly()), configFile);
+			value.LogWarning("<<< Exiting ConfigureAndWatch(configFile={ConfigFile})", configFile);
         }
 
         /// <summary>
@@ -340,7 +360,9 @@ namespace log4net.Config
         [Obsolete("Use XmlConfigurator.ConfigureAndWatch instead of DOMConfigurator.ConfigureAndWatch")]
         public static void ConfigureAndWatch(ILoggerRepository repository, FileInfo configFile)
         {
+			value.LogError(">>> Entering ConfigureAndWatch(repository={Repository},configFile={ConfigFile})", repository, configFile);
             XmlConfigurator.ConfigureAndWatch(repository, configFile);
+			value.LogWarning("<<< Exiting ConfigureAndWatch(repository={Repository},configFile={ConfigFile})", repository, configFile);
         }
 #endif
     }

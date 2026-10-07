@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.Journal.Internal
 
     public class InternalJournalController : ServiceLocator<IInternalJournalController, InternalJournalController>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InternalJournalController));
         /// <inheritdoc />
         protected override Func<IInternalJournalController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new InternalJournalControllerImpl();
         }
     }

@@ -7,6 +7,7 @@ import localization from "../localization";
 import { bindActionCreators } from "redux";
 import ServerActions from "../actions/server";
 import utils from "../utils";
+const logger = console;
 
 const restartAppButtonStyle = {
     "marginRight": "10px"
@@ -15,6 +16,7 @@ const restartAppButtonStyle = {
 class App extends Component { 
 
     UNSAFE_componentWillReceiveProps(newProps) {       
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.newProps": newProps });
         if (this.props.infoMessage !== newProps.infoMessage && newProps.infoMessage) {
             utils.notify(newProps.infoMessage);
         }
@@ -26,15 +28,18 @@ class App extends Component {
         if (this.props.errorMessage !== newProps.errorMessage && newProps.errorMessage) {
             utils.notifyError(newProps.errorMessage);
         }
+		logger.warn(`<<< Exiting UNSAFE_componentWillReceiveProps(newProps=${newProps})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.newProps": newProps });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         const buttonVisible = utils.isHostUser();
         if (this.props.reloadPage) {
             window.top.location.reload();
             return null;
         }
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="servers-app personaBar-mainContainer">
                 <PersonaBarPage isOpen={true}>
@@ -68,6 +73,8 @@ App.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         selectedPage: state.visiblePanel.selectedPage,
         selectedPageVisibleIndex: state.visiblePanel.selectedPageVisibleIndex,
@@ -78,6 +85,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.error(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
+	logger.warn(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
     return {
         ...bindActionCreators ({
             onRestartApplicationClicked: ServerActions.restartApplication,

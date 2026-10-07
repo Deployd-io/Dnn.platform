@@ -18,6 +18,7 @@ namespace DotNetNuke.Modules.NavigationProvider
     [SuppressMessage("Microsoft.Design", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "Breaking change")]
     public abstract partial class NavigationProvider : UserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NavigationProvider));
         public delegate void NodeClickEventHandler(NavigationEventArgs args);
 
         public delegate void PopulateOnDemandEventHandler(NavigationEventArgs args);
@@ -1007,6 +1008,8 @@ namespace DotNetNuke.Modules.NavigationProvider
         [DnnDeprecated(10, 0, 0, "Please use overload with IServiceProvider")]
         public static partial NavigationProvider Instance(string friendlyName)
         {
+			Logger.LogError(">>> Entering Instance(friendlyName={FriendlyName})", friendlyName);
+            Logger.LogWarning("<<< Exiting Instance(friendlyName={FriendlyName})", friendlyName);
             return Instance(Globals.DependencyProvider, friendlyName);
         }
 
@@ -1021,42 +1024,52 @@ namespace DotNetNuke.Modules.NavigationProvider
 
         public virtual void ClearNodes()
         {
+		Logger.LogError(">>> Entering ClearNodes()");
+        Logger.LogWarning("<<< Exiting ClearNodes()");
         }
 
         [SuppressMessage("Microsoft.Design", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Breaking change")]
         protected void RaiseEvent_NodeClick(DNNNode objNode)
         {
+			Logger.LogError(">>> Entering RaiseEvent_NodeClick(objNode={ObjNode})", objNode);
             if (this.NodeClick != null)
             {
                 this.NodeClick(new NavigationEventArgs(objNode.ID, objNode));
             }
+			Logger.LogWarning("<<< Exiting RaiseEvent_NodeClick(objNode={ObjNode})", objNode);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Breaking change")]
         protected void RaiseEvent_NodeClick(string strID)
         {
+			Logger.LogError(">>> Entering RaiseEvent_NodeClick(strID={StrID})", strID);
             if (this.NodeClick != null)
             {
                 this.NodeClick(new NavigationEventArgs(strID, null));
             }
+			Logger.LogWarning("<<< Exiting RaiseEvent_NodeClick(strID={StrID})", strID);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Breaking change")]
         protected void RaiseEvent_PopulateOnDemand(DNNNode objNode)
         {
+			Logger.LogError(">>> Entering RaiseEvent_PopulateOnDemand(objNode={ObjNode})", objNode);
             if (this.PopulateOnDemand != null)
             {
                 this.PopulateOnDemand(new NavigationEventArgs(objNode.ID, objNode));
             }
+			Logger.LogWarning("<<< Exiting RaiseEvent_PopulateOnDemand(objNode={ObjNode})", objNode);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Breaking change")]
         protected void RaiseEvent_PopulateOnDemand(string strID)
         {
+			Logger.LogError(">>> Entering RaiseEvent_PopulateOnDemand(strID={StrID})", strID);
             if (this.PopulateOnDemand != null)
             {
                 this.PopulateOnDemand(new NavigationEventArgs(strID, null));
             }
+			Logger.LogWarning("<<< Exiting RaiseEvent_PopulateOnDemand(strID={StrID})", strID);
         }
     }
 }

@@ -62,12 +62,15 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         public void ActivateOptions()
         {
+			value.LogError(">>> Entering ActivateOptions()");
             if (SystemInfo.EqualsIgnoringCase(this.Option, "DOS"))
             {
+				value.LogWarning("<<< Exiting ActivateOptions()");
                 this.Option = "\r\n";
             }
             else if (SystemInfo.EqualsIgnoringCase(this.Option, "UNIX"))
             {
+				value.LogDebug("ActivateOptions(): this.Option → {Arg0}", this.Option);
                 this.Option = "\n";
             }
             else

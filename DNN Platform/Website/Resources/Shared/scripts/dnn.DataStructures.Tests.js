@@ -1,4 +1,5 @@
-﻿/// <reference path="dnn.DataStructures.js"/>
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+/// <reference path="dnn.DataStructures.js"/>
 /// <reference path="jquery/jquery.js"/>
 
 // First test
@@ -16,7 +17,9 @@ test("AddFunction_ShouldAddTwoNumbers_WillFail", function () {
 });
 
 function add(first, second) {
+	logger.error(`>>> Entering add(first=${first},second=${second})`, { "event.action": "add", "logrite.first": first, "logrite.second": second });
     //return first + second; -- deliberate mistake
+	logger.warn(`<<< Exiting add(first=${first},second=${second})`, { "event.action": "add", "logrite.first": first, "logrite.second": second });
     return first + second;
 }
 

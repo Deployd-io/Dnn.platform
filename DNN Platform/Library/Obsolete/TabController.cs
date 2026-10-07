@@ -21,6 +21,7 @@ namespace DotNetNuke.Entities.Tabs
     /// <content>Deprecated TabController methods.</content>
     public partial class TabController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabController));
         /// <summary>Processes all panes and modules in the template file.</summary>
         /// <param name="nodePanes">Template file node for the panes is current tab.</param>
         /// <param name="portalId">PortalId of the new portal.</param>
@@ -35,7 +36,10 @@ namespace DotNetNuke.Entities.Tabs
             PortalTemplateModuleAction mergeTabs,
             Hashtable hModules)
         {
+			Logger.LogError(">>> Entering DeserializePanes(nodePanes={NodePanes},portalId={PortalId},tabId={TabId},mergeTabs={MergeTabs},hModules={HModules})", nodePanes, portalId, tabId, mergeTabs, hModules);
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogWarning("<<< Exiting DeserializePanes(nodePanes={NodePanes},portalId={PortalId},tabId={TabId},mergeTabs={MergeTabs},hModules={HModules})", nodePanes, portalId, tabId, mergeTabs, hModules);
+			Logger.LogError("DeserializePanes(nodePanes={NodePanes},portalId={PortalId},tabId={TabId},mergeTabs={MergeTabs},hModules={HModules}): scope → {Scope}", nodePanes, portalId, tabId, mergeTabs, hModules, scope);
             DeserializePanes(scope.ServiceProvider.GetRequiredService<IBusinessControllerProvider>(), nodePanes, portalId, tabId, mergeTabs, hModules);
         }
 
@@ -52,7 +56,10 @@ namespace DotNetNuke.Entities.Tabs
             int portalId,
             PortalTemplateModuleAction mergeTabs)
         {
+			Logger.LogError(">>> Entering DeserializeTab(tabNode={TabNode},tab={Tab},portalId={PortalId},mergeTabs={MergeTabs})", tabNode, tab, portalId, mergeTabs);
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogWarning("<<< Exiting DeserializeTab(tabNode={TabNode},tab={Tab},portalId={PortalId},mergeTabs={MergeTabs})", tabNode, tab, portalId, mergeTabs);
+			Logger.LogError("DeserializeTab(tabNode={TabNode},tab={Tab},portalId={PortalId},mergeTabs={MergeTabs}): scope → {Scope}", tabNode, tab, portalId, mergeTabs, scope);
             return DeserializeTab(scope.ServiceProvider.GetRequiredService<IBusinessControllerProvider>(), tabNode, tab, portalId, mergeTabs);
         }
 
@@ -75,7 +82,10 @@ namespace DotNetNuke.Entities.Tabs
             PortalTemplateModuleAction mergeTabs,
             Hashtable modules)
         {
+			Logger.LogError(">>> Entering DeserializeTab(tabNode={TabNode},tab={Tab},tabs={Tabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},modules={Modules})", tabNode, tab, tabs, portalId, isAdminTemplate, mergeTabs, modules);
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogWarning("<<< Exiting DeserializeTab(tabNode={TabNode},tab={Tab},tabs={Tabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},modules={Modules})", tabNode, tab, tabs, portalId, isAdminTemplate, mergeTabs, modules);
+			Logger.LogError("DeserializeTab(tabNode={TabNode},tab={Tab},tabs={Tabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},modules={Modules}): scope → {Scope}", tabNode, tab, tabs, portalId, isAdminTemplate, mergeTabs, modules, scope);
             return DeserializeTab(scope.ServiceProvider.GetRequiredService<IBusinessControllerProvider>(), tabNode, tab, tabs, portalId, isAdminTemplate, mergeTabs, modules);
         }
 
@@ -87,7 +97,10 @@ namespace DotNetNuke.Entities.Tabs
         [DnnDeprecated(10, 0, 0, "Please use overload with IBusinessControllerProvider")]
         public static partial XmlNode SerializeTab(XmlDocument tabXml, TabInfo objTab, bool includeContent)
         {
+			Logger.LogError(">>> Entering SerializeTab(tabXml={TabXml},objTab={ObjTab},includeContent={IncludeContent})", tabXml, objTab, includeContent);
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogError("SerializeTab(tabXml={TabXml},objTab={ObjTab},includeContent={IncludeContent}): scope → {Scope}", tabXml, objTab, includeContent, scope);
+			Logger.LogWarning("<<< Exiting SerializeTab(tabXml={TabXml},objTab={ObjTab},includeContent={IncludeContent})", tabXml, objTab, includeContent);
             return SerializeTab(
                 scope.ServiceProvider.GetRequiredService<IBusinessControllerProvider>(),
                 tabXml,
@@ -126,7 +139,9 @@ namespace DotNetNuke.Entities.Tabs
         [DnnDeprecated(9, 11, 1, "Use AddMissingLanguagesWithWarnings")]
         public partial void AddMissingLanguages(int portalId, int tabId)
         {
+			Logger.LogError(">>> Entering AddMissingLanguages(portalId={PortalId},tabId={TabId})", portalId, tabId);
             this.AddMissingLanguagesWithWarnings(portalId, tabId);
+			Logger.LogWarning("<<< Exiting AddMissingLanguages(portalId={PortalId},tabId={TabId})", portalId, tabId);
         }
     }
 }

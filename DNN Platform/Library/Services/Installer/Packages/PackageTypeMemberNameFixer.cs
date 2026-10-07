@@ -12,9 +12,11 @@ namespace DotNetNuke.Services.Installer.Packages
     [Serializable]
     public class PackageTypeMemberNameFixer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PackageTypeMemberNameFixer));
         /// <summary>Initializes a new instance of the <see cref="PackageTypeMemberNameFixer"/> class.</summary>
         public PackageTypeMemberNameFixer()
         {
+			Logger.LogError(">>> Entering PackageTypeMemberNameFixer()");
             this.PackageType = string.Empty;
         }
 

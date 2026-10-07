@@ -20,6 +20,7 @@ namespace DotNetNuke.Security.Permissions
     /// <summary>TabPermissionController provides the Business Layer for Tab Permissions.</summary>
     public partial class TabPermissionController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabPermissionController));
         private static readonly PermissionProvider Provider = PermissionProvider.Instance();
 
         /// <summary>Returns a list with all roles with implicit permissions on Tabs.</summary>
@@ -27,6 +28,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A List with the implicit roles.</returns>
         public static IEnumerable<RoleInfo> ImplicitRoles(int portalId)
         {
+			Logger.LogError(">>> Entering ImplicitRoles(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting ImplicitRoles(portalId={PortalId})", portalId);
             return Provider.ImplicitRolesForPages(portalId);
         }
 
@@ -34,6 +37,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanAddContentToPage()
         {
+			Logger.LogError(">>> Entering CanAddContentToPage()");
+            Logger.LogWarning("<<< Exiting CanAddContentToPage()");
             return CanAddContentToPage(TabController.CurrentPage);
         }
 
@@ -49,6 +54,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanAddPage()
         {
+			Logger.LogError(">>> Entering CanAddPage()");
+            Logger.LogWarning("<<< Exiting CanAddPage()");
             return CanAddPage(TabController.CurrentPage);
         }
 
@@ -64,6 +71,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanAdminPage()
         {
+			Logger.LogError(">>> Entering CanAdminPage()");
+            Logger.LogWarning("<<< Exiting CanAdminPage()");
             return CanAdminPage(TabController.CurrentPage);
         }
 
@@ -79,6 +88,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanCopyPage()
         {
+			Logger.LogError(">>> Entering CanCopyPage()");
+            Logger.LogWarning("<<< Exiting CanCopyPage()");
             return CanCopyPage(TabController.CurrentPage);
         }
 
@@ -94,6 +105,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanDeletePage()
         {
+			Logger.LogError(">>> Entering CanDeletePage()");
+            Logger.LogWarning("<<< Exiting CanDeletePage()");
             return CanDeletePage(TabController.CurrentPage);
         }
 
@@ -109,6 +122,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanExportPage()
         {
+			Logger.LogError(">>> Entering CanExportPage()");
+            Logger.LogWarning("<<< Exiting CanExportPage()");
             return CanExportPage(TabController.CurrentPage);
         }
 
@@ -124,6 +139,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanImportPage()
         {
+			Logger.LogError(">>> Entering CanImportPage()");
+            Logger.LogWarning("<<< Exiting CanImportPage()");
             return CanImportPage(TabController.CurrentPage);
         }
 
@@ -139,6 +156,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanManagePage()
         {
+			Logger.LogError(">>> Entering CanManagePage()");
+            Logger.LogWarning("<<< Exiting CanManagePage()");
             return CanManagePage(TabController.CurrentPage);
         }
 
@@ -154,6 +173,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanNavigateToPage()
         {
+			Logger.LogError(">>> Entering CanNavigateToPage()");
+            Logger.LogWarning("<<< Exiting CanNavigateToPage()");
             return CanNavigateToPage(TabController.CurrentPage);
         }
 
@@ -169,6 +190,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanViewPage()
         {
+			Logger.LogError(">>> Entering CanViewPage()");
+            Logger.LogWarning("<<< Exiting CanViewPage()");
             return CanViewPage(TabController.CurrentPage);
         }
 
@@ -191,9 +214,11 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="user">The user.</param>
         public static void DeleteTabPermissionsByUser(IEventLogger eventLogger, UserInfo user)
         {
+			Logger.LogError(">>> Entering DeleteTabPermissionsByUser(user={User})", user);
             Provider.DeleteTabPermissionsByUser(user);
             eventLogger.AddLog(user, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.TABPERMISSION_DELETED);
             DataCache.ClearTabPermissionsCache(user.PortalID);
+			Logger.LogWarning("<<< Exiting DeleteTabPermissionsByUser(eventLogger={EventLogger},user={User})", eventLogger, user);
         }
 
         /// <summary>GetTabPermissions gets a TabPermissionCollection.</summary>
@@ -202,6 +227,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A <see cref="TabPermissionCollection"/> instance with the tab's permissions, or an empty <see cref="TabPermissionCollection"/> if it can't be found.</returns>
         public static TabPermissionCollection GetTabPermissions(int tabId, int portalId)
         {
+			Logger.LogError(">>> Entering GetTabPermissions(tabId={TabId},portalId={PortalId})", tabId, portalId);
+            Logger.LogWarning("<<< Exiting GetTabPermissions(tabId={TabId},portalId={PortalId})", tabId, portalId);
             return Provider.GetTabPermissions(tabId, portalId);
         }
 
@@ -211,6 +238,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns><see langword="true"/> if the current user has the given permission, otherwise <see langword="false"/>.</returns>
         public static bool HasTabPermission(string permissionKey)
         {
+			Logger.LogError(">>> Entering HasTabPermission(permissionKey={PermissionKey})", permissionKey);
+            Logger.LogWarning("<<< Exiting HasTabPermission(permissionKey={PermissionKey})", permissionKey);
             return HasTabPermission(TabController.CurrentPage.TabPermissions, permissionKey);
         }
 
@@ -235,14 +264,19 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="tab">The Tab to update.</param>
         public static void SaveTabPermissions(IEventLogger eventLogger, TabInfo tab)
         {
+			Logger.LogError(">>> Entering SaveTabPermissions(tab={Tab})", tab);
             Provider.SaveTabPermissions(tab);
             eventLogger.AddLog(tab, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.TABPERMISSION_UPDATED);
             DataCache.ClearTabPermissionsCache(tab.PortalID);
+			Logger.LogWarning("<<< Exiting SaveTabPermissions(eventLogger={EventLogger},tab={Tab})", eventLogger, tab);
         }
 
         private static void ClearPermissionCache(int tabId)
         {
+			Logger.LogError(">>> Entering ClearPermissionCache(tabId={TabId})", tabId);
             var objTab = TabController.Instance.GetTab(tabId, Null.NullInteger, false);
+			Logger.LogWarning("<<< Exiting ClearPermissionCache(tabId={TabId})", tabId);
+			Logger.LogError("ClearPermissionCache(tabId={TabId}): objTab → {ObjTab}", tabId, objTab);
             DataCache.ClearTabPermissionsCache(objTab.PortalID);
         }
     }

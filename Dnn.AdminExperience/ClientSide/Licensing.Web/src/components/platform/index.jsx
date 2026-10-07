@@ -9,10 +9,13 @@ import DnnTechnologyEditorialIcon from "./../svg/dnn_technology_editorial.svg";
 import GithubIcon from "./../svg/github.svg";
 import DnnIcon from "./../svg/dnn_logo_primary.svg";
 import DocsIcon from "./../svg/dnn_docs_logo.svg";
+const logger = console;
 
 class Platform extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     renderVersion() {
@@ -33,6 +36,8 @@ class Platform extends Component {
 
 
     renderLinks() {
+		logger.error('>>> Entering renderLinks()', { "event.action": "renderLinks" });
+		logger.warn('<<< Exiting renderLinks()', { "event.action": "renderLinks" });
         return (
             <div className="links-wrapper">
                 <div className="link-docs-wrapper" title={resx.get("Docs.Header")} onClick={this.onDocsClick.bind(this) }>
@@ -61,12 +66,16 @@ class Platform extends Component {
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const {props} = this;
         props.dispatch(LicensingActions.getServerInfo());
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     /*eslint no-mixed-spaces-and-tabs: "error"*/
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.licensingPlatform}>
                 <div>
@@ -89,6 +98,8 @@ Platform.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         productVersion: state.licensing.productVersion
     };

@@ -10,10 +10,12 @@ import { ModuleDefinitionActions } from "actions";
 import DefinitionFields from "./DefinitionFields";
 import utils from "utils";
 import "./style.less";
+const logger = console;
 
 class ModuleDefinitions extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             moduleDefinitionBeingEdited: {},
             moduleDefinitionBeingEditedIndex: null,
@@ -24,9 +26,12 @@ class ModuleDefinitions extends Component {
             triedToSave: false,
             editMode: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
     getNewModuleDefinition() {
+		logger.error('>>> Entering getNewModuleDefinition()', { "event.action": "getNewModuleDefinition" });
         const { props } = this;
+		logger.warn('<<< Exiting getNewModuleDefinition()', { "event.action": "getNewModuleDefinition" });
         return {
             id: -1,
             desktopModuleId: props.desktopModuleId,
@@ -36,11 +41,14 @@ class ModuleDefinitions extends Component {
         };
     }
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         this.setState({
             moduleDefinitionBeingEdited: this.getNewModuleDefinition()
         });
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
     confirmAction(callback) {
+		logger.error(`>>> Entering confirmAction(callback=${callback})`, { "event.action": "confirmAction", "logrite.callback": callback });
         const { props } = this;
         if (props.formIsDirty) {
             utilities.utilities.confirm(Localization.get("UnsavedChanges.HelpText"), Localization.get("UnsavedChanges.Confirm"), Localization.get("UnsavedChanges.Cancel"), () => {
@@ -52,15 +60,19 @@ class ModuleDefinitions extends Component {
             });
         } else {
             callback();
+			logger.warn(`<<< Exiting confirmAction(callback=${callback})`, { "event.action": "confirmAction", "logrite.callback": callback });
         }
     }
     resetError() {
+		logger.error('>>> Entering resetError()', { "event.action": "resetError" });
+		logger.warn('<<< Exiting resetError()', { "event.action": "resetError" });
         return {
             name: false,
             friendlyName: false
         };
     }
     exitEditMode() {
+		logger.error('>>> Entering exitEditMode()', { "event.action": "exitEditMode" });
         this.confirmAction(() => {
             this.setState({
                 moduleDefinitionBeingEdited: this.getNewModuleDefinition(),
@@ -72,6 +84,7 @@ class ModuleDefinitions extends Component {
         });
     }
     _onEditModuleDefinition(moduleDefinitionBeingEdited, moduleDefinitionBeingEditedIndex) {
+		logger.error(`>>> Entering _onEditModuleDefinition(moduleDefinitionBeingEdited=${moduleDefinitionBeingEdited},moduleDefinitionBeingEditedIndex=${moduleDefinitionBeingEditedIndex})`, { "event.action": "_onEditModuleDefinition", "logrite.moduleDefinitionBeingEdited": moduleDefinitionBeingEdited, "logrite.moduleDefinitionBeingEditedIndex": moduleDefinitionBeingEditedIndex });
         this.setState({
             editMode: true,
             error: {
@@ -81,11 +94,14 @@ class ModuleDefinitions extends Component {
             moduleDefinitionBeingEdited,
             moduleDefinitionBeingEditedIndex
         });
+		logger.warn(`<<< Exiting _onEditModuleDefinition(moduleDefinitionBeingEdited=${moduleDefinitionBeingEdited},moduleDefinitionBeingEditedIndex=${moduleDefinitionBeingEditedIndex})`, { "event.action": "_onEditModuleDefinition", "logrite.moduleDefinitionBeingEdited": moduleDefinitionBeingEdited, "logrite.moduleDefinitionBeingEditedIndex": moduleDefinitionBeingEditedIndex });
     }
     onEditModuleDefinition(moduleDefinitionBeingEdited, moduleDefinitionBeingEditedIndex) {
+		logger.error(`>>> Entering onEditModuleDefinition(moduleDefinitionBeingEdited=${moduleDefinitionBeingEdited},moduleDefinitionBeingEditedIndex=${moduleDefinitionBeingEditedIndex})`, { "event.action": "onEditModuleDefinition", "logrite.moduleDefinitionBeingEdited": moduleDefinitionBeingEdited, "logrite.moduleDefinitionBeingEditedIndex": moduleDefinitionBeingEditedIndex });
         this.confirmAction(() => {
             this._onEditModuleDefinition(moduleDefinitionBeingEdited, moduleDefinitionBeingEditedIndex);
         });
+		logger.warn(`<<< Exiting onEditModuleDefinition(moduleDefinitionBeingEdited=${moduleDefinitionBeingEdited},moduleDefinitionBeingEditedIndex=${moduleDefinitionBeingEditedIndex})`, { "event.action": "onEditModuleDefinition", "logrite.moduleDefinitionBeingEdited": moduleDefinitionBeingEdited, "logrite.moduleDefinitionBeingEditedIndex": moduleDefinitionBeingEditedIndex });
     }
     onChange(key, event) {
         const { props, state } = this;
@@ -110,6 +126,7 @@ class ModuleDefinitions extends Component {
         }
     }
     onSave() {
+		logger.error('>>> Entering onSave()', { "event.action": "onSave" });
         const { props, state } = this;
         let { error, } = state;
         let triedToSave = true;
@@ -128,6 +145,7 @@ class ModuleDefinitions extends Component {
         }
 
         let extensionBeingUpdated = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+		logger.error(`onSave(): extensionBeingUpdated → ${extensionBeingUpdated}`, { "event.action": "onSave" });
         let moduleDefinitions = extensionBeingUpdated.moduleDefinitions.value;
         if (state.moduleDefinitionBeingEditedIndex > -1) {
             moduleDefinitions[state.moduleDefinitionBeingEditedIndex] = state.moduleDefinitionBeingEdited;
@@ -137,40 +155,51 @@ class ModuleDefinitions extends Component {
 
         state.moduleDefinitionBeingEdited.desktopModuleId = props.extensionBeingEdited.desktopModuleId.value;
         let actions = { savedefinition: JSON.stringify(state.moduleDefinitionBeingEdited) };
+		logger.error(`onSave(): actions → ${actions}`, { "event.action": "onSave" });
 
         props.dispatch(ExtensionActions.updateExtension(extensionBeingUpdated, actions, props.extensionBeingEditedIndex, () => {
             props.dispatch(ModuleDefinitionActions.setFormDirt(false, () => {
                 this.exitEditMode();
             }));
         }));
+		logger.warn('<<< Exiting onSave()', { "event.action": "onSave" });
     }
     onControlSave() {
+		logger.error('>>> Entering onControlSave()', { "event.action": "onControlSave" });
         const { props, state } = this;
         let extensionBeingUpdated = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+		logger.error(`onControlSave(): extensionBeingUpdated → ${extensionBeingUpdated}`, { "event.action": "onControlSave" });
         state.moduleDefinitionBeingEdited.desktopModuleId = props.extensionBeingEdited.desktopModuleId.value;
         let actions = { savedefinition: JSON.stringify(state.moduleDefinitionBeingEdited) };
+		logger.error(`onControlSave(): actions → ${actions}`, { "event.action": "onControlSave" });
 
         props.dispatch(ExtensionActions.updateExtension(extensionBeingUpdated, actions, props.extensionBeingEditedIndex, () => {
             props.dispatch(ModuleDefinitionActions.setFormDirt(false, () => {
                 this.exitEditMode();
+				logger.warn('<<< Exiting onControlSave()', { "event.action": "onControlSave" });
             }));
         }));
     }
     onDelete(definitionId) {
+		logger.error(`>>> Entering onDelete(definitionId=${definitionId})`, { "event.action": "onDelete", "logrite.definitionId": definitionId });
         utilities.utilities.confirm("Are you sure you want to delete this module definition?", "Yes", "No", () => {
             const { props } = this;
 
             let extensionBeingUpdated = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+			logger.error(`onDelete(definitionId=${definitionId}): extensionBeingUpdated → ${extensionBeingUpdated}`, { "event.action": "onDelete", "logrite.definitionId": definitionId });
 
             let actions = { deletedefinition: definitionId.toString() };
+			logger.error(`onDelete(definitionId=${definitionId}): actions → ${actions}`, { "event.action": "onDelete", "logrite.definitionId": definitionId });
 
             props.dispatch(ExtensionActions.updateExtension(extensionBeingUpdated, actions, props.extensionBeingEditedIndex, () => {
                 utils.utilities.notify(Localization.get("UpdateComplete"));
+				logger.warn(`<<< Exiting onDelete(definitionId=${definitionId})`, { "event.action": "onDelete", "logrite.definitionId": definitionId });
             }));
         });
     }
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         const moduleDefinitions = props.extensionBeingEdited.moduleDefinitions.value.map((moduleDefinition, index) => {
 
@@ -192,7 +221,9 @@ class ModuleDefinitions extends Component {
         });
 
         const isAddMode = state.editMode && state.moduleDefinitionBeingEditedIndex === -1;
+		logger.error(`render(): moduleDefinitions → ${moduleDefinitions}`, { "event.action": "render" });
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className="module-definitions">
                 <GridCell className="header-container">
@@ -232,6 +263,8 @@ ModuleDefinitions.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         extensionBeingEdited: state.extension.extensionBeingEdited,
         controlFormIsDirty: state.moduleDefinition.controlFormIsDirty

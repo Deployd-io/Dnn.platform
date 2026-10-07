@@ -10,22 +10,27 @@ import { Dropdown, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
 import util from "../../utils";
 import resx from "../../resources";
+const logger = console;
 
 let tableFields = [];
 
 class SynonymsGroupsPanel extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             synonymsGroups: undefined,
             openId: "",
             culture: ""
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     loadData() {
+		logger.error('>>> Entering loadData()', { "event.action": "loadData" });
         const { props } = this;
         props.dispatch(SearchActions.getSynonymsGroups(props.portalId, props.cultureCode, (data) => {
+			logger.warn('<<< Exiting loadData()', { "event.action": "loadData" });
             this.setState({
                 synonymsGroups: Object.assign({}, data)
             });
@@ -33,6 +38,7 @@ class SynonymsGroupsPanel extends Component {
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const { props } = this;
 
         if (tableFields.length === 0) {
@@ -42,9 +48,11 @@ class SynonymsGroupsPanel extends Component {
         props.dispatch(SearchActions.getCultureList(props.portalId));
 
         this.loadData();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         const { props } = this;
 
         if (props.synonymsGroups) {
@@ -53,11 +61,13 @@ class SynonymsGroupsPanel extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
             }
         }
     }
 
     renderHeader() {
+		logger.error('>>> Entering renderHeader()', { "event.action": "renderHeader" });
         if (this.props.synonymsGroups) {
             let tableHeaders = tableFields.map((field) => {
                 let className = "synonyms-items header-" + field.id;
@@ -66,10 +76,12 @@ class SynonymsGroupsPanel extends Component {
                 </div>;
             });
 
+			logger.error(`renderHeader(): tableHeaders → ${tableHeaders}`, { "event.action": "renderHeader" });
             if (this.props.synonymsGroups.SynonymsGroups.length > 0) {
                 return <div className="header-row">{tableHeaders}</div>;                
             }
             else {
+				logger.warn('<<< Exiting renderHeader()', { "event.action": "renderHeader" });
                 return <div className="header-row-no-border">{tableHeaders}</div>;
             }
         }
@@ -156,6 +168,7 @@ class SynonymsGroupsPanel extends Component {
     }
 
     getCultureOptions() {
+		logger.error('>>> Entering getCultureOptions()', { "event.action": "getCultureOptions" });
         const {props} = this;
         let options = [];
         if (props.cultures !== undefined) {
@@ -170,13 +183,16 @@ class SynonymsGroupsPanel extends Component {
                 };
             });
         }
+		logger.warn('<<< Exiting getCultureOptions()', { "event.action": "getCultureOptions" });
         return options;
     }
 
      
     renderedSynonymsGroups() {
+		logger.error('>>> Entering renderedSynonymsGroups()', { "event.action": "renderedSynonymsGroups" });
         let i = 0;
         if (this.props.synonymsGroups) {
+			logger.warn('<<< Exiting renderedSynonymsGroups()', { "event.action": "renderedSynonymsGroups" });
             return this.props.synonymsGroups.SynonymsGroups.map((item, index) => {
                 let id = "row-" + i++;
                 return (
@@ -206,7 +222,9 @@ class SynonymsGroupsPanel extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let opened = (this.state.openId === "add");
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <div className="synonyms-group-items">
@@ -267,6 +285,8 @@ SynonymsGroupsPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         synonymsGroups: state.search.synonymsGroups,
         cultures: state.search.cultures,

@@ -12,16 +12,21 @@ namespace DotNetNuke.HttpModules.Localization
     /// <summary>Sets up localization for all requests.</summary>
     public class LocalizationModule : IHttpModule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LocalizationModule));
         /// <inheritdoc />
         public void Init(HttpApplication context)
         {
+			Logger.LogError(">>> Entering Init(context={Context})", context);
             context.PreRequestHandlerExecute += Context_PreRequestHandlerExecute;
+			Logger.LogWarning("<<< Exiting Init(context={Context})", context);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogError(">>> Entering Dispose()");
             // intentionally left empty
+			Logger.LogWarning("<<< Exiting Dispose()");
         }
 
         /// <summary>
@@ -31,6 +36,7 @@ namespace DotNetNuke.HttpModules.Localization
         /// </summary>
         private static void Context_PreRequestHandlerExecute(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering Context_PreRequestHandlerExecute(sender={Sender},e={E})", sender, e);
             // We need to ensure that we don't run this code when not requesting a page as otherwise we may not have
             // an accurate portal identified (e.g. resources)
             var isPage = HttpContext.Current.CurrentHandler is Framework.PageBase;
@@ -40,6 +46,7 @@ namespace DotNetNuke.HttpModules.Localization
             }
 
             var isInstallPage = HttpContext.Current.Request.Url.LocalPath.ToLowerInvariant().Contains("installwizard.aspx");
+			Logger.LogError("Context_PreRequestHandlerExecute(sender={Sender},e={E}): isInstallPage → {IsInstallPage}", sender, e, isInstallPage);
             if (isInstallPage)
             {
                 return;
@@ -48,10 +55,12 @@ namespace DotNetNuke.HttpModules.Localization
             // The portalSettings should always be correct at this point, but in case we can't find a portal
             // we need to insure we're not setting the thread locale.
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogError("Context_PreRequestHandlerExecute(sender={Sender},e={E}): portalSettings → {PortalSettings}", sender, e, portalSettings);
             if (portalSettings != null)
             {
                 Localization.SetThreadCultures(Localization.GetPageLocale(portalSettings), portalSettings);
             }
+			Logger.LogWarning("<<< Exiting Context_PreRequestHandlerExecute(sender={Sender},e={E})", sender, e);
         }
     }
 }

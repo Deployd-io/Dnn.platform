@@ -29,6 +29,7 @@ namespace DotNetNuke.Services.Syndication
         where TRssItemType : RssElementBase, new()
         where TRssImageType : RssElementBase, new()
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RssHttpHandlerBase));
         /// <summary>An event which is fired when the handler is initialized.</summary>
         public event InitEventHandler Init;
 
@@ -67,14 +68,18 @@ namespace DotNetNuke.Services.Syndication
         /// <param name="ea">The event args.</param>
         protected virtual void OnInit(EventArgs ea)
         {
+			Logger.LogError(">>> Entering OnInit(ea={Ea})", ea);
             this.Init?.Invoke(this, ea);
+			Logger.LogWarning("<<< Exiting OnInit(ea={Ea})", ea);
         }
 
         /// <summary>Triggers the <see cref="PreRender"/> event.</summary>
         /// <param name="ea">The event args.</param>
         protected virtual void OnPreRender(EventArgs ea)
         {
+			Logger.LogError(">>> Entering OnPreRender(ea={Ea})", ea);
             this.PreRender?.Invoke(this, ea);
+			Logger.LogWarning("<<< Exiting OnPreRender(ea={Ea})", ea);
         }
 
         /// <summary>When overridden in a derived class, populates the channel name and user name.</summary>
@@ -82,25 +87,33 @@ namespace DotNetNuke.Services.Syndication
         /// <param name="userName">The user name.</param>
         protected virtual void PopulateChannel(string channelName, string userName)
         {
+		Logger.LogError(">>> Entering PopulateChannel(channelName={ChannelName},userName={UserName})", channelName, userName);
+        Logger.LogWarning("<<< Exiting PopulateChannel(channelName={ChannelName},userName={UserName})", channelName, userName);
         }
 
         /// <summary>Renders the channel as XML to the <paramref name="writer"/>.</summary>
         /// <param name="writer">The write to which the channel should be rendered.</param>
         protected virtual void Render(XmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering Render(writer={Writer})", writer);
             XmlDocument doc = this.Channel.SaveAsXml();
+			Logger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
+			Logger.LogError("Render(writer={Writer}): doc → {Doc}", writer, doc);
             doc.Save(writer);
         }
 
         private void InternalInit(HttpContext context)
         {
+			Logger.LogError(">>> Entering InternalInit(context={Context})", context);
             this.Context = context;
 
+			Logger.LogDebug("InternalInit(context={Context}): this.Context → {Arg1}", context, this.Context);
             // create the channel
             this.Channel = new TRssChannelType();
             this.Channel.SetDefaults();
 
             this.Context.Response.ContentType = "text/xml";
+			Logger.LogWarning("<<< Exiting InternalInit(context={Context})", context);
         }
     }
 }

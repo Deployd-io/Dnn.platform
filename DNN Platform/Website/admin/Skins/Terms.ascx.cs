@@ -15,13 +15,17 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin/theme object which displays a link to the site's terms page.</summary>
     public partial class Terms : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Terms.ascx));
         private const string MyFileName = "Terms.ascx";
         private readonly INavigationManager navigationManager;
 
         /// <summary>Initializes a new instance of the <see cref="Terms"/> class.</summary>
         public Terms()
         {
+			Logger.LogError(">>> Entering Terms()");
             this.navigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
+			Logger.LogDebug("Terms(): navigationManager → {NavigationManager}", navigationManager);
+        Logger.LogWarning("<<< Exiting Terms()");
         }
 
         public string Text { get; set; }
@@ -33,14 +37,17 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.InitializeComponent();
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -66,12 +73,16 @@ namespace DotNetNuke.UI.Skins.Controls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         private void InitializeComponent()
         {
+		Logger.LogError(">>> Entering InitializeComponent()");
+        Logger.LogWarning("<<< Exiting InitializeComponent()");
         }
     }
 }

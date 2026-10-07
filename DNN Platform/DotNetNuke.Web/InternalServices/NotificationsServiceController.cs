@@ -29,9 +29,11 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Dismiss(NotificationDTO postData)
         {
+			Logger.LogError(">>> Entering Dismiss(postData={PostData})", postData);
             try
             {
                 var recipient = InternalMessagingController.Instance.GetMessageRecipient(postData.NotificationId, this.UserInfo.UserID);
+				Logger.LogError("Dismiss(postData={PostData}): recipient → {Recipient}", postData, recipient);
                 if (recipient != null)
                 {
                     NotificationsController.Instance.DeleteNotificationRecipient(postData.NotificationId, this.UserInfo.UserID);
@@ -43,6 +45,7 @@ namespace DotNetNuke.Web.InternalServices
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting Dismiss(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -52,13 +55,19 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage GetToasts()
         {
+			Logger.LogError(">>> Entering GetToasts()");
             var toasts = NotificationsController.Instance.GetToasts(this.UserInfo);
             IList<object> convertedObjects = toasts.Select(this.ToExpandoObject).ToList();
+			Logger.LogError("GetToasts(): convertedObjects → {ConvertedObjects}", convertedObjects);
+			Logger.LogError("GetToasts(): toasts → {Toasts}", toasts);
+			Logger.LogWarning("<<< Exiting GetToasts()");
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, Toasts = convertedObjects.Take(3) });
         }
 
         private object ToExpandoObject(Notification notification)
         {
+			Logger.LogError(">>> Entering ToExpandoObject(notification={Notification})", notification);
+            Logger.LogWarning("<<< Exiting ToExpandoObject(notification={Notification})", notification);
             return new { Subject = notification.Subject, Body = notification.Body };
         }
     }

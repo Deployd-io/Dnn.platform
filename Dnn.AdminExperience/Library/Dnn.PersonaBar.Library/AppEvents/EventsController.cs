@@ -27,14 +27,17 @@ namespace Dnn.PersonaBar.Library.AppEvents
         /// <inheritdoc />
         public void ApplicationStartEvent()
         {
+			Logger.LogError(">>> Entering ApplicationStartEvent()");
             lock (LockThis)
             {
                 if (isInitialized)
                 {
+					Logger.LogError("Throwing InvalidOperationException from ApplicationStartEvent()");
                     throw new InvalidOperationException("ApplicationStartEvent cannot be called more than once");
                 }
 
                 isInitialized = true;
+				Logger.LogDebug("ApplicationStartEvent(): isInitialized → {IsInitialized}", isInitialized);
             }
 
             GetEventsImplements<IAppEvents>().ForEach(instance =>
@@ -53,11 +56,13 @@ namespace Dnn.PersonaBar.Library.AppEvents
                         e.StackTrace);
                 }
             });
+			Logger.LogWarning("<<< Exiting ApplicationStartEvent()");
         }
 
         /// <inheritdoc />
         public void ApplicationEndEvent()
         {
+			Logger.LogError(">>> Entering ApplicationEndEvent()");
             GetEventsImplements<IAppEvents>().ForEach(instance =>
             {
                 try
@@ -74,28 +79,35 @@ namespace Dnn.PersonaBar.Library.AppEvents
                         e.StackTrace);
                 }
             });
+			Logger.LogWarning("<<< Exiting ApplicationEndEvent()");
         }
 
         /// <inheritdoc />
         protected override Func<IEventsController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new EventsController();
         }
 
         private static IEnumerable<T> GetEventsImplements<T>()
             where T : class
         {
+			Logger.LogError(">>> Entering GetEventsImplements()");
             var types = GetAllEventTypes<T>();
 
+			Logger.LogError("GetEventsImplements(): types → {Types}", types);
             foreach (var type in types)
             {
                 T appEventHandler;
                 try
                 {
                     appEventHandler = Activator.CreateInstance(type) as T;
+					Logger.LogError("GetEventsImplements(): appEventHandler → {AppEventHandler}", appEventHandler);
                 }
                 catch (Exception e)
                 {
+					Logger.LogDebug("GetEventsImplements(): appEventHandler → {AppEventHandler}", appEventHandler);
                     Logger.ErrorFormat(
                         CultureInfo.InvariantCulture,
                         "Unable to create {0} while calling Application start implementors.  {1}",
@@ -109,12 +121,16 @@ namespace Dnn.PersonaBar.Library.AppEvents
                     yield return appEventHandler;
                 }
             }
+			Logger.LogWarning("<<< Exiting GetEventsImplements()");
         }
 
         private static IEnumerable<Type> GetAllEventTypes<T>()
             where T : class
         {
+			Logger.LogError(">>> Entering GetAllEventTypes()");
             var typeLocator = new TypeLocator();
+			Logger.LogWarning("<<< Exiting GetAllEventTypes()");
+					Logger.LogError("GetAllEventTypes(): typeLocator → {TypeLocator}", typeLocator);
             return typeLocator.GetAllMatchingTypes(
                 t => t is { IsClass: true, IsAbstract: false, IsVisible: true, } &&
                      typeof(T).IsAssignableFrom(t) &&
@@ -123,11 +139,14 @@ namespace Dnn.PersonaBar.Library.AppEvents
 
         private static bool IgnoreVersionMatchCheck(Type type)
         {
+			Logger.LogError(">>> Entering IgnoreVersionMatchCheck(type={Type})", type);
+			Logger.LogWarning("<<< Exiting IgnoreVersionMatchCheck(type={Type})", type);
             return type.GetCustomAttributes(true).Any(a => a is IgnoreVersionMatchCheckAttribute);
         }
 
         private static bool VersionMatched(Type t)
         {
+			Logger.LogError(">>> Entering VersionMatched(t={T})", t);
             var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
             var typeVersion = t.Assembly.GetName().Version;
 
@@ -145,6 +164,7 @@ namespace Dnn.PersonaBar.Library.AppEvents
                     currentVersion);
             }
 
+			Logger.LogWarning("<<< Exiting VersionMatched(t={T})", t);
             return matched;
         }
     }

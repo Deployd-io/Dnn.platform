@@ -8,9 +8,11 @@ namespace DotNetNuke.Web.InternalServices.Views.Search
     /// <summary>Detailed Search Result View.</summary>
     public class BasicView
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(BasicView));
         /// <summary>Initializes a new instance of the <see cref="BasicView"/> class.</summary>
         public BasicView()
         {
+			Logger.LogError(">>> Entering BasicView()");
             this.Attributes = new Dictionary<string, string>();
         }
 

@@ -12,11 +12,13 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Views
     using DotNetNuke.Internal.SourceGenerators;
     using DotNetNuke.Modules.HtmlEditorManager.ViewModels;
     using DotNetNuke.Web.Mvp;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>View control for selecting an HTML provider.</summary>
     [DnnDeprecated(9, 2, 0, "Replace WebFormsMvp and DotNetNuke.Web.Mvp with MVC or SPA patterns instead")]
     public partial class ProviderConfiguration : ModuleView<ProviderConfigurationViewModel>, IProviderConfigurationView
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>Occurs when the save button is clicked.</summary>
         public event EventHandler<EditorEventArgs> SaveEditorChoice;
 
@@ -41,7 +43,9 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Views
         /// <inheritdoc />
         public void Refresh()
         {
+			_logger.LogError(">>> Entering Refresh()");
             this.Response.Redirect(this.Request.RawUrl, true);
+			_logger.LogWarning("<<< Exiting Refresh()");
         }
 
         /// <summary>Handles the Click event of the SaveButton control.</summary>
@@ -49,7 +53,9 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Views
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         protected void SaveButton_Click(object sender, EventArgs e)
         {
+			_logger.LogError(">>> Entering SaveButton_Click(sender={Sender},e={E})", sender, e);
             this.SaveEditorChoice(this, new EditorEventArgs(this.ProvidersDropDownList.SelectedValue));
+			_logger.LogWarning("<<< Exiting SaveButton_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Handles the SelectedIndexChanged event of the ProvidersDropDownList control.</summary>
@@ -57,20 +63,26 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Views
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         protected void ProvidersDropDownList_SelectedIndexChanged(object sender, EventArgs e)
         {
+			_logger.LogError(">>> Entering ProvidersDropDownList_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
             this.EditorChanged(this, new EditorEventArgs(this.ProvidersDropDownList.SelectedValue));
+			_logger.LogWarning("<<< Exiting ProvidersDropDownList_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			_logger.LogError(">>> Entering OnInit(e={E})", e);
             var currentUser = UserController.Instance.GetCurrentUserInfo();
+			_logger.LogError("OnInit(e={E}): currentUser → {CurrentUser}", e, currentUser);
             if (currentUser == null || !currentUser.IsSuperUser)
             {
                 this.LocalResourceFile = "/DesktopModules/Admin/HtmlEditorManager/App_LocalResources/ProviderConfiguration.ascx.resx";
+				_logger.LogDebug("OnInit(e={E}): this.LocalResourceFile → {Arg1}", e, this.LocalResourceFile);
                 Globals.Redirect(Globals.AccessDeniedURL(this.LocalizeString("CannotManageHTMLEditorProviders")), true);
             }
 
             base.OnInit(e);
+			_logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
     }
 }

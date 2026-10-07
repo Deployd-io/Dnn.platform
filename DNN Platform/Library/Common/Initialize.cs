@@ -41,8 +41,10 @@ namespace DotNetNuke.Common
         /// <param name="app">The app.</param>
         public static void Init(HttpApplication app)
         {
+			Logger.LogError(">>> Entering Init(app={App})", app);
             string redirect;
             var status = Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>().Status;
+			Logger.LogError("Init(app={App}): status → {Status}", app, status);
 
             // Check if app is initialised
             if (alreadyInitialized && status == UpgradeStatus.None)
@@ -60,28 +62,34 @@ namespace DotNetNuke.Common
 
                 // Initialize ...
                 redirect = InitializeApp(app, ref alreadyInitialized);
+				Logger.LogError("Init(app={App}): redirect → {Redirect}", app, redirect);
+				Logger.LogDebug("Init(app={App}): redirect → {Redirect}", app, redirect);
             }
 
             if (!string.IsNullOrEmpty(redirect))
             {
                 app.Response.Redirect(redirect, true);
             }
+			Logger.LogWarning("<<< Exiting Init(app={App})", app);
         }
 
         /// <summary>LogStart logs the Application Start Event.</summary>
         public static void LogStart()
         {
+			Logger.LogError(">>> Entering LogStart()");
             var log = new LogInfo
             {
                 BypassBuffering = true,
                 LogTypeKey = nameof(EventLogType.APPLICATION_START),
             };
             LogController.Instance.AddLog(log);
+			Logger.LogWarning("<<< Exiting LogStart()");
         }
 
         /// <summary>LogEnd logs the Application Start Event.</summary>
         public static void LogEnd()
         {
+			Logger.LogError(">>> Entering LogEnd()");
             try
             {
                 ApplicationShutdownReason shutdownReason = HostingEnvironment.ShutdownReason;
@@ -90,6 +98,8 @@ namespace DotNetNuke.Common
                 {
                     case ApplicationShutdownReason.BinDirChangeOrDirectoryRename:
                         shutdownDetail = "The AppDomain shut down because of a change to the Bin folder or files contained in it.";
+						Logger.LogError("LogEnd(): shutdownDetail → {ShutdownDetail}", shutdownDetail);
+						Logger.LogDebug("LogEnd(): shutdownDetail → {ShutdownDetail}", shutdownDetail);
                         break;
                     case ApplicationShutdownReason.BrowsersDirChangeOrDirectoryRename:
                         shutdownDetail = "The AppDomain shut down because of a change to the App_Browsers folder or files contained in it.";
@@ -179,15 +189,18 @@ namespace DotNetNuke.Common
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in LogEnd(): {Arg0}", exc.Message);
                 Exceptions.LogException(exc);
             }
 
             var status = Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>().Status;
+			Logger.LogError("LogEnd(): status → {Status}", status);
             if (status != UpgradeStatus.Install)
             {
                 // purge log buffer
                 LoggingProvider.Instance().PurgeLogBuffer();
             }
+			Logger.LogWarning("<<< Exiting LogEnd()");
         }
 
         /// <summary>Tests whether this request should be processed in an HttpModule.</summary>
@@ -197,6 +210,7 @@ namespace DotNetNuke.Common
         /// <returns>A value indicating whether the request should be processed in an HttpModule.</returns>
         public static bool ProcessHttpModule(HttpRequest request, bool allowUnknownExtensions, bool checkOmitFromRewriteProcessing)
         {
+			Logger.LogError(">>> Entering ProcessHttpModule(request={Request},allowUnknownExtensions={AllowUnknownExtensions},checkOmitFromRewriteProcessing={CheckOmitFromRewriteProcessing})", request, allowUnknownExtensions, checkOmitFromRewriteProcessing);
             var localPath = request.Url.LocalPath;
             if (localPath.EndsWith("webresource.axd", StringComparison.OrdinalIgnoreCase)
                     || localPath.EndsWith("scriptresource.axd", StringComparison.OrdinalIgnoreCase)
@@ -214,6 +228,7 @@ namespace DotNetNuke.Common
                     && !localPath.EndsWith(".ashx", StringComparison.OrdinalIgnoreCase)
                     && !localPath.EndsWith(".svc", StringComparison.OrdinalIgnoreCase))
             {
+			Logger.LogWarning("<<< Exiting ProcessHttpModule(request={Request},allowUnknownExtensions={AllowUnknownExtensions},checkOmitFromRewriteProcessing={CheckOmitFromRewriteProcessing})", request, allowUnknownExtensions, checkOmitFromRewriteProcessing);
                 return false;
             }
 
@@ -224,43 +239,55 @@ namespace DotNetNuke.Common
         /// <param name="request">The http request.</param>
         public static void RunSchedule(HttpRequest request)
         {
+			Logger.LogError(">>> Entering RunSchedule(request={Request})", request);
             if (!IsUpgradeOrInstallRequest(request))
             {
                 try
                 {
                     using var scope = Globals.GetOrCreateServiceScope();
+					Logger.LogError("RunSchedule(request={Request}): scope → {Scope}", request, scope);
                     var hostSettings = scope.ServiceProvider.GetRequiredService<IHostSettings>();
+					Logger.LogError("RunSchedule(request={Request}): hostSettings → {HostSettings}", request, hostSettings);
 
                     if (hostSettings.SchedulerMode == SchedulerMode.RequestMethod && SchedulingProvider.ReadyForPoll)
                     {
                         Logger.Trace("Running Schedule " + hostSettings.SchedulerMode);
                         var scheduler = SchedulingProvider.Instance();
+						Logger.LogError("RunSchedule(request={Request}): scheduler → {Scheduler}", request, scheduler);
                         var requestScheduleThread = new Thread(scheduler.ExecuteTasks) { IsBackground = true };
+						Logger.LogError("RunSchedule(request={Request}): requestScheduleThread → {RequestScheduleThread}", request, requestScheduleThread);
                         requestScheduleThread.Start();
                         SchedulingProvider.ScheduleLastPolled = DateTime.Now;
+						Logger.LogDebug("RunSchedule(request={Request}): SchedulingProvider.ScheduleLastPolled → {Arg1}", request, SchedulingProvider.ScheduleLastPolled);
                     }
                 }
                 catch (Exception exc)
                 {
+					Logger.LogError("Exception in RunSchedule(request={Request}): {Arg1}", request, exc.Message);
                     Exceptions.LogException(exc);
                 }
             }
+			Logger.LogWarning("<<< Exiting RunSchedule(request={Request})", request);
         }
 
         /// <summary>StartScheduler starts the Scheduler.</summary>
         /// <param name="resetAppStartElapseTime">Whether reset app start elapse time before running schedule tasks.</param>
         public static void StartScheduler(bool resetAppStartElapseTime = false)
         {
+			Logger.LogError(">>> Entering StartScheduler(resetAppStartElapseTime={ResetAppStartElapseTime})", resetAppStartElapseTime);
             if (resetAppStartElapseTime)
             {
                 Globals.ResetAppStartElapseTime();
             }
 
             var scheduler = SchedulingProvider.Instance();
+			Logger.LogError("StartScheduler(resetAppStartElapseTime={ResetAppStartElapseTime}): scheduler → {Scheduler}", resetAppStartElapseTime, scheduler);
             scheduler.RunEventSchedule(EventName.APPLICATION_START);
 
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogError("StartScheduler(resetAppStartElapseTime={ResetAppStartElapseTime}): scope → {Scope}", resetAppStartElapseTime, scope);
             var hostSettings = scope.ServiceProvider.GetRequiredService<IHostSettings>();
+			Logger.LogError("StartScheduler(resetAppStartElapseTime={ResetAppStartElapseTime}): hostSettings → {HostSettings}", resetAppStartElapseTime, hostSettings);
 
             // instantiate APPLICATION_START scheduled jobs
             if (hostSettings.SchedulerMode == SchedulerMode.TimerMethod)
@@ -273,17 +300,21 @@ namespace DotNetNuke.Common
                 };
                 newThread.Start();
             }
+			Logger.LogWarning("<<< Exiting StartScheduler(resetAppStartElapseTime={ResetAppStartElapseTime})", resetAppStartElapseTime);
         }
 
         /// <summary>StopScheduler stops the Scheduler.</summary>
         public static void StopScheduler()
         {
+			Logger.LogError(">>> Entering StopScheduler()");
             // stop scheduled jobs
             SchedulingProvider.Instance().Halt("Stopped by Application_End");
+			Logger.LogWarning("<<< Exiting StopScheduler()");
         }
 
         private static string CheckVersion(HttpApplication app)
         {
+			Logger.LogError(">>> Entering CheckVersion(app={App})", app);
             HttpServerUtility server = app.Server;
 
             bool autoUpgrade = Config.GetSetting("AutoUpgrade") == null || bool.Parse(Config.GetSetting("AutoUpgrade"));
@@ -356,11 +387,13 @@ namespace DotNetNuke.Common
                     break;
             }
 
+			Logger.LogWarning("<<< Exiting CheckVersion(app={App})", app);
             return retValue;
         }
 
         private static void CreateUnderConstructionPage(HttpServerUtility server)
         {
+			Logger.LogError(">>> Entering CreateUnderConstructionPage(server={Server})", server);
             // create an UnderConstruction page if it does not exist already
             if (!File.Exists(server.MapPath("~/Install/UnderConstruction.htm")))
             {
@@ -369,17 +402,22 @@ namespace DotNetNuke.Common
                     File.Copy(server.MapPath("~/Install/UnderConstruction.template.htm"), server.MapPath("~/Install/UnderConstruction.htm"));
                 }
             }
+			Logger.LogWarning("<<< Exiting CreateUnderConstructionPage(server={Server})", server);
         }
 
         private static Version GetDatabaseEngineVersion()
         {
+			Logger.LogError(">>> Entering GetDatabaseEngineVersion()");
+            Logger.LogWarning("<<< Exiting GetDatabaseEngineVersion()");
             return DataProvider.Instance().GetDatabaseEngineVersion();
         }
 
         private static Version GetNETFrameworkVersion()
         {
+			Logger.LogError(">>> Entering GetNETFrameworkVersion()");
             // Obtain the .NET Framework version, 9.4.0 and later requires .NET 4.7.2 or later
             var version = Environment.Version.ToString(2);
+			Logger.LogError("GetNETFrameworkVersion(): version → {Version}", version);
 
             // If unknown version return as is.
             if (version != "4.0")
@@ -390,6 +428,7 @@ namespace DotNetNuke.Common
             // Otherwise utilize release DWORD from registry to determine version
             // Reference List: https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/versions-and-dependencies
             var release = GetDotNet4ReleaseNumberFromRegistry();
+			Logger.LogError("GetNETFrameworkVersion(): release → {Release}", release);
             if (release >= 533320)
             {
                 return new Version("4.8.1");
@@ -405,11 +444,13 @@ namespace DotNetNuke.Common
                 return new Version("4.7.2");
             }
 
+			Logger.LogWarning("<<< Exiting GetNETFrameworkVersion()");
             return new Version(version);
         }
 
         private static int GetDotNet4ReleaseNumberFromRegistry()
         {
+			Logger.LogError(">>> Entering GetDotNet4ReleaseNumberFromRegistry()");
             try
             {
                 using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
@@ -423,14 +464,17 @@ namespace DotNetNuke.Common
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in GetDotNet4ReleaseNumberFromRegistry(): {Arg0}", Exception.Message);
                 // ignore
             }
 
+			Logger.LogWarning("<<< Exiting GetDotNet4ReleaseNumberFromRegistry()");
             return -1;
         }
 
         private static string InitializeApp(HttpApplication app, ref bool initialized)
         {
+			Logger.LogError(">>> Entering InitializeApp(app={App},initialized={Initialized})", app, initialized);
             var request = app.Request;
 
             Logger.Trace("Request " + request.Url.LocalPath);
@@ -441,13 +485,16 @@ namespace DotNetNuke.Common
                 // NET Framework version is needed by Upgrade
                 Globals.NETFrameworkVersion = GetNETFrameworkVersion();
                 Globals.IISAppName = request.ServerVariables["APPL_MD_PATH"];
+				Logger.LogDebug("InitializeApp(app={App},initialized={Initialized}): Globals.IISAppName → {Arg2}", app, initialized, Globals.IISAppName);
                 Globals.OperatingSystemVersion = Environment.OSVersion.Version;
+				Logger.LogDebug("InitializeApp(app={App},initialized={Initialized}): Globals.OperatingSystemVersion → {Arg2}", app, initialized, Globals.OperatingSystemVersion);
 
                 return Null.NullString;
             }
 
                 // Check whether the current App Version is the same as the DB Version
             var redirect = CheckVersion(app);
+			Logger.LogError("InitializeApp(app={App},initialized={Initialized}): redirect → {Redirect}", app, initialized, redirect);
             if (!string.IsNullOrEmpty(redirect) || InstallBlocker.Instance.IsInstallInProgress())
             {
                 return redirect;
@@ -487,13 +534,16 @@ namespace DotNetNuke.Common
 
             initialized = true;
 
+			Logger.LogWarning("<<< Exiting InitializeApp(app={App},initialized={Initialized})", app, initialized);
             return redirect;
         }
 
         private static bool IsUpgradeOrInstallRequest(HttpRequest request)
         {
+			Logger.LogError(">>> Entering IsUpgradeOrInstallRequest(request={Request})", request);
             var url = request.Url.LocalPath;
 
+			Logger.LogWarning("<<< Exiting IsUpgradeOrInstallRequest(request={Request})", request);
             return url.EndsWith("/install.aspx", StringComparison.OrdinalIgnoreCase)
                 || url.Contains("/upgradewizard.aspx", StringComparison.OrdinalIgnoreCase)
                 || url.Contains("/installwizard.aspx", StringComparison.OrdinalIgnoreCase);

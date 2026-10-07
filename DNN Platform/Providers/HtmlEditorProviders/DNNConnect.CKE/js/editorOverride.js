@@ -1,4 +1,5 @@
-﻿(function ($) {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+(function ($) {
     if (CKEDITOR) {
         CKEDITOR.on('dialogDefinition', function(evt) {
             var dialog = evt.data;
@@ -8,9 +9,11 @@
                 var originOkFunc = def.onOk;
 
                 def.onOk = function () {
+					logger.error('>>> Entering onOk()', { "event.action": "onOk" });
                     originOkFunc.apply(this, arguments);
                     var $element = $(this.imageElement);
                     $element.attr('title', $element.attr('alt'));
+					logger.warn('<<< Exiting onOk()', { "event.action": "onOk" });
                 };
 
             }

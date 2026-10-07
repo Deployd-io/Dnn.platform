@@ -42,7 +42,11 @@ namespace log4net.Util
         /// </remarks>
         internal ThreadContextStacks(ContextPropertiesBase properties)
         {
+			value.LogError(">>> Entering ThreadContextStacks(properties={Properties})", properties);
             this.m_properties = properties;
+			value.LogDebug("ThreadContextStacks(properties={Properties}): m_properties → {M_properties}", properties, m_properties);
+        value.LogDebug("ThreadContextStacks(properties={Properties}): this.m_properties → {Arg1}", properties, this.m_properties);
+        value.LogWarning("<<< Exiting ThreadContextStacks(properties={Properties})", properties);
         }
 
         /// <summary>Gets the named thread context stack</summary>

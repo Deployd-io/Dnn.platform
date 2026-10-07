@@ -26,6 +26,7 @@ namespace DotNetNuke.Modules.Admin.EditExtension
     /// <summary>The EditExtension control is used to edit an Extension.</summary>
     public partial class EditExtension : ModuleUserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EditExtension.ascx));
         private readonly IServiceProvider serviceProvider;
         private readonly INavigationManager navigationManager;
         private readonly IApplicationStatusInfo appStatus;
@@ -50,6 +51,8 @@ namespace DotNetNuke.Modules.Admin.EditExtension
         public EditExtension(INavigationManager navigationManager, IApplicationStatusInfo appStatus, IJavaScriptLibraryHelper javaScript)
             : this(navigationManager, appStatus, javaScript, null, null)
         {
+		Logger.LogError(">>> Entering EditExtension(navigationManager={NavigationManager},appStatus={AppStatus},javaScript={JavaScript})", navigationManager, appStatus, javaScript);
+        Logger.LogWarning("<<< Exiting EditExtension(navigationManager={NavigationManager},appStatus={AppStatus},javaScript={JavaScript})", navigationManager, appStatus, javaScript);
         }
 
         /// <summary>Initializes a new instance of the <see cref="EditExtension"/> class.</summary>
@@ -61,6 +64,7 @@ namespace DotNetNuke.Modules.Admin.EditExtension
         public EditExtension(INavigationManager navigationManager, IApplicationStatusInfo appStatus, IJavaScriptLibraryHelper javaScript, IHostSettings hostSettings)
             : this(navigationManager, appStatus, javaScript, hostSettings, null)
         {
+		Logger.LogError(">>> Entering EditExtension(navigationManager={NavigationManager},appStatus={AppStatus},javaScript={JavaScript},hostSettings={HostSettings})", navigationManager, appStatus, javaScript, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="EditExtension"/> class.</summary>
@@ -71,7 +75,12 @@ namespace DotNetNuke.Modules.Admin.EditExtension
         /// <param name="serviceProvider">The dependency injection container.</param>
         public EditExtension(INavigationManager navigationManager, IApplicationStatusInfo appStatus, IJavaScriptLibraryHelper javaScript, IHostSettings hostSettings, IServiceProvider serviceProvider)
         {
+			Logger.LogDebug("EditExtension(navigationManager={NavigationManager},appStatus={AppStatus},javaScript={JavaScript},hostSettings={HostSettings},serviceProvider={ServiceProvider}): navigationManager → {NavigationManager1}", navigationManager, appStatus, javaScript, hostSettings, serviceProvider, navigationManager);
+			Logger.LogDebug("EditExtension(navigationManager={NavigationManager},appStatus={AppStatus},javaScript={JavaScript},hostSettings={HostSettings},serviceProvider={ServiceProvider}): appStatus → {AppStatus1}", navigationManager, appStatus, javaScript, hostSettings, serviceProvider, appStatus);
+			Logger.LogDebug("EditExtension(navigationManager={NavigationManager},appStatus={AppStatus},javaScript={JavaScript},hostSettings={HostSettings},serviceProvider={ServiceProvider}): javaScript → {JavaScript1}", navigationManager, appStatus, javaScript, hostSettings, serviceProvider, javaScript);
+			Logger.LogDebug("EditExtension(navigationManager={NavigationManager},appStatus={AppStatus},javaScript={JavaScript},hostSettings={HostSettings},serviceProvider={ServiceProvider}): hostSettings → {HostSettings1}", navigationManager, appStatus, javaScript, hostSettings, serviceProvider, hostSettings);
             this.serviceProvider = serviceProvider ?? Globals.GetCurrentServiceProvider();
+			Logger.LogWarning("<<< Exiting EditExtension(navigationManager={NavigationManager},appStatus={AppStatus},javaScript={JavaScript},hostSettings={HostSettings},serviceProvider={ServiceProvider})", navigationManager, appStatus, javaScript, hostSettings, serviceProvider);
             this.navigationManager = navigationManager ?? this.serviceProvider.GetRequiredService<INavigationManager>();
             this.appStatus = appStatus ?? this.serviceProvider.GetRequiredService<IApplicationStatusInfo>();
             this.javaScript = javaScript ?? this.serviceProvider.GetRequiredService<IJavaScriptLibraryHelper>();
@@ -143,14 +152,17 @@ namespace DotNetNuke.Modules.Admin.EditExtension
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.javaScript.RequestRegistration(CommonJs.DnnPlugins);
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>Page_Load runs when the control is loaded.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdCancel.Click += this.OnCancelClick;
@@ -162,6 +174,7 @@ namespace DotNetNuke.Modules.Admin.EditExtension
                 if (UrlUtils.InPopUp())
                 {
                     var title = $"{this.Page.Title} > {this.Package.FriendlyName}";
+					Logger.LogError("OnLoad(e={E}): title → {Title}", e, title);
                     this.Page.Title = title;
                 }
             };
@@ -194,20 +207,26 @@ namespace DotNetNuke.Modules.Admin.EditExtension
                     this.cmdCancel.Visible = this.cmdCancel.Enabled = false;
                     break;
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         protected void OnCancelClick(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnCancelClick(sender={Sender},e={E})", sender, e);
             this.Response.Redirect(this.ReturnUrl);
+			Logger.LogWarning("<<< Exiting OnCancelClick(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnDeleteClick(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnDeleteClick(sender={Sender},e={E})", sender, e);
             this.Response.Redirect(Util.UnInstallURL(this.ModuleContext.TabId, this.PackageID));
+			Logger.LogWarning("<<< Exiting OnDeleteClick(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnPackageClick(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPackageClick(sender={Sender},e={E})", sender, e);
             try
             {
                 this.UpdatePackage(false);
@@ -215,24 +234,30 @@ namespace DotNetNuke.Modules.Admin.EditExtension
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in OnPackageClick(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, ex);
             }
+			Logger.LogWarning("<<< Exiting OnPackageClick(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnUpdateClick(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnUpdateClick(sender={Sender},e={E})", sender, e);
             try
             {
                 this.UpdatePackage(true);
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in OnUpdateClick(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, ex);
             }
+			Logger.LogWarning("<<< Exiting OnUpdateClick(sender={Sender},e={E})", sender, e);
         }
 
         private void BindData()
         {
+			Logger.LogError(">>> Entering BindData()");
             this.email.ValidationExpression = Globals.glbEmailRegEx;
             this.trLanguagePackType.Visible = false;
             switch (this.Mode)
@@ -300,6 +325,7 @@ namespace DotNetNuke.Modules.Admin.EditExtension
 
                 // Determine if Package is ready for packaging
                 PackageWriterBase writer = PackageWriterFactory.GetWriter(this.serviceProvider, this.Package);
+				Logger.LogError("BindData(): writer → {Writer}", writer);
                 this.cmdPackage.Visible = this.IsSuperTab && writer != null && Directory.Exists(Path.Combine(this.appStatus.ApplicationMapPath, writer.BasePath));
 
                 this.cmdDelete.Visible = this.IsSuperTab && (!this.Package.IsSystemPackage) && PackageController.CanDeletePackage(this.hostSettings, this.appStatus, this.Package, this.ModuleContext.PortalSettings);
@@ -316,15 +342,18 @@ namespace DotNetNuke.Modules.Admin.EditExtension
                 this.packageForm.Visible = this.IsSuperTab;
                 this.packageFormReadOnly.Visible = !this.IsSuperTab;
             }
+			Logger.LogWarning("<<< Exiting BindData()");
         }
 
         private void UpdatePackage(bool displayMessage)
         {
+			Logger.LogError(">>> Entering UpdatePackage(displayMessage={DisplayMessage})", displayMessage);
             if (this.packageForm.IsValid)
             {
                 if (this.packageForm.DataSource is PackageInfo packageInfo)
                 {
                     var pkgIconFile = Util.ParsePackageIconFileName(packageInfo);
+					Logger.LogError("UpdatePackage(displayMessage={DisplayMessage}): pkgIconFile → {PkgIconFile}", displayMessage, pkgIconFile);
                     packageInfo.IconFile = (pkgIconFile.Trim().Length > 0) ? Util.ParsePackageIconFile(packageInfo) : null;
                     PackageController.Instance.SaveExtensionPackage(packageInfo);
                 }
@@ -336,6 +365,7 @@ namespace DotNetNuke.Modules.Admin.EditExtension
             }
 
             this.PackageEditor?.UpdatePackage();
+			Logger.LogWarning("<<< Exiting UpdatePackage(displayMessage={DisplayMessage})", displayMessage);
         }
     }
 }

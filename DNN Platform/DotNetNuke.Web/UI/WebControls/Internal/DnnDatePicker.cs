@@ -16,10 +16,13 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
     [Obsolete("Deprecated in DotNetNuke 10.3.0. Please use TextBox with TextMode=TextBoxMode.Date. Scheduled removal in v12.0.0.")]
     public class DnnDatePicker : TextBox
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnDatePicker));
         /// <summary>Initializes a new instance of the <see cref="DnnDatePicker"/> class.</summary>
         public DnnDatePicker()
             : this(null, null, null)
         {
+		Logger.LogError(">>> Entering DnnDatePicker()");
+        Logger.LogWarning("<<< Exiting DnnDatePicker()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnDatePicker"/> class.</summary>
@@ -28,6 +31,8 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <param name="eventLogger">The event logger.</param>
         public DnnDatePicker(IClientResourceController clientResourceController, IApplicationStatusInfo appStatus, IEventLogger eventLogger)
         {
+		Logger.LogError(">>> Entering DnnDatePicker(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger})", clientResourceController, appStatus, eventLogger);
+        Logger.LogWarning("<<< Exiting DnnDatePicker(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger})", clientResourceController, appStatus, eventLogger);
         }
 
         /// <summary>Gets or sets the selected date.</summary>
@@ -64,13 +69,16 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             var settings = this.GetSettings();
+			Logger.LogError("OnPreRender(e={E}): settings → {Settings}", e, settings);
             foreach (var setting in settings)
             {
                 this.Attributes[setting.Key] = setting.Value?.ToString();
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>Gets the settings.</summary>

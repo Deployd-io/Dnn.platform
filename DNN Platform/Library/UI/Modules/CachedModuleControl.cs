@@ -14,6 +14,7 @@ namespace DotNetNuke.UI.Modules
     /// </summary>
     public class CachedModuleControl : Literal, IModuleControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CachedModuleControl));
         private string localResourceFile;
         private ModuleInstanceContext moduleContext;
 
@@ -24,6 +25,7 @@ namespace DotNetNuke.UI.Modules
         /// <param name="cachedContent">The cached Content for this control.</param>
         public CachedModuleControl(string cachedContent)
         {
+			Logger.LogError(">>> Entering CachedModuleControl(cachedContent={CachedContent})", cachedContent);
             this.Text = cachedContent;
         }
 

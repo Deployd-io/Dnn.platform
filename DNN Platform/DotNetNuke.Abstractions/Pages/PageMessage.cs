@@ -1,4 +1,5 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+﻿using Microsoft.Extensions.Logging;
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information
 
@@ -34,6 +35,7 @@ namespace DotNetNuke.Abstractions.Pages
     /// </example>
     public class PageMessage
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Initializes a new instance of the <see cref="PageMessage"/> class.
         /// </summary>
@@ -44,9 +46,12 @@ namespace DotNetNuke.Abstractions.Pages
         /// <param name="priority">The priority of the message. Use values from <see cref="PagePriority"/> for consistency.</param>
         public PageMessage(string heading, string message, PageMessageType messageType, string iconSrc, int priority)
         {
+			_logger.LogError(">>> Entering PageMessage(heading={Heading},message={Message},messageType={MessageType},iconSrc={IconSrc},priority={Priority})", heading, message, messageType, iconSrc, priority);
             this.Heading = heading;
+			_logger.LogDebug("PageMessage(heading={Heading},message={Message},messageType={MessageType},iconSrc={IconSrc},priority={Priority}): this.Heading → {Arg5}", heading, message, messageType, iconSrc, priority, this.Heading);
             this.Message = message;
             this.MessageType = messageType;
+			_logger.LogDebug("PageMessage(heading={Heading},message={Message},messageType={MessageType},iconSrc={IconSrc},priority={Priority}): this.Message → {Arg5}", heading, message, messageType, iconSrc, priority, this.Message);
             this.IconSrc = iconSrc;
             this.Priority = priority;
         }

@@ -13,6 +13,7 @@ namespace DotNetNuke.Entities.Host
     [Serializable]
     public class IPFilterInfo : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(IPFilterInfo));
         /// <summary>
         /// Initializes a new instance of the <see cref="IPFilterInfo"/> class.
         /// Create new IPFilterInfo instance.
@@ -22,9 +23,16 @@ namespace DotNetNuke.Entities.Host
         /// <param name="ruleType">The Rule Type, 1 to allow, 2 to deny.</param>
         public IPFilterInfo(string ipAddress, string subnetMask, int ruleType)
         {
+			Logger.LogError(">>> Entering IPFilterInfo(ipAddress={IpAddress},subnetMask={SubnetMask},ruleType={RuleType})", ipAddress, subnetMask, ruleType);
             this.IPAddress = ipAddress;
+			Logger.LogDebug("IPFilterInfo(ipAddress={IpAddress},subnetMask={SubnetMask},ruleType={RuleType}): this.IPAddress → {Arg3}", ipAddress, subnetMask, ruleType, this.IPAddress);
             this.SubnetMask = subnetMask;
             this.RuleType = ruleType;
+			Logger.LogError(">>> Entering IPFilterInfo()");
+			Logger.LogDebug("IPFilterInfo(ipAddress={IpAddress},subnetMask={SubnetMask},ruleType={RuleType}): this.RuleType → {Arg3}", ipAddress, subnetMask, ruleType, this.RuleType);
+			Logger.LogDebug("IPFilterInfo(): this.IPAddress → {Arg0}", this.IPAddress);
+        Logger.LogDebug("IPFilterInfo(): SubnetMask → {SubnetMask}", SubnetMask);
+        Logger.LogWarning("<<< Exiting IPFilterInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="IPFilterInfo"/> class.</summary>
@@ -72,6 +80,7 @@ namespace DotNetNuke.Entities.Host
         /// <seealso cref="KeyID"></seealso></remarks>
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.IPFilterID = Null.SetNullInteger(dr["IPFilterID"]);
 
             try
@@ -80,6 +89,7 @@ namespace DotNetNuke.Entities.Host
             }
             catch (IndexOutOfRangeException)
             {
+				Logger.LogError("Exception in Fill(dr={Dr}): {Arg1}", dr, IndexOutOfRangeException.Message);
                 // else swallow the error
             }
 
@@ -89,6 +99,7 @@ namespace DotNetNuke.Entities.Host
             this.Notes = Null.SetNullString(dr["Notes"]);
 
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

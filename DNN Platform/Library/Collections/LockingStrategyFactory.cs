@@ -8,11 +8,14 @@ namespace DotNetNuke.Collections.Internal
     /// <summary>Factory class for LockingStrategies.</summary>
     internal class LockingStrategyFactory
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LockingStrategyFactory));
         /// <summary>Creates a new locking strategy.</summary>
         /// <param name="strategy">The <see cref="LockingStrategy"/> to instantiate.</param>
         /// <returns>An instance of <see cref="ILockStrategy"/> that uses the specified strategy.</returns>
         public static ILockStrategy Create(LockingStrategy strategy)
         {
+			Logger.LogError(">>> Entering Create(strategy={Strategy})", strategy);
+			Logger.LogWarning("<<< Exiting Create(strategy={Strategy})", strategy);
             return strategy switch
             {
                 LockingStrategy.ReaderWriter => new ReaderWriterLockStrategy(),

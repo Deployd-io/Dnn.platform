@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
@@ -75,10 +76,15 @@ define(['jquery', 'knockout', 'jquery-ui.min', 'css!cssPath/personaBarDialog.css
         _personaBarDialogMask = null;
 
         /* Costructor */
+		logger.error('>>> Entering IIFE()', { "event.action": "IIFE" });
+		logger.debug(`IIFE(): _options → ${_options}`, { "event.action": "IIFE" });
         function PersonaBarDialog(options, htmlForPannels, koObserveCallback, afterBindCallback) {
             //console.log('~PersonaBarDialog');
+			logger.warn('<<< Exiting IIFE()', { "event.action": "IIFE" });
             if (PersonaBarDialog.active) {
+				logger.error(`>>> Entering PersonaBarDialog(options=${options},htmlForPannels=${htmlForPannels},koObserveCallback=${koObserveCallback},afterBindCallback=${afterBindCallback})`, { "event.action": "PersonaBarDialog", "logrite.options": options, "logrite.htmlForPannels": htmlForPannels, "logrite.koObserveCallback": koObserveCallback, "logrite.afterBindCallback": afterBindCallback });
                 console.log('PersonaBarDialog already opened'); // TODO throw ex or change for stack support
+				logger.warn(`<<< Exiting PersonaBarDialog(options=${options},htmlForPannels=${htmlForPannels},koObserveCallback=${koObserveCallback},afterBindCallback=${afterBindCallback})`, { "event.action": "PersonaBarDialog", "logrite.options": options, "logrite.htmlForPannels": htmlForPannels, "logrite.koObserveCallback": koObserveCallback, "logrite.afterBindCallback": afterBindCallback });
                 return;
             }
 
@@ -147,6 +153,7 @@ define(['jquery', 'knockout', 'jquery-ui.min', 'css!cssPath/personaBarDialog.css
 
         /* Private Methods */
         applyBindings = function (viewModel) {
+			logger.error(`>>> Entering applyBindings(viewModel=${viewModel})`, { "event.action": "applyBindings", "logrite.viewModel": viewModel });
             setTimeout(function () {
                 _viewModel = {
                     dialogHTML: '',
@@ -170,13 +177,17 @@ define(['jquery', 'knockout', 'jquery-ui.min', 'css!cssPath/personaBarDialog.css
 
                 ko.applyBindings(_viewModel, _personaBarDialog[0]);
             }, 0);
+			logger.warn(`<<< Exiting applyBindings(viewModel=${viewModel})`, { "event.action": "applyBindings", "logrite.viewModel": viewModel });
         };
 
         addDialog = function () {
+			logger.error('>>> Entering addDialog()', { "event.action": "addDialog" });
+			logger.warn('<<< Exiting addDialog()', { "event.action": "addDialog" });
             return $('body').prepend(_html);
         };
 
         closeDialog = function () {
+			logger.error('>>> Entering closeDialog()', { "event.action": "closeDialog" });
             var node;
 
             // Remove events
@@ -185,6 +196,8 @@ define(['jquery', 'knockout', 'jquery-ui.min', 'css!cssPath/personaBarDialog.css
 
             node = $('.personaBarDialog');
             if (typeof _options.beforeCloseCallback === 'function') _options.beforeCloseCallback();
+			logger.error(`closeDialog(): node → ${node}`, { "event.action": "closeDialog" });
+			logger.debug(`closeDialog(): node → ${node}`, { "event.action": "closeDialog" });
 
             if (node.length > 0) {
                 ko.cleanNode($('.personaBarDialog')[0]);
@@ -195,20 +208,25 @@ define(['jquery', 'knockout', 'jquery-ui.min', 'css!cssPath/personaBarDialog.css
             if (typeof _options.onCloseCallback === 'function') _options.onCloseCallback();
 
             PersonaBarDialog.active = false;
+			logger.warn('<<< Exiting closeDialog()', { "event.action": "closeDialog" });
         };
 
         acceptDialog = function () {
+			logger.error('>>> Entering acceptDialog()', { "event.action": "acceptDialog" });
             if (typeof _viewModel.enableAccept === 'boolean' && !_viewModel.enableAccept) return;
             if (typeof _viewModel.enableAccept === 'function' && !_viewModel.enableAccept()) return;
             if (typeof _options.onAcceptCallback === 'function') _options.onAcceptCallback();
             if (_options.closeOnAccept === true) closeDialog();
+			logger.warn('<<< Exiting acceptDialog()', { "event.action": "acceptDialog" });
         };
 
         initDialog = function () {
+			logger.error('>>> Entering initDialog()', { "event.action": "initDialog" });
             var doc, bottom, left, top, scrollDown, currentWinPos, lastWinPos, topPercent, percent;
 
             _win = $(window);
             doc = $(document);
+			logger.error(`initDialog(): doc → ${doc}`, { "event.action": "initDialog" });
 
             _personaBarDialogMask = $('.personaBarDialogMask');
             _personaBarDialog = $('.personaBarDialog');
@@ -254,6 +272,7 @@ define(['jquery', 'knockout', 'jquery-ui.min', 'css!cssPath/personaBarDialog.css
                 var self, scrollTop, scrollHeight, height, delta, up, prevent;
                 self = $(this);
 
+				logger.debug(`initDialog(): self → ${self}`, { "event.action": "initDialog" });
                 scrollTop    = this.scrollTop;
                 scrollHeight = this.scrollHeight;
                 height       = self.height();
@@ -261,9 +280,11 @@ define(['jquery', 'knockout', 'jquery-ui.min', 'css!cssPath/personaBarDialog.css
                 up = delta > 0;
 
                 prevent = function() {
+					logger.error('>>> Entering prevent()', { "event.action": "prevent" });
                     evt.stopPropagation();
                     evt.preventDefault();
                     evt.returnValue = false;
+					logger.warn('<<< Exiting prevent()', { "event.action": "prevent" });
                     return false;
                 };
 
@@ -275,17 +296,22 @@ define(['jquery', 'knockout', 'jquery-ui.min', 'css!cssPath/personaBarDialog.css
                     return prevent();
                 }
             });
+			logger.warn('<<< Exiting initDialog()', { "event.action": "initDialog" });
         };
 
         showDialog = function () {
+			logger.error('>>> Entering showDialog()', { "event.action": "showDialog" });
             _personaBarDialogMask.show();
             if (_options.animation) {_personaBarDialog.fadeIn(100);} else {_personaBarDialog.show();}
+			logger.warn('<<< Exiting showDialog()', { "event.action": "showDialog" });
         };
 
         updateHeight = function () {
+			logger.error('>>> Entering updateHeight()', { "event.action": "updateHeight" });
             _personaBarDialogMask.css({
                 'min-height': $(document).scrollTop() + _personaBarDialog.height() + 400 + 'px'
             });
+			logger.warn('<<< Exiting updateHeight()', { "event.action": "updateHeight" });
         };
 
         /* Public Methods */

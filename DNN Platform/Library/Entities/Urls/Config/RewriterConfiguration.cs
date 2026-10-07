@@ -38,10 +38,13 @@ namespace DotNetNuke.Entities.Urls.Config
 
         public static RewriterConfiguration GetConfig()
         {
+			Logger.LogError(">>> Entering GetConfig()");
             var config = new RewriterConfiguration { Rules = new RewriterRuleCollection() };
             string filePath = string.Empty;
+			Logger.LogError("GetConfig(): config → {Config}", config);
             try
             {
+				Logger.LogError("GetConfig(): filePath → {FilePath}", filePath);
                 config = (RewriterConfiguration)DataCache.GetCache("RewriterConfig");
                 if (config == null)
                 {
@@ -58,6 +61,8 @@ namespace DotNetNuke.Entities.Urls.Config
                             using (var xmlReader = XmlReader.Create(fileReader))
                             {
                                 doc = new XPathDocument(xmlReader);
+								Logger.LogError("GetConfig(): doc → {Doc}", doc);
+								Logger.LogDebug("GetConfig(): doc → {Doc}", doc);
                             }
 
                             config = new RewriterConfiguration { Rules = new RewriterRuleCollection() };
@@ -84,6 +89,7 @@ namespace DotNetNuke.Entities.Urls.Config
             {
                 // log it
                 var log = new LogInfo { LogTypeKey = nameof(EventLogType.HOST_ALERT) };
+				Logger.LogError("GetConfig(): log → {Log}", log);
                 log.AddProperty("UrlRewriter.RewriterConfiguration", "GetConfig Failed");
                 log.AddProperty("FilePath", filePath);
                 log.AddProperty("ExceptionMessage", ex.Message);
@@ -91,20 +97,25 @@ namespace DotNetNuke.Entities.Urls.Config
                 Logger.Error(log);
             }
 
+			Logger.LogWarning("<<< Exiting GetConfig()");
             return config;
         }
 
         public static void SaveConfig(RewriterRuleCollection rules)
         {
+			Logger.LogError(">>> Entering SaveConfig(rules={Rules})", rules);
             if (rules != null)
             {
                 var config = new RewriterConfiguration { Rules = rules };
+				Logger.LogError("SaveConfig(rules={Rules}): config → {Config}", rules, config);
 
                 // Create a new Xml Serializer
                 var ser = new XmlSerializer(typeof(RewriterConfiguration));
+				Logger.LogError("SaveConfig(rules={Rules}): ser → {Ser}", rules, ser);
 
                 // Create a FileStream for the Config file
                 var filePath = Common.Utilities.Config.GetPathToFile(Common.Utilities.Config.ConfigFileType.SiteUrls);
+				Logger.LogError("SaveConfig(rules={Rules}): filePath → {FilePath}", rules, filePath);
                 if (File.Exists(filePath))
                 {
                     // make sure file is not read-only
@@ -125,6 +136,7 @@ namespace DotNetNuke.Entities.Urls.Config
                 // Set Cache
                 DataCache.SetCache("RewriterConfig", config, new DNNCacheDependency(filePath));
             }
+			Logger.LogWarning("<<< Exiting SaveConfig(rules={Rules})", rules);
         }
     }
 }

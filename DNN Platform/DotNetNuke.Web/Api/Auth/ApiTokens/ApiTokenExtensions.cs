@@ -15,6 +15,7 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
     /// </summary>
     public static class ApiTokenExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ApiTokenExtensions));
         /// <summary>
         /// Converts ApiToken properties to LogProperties in order to log them.
         /// </summary>
@@ -22,6 +23,7 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
         /// <returns>A LogProperties instance with ApiToken properties as LogDetailInfo.</returns>
         public static ILogProperties ToLogProps(this ApiToken apiToken)
         {
+			Logger.LogError(">>> Entering ToLogProps(apiToken=<redacted>)");
             var lp = new LogProperties
               {
                 new LogDetailInfo("ApiTokenId", apiToken.ApiTokenId.ToString(CultureInfo.InvariantCulture)),
@@ -36,6 +38,7 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
                 new LogDetailInfo("Revoked On", apiToken.RevokedOnDate?.ToString(CultureInfo.InvariantCulture) ?? string.Empty),
                 new LogDetailInfo("Last Used On", apiToken.LastUsedOnDate?.ToString(CultureInfo.InvariantCulture) ?? string.Empty),
               };
+			Logger.LogWarning("<<< Exiting ToLogProps(apiToken=<redacted>)");
             return lp;
         }
     }

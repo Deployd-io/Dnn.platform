@@ -4,9 +4,11 @@ import resx from "resources";
 import ResourceTree from "./resourceTree";
 import { Switch, Button, Label, Flag, RadioButtons, GridCell, TextOverflowWrapper } from "@dnnsoftware/dnn-react-common";
 import util from "utils";
+const logger = console;
 
 class LanguageInfoView extends Component {
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {
             languageBeingEdited,
             ModeOptions,
@@ -23,6 +25,7 @@ class LanguageInfoView extends Component {
             highlightPendingTranslations,
             portalName
         } = this.props;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className="edit-language-info">
                 <GridCell className="edit-language-top-bar">

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -15,11 +16,14 @@ CodeMirror.defineMode("pegjs", function (config) {
   var jsMode = CodeMirror.getMode(config, "javascript");
 
   function identifier(stream) {
+	logger.error(`>>> Entering identifier(stream=${stream})`, { "event.action": "identifier", "logrite.stream": stream });
+	logger.warn(`<<< Exiting identifier(stream=${stream})`, { "event.action": "identifier", "logrite.stream": stream });
     return stream.match(/^[a-zA-Z_][a-zA-Z0-9_]*/);
   }
 
   return {
     startState: function () {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         inString: false,
         stringType: null,
@@ -29,8 +33,10 @@ CodeMirror.defineMode("pegjs", function (config) {
         lhs: true,
         localState: null
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     token: function (stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream)
 
       //check for state changes
@@ -38,9 +44,11 @@ CodeMirror.defineMode("pegjs", function (config) {
         state.stringType = stream.peek();
         stream.next(); // Skip quote
         state.inString = true; // Update state
+		logger.debug(`token(stream=${stream},state=${state}): state.inString → ${state.inString}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       }
       if (!state.inString && !state.inComment && stream.match(/^\/\*/)) {
         state.inComment = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.inComment → ${state.inComment}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       }
 
       //return state
@@ -63,6 +71,7 @@ CodeMirror.defineMode("pegjs", function (config) {
             state.inComment = false; // Clear flag
           } else {
             stream.match(/^.[^\*]*/);
+			logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           }
         }
         return "comment";

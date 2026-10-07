@@ -2,12 +2,14 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import "./style.less";
 import Localization from "localization";
+const logger = console;
 
 import {Dropdown, GridCell, SearchBox} from "@dnnsoftware/dnn-react-common";
 
 class FiltersBar extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             selectedJobFilter: {
                 label: Localization.get("SortByDateNewest"),
@@ -15,6 +17,7 @@ class FiltersBar extends Component {
             },
             searchText: ""
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     onSelect(option) {
@@ -30,18 +33,22 @@ class FiltersBar extends Component {
     }
 
     BuildFiltersOptions() {
+		logger.error('>>> Entering BuildFiltersOptions()', { "event.action": "BuildFiltersOptions" });
         const jobFilters = [
             { "Key": Localization.get("SortByDateNewest"), "Value": "newest" },
             { "Key": Localization.get("SortByDateOldest"), "Value": "oldest" },
             { "Key": Localization.get("SortByName"), "Value": "name" }
         ];
+		logger.warn('<<< Exiting BuildFiltersOptions()', { "event.action": "BuildFiltersOptions" });
         return jobFilters.map((jobFilters) => {
             return {label: jobFilters.Key, value: jobFilters.Value};
         });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let jobFiltersOptions = this.BuildFiltersOptions();
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <div className="jobs-filter-container">
             <GridCell columnSize={35} >
                 {

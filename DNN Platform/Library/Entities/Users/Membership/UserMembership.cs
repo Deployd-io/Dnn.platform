@@ -12,6 +12,7 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class UserMembership
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserMembership));
         private readonly UserInfo user;
         private bool approved;
 
@@ -25,7 +26,10 @@ namespace DotNetNuke.Entities.Users
         /// <param name="user">The user info.</param>
         public UserMembership(UserInfo user)
         {
+			Logger.LogError(">>> Entering UserMembership(user={User})", user);
             this.approved = true;
+			Logger.LogWarning("<<< Exiting UserMembership(user={User})", user);
+			Logger.LogDebug("UserMembership(user={User}): this.approved → {Arg1}", user, this.approved);
             this.user = user;
         }
 
@@ -92,6 +96,7 @@ namespace DotNetNuke.Entities.Users
 
         internal void ConfirmApproved()
         {
+			Logger.LogError(">>> Entering ConfirmApproved()");
             this.Approving = false;
         }
     }

@@ -14,10 +14,12 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
 
     public class DnnModuleAuthorizeAttribute : AuthorizeAttributeBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnModuleAuthorizeAttribute));
         private ModuleInfo module;
 
         public DnnModuleAuthorizeAttribute()
         {
+			Logger.LogError(">>> Entering DnnModuleAuthorizeAttribute()");
             this.AccessLevel = SecurityAccessLevel.Host;
         }
 
@@ -28,31 +30,40 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
         /// <inheritdoc />
         public override void OnAuthorization(AuthorizationContext filterContext)
         {
+			Logger.LogError(">>> Entering OnAuthorization(filterContext={FilterContext})", filterContext);
             var controller = filterContext.Controller as IDnnController;
 
             if (controller == null)
             {
+				Logger.LogError("Throwing InvalidOperationException from OnAuthorization(filterContext={FilterContext})", filterContext);
                 throw new InvalidOperationException("This attribute can only be applied to Controllers that implement IDnnController");
             }
 
             this.module = controller.ModuleContext.Configuration;
+			Logger.LogDebug("OnAuthorization(filterContext={FilterContext}): module → {Module}", filterContext, module);
+			Logger.LogDebug("OnAuthorization(filterContext={FilterContext}): this.module → {Arg1}", filterContext, this.module);
 
             base.OnAuthorization(filterContext);
+			Logger.LogWarning("<<< Exiting OnAuthorization(filterContext={FilterContext})", filterContext);
         }
 
         /// <inheritdoc />
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
+			Logger.LogError(">>> Entering AuthorizeCore(httpContext={HttpContext})", httpContext);
             if (this.module != null)
             {
                 return this.HasModuleAccess();
             }
 
+			Logger.LogWarning("<<< Exiting AuthorizeCore(httpContext={HttpContext})", httpContext);
             return false;
         }
 
         protected virtual bool HasModuleAccess()
         {
+			Logger.LogError(">>> Entering HasModuleAccess()");
+            Logger.LogWarning("<<< Exiting HasModuleAccess()");
             return ModulePermissionController.HasModuleAccess(this.AccessLevel, this.PermissionKey, this.module);
         }
     }

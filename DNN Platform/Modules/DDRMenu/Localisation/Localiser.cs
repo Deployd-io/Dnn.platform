@@ -38,7 +38,10 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
         /// <param name="portalController">The portal controller.</param>
         public Localiser(IEnumerable<ILocalisation> localizations, IPortalController portalController)
         {
+			eventLogger.LogError(">>> Entering Localiser(localizations={Localizations},portalController={PortalController})", localizations, portalController);
+			eventLogger.LogDebug("Localiser(localizations={Localizations},portalController={PortalController}): portalController → {PortalController1}", localizations, portalController, portalController);
             this.localizations = localizations ?? Globals.GetCurrentServiceProvider().GetServices<ILocalisation>();
+			eventLogger.LogWarning("<<< Exiting Localiser(localizations={Localizations},portalController={PortalController})", localizations, portalController);
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
         }
 
@@ -67,6 +70,8 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
         /// <inheritdoc />
         public DNNNodeCollection LocaliseDNNNodeCollection(DNNNodeCollection nodes)
         {
+			eventLogger.LogError(">>> Entering LocaliseDNNNodeCollection(nodes={Nodes})", nodes);
+            eventLogger.LogWarning("<<< Exiting LocaliseDNNNodeCollection(nodes={Nodes})", nodes);
             return this.LocalisationApi?.LocaliseNodes(nodes) ?? nodes;
         }
 
@@ -75,21 +80,30 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
         [DnnDeprecated(10, 0, 0, "Use overload taking a portalId.")]
         public partial void LocaliseNode(MenuNode node)
         {
+			eventLogger.LogError(">>> Entering LocaliseNode(node={Node})", node);
             this.LocaliseNode(node, this.portalController.GetCurrentSettings().PortalId);
+			eventLogger.LogWarning("<<< Exiting LocaliseNode(node={Node})", node);
         }
 
         /// <inheritdoc />
         public void LocaliseNode(MenuNode node, int portalId)
         {
+			eventLogger.LogError(">>> Entering LocaliseNode(node={Node},portalId={PortalId})", node, portalId);
             var tab = (node.TabId > 0) ? TabController.Instance.GetTab(node.TabId, Null.NullInteger, false) : null;
+			eventLogger.LogError("LocaliseNode(node={Node},portalId={PortalId}): tab → {Tab}", node, portalId, tab);
             if (tab != null)
             {
+				eventLogger.LogWarning("<<< Exiting LocaliseNode(node={Node})", node);
                 var localised = this.LocaliseTab(tab, portalId);
+				eventLogger.LogError("LocaliseNode(node={Node},portalId={PortalId}): localised → {Localised}", node, portalId, localised);
                 tab = localised ?? tab;
 
                 if (localised != null)
                 {
                     node.TabId = tab.TabID;
+					eventLogger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): node.TabId → {Arg2}", node, portalId, node.TabId);
+					eventLogger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): node.Text → {Arg2}", node, portalId, node.Text);
+					eventLogger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): node.Enabled → {Arg2}", node, portalId, node.Enabled);
                     node.Text = tab.TabName;
                     node.Enabled = !tab.DisableLink;
                     if (!tab.IsVisible)
@@ -99,6 +113,9 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
                 }
 
                 node.Title = tab.Title;
+				eventLogger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): node.Title → {Arg2}", node, portalId, node.Title);
+				eventLogger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): node.Description → {Arg2}", node, portalId, node.Description);
+				eventLogger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): node.Keywords → {Arg2}", node, portalId, node.Keywords);
                 node.Description = tab.Description;
                 node.Keywords = tab.KeyWords;
             }
@@ -112,6 +129,8 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
 
         private TabInfo LocaliseTab(TabInfo tab, int portalId)
         {
+			eventLogger.LogError(">>> Entering LocaliseTab(tab={Tab},portalId={PortalId})", tab, portalId);
+            eventLogger.LogWarning("<<< Exiting LocaliseTab(tab={Tab},portalId={PortalId})", tab, portalId);
             return this.LocalisationApi?.LocaliseTab(tab, portalId);
         }
     }

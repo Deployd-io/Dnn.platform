@@ -6,12 +6,14 @@ namespace DotNetNuke.ContentSecurityPolicy
 {
     using System.Collections.Generic;
     using System.Linq;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Contributor for fetch directives (sources-based directives).
     /// </summary>
     public class SourceCspContributor : BaseCspContributor
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private bool checkSyntax;
 
         /// <summary>
@@ -21,7 +23,10 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="checkSyntax">Check syntax of value.</param>
         public SourceCspContributor(CspDirectiveType directiveType, bool checkSyntax)
         {
+			_logger.LogError(">>> Entering SourceCspContributor(directiveType={DirectiveType},checkSyntax={CheckSyntax})", directiveType, checkSyntax);
             this.DirectiveType = directiveType;
+			_logger.LogDebug("SourceCspContributor(directiveType={DirectiveType},checkSyntax={CheckSyntax}): this.DirectiveType → {Arg2}", directiveType, checkSyntax, this.DirectiveType);
+        _logger.LogWarning("<<< Exiting SourceCspContributor(directiveType={DirectiveType},checkSyntax={CheckSyntax})", directiveType, checkSyntax);
             this.checkSyntax = checkSyntax;
         }
 
@@ -41,6 +46,8 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The current instance for method chaining.</returns>
         public SourceCspContributor AddInline()
         {
+			_logger.LogError(">>> Entering AddInline()");
+            _logger.LogWarning("<<< Exiting AddInline()");
             return this.AddSource(new CspSource(CspSourceType.Inline));
         }
 
@@ -50,6 +57,8 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The current instance for method chaining.</returns>
         public SourceCspContributor AddSelf()
         {
+			_logger.LogError(">>> Entering AddSelf()");
+            _logger.LogWarning("<<< Exiting AddSelf()");
             return this.AddSource(new CspSource(CspSourceType.Self));
         }
 
@@ -59,6 +68,8 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The current instance for method chaining.</returns>
         public SourceCspContributor AddEval()
         {
+			_logger.LogError(">>> Entering AddEval()");
+            _logger.LogWarning("<<< Exiting AddEval()");
             return this.AddSource(new CspSource(CspSourceType.Eval));
         }
 
@@ -69,6 +80,8 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The current instance for method chaining.</returns>
         public SourceCspContributor AddHost(string host)
         {
+			_logger.LogError(">>> Entering AddHost(host={Host})", host);
+            _logger.LogWarning("<<< Exiting AddHost(host={Host})", host);
             return this.AddSource(new CspSource(CspSourceType.Host, host, this.checkSyntax));
         }
 
@@ -79,6 +92,8 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The current instance for method chaining.</returns>
         public SourceCspContributor AddScheme(string scheme)
         {
+			_logger.LogError(">>> Entering AddScheme(scheme={Scheme})", scheme);
+            _logger.LogWarning("<<< Exiting AddScheme(scheme={Scheme})", scheme);
             return this.AddSource(new CspSource(CspSourceType.Scheme, scheme, this.checkSyntax));
         }
 
@@ -89,6 +104,8 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The current instance for method chaining.</returns>
         public SourceCspContributor AddNonce(string nonce)
         {
+			_logger.LogError(">>> Entering AddNonce(nonce=<redacted>)");
+            _logger.LogWarning("<<< Exiting AddNonce(nonce=<redacted>)");
             return this.AddSource(new CspSource(CspSourceType.Nonce, nonce, this.checkSyntax));
         }
 
@@ -99,6 +116,8 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The current instance for method chaining.</returns>
         public SourceCspContributor AddHash(string hash)
         {
+			_logger.LogError(">>> Entering AddHash(hash=<redacted>)");
+            _logger.LogWarning("<<< Exiting AddHash(hash=<redacted>)");
             return this.AddSource(new CspSource(CspSourceType.Hash, hash, this.checkSyntax));
         }
 
@@ -108,6 +127,8 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The current instance for method chaining.</returns>
         public SourceCspContributor AddNone()
         {
+			_logger.LogError(">>> Entering AddNone()");
+            _logger.LogWarning("<<< Exiting AddNone()");
             return this.AddSource(new CspSource(CspSourceType.None));
         }
 
@@ -117,6 +138,8 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The current instance for method chaining.</returns>
         public SourceCspContributor AddStrictDynamic()
         {
+			_logger.LogError(">>> Entering AddStrictDynamic()");
+            _logger.LogWarning("<<< Exiting AddStrictDynamic()");
             return this.AddSource(new CspSource(CspSourceType.StrictDynamic));
         }
 
@@ -127,11 +150,13 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The current instance for method chaining.</returns>
         public SourceCspContributor AddSource(CspSource source)
         {
+			_logger.LogError(">>> Entering AddSource(source={Source})", source);
             if (!this.Sources.Any(s => s.Type == source.Type && s.Value == source.Value))
             {
                 this.Sources.Add(source);
             }
 
+			_logger.LogWarning("<<< Exiting AddSource(source={Source})", source);
             return this;
         }
 
@@ -141,7 +166,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="sourceType">The type of the source to remove.</param>
         public void RemoveSources(CspSourceType sourceType)
         {
+			_logger.LogError(">>> Entering RemoveSources(sourceType={SourceType})", sourceType);
             this.Sources.RemoveAll(s => s.Type == sourceType);
+			_logger.LogWarning("<<< Exiting RemoveSources(sourceType={SourceType})", sourceType);
         }
 
         /// <summary>
@@ -150,6 +177,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The directive string.</returns>
         public override string GenerateDirective()
         {
+			_logger.LogError(">>> Entering GenerateDirective()");
             if (this.Sources.Count == 0)
             {
                 return string.Empty;
@@ -161,6 +189,7 @@ namespace DotNetNuke.ContentSecurityPolicy
                 this.RemoveSources(CspSourceType.StrictDynamic);
             }
 
+			_logger.LogWarning("<<< Exiting GenerateDirective()");
             return $"{CspDirectiveNameMapper.GetDirectiveName(this.DirectiveType)} {string.Join(" ", this.Sources.Select(s => s.ToString()))}";
         }
 
@@ -171,6 +200,8 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The sources of the specified type.</returns>
         public IEnumerable<CspSource> GetSourcesByType(CspSourceType type)
         {
+			_logger.LogError(">>> Entering GetSourcesByType(type={Type})", type);
+			_logger.LogWarning("<<< Exiting GetSourcesByType(type={Type})", type);
             return this.Sources.Where(s => s.Type == type);
         }
     }

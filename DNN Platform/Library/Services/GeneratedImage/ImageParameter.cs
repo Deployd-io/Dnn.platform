@@ -12,6 +12,7 @@ namespace DotNetNuke.Services.GeneratedImage
     [Bindable(true)]
     public class ImageParameter : IDataBindingsAccessor
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImageParameter));
         private readonly DataBindingCollection dataBindings = new DataBindingCollection();
 
         public event EventHandler DataBinding;
@@ -31,20 +32,24 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogError(">>> Entering ToString()");
             if (string.IsNullOrEmpty(this.Name) && string.IsNullOrEmpty(this.Value))
             {
                 return base.ToString();
             }
 
+			Logger.LogWarning("<<< Exiting ToString()");
             return string.Format(CultureInfo.InvariantCulture, "{0} = {1}", this.Name, this.Value);
         }
 
         internal void DataBind()
         {
+			Logger.LogError(">>> Entering DataBind()");
             if (this.DataBinding != null)
             {
                 this.DataBinding(this, EventArgs.Empty);
             }
+			Logger.LogWarning("<<< Exiting DataBind()");
         }
     }
 }

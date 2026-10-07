@@ -1,4 +1,5 @@
-﻿
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+
 dnn.controls.DNNRichText=function(initFunc)
 {this.supportsCE=(document.body.contentEditable!=null);this.text='';this.supportsMultiLine=true;this.document=null;this.control=null;this.initialized=false;this.isRichText=true;this.loaded=false;if(this.supportsCE)
 {this.document=document;this.container=document.createElement('div');this.container.contentEditable=true;this.control=this.container;this.initialized=true;}
@@ -7,6 +8,7 @@ else
 dnn.controls.DNNRichText.prototype={focus:function()
 {if(this.supportsCE)
 this.control.focus();else
+logger.error('>>> Entering focus()', { "event.action": "focus" });
 this.container.contentWindow.focus();},execCommand:function(cmd,ui,vValue)
 {this.document.execCommand(cmd,ui,vValue);},getText:function()
 {return this.control.innerHTML;},setText:function(s)
@@ -22,5 +24,6 @@ if(this.initialized==false)
 dnn.doDelay(this.container.id+'initEdit',10,this._initDelegate);},_getCSSLinks:function()
 {var arr=dnn.dom.getByTagName('link');var s='';for(var i=0;i<arr.length;i++)
 {s+='<LINK href="'+arr[i].href+'" type=text/css rel=stylesheet>';}
+logger.warn('<<< Exiting focus()', { "event.action": "focus" });
 return s;}}
 dnn.controls.DNNRichText.registerClass('dnn.controls.DNNRichText');

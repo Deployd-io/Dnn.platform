@@ -1,12 +1,17 @@
 import {roles as ActionTypes}  from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
 import util from "../utils";
+const logger = console;
 
 function errorCallback(message) {
+	logger.error(`>>> Entering errorCallback(message=${message})`, { "event.action": "errorCallback", "logrite.message": message });
     util.utilities.notifyError(JSON.parse(message.responseText).Message, 5000);
+	logger.warn(`<<< Exiting errorCallback(message=${message})`, { "event.action": "errorCallback", "logrite.message": message });
 }
 const rolesActions = {
     getRoleGroupsList(reload, callback) {
+		logger.error(`>>> Entering getRoleGroupsList(reload=${reload},callback=${callback})`, { "event.action": "getRoleGroupsList", "logrite.reload": reload, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getRoleGroupsList(reload=${reload},callback=${callback})`, { "event.action": "getRoleGroupsList", "logrite.reload": reload, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getRoleGroups(reload, data => {
                 dispatch({
@@ -20,6 +25,8 @@ const rolesActions = {
         };
     },
     saveRoleGroup(group, callback) {
+		logger.error(`>>> Entering saveRoleGroup(group=${group},callback=${callback})`, { "event.action": "saveRoleGroup", "logrite.group": group, "logrite.callback": callback });
+		logger.warn(`<<< Exiting saveRoleGroup(group=${group},callback=${callback})`, { "event.action": "saveRoleGroup", "logrite.group": group, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.saveRoleGroup(group, data => {
                 dispatch({
@@ -34,6 +41,8 @@ const rolesActions = {
         };
     },
     deleteRoleGroup(group, callback) {
+		logger.error(`>>> Entering deleteRoleGroup(group=${group},callback=${callback})`, { "event.action": "deleteRoleGroup", "logrite.group": group, "logrite.callback": callback });
+		logger.warn(`<<< Exiting deleteRoleGroup(group=${group},callback=${callback})`, { "event.action": "deleteRoleGroup", "logrite.group": group, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.deleteRoleGroup(group, data => {
                 dispatch({
@@ -48,6 +57,8 @@ const rolesActions = {
         };
     },
     getRolesList(parameters, callback) {
+		logger.error(`>>> Entering getRolesList(parameters=${parameters},callback=${callback})`, { "event.action": "getRolesList", "logrite.parameters": parameters, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getRolesList(parameters=${parameters},callback=${callback})`, { "event.action": "getRolesList", "logrite.parameters": parameters, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getRoles(parameters, data => {
                 dispatch({
@@ -64,6 +75,8 @@ const rolesActions = {
         };
     },
     saveRole(currentGroupId, assignExistUsers, role, callback) {
+		logger.error(`>>> Entering saveRole(currentGroupId=${currentGroupId},assignExistUsers=${assignExistUsers},role=${role},callback=${callback})`, { "event.action": "saveRole", "logrite.currentGroupId": currentGroupId, "logrite.assignExistUsers": assignExistUsers, "logrite.role": role, "logrite.callback": callback });
+		logger.warn(`<<< Exiting saveRole(currentGroupId=${currentGroupId},assignExistUsers=${assignExistUsers},role=${role},callback=${callback})`, { "event.action": "saveRole", "logrite.currentGroupId": currentGroupId, "logrite.assignExistUsers": assignExistUsers, "logrite.role": role, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.saveRole(assignExistUsers, role, data => {
                 dispatch({
@@ -78,6 +91,8 @@ const rolesActions = {
         };
     },
     deleteRole(role, callback) {
+		logger.error(`>>> Entering deleteRole(role=${role},callback=${callback})`, { "event.action": "deleteRole", "logrite.role": role, "logrite.callback": callback });
+		logger.warn(`<<< Exiting deleteRole(role=${role},callback=${callback})`, { "event.action": "deleteRole", "logrite.role": role, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.deleteRole(role, data => {
                 dispatch({

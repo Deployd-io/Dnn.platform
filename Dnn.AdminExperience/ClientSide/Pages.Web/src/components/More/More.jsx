@@ -7,21 +7,27 @@ import Localization from "../../localization";
 import { pageActions as PageActions } from "../../actions";
 import styles from "./style.module.less";
 import utils from "../../utils";
+const logger = console;
 
 class More extends Component {
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.props.onFetchCacheProviderList();
         if (this.props.page.cacheProvider && !this.props.cachedPageCount) {
             this.props.onGetCachedPageCount(this.props.page.cacheProvider);
+			logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
         }
     }
 
     onChangeField(key, event) {
+		logger.error(`>>> Entering onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
         const { onChangeField } = this.props;
         onChangeField(key, event.target.value);
+		logger.warn(`<<< Exiting onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
     }
 
     onCacheProviderSelected(option) {
+		logger.error(`>>> Entering onCacheProviderSelected(option=${option})`, { "event.action": "onCacheProviderSelected", "logrite.option": option });
         this.props.onChangeField("cacheProvider", option.value);
         if (!this.props.page.cacheProvider && option.value) {
             this.props.onChangeField("cacheIncludeExclude", true);
@@ -30,6 +36,7 @@ class More extends Component {
         }
         if (option.value) {
             this.props.onGetCachedPageCount(option.value);
+			logger.warn(`<<< Exiting onCacheProviderSelected(option=${option})`, { "event.action": "onCacheProviderSelected", "logrite.option": option });
         }
         this.setState({
             cacheProvider: option.value
@@ -37,27 +44,36 @@ class More extends Component {
     }
 
     onChangeIncludeExclude(value) {
+		logger.error(`>>> Entering onChangeIncludeExclude(value=${value})`, { "event.action": "onChangeIncludeExclude", "logrite.value": value });
         const include = value === "true";
         this.props.onChangeField("cacheIncludeExclude", include);
+		logger.error(`onChangeIncludeExclude(value=${value}): include → ${include}`, { "event.action": "onChangeIncludeExclude", "logrite.value": value });
     }
 
     onClearCache() {
+		logger.error('>>> Entering onClearCache()', { "event.action": "onClearCache" });
         this.props.onClearCache(this.props.page.cacheProvider);
+		logger.warn('<<< Exiting onClearCache()', { "event.action": "onClearCache" });
     }
 
     getWorkflowOptions() {
+		logger.error('>>> Entering getWorkflowOptions()', { "event.action": "getWorkflowOptions" });
+		logger.warn('<<< Exiting getWorkflowOptions()', { "event.action": "getWorkflowOptions" });
         return this.props.workflowList.length ? this.props.workflowList.map((item => { return { value: item.workflowId, label: item.workflowName }; })) : null;
     }
 
     onWorkflowDropDownChange(option) {
+		logger.error(`>>> Entering onWorkflowDropDownChange(option=${option})`, { "event.action": "onWorkflowDropDownChange", "logrite.option": option });
         this.props.onChangeField("workflowId", option.value);
         this.props.page.workflowId = option.value;
         this.setState({
             page: {...this.props.page},
         });
+		logger.warn(`<<< Exiting onWorkflowDropDownChange(option=${option})`, { "event.action": "onWorkflowDropDownChange", "logrite.option": option });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { page, errors, onChangeField, cacheProviderList } = this.props;
         const cacheProviderOptions = cacheProviderList &&
             [{ value: null, label: Localization.get("None") },
@@ -66,6 +82,7 @@ class More extends Component {
             { value: true, label: Localization.get("Include") },
             { value: false, label: Localization.get("Exclude") }];
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.moreContainer}>
                 <div className="title">
@@ -235,6 +252,8 @@ More.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         cacheProviderList: state.pages.cacheProviderList,
         cachedPageCount: state.pages.cachedPageCount,
@@ -243,6 +262,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.error(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
+	logger.warn(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
     return bindActionCreators({
         onFetchCacheProviderList: PageActions.fetchCacheProviderList,
         onGetCachedPageCount: PageActions.getCachedPageCount,

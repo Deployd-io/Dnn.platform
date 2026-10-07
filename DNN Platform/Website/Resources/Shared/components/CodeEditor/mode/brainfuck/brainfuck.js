@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -29,19 +30,24 @@
   CodeMirror.defineMode("brainfuck", function() {
     return {
       startState: function() {
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
         return {
           commentLine: false,
           left: 0,
           right: 0,
           commentLoop: false
         }
+		logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       },
       token: function(stream, state) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if (stream.eatSpace()) return null
         if(stream.sol()){
           state.commentLine = false;
+		logger.debug(`token(stream=${stream},state=${state}): state.commentLine → ${state.commentLine}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         }
         var ch = stream.next().toString();
+		logger.error(`token(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if(reserve.indexOf(ch) !== -1){
           if(state.commentLine === true){
             if(stream.eol()){
@@ -55,6 +61,7 @@
             }
             else{
               state.right++;
+			logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
             }
             return "bracket";
           }

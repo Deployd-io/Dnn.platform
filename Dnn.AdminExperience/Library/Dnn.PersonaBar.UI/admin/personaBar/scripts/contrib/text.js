@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 /**
  * @license text 2.0.15 Copyright jQuery Foundation and other contributors.
  * Released under MIT license, http://github.com/requirejs/text/LICENSE
@@ -22,11 +23,14 @@ define(['module'], function (module) {
         masterConfig = (module.config && module.config()) || {};
 
     function useDefault(value, defaultValue) {
+		logger.error(`>>> Entering useDefault(value=${value},defaultValue=${defaultValue})`, { "event.action": "useDefault", "logrite.value": value, "logrite.defaultValue": defaultValue });
+		logger.warn(`<<< Exiting useDefault(value=${value},defaultValue=${defaultValue})`, { "event.action": "useDefault", "logrite.value": value, "logrite.defaultValue": defaultValue });
         return value === undefined || value === '' ? defaultValue : value;
     }
 
     //Allow for default ports for http and https.
     function isSamePort(protocol1, port1, protocol2, port2) {
+		logger.error(`>>> Entering isSamePort(protocol1=${protocol1},port1=${port1},protocol2=${protocol2},port2=${port2})`, { "event.action": "isSamePort", "logrite.protocol1": protocol1, "logrite.port1": port1, "logrite.protocol2": protocol2, "logrite.port2": port2 });
         if (port1 === port2) {
             return true;
         } else if (protocol1 === protocol2) {
@@ -36,6 +40,7 @@ define(['module'], function (module) {
                 return useDefault(port1, '443') === useDefault(port2, '443');
             }
         }
+		logger.warn(`<<< Exiting isSamePort(protocol1=${protocol1},port1=${port1},protocol2=${protocol2},port2=${port2})`, { "event.action": "isSamePort", "logrite.protocol1": protocol1, "logrite.port1": port1, "logrite.protocol2": protocol2, "logrite.port2": port2 });
         return false;
     }
 
@@ -43,18 +48,22 @@ define(['module'], function (module) {
         version: '2.0.15',
 
         strip: function (content) {
+			logger.error(`>>> Entering strip(content=${content})`, { "event.action": "strip", "logrite.content": content });
             //Strips <?xml ...?> declarations so that external SVG and XML
             //documents can be added to a document without worry. Also, if the string
             //is an HTML document, only the part inside the body tag is returned.
             if (content) {
                 content = content.replace(xmlRegExp, "");
                 var matches = content.match(bodyRegExp);
+				logger.error(`strip(content=${content}): matches → ${matches}`, { "event.action": "strip", "logrite.content": content });
                 if (matches) {
                     content = matches[1];
                 }
             } else {
                 content = "";
+				logger.warn(`<<< Exiting strip(content=${content})`, { "event.action": "strip", "logrite.content": content });
             }
+			logger.error(`strip(content=${content}): content → ${content}`, { "event.action": "strip", "logrite.content": content });
             return content;
         },
 
@@ -100,6 +109,7 @@ define(['module'], function (module) {
          * where strip is a boolean.
          */
         parseName: function (name) {
+			logger.error(`>>> Entering parseName(name=${name})`, { "event.action": "parseName", "logrite.name": name });
             var modName, ext, temp,
                 strip = false,
                 index = name.lastIndexOf("."),
@@ -108,6 +118,7 @@ define(['module'], function (module) {
 
             if (index !== -1 && (!isRelative || index > 1)) {
                 modName = name.substring(0, index);
+				logger.debug(`parseName(name=${name}): modName → ${modName}`, { "event.action": "parseName", "logrite.name": name });
                 ext = name.substring(index + 1);
             } else {
                 modName = name;
@@ -123,6 +134,7 @@ define(['module'], function (module) {
                     ext = temp;
                 } else {
                     modName = temp;
+					logger.warn(`<<< Exiting parseName(name=${name})`, { "event.action": "parseName", "logrite.name": name });
                 }
             }
 
@@ -144,12 +156,14 @@ define(['module'], function (module) {
          * @returns Boolean
          */
         useXhr: function (url, protocol, hostname, port) {
+			logger.error(`>>> Entering useXhr(url=${url},protocol=${protocol},hostname=${hostname},port=${port})`, { "event.action": "useXhr", "logrite.url": url, "logrite.protocol": protocol, "logrite.hostname": hostname, "logrite.port": port });
             var uProtocol, uHostName, uPort,
                 match = text.xdRegExp.exec(url);
             if (!match) {
                 return true;
             }
             uProtocol = match[2];
+			logger.debug(`useXhr(url=${url},protocol=${protocol},hostname=${hostname},port=${port}): uProtocol → ${uProtocol}`, { "event.action": "useXhr", "logrite.url": url, "logrite.protocol": protocol, "logrite.hostname": hostname, "logrite.port": port });
             uHostName = match[3];
 
             uHostName = uHostName.split(':');
@@ -159,17 +173,21 @@ define(['module'], function (module) {
             return (!uProtocol || uProtocol === protocol) &&
                    (!uHostName || uHostName.toLowerCase() === hostname.toLowerCase()) &&
                    ((!uPort && !uHostName) || isSamePort(uProtocol, uPort, protocol, port));
+				logger.warn(`<<< Exiting useXhr(url=${url},protocol=${protocol},hostname=${hostname},port=${port})`, { "event.action": "useXhr", "logrite.url": url, "logrite.protocol": protocol, "logrite.hostname": hostname, "logrite.port": port });
         },
 
         finishLoad: function (name, strip, content, onLoad) {
+			logger.error(`>>> Entering finishLoad(name=${name},strip=${strip},content=${content},onLoad=${onLoad})`, { "event.action": "finishLoad", "logrite.name": name, "logrite.strip": strip, "logrite.content": content, "logrite.onLoad": onLoad });
             content = strip ? text.strip(content) : content;
             if (masterConfig.isBuild) {
                 buildMap[name] = content;
             }
             onLoad(content);
+			logger.warn(`<<< Exiting finishLoad(name=${name},strip=${strip},content=${content},onLoad=${onLoad})`, { "event.action": "finishLoad", "logrite.name": name, "logrite.strip": strip, "logrite.content": content, "logrite.onLoad": onLoad });
         },
 
         load: function (name, req, onLoad, config) {
+			logger.error(`>>> Entering load(name=${name},req=${req},onLoad=${onLoad},config=${config})`, { "event.action": "load", "logrite.name": name, "logrite.req": req, "logrite.onLoad": onLoad, "logrite.config": config });
             //Name has format: some.module.filext!strip
             //The strip part is optional.
             //if strip is present, then that means only get the string contents
@@ -192,6 +210,7 @@ define(['module'], function (module) {
                 url = req.toUrl(nonStripName),
                 useXhr = (masterConfig.useXhr) ||
                          text.useXhr;
+						logger.error(`load(name=${name},req=${req},onLoad=${onLoad},config=${config}): parsed → ${parsed}`, { "event.action": "load", "logrite.name": name, "logrite.req": req, "logrite.onLoad": onLoad, "logrite.config": config });
 
             // Do not load if it is an empty: url
             if (url.indexOf('empty:') === 0) {
@@ -218,25 +237,31 @@ define(['module'], function (module) {
                                     parsed.strip, content, onLoad);
                 });
             }
+			logger.warn(`<<< Exiting load(name=${name},req=${req},onLoad=${onLoad},config=${config})`, { "event.action": "load", "logrite.name": name, "logrite.req": req, "logrite.onLoad": onLoad, "logrite.config": config });
         },
 
         write: function (pluginName, moduleName, write, config) {
+			logger.error(`>>> Entering write(pluginName=${pluginName},moduleName=${moduleName},write=${write},config=${config})`, { "event.action": "write", "logrite.pluginName": pluginName, "logrite.moduleName": moduleName, "logrite.write": write, "logrite.config": config });
             if (buildMap.hasOwnProperty(moduleName)) {
                 var content = text.jsEscape(buildMap[moduleName]);
+				logger.error(`write(pluginName=${pluginName},moduleName=${moduleName},write=${write},config=${config}): content → ${content}`, { "event.action": "write", "logrite.pluginName": pluginName, "logrite.moduleName": moduleName, "logrite.write": write, "logrite.config": config });
                 write.asModule(pluginName + "!" + moduleName,
                                "define(function () { return '" +
                                    content +
                                "';});\n");
+							logger.warn(`<<< Exiting write(pluginName=${pluginName},moduleName=${moduleName},write=${write},config=${config})`, { "event.action": "write", "logrite.pluginName": pluginName, "logrite.moduleName": moduleName, "logrite.write": write, "logrite.config": config });
             }
         },
 
         writeFile: function (pluginName, moduleName, req, write, config) {
+			logger.error(`>>> Entering writeFile(pluginName=${pluginName},moduleName=${moduleName},req=${req},write=${write},config=${config})`, { "event.action": "writeFile", "logrite.pluginName": pluginName, "logrite.moduleName": moduleName, "logrite.req": req, "logrite.write": write, "logrite.config": config });
             var parsed = text.parseName(moduleName),
                 extPart = parsed.ext ? '.' + parsed.ext : '',
                 nonStripName = parsed.moduleName + extPart,
                 //Use a '.js' file name so that it indicates it is a
                 //script that can be loaded across domains.
                 fileName = req.toUrl(parsed.moduleName + extPart) + '.js';
+				logger.error(`writeFile(pluginName=${pluginName},moduleName=${moduleName},req=${req},write=${write},config=${config}): parsed → ${parsed}`, { "event.action": "writeFile", "logrite.pluginName": pluginName, "logrite.moduleName": moduleName, "logrite.req": req, "logrite.write": write, "logrite.config": config });
 
             //Leverage own load() method to load plugin value, but only
             //write out values that do not have the strip argument,
@@ -246,14 +271,19 @@ define(['module'], function (module) {
                 //But need to create shell that translates writeFile's
                 //write() to the right interface.
                 var textWrite = function (contents) {
+					logger.error(`>>> Entering textWrite(contents=${contents})`, { "event.action": "textWrite", "logrite.contents": contents });
+					logger.warn(`<<< Exiting textWrite(contents=${contents})`, { "event.action": "textWrite", "logrite.contents": contents });
                     return write(fileName, contents);
                 };
                 textWrite.asModule = function (moduleName, contents) {
+					logger.error(`>>> Entering asModule(moduleName=${moduleName},contents=${contents})`, { "event.action": "asModule", "logrite.moduleName": moduleName, "logrite.contents": contents });
+					logger.warn(`<<< Exiting asModule(moduleName=${moduleName},contents=${contents})`, { "event.action": "asModule", "logrite.moduleName": moduleName, "logrite.contents": contents });
                     return write.asModule(moduleName, fileName, contents);
                 };
 
                 text.write(pluginName, nonStripName, textWrite, config);
             }, config);
+			logger.warn(`<<< Exiting writeFile(pluginName=${pluginName},moduleName=${moduleName},req=${req},write=${write},config=${config})`, { "event.action": "writeFile", "logrite.pluginName": pluginName, "logrite.moduleName": moduleName, "logrite.req": req, "logrite.write": write, "logrite.config": config });
         }
     };
 
@@ -267,24 +297,31 @@ define(['module'], function (module) {
         fs = require.nodeRequire('fs');
 
         text.get = function (url, callback, errback) {
+			logger.error(`>>> Entering get(url=${url},callback=${callback},errback=${errback})`, { "event.action": "get", "logrite.url": url, "logrite.callback": callback });
             try {
+				logger.warn(`<<< Exiting get(url=${url},callback=${callback},errback=${errback})`, { "event.action": "get", "logrite.url": url, "logrite.callback": callback });
                 var file = fs.readFileSync(url, 'utf8');
+				logger.error(`get(url=${url},callback=${callback},errback=${errback}): file → ${file}`, { "event.action": "get", "logrite.url": url, "logrite.callback": callback });
                 //Remove BOM (Byte Mark Order) from utf8 files if it is there.
                 if (file[0] === '\uFEFF') {
                     file = file.substring(1);
                 }
                 callback(file);
             } catch (e) {
+				logger.error(`Exception in get(url=${url},callback=${callback},errback=${errback}): ${e.message}`, e, { "event.action": "get", "event.category": "process", "logrite.url": url, "logrite.callback": callback });
                 if (errback) {
                     errback(e);
                 }
             }
+			logger.warn(`<<< Exiting get(url=${url},callback=${callback})`, { "event.action": "get", "logrite.url": url, "logrite.callback": callback });
         };
     } else if (masterConfig.env === 'xhr' || (!masterConfig.env &&
             text.createXhr())) {
         text.get = function (url, callback, errback, headers) {
+			logger.error(`>>> Entering get(url=${url},callback=${callback},errback=${errback},headers=${headers})`, { "event.action": "get", "logrite.url": url, "logrite.callback": callback });
             var xhr = text.createXhr(), header;
             xhr.open('GET', url, true);
+			logger.error(`get(url=${url},callback=${callback},errback=${errback},headers=${headers}): xhr → ${xhr}`, { "event.action": "get", "logrite.url": url, "logrite.callback": callback });
 
             //Allow plugins direct access to xhr headers
             if (headers) {
@@ -301,11 +338,13 @@ define(['module'], function (module) {
             }
 
             xhr.onreadystatechange = function (evt) {
+				logger.error(`>>> Entering onreadystatechange(evt=${evt})`, { "event.action": "onreadystatechange", "logrite.evt": evt });
                 var status, err;
                 //Do not explicitly handle errors, those should be
                 //visible via console output in the browser.
                 if (xhr.readyState === 4) {
                     status = xhr.status || 0;
+					logger.error(`onreadystatechange(evt=${evt}): status → ${status}`, { "event.action": "onreadystatechange", "logrite.evt": evt });
                     if (status > 399 && status < 600) {
                         //An http 4xx or 5xx error. Signal an error.
                         err = new Error(url + ' HTTP status: ' + status);
@@ -319,6 +358,7 @@ define(['module'], function (module) {
 
                     if (masterConfig.onXhrComplete) {
                         masterConfig.onXhrComplete(xhr, url);
+						logger.warn(`<<< Exiting onreadystatechange(evt=${evt})`, { "event.action": "onreadystatechange", "logrite.evt": evt });
                     }
                 }
             };
@@ -328,6 +368,7 @@ define(['module'], function (module) {
             typeof Packages !== 'undefined' && typeof java !== 'undefined')) {
         //Why Java, why is this so awkward?
         text.get = function (url, callback) {
+			logger.error(`>>> Entering get(url=${url},callback=${callback})`, { "event.action": "get", "logrite.url": url, "logrite.callback": callback });
             var stringBuffer, line,
                 encoding = "utf-8",
                 file = new java.io.File(url),
@@ -336,6 +377,7 @@ define(['module'], function (module) {
                 content = '';
             try {
                 stringBuffer = new java.lang.StringBuffer();
+				logger.error(`get(url=${url},callback=${callback}): stringBuffer → ${stringBuffer}`, { "event.action": "get", "logrite.url": url, "logrite.callback": callback });
                 line = input.readLine();
 
                 // Byte Order Mark (BOM) - The Unicode Standard, version 3.0, page 324
@@ -364,6 +406,10 @@ define(['module'], function (module) {
                 input.close();
             }
             callback(content);
+			logger.warn(`<<< Exiting get(url=${url},callback=${callback},errback=${errback},headers=${headers})`, { "event.action": "get", "logrite.url": url, "logrite.callback": callback });
+			logger.error(`get(url=${url},callback=${callback}): inStream → ${inStream}`, { "event.action": "get", "logrite.url": url, "logrite.callback": callback });
+			logger.error(`get(url=${url},callback=${callback}): url → ${url}`, { "event.action": "get", "logrite.url": url, "logrite.callback": callback });
+			logger.error(`Exception in get(url=${url},callback=${callback}): ${e.message}`, e, { "event.action": "get", "event.category": "process", "logrite.url": url, "logrite.callback": callback });
         };
     } else if (masterConfig.env === 'xpconnect' || (!masterConfig.env &&
             typeof Components !== 'undefined' && Components.classes &&
@@ -400,9 +446,11 @@ define(['module'], function (module) {
                 inStream.close();
                 callback(readData.value);
             } catch (e) {
+				logger.error(`Exception in get(url=${url},callback=${callback}): ${e.message}`, e, { "event.action": "get", "event.category": "process", "logrite.url": url, "logrite.callback": callback });
                 throw new Error((fileObj && fileObj.path || '') + ': ' + e);
             }
         };
+		logger.warn(`<<< Exiting jsEscape(content=${content})`, { "event.action": "jsEscape", "logrite.content": content });
     }
     return text;
 });

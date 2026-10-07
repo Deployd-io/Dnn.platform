@@ -10,22 +10,27 @@ import "./style.less";
 import { Dropdown, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import util from "../../utils";
 import resx from "../../resources";
+const logger = console;
 
 let tableFields = [];
 
 class IgnoreWordsPanel extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             ignoreWords: undefined,
             openId: "",
             culture: ""
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     loadData() {
+		logger.error('>>> Entering loadData()', { "event.action": "loadData" });
         const { props } = this;
         props.dispatch(SearchActions.getIgnoreWords(props.portalId, props.cultureCode, (data) => {
+			logger.warn('<<< Exiting loadData()', { "event.action": "loadData" });
             this.setState({
                 ignoreWords: Object.assign({}, data),
                 culture: data.CultureCode
@@ -34,6 +39,7 @@ class IgnoreWordsPanel extends Component {
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const { props } = this;
 
         if (tableFields.length === 0) {
@@ -42,9 +48,11 @@ class IgnoreWordsPanel extends Component {
 
         props.dispatch(SearchActions.getCultureList(props.portalId));
         this.loadData();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         const { props } = this;
 
         if (props.ignoreWords) {
@@ -53,17 +61,20 @@ class IgnoreWordsPanel extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
             }
         }
     }
 
     renderHeader() {
+		logger.error('>>> Entering renderHeader()', { "event.action": "renderHeader" });
         let tableHeaders = tableFields.map((field) => {
             let className = "words-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.warn('<<< Exiting renderHeader()', { "event.action": "renderHeader" });
         return <div className="header-row">{tableHeaders}</div>;
     }
 
@@ -136,6 +147,7 @@ class IgnoreWordsPanel extends Component {
     }
 
     getCultureOptions() {
+		logger.error('>>> Entering getCultureOptions()', { "event.action": "getCultureOptions" });
         const {props} = this;
         let options = [];
         if (props.cultures !== undefined) {
@@ -150,13 +162,16 @@ class IgnoreWordsPanel extends Component {
                 };
             });
         }
+		logger.warn('<<< Exiting getCultureOptions()', { "event.action": "getCultureOptions" });
         return options;
     }
 
      
     renderedIgnoreWords() {
+		logger.error('>>> Entering renderedIgnoreWords()', { "event.action": "renderedIgnoreWords" });
         const {props} = this;
         if (props.ignoreWords && props.ignoreWords.StopWords) {
+			logger.warn('<<< Exiting renderedIgnoreWords()', { "event.action": "renderedIgnoreWords" });
             return (
                 <IgnoreWordsRow
                     wordsId={props.ignoreWords.StopWordsId}
@@ -183,8 +198,10 @@ class IgnoreWordsPanel extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         let opened = (state.openId === "add");
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <div className="words-group-items">
@@ -249,6 +266,8 @@ IgnoreWordsPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         ignoreWords: state.search.ignoreWords,
         tabIndex: state.pagination.tabIndex,

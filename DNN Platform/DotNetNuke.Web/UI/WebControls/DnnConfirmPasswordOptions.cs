@@ -11,6 +11,7 @@ namespace DotNetNuke.Web.UI.WebControls
     [DataContract]
     public class DnnConfirmPasswordOptions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnConfirmPasswordOptions));
         /// <summary>Gets or sets the first element selector.</summary>
         [DataMember(Name = "firstElementSelector")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
@@ -56,7 +57,9 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <summary>Initializes a new instance of the <see cref="DnnConfirmPasswordOptions"/> class.</summary>
         public DnnConfirmPasswordOptions()
         {
+			Logger.LogError(">>> Entering DnnConfirmPasswordOptions()");
             // all the Confirm Password related resources are located under the Website\App_GlobalResources\WebControls.resx
+			Logger.LogWarning("<<< Exiting DnnConfirmPasswordOptions()");
             this.ConfirmPasswordUnmatchedText = Utilities.GetLocalizedString("ConfirmPasswordUnmatched");
             this.ConfirmPasswordMatchedText = Utilities.GetLocalizedString("ConfirmPasswordMatched");
         }

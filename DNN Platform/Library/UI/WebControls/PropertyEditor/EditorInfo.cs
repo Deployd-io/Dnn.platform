@@ -17,9 +17,11 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The EditorInfo class provides a helper class for the Property Editor.</summary>
     public partial class EditorInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EditorInfo));
         /// <summary>Initializes a new instance of the <see cref="EditorInfo"/> class.</summary>
         public EditorInfo()
         {
+			Logger.LogError(">>> Entering EditorInfo()");
             this.Visible = true;
         }
 
@@ -66,16 +68,22 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>The non-localized name of the editor.</returns>
         public static string GetEditor(ListController listController, int editorType)
         {
+			Logger.LogError(">>> Entering GetEditor(editorType={EditorType})", editorType);
             string editor = "UseSystemType";
+			Logger.LogError(">>> Entering GetEditor(listController={ListController},editorType={EditorType})", listController, editorType);
             if (editorType != Null.NullInteger)
             {
                 ListEntryInfo definitionEntry = listController.GetListEntryInfo("DataType", editorType);
+				Logger.LogError("GetEditor(editorType={EditorType}): definitionEntry → {DefinitionEntry}", editorType, definitionEntry);
                 if (definitionEntry != null)
                 {
+					Logger.LogError("GetEditor(listController={ListController},editorType={EditorType}): definitionEntry → {DefinitionEntry}", listController, editorType, definitionEntry);
                     editor = definitionEntry.TextNonLocalized;
+					Logger.LogError("GetEditor(editorType={EditorType}): editor → {Editor}", editorType, editor);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetEditor(listController={ListController},editorType={EditorType})", listController, editorType);
             return editor;
         }
 
@@ -99,6 +107,8 @@ namespace DotNetNuke.UI.WebControls
                 editor = definitionEntry.TextNonLocalized;
             }
 
+			Logger.LogError("GetEditor(editorValue={EditorValue}): editor → {Editor}", editorValue, editor);
+        Logger.LogWarning("<<< Exiting GetEditor(listController={ListController},editorValue={EditorValue})", listController, editorValue);
             return editor;
         }
     }

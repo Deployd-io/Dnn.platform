@@ -11,10 +11,13 @@ namespace DotNetNuke.Web.Client.ResourceManager
     /// <inheritdoc />
     public class Startup : IDnnStartup
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Startup));
         /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services)
         {
+			Logger.LogError(">>> Entering ConfigureServices(services={Services})", services);
             services.AddScoped<IClientResourceController, ClientResourceController>();
+			Logger.LogWarning("<<< Exiting ConfigureServices(services={Services})", services);
         }
     }
 }

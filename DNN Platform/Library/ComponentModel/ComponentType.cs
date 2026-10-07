@@ -7,10 +7,12 @@ namespace DotNetNuke.ComponentModel
 
     internal sealed class ComponentType : IDisposable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ComponentType));
         /// <summary>Initializes a new instance of the <see cref="ComponentType"/> class.</summary>
         /// <param name="baseType">The base type of Components of this ComponentType.</param>
         public ComponentType(Type baseType)
         {
+			Logger.LogError(">>> Entering ComponentType(baseType={BaseType})", baseType);
             this.BaseType = baseType;
         }
 
@@ -21,7 +23,9 @@ namespace DotNetNuke.ComponentModel
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogError(">>> Entering Dispose()");
             this.ComponentBuilders?.Dispose();
+			Logger.LogWarning("<<< Exiting Dispose()");
         }
     }
 }

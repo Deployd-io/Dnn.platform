@@ -5,18 +5,22 @@ import styles from "./style.module.less";
 import ColumnSizes from "../ExtensionColumnSizes";
 import InUseModal from "../InUseModal";
 import Html from "../../../../Html";
+const logger = console;
 
 class ExtensionDetailRow extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             inUseModalOpen: false,
             usagePackageName: null,
             usagePackageId: -1
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     toggleInUseModal(packageName, packageId) {
+		logger.error(`>>> Entering toggleInUseModal(packageName=${packageName},packageId=${packageId})`, { "event.action": "toggleInUseModal", "logrite.packageName": packageName, "logrite.packageId": packageId });
         let nextState = !this.state.inUseModalOpen;
         window.dnn.stopEscapeFromClosingPB = nextState;
         this.setState({
@@ -24,21 +28,26 @@ class ExtensionDetailRow extends Component {
             usagePackageName: packageName,
             usagePackageId: packageId
         });
+		logger.warn(`<<< Exiting toggleInUseModal(packageName=${packageName},packageId=${packageId})`, { "event.action": "toggleInUseModal", "logrite.packageName": packageName, "logrite.packageId": packageId });
     }
 
     getInUseDisplay(packageName, packageId) {
+		logger.error(`>>> Entering getInUseDisplay(packageName=${packageName},packageId=${packageId})`, { "event.action": "getInUseDisplay", "logrite.packageName": packageName, "logrite.packageId": packageId });
         const {props} = this;
         if (props._package.inUse === "Yes") {
             return <div className="in-use" onClick={this.toggleInUseModal.bind(this, packageName, packageId)}>{props._package.inUse}</div>;
         }
         else {
+			logger.warn(`<<< Exiting getInUseDisplay(packageName=${packageName},packageId=${packageId})`, { "event.action": "getInUseDisplay", "logrite.packageName": packageName, "logrite.packageId": packageId });
             return <p>{props._package.inUse}</p>;
         }
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <GridCell className={styles.extensionDetailRow} columnSize={100} style={{ padding: "20px 0 20px 20px" }}>

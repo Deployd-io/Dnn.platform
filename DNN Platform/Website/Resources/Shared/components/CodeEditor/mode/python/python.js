@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -12,6 +13,8 @@
   "use strict";
 
   function wordRegexp(words) {
+	logger.error(`>>> Entering wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
+	logger.warn(`<<< Exiting wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
     return new RegExp("^((" + words.join(")|(") + "))\\b");
   }
 
@@ -42,6 +45,8 @@
   CodeMirror.registerHelper("hintWords", "python", commonKeywords.concat(commonBuiltins));
 
   function top(state) {
+	logger.error(`>>> Entering top(state=${state})`, { "event.action": "top", "logrite.state": state });
+	logger.warn(`<<< Exiting top(state=${state})`, { "event.action": "top", "logrite.state": state });
     return state.scopes[state.scopes.length - 1];
   }
 
@@ -347,7 +352,9 @@
   CodeMirror.defineMIME("text/x-python", "python");
 
   var words = function(str) { return str.split(" "); };
+logger.error(`>>> Entering words(str=${str})`, { "event.action": "words", "logrite.str": str });
 
+logger.warn(`<<< Exiting words(str=${str})`, { "event.action": "words", "logrite.str": str });
   CodeMirror.defineMIME("text/x-cython", {
     name: "python",
     extra_keywords: words("by cdef cimport cpdef ctypedef enum except"+

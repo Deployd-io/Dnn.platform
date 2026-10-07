@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -28,49 +29,64 @@
     var isNonDigit = /[_a-zA-Z]/;
 
     function tokenLineComment(stream, state) {
+	logger.error(`>>> Entering tokenLineComment(stream=${stream},state=${state})`, { "event.action": "tokenLineComment", "logrite.stream": stream, "logrite.state": state });
       stream.skipToEnd();
       state.tokenize = null;
+	logger.debug(`tokenLineComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenLineComment", "logrite.stream": stream, "logrite.state": state });
+	logger.warn(`<<< Exiting tokenLineComment(stream=${stream},state=${state})`, { "event.action": "tokenLineComment", "logrite.stream": stream, "logrite.state": state });
       return "comment";
     }
 
     function tokenBlockComment(stream, state) {
+	logger.error(`>>> Entering tokenBlockComment(stream=${stream},state=${state})`, { "event.action": "tokenBlockComment", "logrite.stream": stream, "logrite.state": state });
       var maybeEnd = false, ch;
       while (ch = stream.next()) {
         if (maybeEnd && ch == "/") {
           state.tokenize = null;
+		logger.debug(`tokenBlockComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenBlockComment", "logrite.stream": stream, "logrite.state": state });
           break;
         }
         maybeEnd = (ch == "*");
       }
+	logger.error(`tokenBlockComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "tokenBlockComment", "logrite.stream": stream, "logrite.state": state });
       return "comment";
     }
 
     function tokenString(stream, state) {
+	logger.error(`>>> Entering tokenString(stream=${stream},state=${state})`, { "event.action": "tokenString", "logrite.stream": stream, "logrite.state": state });
       var escaped = false, ch;
       while ((ch = stream.next()) != null) {
+		logger.error(`tokenString(stream=${stream},state=${state}): escaped → ${escaped}`, { "event.action": "tokenString", "logrite.stream": stream, "logrite.state": state });
         if (ch == '"' && !escaped) {
           state.tokenize = null;
+		logger.debug(`tokenString(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenString", "logrite.stream": stream, "logrite.state": state });
           state.sol = false;
+		logger.debug(`tokenString(stream=${stream},state=${state}): state.sol → ${state.sol}`, { "event.action": "tokenString", "logrite.stream": stream, "logrite.state": state });
           break;
         }
         escaped = !escaped && ch == "\\";
       }
 
+	logger.warn(`<<< Exiting tokenString(stream=${stream},state=${state})`, { "event.action": "tokenString", "logrite.stream": stream, "logrite.state": state });
       return "string";
     }
 
     function tokenIdent(stream, state) {
+	logger.error(`>>> Entering tokenIdent(stream=${stream},state=${state})`, { "event.action": "tokenIdent", "logrite.stream": stream, "logrite.state": state });
       stream.eatWhile(isDigit);
       while (stream.eat(isDigit) || stream.eat(isNonDigit)) { }
 
 
       var cur = stream.current();
+	logger.error(`tokenIdent(stream=${stream},state=${state}): cur → ${cur}`, { "event.action": "tokenIdent", "logrite.stream": stream, "logrite.state": state });
 
       if(state.sol && (cur == "package" || cur == "model" || cur == "when" || cur == "connector")) state.level++;
       else if(state.sol && cur == "end" && state.level > 0) state.level--;
 
       state.tokenize = null;
+	logger.debug(`tokenIdent(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenIdent", "logrite.stream": stream, "logrite.state": state });
       state.sol = false;
+	logger.debug(`tokenIdent(stream=${stream},state=${state}): state.sol → ${state.sol}`, { "event.action": "tokenIdent", "logrite.stream": stream, "logrite.state": state });
 
       if (keywords.propertyIsEnumerable(cur)) return "keyword";
       else if (builtin.propertyIsEnumerable(cur)) return "builtin";
@@ -79,10 +95,13 @@
     }
 
     function tokenQIdent(stream, state) {
+	logger.error(`>>> Entering tokenQIdent(stream=${stream},state=${state})`, { "event.action": "tokenQIdent", "logrite.stream": stream, "logrite.state": state });
       while (stream.eat(/[^']/)) { }
 
       state.tokenize = null;
+	logger.debug(`tokenQIdent(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenQIdent", "logrite.stream": stream, "logrite.state": state });
       state.sol = false;
+	logger.debug(`tokenQIdent(stream=${stream},state=${state}): state.sol → ${state.sol}`, { "event.action": "tokenQIdent", "logrite.stream": stream, "logrite.state": state });
 
       if(stream.eat("'"))
         return "variable";
@@ -91,6 +110,7 @@
     }
 
     function tokenUnsignedNuber(stream, state) {
+	logger.error(`>>> Entering tokenUnsignedNuber(stream=${stream},state=${state})`, { "event.action": "tokenUnsignedNuber", "logrite.stream": stream, "logrite.state": state });
       stream.eatWhile(isDigit);
       if (stream.eat('.')) {
         stream.eatWhile(isDigit);
@@ -102,36 +122,46 @@
       }
 
       state.tokenize = null;
+	logger.debug(`tokenUnsignedNuber(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenUnsignedNuber", "logrite.stream": stream, "logrite.state": state });
       state.sol = false;
+	logger.debug(`tokenUnsignedNuber(stream=${stream},state=${state}): state.sol → ${state.sol}`, { "event.action": "tokenUnsignedNuber", "logrite.stream": stream, "logrite.state": state });
+	logger.warn(`<<< Exiting tokenUnsignedNuber(stream=${stream},state=${state})`, { "event.action": "tokenUnsignedNuber", "logrite.stream": stream, "logrite.state": state });
       return "number";
     }
 
     // Interface
     return {
       startState: function() {
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
         return {
           tokenize: null,
           level: 0,
           sol: true
         };
+		logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       },
 
       token: function(stream, state) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if(state.tokenize != null) {
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           return state.tokenize(stream, state);
         }
 
         if(stream.sol()) {
           state.sol = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.sol → ${state.sol}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         }
 
         // WHITESPACE
         if(stream.eatSpace()) {
           state.tokenize = null;
+		logger.debug(`token(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           return null;
         }
 
         var ch = stream.next();
+		logger.error(`token(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
 
         // LINECOMMENT
         if(ch == '/' && stream.eat('/')) {
@@ -178,6 +208,7 @@
       },
 
       indent: function(state, textAfter) {
+		logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
         if (state.tokenize != null) return CodeMirror.Pass;
 
         var level = state.level;
@@ -200,9 +231,11 @@
   });
 
   function words(str) {
+	logger.error(`>>> Entering words(str=${str})`, { "event.action": "words", "logrite.str": str });
     var obj = {}, words = str.split(" ");
     for (var i=0; i<words.length; ++i)
       obj[words[i]] = true;
+	logger.warn(`<<< Exiting words(str=${str})`, { "event.action": "words", "logrite.str": str });
     return obj;
   }
 
@@ -211,16 +244,20 @@
   var modelicaAtoms = "Real Boolean Integer String";
 
   function def(mimes, mode) {
+	logger.error(`>>> Entering def(mimes=${mimes},mode=${mode})`, { "event.action": "def", "logrite.mimes": mimes, "logrite.mode": mode });
     if (typeof mimes == "string")
       mimes = [mimes];
 
     var words = [];
+	logger.warn(`<<< Exiting def(mimes=${mimes},mode=${mode})`, { "event.action": "def", "logrite.mimes": mimes, "logrite.mode": mode });
 
     function add(obj) {
+	logger.error(`>>> Entering add(obj=${obj})`, { "event.action": "add", "logrite.obj": obj });
       if (obj)
         for (var prop in obj)
           if (obj.hasOwnProperty(prop))
             words.push(prop);
+			logger.warn(`<<< Exiting add(obj=${obj})`, { "event.action": "add", "logrite.obj": obj });
     }
 
     add(mode.keywords);

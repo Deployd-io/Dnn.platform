@@ -29,10 +29,12 @@ namespace Dnn.AzureConnector.Components
     using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
     using ICryptographyProvider = DotNetNuke.Abstractions.Security.ICryptographyProvider;
+	using Microsoft.Extensions.Logging;
 
     /// <inheritdoc />
     public class AzureConnector : IConnector
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private const string DefaultDisplayName = "Azure Storage";
         private static readonly DataProvider DataProvider = DataProvider.Instance();
 
@@ -46,6 +48,8 @@ namespace Dnn.AzureConnector.Components
         public AzureConnector()
             : this(null, null, null)
         {
+		_logger.LogError(">>> Entering AzureConnector()");
+        _logger.LogWarning("<<< Exiting AzureConnector()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="AzureConnector"/> class.</summary>
@@ -54,6 +58,8 @@ namespace Dnn.AzureConnector.Components
         public AzureConnector(IFolderMappingController folderMappingController)
             : this(folderMappingController, null, null)
         {
+		_logger.LogError(">>> Entering AzureConnector(folderMappingController=<redacted>)");
+        _logger.LogWarning("<<< Exiting AzureConnector(folderMappingController=<redacted>)");
         }
 
         /// <summary>Initializes a new instance of the <see cref="AzureConnector"/> class.</summary>
@@ -64,8 +70,11 @@ namespace Dnn.AzureConnector.Components
         {
             this.folderMappingController = folderMappingController ?? FolderMappingController.Instance;
 #pragma warning disable CS0618 // Type or member is obsolete
+			_logger.LogDebug("AzureConnector(folderMappingController=<redacted>,cryptographyProvider={CryptographyProvider},hostSettings={HostSettings}): this.folderMappingController → {Arg3}", cryptographyProvider, hostSettings, this.folderMappingController);
             this.cryptographyProvider = cryptographyProvider ?? (ICryptographyProvider)CryptographyProvider.Instance();
 #pragma warning restore CS0618 // Type or member is obsolete
+			_logger.LogDebug("AzureConnector(folderMappingController=<redacted>,cryptographyProvider={CryptographyProvider},hostSettings={HostSettings}): folderMappingController → {FolderMappingController1}", cryptographyProvider, hostSettings, folderMappingController);
+			_logger.LogDebug("AzureConnector(folderMappingController=<redacted>,cryptographyProvider={CryptographyProvider},hostSettings={HostSettings}): cryptographyProvider → {CryptographyProvider1}", cryptographyProvider, hostSettings, cryptographyProvider);
             this.hostSettings = hostSettings ??
                                 new HostSettings(
                                     new HostController(
@@ -73,6 +82,9 @@ namespace Dnn.AzureConnector.Components
                                         new EventLogController(),
 #pragma warning restore CS0618 // Type or member is obsolete
                                         new Lazy<IPortalController>(() => PortalController.Instance)));
+										_logger.LogDebug("AzureConnector(folderMappingController=<redacted>,cryptographyProvider={CryptographyProvider},hostSettings={HostSettings}): hostSettings → {HostSettings1}", cryptographyProvider, hostSettings, hostSettings);
+        _logger.LogDebug("AzureConnector(folderMappingController=<redacted>,cryptographyProvider={CryptographyProvider},hostSettings={HostSettings}): this.hostSettings → {Arg3}", cryptographyProvider, hostSettings, this.hostSettings);
+        _logger.LogWarning("<<< Exiting AzureConnector(folderMappingController=<redacted>,cryptographyProvider={CryptographyProvider},hostSettings={HostSettings})", cryptographyProvider, hostSettings);
         }
 
         /// <inheritdoc />
@@ -106,11 +118,14 @@ namespace Dnn.AzureConnector.Components
         /// <inheritdoc />
         public IEnumerable<IConnector> GetConnectors(int portalId)
         {
+			_logger.LogError(">>> Entering GetConnectors(portalId={PortalId})", portalId);
             var connectors = this.FindAzureFolderMappings(portalId);
+			_logger.LogError("GetConnectors(portalId={PortalId}): connectors → {Connectors}", portalId, connectors);
             if (connectors != null && connectors.Count != 0)
             {
                 connectors.ForEach(x => { this.Id = x.FolderMappingID.ToString(CultureInfo.InvariantCulture); });
                 var finalCon = connectors.Select(x => (IConnector)Activator.CreateInstance(this.GetType())).ToList();
+				_logger.LogError("GetConnectors(portalId={PortalId}): finalCon → {FinalCon}", portalId, finalCon);
                 finalCon.ForEach(x =>
                 {
                     x.Id = connectors[finalCon.IndexOf(x)].FolderMappingID.ToString(CultureInfo.InvariantCulture);
@@ -119,12 +134,14 @@ namespace Dnn.AzureConnector.Components
                 return finalCon;
             }
 
+			_logger.LogWarning("<<< Exiting GetConnectors(portalId={PortalId})", portalId);
             return new List<IConnector> { this };
         }
 
         /// <inheritdoc />
         public void DeleteConnector(int portalId)
         {
+			_logger.LogError(">>> Entering DeleteConnector(portalId={PortalId})", portalId);
             if (!string.IsNullOrEmpty(this.Id))
             {
                 int mappingId;
@@ -134,13 +151,17 @@ namespace Dnn.AzureConnector.Components
                     this.DeleteAzureFolderMapping(portalId, mappingId);
                 }
             }
+			_logger.LogWarning("<<< Exiting DeleteConnector(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public bool HasConfig(int portalId)
         {
+			_logger.LogError(">>> Entering HasConfig(portalId={PortalId})", portalId);
             var folderMapping = this.FindAzureFolderMapping(portalId, false, true);
             this.Id = Convert.ToString(folderMapping?.FolderMappingID, CultureInfo.InvariantCulture);
+			_logger.LogError("HasConfig(portalId={PortalId}): folderMapping → {FolderMapping}", portalId, folderMapping);
+			_logger.LogWarning("<<< Exiting HasConfig(portalId={PortalId})", portalId);
             return this.GetConfig(portalId)["Connected"] == "true";
         }
 
@@ -167,18 +188,24 @@ namespace Dnn.AzureConnector.Components
         /// <inheritdoc />
         public bool SaveConfig(int portalId, IDictionary<string, string> values, ref bool validated, out string customErrorMessage)
         {
+			_logger.LogError(">>> Entering SaveConfig(portalId={PortalId},values={Values},validated={Validated})", portalId, values, validated);
             customErrorMessage = string.Empty;
             var azureAccountName = values[Constants.AzureAccountName];
+			_logger.LogDebug("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): customErrorMessage → {CustomErrorMessage}", portalId, values, validated, customErrorMessage);
             var azureAccountKey = values[Constants.AzureAccountKey];
             var azureContainerName = values.TryGetValue(Constants.AzureContainerName, out var containerName) ? containerName : string.Empty;
+			_logger.LogError("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): azureContainerName → {AzureContainerName}", portalId, values, validated, azureContainerName);
 
             var emptyFields = string.IsNullOrEmpty(azureAccountKey) && string.IsNullOrEmpty(azureAccountName);
+			_logger.LogError("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): emptyFields → {EmptyFields}", portalId, values, validated, emptyFields);
 
             validated = true;
+			_logger.LogError("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): validated → {Validated1}", portalId, values, validated, validated);
             if (emptyFields)
             {
                 if (this.SupportsMultiple)
                 {
+					_logger.LogError("Throwing AzureConnectorException from SaveConfig(portalId={PortalId},values={Values},validated={Validated})", portalId, values, validated);
                     throw new AzureConnectorException(Localization.GetString("ErrorRequiredFields", Constants.LocalResourceFile));
                 }
 
@@ -200,10 +227,12 @@ namespace Dnn.AzureConnector.Components
             try
             {
                 var folderMappings = this.FindAzureFolderMappings(portalId);
+				_logger.LogError("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): folderMappings → {FolderMappings}", portalId, values, validated, folderMappings);
                 FolderMappingInfo folderMapping;
                 if (this.SupportsMultiple && !string.IsNullOrEmpty(this.Id))
                 {
                     folderMapping = folderMappings.FirstOrDefault(x => x.FolderMappingID.ToString(CultureInfo.InvariantCulture) == this.Id);
+					_logger.LogError("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): folderMapping → {FolderMapping}", portalId, values, validated, folderMapping);
                 }
                 else
                 {
@@ -211,10 +240,14 @@ namespace Dnn.AzureConnector.Components
                 }
 
                 var settings = folderMapping.FolderMappingSettings;
+				_logger.LogError("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): settings → {Settings}", portalId, values, validated, settings);
 
                 var savedAccount = this.GetSetting(settings, Constants.AzureAccountName, true);
+				_logger.LogError("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): savedAccount → {SavedAccount}", portalId, values, validated, savedAccount);
                 var savedKey = this.GetSetting(settings, Constants.AzureAccountKey, true);
+				_logger.LogError("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): savedKey → {SavedKey}", portalId, values, validated, savedKey);
                 var savedContainer = this.GetSetting(settings, Constants.AzureContainerName);
+				_logger.LogError("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): savedContainer → {SavedContainer}", portalId, values, validated, savedContainer);
 
                 var accountChanged = savedAccount != azureAccountName || savedKey != azureAccountKey;
 
@@ -275,7 +308,9 @@ namespace Dnn.AzureConnector.Components
             }
             catch (Exception ex)
             {
+				_logger.LogError("Exception in SaveConfig(portalId={PortalId},values={Values},validated={Validated}): {Arg3}", portalId, values, validated, ex.Message);
                 Exceptions.LogException(ex);
+				_logger.LogWarning("<<< Exiting SaveConfig(portalId={PortalId},values={Values},validated={Validated})", portalId, values, validated);
                 return false;
             }
         }
@@ -288,6 +323,7 @@ namespace Dnn.AzureConnector.Components
         /// <returns>A <see cref="FolderMappingInfo"/> instance.</returns>
         internal static FolderMappingInfo FindAzureFolderMappingStatic(IFolderMappingController folderMappingController, int portalId, int? folderMappingId = null, bool autoCreate = true)
         {
+			_logger.LogError(">>> Entering FindAzureFolderMappingStatic(folderMappingController=<redacted>,portalId={PortalId},folderMappingId=<redacted>,autoCreate={AutoCreate})", portalId, autoCreate);
             var folderMappings = folderMappingController.GetFolderMappings(portalId)
                 .Where(f => f.FolderProviderType == Constants.FolderProviderType);
 
@@ -306,6 +342,7 @@ namespace Dnn.AzureConnector.Components
 
         private static FolderMappingInfo CreateAzureFolderMappingStatic(IFolderMappingController folderMappingController, int portalId, string mappingName = "")
         {
+			_logger.LogError(">>> Entering CreateAzureFolderMappingStatic(folderMappingController=<redacted>,portalId={PortalId},mappingName=<redacted>)", portalId);
             var folderMapping = new FolderMappingInfo
             {
                 PortalID = portalId,
@@ -321,10 +358,12 @@ namespace Dnn.AzureConnector.Components
 
         private static bool Validation(string azureAccountName, string azureAccountKey, string azureContainerName)
         {
+			_logger.LogError(">>> Entering Validation(azureAccountName={AzureAccountName},azureAccountKey={AzureAccountKey},azureContainerName={AzureContainerName})", azureAccountName, azureAccountKey, azureContainerName);
             try
             {
                 if (string.IsNullOrWhiteSpace(azureAccountName))
                 {
+					_logger.LogError("Throwing ConnectorArgumentException from Validation(azureAccountName={AzureAccountName},azureAccountKey={AzureAccountKey},azureContainerName={AzureContainerName})", azureAccountName, azureAccountKey, azureContainerName);
                     throw new ConnectorArgumentException(Localization.GetString(
                         "AccountNameCannotBeEmpty.ErrorMessage",
                         Constants.LocalResourceFile));
@@ -338,18 +377,23 @@ namespace Dnn.AzureConnector.Components
                 }
 
                 StorageCredentials sc = new StorageCredentials(azureAccountName, azureAccountKey);
+				_logger.LogError("Validation(azureAccountName={AzureAccountName},azureAccountKey={AzureAccountKey},azureContainerName={AzureContainerName}): sc → {Sc}", azureAccountName, azureAccountKey, azureContainerName, sc);
                 var csa = new CloudStorageAccount(sc, true);
+				_logger.LogError("Validation(azureAccountName={AzureAccountName},azureAccountKey={AzureAccountKey},azureContainerName={AzureContainerName}): csa → {Csa}", azureAccountName, azureAccountKey, azureContainerName, csa);
                 var blobClient = csa.CreateCloudBlobClient();
+				_logger.LogError("Validation(azureAccountName={AzureAccountName},azureAccountKey={AzureAccountKey},azureContainerName={AzureContainerName}): blobClient → {BlobClient}", azureAccountName, azureAccountKey, azureContainerName, blobClient);
 
                 blobClient.DefaultRequestOptions.RetryPolicy = new NoRetry();
 
                 var containers = blobClient.ListContainers();
+				_logger.LogError("Validation(azureAccountName={AzureAccountName},azureAccountKey={AzureAccountKey},azureContainerName={AzureContainerName}): containers → {Containers}", azureAccountName, azureAccountKey, azureContainerName, containers);
                 if (containers.Any())
                 {
                     if (!string.IsNullOrEmpty(azureContainerName))
                     {
                         if (!containers.Any(container => container.Name == azureContainerName))
                         {
+							_logger.LogError("Throwing AzureConnectorException from Validation(azureAccountName={AzureAccountName},azureAccountKey={AzureAccountKey},azureContainerName={AzureContainerName})", azureAccountName, azureAccountKey, azureContainerName);
                             throw new AzureConnectorException(Localization.GetString("ErrorInvalidContainerName", Constants.LocalResourceFile));
                         }
                         else
@@ -369,6 +413,7 @@ namespace Dnn.AzureConnector.Components
             }
             catch (StorageException ex)
             {
+				_logger.LogError("Exception in Validation(azureAccountName={AzureAccountName},azureAccountKey={AzureAccountKey},azureContainerName={AzureContainerName}): {Arg3}", azureAccountName, azureAccountKey, azureContainerName, ex.Message);
                 if (ex.RequestInformation.ExtendedErrorInformation != null)
                 {
                     if (ex.RequestInformation.ExtendedErrorInformation.ErrorCode == "AccountNotFound")
@@ -394,12 +439,14 @@ namespace Dnn.AzureConnector.Components
                     throw new ConnectorArgumentException(Localization.GetString("InvalidAccountName.ErrorMessage", Constants.LocalResourceFile));
                 }
 
+			_logger.LogWarning("<<< Exiting Validation(azureAccountName={AzureAccountName},azureAccountKey={AzureAccountKey},azureContainerName={AzureContainerName})", azureAccountName, azureAccountKey, azureContainerName);
                 throw new ConnectorArgumentException(Localization.GetString("InvalidAccountKey.ErrorMessage", Constants.LocalResourceFile));
             }
         }
 
         private string GetSetting(Hashtable settings, string name, bool encrypt = false)
         {
+			_logger.LogError(">>> Entering GetSetting(settings={Settings},name={Name},encrypt={Encrypt})", settings, name, encrypt);
             if (!settings.ContainsKey(name))
             {
                 return string.Empty;
@@ -410,12 +457,17 @@ namespace Dnn.AzureConnector.Components
                 return FolderProvider.GetEncryptedSetting(this.cryptographyProvider, this.hostSettings, settings, name);
             }
 
+			_logger.LogWarning("<<< Exiting GetSetting(settings={Settings},name={Name},encrypt={Encrypt})", settings, name, encrypt);
             return settings[name].ToString();
         }
 
         private void DeleteAzureFolderMapping(int portalId, int folderMappingId)
         {
+			_logger.LogError(">>> Entering DeleteAzureFolderMapping(portalId={PortalId},folderMappingId=<redacted>)", portalId);
             this.folderMappingController.DeleteFolderMapping(portalId, folderMappingId);
+			_logger.LogWarning("<<< Exiting DeleteAzureFolderMapping(portalId={PortalId},folderMappingId=<redacted>)", portalId);
+			_logger.LogError(">>> Entering DeleteAzureFolderMapping(portalId={PortalId})", portalId);
+			_logger.LogWarning("<<< Exiting DeleteAzureFolderMapping(portalId={PortalId})", portalId);
         }
 
         private void DeleteAzureFolderMapping(int portalId)
@@ -431,10 +483,13 @@ namespace Dnn.AzureConnector.Components
 
         private void DeleteAzureFolders(int portalId, int folderMappingId)
         {
+			_logger.LogError(">>> Entering DeleteAzureFolders(portalId={PortalId},folderMappingId=<redacted>)", portalId);
             var folderManager = FolderManager.Instance;
             var folders = folderManager.GetFolders(portalId);
+			_logger.LogError("DeleteAzureFolders(portalId={PortalId},folderMappingId=<redacted>): folders → {Folders}", portalId, folders);
 
             var folderMappingFolders = folders.Where(f => f.FolderMappingID == folderMappingId);
+			_logger.LogError("DeleteAzureFolders(portalId={PortalId},folderMappingId=<redacted>): folderMappingFolders → {FolderMappingFolders}", portalId, folderMappingFolders);
 
             if (folderMappingFolders.Any())
             {
@@ -472,18 +527,22 @@ namespace Dnn.AzureConnector.Components
                 if (folderMappingFolders.Any())
                 {
                     var defaultFolderMapping = this.folderMappingController.GetDefaultFolderMapping(portalId);
+					_logger.LogError("DeleteAzureFolders(portalId={PortalId},folderMappingId=<redacted>): defaultFolderMapping → {DefaultFolderMapping}", portalId, defaultFolderMapping);
 
                     foreach (var folderMappingFolder in folderMappingFolders)
                     {
                         folderMappingFolder.FolderMappingID = defaultFolderMapping.FolderMappingID;
+						_logger.LogDebug("DeleteAzureFolders(portalId={PortalId},folderMappingId=<redacted>): folderMappingFolder.FolderMappingID → {Arg2}", portalId, folderMappingFolder.FolderMappingID);
                         folderManager.UpdateFolder(folderMappingFolder);
                     }
                 }
             }
+			_logger.LogWarning("<<< Exiting DeleteAzureFolders(portalId={PortalId},folderMappingId=<redacted>)", portalId);
         }
 
         private FolderMappingInfo FindAzureFolderMapping(int portalId, bool autoCreate = true, bool checkId = false)
         {
+			_logger.LogError(">>> Entering FindAzureFolderMapping(portalId={PortalId},autoCreate={AutoCreate},checkId={CheckId})", portalId, autoCreate, checkId);
             var folderMappings = this.folderMappingController.GetFolderMappings(portalId)
                 .Where(f => f.FolderProviderType == Constants.FolderProviderType).ToList();
 
@@ -499,23 +558,29 @@ namespace Dnn.AzureConnector.Components
             }
 
             var folderMapping = folderMappings.FirstOrDefault(x => x.FolderMappingID.ToString(CultureInfo.InvariantCulture) == this.Id);
+			_logger.LogError("FindAzureFolderMapping(portalId={PortalId},autoCreate={AutoCreate},checkId={CheckId}): folderMapping → {FolderMapping}", portalId, autoCreate, checkId, folderMapping);
 
             if (folderMapping == null && autoCreate)
             {
                 folderMapping = this.CreateAzureFolderMapping(portalId);
             }
 
+			_logger.LogWarning("<<< Exiting FindAzureFolderMapping(portalId={PortalId},autoCreate={AutoCreate},checkId={CheckId})", portalId, autoCreate, checkId);
             return folderMapping;
         }
 
         private List<FolderMappingInfo> FindAzureFolderMappings(int portalId)
         {
+			_logger.LogError(">>> Entering FindAzureFolderMappings(portalId={PortalId})", portalId);
+            _logger.LogWarning("<<< Exiting FindAzureFolderMappings(portalId={PortalId})", portalId);
             return this.folderMappingController.GetFolderMappings(portalId)
                 .Where(f => f.FolderProviderType == Constants.FolderProviderType).ToList();
         }
 
         private bool FolderMappingNameExists(int portalId, string mappingName, int? exceptMappingId)
         {
+			_logger.LogError(">>> Entering FolderMappingNameExists(portalId={PortalId},mappingName=<redacted>,exceptMappingId=<redacted>)", portalId);
+            _logger.LogWarning("<<< Exiting FolderMappingNameExists(portalId={PortalId},mappingName=<redacted>,exceptMappingId=<redacted>)", portalId);
             return this.folderMappingController.GetFolderMappings(portalId)
                 .Any(
                     f =>
@@ -525,8 +590,10 @@ namespace Dnn.AzureConnector.Components
 
         private FolderMappingInfo CreateAzureFolderMapping(int portalId, string mappingName = "")
         {
+			_logger.LogError(">>> Entering CreateAzureFolderMapping(portalId={PortalId},mappingName=<redacted>)", portalId);
             var folderMapping = CreateAzureFolderMappingStatic(this.folderMappingController, portalId, mappingName);
             this.Id = folderMapping.FolderMappingID.ToString(CultureInfo.InvariantCulture);
+			_logger.LogError("CreateAzureFolderMapping(portalId={PortalId},mappingName=<redacted>): folderMapping → {FolderMapping}", portalId, folderMapping);
             return folderMapping;
         }
     }

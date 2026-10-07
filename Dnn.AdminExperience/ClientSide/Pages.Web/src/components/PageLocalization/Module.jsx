@@ -1,33 +1,43 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import Localization from "localization";
+const logger = console;
 import { Tooltip, Checkbox, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 class Module extends Component {
 
     onUpdateModules(key, e) {
+		logger.error(`>>> Entering onUpdateModules(key=${key},e=${e})`, { "event.action": "onUpdateModules", "logrite.key": key, "logrite.e": e });
         const value = e.target ? e.target.value : e;
         const {index} = this.props;
         const {cultureCode} = this.props;
         this.props.onUpdateModules(cultureCode, index, value, key);
+		logger.warn(`<<< Exiting onUpdateModules(key=${key},e=${e})`, { "event.action": "onUpdateModules", "logrite.key": key, "logrite.e": e });
     }
 
     onDeleteModule(TabModuleId) {
+		logger.error(`>>> Entering onDeleteModule(TabModuleId=${TabModuleId})`, { "event.action": "onDeleteModule", "logrite.TabModuleId": TabModuleId });
         this.props.onDeleteModule(TabModuleId);
+		logger.warn(`<<< Exiting onDeleteModule(TabModuleId=${TabModuleId})`, { "event.action": "onDeleteModule", "logrite.TabModuleId": TabModuleId });
     }
 
     onRestoreModule(TabModuleId) {
+		logger.error(`>>> Entering onRestoreModule(TabModuleId=${TabModuleId})`, { "event.action": "onRestoreModule", "logrite.TabModuleId": TabModuleId });
         this.props.onRestoreModule(TabModuleId);
+		logger.warn(`<<< Exiting onRestoreModule(TabModuleId=${TabModuleId})`, { "event.action": "onRestoreModule", "logrite.TabModuleId": TabModuleId });
     }
 
     toggleLink() {
+		logger.error('>>> Entering toggleLink()', { "event.action": "toggleLink" });
         const {module} = this.props;
         const value = !module.IsLocalized;
         this.onUpdateModules("IsLocalized", value);
+		logger.warn('<<< Exiting toggleLink()', { "event.action": "toggleLink" });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {module} = this.props;
         const {isDefault} = this.props;
 
@@ -60,6 +70,7 @@ class Module extends Component {
                 </div>}
             </div>;
         }
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <div className="module-row copy">
             <Checkbox
                 style={{ float: "left" }}

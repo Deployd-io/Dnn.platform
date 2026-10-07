@@ -11,25 +11,32 @@ Imports System.ComponentModel
 Imports System.Diagnostics
 Imports System.Text
 Imports System.Web.UI
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     <PersistChildren(True), ParseChildren(False)> _
     Public Class DNNToolBarButton
         Inherits Control
         Implements ICustomTypeDescriptor
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Public Sub New()
+			_logger.LogError(">>> Entering New()")
             DNNToolBarButton.__ENCAddToList(Me)
             Me.m_blnMarked = False
+			_logger.LogDebug("New(): Me.m_blnMarked → {Arg0}", Me.m_blnMarked)
             Me.CommonActions = New String() { "js", "navigate" }
+			_logger.LogWarning("<<< Exiting New()")
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			_logger.LogError(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNToolBarButton.__ENCList
                 If (DNNToolBarButton.__ENCList.Count = DNNToolBarButton.__ENCList.Capacity) Then
                     Dim index As Integer = 0
                     Dim num3 As Integer = (DNNToolBarButton.__ENCList.Count - 1)
+					_logger.LogError("__ENCAddToList(value={Value}): num3 → {Num3}", value, num3)
                     Dim num2 As Integer = 0
                     Do While True
                         Dim num4 As Integer = num3
@@ -39,6 +46,7 @@ Namespace DotNetNuke.UI.WebControls
                             Exit Do
                         End If
                         Dim reference As WeakReference = DNNToolBarButton.__ENCList(num2)
+						_logger.LogError("__ENCAddToList(value={Value}): reference → {Reference}", value, reference)
                         If reference.IsAlive Then
                             If (num2 <> index) Then
                                 DNNToolBarButton.__ENCList(index) = DNNToolBarButton.__ENCList(num2)
@@ -50,57 +58,81 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 DNNToolBarButton.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			_logger.LogWarning("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Public Function GetAttributes() As ComponentModel.AttributeCollection Implements ICustomTypeDescriptor.GetAttributes
+			_logger.LogError(">>> Entering GetAttributes()")
+			_logger.LogWarning("<<< Exiting GetAttributes()")
             Return TypeDescriptor.GetAttributes(Me.GetType)
         End Function
 
         Public Function GetClassName() As String Implements ICustomTypeDescriptor.GetClassName
+			_logger.LogError(">>> Entering GetClassName()")
+			_logger.LogWarning("<<< Exiting GetClassName()")
             Return TypeDescriptor.GetClassName(Me.GetType)
         End Function
 
         Public Function GetComponentName() As String Implements ICustomTypeDescriptor.GetComponentName
+			_logger.LogError(">>> Entering GetComponentName()")
+			_logger.LogWarning("<<< Exiting GetComponentName()")
             Return TypeDescriptor.GetComponentName(Me.GetType)
         End Function
 
         Public Function GetConverter() As TypeConverter Implements ICustomTypeDescriptor.GetConverter
+			_logger.LogError(">>> Entering GetConverter()")
+			_logger.LogWarning("<<< Exiting GetConverter()")
             Return TypeDescriptor.GetConverter(Me.GetType)
         End Function
 
         Public Function GetDefaultEvent() As EventDescriptor Implements ICustomTypeDescriptor.GetDefaultEvent
+			_logger.LogError(">>> Entering GetDefaultEvent()")
+			_logger.LogWarning("<<< Exiting GetDefaultEvent()")
             Return TypeDescriptor.GetDefaultEvent(Me.GetType)
         End Function
 
         Public Function GetDefaultProperty() As PropertyDescriptor Implements ICustomTypeDescriptor.GetDefaultProperty
+			_logger.LogError(">>> Entering GetDefaultProperty()")
+			_logger.LogWarning("<<< Exiting GetDefaultProperty()")
             Return TypeDescriptor.GetDefaultProperty(Me.GetType)
         End Function
 
         Public Function GetEditor(ByVal editorBaseType As Type) As Object Implements ICustomTypeDescriptor.GetEditor
+			_logger.LogError(">>> Entering GetEditor(editorBaseType={EditorBaseType})", editorBaseType)
+			_logger.LogWarning("<<< Exiting GetEditor(editorBaseType={EditorBaseType})", editorBaseType)
             Return TypeDescriptor.GetEditor(Me.GetType, editorBaseType)
         End Function
 
         Public Function GetEvents(ByVal attributes As Attribute()) As EventDescriptorCollection Implements ICustomTypeDescriptor.GetEvents
+			_logger.LogError(">>> Entering GetEvents(attributes={Attributes})", attributes)
+			_logger.LogWarning("<<< Exiting GetEvents(attributes={Attributes})", attributes)
             Return TypeDescriptor.GetEvents(Me.GetType, attributes)
         End Function
 
         Public Function GetEvents2() As EventDescriptorCollection Implements ICustomTypeDescriptor.GetEvents
+			_logger.LogError(">>> Entering GetEvents2()")
+			_logger.LogWarning("<<< Exiting GetEvents2()")
             Return TypeDescriptor.GetEvents(Me.GetType)
         End Function
 
         Public Function GetProperties(ByVal attributes As Attribute()) As PropertyDescriptorCollection Implements ICustomTypeDescriptor.GetProperties
+			_logger.LogError(">>> Entering GetProperties(attributes={Attributes})", attributes)
             Dim enumerator As IEnumerator = Nothing
             Dim descriptors3 As New PropertyDescriptorCollection(Nothing)
             Dim properties As PropertyDescriptorCollection = TypeDescriptor.GetProperties(Me.GetType, attributes)
+			_logger.LogError("GetProperties(attributes={Attributes}): properties → {Properties}", attributes, properties)
             Try 
                 enumerator = properties.GetEnumerator
+				_logger.LogDebug("GetProperties(attributes={Attributes}): enumerator → {Enumerator}", attributes, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
                     End If
                     Dim current As PropertyDescriptor = DirectCast(enumerator.Current, PropertyDescriptor)
+					_logger.LogError("GetProperties(attributes={Attributes}): current → {Current}", attributes, current)
                     Dim name As String = current.Name
                     If (name = "NavigateUrl") Then
+						_logger.LogError("GetProperties(attributes={Attributes}): name → {Name}", attributes, name)
                         If (Me.ControlAction <> "navigate") Then
                             Continue Do
                         End If
@@ -131,36 +163,49 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			_logger.LogWarning("<<< Exiting GetProperties(attributes={Attributes})", attributes)
             Return descriptors3
         End Function
 
         Public Function GetProperties2() As PropertyDescriptorCollection Implements ICustomTypeDescriptor.GetProperties
+			_logger.LogError(">>> Entering GetProperties2()")
+			_logger.LogWarning("<<< Exiting GetProperties2()")
             Return TypeDescriptor.GetProperties(Me.GetType)
         End Function
 
         Public Function GetPropertyOwner(ByVal pd As PropertyDescriptor) As Object Implements ICustomTypeDescriptor.GetPropertyOwner
+			_logger.LogError(">>> Entering GetPropertyOwner(pd={Pd})", pd)
+			_logger.LogWarning("<<< Exiting GetPropertyOwner(pd={Pd})", pd)
             Return Me
         End Function
 
         Private Sub HandlePropertyFilters(ByVal pd As PropertyDescriptor, ByVal x As PropertyDescriptorCollection)
+			_logger.LogError(">>> Entering HandlePropertyFilters(pd={Pd},x={X})", pd, x)
             pd.GetValue(Me)
             x.Add(pd)
+			_logger.LogWarning("<<< Exiting HandlePropertyFilters(pd={Pd},x={X})", pd, x)
         End Sub
 
         Private Sub NotifyDesigner()
+			_logger.LogError(">>> Entering NotifyDesigner()")
             If (If(((Me.Owner Is Nothing) OrElse Not WebControls.IsDesignMode), 0, 1) <> 0) Then
                 Me.Owner.NotifyDesigner
             End If
+			_logger.LogWarning("<<< Exiting NotifyDesigner()")
         End Sub
 
         Protected Overrides Sub Render(ByVal writer As HtmlTextWriter)
+		_logger.LogError(">>> Entering Render(writer={Writer})", writer)
         End Sub
 
         Private Function SafeJSONString(ByVal strString As String) As String
+			_logger.LogError(">>> Entering SafeJSONString(strString={StrString})", strString)
+			_logger.LogWarning("<<< Exiting SafeJSONString(strString={StrString})", strString)
             Return ("'" & Strings.Replace(strString, "'", "\'", 1, -1, CompareMethod.Binary) & "'")
         End Function
 
         Public Function ToJSON() As String
+			_logger.LogError(">>> Entering ToJSON()")
             Dim enumerator As IEnumerator = Nothing
             Dim hashtable As New Hashtable
             Dim builder As New StringBuilder
@@ -197,11 +242,13 @@ Namespace DotNetNuke.UI.WebControls
             builder.Append("{"c)
             Try 
                 enumerator = hashtable.Keys.GetEnumerator
+				_logger.LogDebug("ToJSON(): enumerator → {Enumerator}", enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
                     End If
                     Dim str2 As String = Conversions.ToString(enumerator.Current)
+					_logger.LogError("ToJSON(): str2 → {Str2}", str2)
                     If (builder.Length > 1) Then
                         builder.Append(","c)
                     End If
@@ -213,6 +260,7 @@ Namespace DotNetNuke.UI.WebControls
                 End If
             End Try
             builder.Append("}"c)
+			_logger.LogWarning("<<< Exiting ToJSON()")
             Return builder.ToString
         End Function
 

@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Mobile
     [Serializable]
     public class Redirection : IRedirection, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Redirection));
         private int id = -1;
 
         [XmlIgnore]
@@ -136,6 +137,7 @@ namespace DotNetNuke.Services.Mobile
         /// <param name="dr">the data reader.</param>
         public void Fill(System.Data.IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.Id = Convert.ToInt32(dr["Id"], CultureInfo.InvariantCulture);
             this.PortalId = Convert.ToInt32(dr["PortalId"], CultureInfo.InvariantCulture);
             this.Name = dr["Name"].ToString();
@@ -145,6 +147,8 @@ namespace DotNetNuke.Services.Mobile
             this.SortOrder = Convert.ToInt32(dr["SortOrder"], CultureInfo.InvariantCulture);
             this.TargetType = (TargetType)Convert.ToInt32(dr["TargetType"], CultureInfo.InvariantCulture);
             this.TargetValue = dr["TargetValue"];
+			Logger.LogDebug("Fill(dr={Dr}): this.TargetValue → {Arg1}", dr, this.TargetValue);
+        Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
             this.Enabled = Convert.ToBoolean(dr["Enabled"], CultureInfo.InvariantCulture);
         }
     }

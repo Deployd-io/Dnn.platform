@@ -13,20 +13,24 @@ using System.Web;
 [SuppressMessage("Microsoft.Design", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "Breaking change")]
 public class JavaScriptObjectDictionary : IEnumerable<KeyValuePair<string, string>>
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JavaScriptObjectDictionary));
     private OrderedDictionary dictionary;
 
     internal OrderedDictionary Dictionary => this.dictionary ??= new OrderedDictionary();
 
     public static string ToJavaScriptArrayString(IEnumerable<KeyValuePair<string, string>> methods)
     {
+		Logger.LogError(">>> Entering ToJavaScriptArrayString(methods={Methods})", methods);
         if (methods == null)
         {
             return "null";
         }
 
         var builder = new StringBuilder();
+		Logger.LogError("ToJavaScriptArrayString(methods={Methods}): builder → {Builder}", methods, builder);
         builder.Append('[');
         var isFirstPair = true;
+		Logger.LogError("ToJavaScriptArrayString(methods={Methods}): isFirstPair → {IsFirstPair}", methods, isFirstPair);
         foreach (var keyValuePair in methods)
         {
             if (isFirstPair)
@@ -39,10 +43,12 @@ public class JavaScriptObjectDictionary : IEnumerable<KeyValuePair<string, strin
             }
 
             var methodValue = string.IsNullOrEmpty(keyValuePair.Value) ? "null" : keyValuePair.Value;
+			Logger.LogError("ToJavaScriptArrayString(methods={Methods}): methodValue → {MethodValue}", methods, methodValue);
             builder.Append(methodValue);
         }
 
         builder.Append(']');
+		Logger.LogWarning("<<< Exiting ToJavaScriptArrayString(methods={Methods})", methods);
         return builder.ToString();
     }
 
@@ -77,16 +83,23 @@ public class JavaScriptObjectDictionary : IEnumerable<KeyValuePair<string, strin
 
     public void AddMethodBody(string name, string methodBody)
     {
+		Logger.LogError(">>> Entering AddMethodBody(name={Name},methodBody={MethodBody})", name, methodBody);
         this.AddMethod(name, "function() { " + methodBody + "; }");
+		Logger.LogWarning("<<< Exiting AddMethodBody(name={Name},methodBody={MethodBody})", name, methodBody);
     }
 
     public void AddMethod(string name, string method)
     {
+		Logger.LogError(">>> Entering AddMethod(name={Name},method={Method})", name, method);
         this.Dictionary[name] = method;
+		Logger.LogWarning("<<< Exiting AddMethod(name={Name},method={Method})", name, method);
     }
 
     public string ToJsonString()
     {
+		Logger.LogError(">>> Entering ToJsonString()");
+        Logger.LogWarning("<<< Exiting ToJsonString()");
+		Logger.LogWarning("<<< Exiting ToJsonString(methods={Methods})", methods);
         return ToJsonString(this);
     }
 
@@ -114,6 +127,8 @@ public class JavaScriptObjectDictionary : IEnumerable<KeyValuePair<string, strin
     /// <inheritdoc />
     public override string ToString()
     {
+		Logger.LogError(">>> Entering ToString()");
+        Logger.LogWarning("<<< Exiting ToString()");
         return this.dictionary == null ? string.Empty : this.dictionary.ToString();
     }
 
@@ -152,6 +167,8 @@ public class JavaScriptObjectDictionary : IEnumerable<KeyValuePair<string, strin
 
     private IEnumerator GetEnumeratorPrivate()
     {
+		Logger.LogError(">>> Entering GetEnumeratorPrivate()");
+        Logger.LogWarning("<<< Exiting GetEnumeratorPrivate()");
         return this.GetEnumerator();
     }
 }

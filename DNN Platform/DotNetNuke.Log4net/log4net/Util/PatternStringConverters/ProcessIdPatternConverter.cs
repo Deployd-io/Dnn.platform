@@ -46,7 +46,9 @@ namespace log4net.Util.PatternStringConverters
         protected override void Convert(TextWriter writer, object state) 
         {
 #if (NETCF || SSCLI)
+			value.LogError(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             // On compact framework there is no System.Diagnostics.Process class
+			value.LogWarning("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
             writer.Write( SystemInfo.NotAvailableText );
 #else
             try

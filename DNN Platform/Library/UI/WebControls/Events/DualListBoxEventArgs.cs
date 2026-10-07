@@ -12,6 +12,7 @@ namespace DotNetNuke.UI.WebControls
     /// </summary>
     public class DualListBoxEventArgs : EventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DualListBoxEventArgs));
         /// <summary>
         /// Initializes a new instance of the <see cref="DualListBoxEventArgs"/> class.
         /// Constructs a new DualListBoxEventArgs.
@@ -19,6 +20,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="items">The items.</param>
         public DualListBoxEventArgs(List<string> items)
         {
+			Logger.LogError(">>> Entering DualListBoxEventArgs(items={Items})", items);
             this.Items = items;
         }
 

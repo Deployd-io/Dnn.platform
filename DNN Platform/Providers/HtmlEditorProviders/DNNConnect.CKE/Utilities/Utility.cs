@@ -69,6 +69,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool IsUnit(object valueToCheck)
         {
+			eventLogger.LogError(">>> Entering IsUnit(valueToCheck={ValueToCheck})", valueToCheck);
             string sInputValue = Convert.ToString(valueToCheck);
 
             string sNewValue;
@@ -76,6 +77,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
             if (sInputValue.EndsWith("px"))
             {
                 sNewValue = sInputValue.Replace("px", string.Empty);
+				eventLogger.LogError("IsUnit(valueToCheck={ValueToCheck}): sNewValue → {SNewValue}", valueToCheck, sNewValue);
+				eventLogger.LogDebug("IsUnit(valueToCheck={ValueToCheck}): sNewValue → {SNewValue}", valueToCheck, sNewValue);
 
                 if (IsNumeric(sNewValue))
                 {
@@ -99,6 +102,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting IsUnit(valueToCheck={ValueToCheck})", valueToCheck);
             return false;
         }
 
@@ -111,11 +115,13 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool IsNumeric(object valueToCheck)
         {
+			eventLogger.LogError(">>> Entering IsNumeric(valueToCheck={ValueToCheck})", valueToCheck);
             double resultValue;
             string inputValue = Convert.ToString(valueToCheck);
 
             bool numeric = double.TryParse(inputValue, NumberStyles.Any, null, out resultValue);
 
+			eventLogger.LogWarning("<<< Exiting IsNumeric(valueToCheck={ValueToCheck})", valueToCheck);
             return numeric;
         }
 
@@ -128,6 +134,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool ValidatePath(string path)
         {
+			eventLogger.LogError(">>> Entering ValidatePath(path={Path})", path);
+            eventLogger.LogWarning("<<< Exiting ValidatePath(path={Path})", path);
             return PathValidator.IsMatch(path);
         }
 
@@ -140,6 +148,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool ValidateFileName(string fileName)
         {
+			eventLogger.LogError(">>> Entering ValidateFileName(fileName={FileName})", fileName);
+            eventLogger.LogWarning("<<< Exiting ValidateFileName(fileName={FileName})", fileName);
             return FileNameValidator.IsMatch(fileName);
         }
 
@@ -152,6 +162,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static string CleanPath(string path)
         {
+			eventLogger.LogError(">>> Entering CleanPath(path={Path})", path);
+            eventLogger.LogWarning("<<< Exiting CleanPath(path={Path})", path);
             return PathCleaner.Replace(path, string.Empty);
         }
 
@@ -164,6 +176,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static string CleanFileName(string fileName)
         {
+			eventLogger.LogError(">>> Entering CleanFileName(fileName={FileName})", fileName);
+            eventLogger.LogWarning("<<< Exiting CleanFileName(fileName={FileName})", fileName);
             return FileNameCleaner.Replace(fileName, string.Empty);
         }
 
@@ -172,32 +186,59 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// <returns>The ASCII equivalent output.</returns>
         public static string ConvertUnicodeChars(string input)
         {
+			eventLogger.LogError(">>> Entering ConvertUnicodeChars(input={Input})", input);
             Regex regA = new Regex("[ã|à|â|ä|á|å]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regA → {RegA}", input, regA);
             Regex regAA = new Regex("[Ã|À|Â|Ä|Á|Å]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regAA → {RegAA}", input, regAA);
             Regex regE = new Regex("[é|è|ê|ë]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regE → {RegE}", input, regE);
             Regex regEE = new Regex("[É|È|Ê|Ë]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regEE → {RegEE}", input, regEE);
             Regex regI = new Regex("[í|ì|î|ï]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regI → {RegI}", input, regI);
             Regex regII = new Regex("[Í|Ì|Î|Ï]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regII → {RegII}", input, regII);
             Regex regO = new Regex("[õ|ò|ó|ô|ö]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regO → {RegO}", input, regO);
             Regex regOO = new Regex("[Õ|Ó|Ò|Ô|Ö]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regOO → {RegOO}", input, regOO);
             Regex regU = new Regex("[ù|ú|û|ü|µ]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regU → {RegU}", input, regU);
             Regex regUU = new Regex("[Ü|Ú|Ù|Û]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regUU → {RegUU}", input, regUU);
             Regex regY = new Regex("[ý|ÿ]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regY → {RegY}", input, regY);
             Regex regYY = new Regex("[Ý]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regYY → {RegYY}", input, regYY);
             Regex regAE = new Regex("[æ]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regAE → {RegAE}", input, regAE);
             Regex regAEAE = new Regex("[Æ]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regAEAE → {RegAEAE}", input, regAEAE);
             Regex regOE = new Regex("[œ]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regOE → {RegOE}", input, regOE);
             Regex regOEOE = new Regex("[Œ]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regOEOE → {RegOEOE}", input, regOEOE);
             Regex regC = new Regex("[ç]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regC → {RegC}", input, regC);
             Regex regCC = new Regex("[Ç]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regCC → {RegCC}", input, regCC);
             Regex regDD = new Regex("[Ð]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regDD → {RegDD}", input, regDD);
             Regex regN = new Regex("[ñ]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regN → {RegN}", input, regN);
             Regex regNN = new Regex("[Ñ]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regNN → {RegNN}", input, regNN);
             Regex regS = new Regex("[š]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regS → {RegS}", input, regS);
             Regex regSS = new Regex("[Š]");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regSS → {RegSS}", input, regSS);
             Regex regDot = new Regex("[\uFF0E]");                      // 'U+FF0E' = full-width dot
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regDot → {RegDot}", input, regDot);
             Regex regBackslash = new Regex("[\uFF3C|\u29F5|\uFE68]");  // backslash-like characters
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): regBackslash → {RegBackslash}", input, regBackslash);
             input = regA.Replace(input, "a");
+			eventLogger.LogError("ConvertUnicodeChars(input={Input}): input → {Input1}", input, input);
             input = regAA.Replace(input, "A");
             input = regE.Replace(input, "e");
             input = regEE.Replace(input, "E");
@@ -221,6 +262,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
             input = regS.Replace(input, "s");
             input = regSS.Replace(input, "S");
             input = regDot.Replace(input, ".");         // full-width dot       -> ASCII period
+            eventLogger.LogWarning("<<< Exiting ConvertUnicodeChars(input={Input})", input);
             input = regBackslash.Replace(input, @"\");  // backslash-like chars -> ASCII backslash
 
             input = input.Replace("�", string.Empty);
@@ -247,6 +289,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool CheckIfUserHasFolderWriteAccess(int folderId, IPortalSettings portalSettings)
         {
+			eventLogger.LogError(">>> Entering CheckIfUserHasFolderWriteAccess(folderId={FolderId},portalSettings={PortalSettings})", folderId, portalSettings);
+            eventLogger.LogWarning("<<< Exiting CheckIfUserHasFolderWriteAccess(folderId={FolderId},portalSettings={PortalSettings})", folderId, portalSettings);
             return CheckIfUserHasFolderAccess(folderId, portalSettings, "WRITE");
         }
 
@@ -258,6 +302,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool CheckIfUserHasFolderReadAccess(int folderId, IPortalSettings portalSettings)
         {
+			eventLogger.LogError(">>> Entering CheckIfUserHasFolderReadAccess(folderId={FolderId},portalSettings={PortalSettings})", folderId, portalSettings);
+            eventLogger.LogWarning("<<< Exiting CheckIfUserHasFolderReadAccess(folderId={FolderId},portalSettings={PortalSettings})", folderId, portalSettings);
             return CheckIfUserHasFolderAccess(folderId, portalSettings, "READ");
         }
 
@@ -269,15 +315,18 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static IFolderInfo ConvertFilePathToFolderInfo(string folderPath, IPortalSettings portalSettings)
         {
+			eventLogger.LogError(">>> Entering ConvertFilePathToFolderInfo(folderPath={FolderPath},portalSettings={PortalSettings})", folderPath, portalSettings);
             if (!string.IsNullOrEmpty(portalSettings.HomeDirectoryMapPath) && folderPath.Length >= portalSettings.HomeDirectoryMapPath.Length)
             {
                 folderPath = folderPath.Substring(portalSettings.HomeDirectoryMapPath.Length).Replace(@"\", "/");
             }
             else
             {
+				eventLogger.LogError("ConvertFilePathToFolderInfo(folderPath={FolderPath},portalSettings={PortalSettings}): folderPath → {FolderPath1}", folderPath, portalSettings, folderPath);
                 folderPath = folderPath.Replace(@"\", "/");
             }
 
+			eventLogger.LogWarning("<<< Exiting ConvertFilePathToFolderInfo(folderPath={FolderPath},portalSettings={PortalSettings})", folderPath, portalSettings);
             return FolderManager.Instance.GetFolder(portalSettings.PortalId, folderPath);
         }
 
@@ -289,18 +338,24 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static int ConvertFilePathToFileId(string filePath, int portalID)
         {
+			eventLogger.LogError(">>> Entering ConvertFilePathToFileId(filePath={FilePath},portalID={PortalID})", filePath, portalID);
             var fileName = Path.GetFileName(filePath);
 
+			eventLogger.LogError("ConvertFilePathToFileId(filePath={FilePath},portalID={PortalID}): fileName → {FileName}", filePath, portalID, fileName);
             if (fileName == null)
             {
                 return Null.NullInteger;
             }
 
             var folderPath = filePath.Substring(0, filePath.LastIndexOf(fileName, StringComparison.Ordinal));
+			eventLogger.LogError("ConvertFilePathToFileId(filePath={FilePath},portalID={PortalID}): folderPath → {FolderPath}", filePath, portalID, folderPath);
             var folder = FolderManager.Instance.GetFolder(portalID, folderPath);
+			eventLogger.LogError("ConvertFilePathToFileId(filePath={FilePath},portalID={PortalID}): folder → {Folder}", filePath, portalID, folder);
 
             var file = FileManager.Instance.GetFile(folder, fileName);
+			eventLogger.LogError("ConvertFilePathToFileId(filePath={FilePath},portalID={PortalID}): file → {File}", filePath, portalID, file);
 
+			eventLogger.LogWarning("<<< Exiting ConvertFilePathToFileId(filePath={FilePath},portalID={PortalID})", filePath, portalID);
             return file.FileId;
         }
 
@@ -319,8 +374,10 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </typeparam>
         public static void SortAscending<TSource, TValue>(List<TSource> source, Func<TSource, TValue> selector)
         {
+			eventLogger.LogError(">>> Entering SortAscending(source={Source},selector={Selector})", source, selector);
             var comparer = Comparer<TValue>.Default;
             source.Sort((x, y) => comparer.Compare(selector(x), selector(y)));
+			eventLogger.LogWarning("<<< Exiting SortAscending(source={Source},selector={Selector})", source, selector);
         }
 
         /// <summary>Sort a List Descending.</summary>
@@ -338,8 +395,10 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </typeparam>
         public static void SortDescending<TSource, TValue>(List<TSource> source, Func<TSource, TValue> selector)
         {
+			eventLogger.LogError(">>> Entering SortDescending(source={Source},selector={Selector})", source, selector);
             var comparer = Comparer<TValue>.Default;
             source.Sort((x, y) => comparer.Compare(selector(y), selector(x)));
+			eventLogger.LogWarning("<<< Exiting SortDescending(source={Source},selector={Selector})", source, selector);
         }
 
         /// <summary>Determines whether user is in the specified role.</summary>
@@ -350,9 +409,12 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool IsInRoles(string roles, IPortalSettings settings)
         {
+			eventLogger.LogError(">>> Entering IsInRoles(roles={Roles},settings={Settings})", roles, settings);
             var objUserInfo = UserController.Instance.GetCurrentUserInfo();
 
+			eventLogger.LogError("IsInRoles(roles={Roles},settings={Settings}): objUserInfo → {ObjUserInfo}", roles, settings, objUserInfo);
             var isInRoles = objUserInfo.IsSuperUser;
+			eventLogger.LogError("IsInRoles(roles={Roles},settings={Settings}): isInRoles → {IsInRoles}", roles, settings, isInRoles);
 
             if (isInRoles)
             {
@@ -367,6 +429,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (role.StartsWith("!"))
                 {
                     var denyRole = role.Replace("!", string.Empty);
+					eventLogger.LogError("IsInRoles(roles={Roles},settings={Settings}): denyRole → {DenyRole}", roles, settings, denyRole);
 
                     if ((!context.Request.IsAuthenticated && denyRole.Equals(Globals.glbRoleUnauthUserName)) || denyRole.Equals(Globals.glbRoleAllUsersName) ||
                         objUserInfo.IsInRole(denyRole))
@@ -394,6 +457,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting IsInRoles(roles={Roles},settings={Settings})", roles, settings);
             return isInRoles;
         }
 
@@ -405,8 +469,10 @@ namespace DNNConnect.CKEditorProvider.Utilities
         public static T FindControl<T>(Control startingControl, string id)
             where T : Control
         {
+			eventLogger.LogError(">>> Entering FindControl(startingControl={StartingControl},id={Id})", startingControl, id);
             // this is null by default
             T found = null;
+			eventLogger.LogError("FindControl(startingControl={StartingControl},id={Id}): found → {Found}", startingControl, id, found);
 
             int controlCount = startingControl.Controls.Count;
 
@@ -439,6 +505,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting FindControl(startingControl={StartingControl},id={Id})", startingControl, id);
             return found;
         }
 
@@ -449,6 +516,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static long GetMaxUploadSize(bool inkilobytes = false)
         {
+			eventLogger.LogError(">>> Entering GetMaxUploadSize(inkilobytes={Inkilobytes})", inkilobytes);
             long result;
 
             try
@@ -457,12 +525,15 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     HttpContext.Current.GetSection("system.web/httpRuntime") as
                     HttpRuntimeSection;
                 result = section.MaxRequestLength;
+				eventLogger.LogError("GetMaxUploadSize(inkilobytes={Inkilobytes}): result → {Result}", inkilobytes, result);
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in GetMaxUploadSize(inkilobytes={Inkilobytes}): {Arg1}", inkilobytes, Exception.Message);
                 result = 0;
             }
 
+			eventLogger.LogWarning("<<< Exiting GetMaxUploadSize(inkilobytes={Inkilobytes})", inkilobytes);
             return inkilobytes ? result : (result * 1024);
         }
 
@@ -471,6 +542,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// <returns>The protocol string value.</returns>
         public static string ToSettingValue(this LinkProtocol protocol)
         {
+			eventLogger.LogError(">>> Entering ToSettingValue(protocol={Protocol})", protocol);
             switch (protocol)
             {
                 case LinkProtocol.Http:
@@ -483,12 +555,14 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     return string.Empty;
                 case LinkProtocol.Https:
                 default:
+					eventLogger.LogWarning("<<< Exiting ToSettingValue(protocol={Protocol})", protocol);
                     return "https://";
             }
         }
 
         public static IFolderInfo EnsureGetFolder(int portalId, string folderPath)
         {
+			eventLogger.LogError(">>> Entering EnsureGetFolder(portalId={PortalId},folderPath={FolderPath})", portalId, folderPath);
             if (FolderManager.Instance.FolderExists(portalId, folderPath))
             {
                 return FolderManager.Instance.GetFolder(portalId, folderPath);
@@ -497,7 +571,9 @@ namespace DNNConnect.CKEditorProvider.Utilities
             if (!string.IsNullOrEmpty(folderPath))
             {
                 var newFolderPath = string.Empty;
+				eventLogger.LogError("EnsureGetFolder(portalId={PortalId},folderPath={FolderPath}): newFolderPath → {NewFolderPath}", portalId, folderPath, newFolderPath);
                 IFolderInfo retval = null;
+				eventLogger.LogError("EnsureGetFolder(portalId={PortalId},folderPath={FolderPath}): retval → {Retval}", portalId, folderPath, retval);
                 foreach (var folderName in folderPath.Split('/'))
                 {
                     newFolderPath = $"{newFolderPath}{folderName}/";
@@ -507,11 +583,13 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 return retval;
             }
 
+			eventLogger.LogWarning("<<< Exiting EnsureGetFolder(portalId={PortalId},folderPath={FolderPath})", portalId, folderPath);
             return null;
         }
 
         private static bool CheckIfUserHasFolderAccess(int folderId, IPortalSettings portalSettings, string permissionKey)
         {
+			eventLogger.LogError(">>> Entering CheckIfUserHasFolderAccess(folderId={FolderId},portalSettings={PortalSettings},permissionKey={PermissionKey})", folderId, portalSettings, permissionKey);
             try
             {
                 var checkFolder = folderId.Equals(-1)
@@ -522,12 +600,16 @@ namespace DNNConnect.CKEditorProvider.Utilities
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in CheckIfUserHasFolderAccess(folderId={FolderId},portalSettings={PortalSettings},permissionKey={PermissionKey}): {Arg3}", folderId, portalSettings, permissionKey, Exception.Message);
+				eventLogger.LogWarning("<<< Exiting CheckIfUserHasFolderAccess(folderId={FolderId},portalSettings={PortalSettings},permissionKey={PermissionKey})", folderId, portalSettings, permissionKey);
                 return false;
             }
         }
 
         private static bool Contains(this string @this, string value, StringComparison comparisonType)
         {
+			eventLogger.LogError(">>> Entering Contains(value={Value},comparisonType={ComparisonType})", value, comparisonType);
+            eventLogger.LogWarning("<<< Exiting Contains(value={Value},comparisonType={ComparisonType})", value, comparisonType);
             return @this.IndexOf(value, comparisonType) > -1;
         }
     }

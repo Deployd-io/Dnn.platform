@@ -7,8 +7,11 @@ import utils from "../utils";
 import Localization from "../localization";
 import cloneDeep from "lodash/cloneDeep";
 import Promise from "promise";
+const logger = console;
 
 const loadPage = function (dispatch, pageId, callback) {
+	logger.error(`>>> Entering loadPage(dispatch=${dispatch},pageId=${pageId},callback=${callback})`, { "event.action": "loadPage", "logrite.pageId": pageId });
+	logger.warn(`<<< Exiting loadPage(dispatch=${dispatch},pageId=${pageId},callback=${callback})`, { "event.action": "loadPage", "logrite.pageId": pageId });
     return new Promise((resolve) => {
         const currentPageId = utils.getCurrentPageId();
         if (pageId === currentPageId && !utils.getCurrentPagePermissions().managePage) {
@@ -48,6 +51,7 @@ const loadPage = function (dispatch, pageId, callback) {
                 }
                 resolve(response);
             }).catch((error) => {
+				logger.error(`Exception in loadPage(dispatch=${dispatch},pageId=${pageId},callback=${callback}): (no error binding)`, { "event.action": "loadPage", "event.category": "process", "logrite.pageId": pageId });
                 dispatch({
                     type: ActionTypes.ERROR_LOADING_PAGE,
                     data: { error }
@@ -56,14 +60,20 @@ const loadPage = function (dispatch, pageId, callback) {
             });
         }
     });
+	logger.error(`>>> Entering loadPage(pageId=${pageId})`, { "event.action": "loadPage", "logrite.pageId": pageId });
+	logger.warn(`<<< Exiting loadPage(pageId=${pageId})`, { "event.action": "loadPage", "logrite.pageId": pageId });
 };
 
 const redirectFromNonExistingPage = function (redirectUrl) {
+	logger.error(`>>> Entering redirectFromNonExistingPage(redirectUrl=${redirectUrl})`, { "event.action": "redirectFromNonExistingPage", "logrite.redirectUrl": redirectUrl });
     window.top.location.href = redirectUrl ? redirectUrl : utils.getDefaultPageUrl();
+	logger.warn(`<<< Exiting redirectFromNonExistingPage(redirectUrl=${redirectUrl})`, { "event.action": "redirectFromNonExistingPage", "logrite.redirectUrl": redirectUrl });
 };
 
 const pageActions = {
     getPageList(id) {
+		logger.error(`>>> Entering getPageList(id=${id})`, { "event.action": "getPageList", "logrite.id": id });
+		logger.warn(`<<< Exiting getPageList(id=${id})`, { "event.action": "getPageList", "logrite.id": id });
         return (dispatch) => PagesService.getPageList(id).then(pageList => {
 
             dispatch({
@@ -74,6 +84,8 @@ const pageActions = {
     },
 
     searchPageList(searchKey) {
+		logger.error(`>>> Entering searchPageList(searchKey=${searchKey})`, { "event.action": "searchPageList", "logrite.searchKey": searchKey });
+		logger.warn(`<<< Exiting searchPageList(searchKey=${searchKey})`, { "event.action": "searchPageList", "logrite.searchKey": searchKey });
         return (dispatch) => PagesService.searchPageList(searchKey).then((searchList) => {
             dispatch({
                 type: SearchListActionTypes.SAVE_SEARCH_LIST,
@@ -84,10 +96,14 @@ const pageActions = {
 
 
     getPageHierarchy(id) {
+		logger.error(`>>> Entering getPageHierarchy(id=${id})`, { "event.action": "getPageHierarchy", "logrite.id": id });
+		logger.warn(`<<< Exiting getPageHierarchy(id=${id})`, { "event.action": "getPageHierarchy", "logrite.id": id });
         return () => PagesService.getPageHierarchy(id);
     },
 
     searchAndFilterPageList(params) {
+		logger.error(`>>> Entering searchAndFilterPageList(params=${params})`, { "event.action": "searchAndFilterPageList", "logrite.params": params });
+		logger.warn(`<<< Exiting searchAndFilterPageList(params=${params})`, { "event.action": "searchAndFilterPageList", "logrite.params": params });
         return (dispatch) => PagesService.searchAndFilterPageList(params).then((searchList) => {
             searchList = searchList.Results;
             dispatch({
@@ -98,6 +114,8 @@ const pageActions = {
     },
 
     searchAndFilterPagedPageList(params,filtersUpdated) {
+		logger.error(`>>> Entering searchAndFilterPagedPageList(params=${params},filtersUpdated=${filtersUpdated})`, { "event.action": "searchAndFilterPagedPageList", "logrite.params": params, "logrite.filtersUpdated": filtersUpdated });
+		logger.warn(`<<< Exiting searchAndFilterPagedPageList(params=${params},filtersUpdated=${filtersUpdated})`, { "event.action": "searchAndFilterPagedPageList", "logrite.params": params, "logrite.filtersUpdated": filtersUpdated });
         return (dispatch) => PagesService.searchAndFilterPageList(params).then(searchResult => {
             dispatch({
                 type: SearchListActionTypes.SAVE_SEARCH_RESULT,
@@ -110,6 +128,8 @@ const pageActions = {
     },
 
     getWorkflowsList() {
+		logger.error('>>> Entering getWorkflowsList()', { "event.action": "getWorkflowsList" });
+		logger.warn('<<< Exiting getWorkflowsList()', { "event.action": "getWorkflowsList" });
         return (dispatch) => PagesService.getWorkflowsList().then(workflowList => {
             dispatch({
                 type: ActionTypes.GET_WORKFLOW_LIST,
@@ -119,14 +139,20 @@ const pageActions = {
     },
 
     getPage(id) {
+		logger.error(`>>> Entering getPage(id=${id})`, { "event.action": "getPage", "logrite.id": id });
+		logger.warn(`<<< Exiting getPage(id=${id})`, { "event.action": "getPage", "logrite.id": id });
         return () => PagesService.getPage(id);
     },
 
     getChildPageList(id) {
+		logger.error(`>>> Entering getChildPageList(id=${id})`, { "event.action": "getChildPageList", "logrite.id": id });
+		logger.warn(`<<< Exiting getChildPageList(id=${id})`, { "event.action": "getChildPageList", "logrite.id": id });
         return () => PagesService.getChildPageList(id);
     },
 
     updatePageListStore(pageList) {
+		logger.error(`>>> Entering updatePageListStore(pageList=${pageList})`, { "event.action": "updatePageListStore", "logrite.pageList": pageList });
+		logger.warn(`<<< Exiting updatePageListStore(pageList=${pageList})`, { "event.action": "updatePageListStore", "logrite.pageList": pageList });
         return (dispatch) => {
             dispatch({
                 type: PageListActionTypes.SAVE,
@@ -136,6 +162,8 @@ const pageActions = {
     },
 
     selectPageSettingTab(selectedPageSettingTab) {
+		logger.error(`>>> Entering selectPageSettingTab(selectedPageSettingTab=${selectedPageSettingTab})`, { "event.action": "selectPageSettingTab", "logrite.selectedPageSettingTab": selectedPageSettingTab });
+		logger.warn(`<<< Exiting selectPageSettingTab(selectedPageSettingTab=${selectedPageSettingTab})`, { "event.action": "selectPageSettingTab", "logrite.selectedPageSettingTab": selectedPageSettingTab });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SELECT_PAGE_SETTING_TAB,
@@ -151,22 +179,28 @@ const pageActions = {
     },
 
     viewPage(id, url, callback) {
+		logger.error(`>>> Entering viewPage(id=${id},url=${url},callback=${callback})`, { "event.action": "viewPage", "logrite.id": id, "logrite.url": url, "logrite.callback": callback });
         PagesService.openPageInEditMode(id, url, callback);
+		logger.warn(`<<< Exiting viewPage(id=${id},url=${url},callback=${callback})`, { "event.action": "viewPage", "logrite.id": id, "logrite.url": url, "logrite.callback": callback });
         return () => {
 
         };
     },
 
     duplicatePage() {
+		logger.error('>>> Entering duplicatePage()', { "event.action": "duplicatePage" });
         return (dispatch, getState) => {
             const { pages } = getState();
+			logger.warn('<<< Exiting duplicatePage()', { "event.action": "duplicatePage" });
             const duplicate = (page) => {
                 const duplicatedPage = cloneDeep(page);
+				logger.error(`>>> Entering duplicate(page=${page})`, { "event.action": "duplicate", "logrite.page": page });
 
                 duplicatedPage.templateTabId = duplicatedPage.tabId;
                 duplicatedPage.tabId = 0;
                 duplicatedPage.name = "";
                 duplicatedPage.url = "";
+				logger.warn(`<<< Exiting duplicate(page=${page})`, { "event.action": "duplicate", "logrite.page": page });
                 duplicatedPage.isCopy = true;
 
                 dispatch({
@@ -186,8 +220,10 @@ const pageActions = {
 
 
     getNewPage(parentPage) {
+		logger.error(`>>> Entering getNewPage(parentPage=${parentPage})`, { "event.action": "getNewPage", "logrite.parentPage": parentPage });
         return (dispatch) => PagesService.getNewPage(parentPage).then((page) => {
             page.referralTabId = parentPage.id;
+			logger.warn(`<<< Exiting getNewPage(parentPage=${parentPage})`, { "event.action": "getNewPage", "logrite.parentPage": parentPage });
             dispatch({
                 type: ActionTypes.LOADED_PAGE,
                 data: { page },
@@ -197,11 +233,13 @@ const pageActions = {
     },
 
     cancelPage(reloadPageId) {
+		logger.error(`>>> Entering cancelPage(reloadPageId=${reloadPageId})`, { "event.action": "cancelPage", "logrite.reloadPageId": reloadPageId });
         if (reloadPageId) {
             return (dispatch) => {
                 return loadPage(dispatch, reloadPageId);
             };
         }
+		logger.warn(`<<< Exiting cancelPage(reloadPageId=${reloadPageId})`, { "event.action": "cancelPage", "logrite.reloadPageId": reloadPageId });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CANCEL_PAGE,
@@ -211,7 +249,9 @@ const pageActions = {
     },
 
     deletePage(page, redirectUrl) {
+		logger.error(`>>> Entering deletePage(page=${page},redirectUrl=${redirectUrl})`, { "event.action": "deletePage", "logrite.page": page, "logrite.redirectUrl": redirectUrl });
         
+		logger.warn(`<<< Exiting deletePage(page=${page},redirectUrl=${redirectUrl})`, { "event.action": "deletePage", "logrite.page": page, "logrite.redirectUrl": redirectUrl });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.DELETE_PAGE
@@ -247,6 +287,8 @@ const pageActions = {
         };
     },
     deleteLocalizePage(page) {
+		logger.error(`>>> Entering deleteLocalizePage(page=${page})`, { "event.action": "deleteLocalizePage", "logrite.page": page });
+		logger.warn(`<<< Exiting deleteLocalizePage(page=${page})`, { "event.action": "deleteLocalizePage", "logrite.page": page });
         return (dispatch) => {
             PagesService.deletePage(page, true).then(response => {
                 if (response.Status === responseStatus.ERROR) {
@@ -254,6 +296,7 @@ const pageActions = {
                     return;
                 }
             }).catch((error) => {
+				logger.error(`Exception in deleteLocalizePage(page=${page}): (no error binding)`, { "event.action": "deleteLocalizePage", "event.category": "process", "logrite.page": page });
                 dispatch({
                     type: ActionTypes.ERROR_DELETING_PAGE,
                     data: { error }
@@ -262,7 +305,9 @@ const pageActions = {
         };
     },
     createPage(callback) {
+	logger.error(`>>> Entering createPage(callback=${callback})`, { "event.action": "createPage", "logrite.callback": callback });
 
+		logger.warn(`<<< Exiting createPage(callback=${callback})`, { "event.action": "createPage", "logrite.callback": callback });
         return (dispatch, getState) => {
             dispatch({
                 type: ActionTypes.SAVE_PAGE
@@ -297,6 +342,8 @@ const pageActions = {
     },
 
     updatePage(page, callback) {
+		logger.error(`>>> Entering updatePage(page=${page},callback=${callback})`, { "event.action": "updatePage", "logrite.page": page, "logrite.callback": callback });
+		logger.warn(`<<< Exiting updatePage(page=${page},callback=${callback})`, { "event.action": "updatePage", "logrite.page": page, "logrite.callback": callback });
         return (dispatch) => {
 
             PagesService.savePage(page).then(response => {
@@ -318,6 +365,7 @@ const pageActions = {
                 callback(response.Page);
 
             }).catch((error) => {
+				logger.error(`Exception in updatePage(page=${page},callback=${callback}): (no error binding)`, { "event.action": "updatePage", "event.category": "process", "logrite.page": page, "logrite.callback": callback });
                 dispatch({
                     type: ActionTypes.ERROR_SAVING_PAGE,
                     data: { error }
@@ -328,6 +376,8 @@ const pageActions = {
 
 
     changePageField(key, value) {
+		logger.error(`>>> Entering changePageField(key=${key},value=${value})`, { "event.action": "changePageField", "logrite.key": key, "logrite.value": value });
+		logger.warn(`<<< Exiting changePageField(key=${key},value=${value})`, { "event.action": "changePageField", "logrite.key": key, "logrite.value": value });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CHANGE_FIELD_VALUE,
@@ -338,6 +388,8 @@ const pageActions = {
     },
 
     changePageType(value) {
+		logger.error(`>>> Entering changePageType(value=${value})`, { "event.action": "changePageType", "logrite.value": value });
+		logger.warn(`<<< Exiting changePageType(value=${value})`, { "event.action": "changePageType", "logrite.value": value });
         return {
             type: ActionTypes.CHANGE_FIELD_VALUE,
             field: "pageType",
@@ -346,6 +398,8 @@ const pageActions = {
     },
 
     changePermissions(permissions) {
+		logger.error(`>>> Entering changePermissions(permissions=${permissions})`, { "event.action": "changePermissions", "logrite.permissions": permissions });
+		logger.warn(`<<< Exiting changePermissions(permissions=${permissions})`, { "event.action": "changePermissions", "logrite.permissions": permissions });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CHANGE_PERMISSIONS,
@@ -355,6 +409,8 @@ const pageActions = {
     },
 
     fetchCacheProviderList() {
+		logger.error('>>> Entering fetchCacheProviderList()', { "event.action": "fetchCacheProviderList" });
+		logger.warn('<<< Exiting fetchCacheProviderList()', { "event.action": "fetchCacheProviderList" });
         return (dispatch, getState) => {
             if (!getState().pages.cacheProviderList) {
                 dispatch({
@@ -367,6 +423,7 @@ const pageActions = {
                         data: { cacheProviderList }
                     });
                 }).catch((error) => {
+					logger.error('Exception in fetchCacheProviderList()', { "event.action": "fetchCacheProviderList", "event.category": "process" });
                     dispatch({
                         type: ActionTypes.ERROR_FETCHING_CACHE_PROVIDER_LIST,
                         data: { error }
@@ -377,12 +434,15 @@ const pageActions = {
     },
 
     deletePageModule(module) {
+		logger.error(`>>> Entering deletePageModule(module=${module})`, { "event.action": "deletePageModule", "logrite.module": module });
+		logger.warn(`<<< Exiting deletePageModule(module=${module})`, { "event.action": "deletePageModule", "logrite.module": module });
         return (dispatch, getState) => {
             dispatch({
                 type: ActionTypes.DELETING_PAGE_MODULE
             });
 
             const pageId = getState().pages.selectedPage.tabId;
+			logger.error(`deletePageModule(module=${module}): pageId → ${pageId}`, { "event.action": "deletePageModule", "logrite.module": module });
             const moduleToDelete = {
                 moduleId: module.id,
                 pageId
@@ -394,6 +454,7 @@ const pageActions = {
                     data: { module }
                 });
             }).catch((error) => {
+				logger.error(`Exception in deletePageModule(module=${module}): (no error binding)`, { "event.action": "deletePageModule", "event.category": "process", "logrite.module": module });
                 dispatch({
                     type: ActionTypes.ERROR_DELETING_PAGE_MODULE,
                     data: { error }
@@ -403,6 +464,8 @@ const pageActions = {
     },
 
     updatePageModuleCopy(id, key, event) {
+		logger.error(`>>> Entering updatePageModuleCopy(id=${id},key=${key},event=${event})`, { "event.action": "updatePageModuleCopy", "logrite.id": id, "logrite.key": key, "logrite.event": event });
+		logger.warn(`<<< Exiting updatePageModuleCopy(id=${id},key=${key},event=${event})`, { "event.action": "updatePageModuleCopy", "logrite.id": id, "logrite.key": key, "logrite.event": event });
         return {
             type: ActionTypes.UPDATED_PAGE_MODULE_COPY,
             data: { id, key, event }
@@ -410,6 +473,8 @@ const pageActions = {
     },
 
     editingPageModule(module) {
+		logger.error(`>>> Entering editingPageModule(module=${module})`, { "event.action": "editingPageModule", "logrite.module": module });
+		logger.warn(`<<< Exiting editingPageModule(module=${module})`, { "event.action": "editingPageModule", "logrite.module": module });
         return {
             type: ActionTypes.EDITING_PAGE_MODULE,
             data: { module }
@@ -417,6 +482,8 @@ const pageActions = {
     },
 
     cancelEditingPageModule() {
+		logger.error('>>> Entering cancelEditingPageModule()', { "event.action": "cancelEditingPageModule" });
+		logger.warn('<<< Exiting cancelEditingPageModule()', { "event.action": "cancelEditingPageModule" });
         return {
             type: ActionTypes.CANCEL_EDITING_PAGE_MODULE,
             data: {}
@@ -424,6 +491,8 @@ const pageActions = {
     },
 
     copyAppearanceToDescendantPages() {
+		logger.error('>>> Entering copyAppearanceToDescendantPages()', { "event.action": "copyAppearanceToDescendantPages" });
+		logger.warn('<<< Exiting copyAppearanceToDescendantPages()', { "event.action": "copyAppearanceToDescendantPages" });
         return (dispatch, getState) => {
             dispatch({
                 type: ActionTypes.COPYING_APPEARANCE_TO_DESCENDANT_PAGES
@@ -449,6 +518,7 @@ const pageActions = {
                     data: {}
                 });
             }).catch((error) => {
+				logger.error('Exception in copyAppearanceToDescendantPages()', { "event.action": "copyAppearanceToDescendantPages", "event.category": "process" });
                 dispatch({
                     type: ActionTypes.ERROR_COPYING_APPEARANCE_TO_DESCENDANT_PAGES,
                     data: { error }
@@ -458,12 +528,15 @@ const pageActions = {
     },
 
     copyPermissionsToDescendantPages() {
+		logger.error('>>> Entering copyPermissionsToDescendantPages()', { "event.action": "copyPermissionsToDescendantPages" });
+		logger.warn('<<< Exiting copyPermissionsToDescendantPages()', { "event.action": "copyPermissionsToDescendantPages" });
         return (dispatch, getState) => {
             dispatch({
                 type: ActionTypes.COPYING_PERMISSIONS_TO_DESCENDANT_PAGES
             });
 
             const page = getState().pages.selectedPage;
+			logger.error(`copyPermissionsToDescendantPages(): page → ${page}`, { "event.action": "copyPermissionsToDescendantPages" });
             PagesService.copyPermissionsToDescendantPages(page.tabId).then(() => {
                 utils.notify(Localization.get("CopyPermissionsToDescendantPagesSuccess"));
                 dispatch({
@@ -471,6 +544,7 @@ const pageActions = {
                     data: {}
                 });
             }).catch((error) => {
+				logger.error('Exception in copyPermissionsToDescendantPages()', { "event.action": "copyPermissionsToDescendantPages", "event.category": "process" });
                 dispatch({
                     type: ActionTypes.ERROR_COPYING_PERMISSIONS_TO_DESCENDANT_PAGES,
                     data: { error }
@@ -480,6 +554,9 @@ const pageActions = {
     },
 
     getCachedPageCount(cacheProvider) {
+		logger.error(`>>> Entering getCachedPageCount(cacheProvider=${cacheProvider})`, { "event.action": "getCachedPageCount", "logrite.cacheProvider": cacheProvider });
+		logger.error(`getCachedPageCount(cacheProvider=${cacheProvider}): page → ${page}`, { "event.action": "getCachedPageCount", "logrite.cacheProvider": cacheProvider });
+		logger.warn(`<<< Exiting getCachedPageCount(cacheProvider=${cacheProvider})`, { "event.action": "getCachedPageCount", "logrite.cacheProvider": cacheProvider });
         return (dispatch, getState) => {
             const page = getState().pages.selectedPage;
             PagesService.getCachedPageCount(cacheProvider, page.tabId).then(data => {
@@ -494,6 +571,9 @@ const pageActions = {
     },
 
     clearCache(cacheProvider) {
+		logger.error(`>>> Entering clearCache(cacheProvider=${cacheProvider})`, { "event.action": "clearCache", "logrite.cacheProvider": cacheProvider });
+		logger.error(`clearCache(cacheProvider=${cacheProvider}): page → ${page}`, { "event.action": "clearCache", "logrite.cacheProvider": cacheProvider });
+		logger.warn(`<<< Exiting clearCache(cacheProvider=${cacheProvider})`, { "event.action": "clearCache", "logrite.cacheProvider": cacheProvider });
         return (dispatch, getState) => {
             const page = getState().pages.selectedPage;
             PagesService.clearCache(cacheProvider, page.tabId).then(() => {
@@ -508,6 +588,8 @@ const pageActions = {
     },
 
     clearSelectedPage() {
+		logger.error('>>> Entering clearSelectedPage()', { "event.action": "clearSelectedPage" });
+		logger.warn('<<< Exiting clearSelectedPage()', { "event.action": "clearSelectedPage" });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CLEAR_SELECTED_PAGE,
@@ -517,12 +599,17 @@ const pageActions = {
     },
 
     movePage({ Action, PageId, ParentId, RelatedPageId }) {
+		logger.error(`>>> Entering movePage(Action=${Action},PageId=${PageId},ParentId=${ParentId},RelatedPageId=${RelatedPageId})`, { "event.action": "movePage", "logrite.Action": Action, "logrite.PageId": PageId, "logrite.ParentId": ParentId, "logrite.RelatedPageId": RelatedPageId });
+		logger.warn(`<<< Exiting movePage(Action=${Action},PageId=${PageId},ParentId=${ParentId},RelatedPageId=${RelatedPageId})`, { "event.action": "movePage", "logrite.Action": Action, "logrite.PageId": PageId, "logrite.ParentId": ParentId, "logrite.RelatedPageId": RelatedPageId });
         return PagesService.movePage({ Action, PageId, ParentId, RelatedPageId }).catch(() => {
             utils.notifyError(Localization.get("AnErrorOccurred"));
         });
+		logger.error(`Exception in movePage(Action=${Action},PageId=${PageId},ParentId=${ParentId},RelatedPageId=${RelatedPageId}): (no error binding)`, { "event.action": "movePage", "event.category": "process", "logrite.Action": Action, "logrite.PageId": PageId, "logrite.ParentId": ParentId, "logrite.RelatedPageId": RelatedPageId });
     },
 
     dirtyCustomDetails() {
+		logger.error('>>> Entering dirtyCustomDetails()', { "event.action": "dirtyCustomDetails" });
+		logger.warn('<<< Exiting dirtyCustomDetails()', { "event.action": "dirtyCustomDetails" });
         return {
             type: ActionTypes.CUSTOM_PAGE_DETAILS_UPDATED,
             data: {}

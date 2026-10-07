@@ -20,9 +20,11 @@ namespace DotNetNuke.Common.Internal
     [SuppressMessage("Microsoft.Design", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "Breaking change")]
     public class GlobalsImpl : IGlobals
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(GlobalsImpl));
         /// <summary>Initializes a new instance of the <see cref="GlobalsImpl"/> class.</summary>
         public GlobalsImpl()
         {
+			Logger.LogError(">>> Entering GlobalsImpl()");
             this.NavigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
         }
 
@@ -45,12 +47,16 @@ namespace DotNetNuke.Common.Internal
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public string GetSubFolderPath(string strFileNamePath, int portalId)
         {
+			Logger.LogError(">>> Entering GetSubFolderPath(strFileNamePath={StrFileNamePath},portalId={PortalId})", strFileNamePath, portalId);
+            Logger.LogWarning("<<< Exiting GetSubFolderPath(strFileNamePath={StrFileNamePath},portalId={PortalId})", strFileNamePath, portalId);
             return Globals.GetSubFolderPath(strFileNamePath, portalId);
         }
 
         /// <inheritdoc />
         public string LinkClick(string link, int tabId, int moduleId)
         {
+			Logger.LogError(">>> Entering LinkClick(link={Link},tabId={TabId},moduleId={ModuleId})", link, tabId, moduleId);
+            Logger.LogWarning("<<< Exiting LinkClick(link={Link},tabId={TabId},moduleId={ModuleId})", link, tabId, moduleId);
             return Globals.LinkClick(link, tabId, moduleId);
         }
 
@@ -64,30 +70,41 @@ namespace DotNetNuke.Common.Internal
         /// <inheritdoc />
         public string ResolveUrl(string url)
         {
+			Logger.LogError(">>> Entering ResolveUrl(url={Url})", url);
+            Logger.LogWarning("<<< Exiting ResolveUrl(url={Url})", url);
             return Globals.ResolveUrl(url);
         }
 
         /// <inheritdoc />
         public bool IsHostTab(int tabId)
         {
+			Logger.LogError(">>> Entering IsHostTab(tabId={TabId})", tabId);
+            Logger.LogWarning("<<< Exiting IsHostTab(tabId={TabId})", tabId);
             return Globals.IsHostTab(tabId);
         }
 
         /// <inheritdoc />
         public string AddHTTP(string strURL)
         {
+			Logger.LogError(">>> Entering AddHTTP(strURL={StrURL})", strURL);
+            Logger.LogWarning("<<< Exiting AddHTTP(strURL={StrURL})", strURL);
             return Globals.AddHTTP(strURL);
         }
 
         /// <inheritdoc />
         public string GetPortalDomainName(string strPortalAlias, HttpRequest request, bool blnAddHTTP)
         {
+			Logger.LogError(">>> Entering GetPortalDomainName(strPortalAlias={StrPortalAlias},request={Request},blnAddHTTP={BlnAddHTTP})", strPortalAlias, request, blnAddHTTP);
+            Logger.LogWarning("<<< Exiting GetPortalDomainName(strPortalAlias={StrPortalAlias},request={Request},blnAddHTTP={BlnAddHTTP})", strPortalAlias, request, blnAddHTTP);
             return Globals.GetPortalDomainName(strPortalAlias, request, blnAddHTTP);
         }
 
         /// <inheritdoc />
         public string GetDomainName(Uri requestedUri)
         {
+			Logger.LogError(">>> Entering GetDomainName(requestedUri={RequestedUri})", requestedUri);
+			Logger.LogWarning("<<< Exiting GetDomainName(requestedUri={RequestedUri})", requestedUri);
+			Logger.LogWarning("<<< Exiting GetDomainName(requestedUri={RequestedUri},parsePortNumber={ParsePortNumber})", requestedUri, parsePortNumber);
             return this.GetDomainName(requestedUri, false);
         }
 
@@ -174,6 +191,8 @@ namespace DotNetNuke.Common.Internal
         /// <inheritdoc />
         public string FormatHelpUrl(string helpUrl, PortalSettings objPortalSettings, string name)
         {
+			Logger.LogError(">>> Entering FormatHelpUrl(helpUrl={HelpUrl},objPortalSettings={ObjPortalSettings},name={Name})", helpUrl, objPortalSettings, name);
+            Logger.LogWarning("<<< Exiting FormatHelpUrl(helpUrl={HelpUrl},objPortalSettings={ObjPortalSettings},name={Name})", helpUrl, objPortalSettings, name);
             return Globals.FormatHelpUrl(helpUrl, objPortalSettings, name);
         }
 
@@ -186,6 +205,8 @@ namespace DotNetNuke.Common.Internal
         /// <inheritdoc />
         public string AccessDeniedURL()
         {
+			Logger.LogError(">>> Entering AccessDeniedURL()");
+            Logger.LogWarning("<<< Exiting AccessDeniedURL()");
             return Globals.AccessDeniedURL();
         }
 
@@ -198,12 +219,16 @@ namespace DotNetNuke.Common.Internal
         /// <inheritdoc />
         public string LoginURL(string returnURL, bool @override)
         {
+			Logger.LogError(">>> Entering LoginURL(returnURL={ReturnURL})", returnURL);
+            Logger.LogWarning("<<< Exiting LoginURL(returnURL={ReturnURL})", returnURL);
             return Globals.LoginURL(returnURL, @override);
         }
 
         /// <inheritdoc />
         public string NavigateURL()
         {
+			Logger.LogError(">>> Entering NavigateURL()");
+            Logger.LogWarning("<<< Exiting NavigateURL()");
             return this.NavigationManager.NavigateURL();
         }
 
@@ -270,6 +295,8 @@ namespace DotNetNuke.Common.Internal
         /// <inheritdoc />
         public string FriendlyUrl(TabInfo tab, string path)
         {
+			Logger.LogError(">>> Entering FriendlyUrl(tab={Tab},path={Path})", tab, path);
+            Logger.LogWarning("<<< Exiting FriendlyUrl(tab={Tab},path={Path})", tab, path);
             return Globals.FriendlyUrl(tab, path);
         }
 

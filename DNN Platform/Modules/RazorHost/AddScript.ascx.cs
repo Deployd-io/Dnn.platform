@@ -18,6 +18,7 @@ namespace DotNetNuke.Modules.RazorHost
     [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
     public partial class AddScript : ModuleUserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AddScript.ascx));
         private readonly INavigationManager navigationManager;
         private string razorScriptFileFormatString = "~/DesktopModules/RazorModules/RazorHost/Scripts/{0}";
 
@@ -26,31 +27,40 @@ namespace DotNetNuke.Modules.RazorHost
         public AddScript()
             : this(null)
         {
+		Logger.LogError(">>> Entering AddScript()");
+        Logger.LogWarning("<<< Exiting AddScript()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="AddScript"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
         public AddScript(INavigationManager navigationManager)
         {
+			Logger.LogError(">>> Entering AddScript(navigationManager={NavigationManager})", navigationManager);
             this.navigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
+			Logger.LogDebug("AddScript(navigationManager={NavigationManager}): navigationManager → {NavigationManager1}", navigationManager, navigationManager);
+        Logger.LogWarning("<<< Exiting AddScript(navigationManager={NavigationManager})", navigationManager);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.cmdCancel.Click += this.CmdCancel_Click;
             this.cmdAdd.Click += this.CmdAdd_Click;
             this.scriptFileType.SelectedIndexChanged += this.ScriptFileType_SelectedIndexChanged;
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.DisplayExtension();
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>Cancel button click event handler.</summary>
@@ -58,14 +68,17 @@ namespace DotNetNuke.Modules.RazorHost
         /// <param name="e">The event arguments.</param>
         protected void CmdCancel_Click(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering CmdCancel_Click(sender={Sender},e={E})", sender, e);
             try
             {
                 this.Response.Redirect(this.ModuleContext.EditUrl("Edit"), true);
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in CmdCancel_Click(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting CmdCancel_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Add button event handler.</summary>
@@ -73,6 +86,7 @@ namespace DotNetNuke.Modules.RazorHost
         /// <param name="e">The event arguments.</param>
         protected void CmdAdd_Click(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering CmdAdd_Click(sender={Sender},e={E})", sender, e);
             try
             {
                 if (!this.ModuleContext.PortalSettings.UserInfo.IsSuperUser)
@@ -89,6 +103,7 @@ namespace DotNetNuke.Modules.RazorHost
                     // write file
                     StreamWriter objStream = null;
                     objStream = File.CreateText(srcFile);
+					Logger.LogError("CmdAdd_Click(sender={Sender},e={E}): objStream → {ObjStream}", sender, e, objStream);
                     objStream.WriteLine(Localization.GetString("NewScript", this.LocalResourceFile));
                     objStream.Close();
 
@@ -97,18 +112,24 @@ namespace DotNetNuke.Modules.RazorHost
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in CmdAdd_Click(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting CmdAdd_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void DisplayExtension()
         {
+			Logger.LogError(">>> Entering DisplayExtension()");
             this.fileExtension.Text = "." + this.scriptFileType.SelectedValue.ToLowerInvariant();
+			Logger.LogWarning("<<< Exiting DisplayExtension()");
         }
 
         private void ScriptFileType_SelectedIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering ScriptFileType_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
             this.DisplayExtension();
+			Logger.LogWarning("<<< Exiting ScriptFileType_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
     }
 }

@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Connections
     /// <summary>The <see cref="IConnectionsController"/> implementation.</summary>
     public class ConnectionsController : ServiceLocator<IConnectionsController, ConnectionsController>, IConnectionsController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConnectionsController));
         private readonly IServiceProvider serviceProvider;
         private readonly IConnectionsManager connectionsManager;
 
@@ -31,13 +32,18 @@ namespace DotNetNuke.Services.Connections
         /// <param name="connectionsManager">The connections manager.</param>
         public ConnectionsController(IServiceProvider serviceProvider, IConnectionsManager connectionsManager)
         {
+			Logger.LogError(">>> Entering ConnectionsController(serviceProvider={ServiceProvider},connectionsManager={ConnectionsManager})", serviceProvider, connectionsManager);
             this.serviceProvider = serviceProvider;
+			Logger.LogWarning("<<< Exiting ConnectionsController(serviceProvider={ServiceProvider},connectionsManager={ConnectionsManager})", serviceProvider, connectionsManager);
+			Logger.LogDebug("ConnectionsController(serviceProvider={ServiceProvider},connectionsManager={ConnectionsManager}): this.serviceProvider → {Arg2}", serviceProvider, connectionsManager, this.serviceProvider);
             this.connectionsManager = connectionsManager ?? serviceProvider.GetRequiredService<IConnectionsManager>();
         }
 
         /// <inheritdoc />
         public IList<IConnector> GetConnections(int portalId)
         {
+			Logger.LogError(">>> Entering GetConnections(portalId={PortalId})", portalId);
+				Logger.LogWarning("<<< Exiting GetConnections(portalId={PortalId})", portalId);
             return
                 this.connectionsManager.GetConnectors(this.serviceProvider)
                     .Where(c => c.HasConfig(portalId))
@@ -58,6 +64,8 @@ namespace DotNetNuke.Services.Connections
         /// <inheritdoc />
         protected override Func<IConnectionsController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<IConnectionsController>;
         }
     }

@@ -16,16 +16,21 @@ namespace DotNetNuke.Services.OutputCache.Providers
     /// <summary>DatabaseProvider implements the OutputCachingProvider for database storage.</summary>
     public class DatabaseProvider : OutputCachingProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DatabaseProvider));
         /// <inheritdoc />
         public override int GetItemCount(int tabId)
         {
+			Logger.LogError(">>> Entering GetItemCount(tabId={TabId})", tabId);
+            Logger.LogWarning("<<< Exiting GetItemCount(tabId={TabId})", tabId);
             return DataProvider.Instance().GetOutputCacheItemCount(tabId);
         }
 
         /// <inheritdoc />
         public override byte[] GetOutput(int tabId, string cacheKey)
         {
+			Logger.LogError(">>> Entering GetOutput(tabId={TabId},cacheKey={CacheKey})", tabId, cacheKey);
             IDataReader dr = null;
+			Logger.LogError("GetOutput(tabId={TabId},cacheKey={CacheKey}): dr → {Dr}", tabId, cacheKey, dr);
             try
             {
                 dr = DataProvider.Instance().GetOutputCacheItem(cacheKey);
@@ -40,6 +45,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
                         return null;
                     }
 
+					Logger.LogWarning("<<< Exiting GetOutput(tabId={TabId},cacheKey={CacheKey})", tabId, cacheKey);
                     return Encoding.UTF8.GetBytes(dr["Data"].ToString());
                 }
             }
@@ -55,38 +61,50 @@ namespace DotNetNuke.Services.OutputCache.Providers
         /// <inheritdoc />
         public override OutputCacheResponseFilter GetResponseFilter(int tabId, int maxVaryByCount, Stream responseFilter, string cacheKey, TimeSpan cacheDuration)
         {
+			Logger.LogError(">>> Entering GetResponseFilter(tabId={TabId},maxVaryByCount={MaxVaryByCount},responseFilter={ResponseFilter},cacheKey={CacheKey},cacheDuration={CacheDuration})", tabId, maxVaryByCount, responseFilter, cacheKey, cacheDuration);
+            Logger.LogWarning("<<< Exiting GetResponseFilter(tabId={TabId},maxVaryByCount={MaxVaryByCount},responseFilter={ResponseFilter},cacheKey={CacheKey},cacheDuration={CacheDuration})", tabId, maxVaryByCount, responseFilter, cacheKey, cacheDuration);
             return new DatabaseResponseFilter(tabId, maxVaryByCount, responseFilter, cacheKey, cacheDuration);
         }
 
         /// <inheritdoc />
         public override void PurgeCache(int portalId)
         {
+			Logger.LogError(">>> Entering PurgeCache(portalId={PortalId})", portalId);
             DataProvider.Instance().PurgeOutputCache();
+			Logger.LogWarning("<<< Exiting PurgeCache(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public override void PurgeExpiredItems(int portalId)
         {
+			Logger.LogError(">>> Entering PurgeExpiredItems(portalId={PortalId})", portalId);
             DataProvider.Instance().PurgeExpiredOutputCacheItems();
+			Logger.LogWarning("<<< Exiting PurgeExpiredItems(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public override void Remove(int tabId)
         {
+			Logger.LogError(">>> Entering Remove(tabId={TabId})", tabId);
             DataProvider.Instance().RemoveOutputCacheItem(tabId);
+			Logger.LogWarning("<<< Exiting Remove(tabId={TabId})", tabId);
         }
 
         /// <inheritdoc />
         public override void SetOutput(int tabId, string cacheKey, TimeSpan duration, byte[] output)
         {
+			Logger.LogError(">>> Entering SetOutput(tabId={TabId},cacheKey={CacheKey},duration={Duration},output={Output})", tabId, cacheKey, duration, output);
             string data = Encoding.UTF8.GetString(output);
+			Logger.LogWarning("<<< Exiting SetOutput(tabId={TabId},cacheKey={CacheKey},duration={Duration},output={Output})", tabId, cacheKey, duration, output);
             DataProvider.Instance().AddOutputCacheItem(tabId, cacheKey, data, DateTime.UtcNow.Add(duration));
         }
 
         /// <inheritdoc />
         public override bool StreamOutput(int tabId, string cacheKey, HttpContext context)
         {
+			Logger.LogError(">>> Entering StreamOutput(tabId={TabId},cacheKey={CacheKey},context={Context})", tabId, cacheKey, context);
             IDataReader dr = null;
+			Logger.LogError("StreamOutput(tabId={TabId},cacheKey={CacheKey},context={Context}): dr → {Dr}", tabId, cacheKey, context, dr);
             try
             {
                 dr = DataProvider.Instance().GetOutputCacheItem(cacheKey);
@@ -102,6 +120,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
                     }
 
                     var expireTime = Convert.ToDateTime(dr["Expiration"], CultureInfo.InvariantCulture);
+					Logger.LogError("StreamOutput(tabId={TabId},cacheKey={CacheKey},context={Context}): expireTime → {ExpireTime}", tabId, cacheKey, context, expireTime);
                     if (expireTime < DateTime.UtcNow)
                     {
                         DataProvider.Instance().RemoveOutputCacheItem(tabId);
@@ -109,6 +128,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
                     }
 
                     context.Response.BinaryWrite(Encoding.Default.GetBytes(dr["Data"].ToString()));
+					Logger.LogWarning("<<< Exiting StreamOutput(tabId={TabId},cacheKey={CacheKey},context={Context})", tabId, cacheKey, context);
                     return true;
                 }
             }

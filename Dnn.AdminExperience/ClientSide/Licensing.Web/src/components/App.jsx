@@ -4,14 +4,19 @@ import { connect } from "react-redux";
 import { PersonaBarPageHeader, PersonaBarPage } from "@dnnsoftware/dnn-react-common";
 import Body from "./body";
 import resx from "../resources";
+const logger = console;
 
 class App extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="licensing-app">
                 <PersonaBarPage isOpen={props.selectedPage === 0}>
@@ -31,6 +36,8 @@ App.propTypes = {
 
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         selectedPage: state.visiblePanel.selectedPage,
         selectedPageVisibleIndex: state.visiblePanel.selectedPageVisibleIndex

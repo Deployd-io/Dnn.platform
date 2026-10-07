@@ -28,6 +28,7 @@ namespace DotNetNuke.Web.Services
     [AllowAnonymous]
     public class MobileHelperController : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MobileHelperController));
         private static readonly char[] ModuleSeparator = [',',];
         private readonly string dnnVersion = Globals.FormatVersion(DotNetNukeContext.Current.Application.Version, false);
         private readonly IHostSettings hostSettings;
@@ -45,7 +46,10 @@ namespace DotNetNuke.Web.Services
         /// <param name="tabController">The tab controller.</param>
         public MobileHelperController(IHostSettings hostSettings, ITabController tabController)
         {
+			Logger.LogError(">>> Entering MobileHelperController(hostSettings={HostSettings},tabController={TabController})", hostSettings, tabController);
+			Logger.LogDebug("MobileHelperController(hostSettings={HostSettings},tabController={TabController}): tabController → {TabController1}", hostSettings, tabController, tabController);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogWarning("<<< Exiting MobileHelperController(hostSettings={HostSettings},tabController={TabController})", hostSettings, tabController);
             this.tabController = tabController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITabController>();
         }
 
@@ -55,7 +59,10 @@ namespace DotNetNuke.Web.Services
         [HttpGet]
         public IHttpActionResult Monikers(string moduleList)
         {
+			Logger.LogError(">>> Entering Monikers(moduleList={ModuleList})", moduleList);
             var monikers = GetMonikersForList(this.hostSettings, moduleList);
+			Logger.LogWarning("<<< Exiting Monikers(moduleList={ModuleList})", moduleList);
+			Logger.LogError("Monikers(moduleList={ModuleList}): monikers → {Monikers}", moduleList, monikers);
             return this.Ok(monikers.Select(kpv => new { tabModuleId = kpv.Key, moniker = kpv.Value, }));
         }
 
@@ -65,7 +72,10 @@ namespace DotNetNuke.Web.Services
         [HttpGet]
         public HttpResponseMessage ModuleDetails(string moduleList)
         {
+			Logger.LogError(">>> Entering ModuleDetails(moduleList={ModuleList})", moduleList);
             var siteDetails = this.GetSiteDetails(moduleList);
+			Logger.LogError("ModuleDetails(moduleList={ModuleList}): siteDetails → {SiteDetails}", moduleList, siteDetails);
+			Logger.LogWarning("<<< Exiting ModuleDetails(moduleList={ModuleList})", moduleList);
             return this.Request.CreateResponse(HttpStatusCode.OK, siteDetails);
         }
 
@@ -104,30 +114,44 @@ namespace DotNetNuke.Web.Services
 
         private static IEnumerable<TabModule> GetTabModules(IHostSettings hostSettings, ITabController tabController, string moduleName)
         {
+			Logger.LogError(">>> Entering GetTabModules(hostSettings={HostSettings},tabController={TabController},moduleName={ModuleName})", hostSettings, tabController, moduleName);
             var portalId = PortalController.Instance.GetCurrentSettings().PortalId;
             var desktopModule = DesktopModuleController.GetDesktopModuleByModuleName(hostSettings, moduleName, portalId);
+			Logger.LogError("GetTabModules(hostSettings={HostSettings},tabController={TabController},moduleName={ModuleName}): portalId → {PortalId}", hostSettings, tabController, moduleName, portalId);
             if (desktopModule != null)
             {
+				Logger.LogError("GetTabModules(hostSettings={HostSettings},tabController={TabController},moduleName={ModuleName}): desktopModule → {DesktopModule}", hostSettings, tabController, moduleName, desktopModule);
                 var cacheKey = $"{string.Format(CultureInfo.InvariantCulture, DataCache.DesktopModuleCacheKey, portalId)}_{desktopModule.DesktopModuleID}";
+				Logger.LogError("GetTabModules(hostSettings={HostSettings},tabController={TabController},moduleName={ModuleName}): cacheKey → {CacheKey}", hostSettings, tabController, moduleName, cacheKey);
                 var args = new CacheItemArgs(cacheKey, DataCache.DesktopModuleCacheTimeOut, DataCache.DesktopModuleCachePriority, portalId, desktopModule, tabController);
+				Logger.LogError("GetTabModules(hostSettings={HostSettings},tabController={TabController},moduleName={ModuleName}): args → {Args}", hostSettings, tabController, moduleName, args);
 
                 return CBO.GetCachedObject<IList<TabModule>>(hostSettings, args, GetTabModulesCallback);
             }
 
+			Logger.LogWarning("<<< Exiting GetTabModules(hostSettings={HostSettings},tabController={TabController},moduleName={ModuleName})", hostSettings, tabController, moduleName);
             return new List<TabModule>();
         }
 
         private static object GetTabModulesCallback(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogError(">>> Entering GetTabModulesCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var tabModules = new List<TabModule>();
 
+			Logger.LogError("GetTabModulesCallback(cacheItemArgs={CacheItemArgs}): tabModules → {TabModules}", cacheItemArgs, tabModules);
             var portalId = (int)cacheItemArgs.ParamList[0];
+			Logger.LogError("GetTabModulesCallback(cacheItemArgs={CacheItemArgs}): portalId → {PortalId}", cacheItemArgs, portalId);
             var desktopModule = (DesktopModuleInfo)cacheItemArgs.ParamList[1];
+			Logger.LogError("GetTabModulesCallback(cacheItemArgs={CacheItemArgs}): desktopModule → {DesktopModule}", cacheItemArgs, desktopModule);
             var tabController = (ITabController)cacheItemArgs.ParamList[2];
+			Logger.LogError("GetTabModulesCallback(cacheItemArgs={CacheItemArgs}): tabController → {TabController}", cacheItemArgs, tabController);
 
             var tabsWithModule = tabController.GetTabsByPackageID(portalId, desktopModule.PackageID, false);
+			Logger.LogError("GetTabModulesCallback(cacheItemArgs={CacheItemArgs}): tabsWithModule → {TabsWithModule}", cacheItemArgs, tabsWithModule);
             var allPortalTabs = tabController.GetTabsByPortal(portalId);
+			Logger.LogError("GetTabModulesCallback(cacheItemArgs={CacheItemArgs}): allPortalTabs → {AllPortalTabs}", cacheItemArgs, allPortalTabs);
             IDictionary<int, TabInfo> tabsInOrder = new Dictionary<int, TabInfo>();
+			Logger.LogError("GetTabModulesCallback(cacheItemArgs={CacheItemArgs}): tabsInOrder → {TabsInOrder}", cacheItemArgs, tabsInOrder);
 
             // must get each tab, they parent may not exist
             foreach (var tab in allPortalTabs.Values)
@@ -148,11 +172,13 @@ namespace DotNetNuke.Web.Services
                        }));
             }
 
+			Logger.LogWarning("<<< Exiting GetTabModulesCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return tabModules;
         }
 
         private static void AddChildTabsToList(TabInfo currentTab, TabCollection allPortalTabs, IDictionary<int, TabInfo> tabsWithModule, IDictionary<int, TabInfo> tabsInOrder)
         {
+			Logger.LogError(">>> Entering AddChildTabsToList(currentTab={CurrentTab},allPortalTabs={AllPortalTabs},tabsWithModule={TabsWithModule},tabsInOrder={TabsInOrder})", currentTab, allPortalTabs, tabsWithModule, tabsInOrder);
             if (tabsWithModule.ContainsKey(currentTab.TabID) && !tabsInOrder.ContainsKey(currentTab.TabID))
             {
                 // add current tab
@@ -164,10 +190,12 @@ namespace DotNetNuke.Web.Services
                     AddChildTabsToList(tab, allPortalTabs, tabsWithModule, tabsInOrder);
                 }
             }
+			Logger.LogWarning("<<< Exiting AddChildTabsToList(currentTab={CurrentTab},allPortalTabs={AllPortalTabs},tabsWithModule={TabsWithModule},tabsInOrder={TabsInOrder})", currentTab, allPortalTabs, tabsWithModule, tabsInOrder);
         }
 
         private SiteDetail GetSiteDetails(string moduleList)
         {
+			Logger.LogError(">>> Entering GetSiteDetails(moduleList={ModuleList})", moduleList);
             var siteDetails = new SiteDetail
             {
                 SiteName = this.PortalSettings.PortalName,
@@ -200,6 +228,7 @@ namespace DotNetNuke.Web.Services
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetSiteDetails(moduleList={ModuleList})", moduleList);
             return siteDetails;
         }
     }

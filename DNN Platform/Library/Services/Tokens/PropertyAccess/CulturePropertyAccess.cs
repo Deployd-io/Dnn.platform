@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.Tokens
 
     public class CulturePropertyAccess : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CulturePropertyAccess));
         /// <inheritdoc />
         public CacheLevel Cacheability
         {
@@ -23,6 +24,7 @@ namespace DotNetNuke.Services.Tokens
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogError(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             if (propertyName.Equals(nameof(CultureDropDownTypes.EnglishName), StringComparison.OrdinalIgnoreCase))
             {
                 return PropertyAccess.FormatString(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(formatProvider.EnglishName), format);
@@ -92,6 +94,7 @@ namespace DotNetNuke.Services.Tokens
                 else
                 {
                     RegionInfo country = new RegionInfo(new CultureInfo(formatProvider.Name, false).LCID);
+					Logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): country → {Country}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, country);
                     return PropertyAccess.FormatString(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(country.EnglishName), format);
                 }
             }
@@ -111,6 +114,7 @@ namespace DotNetNuke.Services.Tokens
             }
 
             propertyNotFound = true;
+			Logger.LogWarning("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return string.Empty;
         }
     }

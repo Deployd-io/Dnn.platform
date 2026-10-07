@@ -31,16 +31,21 @@ namespace DotNetNuke.Entities
         public EventManager()
             : this(null)
         {
+		eventLogger.LogError(">>> Entering EventManager()");
+		eventLogger.LogWarning("<<< Exiting EventManager()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="EventManager"/> class.</summary>
         /// <param name="eventLogger">An event logger.</param>
         public EventManager(IEventLogger eventLogger)
         {
+			eventLogger.LogError(">>> Entering EventManager(eventLogger={EventLogger})", eventLogger);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
 
+			eventLogger.LogDebug("EventManager(eventLogger={EventLogger}): eventLogger → {EventLogger1}", eventLogger, eventLogger);
             foreach (var handler in EventHandlersContainer<IFileEventHandlers>.Instance.EventHandlers)
             {
+				eventLogger.LogWarning("<<< Exiting EventManager()");
                 this.FileChanged += handler.Value.FileOverwritten;
                 this.FileDeleted += handler.Value.FileDeleted;
                 this.FileRenamed += handler.Value.FileRenamed;
@@ -227,437 +232,531 @@ namespace DotNetNuke.Entities
         /// <inheritdoc />
         public virtual void OnFileAdded(FileAddedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFileAdded(args={Args})", args);
             if (this.FileAdded != null)
             {
                 this.FileAdded(this, args);
             }
 
             this.AddLog(args.FileInfo, args.UserId, EventLogType.FILE_ADDED);
+			eventLogger.LogWarning("<<< Exiting OnFileAdded(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFileChanged(FileChangedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFileChanged(args={Args})", args);
             if (this.FileChanged != null)
             {
                 this.FileChanged(this, args);
             }
 
             this.AddLog(args.FileInfo, args.UserId, EventLogType.FILE_CHANGED);
+			eventLogger.LogWarning("<<< Exiting OnFileChanged(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFileDeleted(FileDeletedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFileDeleted(args={Args})", args);
             if (this.FileDeleted != null)
             {
                 this.FileDeleted(this, args);
             }
 
             this.AddLog(args.FileInfo, args.UserId, EventLogType.FILE_DELETED);
+			eventLogger.LogWarning("<<< Exiting OnFileDeleted(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFileMetadataChanged(FileChangedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFileMetadataChanged(args={Args})", args);
             if (this.FileMetadataChanged != null)
             {
                 this.FileMetadataChanged(this, args);
             }
 
             this.AddLog(args.FileInfo, args.UserId, EventLogType.FILE_METADATACHANGED);
+			eventLogger.LogWarning("<<< Exiting OnFileMetadataChanged(args={Args})", args);
         }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public virtual void OnFileDownloaded(FileDownloadedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFileDownloaded(args={Args})", args);
             if (this.FileDownloaded != null)
             {
                 this.FileDownloaded(this, args);
             }
 
             this.AddLog(args.FileInfo, args.UserId, EventLogType.FILE_DOWNLOADED);
+			eventLogger.LogWarning("<<< Exiting OnFileDownloaded(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFileMoved(FileMovedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFileMoved(args={Args})", args);
             if (this.FileMoved != null)
             {
                 this.FileMoved(this, args);
             }
 
             this.AddLog(args.FileInfo, args.UserId, EventLogType.FILE_MOVED);
+			eventLogger.LogWarning("<<< Exiting OnFileMoved(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFileOverwritten(FileChangedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFileOverwritten(args={Args})", args);
             if (this.FileOverwritten != null)
             {
                 this.FileOverwritten(this, args);
             }
 
             this.AddLog(args.FileInfo, args.UserId, EventLogType.FILE_OVERWRITTEN);
+			eventLogger.LogWarning("<<< Exiting OnFileOverwritten(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFileRenamed(FileRenamedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFileRenamed(args={Args})", args);
             if (this.FileRenamed != null)
             {
                 this.FileRenamed(this, args);
             }
 
             this.AddLog(args.FileInfo, args.UserId, EventLogType.FILE_RENAMED);
+			eventLogger.LogWarning("<<< Exiting OnFileRenamed(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFolderAdded(FolderChangedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFolderAdded(args={Args})", args);
             if (this.FolderAdded != null)
             {
                 this.FolderAdded(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnFolderAdded(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFolderDeleted(FolderDeletedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFolderDeleted(args={Args})", args);
             if (this.FolderDeleted != null)
             {
                 this.FolderDeleted(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnFolderDeleted(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFolderMoved(FolderMovedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFolderMoved(args={Args})", args);
             if (this.FolderMoved != null)
             {
                 this.FolderMoved(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnFolderMoved(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFolderRenamed(FolderRenamedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFolderRenamed(args={Args})", args);
             if (this.FolderRenamed != null)
             {
                 this.FolderRenamed(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnFolderRenamed(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFollowRequested(RelationshipEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFollowRequested(args={Args})", args);
             if (this.FollowRequested != null)
             {
                 this.FollowRequested(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnFollowRequested(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFriendshipAccepted(RelationshipEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFriendshipAccepted(args={Args})", args);
             if (this.FriendshipAccepted != null)
             {
                 this.FriendshipAccepted(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnFriendshipAccepted(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFriendshipDeleted(RelationshipEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFriendshipDeleted(args={Args})", args);
             if (this.FriendshipDeleted != null)
             {
                 this.FriendshipDeleted(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnFriendshipDeleted(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnFriendshipRequested(RelationshipEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnFriendshipRequested(args={Args})", args);
             if (this.FriendshipRequested != null)
             {
                 this.FriendshipRequested(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnFriendshipRequested(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnModuleCreated(ModuleEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnModuleCreated(args={Args})", args);
             if (this.ModuleCreated != null)
             {
                 this.ModuleCreated(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnModuleCreated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnModuleDeleted(ModuleEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnModuleDeleted(args={Args})", args);
             if (this.ModuleDeleted != null)
             {
                 this.ModuleDeleted(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnModuleDeleted(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnModuleRemoved(ModuleEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnModuleRemoved(args={Args})", args);
             if (this.ModuleRemoved != null)
             {
                 this.ModuleRemoved(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnModuleRemoved(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnModuleUpdated(ModuleEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnModuleUpdated(args={Args})", args);
             if (this.ModuleUpdated != null)
             {
                 this.ModuleUpdated(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnModuleUpdated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnPortalCreated(PortalCreatedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnPortalCreated(args={Args})", args);
             if (this.PortalCreated != null)
             {
                 this.PortalCreated(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnPortalCreated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnPortalSettingUpdated(PortalSettingUpdatedEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnPortalSettingUpdated(args={Args})", args);
             if (this.PortalSettingUpdated != null)
             {
                 this.PortalSettingUpdated(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnPortalSettingUpdated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnPortalTemplateCreated(PortalTemplateEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnPortalTemplateCreated(args={Args})", args);
             if (this.PortalTemplateCreated != null)
             {
                 this.PortalTemplateCreated(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnPortalTemplateCreated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnProfileUpdated(ProfileEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnProfileUpdated(args={Args})", args);
             if (this.ProfileUpdated != null)
             {
                 this.ProfileUpdated(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnProfileUpdated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnRoleCreated(RoleEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnRoleCreated(args={Args})", args);
             if (this.RoleCreated != null)
             {
                 this.RoleCreated(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnRoleCreated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnRoleUpdated(RoleEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnRoleUpdated(args={Args})", args);
             this.RoleUpdated?.Invoke(this, args);
+			eventLogger.LogWarning("<<< Exiting OnRoleUpdated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnRoleDeleted(RoleEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnRoleDeleted(args={Args})", args);
             if (this.RoleDeleted != null)
             {
                 this.RoleDeleted(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnRoleDeleted(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnRoleJoined(RoleEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnRoleJoined(args={Args})", args);
             if (this.RoleJoined != null)
             {
                 this.RoleJoined(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnRoleJoined(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnRoleLeft(RoleEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnRoleLeft(args={Args})", args);
             if (this.RoleLeft != null)
             {
                 this.RoleLeft(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnRoleLeft(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnTabCreated(TabEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnTabCreated(args={Args})", args);
             if (this.TabCreated != null)
             {
                 this.TabCreated(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnTabCreated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnTabDeleted(TabEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnTabDeleted(args={Args})", args);
             if (this.TabDeleted != null)
             {
                 this.TabDeleted(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnTabDeleted(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnTabDeserialize(TabSyncEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnTabDeserialize(args={Args})", args);
             if (this.TabDeserialize != null)
             {
                 this.TabDeserialize(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnTabDeserialize(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnTabMarkedAsPublished(TabEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnTabMarkedAsPublished(args={Args})", args);
             if (this.TabMarkedAsPublished != null)
             {
                 this.TabMarkedAsPublished(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnTabMarkedAsPublished(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnTabRemoved(TabEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnTabRemoved(args={Args})", args);
             if (this.TabRemoved != null)
             {
                 this.TabRemoved(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnTabRemoved(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnTabRestored(TabEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnTabRestored(args={Args})", args);
             if (this.TabRestored != null)
             {
                 this.TabRestored(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnTabRestored(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnTabSerialize(TabSyncEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnTabSerialize(args={Args})", args);
             if (this.TabSerialize != null)
             {
                 this.TabSerialize(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnTabSerialize(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnTabUpdated(TabEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnTabUpdated(args={Args})", args);
             if (this.TabUpdated != null)
             {
                 this.TabUpdated(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnTabUpdated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnUnfollowRequested(RelationshipEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnUnfollowRequested(args={Args})", args);
             if (this.UnfollowRequested != null)
             {
                 this.UnfollowRequested(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnUnfollowRequested(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnUserApproved(UserEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnUserApproved(args={Args})", args);
             if (this.UserApproved != null)
             {
                 this.UserApproved(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnUserApproved(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnUserAuthenticated(UserEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnUserAuthenticated(args={Args})", args);
             if (this.UserAuthenticated != null)
             {
                 this.UserAuthenticated(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnUserAuthenticated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnUserCreated(UserEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnUserCreated(args={Args})", args);
             if (this.UserCreated != null)
             {
                 this.UserCreated(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnUserCreated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnUserDeleted(UserEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnUserDeleted(args={Args})", args);
             if (this.UserDeleted != null)
             {
                 this.UserDeleted(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnUserDeleted(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnUserRemoved(UserEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnUserRemoved(args={Args})", args);
             if (this.UserRemoved != null)
             {
                 this.UserRemoved(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnUserRemoved(args={Args})", args);
         }
 
         /// <inheritdoc />
         public virtual void OnUserUpdated(UpdateUserEventArgs args)
         {
+			eventLogger.LogError(">>> Entering OnUserUpdated(args={Args})", args);
             if (this.UserUpdated != null)
             {
                 this.UserUpdated(this, args);
             }
+			eventLogger.LogWarning("<<< Exiting OnUserUpdated(args={Args})", args);
         }
 
         /// <inheritdoc />
         public void RefreshTabSyncHandlers()
         {
+			eventLogger.LogError(">>> Entering RefreshTabSyncHandlers()");
             foreach (var handlers in new EventHandlersContainer<ITabSyncEventHandler>().EventHandlers)
             {
                 this.TabSerialize += handlers.Value.TabSerialize;
                 this.TabDeserialize += handlers.Value.TabDeserialize;
             }
+			eventLogger.LogWarning("<<< Exiting RefreshTabSyncHandlers()");
         }
 
         /// <inheritdoc />
         protected override Func<IEventManager> GetFactory()
         {
+			eventLogger.LogError(">>> Entering GetFactory()");
+			eventLogger.LogWarning("<<< Exiting GetFactory()");
             return () => new EventManager(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>());
         }
 
         private void AddLog(IFileInfo fileInfo, int userId, EventLogType logType)
         {
+			eventLogger.LogError(">>> Entering AddLog(fileInfo={FileInfo},userId={UserId},logType={LogType})", fileInfo, userId, logType);
             if (fileInfo == null)
             {
                 return;
             }
 
             this.eventLogger.AddLog(fileInfo, PortalSettings.Current, userId, string.Empty, logType);
+			eventLogger.LogWarning("<<< Exiting AddLog(fileInfo={FileInfo},userId={UserId},logType={LogType})", fileInfo, userId, logType);
         }
     }
 }

@@ -25,6 +25,7 @@ namespace Dnn.PersonaBar.Licensing.Services
         [HttpGet]
         public HttpResponseMessage GetProduct()
         {
+			Logger.LogError(">>> Entering GetProduct()");
             try
             {
                 var response = new
@@ -43,6 +44,7 @@ namespace Dnn.PersonaBar.Licensing.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetProduct()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

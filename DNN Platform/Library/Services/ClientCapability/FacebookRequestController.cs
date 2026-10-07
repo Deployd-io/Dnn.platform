@@ -14,6 +14,7 @@ namespace DotNetNuke.Services.ClientCapability
     /// <summary>Make modules that are aware of Facebook’s <c>signed_request</c> – a parameter that is POSTed to the web page being loaded in the iFrame, giving it variables such as if the Page has been Liked, and the age range of the user.</summary>
     public class FacebookRequestController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FacebookRequestController));
         private const string SignedRequestParameter = "signed_request";
 
         [SuppressMessage("Microsoft.Design", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Breaking change")]
@@ -36,6 +37,7 @@ namespace DotNetNuke.Services.ClientCapability
 
         public static FacebookRequest GetFacebookDetailsFromRequest(HttpRequest request)
         {
+			Logger.LogError(">>> Entering GetFacebookDetailsFromRequest(request={Request})", request);
             if (request == null)
             {
                 return null;
@@ -47,6 +49,8 @@ namespace DotNetNuke.Services.ClientCapability
             }
 
             string rawSignedRequest = request[SignedRequestParameter];
+			Logger.LogWarning("<<< Exiting GetFacebookDetailsFromRequest(request={Request})", request);
+			Logger.LogWarning("<<< Exiting GetFacebookDetailsFromRequest(rawSignedRequest={RawSignedRequest})", rawSignedRequest);
             return GetFacebookDetailsFromRequest(rawSignedRequest);
         }
 
@@ -104,6 +108,7 @@ namespace DotNetNuke.Services.ClientCapability
 
         public static bool IsValidSignature(string rawSignedRequest, string secretKey)
         {
+			Logger.LogError(">>> Entering IsValidSignature(rawSignedRequest={RawSignedRequest},secretKey=<redacted>)", rawSignedRequest);
             if (!string.IsNullOrEmpty(secretKey) && !string.IsNullOrEmpty(rawSignedRequest))
             {
                 string[] signedRequestSplit = rawSignedRequest.Split('.');
@@ -114,8 +119,11 @@ namespace DotNetNuke.Services.ClientCapability
                 {
                     // Attempt to get same hash
                     var encoding = new UTF8Encoding();
+					Logger.LogError("IsValidSignature(rawSignedRequest={RawSignedRequest},secretKey=<redacted>): encoding → {Encoding}", rawSignedRequest, encoding);
                     var hmac = SignWithHmac(encoding.GetBytes(payload), encoding.GetBytes(secretKey));
+					Logger.LogError("IsValidSignature(rawSignedRequest={RawSignedRequest},secretKey=<redacted>): hmac → {Hmac}", rawSignedRequest, hmac);
                     var hmacBase64 = Base64UrlDecode(Convert.ToBase64String(hmac));
+					Logger.LogError("IsValidSignature(rawSignedRequest={RawSignedRequest},secretKey=<redacted>): hmacBase64 → {HmacBase64}", rawSignedRequest, hmacBase64);
                     if (hmacBase64 == expectedSignature)
                     {
                         return true;
@@ -123,6 +131,7 @@ namespace DotNetNuke.Services.ClientCapability
                 }
             }
 
+			Logger.LogWarning("<<< Exiting IsValidSignature(rawSignedRequest={RawSignedRequest},secretKey=<redacted>)", rawSignedRequest);
             return false;
         }
 
@@ -131,25 +140,31 @@ namespace DotNetNuke.Services.ClientCapability
         /// <returns>The base 64 string.</returns>
         private static string Base64UrlDecode(string encodedValue)
         {
+			Logger.LogError(">>> Entering Base64UrlDecode(encodedValue={EncodedValue})", encodedValue);
             if (string.IsNullOrEmpty(encodedValue))
             {
                 return null;
             }
 
             encodedValue = encodedValue.Replace('+', '-').Replace('/', '_').Replace("=", string.Empty).Trim();
+			Logger.LogWarning("<<< Exiting Base64UrlDecode(encodedValue={EncodedValue})", encodedValue);
             return encodedValue;
         }
 
         private static string ReplaceSpecialCharactersInSignedRequest(string str)
         {
+			Logger.LogError(">>> Entering ReplaceSpecialCharactersInSignedRequest(str={Str})", str);
+            Logger.LogWarning("<<< Exiting ReplaceSpecialCharactersInSignedRequest(str={Str})", str);
             return str.Replace("=", string.Empty).Replace('-', '+').Replace('_', '/');
         }
 
         private static byte[] SignWithHmac(byte[] dataToSign, byte[] keyBody)
         {
+			Logger.LogError(">>> Entering SignWithHmac(dataToSign={DataToSign},keyBody={KeyBody})", dataToSign, keyBody);
             using (var hmacAlgorithm = new HMACSHA256(keyBody))
             {
                 hmacAlgorithm.ComputeHash(dataToSign);
+				Logger.LogWarning("<<< Exiting SignWithHmac(dataToSign={DataToSign},keyBody={KeyBody})", dataToSign, keyBody);
                 return hmacAlgorithm.Hash;
             }
         }
@@ -159,9 +174,12 @@ namespace DotNetNuke.Services.ClientCapability
         /// <returns>The corresponding <see cref="DateTime"/> value.</returns>
         private static DateTime ConvertToTimestamp(long value)
         {
+			Logger.LogError(">>> Entering ConvertToTimestamp(value={Value})", value);
             // create Timespan by subtracting the value provided from
             // the Unix Epoch
             DateTime epoc = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+			Logger.LogError("ConvertToTimestamp(value={Value}): epoc → {Epoc}", value, epoc);
+			Logger.LogWarning("<<< Exiting ConvertToTimestamp(value={Value})", value);
             return epoc.AddSeconds((double)value);
         }
     }

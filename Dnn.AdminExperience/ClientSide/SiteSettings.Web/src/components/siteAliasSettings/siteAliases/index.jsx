@@ -11,26 +11,34 @@ import "./style.less";
 import { SvgIcons } from "@dnnsoftware/dnn-react-common";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 
 class SiteAliasesPanel extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             openId: "",
             tableFields: []
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     loadData() {
+		logger.error('>>> Entering loadData()', { "event.action": "loadData" });
         const {props} = this;
         props.dispatch(SiteBehaviorActions.getSiteAliases(props.portalId));
+		logger.warn('<<< Exiting loadData()', { "event.action": "loadData" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.loadData();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         const {props} = this;
         if (props !== prevProps) {
             let tableFields = [];
@@ -48,17 +56,20 @@ class SiteAliasesPanel extends Component {
             if (!props.siteAliases ||
                 props.portalId !== undefined && props.siteAliases.PortalId !== props.portalId) {
                 this.loadData();
+				logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
             }
         }
     }
 
     renderHeader() {
+		logger.error('>>> Entering renderHeader()', { "event.action": "renderHeader" });
         let tableHeaders = this.state.tableFields.map((field) => {
             let className = "alias-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.warn('<<< Exiting renderHeader()', { "event.action": "renderHeader" });
         return <div className="header-row">{tableHeaders}</div>;
     }
 
@@ -124,8 +135,10 @@ class SiteAliasesPanel extends Component {
 
      
     renderedSiteAliases() {
+		logger.error('>>> Entering renderedSiteAliases()', { "event.action": "renderedSiteAliases" });
         let i = 0;
         if (this.props.siteAliases) {
+			logger.warn('<<< Exiting renderedSiteAliases()', { "event.action": "renderedSiteAliases" });
             return this.props.siteAliases.PortalAliases.map((item, index) => {
                 let id = "row-" + i++;
                 return (
@@ -160,7 +173,9 @@ class SiteAliasesPanel extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let opened = (this.state.openId === "add");
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <div className="alias-items">
@@ -215,6 +230,8 @@ SiteAliasesPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         siteAliases: state.siteBehavior.siteAliases,
         tabIndex: state.pagination.tabIndex

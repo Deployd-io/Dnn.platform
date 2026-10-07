@@ -11,13 +11,18 @@ namespace DotNetNuke.Entities.Users
 
     public class MembershipPropertyAccess : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MembershipPropertyAccess));
         private readonly UserInfo objUser;
 
         /// <summary>Initializes a new instance of the <see cref="MembershipPropertyAccess"/> class.</summary>
         /// <param name="user">The user info.</param>
         public MembershipPropertyAccess(UserInfo user)
         {
+			Logger.LogError(">>> Entering MembershipPropertyAccess(user={User})", user);
             this.objUser = user;
+			Logger.LogDebug("MembershipPropertyAccess(user={User}): objUser → {ObjUser}", user, objUser);
+        Logger.LogDebug("MembershipPropertyAccess(user={User}): this.objUser → {Arg1}", user, this.objUser);
+        Logger.LogWarning("<<< Exiting MembershipPropertyAccess(user={User})", user);
         }
 
         /// <inheritdoc />
@@ -27,6 +32,7 @@ namespace DotNetNuke.Entities.Users
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope currentScope, ref bool propertyNotFound)
         {
+			Logger.LogError(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
             UserMembership objMembership = this.objUser.Membership;
             bool userQueriesHimself = this.objUser.UserID == accessingUser.UserID && this.objUser.UserID != -1;
             if (currentScope < Scope.DefaultSettings || (currentScope == Scope.DefaultSettings && !userQueriesHimself) ||
@@ -38,6 +44,7 @@ namespace DotNetNuke.Entities.Users
             }
 
             string outputFormat = string.Empty;
+			Logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): outputFormat → {OutputFormat}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, outputFormat);
             if (format == string.Empty)
             {
                 outputFormat = "g";
@@ -48,6 +55,7 @@ namespace DotNetNuke.Entities.Users
                 case "approved":
                     return PropertyAccess.Boolean2LocalizedYesNo(objMembership.Approved, formatProvider);
                 case "createdondate":
+			Logger.LogWarning("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
                     return objMembership.CreatedDate.ToString(outputFormat, formatProvider);
 #pragma warning disable CS0618 // Type or member is obsolete
                 case "isonline":

@@ -22,6 +22,8 @@ namespace Dnn.EditBar.UI.Items
         public WorkflowStateMenu()
             : this(null, null)
         {
+		eventLogger.LogError(">>> Entering WorkflowStateMenu()");
+        eventLogger.LogWarning("<<< Exiting WorkflowStateMenu()");
         }
 
         /// <inheritdoc />
@@ -48,12 +50,14 @@ namespace Dnn.EditBar.UI.Items
         // render list of workflow states from first state to current workflow state
         private string RenderStates()
         {
+			eventLogger.LogError(">>> Entering RenderStates()");
             if (this.WorkflowState == null)
             {
                 return string.Empty;
             }
 
             var currentState = $"<strong>{this.WorkflowState.StateName}</strong>";
+			eventLogger.LogError("RenderStates(): currentState → {CurrentState}", currentState);
             if (this.IsFirstState == true || this.IsLastState == true)
             {
                 return currentState;
@@ -61,7 +65,10 @@ namespace Dnn.EditBar.UI.Items
 
             // return "Draft > Review > Review2" for example
             var pastStates = this.Workflow.States.Where(s => s.Order < this.WorkflowState.Order).OrderBy(s => s.Order).ToList();
+			eventLogger.LogError("RenderStates(): pastStates → {PastStates}", pastStates);
             var pastStatesHtml = string.Join(" &gt; ", pastStates.Select(s => $"{s.StateName}"));
+			eventLogger.LogError("RenderStates(): pastStatesHtml → {PastStatesHtml}", pastStatesHtml);
+			eventLogger.LogWarning("<<< Exiting RenderStates()");
             return string.Join(" &gt; ", pastStatesHtml, currentState);
         }
     }

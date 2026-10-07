@@ -9,40 +9,52 @@ import utilities from "utils";
 import { GridCell } from "@dnnsoftware/dnn-react-common";
 import ChangePassword from "../ChangePassword";
 import "./style.less";
+const logger = console;
 import {canManagePassword, canDeleteUser, canAuthorizeUnAuthorizeUser, canPromoteDemote} from "../../permissionHelpers.js";
 
 class UserMenu extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             userDetails: props.userDetails,
             ChangePasswordVisible: false
         };
         this.showMenu = false;
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`, { "event.action": "constructor", "logrite.props": props });
         this.handleClick = this.handleClick.bind(this);
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     handleClick(event) {
+		logger.error(`>>> Entering handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         if (!(this.rootElement && this.rootElement.contains(event.target)) && (typeof event.target.className !== "string" || (typeof event.target.className === "string" && event.target.className.indexOf("menu-item") === -1))) {
             this.props.onClose();
+			logger.warn(`<<< Exiting handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         }
     }
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         document.addEventListener("click", this.handleClick, false);
         let {props} = this;
         this.showMenu = false;
         this.getUserDetails(props);
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
     componentDidUpdate() {
+		logger.error('>>> Entering componentDidUpdate()', { "event.action": "componentDidUpdate" });
         if (this.props.userDetails === undefined && this.props.userDetails.userId !== this.props.userId) {
             this.showMenu = false;
             this.getUserDetails(this.props);
         }
         else {
             this.showMenu = true;
+			logger.debug(`componentDidUpdate(): this.showMenu → ${this.showMenu}`, { "event.action": "componentDidUpdate" });
+			logger.warn('<<< Exiting componentDidUpdate()', { "event.action": "componentDidUpdate" });
         }
     }
     getUserDetails(props) {
+		logger.error(`>>> Entering getUserDetails(props=${props})`, { "event.action": "getUserDetails", "logrite.props": props });
         props.dispatch(CommonUsersActions.getUserDetails({ userId: props.userId }, (data) => {
             let userDetails = Object.assign({}, data);
             this.setState({
@@ -50,15 +62,21 @@ class UserMenu extends Component {
             },()=>{
                 this.showMenu = true;
             });
+			logger.warn(`<<< Exiting getUserDetails(props=${props})`, { "event.action": "getUserDetails", "logrite.props": props });
         }));
     }
     reload() {
+		logger.error('>>> Entering reload()', { "event.action": "reload" });
         this.getUserDetails(this.props);
+		logger.warn('<<< Exiting reload()', { "event.action": "reload" });
     }
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         document.removeEventListener("click", this.handleClick, false);
+		logger.warn('<<< Exiting componentWillUnmount()', { "event.action": "componentWillUnmount" });
     }
     sort(items, column, order) {
+		logger.error(`>>> Entering sort(items=${items},column=${column},order=${order})`, { "event.action": "sort", "logrite.items": items, "logrite.column": column, "logrite.order": order });
         order = order === undefined ? "asc" : order;
         items = items.sort(function (a, b) {
             if (a[column] > b[column]) //sort string descending
@@ -70,6 +88,7 @@ class UserMenu extends Component {
         return items;
     }
     onItemClick(key) {
+		logger.error(`>>> Entering onItemClick(key=${key})`, { "event.action": "onItemClick", "logrite.key": key });
         switch (key) {
             case "ResetPassword":
                 this.onSendPasswordLink();
@@ -124,61 +143,81 @@ class UserMenu extends Component {
                 this.props.onClose();
                 break;
         }
+		logger.warn(`<<< Exiting onItemClick(key=${key})`, { "event.action": "onItemClick", "logrite.key": key });
     }
     
     onViewProfile() {
+		logger.error('>>> Entering onViewProfile()', { "event.action": "onViewProfile" });
         utilities.closePersonaBar(() => {
             window.top.location = this.state.userDetails.profileUrl;
         });
+		logger.warn('<<< Exiting onViewProfile()', { "event.action": "onViewProfile" });
     }
     onSendPasswordLink() {
+		logger.error('>>> Entering onSendPasswordLink()', { "event.action": "onSendPasswordLink" });
         this.props.dispatch(CommonUsersActions.sendPasswordResetLink({ userId: this.props.userId }, () => {
             utilities.notify(Localization.get("PasswordSent"), 10000);
+			logger.warn('<<< Exiting onSendPasswordLink()', { "event.action": "onSendPasswordLink" });
         }));
     }
     deleteUser() {
+		logger.error('>>> Entering deleteUser()', { "event.action": "deleteUser" });
         utilities.confirm(Localization.get("DeleteUser.Confirm"), Localization.get("Delete"), Localization.get("Cancel"), () => {
             this.props.dispatch(CommonUsersActions.deleteUser({ userDetails: this.props.userDetails }, this.props.filter, () => {
                 utilities.notify(Localization.get("UserDeleted"), 3000);
                 this.reload();
+				logger.warn('<<< Exiting deleteUser()', { "event.action": "deleteUser" });
             }));
         });
     }
     hardDeleteUser() {
+		logger.error('>>> Entering hardDeleteUser()', { "event.action": "hardDeleteUser" });
         utilities.confirm(Localization.get("RemoveUser.Confirm"), Localization.get("Delete"), Localization.get("Cancel"), () => {
             this.props.dispatch(CommonUsersActions.eraseUser({ userId: this.props.userId }));
         });
+		logger.warn('<<< Exiting hardDeleteUser()', { "event.action": "hardDeleteUser" });
     }
     restoreUser() {
+		logger.error('>>> Entering restoreUser()', { "event.action": "restoreUser" });
         this.props.dispatch(CommonUsersActions.restoreUser({ userDetails: this.props.userDetails }, this.props.filter, () => {
             utilities.notify(Localization.get("UserRestored"), 3000);
             this.reload();
+			logger.warn('<<< Exiting restoreUser()', { "event.action": "restoreUser" });
         }));
     }
     forcePasswordChange() {
+		logger.error('>>> Entering forcePasswordChange()', { "event.action": "forcePasswordChange" });
         this.props.dispatch(CommonUsersActions.forceChangePassword({ userId: this.props.userId }, () => {
             utilities.notify(Localization.get("UserPasswordUpdateChanged"), 10000);
             this.reload();
+			logger.warn('<<< Exiting forcePasswordChange()', { "event.action": "forcePasswordChange" });
         }));
     }
     updateAuthorizeStatus(authorized) {
+		logger.error(`>>> Entering updateAuthorizeStatus(authorized=${authorized})`, { "event.action": "updateAuthorizeStatus", "logrite.authorized": authorized });
         this.props.dispatch(CommonUsersActions.updateAuthorizeStatus({ userDetails: this.props.userDetails }, authorized, this.props.filter, () => {
             utilities.notify(authorized ? Localization.get("UserAuthorized") :Localization.get("UserUnAuthorized"), 3000);
             this.reload();
+			logger.warn(`<<< Exiting updateAuthorizeStatus(authorized=${authorized})`, { "event.action": "updateAuthorizeStatus", "logrite.authorized": authorized });
         }));
     }
     unLockUser() {
+		logger.error('>>> Entering unLockUser()', { "event.action": "unLockUser" });
         this.props.dispatch(CommonUsersActions.unLockUser({ userDetails: this.props.userDetails }, () => {
             utilities.notify(Localization.get("UserUnLocked"), 3000);
             this.reload();
+			logger.warn('<<< Exiting unLockUser()', { "event.action": "unLockUser" });
         }));
     }
     updateSuperUserStatus(setSuperUser) {
+		logger.error(`>>> Entering updateSuperUserStatus(setSuperUser=${setSuperUser})`, { "event.action": "updateSuperUserStatus", "logrite.setSuperUser": setSuperUser });
         this.props.dispatch(CommonUsersActions.updateSuperUserStatus({ userId: this.props.userId, setSuperUser: setSuperUser }, this.props.filter, () => {
             this.reload();
+			logger.warn(`<<< Exiting updateSuperUserStatus(setSuperUser=${setSuperUser})`, { "event.action": "updateSuperUserStatus", "logrite.setSuperUser": setSuperUser });
         }));
     }
     toggleChangePassword(close) {
+		logger.error(`>>> Entering toggleChangePassword(close=${close})`, { "event.action": "toggleChangePassword", "logrite.close": close });
         const show = !this.state.ChangePasswordVisible;
         this.setState({ ChangePasswordVisible: show });
         if (close)
@@ -186,8 +225,10 @@ class UserMenu extends Component {
     }
     
     render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
 
         let visibleMenus = [{ key:"ViewProfile", title:  Localization.get("ViewProfile"), index: 10 }];
+		logger.error(`render(): visibleMenus → ${visibleMenus}`, { "event.action": "render" });
         
         if (canPromoteDemote(this.props.appSettings.applicationSettings.settings, this.state.userDetails.userId))
         {
@@ -259,6 +300,7 @@ class UserMenu extends Component {
         }
         else
         {
+			logger.warn('<<< Exiting render()', { "event.action": "render" });
             return <div/>;
         }
     }
@@ -276,6 +318,8 @@ UserMenu.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         userDetails: state.users.userDetails
     };

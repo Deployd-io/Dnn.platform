@@ -11,9 +11,11 @@ namespace DotNetNuke.Web.Models
     [DataContract]
     public class ModuleDetail
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleDetail));
         /// <summary>Initializes a new instance of the <see cref="ModuleDetail"/> class.</summary>
         public ModuleDetail()
         {
+			Logger.LogError(">>> Entering ModuleDetail()");
             this.ModuleInstances = new List<ModuleInstance>();
         }
 

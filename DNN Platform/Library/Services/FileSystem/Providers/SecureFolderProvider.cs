@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.FileSystem
 
     public class SecureFolderProvider : StandardFolderProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SecureFolderProvider));
         /// <summary>Gets the file extension to use for protected files.</summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public string ProtectedExtension => Globals.glbProtectedExtension;
@@ -26,13 +27,16 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public override string[] GetFiles(IFolderInfo folder)
         {
+			Logger.LogError(">>> Entering GetFiles(folder={Folder})", folder);
             Requires.NotNull("folder", folder);
 
             var fileNames = DirectoryWrapper.Instance.GetFiles(folder.PhysicalPath);
+			Logger.LogError("GetFiles(folder={Folder}): fileNames → {FileNames}", folder, fileNames);
 
             for (var i = 0; i < fileNames.Length; i++)
             {
                 var fileName = Path.GetFileName(fileNames[i]);
+				Logger.LogError("GetFiles(folder={Folder}): fileName → {FileName}", folder, fileName);
                 if (!fileName.EndsWith(this.ProtectedExtension, StringComparison.InvariantCultureIgnoreCase))
                 {
                     var destFileName = fileNames[i] + this.ProtectedExtension;
@@ -51,24 +55,31 @@ namespace DotNetNuke.Services.FileSystem
                 fileNames[i] = fileName;
             }
 
+			Logger.LogWarning("<<< Exiting GetFiles(folder={Folder})", folder);
             return fileNames;
         }
 
         /// <inheritdoc />
         public override string GetFileUrl(IFileInfo file)
         {
+			Logger.LogError(">>> Entering GetFileUrl(file={File})", file);
+            Logger.LogWarning("<<< Exiting GetFileUrl(file={File})", file);
             return FileLinkClickController.Instance.GetFileLinkClick(file);
         }
 
         /// <inheritdoc />
         public override string GetFolderProviderIconPath()
         {
+			Logger.LogError(">>> Entering GetFolderProviderIconPath()");
+            Logger.LogWarning("<<< Exiting GetFolderProviderIconPath()");
             return IconControllerWrapper.Instance.IconURL("FolderSecure", "32x32");
         }
 
         /// <inheritdoc />
         protected override string GetActualPath(FolderMappingInfo folderMapping, string folderPath, string fileName)
         {
+			Logger.LogError(">>> Entering GetActualPath(folderMapping=<redacted>,folderPath={FolderPath},fileName={FileName})", folderPath, fileName);
+            Logger.LogWarning("<<< Exiting GetActualPath(folderMapping=<redacted>,folderPath={FolderPath},fileName={FileName})", folderPath, fileName);
             return base.GetActualPath(folderMapping, folderPath, fileName) + this.ProtectedExtension;
         }
 

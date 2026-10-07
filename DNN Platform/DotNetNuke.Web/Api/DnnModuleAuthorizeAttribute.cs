@@ -13,9 +13,11 @@ namespace DotNetNuke.Web.Api
     /// <summary>Determines web API authorization based on module permissions.</summary>
     public class DnnModuleAuthorizeAttribute : AuthorizeAttributeBase, IOverrideDefaultAuthLevel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnModuleAuthorizeAttribute));
         /// <summary>Initializes a new instance of the <see cref="DnnModuleAuthorizeAttribute"/> class.</summary>
         public DnnModuleAuthorizeAttribute()
         {
+			Logger.LogError(">>> Entering DnnModuleAuthorizeAttribute()");
             this.AccessLevel = SecurityAccessLevel.Host;
         }
 
@@ -28,13 +30,16 @@ namespace DotNetNuke.Web.Api
         /// <inheritdoc />
         public override bool IsAuthorized(AuthFilterContext context)
         {
+			Logger.LogError(">>> Entering IsAuthorized(context={Context})", context);
             var activeModule = this.FindModuleInfo(context.ActionContext.Request);
 
+			Logger.LogError("IsAuthorized(context={Context}): activeModule → {ActiveModule}", context, activeModule);
             if (activeModule != null)
             {
                 return ModulePermissionController.HasModuleAccess(this.AccessLevel, this.PermissionKey, activeModule);
             }
 
+			Logger.LogWarning("<<< Exiting IsAuthorized(context={Context})", context);
             return false;
         }
 
@@ -43,6 +48,8 @@ namespace DotNetNuke.Web.Api
         /// <returns>A <see cref="ModuleInfo"/> instance or <see langword="null"/>.</returns>
         protected virtual ModuleInfo FindModuleInfo(HttpRequestMessage request)
         {
+			Logger.LogError(">>> Entering FindModuleInfo(request={Request})", request);
+            Logger.LogWarning("<<< Exiting FindModuleInfo(request={Request})", request);
             return request.FindModuleInfo();
         }
     }

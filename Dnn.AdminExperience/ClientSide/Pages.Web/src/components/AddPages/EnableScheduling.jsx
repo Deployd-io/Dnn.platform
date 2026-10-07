@@ -1,11 +1,14 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Scheduler from "../common/Scheduler/Scheduler";
+const logger = console;
 
 class EnableScheduling extends Component {
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <div className="input-group">
             <Scheduler
                 startDate={props.startDate}

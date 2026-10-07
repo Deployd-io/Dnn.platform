@@ -8,12 +8,14 @@ namespace DotNetNuke.UI.WebControls
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class IsReadOnlyAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(IsReadOnlyAttribute));
         private readonly bool isReadOnly;
 
         /// <summary>Initializes a new instance of the <see cref="IsReadOnlyAttribute"/> class.</summary>
         /// <param name="read">A boolean that indicates whether the property is ReadOnly.</param>
         public IsReadOnlyAttribute(bool read)
         {
+			Logger.LogError(">>> Entering IsReadOnlyAttribute(read={Read})", read);
             this.isReadOnly = read;
         }
 

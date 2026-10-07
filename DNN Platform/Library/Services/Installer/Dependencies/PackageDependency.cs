@@ -12,6 +12,7 @@ namespace DotNetNuke.Services.Installer.Dependencies
     /// <summary>The PackageDependency determines whether the dependent package is installed.</summary>
     public class PackageDependency : DependencyBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PackageDependency));
         private string packageName;
 
         /// <inheritdoc />
@@ -44,6 +45,7 @@ namespace DotNetNuke.Services.Installer.Dependencies
         /// <inheritdoc />
         public override void ReadManifest(XPathNavigator dependencyNav)
         {
+			Logger.LogError(">>> Entering ReadManifest(dependencyNav={DependencyNav})", dependencyNav);
             this.packageName = dependencyNav.Value;
         }
     }

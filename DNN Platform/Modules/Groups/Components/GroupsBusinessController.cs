@@ -26,11 +26,14 @@ namespace DotNetNuke.Modules.Groups.Components
         public GroupsBusinessController()
             : this(null)
         {
+		eventLogger.LogError(">>> Entering GroupsBusinessController()");
+        eventLogger.LogWarning("<<< Exiting GroupsBusinessController()");
         }
 
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			eventLogger.LogError(">>> Entering UpgradeModule(version={Version})", version);
             switch (version)
             {
                 case "06.02.00":
@@ -44,18 +47,23 @@ namespace DotNetNuke.Modules.Groups.Components
                     break;
             }
 
+			eventLogger.LogWarning("<<< Exiting UpgradeModule(version={Version})", version);
             return string.Empty;
         }
 
         private static void ConvertNotificationTypeActionsFor700()
         {
+			eventLogger.LogError(">>> Entering ConvertNotificationTypeActionsFor700()");
             var notificationTypeNames = new[] { "GroupPendingNotification", "GroupApprovedNotification", "GroupCreatedNotification", "GroupRejectedNotification", "GroupMemberPendingNotification", "GroupMemberApprovedNotification", "GroupMemberRejectedNotification" };
 
+			eventLogger.LogError("ConvertNotificationTypeActionsFor700(): notificationTypeNames → {NotificationTypeNames}", notificationTypeNames);
             foreach (var name in notificationTypeNames)
             {
                 var nt = NotificationsController.Instance.GetNotificationType(name);
+				eventLogger.LogError("ConvertNotificationTypeActionsFor700(): nt → {Nt}", nt);
 
                 var actions = NotificationsController.Instance.GetNotificationTypeActions(nt.NotificationTypeId).ToList();
+				eventLogger.LogError("ConvertNotificationTypeActionsFor700(): actions → {Actions}", actions);
 
                 if (actions.Any())
                 {
@@ -68,34 +76,43 @@ namespace DotNetNuke.Modules.Groups.Components
                     NotificationsController.Instance.SetNotificationTypeActions(actions, nt.NotificationTypeId);
                 }
             }
+			eventLogger.LogWarning("<<< Exiting ConvertNotificationTypeActionsFor700()");
         }
 
         private void RemoveRejectActionForCreatedNotification()
         {
+			eventLogger.LogError(">>> Entering RemoveRejectActionForCreatedNotification()");
             var notificationType = NotificationsController.Instance.GetNotificationType(Constants.GroupCreatedNotification);
+			eventLogger.LogError("RemoveRejectActionForCreatedNotification(): notificationType → {NotificationType}", notificationType);
             if (notificationType == null)
             {
                 return;
             }
 
             var action = NotificationsController.Instance.GetNotificationTypeAction(notificationType.NotificationTypeId, "RejectGroup");
+			eventLogger.LogError("RemoveRejectActionForCreatedNotification(): action → {Action}", action);
             if (action == null)
             {
                 return;
             }
 
             NotificationsController.Instance.DeleteNotificationTypeAction(action.NotificationTypeActionId);
+			eventLogger.LogWarning("<<< Exiting RemoveRejectActionForCreatedNotification()");
         }
 
         private void AddNotificationTypes()
         {
+			eventLogger.LogError(">>> Entering AddNotificationTypes()");
             var actions = new List<NotificationTypeAction>();
 
+			eventLogger.LogError("AddNotificationTypes(): actions → {Actions}", actions);
             // DesktopModule should not be null
             var deskModuleId = DesktopModuleController.GetDesktopModuleByFriendlyName(this.hostSettings, "Social Groups").DesktopModuleID;
+			eventLogger.LogError("AddNotificationTypes(): deskModuleId → {DeskModuleId}", deskModuleId);
 
             // GroupPendingNotification
             var type = new NotificationType { Name = "GroupPendingNotification", Description = "Group Pending Notification", DesktopModuleId = deskModuleId };
+			eventLogger.LogError("AddNotificationTypes(): type → {Type}", type);
             if (NotificationsController.Instance.GetNotificationType(type.Name) == null)
             {
                 actions.Add(new NotificationTypeAction
@@ -179,6 +196,7 @@ namespace DotNetNuke.Modules.Groups.Components
             {
                 NotificationsController.Instance.CreateNotificationType(type);
             }
+			eventLogger.LogWarning("<<< Exiting AddNotificationTypes()");
         }
     }
 }

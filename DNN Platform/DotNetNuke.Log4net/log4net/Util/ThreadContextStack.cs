@@ -48,6 +48,8 @@ namespace log4net.Util
         /// </remarks>
         internal ThreadContextStack()
         {
+		value.LogError(">>> Entering ThreadContextStack()");
+        value.LogWarning("<<< Exiting ThreadContextStack()");
         }
 
         /// <summary>The number of messages in the stack</summary>
@@ -82,6 +84,8 @@ namespace log4net.Util
         public void Clear() 
         {
             this.m_stack.Clear();
+			value.LogError(">>> Entering Clear()");
+			value.LogWarning("<<< Exiting Clear()");
         }
 
         /// <summary>Removes the top context from this stack.</summary>
@@ -95,11 +99,13 @@ namespace log4net.Util
         /// </remarks>
         public string Pop() 
         {
+			value.LogError(">>> Entering Pop()");
             Stack stack = this.m_stack;
             if (stack.Count > 0)
             {
                 return ((StackFrame)(stack.Pop())).Message;
             }
+			value.LogWarning("<<< Exiting Pop()");
             return string.Empty;
         }
 
@@ -126,9 +132,11 @@ namespace log4net.Util
         /// </example>
         public IDisposable Push(string message) 
         {
+			value.LogError(">>> Entering Push(message={Message})", message);
             Stack stack = this.m_stack;
             stack.Push(new StackFrame(message, (stack.Count>0) ? (StackFrame)stack.Peek() : null));
 
+			value.LogWarning("<<< Exiting Push(message={Message})", message);
             return new AutoPopStackFrame(stack, stack.Count - 1);
         }
 
@@ -136,11 +144,13 @@ namespace log4net.Util
         /// <returns>The current context information.</returns>
         internal string GetFullMessage() 
         {
+			value.LogError(">>> Entering GetFullMessage()");
             Stack stack = this.m_stack;
             if (stack.Count > 0)
             {
                 return ((StackFrame)(stack.Peek())).FullMessage;
             }
+			value.LogWarning("<<< Exiting GetFullMessage()");
             return null;
         }
 
@@ -168,6 +178,8 @@ namespace log4net.Util
         /// </remarks>
         public override string ToString()
         {
+			value.LogError(">>> Entering ToString()");
+            value.LogWarning("<<< Exiting ToString()");
             return this.GetFullMessage();
         }
 
@@ -206,11 +218,15 @@ namespace log4net.Util
             /// </remarks>
             internal StackFrame(string message, StackFrame parent) 
             {
+				value.LogError(">>> Entering StackFrame(message={Message},parent={Parent})", message, parent);
                 this.m_message = message;
+				value.LogDebug("StackFrame(message={Message},parent={Parent}): this.m_message → {Arg2}", message, parent, this.m_message);
                 this.m_parent = parent;
 
+				value.LogDebug("StackFrame(message={Message},parent={Parent}): m_parent → {M_parent}", message, parent, m_parent);
                 if (parent == null) 
                 {
+					value.LogDebug("StackFrame(message={Message},parent={Parent}): this.m_parent → {Arg2}", message, parent, this.m_parent);
                     this.m_fullMessage = message;
                 } 
             }
@@ -275,7 +291,10 @@ namespace log4net.Util
             /// </remarks>
             internal AutoPopStackFrame(Stack frameStack, int frameDepth)
             {
+				value.LogError(">>> Entering AutoPopStackFrame(frameStack={FrameStack},frameDepth={FrameDepth})", frameStack, frameDepth);
                 this.m_frameStack = frameStack;
+				value.LogDebug("AutoPopStackFrame(frameStack={FrameStack},frameDepth={FrameDepth}): this.m_frameStack → {Arg2}", frameStack, frameDepth, this.m_frameStack);
+            value.LogWarning("<<< Exiting AutoPopStackFrame(frameStack={FrameStack},frameDepth={FrameDepth})", frameStack, frameDepth);
                 this.m_frameDepth = frameDepth;
             }
 
@@ -287,6 +306,7 @@ namespace log4net.Util
             /// </remarks>
             public void Dispose()
             {
+				value.LogError(">>> Entering Dispose()");
                 if (this.m_frameDepth >= 0 && this.m_frameStack != null)
                 {
                     while(this.m_frameStack.Count > this.m_frameDepth)
@@ -294,6 +314,7 @@ namespace log4net.Util
                         this.m_frameStack.Pop();
                     }
                 }
+				value.LogWarning("<<< Exiting Dispose()");
             }
         }
 
@@ -319,10 +340,12 @@ namespace log4net.Util
             /// </remarks>
             public void Clear()
             {
+				value.LogError(">>> Entering Clear()");
                 while(Count > 0)
                 {
                     Pop();
                 }
+				value.LogWarning("<<< Exiting Clear()");
             }
 
             /// <summary>Makes a shallow copy of the stack's elements.</summary>
@@ -334,12 +357,15 @@ namespace log4net.Util
             /// </remarks>
             public Stack Clone()
             {
+				value.LogError(">>> Entering Clone()");
                 Stack res = new Stack();
                 object[] items = ToArray();
+				value.LogError("Clone(): res → {Res}", res);
                 foreach(object item in items)
                 {
                     res.Push(item);
                 }
+				value.LogWarning("<<< Exiting Clone()");
                 return res;
             }
         }

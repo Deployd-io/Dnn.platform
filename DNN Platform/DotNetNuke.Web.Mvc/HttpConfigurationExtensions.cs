@@ -12,14 +12,17 @@ namespace DotNetNuke.Web.Mvc
 
     public static class HttpConfigurationExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HttpConfigurationExtensions));
         private const string Key = "MvcTabAndModuleInfoProvider";
 
         public static void AddTabAndModuleInfoProvider(this HttpConfiguration configuration, ITabAndModuleInfoProvider tabAndModuleInfoProvider)
         {
+			Logger.LogError(">>> Entering AddTabAndModuleInfoProvider(configuration={Configuration},tabAndModuleInfoProvider={TabAndModuleInfoProvider})", configuration, tabAndModuleInfoProvider);
             Requires.NotNull("configuration", configuration);
             Requires.NotNull("tabAndModuleInfoProvider", tabAndModuleInfoProvider);
 
             var providers = configuration.Properties.GetOrAdd(Key, InitValue) as ConcurrentQueue<ITabAndModuleInfoProvider>;
+			Logger.LogError("AddTabAndModuleInfoProvider(configuration={Configuration},tabAndModuleInfoProvider={TabAndModuleInfoProvider}): providers → {Providers}", configuration, tabAndModuleInfoProvider, providers);
 
             if (providers == null)
             {
@@ -28,10 +31,12 @@ namespace DotNetNuke.Web.Mvc
             }
 
             providers.Enqueue(tabAndModuleInfoProvider);
+			Logger.LogWarning("<<< Exiting AddTabAndModuleInfoProvider(configuration={Configuration},tabAndModuleInfoProvider={TabAndModuleInfoProvider})", configuration, tabAndModuleInfoProvider);
         }
 
         public static IEnumerable<ITabAndModuleInfoProvider> GetTabAndModuleInfoProviders(this HttpConfiguration configuration)
         {
+			Logger.LogError(">>> Entering GetTabAndModuleInfoProviders(configuration={Configuration})", configuration);
             Requires.NotNull("configuration", configuration);
 
             if (configuration.Properties.GetOrAdd(Key, InitValue) is not ConcurrentQueue<ITabAndModuleInfoProvider> providers)
@@ -40,11 +45,14 @@ namespace DotNetNuke.Web.Mvc
                 return [];
             }
 
+			Logger.LogWarning("<<< Exiting GetTabAndModuleInfoProviders(configuration={Configuration})", configuration);
             return providers.ToArray();
         }
 
         private static object InitValue(object o)
         {
+			Logger.LogError(">>> Entering InitValue(o={O})", o);
+            Logger.LogWarning("<<< Exiting InitValue(o={O})", o);
             return new ConcurrentQueue<ITabAndModuleInfoProvider>();
         }
     }

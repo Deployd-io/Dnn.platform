@@ -13,10 +13,12 @@ namespace DNN.Connectors.GoogleAnalytics4
     using DotNetNuke.Services.Connections;
     using DotNetNuke.Services.Exceptions;
     using DotNetNuke.Services.Localization;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>Connector to provide configuration for Google Tag Manager support.</summary>
     public class GoogleAnalytics4Connector : IConnector
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private const string DefaultDisplayName = "Google Analytics 4";
 
         private string displayName;
@@ -68,19 +70,26 @@ namespace DNN.Connectors.GoogleAnalytics4
         /// <inheritdoc />
         public IEnumerable<IConnector> GetConnectors(int portalId)
         {
+			_logger.LogError(">>> Entering GetConnectors(portalId={PortalId})", portalId);
+            _logger.LogWarning("<<< Exiting GetConnectors(portalId={PortalId})", portalId);
             return new List<IConnector> { this };
         }
 
         /// <inheritdoc />
         public void DeleteConnector(int portalId)
         {
+		_logger.LogError(">>> Entering DeleteConnector(portalId={PortalId})", portalId);
+        _logger.LogWarning("<<< Exiting DeleteConnector(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public bool HasConfig(int portalId)
         {
+			_logger.LogError(">>> Entering HasConfig(portalId={PortalId})", portalId);
             var config = this.GetConfig(portalId);
 
+			_logger.LogError("HasConfig(portalId={PortalId}): config → {Config}", portalId, config);
+			_logger.LogWarning("<<< Exiting HasConfig(portalId={PortalId})", portalId);
             return config.ContainsKey("Ga4ID") && !string.IsNullOrEmpty(config["Ga4ID"]);
         }
 
@@ -124,30 +133,38 @@ namespace DNN.Connectors.GoogleAnalytics4
         /// <inheritdoc />
         public bool SaveConfig(int portalId, IDictionary<string, string> values, ref bool validated, out string customErrorMessage)
         {
+			_logger.LogError(">>> Entering SaveConfig(portalId={PortalId},values={Values},validated={Validated})", portalId, values, validated);
             // Delete / Deactivation functionality added into SaveConfig because
             // As of DNN 9.2.2 you need to support multiple to get access to the Delete Connection functionality
             customErrorMessage = string.Empty;
+			_logger.LogError("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): customErrorMessage → {CustomErrorMessage}", portalId, values, validated, customErrorMessage);
+			_logger.LogDebug("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): customErrorMessage → {CustomErrorMessage}", portalId, values, validated, customErrorMessage);
 
             try
             {
                 if (!bool.TryParse(values["isDeactivating"].ToLowerInvariant(), out var isDeactivating))
                 {
                     isDeactivating = false;
+					_logger.LogDebug("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): isDeactivating → {IsDeactivating}", portalId, values, validated, isDeactivating);
                 }
 
                 string ga4Id;
                 string trackForAdmin;
 
                 var isValid = true;
+				_logger.LogError("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): isValid → {IsValid}", portalId, values, validated, isValid);
 
                 if (isDeactivating)
                 {
                     ga4Id = null;
+					_logger.LogError("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): ga4Id → {Ga4Id}", portalId, values, validated, ga4Id);
                     trackForAdmin = null;
+					_logger.LogDebug("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): trackForAdmin → {TrackForAdmin}", portalId, values, validated, trackForAdmin);
                 }
                 else
                 {
                     ga4Id = values["Ga4ID"] != null ? values["Ga4ID"].ToUpperInvariant().Trim() : string.Empty;
+					_logger.LogDebug("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): ga4Id → {Ga4Id}", portalId, values, validated, ga4Id);
                     trackForAdmin = values["TrackAdministrators"] != null ? values["TrackAdministrators"].ToLowerInvariant().Trim() : string.Empty;
 
                     if (string.IsNullOrEmpty(ga4Id))
@@ -190,7 +207,9 @@ namespace DNN.Connectors.GoogleAnalytics4
             }
             catch (Exception ex)
             {
+				_logger.LogError("Exception in SaveConfig(portalId={PortalId},values={Values},validated={Validated}): {Arg3}", portalId, values, validated, ex.Message);
                 Exceptions.LogException(ex);
+				_logger.LogWarning("<<< Exiting SaveConfig(portalId={PortalId},values={Values},validated={Validated})", portalId, values, validated);
                 return false;
             }
         }
@@ -198,20 +217,25 @@ namespace DNN.Connectors.GoogleAnalytics4
         /// <summary>Check if there's an AnalyticsEngine element in siteanalytics.config for this connector. If not, adds the default one.</summary>
         private static void EnsureScriptInConfig()
         {
+			_logger.LogError(">>> Entering EnsureScriptInConfig()");
             var applicationMapPath = HttpContext.Current.Server.MapPath(@"\");
             var file = applicationMapPath + @"\SiteAnalytics.config";
             var xdoc = new XmlDocument();
             using (var siteConfigReader = XmlReader.Create(file, new XmlReaderSettings { XmlResolver = null, }))
             {
+				_logger.LogError("EnsureScriptInConfig(): applicationMapPath → {ApplicationMapPath}", applicationMapPath);
+				_logger.LogError("EnsureScriptInConfig(): file → {File}", file);
                 xdoc.Load(siteConfigReader);
             }
 
             var found = false;
             foreach (XmlNode engineTypeNode in xdoc.SelectNodes("/AnalyticsEngineConfig/Engines/AnalyticsEngine/EngineType"))
             {
+				_logger.LogError("EnsureScriptInConfig(): xdoc → {Xdoc}", xdoc);
                 if (engineTypeNode.InnerText.Contains("DotNetNuke.Services.Analytics.GoogleAnalytics4Engine"))
                 {
                     found = true;
+					_logger.LogError("EnsureScriptInConfig(): found → {Found}", found);
                     break;
                 }
             }
@@ -219,21 +243,27 @@ namespace DNN.Connectors.GoogleAnalytics4
             if (!found)
             {
                 var fileGa4 = applicationMapPath + @"\DesktopModules\Connectors\GoogleAnalytics4\GoogleAnalytics4.config";
+				_logger.LogError("EnsureScriptInConfig(): fileGa4 → {FileGa4}", fileGa4);
                 var xdocGa4 = new XmlDocument();
+				_logger.LogError("EnsureScriptInConfig(): xdocGa4 → {XdocGa4}", xdocGa4);
                 using (var googleConfigReader = XmlReader.Create(fileGa4, new XmlReaderSettings { XmlResolver = null, }))
                 {
                     xdocGa4.Load(googleConfigReader);
                 }
 
                 var enginesElement = xdoc.SelectSingleNode("/AnalyticsEngineConfig/Engines");
+				_logger.LogError("EnsureScriptInConfig(): enginesElement → {EnginesElement}", enginesElement);
                 foreach (XmlNode engineNode in xdocGa4.SelectNodes("/AnalyticsEngineConfig/Engines/AnalyticsEngine"))
                 {
                     var engineFrag = xdoc.CreateDocumentFragment();
+					_logger.LogError("EnsureScriptInConfig(): engineFrag → {EngineFrag}", engineFrag);
                     engineFrag.InnerXml = engineNode.OuterXml;
+					_logger.LogDebug("EnsureScriptInConfig(): engineFrag.InnerXml → {Arg0}", engineFrag.InnerXml);
                     enginesElement.AppendChild(engineFrag);
                 }
 
                 xdoc.Save(file);
+				_logger.LogWarning("<<< Exiting EnsureScriptInConfig()");
             }
         }
 
@@ -245,11 +275,13 @@ namespace DNN.Connectors.GoogleAnalytics4
         /// <returns>The string representing a boolean after the correction.</returns>
         private static string HandleCustomBoolean(string value)
         {
+			_logger.LogError(">>> Entering HandleCustomBoolean(value={Value})", value);
             if ((value ?? string.Empty).Trim().Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 return "true";
             }
 
+			_logger.LogWarning("<<< Exiting HandleCustomBoolean(value={Value})", value);
             return string.Empty;
         }
     }

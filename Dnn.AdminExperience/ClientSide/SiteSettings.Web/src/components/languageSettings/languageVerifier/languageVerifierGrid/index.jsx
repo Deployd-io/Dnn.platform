@@ -4,36 +4,47 @@ import { connect } from "react-redux";
 import LanguageVerifierRow from "./languageVerifierRow";
 import resx from "../../../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class LanguageVerifierGridPanel extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             openId: ""
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     uncollapse(id) {
+		logger.error(`>>> Entering uncollapse(id=${id})`, { "event.action": "uncollapse", "logrite.id": id });
         this.setState({
             openId: id
         });
+		logger.warn(`<<< Exiting uncollapse(id=${id})`, { "event.action": "uncollapse", "logrite.id": id });
     }
 
     collapse() {
+		logger.error('>>> Entering collapse()', { "event.action": "collapse" });
         if (this.state.openId !== "") {
             this.setState({
                 openId: ""
             });
+			logger.warn('<<< Exiting collapse()', { "event.action": "collapse" });
         }
     }
 
     toggle(openId) {
+		logger.error(`>>> Entering toggle(openId=${openId})`, { "event.action": "toggle", "logrite.openId": openId });
         if (openId !== "") {
             this.uncollapse(openId);
+			logger.warn(`<<< Exiting toggle(openId=${openId})`, { "event.action": "toggle", "logrite.openId": openId });
         }
     }
 
     renderBody(list) {
+		logger.error(`>>> Entering renderBody(list=${list})`, { "event.action": "renderBody", "logrite.list": list });
+		logger.warn(`<<< Exiting renderBody(list=${list})`, { "event.action": "renderBody", "logrite.list": list });
         return list.map((item, i) => {
             return (
                 <div className="resx-file" key={i}>{item}</div>
@@ -43,7 +54,9 @@ class LanguageVerifierGridPanel extends Component {
 
      
     renderedGrid() {
+		logger.error('>>> Entering renderedGrid()', { "event.action": "renderedGrid" });
         const {props} = this;
+		logger.warn('<<< Exiting renderedGrid()', { "event.action": "renderedGrid" });
         return (
             <div>
                 <div className="verifier-grid">
@@ -131,6 +144,8 @@ class LanguageVerifierGridPanel extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <div className={styles.verifierItems}>
@@ -158,6 +173,8 @@ LanguageVerifierGridPanel.propTypes = {
 };
 
 function mapStateToProps() {
+	logger.error('>>> Entering mapStateToProps()', { "event.action": "mapStateToProps" });
+	logger.warn('<<< Exiting mapStateToProps()', { "event.action": "mapStateToProps" });
     return {
 
     };

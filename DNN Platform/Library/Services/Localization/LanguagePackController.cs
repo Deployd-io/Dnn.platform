@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Localization
     /// <summary>A controller for language packs.</summary>
     public partial class LanguagePackController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LanguagePackController));
         /// <summary>Delete the specified language pack.</summary>
         /// <param name="languagePack">The language pack.</param>
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
@@ -28,6 +29,7 @@ namespace DotNetNuke.Services.Localization
         /// <param name="languagePack">The language pack.</param>
         public static void DeleteLanguagePack(IEventLogger eventLogger, LanguagePackInfo languagePack)
         {
+			Logger.LogError(">>> Entering DeleteLanguagePack(languagePack={LanguagePack})", languagePack);
             // fix DNN-26330     Removing a language pack extension removes the language
             // we should not delete language when deleting language pack, as there is just a loose relationship
 
@@ -41,10 +43,13 @@ namespace DotNetNuke.Services.Localization
             ////}
             DataProvider.Instance().DeleteLanguagePack(languagePack.LanguagePackID);
             eventLogger.AddLog(languagePack, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.LANGUAGEPACK_DELETED);
+			Logger.LogWarning("<<< Exiting DeleteLanguagePack(eventLogger={EventLogger},languagePack={LanguagePack})", eventLogger, languagePack);
         }
 
         public static LanguagePackInfo GetLanguagePackByPackage(int packageID)
         {
+			Logger.LogError(">>> Entering GetLanguagePackByPackage(packageID={PackageID})", packageID);
+            Logger.LogWarning("<<< Exiting GetLanguagePackByPackage(packageID={PackageID})", packageID);
             return CBO.FillObject<LanguagePackInfo>(DataProvider.Instance().GetLanguagePackByPackage(packageID));
         }
 
@@ -59,6 +64,7 @@ namespace DotNetNuke.Services.Localization
         /// <param name="languagePack">The language pack.</param>
         public static void SaveLanguagePack(IEventLogger eventLogger, LanguagePackInfo languagePack)
         {
+			Logger.LogError(">>> Entering SaveLanguagePack(languagePack={LanguagePack})", languagePack);
             if (languagePack.LanguagePackID == Null.NullInteger)
             {
                 // Add Language Pack
@@ -80,6 +86,7 @@ namespace DotNetNuke.Services.Localization
                     UserController.Instance.GetCurrentUserInfo().UserID);
                 eventLogger.AddLog(languagePack, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.LANGUAGEPACK_UPDATED);
             }
+			Logger.LogWarning("<<< Exiting SaveLanguagePack(eventLogger={EventLogger},languagePack={LanguagePack})", eventLogger, languagePack);
         }
     }
 }

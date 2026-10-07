@@ -20,6 +20,7 @@ namespace Dnn.AuthServices.Jwt.Components.Schedule
         /// <param name="objScheduleHistoryItem">The object used to record the results from this task.</param>
         public PurgeExpiredTokensTask(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogError(">>> Entering PurgeExpiredTokensTask(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             this.ScheduleHistoryItem = objScheduleHistoryItem;
         }
 
@@ -41,6 +42,7 @@ namespace Dnn.AuthServices.Jwt.Components.Schedule
                 Logger.ErrorFormat("Error in PurgeExpiredTokensTask: {0}. {1}", exc.Message, exc.StackTrace);
                 Exceptions.LogException(exc);
             }
+			Logger.LogWarning("<<< Exiting DoWork()");
         }
     }
 }

@@ -14,33 +14,41 @@ namespace DotNetNuke.Modules.RazorHost
     [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
     public partial class Settings : ModuleSettingsBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Settings.ascx));
         private string razorScriptFolder = "~/DesktopModules/RazorModules/RazorHost/Scripts/";
 
         /// <inheritdoc />
         public override void LoadSettings()
         {
+			Logger.LogError(">>> Entering LoadSettings()");
             string basePath = this.Server.MapPath(this.razorScriptFolder);
             var scriptFileSetting = this.Settings["ScriptFile"] as string;
+			Logger.LogError("LoadSettings(): scriptFileSetting → {ScriptFileSetting}", scriptFileSetting);
 
             foreach (string script in Directory.GetFiles(this.Server.MapPath(this.razorScriptFolder), "*.??html"))
             {
                 string scriptPath = script.Replace(basePath, string.Empty);
                 var item = new ListItem(scriptPath, scriptPath);
+				Logger.LogError("LoadSettings(): item → {Item}", item);
                 if (!string.IsNullOrEmpty(scriptFileSetting) && scriptPath.ToLowerInvariant() == scriptFileSetting.ToLowerInvariant())
                 {
                     item.Selected = true;
+					Logger.LogDebug("LoadSettings(): item.Selected → {Arg0}", item.Selected);
                 }
 
                 this.scriptList.Items.Add(item);
             }
 
             base.LoadSettings();
+			Logger.LogWarning("<<< Exiting LoadSettings()");
         }
 
         /// <inheritdoc />
         public override void UpdateSettings()
         {
+			Logger.LogError(">>> Entering UpdateSettings()");
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "ScriptFile", this.scriptList.SelectedValue);
+			Logger.LogWarning("<<< Exiting UpdateSettings()");
         }
     }
 }

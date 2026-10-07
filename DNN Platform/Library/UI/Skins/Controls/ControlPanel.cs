@@ -17,12 +17,15 @@ namespace DotNetNuke.UI.Skins.Controls
 
     public class ControlPanel : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ControlPanel));
         private readonly IHostSettings hostSettings;
 
         /// <summary>Initializes a new instance of the <see cref="ControlPanel"/> class.</summary>
         public ControlPanel()
             : this(null)
         {
+		Logger.LogError(">>> Entering ControlPanel()");
+        Logger.LogWarning("<<< Exiting ControlPanel()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ControlPanel"/> class.</summary>
@@ -30,6 +33,8 @@ namespace DotNetNuke.UI.Skins.Controls
         public ControlPanel(IHostSettings hostSettings)
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("ControlPanel(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
+        Logger.LogWarning("<<< Exiting ControlPanel(hostSettings={HostSettings})", hostSettings);
         }
 
         public bool IsDockable { get; set; }
@@ -37,16 +42,20 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (this.Request.QueryString["dnnprintmode"] != "true" && !UrlUtils.InPopUp())
             {
                 var objControlPanel = ControlUtilities.LoadControl<ControlPanelBase>(this, this.hostSettings.ControlPanel);
+				Logger.LogError("OnInit(e={E}): objControlPanel → {ObjControlPanel}", e, objControlPanel);
                 var objForm = (HtmlForm)this.Page.FindControl("Form");
+				Logger.LogError("OnInit(e={E}): objForm → {ObjForm}", e, objForm);
 
                 if (objControlPanel.IncludeInControlHierarchy)
                 {
                     objControlPanel.IsDockable = this.IsDockable;
+					Logger.LogDebug("OnInit(e={E}): objControlPanel.IsDockable → {Arg1}", e, objControlPanel.IsDockable);
                     if (!this.hostSettings.ControlPanel.EndsWith("controlbar.ascx", StringComparison.InvariantCultureIgnoreCase))
                     {
                         this.Controls.Add(objControlPanel);
@@ -67,6 +76,7 @@ namespace DotNetNuke.UI.Skins.Controls
                     ClientResourceManager.RegisterAdminStylesheet(this.Page, Globals.HostPath + "admin.css");
                 }
             }
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
     }
 }

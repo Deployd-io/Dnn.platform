@@ -8,12 +8,14 @@ import {
 } from "../../../actions";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 
 const re = /^([0-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-4][0-4][0])$/;
 
 class ModePanel extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             updateRequest: {
                 SchedulerMode: "",
@@ -25,12 +27,15 @@ class ModePanel extends Component {
             triedToSubmit: false,
             clientModified: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         let {props, state} = this;
         if (props.schedulerDelay === "" || !re.test(props.schedulerDelay)) {
             state.error["schedulerDelay"] = true;
+			logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
         }
         this.setState({
             triedToSubmit: false,
@@ -43,6 +48,7 @@ class ModePanel extends Component {
     }    
 
     onSave(event) {
+		logger.error(`>>> Entering onSave(event=${event})`, { "event.action": "onSave", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
 
@@ -65,6 +71,7 @@ class ModePanel extends Component {
         });
 
         props.onClose();
+		logger.warn(`<<< Exiting onSave(event=${event})`, { "event.action": "onSave", "logrite.event": event });
     }
 
     onValueChange(key, event) {
@@ -89,6 +96,7 @@ class ModePanel extends Component {
     }
 
     onClose() {
+		logger.error('>>> Entering onClose()', { "event.action": "onClose" });
         const {props, state} = this;
         state.error["schedulerDelay"] = false;
         this.setState({
@@ -96,11 +104,14 @@ class ModePanel extends Component {
             clientModified: false
         });
         props.onClose();
+		logger.warn('<<< Exiting onClose()', { "event.action": "onClose" });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={props.isOpened ? "collapsible-content-mode" : "collapsible-content-mode-hidden"}>
                 <Collapsible
@@ -161,6 +172,8 @@ ModePanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         schedulerDelay: state.task.schedulerDelay,
         schedulerMode: state.task.schedulerMode,

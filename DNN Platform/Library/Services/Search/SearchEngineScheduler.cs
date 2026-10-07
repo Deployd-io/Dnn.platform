@@ -33,7 +33,9 @@ namespace DotNetNuke.Services.Search
         /// <param name="businessControllerProvider">The business controller provider.</param>
         public SearchEngineScheduler(ScheduleHistoryItem objScheduleHistoryItem, IBusinessControllerProvider businessControllerProvider)
         {
+			Logger.LogError(">>> Entering SearchEngineScheduler(objScheduleHistoryItem={ObjScheduleHistoryItem},businessControllerProvider={BusinessControllerProvider})", objScheduleHistoryItem, businessControllerProvider);
             this.businessControllerProvider = businessControllerProvider ?? Globals.DependencyProvider.GetRequiredService<IBusinessControllerProvider>();
+			Logger.LogWarning("<<< Exiting SearchEngineScheduler(objScheduleHistoryItem={ObjScheduleHistoryItem},businessControllerProvider={BusinessControllerProvider})", objScheduleHistoryItem, businessControllerProvider);
             this.ScheduleHistoryItem = objScheduleHistoryItem;
         }
 
@@ -43,10 +45,12 @@ namespace DotNetNuke.Services.Search
             try
             {
                 var lastSuccessFulDateTime = SearchHelper.Instance.GetLastSuccessfulIndexingDateTime(this.ScheduleHistoryItem.ScheduleID);
+				Logger.LogError("DoWork(): lastSuccessFulDateTime → {LastSuccessFulDateTime}", lastSuccessFulDateTime);
                 Logger.Trace("Search: Site Crawler - Starting. Content change start time " + lastSuccessFulDateTime.ToString("g", CultureInfo.InvariantCulture));
                 this.ScheduleHistoryItem.AddLogNote(string.Format(CultureInfo.InvariantCulture, "Starting. Content change start time <b>{0:g}</b>", lastSuccessFulDateTime));
 
                 var searchEngine = new SearchEngine(this.ScheduleHistoryItem, lastSuccessFulDateTime, this.businessControllerProvider);
+				Logger.LogError("DoWork(): searchEngine → {SearchEngine}", searchEngine);
                 try
                 {
                     searchEngine.DeleteOldDocsBeforeReindex();
@@ -67,6 +71,7 @@ namespace DotNetNuke.Services.Search
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in DoWork(): {Arg0}", ex.Message);
                 this.ScheduleHistoryItem.Succeeded = false;
                 this.ScheduleHistoryItem.AddLogNote("<br/>EXCEPTION: " + ex.Message);
                 this.Errored(ref ex);
@@ -75,6 +80,7 @@ namespace DotNetNuke.Services.Search
                     Exceptions.Exceptions.LogException(ex);
                 }
             }
+			Logger.LogWarning("<<< Exiting DoWork()");
         }
     }
 }

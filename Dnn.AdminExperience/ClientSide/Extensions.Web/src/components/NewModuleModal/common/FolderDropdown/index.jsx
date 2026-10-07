@@ -4,18 +4,22 @@ import { DropdownWithError, SingleLineInputWithError, Button, GridCell } from "@
 import Collapsible from "react-collapse";
 import Localization from "localization";
 import styles from "./style.module.less";
+const logger = console;
 
 class FolderDropdown extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             addNewFolderOpen: false,
             newFolderValue: "",
             triedToSave: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     onOwnerFolderSelect(option) {
+		logger.error(`>>> Entering onOwnerFolderSelect(option=${option})`, { "event.action": "onOwnerFolderSelect", "logrite.option": option });
         const { props } = this;
         if (option && option.value === "AddNewFolder") {
             this.setState({
@@ -23,17 +27,21 @@ class FolderDropdown extends Component {
             });
         } else {
             props.onFolderSelect(option);
+			logger.warn(`<<< Exiting onOwnerFolderSelect(option=${option})`, { "event.action": "onOwnerFolderSelect", "logrite.option": option });
         }
     }
 
     closeAddNewFolderBox() {
+		logger.error('>>> Entering closeAddNewFolderBox()', { "event.action": "closeAddNewFolderBox" });
         this.setState({
             addNewFolderOpen: false,
             newFolderValue: ""
         });
+		logger.warn('<<< Exiting closeAddNewFolderBox()', { "event.action": "closeAddNewFolderBox" });
     }
 
     onAddNewFolder() {
+		logger.error('>>> Entering onAddNewFolder()', { "event.action": "onAddNewFolder" });
         const { props, state } = this;
         if (this.state.newFolderValue === "") {
             this.setState({
@@ -42,16 +50,20 @@ class FolderDropdown extends Component {
             return;
         }
         props.onAddNewFolder(state.newFolderValue, props.type, this.closeAddNewFolderBox.bind(this));
+		logger.warn('<<< Exiting onAddNewFolder()', { "event.action": "onAddNewFolder" });
     }
 
     onFolderNameChange(event) {
+		logger.error(`>>> Entering onFolderNameChange(event=${event})`, { "event.action": "onFolderNameChange", "logrite.event": event });
         this.setState({
             newFolderValue: event.target.value,
             triedToSave: false
         });
+		logger.warn(`<<< Exiting onFolderNameChange(event=${event})`, { "event.action": "onFolderNameChange", "logrite.event": event });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props, state } = this;
         const folders = [
             {
@@ -63,6 +75,7 @@ class FolderDropdown extends Component {
                 value: ""
             }
         ].concat(props.folders);
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.folderDropdown} style={{ padding: 0 }}>
                 <Collapsible 

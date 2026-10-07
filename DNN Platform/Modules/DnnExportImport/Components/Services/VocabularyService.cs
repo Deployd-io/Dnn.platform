@@ -22,6 +22,7 @@ namespace Dnn.ExportImport.Components.Services
     /// <summary>An export service for vocabularies.</summary>
     public class VocabularyService : BasePortableService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(VocabularyService));
         /// <inheritdoc />
         public override string Category => Constants.Category_Vocabularies;
 
@@ -34,6 +35,7 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			Logger.LogError(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
             if (this.CheckPoint.Stage > 0)
             {
                 return;
@@ -45,22 +47,28 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             var fromDate = (exportDto.FromDateUtc ?? Constants.MinDbTime).ToLocalTime();
+			Logger.LogError("ExportData(exportJob={ExportJob},exportDto={ExportDto}): fromDate → {FromDate}", exportJob, exportDto, fromDate);
             var toDate = exportDto.ToDateUtc.ToLocalTime();
+			Logger.LogError("ExportData(exportJob={ExportJob},exportDto={ExportDto}): toDate → {ToDate}", exportJob, exportDto, toDate);
             List<TaxonomyVocabularyType> vocabularyTypes = null;
 
             if (this.CheckPoint.Stage == 0)
             {
                 var taxonomyTerms = GetTaxonomyTerms(exportDto.PortalId, toDate, fromDate);
+				Logger.LogError("ExportData(exportJob={ExportJob},exportDto={ExportDto}): taxonomyTerms → {TaxonomyTerms}", exportJob, exportDto, taxonomyTerms);
                 var taxonomyVocabularies = GetTaxonomyVocabularies(exportDto.PortalId, toDate, fromDate);
+				Logger.LogError("ExportData(exportJob={ExportJob},exportDto={ExportDto}): taxonomyVocabularies → {TaxonomyVocabularies}", exportJob, exportDto, taxonomyVocabularies);
                 if (taxonomyTerms.Count > 0 || taxonomyVocabularies.Count > 0)
                 {
                     var scopeTypes = CBO.FillCollection<TaxonomyScopeType>(DataProvider.Instance().GetAllScopeTypes());
+					Logger.LogError("ExportData(exportJob={ExportJob},exportDto={ExportDto}): scopeTypes → {ScopeTypes}", exportJob, exportDto, scopeTypes);
 
                     // Update the total items count in the check points. This should be updated only once.
                     this.CheckPoint.TotalItems = this.CheckPoint.TotalItems <= 0 ? scopeTypes.Count : this.CheckPoint.TotalItems;
                     if (this.CheckPoint.TotalItems == scopeTypes.Count)
                     {
                         vocabularyTypes = CBO.FillCollection<TaxonomyVocabularyType>(DataProvider.Instance().GetAllVocabularyTypes());
+						Logger.LogError("ExportData(exportJob={ExportJob},exportDto={ExportDto}): vocabularyTypes → {VocabularyTypes}", exportJob, exportDto, vocabularyTypes);
                         taxonomyTerms = GetTaxonomyTerms(exportDto.PortalId, toDate, fromDate);
                         taxonomyVocabularies = GetTaxonomyVocabularies(exportDto.PortalId, toDate, fromDate);
                         this.CheckPoint.TotalItems += taxonomyTerms.Count + taxonomyVocabularies.Count;
@@ -68,6 +76,8 @@ namespace Dnn.ExportImport.Components.Services
 
                     this.CheckPointStageCallback(this);
 
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
+					Logger.LogError("ExportData(exportJob,exportDto)={ExportJob},{ExportDto}: database query executed in {Arg2} ms", exportJob, exportDto, __logStart.ElapsedMilliseconds);
                     this.Repository.CreateItems(scopeTypes);
 
                     ////Result.AddSummary("Exported Taxonomy Scopes", scopeTypes.Count.ToString()); -- not imported so don't show
@@ -117,11 +127,13 @@ namespace Dnn.ExportImport.Components.Services
                 this.CheckPoint.Completed = true;
                 this.CheckPointStageCallback(this);
             }
+			Logger.LogWarning("<<< Exiting ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
         }
 
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			Logger.LogError(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
             if (this.CheckPoint.Stage > 0)
             {
                 return;
@@ -137,6 +149,7 @@ namespace Dnn.ExportImport.Components.Services
             if (this.CheckPoint.Stage == 0)
             {
                 var otherScopeTypes = this.Repository.GetAllItems<TaxonomyScopeType>().ToList();
+				Logger.LogError("ImportData(importJob={ImportJob},importDto={ImportDto}): otherScopeTypes → {OtherScopeTypes}", importJob, importDto, otherScopeTypes);
 
                 // the table Taxonomy_ScopeTypes is used for lookup only and never changed/updated in the database
                 ////CheckPoint.Progress = 10;
@@ -146,13 +159,17 @@ namespace Dnn.ExportImport.Components.Services
                 this.CheckPoint.Progress = 20;
 
                 var otherVocabularies = this.Repository.GetAllItems<TaxonomyVocabulary>().ToList();
+				Logger.LogError("ImportData(importJob={ImportJob},importDto={ImportDto}): otherVocabularies → {OtherVocabularies}", importJob, importDto, otherVocabularies);
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 this.ProcessVocabularies(importJob, importDto, otherScopeTypes, otherVocabularies);
                 this.Repository.UpdateItems(otherVocabularies);
+				Logger.LogError("ImportData(importJob,importDto)={ImportJob},{ImportDto}: update query executed in {Arg2} ms", importJob, importDto, __logStart.ElapsedMilliseconds);
                 this.Result.AddSummary("Imported Vocabularies", otherVocabularies.Count.ToString(CultureInfo.InvariantCulture));
                 this.CheckPoint.Progress = 60;
                 this.CheckPoint.ProcessedItems += otherVocabularies.Count;
 
                 var otherTaxonomyTerms = this.Repository.GetAllItems<TaxonomyTerm>().ToList();
+				Logger.LogError("ImportData(importJob={ImportJob},importDto={ImportDto}): otherTaxonomyTerms → {OtherTaxonomyTerms}", importJob, importDto, otherTaxonomyTerms);
                 this.ProcessTaxonomyTerms(importJob, importDto, otherVocabularies, otherTaxonomyTerms);
                 this.Repository.UpdateItems(otherTaxonomyTerms);
                 this.Result.AddSummary("Imported Terms", otherTaxonomyTerms.Count.ToString(CultureInfo.InvariantCulture));
@@ -162,37 +179,53 @@ namespace Dnn.ExportImport.Components.Services
                 this.CheckPoint.Completed = true;
                 this.CheckPointStageCallback(this);
             }
+			Logger.LogWarning("<<< Exiting ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
         }
 
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			Logger.LogError(">>> Entering GetImportTotal()");
+            Logger.LogWarning("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<TaxonomyVocabulary>() + this.Repository.GetCount<TaxonomyTerm>();
         }
 
         private static List<TaxonomyTerm> GetTaxonomyTerms(int portalId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogError(">>> Entering GetTaxonomyTerms(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
+            Logger.LogWarning("<<< Exiting GetTaxonomyTerms(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
             return CBO.FillCollection<TaxonomyTerm>(DataProvider.Instance().GetAllTerms(portalId, toDate, fromDate));
         }
 
         private static List<TaxonomyVocabulary> GetTaxonomyVocabularies(int portalId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogError(">>> Entering GetTaxonomyVocabularies(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
+            Logger.LogWarning("<<< Exiting GetTaxonomyVocabularies(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
             return CBO.FillCollection<TaxonomyVocabulary>(DataProvider.Instance().GetAllVocabularies(portalId, toDate, fromDate));
         }
 
         private void ProcessVocabularies(ExportImportJob importJob, ImportDto importDto, IList<TaxonomyScopeType> otherScopeTypes, IEnumerable<TaxonomyVocabulary> otherVocabularies)
         {
+			Logger.LogError(">>> Entering ProcessVocabularies(importJob={ImportJob},importDto={ImportDto},otherScopeTypes={OtherScopeTypes},otherVocabularies={OtherVocabularies})", importJob, importDto, otherScopeTypes, otherVocabularies);
             var changed = false;
             var dataService = Util.GetDataService();
+			Logger.LogError("ProcessVocabularies(importJob={ImportJob},importDto={ImportDto},otherScopeTypes={OtherScopeTypes},otherVocabularies={OtherVocabularies}): dataService → {DataService}", importJob, importDto, otherScopeTypes, otherVocabularies, dataService);
+			Logger.LogError("ProcessVocabularies(importJob={ImportJob},importDto={ImportDto},otherScopeTypes={OtherScopeTypes},otherVocabularies={OtherVocabularies}): changed → {Changed}", importJob, importDto, otherScopeTypes, otherVocabularies, changed);
             var localVocabularies = GetTaxonomyVocabularies(importDto.PortalId, DateUtils.GetDatabaseUtcTime().AddYears(1), null);
             foreach (var other in otherVocabularies)
             {
+				Logger.LogError("ProcessVocabularies(importJob={ImportJob},importDto={ImportDto},otherScopeTypes={OtherScopeTypes},otherVocabularies={OtherVocabularies}): localVocabularies → {LocalVocabularies}", importJob, importDto, otherScopeTypes, otherVocabularies, localVocabularies);
                 var createdBy = Common.Util.GetUserIdByName(importJob, other.CreatedByUserID, other.CreatedByUserName);
+				Logger.LogError("ProcessVocabularies(importJob={ImportJob},importDto={ImportDto},otherScopeTypes={OtherScopeTypes},otherVocabularies={OtherVocabularies}): createdBy → {CreatedBy}", importJob, importDto, otherScopeTypes, otherVocabularies, createdBy);
                 var modifiedBy = Common.Util.GetUserIdByName(importJob, other.LastModifiedByUserID, other.LastModifiedByUserName);
+				Logger.LogError("ProcessVocabularies(importJob={ImportJob},importDto={ImportDto},otherScopeTypes={OtherScopeTypes},otherVocabularies={OtherVocabularies}): modifiedBy → {ModifiedBy}", importJob, importDto, otherScopeTypes, otherVocabularies, modifiedBy);
                 var local = localVocabularies.FirstOrDefault(t => t.Name == other.Name);
+				Logger.LogError("ProcessVocabularies(importJob={ImportJob},importDto={ImportDto},otherScopeTypes={OtherScopeTypes},otherVocabularies={OtherVocabularies}): local → {Local}", importJob, importDto, otherScopeTypes, otherVocabularies, local);
                 var scope = otherScopeTypes.FirstOrDefault(s => s.ScopeTypeID == other.ScopeTypeID);
+				Logger.LogError("ProcessVocabularies(importJob={ImportJob},importDto={ImportDto},otherScopeTypes={OtherScopeTypes},otherVocabularies={OtherVocabularies}): scope → {Scope}", importJob, importDto, otherScopeTypes, otherVocabularies, scope);
 
                 var scopeId = other.ScopeID ?? Null.NullInteger;
+				Logger.LogError("ProcessVocabularies(importJob={ImportJob},importDto={ImportDto},otherScopeTypes={OtherScopeTypes},otherVocabularies={OtherVocabularies}): scopeId → {ScopeId}", importJob, importDto, otherScopeTypes, otherVocabularies, scopeId);
                 if (scope != null && scope.ScopeType.Equals("Application", StringComparison.OrdinalIgnoreCase))
                 {
                     scopeId = Null.NullInteger;
@@ -205,6 +238,7 @@ namespace Dnn.ExportImport.Components.Services
                 if (local != null)
                 {
                     other.LocalId = local.VocabularyID;
+					Logger.LogDebug("ProcessVocabularies(importJob={ImportJob},importDto={ImportDto},otherScopeTypes={OtherScopeTypes},otherVocabularies={OtherVocabularies}): other.LocalId → {Arg4}", importJob, importDto, otherScopeTypes, otherVocabularies, other.LocalId);
                     switch (importDto.CollisionResolution)
                     {
                         case CollisionResolution.Ignore:
@@ -223,6 +257,7 @@ namespace Dnn.ExportImport.Components.Services
                             changed = true;
                             break;
                         default:
+							Logger.LogError("Throwing ArgumentOutOfRangeException from ProcessVocabularies(importJob={ImportJob},importDto={ImportDto},otherScopeTypes={OtherScopeTypes},otherVocabularies={OtherVocabularies})", importJob, importDto, otherScopeTypes, otherVocabularies);
                             throw new ArgumentOutOfRangeException(importDto.CollisionResolution.ToString());
                     }
                 }
@@ -245,27 +280,37 @@ namespace Dnn.ExportImport.Components.Services
             {
                 DataCache.ClearCache(DataCache.VocabularyCacheKey);
             }
+			Logger.LogWarning("<<< Exiting ProcessVocabularies(importJob={ImportJob},importDto={ImportDto},otherScopeTypes={OtherScopeTypes},otherVocabularies={OtherVocabularies})", importJob, importDto, otherScopeTypes, otherVocabularies);
         }
 
         private void ProcessTaxonomyTerms(ExportImportJob importJob, ImportDto importDto, IList<TaxonomyVocabulary> otherVocabularies, IList<TaxonomyTerm> otherTaxonomyTerms)
         {
+			Logger.LogError(">>> Entering ProcessTaxonomyTerms(importJob={ImportJob},importDto={ImportDto},otherVocabularies={OtherVocabularies},otherTaxonomyTerms={OtherTaxonomyTerms})", importJob, importDto, otherVocabularies, otherTaxonomyTerms);
             var dataService = Util.GetDataService();
 
+			Logger.LogError("ProcessTaxonomyTerms(importJob={ImportJob},importDto={ImportDto},otherVocabularies={OtherVocabularies},otherTaxonomyTerms={OtherTaxonomyTerms}): dataService → {DataService}", importJob, importDto, otherVocabularies, otherTaxonomyTerms, dataService);
             ////var vocabularyController = new VocabularyController();
             var localTaxonomyTerms = GetTaxonomyTerms(importDto.PortalId, DateUtils.GetDatabaseUtcTime().AddYears(1), null);
+			Logger.LogError("ProcessTaxonomyTerms(importJob={ImportJob},importDto={ImportDto},otherVocabularies={OtherVocabularies},otherTaxonomyTerms={OtherTaxonomyTerms}): localTaxonomyTerms → {LocalTaxonomyTerms}", importJob, importDto, otherVocabularies, otherTaxonomyTerms, localTaxonomyTerms);
             foreach (var other in otherTaxonomyTerms)
             {
                 var createdBy = Common.Util.GetUserIdByName(importJob, other.CreatedByUserID, other.CreatedByUserName);
+				Logger.LogError("ProcessTaxonomyTerms(importJob={ImportJob},importDto={ImportDto},otherVocabularies={OtherVocabularies},otherTaxonomyTerms={OtherTaxonomyTerms}): createdBy → {CreatedBy}", importJob, importDto, otherVocabularies, otherTaxonomyTerms, createdBy);
                 var modifiedBy = Common.Util.GetUserIdByName(importJob, other.LastModifiedByUserID, other.LastModifiedByUserName);
+				Logger.LogError("ProcessTaxonomyTerms(importJob={ImportJob},importDto={ImportDto},otherVocabularies={OtherVocabularies},otherTaxonomyTerms={OtherTaxonomyTerms}): modifiedBy → {ModifiedBy}", importJob, importDto, otherVocabularies, otherTaxonomyTerms, modifiedBy);
 
                 var vocabulary = otherVocabularies.FirstOrDefault(v => v.VocabularyID == other.VocabularyID);
+				Logger.LogError("ProcessTaxonomyTerms(importJob={ImportJob},importDto={ImportDto},otherVocabularies={OtherVocabularies},otherTaxonomyTerms={OtherTaxonomyTerms}): vocabulary → {Vocabulary}", importJob, importDto, otherVocabularies, otherTaxonomyTerms, vocabulary);
                 var vocabularyId = vocabulary?.LocalId ?? 0;
                 var isHierarchical = vocabulary != null && vocabulary.VocabularyTypeID == (int)VocabularyType.Hierarchy;
+				Logger.LogError("ProcessTaxonomyTerms(importJob={ImportJob},importDto={ImportDto},otherVocabularies={OtherVocabularies},otherTaxonomyTerms={OtherTaxonomyTerms}): isHierarchical → {IsHierarchical}", importJob, importDto, otherVocabularies, otherTaxonomyTerms, isHierarchical);
                 var local = localTaxonomyTerms.FirstOrDefault(t => t.Name == other.Name && t.VocabularyID == vocabularyId);
+				Logger.LogError("ProcessTaxonomyTerms(importJob={ImportJob},importDto={ImportDto},otherVocabularies={OtherVocabularies},otherTaxonomyTerms={OtherTaxonomyTerms}): local → {Local}", importJob, importDto, otherVocabularies, otherTaxonomyTerms, local);
 
                 if (local != null)
                 {
                     other.LocalId = local.TermID;
+					Logger.LogDebug("ProcessTaxonomyTerms(importJob={ImportJob},importDto={ImportDto},otherVocabularies={OtherVocabularies},otherTaxonomyTerms={OtherTaxonomyTerms}): other.LocalId → {Arg4}", importJob, importDto, otherVocabularies, otherTaxonomyTerms, other.LocalId);
                     switch (importDto.CollisionResolution)
                     {
                         case CollisionResolution.Ignore:
@@ -295,6 +340,7 @@ namespace Dnn.ExportImport.Components.Services
                             this.Result.AddLogEntry("Updated taxonomy", other.Name);
                             break;
                         default:
+							Logger.LogError("Throwing ArgumentOutOfRangeException from ProcessTaxonomyTerms(importJob={ImportJob},importDto={ImportDto},otherVocabularies={OtherVocabularies},otherTaxonomyTerms={OtherTaxonomyTerms})", importJob, importDto, otherVocabularies, otherTaxonomyTerms);
                             throw new ArgumentOutOfRangeException(importDto.CollisionResolution.ToString());
                     }
                 }
@@ -315,6 +361,7 @@ namespace Dnn.ExportImport.Components.Services
                     this.Result.AddLogEntry("Added taxonomy", other.Name);
                 }
             }
+			Logger.LogWarning("<<< Exiting ProcessTaxonomyTerms(importJob={ImportJob},importDto={ImportDto},otherVocabularies={OtherVocabularies},otherTaxonomyTerms={OtherTaxonomyTerms})", importJob, importDto, otherVocabularies, otherTaxonomyTerms);
         }
     }
 }

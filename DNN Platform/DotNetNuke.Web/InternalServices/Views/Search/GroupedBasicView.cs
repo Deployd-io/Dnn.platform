@@ -8,20 +8,25 @@ namespace DotNetNuke.Web.InternalServices.Views.Search
     /// <summary>BasicView grouped by DocumentTypeName.</summary>
     public class GroupedBasicView
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(GroupedBasicView));
         /// <summary>Initializes a new instance of the <see cref="GroupedBasicView"/> class.</summary>
         public GroupedBasicView()
         {
+		Logger.LogError(">>> Entering GroupedBasicView()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="GroupedBasicView"/> class.</summary>
         /// <param name="basic">The basic view.</param>
         public GroupedBasicView(BasicView basic)
         {
+			Logger.LogError(">>> Entering GroupedBasicView(basic={Basic})", basic);
             this.DocumentTypeName = basic.DocumentTypeName;
+			Logger.LogDebug("GroupedBasicView(basic={Basic}): this.DocumentTypeName → {Arg1}", basic, this.DocumentTypeName);
             this.Results = new List<BasicView>
             {
                 new BasicView
                 {
+					Logger.LogDebug("GroupedBasicView(basic={Basic}): this.Results → {Arg1}", basic, this.Results);
                     Title = basic.Title,
                     Snippet = basic.Snippet,
                     Description = basic.Description,

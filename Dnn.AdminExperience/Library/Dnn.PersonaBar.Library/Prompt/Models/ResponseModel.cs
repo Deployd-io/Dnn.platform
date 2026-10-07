@@ -7,6 +7,7 @@ namespace Dnn.PersonaBar.Library.Prompt.Models
 
     public class ResponseModel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ResponseModel));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         public bool IsError;
@@ -22,9 +23,12 @@ namespace Dnn.PersonaBar.Library.Prompt.Models
         /// <param name="msg">The message.</param>
         public ResponseModel(bool err, string msg)
         {
+			Logger.LogError(">>> Entering ResponseModel(err={Err},msg={Msg})", err, msg);
             this.IsError = err;
+			Logger.LogDebug("ResponseModel(err={Err},msg={Msg}): this.IsError → {Arg2}", err, msg, this.IsError);
             this.Message = msg;
             this.Data = string.Empty;
+			Logger.LogWarning("<<< Exiting ResponseModel(err={Err},msg={Msg},data={Data})", err, msg, data);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ResponseModel"/> class.</summary>
@@ -33,7 +37,9 @@ namespace Dnn.PersonaBar.Library.Prompt.Models
         /// <param name="data">The data.</param>
         public ResponseModel(bool err, string msg, string data)
         {
+			Logger.LogError(">>> Entering ResponseModel(err={Err},msg={Msg},data={Data})", err, msg, data);
             this.IsError = err;
+			Logger.LogDebug("ResponseModel(err={Err},msg={Msg},data={Data}): this.IsError → {Arg3}", err, msg, data, this.IsError);
             this.Message = msg;
             this.Data = data;
         }

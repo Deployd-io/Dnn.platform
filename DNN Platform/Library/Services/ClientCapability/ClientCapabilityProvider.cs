@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.ClientCapability
 
     public abstract class ClientCapabilityProvider : IClientCapabilityProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ClientCapabilityProvider));
         public static IClientCapability CurrentClientCapability
         {
             get
@@ -24,6 +25,8 @@ namespace DotNetNuke.Services.ClientCapability
 
         public static ClientCapabilityProvider Instance()
         {
+			Logger.LogError(">>> Entering Instance()");
+            Logger.LogWarning("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<ClientCapabilityProvider>();
         }
 
@@ -42,9 +45,12 @@ namespace DotNetNuke.Services.ClientCapability
         /// <inheritdoc />
         public virtual IClientCapability GetClientCapability(HttpRequest httpRequest)
         {
+			Logger.LogError(">>> Entering GetClientCapability(httpRequest={HttpRequest})", httpRequest);
             IClientCapability clientCapability = this.GetClientCapability(httpRequest.UserAgent);
             clientCapability.FacebookRequest = FacebookRequestController.GetFacebookDetailsFromRequest(httpRequest);
+			Logger.LogError("GetClientCapability(httpRequest={HttpRequest}): clientCapability → {ClientCapability}", httpRequest, clientCapability);
 
+			Logger.LogWarning("<<< Exiting GetClientCapability(httpRequest={HttpRequest})", httpRequest);
             return clientCapability;
         }
     }

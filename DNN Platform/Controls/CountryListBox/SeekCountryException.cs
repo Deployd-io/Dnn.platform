@@ -6,20 +6,26 @@ namespace DotNetNuke.UI.WebControls;
 
 using System;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.Logging;
 
 /// <summary>An exception throw when there's an error calling <see cref="CountryLookup.SeekCountry"/>.</summary>
 [Serializable]
 public class SeekCountryException : Exception
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <inheritdoc />
     public SeekCountryException()
     {
+	_logger.LogError(">>> Entering SeekCountryException()");
+    _logger.LogWarning("<<< Exiting SeekCountryException()");
     }
 
     /// <inheritdoc />
     public SeekCountryException(string message)
         : base(message)
     {
+	_logger.LogError(">>> Entering SeekCountryException(message={Message})", message);
+    _logger.LogWarning("<<< Exiting SeekCountryException(message={Message})", message);
     }
 
     /// <inheritdoc />

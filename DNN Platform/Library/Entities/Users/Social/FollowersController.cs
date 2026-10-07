@@ -10,9 +10,12 @@ namespace DotNetNuke.Entities.Users.Social
 
     public class FollowersController : ServiceLocator<IFollowersController, FollowersController>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FollowersController));
         /// <inheritdoc />
         protected override Func<IFollowersController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new FollowersControllerImpl();
         }
     }

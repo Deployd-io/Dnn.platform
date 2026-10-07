@@ -13,27 +13,34 @@ import PageTypeSelector from "../PageTypeSelector/PageTypeSelector";
 import PageLocalization from "../PageLocalization/PageLocalization";
 import securityService from "../../services/securityService";
 import permissionTypes from "../../services/permissionTypes";
+const logger = console;
 
 class PageSettings extends Component {
 
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = { selectedPageName: "" };
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
     }
 
     hasPageErrors() {
+		logger.error('>>> Entering hasPageErrors()', { "event.action": "hasPageErrors" });
         const { selectedPageErrors } = this.props;
+		logger.warn('<<< Exiting hasPageErrors()', { "event.action": "hasPageErrors" });
         return Object.keys(selectedPageErrors)
             .map(key => selectedPageErrors[key])
             .some(value => value);
     }
 
     getButtons() {
+		logger.error('>>> Entering getButtons()', { "event.action": "getButtons" });
         const { selectedPage, onCancel, onSave, onDelete, selectedPageDirty } = this.props;
 
         const saveButtonText = selectedPage.tabId === 0 ?
             Localization.get("AddPage") : Localization.get("Save");
         const pageErrors = this.hasPageErrors();
+		logger.error(`getButtons(): pageErrors → ${pageErrors}`, { "event.action": "getButtons" });
 
         let buttons = [<Button
             key="cancelButton"
@@ -59,11 +66,14 @@ class PageSettings extends Component {
                 {Localization.get("Delete")}
             </Button>);
         }
+		logger.warn('<<< Exiting getButtons()', { "event.action": "getButtons" });
         return buttons;
     }
 
     getPageFooter(buttons) {
+		logger.error(`>>> Entering getPageFooter(buttons=${buttons})`, { "event.action": "getPageFooter", "logrite.buttons": buttons });
         const { selectedPageDirty } = this.props;
+		logger.warn(`<<< Exiting getPageFooter(buttons=${buttons})`, { "event.action": "getPageFooter", "logrite.buttons": buttons });
         return (
             <div className="buttons-box">
                 {buttons}
@@ -77,6 +87,8 @@ class PageSettings extends Component {
     }
 
     getCopyAppearanceToDescendantPagesButton() {
+		logger.error('>>> Entering getCopyAppearanceToDescendantPagesButton()', { "event.action": "getCopyAppearanceToDescendantPagesButton" });
+		logger.warn('<<< Exiting getCopyAppearanceToDescendantPagesButton()', { "event.action": "getCopyAppearanceToDescendantPagesButton" });
         return <Button
             key="secondaryAppearanceButton"
             type="secondary"
@@ -86,6 +98,8 @@ class PageSettings extends Component {
     }
 
     getCopyPermissionsToDescendantPagesButton() {
+		logger.error('>>> Entering getCopyPermissionsToDescendantPagesButton()', { "event.action": "getCopyPermissionsToDescendantPagesButton" });
+		logger.warn('<<< Exiting getCopyPermissionsToDescendantPagesButton()', { "event.action": "getCopyPermissionsToDescendantPagesButton" });
         return <Button
             key="secondaryPermissionsButton"
             type="secondary"
@@ -95,14 +109,17 @@ class PageSettings extends Component {
     }
 
     onSelectParentPageId(parentPageId, parentPageName) {
+		logger.error(`>>> Entering onSelectParentPageId(parentPageId=${parentPageId},parentPageName=${parentPageName})`, { "event.action": "onSelectParentPageId", "logrite.parentPageId": parentPageId, "logrite.parentPageName": parentPageName });
         if (this.state.parentPageId !== parentPageId) {
             this.setState({ parentPageId, parentPageName });
             this.props.onChangeParentId(parentPageId);
             this.props.onChangeField("hierarchy", parentPageName);
+			logger.warn(`<<< Exiting onSelectParentPageId(parentPageId=${parentPageId},parentPageName=${parentPageName})`, { "event.action": "onSelectParentPageId", "logrite.parentPageId": parentPageId, "logrite.parentPageName": parentPageName });
         }
     }
     
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {
             selectedPage,
             selectedPageErrors,
@@ -121,6 +138,7 @@ class PageSettings extends Component {
         } = this.props;
 
         const buttons = this.getButtons();
+		logger.error(`render(): buttons → ${buttons}`, { "event.action": "render" });
         const isEditingExistingPage = selectedPage.tabId !== 0;
         const appearanceButtons = [...buttons];
         const permissionsButtons = [...buttons];
@@ -133,8 +151,11 @@ class PageSettings extends Component {
         }
 
         const footer = this.getPageFooter(buttons);
+		logger.error(`render(): footer → ${footer}`, { "event.action": "render" });
         const appearanceFooter = this.getPageFooter(appearanceButtons);
+		logger.error(`render(): appearanceFooter → ${appearanceFooter}`, { "event.action": "render" });
         const permissionFooter = this.getPageFooter(permissionsButtons);
+		logger.error(`render(): permissionFooter → ${permissionFooter}`, { "event.action": "render" });
 
         const advancedTabs = [
             {
@@ -234,6 +255,7 @@ class PageSettings extends Component {
                 </DnnTabs>
             </div>);
         }
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <DnnTabs

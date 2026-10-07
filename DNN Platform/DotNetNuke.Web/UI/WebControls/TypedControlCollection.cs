@@ -14,11 +14,14 @@ namespace DotNetNuke.Web.UI.WebControls
     public class TypedControlCollection<T> : ControlCollection, IList<T>
         where T : Control
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TypedControlCollection));
         /// <summary>Initializes a new instance of the <see cref="TypedControlCollection{T}"/> class.</summary>
         /// <param name="owner">The owner control.</param>
         public TypedControlCollection(Control owner)
             : base(owner)
         {
+		Logger.LogError(">>> Entering TypedControlCollection(owner={Owner})", owner);
+        Logger.LogWarning("<<< Exiting TypedControlCollection(owner={Owner})", owner);
         }
 
         /// <inheritdoc />
@@ -41,6 +44,8 @@ namespace DotNetNuke.Web.UI.WebControls
         {
             if (child is not T item)
             {
+				Logger.LogError(">>> Entering Add(child={Child})", child);
+				Logger.LogWarning("<<< Exiting Add(child={Child})", child);
                 this.ThrowOnInvalidControlType();
             }
 
@@ -50,12 +55,14 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public override void AddAt(int index, Control child)
         {
+			Logger.LogError(">>> Entering AddAt(index={Index},child={Child})", index, child);
             if (child is not T)
             {
                 this.ThrowOnInvalidControlType();
             }
 
             base.AddAt(index, child);
+			Logger.LogWarning("<<< Exiting AddAt(index={Index},child={Child})", index, child);
         }
 
         /// <inheritdoc />
@@ -75,6 +82,8 @@ namespace DotNetNuke.Web.UI.WebControls
         {
             if (!this.Contains(item))
             {
+				Logger.LogError(">>> Entering Remove(item={Item})", item);
+				Logger.LogWarning("<<< Exiting Remove(item={Item})", item);
                 return false;
             }
 
@@ -90,6 +99,9 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <exception cref="InvalidOperationException">Always.</exception>
         protected virtual void ThrowOnInvalidControlType()
         {
+			Logger.LogError(">>> Entering ThrowOnInvalidControlType()");
+			Logger.LogError("Throwing InvalidOperationException from ThrowOnInvalidControlType()");
+        Logger.LogWarning("<<< Exiting ThrowOnInvalidControlType()");
             throw new InvalidOperationException("Not supported");
         }
 

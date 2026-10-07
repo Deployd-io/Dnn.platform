@@ -45,22 +45,32 @@ public partial class GroupEdit : GroupsModuleBase
     /// <param name="eventLogger">The event logger.</param>
     public GroupEdit(INavigationManager navigationManager, IFileManager fileManager, IFolderManager folderManager, IFileContentTypeManager fileContentTypeManager, IRoleController roleController, IApplicationStatusInfo applicationStatusInfo, IEventLogger eventLogger)
     {
+		eventLogger.LogError(">>> Entering GroupEdit(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger})", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger);
+		eventLogger.LogDebug("GroupEdit(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger}): fileManager → {FileManager1}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, fileManager);
+		eventLogger.LogDebug("GroupEdit(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger}): folderManager → {FolderManager1}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, folderManager);
+		eventLogger.LogDebug("GroupEdit(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger}): fileContentTypeManager → {FileContentTypeManager1}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, fileContentTypeManager);
+		eventLogger.LogDebug("GroupEdit(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger}): roleController → {RoleController1}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, roleController);
+		eventLogger.LogDebug("GroupEdit(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger}): eventLogger → {EventLogger1}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, eventLogger);
         this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
+		eventLogger.LogWarning("<<< Exiting GroupEdit(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger})", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger);
         this.fileManager = fileManager ?? this.DependencyProvider.GetRequiredService<IFileManager>();
         this.folderManager = folderManager ?? this.DependencyProvider.GetRequiredService<IFolderManager>();
         this.fileContentTypeManager = fileContentTypeManager ?? this.DependencyProvider.GetRequiredService<IFileContentTypeManager>();
         this.roleController = roleController ?? this.DependencyProvider.GetRequiredService<IRoleController>();
         this.appStatus = applicationStatusInfo ?? this.DependencyProvider.GetRequiredService<IApplicationStatusInfo>();
+		eventLogger.LogDebug("GroupEdit(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger}): appStatus → {AppStatus}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, appStatus);
         this.eventLogger = eventLogger ?? this.DependencyProvider.GetRequiredService<IEventLogger>();
     }
 
     /// <inheritdoc />
     protected override void OnInit(EventArgs e)
     {
+		eventLogger.LogError(">>> Entering OnInit(e={E})", e);
         this.Load += this.Page_Load;
         this.btnSave.Click += this.Save_Click;
         this.btnCancel.Click += this.Cancel_Click;
         base.OnInit(e);
+		eventLogger.LogWarning("<<< Exiting OnInit(e={E})", e);
     }
 
     /// <summary>Handles the <see cref="Control.Load"/> event.</summary>
@@ -68,6 +78,7 @@ public partial class GroupEdit : GroupsModuleBase
     /// <param name="e">The event args.</param>
     protected void Page_Load(object sender, EventArgs e)
     {
+		eventLogger.LogError(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
         JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.PortalSettings, CommonJs.DnnPlugins);
 
         this.imgGroup.Src = this.Page.ResolveUrl("~/DesktopModules/SocialGroups/Images/") + "sample-group-profile.jpg";
@@ -77,6 +88,7 @@ public partial class GroupEdit : GroupsModuleBase
         }
 
         var roleInfo = this.roleController.GetRoleById(this.PortalId, this.GroupId);
+		eventLogger.LogError("Page_Load(sender={Sender},e={E}): roleInfo → {RoleInfo}", sender, e, roleInfo);
         if (roleInfo == null)
         {
             this.Response.Redirect(this.ModuleContext.NavigateUrl(this.TabId, string.Empty, false));
@@ -114,20 +126,25 @@ public partial class GroupEdit : GroupsModuleBase
         }
 
         this.imgGroup.Src = roleInfo.PhotoURL;
+		eventLogger.LogWarning("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
     }
 
     private void Cancel_Click(object sender, EventArgs e)
     {
+		eventLogger.LogError(">>> Entering Cancel_Click(sender={Sender},e={E})", sender, e);
         this.Response.Redirect(this.ModuleContext.NavigateUrl(this.TabId, string.Empty, false, $"groupid={this.GroupId}"));
+		eventLogger.LogWarning("<<< Exiting Cancel_Click(sender={Sender},e={E})", sender, e);
     }
 
     private void Save_Click(object sender, EventArgs e)
     {
+		eventLogger.LogError(">>> Entering Save_Click(sender={Sender},e={E})", sender, e);
         if (this.GroupId <= 0)
         {
             return;
         }
 
+		eventLogger.LogWarning("<<< Exiting Save_Click(sender={Sender},e={E})", sender, e);
         var ps = Security.PortalSecurity.Instance;
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -138,6 +155,7 @@ public partial class GroupEdit : GroupsModuleBase
 #pragma warning restore CS0618 // Type or member is obsolete
 
         var roleInfo = this.roleController.GetRoleById(this.PortalId, this.GroupId);
+		eventLogger.LogError("Save_Click(sender={Sender},e={E}): roleInfo → {RoleInfo}", sender, e, roleInfo);
         if (roleInfo != null)
         {
             // if this is visible assume that we're editing the groupname
@@ -156,9 +174,12 @@ public partial class GroupEdit : GroupsModuleBase
             if (!roleInfo.IsSystemRole)
             {
                 roleInfo.RoleName = this.txtGroupName.Text;
+				eventLogger.LogDebug("Save_Click(sender={Sender},e={E}): roleInfo.RoleName → {Arg2}", sender, e, roleInfo.RoleName);
             }
 
             roleInfo.Description = this.txtDescription.Text;
+			eventLogger.LogDebug("Save_Click(sender={Sender},e={E}): roleInfo.Description → {Arg2}", sender, e, roleInfo.Description);
+			eventLogger.LogDebug("Save_Click(sender={Sender},e={E}): roleInfo.IsPublic → {Arg2}", sender, e, roleInfo.IsPublic);
             roleInfo.IsPublic = this.rdAccessTypePublic.Checked;
 
             if (roleInfo.Settings.ContainsKey("ReviewMembers"))
@@ -181,7 +202,10 @@ public partial class GroupEdit : GroupsModuleBase
                 if (groupFolder != null)
                 {
                     var fileName = Path.GetFileName(this.inpFile.PostedFile.FileName);
+					eventLogger.LogError("Save_Click(sender={Sender},e={E}): fileName → {FileName}", sender, e, fileName);
+					eventLogger.LogDebug("Save_Click(sender={Sender},e={E}): roleInfo.IconFile → {Arg2}", sender, e, roleInfo.IconFile);
                     var fileInfo = this.fileManager.AddFile(groupFolder, fileName, this.inpFile.PostedFile.InputStream, true, true, this.fileContentTypeManager.GetContentType(Path.GetExtension(fileName)));
+					eventLogger.LogError("Save_Click(sender={Sender},e={E}): fileInfo → {FileInfo}", sender, e, fileInfo);
                     roleInfo.IconFile = $"FileID={fileInfo.FileId}";
                     this.roleController.UpdateRole(roleInfo);
                 }

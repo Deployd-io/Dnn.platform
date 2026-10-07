@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Exceptions
     [Serializable]
     public class ExceptionInfo : IExceptionInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExceptionInfo));
         /// <summary>Initializes a new instance of the <see cref="ExceptionInfo"/> class.</summary>
         public ExceptionInfo()
         {
@@ -25,14 +26,19 @@ namespace DotNetNuke.Services.Exceptions
         /// <param name="e">The exception.</param>
         public ExceptionInfo(Exception e)
         {
+			Logger.LogError(">>> Entering ExceptionInfo(e={E})", e);
             this.Message = e.Message;
+			Logger.LogDebug("ExceptionInfo(e={E}): this.Message → {Arg1}", e, this.Message);
             this.StackTrace = e.StackTrace;
             this.Source = e.Source;
             if (e.InnerException != null)
             {
+				Logger.LogDebug("ExceptionInfo(e={E}): this.StackTrace → {Arg1}", e, this.StackTrace);
+				Logger.LogDebug("ExceptionInfo(e={E}): this.Source → {Arg1}", e, this.Source);
                 this.InnerMessage = e.InnerException.Message;
                 this.InnerStackTrace = e.InnerException.StackTrace;
             }
+			Logger.LogDebug("ExceptionInfo(e={E}): this.InnerMessage → {Arg1}", e, this.InnerMessage);
 
             this.ExceptionHash = e.Hash();
         }
@@ -90,6 +96,7 @@ namespace DotNetNuke.Services.Exceptions
 
         public void Deserialize(string content)
         {
+			Logger.LogError(">>> Entering Deserialize(content={Content})", content);
             using (XmlReader reader = XmlReader.Create(new StringReader(content)))
             {
                 if (reader.Read())
@@ -99,10 +106,12 @@ namespace DotNetNuke.Services.Exceptions
 
                 reader.Close();
             }
+			Logger.LogWarning("<<< Exiting Deserialize(content={Content})", content);
         }
 
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogError(">>> Entering ReadXml(reader={Reader})", reader);
             do
             {
                 switch (reader.Name)
@@ -164,18 +173,25 @@ namespace DotNetNuke.Services.Exceptions
                 reader.Read();
             }
             while (reader.ReadState != ReadState.EndOfFile && reader.NodeType != XmlNodeType.None && !string.IsNullOrEmpty(reader.LocalName));
+			Logger.LogWarning("<<< Exiting ReadXml(reader={Reader})", reader);
         }
 
         public string Serialize()
         {
+			Logger.LogError(">>> Entering Serialize()");
             var settings = new XmlWriterSettings();
             settings.ConformanceLevel = ConformanceLevel.Fragment;
+			Logger.LogDebug("Serialize(): settings.ConformanceLevel → {Arg0}", settings.ConformanceLevel);
+			Logger.LogError("Serialize(): settings → {Settings}", settings);
             settings.OmitXmlDeclaration = true;
+			Logger.LogDebug("Serialize(): settings.OmitXmlDeclaration → {Arg0}", settings.OmitXmlDeclaration);
             var sb = new StringBuilder();
             using (XmlWriter writer = XmlWriter.Create(sb, settings))
             {
+				Logger.LogError("Serialize(): sb → {Sb}", sb);
                 this.WriteXml(writer);
                 writer.Close();
+				Logger.LogWarning("<<< Exiting Serialize()");
                 return sb.ToString();
             }
         }
@@ -183,8 +199,10 @@ namespace DotNetNuke.Services.Exceptions
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogError(">>> Entering ToString()");
             var str = new StringBuilder();
             str.Append("<p><strong>AssemblyVersion:</strong>" + WebUtility.HtmlEncode(this.AssemblyVersion) + "</p>");
+			Logger.LogError("ToString(): str → {Str}", str);
             str.Append("<p><strong>PortalId:</strong>" + this.PortalId + "</p>");
             str.Append("<p><strong>UserId:</strong>" + this.UserId + "</p>");
             str.Append("<p><strong>TabId:</strong>" + this.TabId + "</p>");
@@ -201,11 +219,13 @@ namespace DotNetNuke.Services.Exceptions
             str.Append("<p><strong>FileLineNumber:</strong>" + this.FileLineNumber + "</p>");
             str.Append("<p><strong>FileColumnNumber:</strong>" + this.FileColumnNumber + "</p>");
             str.Append("<p><strong>Method:</strong>" + WebUtility.HtmlEncode(this.Method) + "</p>");
+			Logger.LogWarning("<<< Exiting ToString()");
             return str.ToString();
         }
 
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteXml(writer={Writer})", writer);
             writer.WriteStartElement("Exception");
             writer.WriteElementString("AssemblyVersion", this.AssemblyVersion);
             writer.WriteElementString("PortalId", this.PortalId.ToString(CultureInfo.InvariantCulture));
@@ -225,6 +245,7 @@ namespace DotNetNuke.Services.Exceptions
             writer.WriteElementString("FileColumnNumber", this.FileColumnNumber.ToString(CultureInfo.InvariantCulture));
             writer.WriteElementString("Method", this.Method);
             writer.WriteEndElement();
+			Logger.LogWarning("<<< Exiting WriteXml(writer={Writer})", writer);
         }
     }
 }

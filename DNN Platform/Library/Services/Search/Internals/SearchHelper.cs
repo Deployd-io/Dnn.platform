@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.Search.Internals
     /// <summary>Internal Search Controller. This is an Internal class and should not be used outside of Core.</summary>
     public class SearchHelper : ServiceLocator<ISearchHelper, SearchHelper>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchHelper));
         /// <inheritdoc />
         protected override Func<ISearchHelper> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new SearchHelperImpl();
         }
     }

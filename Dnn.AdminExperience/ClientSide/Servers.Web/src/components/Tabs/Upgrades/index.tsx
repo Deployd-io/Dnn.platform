@@ -16,6 +16,7 @@ import UpgradeList from "./UpgradeList";
 import FileUpload from "./Upload";
 import Upgrading from "./Upgrading";
 import Done from "./Done";
+const logger = console;
 import { UpgradeSettings } from "models/UpgradeSettings";
 
 interface IProps {
@@ -23,6 +24,7 @@ interface IProps {
 }
 
 const UpgradesTab: React.FC<IProps> = (props) => {
+logger.error(`>>> Entering UpgradesTab(props=${props})`, { "event.action": "UpgradesTab", "logrite.props": props });
   const [upgrades, setUpgrades] = useState<LocalUpgradeInfo[]>([]);
   const [upgradeSettings, setUpgradeSettings] = useState<UpgradeSettings>({
     AllowDnnUpgradeUpload: false,
@@ -31,31 +33,40 @@ const UpgradesTab: React.FC<IProps> = (props) => {
     "done" | "upload" | "upgrading" | "list"
   >("list");
   const [showUploadCancelButton, setShowUploadCancelButton] = useState(true);
+logger.debug(`UpgradesTab: showUploadCancelButton → ${showUploadCancelButton}`, { "event.action": "UpgradesTab", "logrite.props": props });
 
   const getUpgrades = () => {
+	logger.error('>>> Entering getUpgrades()', { "event.action": "getUpgrades" });
     upgradeService.listUpgrades().then((upgrades) => {
       setUpgrades(upgrades);
     });
+	logger.warn('<<< Exiting getUpgrades()', { "event.action": "getUpgrades" });
   };
 
   const deletePackage = (packageName: string) => {
+	logger.error(`>>> Entering deletePackage(packageName=${packageName})`, { "event.action": "deletePackage", "logrite.packageName": packageName });
     upgradeService.deletePackage(packageName).then(() => {
       getUpgrades();
     });
+	logger.warn(`<<< Exiting deletePackage(packageName=${packageName})`, { "event.action": "deletePackage", "logrite.packageName": packageName });
   };
 
   const installPackage = (packageName: string) => {
+	logger.error(`>>> Entering installPackage(packageName=${packageName})`, { "event.action": "installPackage", "logrite.packageName": packageName });
     setPanelToShow("upgrading");
     upgradeService.startUpgrade(packageName).then(() => {
       setPanelToShow("done");
     });
+	logger.warn(`<<< Exiting installPackage(packageName=${packageName})`, { "event.action": "installPackage", "logrite.packageName": packageName });
   };
 
   useEffect(() => {
+	logger.error('>>> Entering UpgradesTab useEffect()');
     upgradeService.getUpgradeSettings().then((settings) => {
       setUpgradeSettings(settings);
     });
   }, []);
+logger.warn('<<< Exiting UpgradesTab useEffect()');
 
   useEffect(() => {
     if (panelToShow === "list") {
@@ -83,6 +94,7 @@ const UpgradesTab: React.FC<IProps> = (props) => {
                 type="secondary"
                 size="large"
                 onClick={() => {
+				logger.error(`UpgradesTab(props=${props}): panel → ${panel}`, { "event.action": "UpgradesTab", "logrite.props": props });
                   setPanelToShow("upload");
                 }}
               >
@@ -154,6 +166,7 @@ const UpgradesTab: React.FC<IProps> = (props) => {
       <GridCell className="dnn-servers-grid-panel">{panel}</GridCell>
     </GridCell>
   );
+logger.warn(`<<< Exiting UpgradesTab(props=${props})`, { "event.action": "UpgradesTab", "logrite.props": props });
 };
 
 export default UpgradesTab;

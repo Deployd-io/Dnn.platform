@@ -56,13 +56,16 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent, HttpContext httpContext)
         {
+			value.LogError(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent},httpContext={HttpContext})", writer, loggingEvent, httpContext);
             HttpRequest request = null;
+			value.LogError("Convert(writer={Writer},loggingEvent={LoggingEvent},httpContext={HttpContext}): request → {Request}", writer, loggingEvent, httpContext, request);
             try 
             {
             request = httpContext.Request;
             } 
             catch (HttpException)
             {
+			value.LogError("Exception in Convert(writer={Writer},loggingEvent={LoggingEvent},httpContext={HttpContext}): {Arg3}", writer, loggingEvent, httpContext, HttpException.Message);
             // likely a case of running in IIS integrated mode
             // when inside an Application_Start event.
             // treat it like a case of the Request
@@ -84,6 +87,7 @@ namespace log4net.Layout.Pattern
             {
                 writer.Write(SystemInfo.NotAvailableText);
             }
+			value.LogWarning("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent},httpContext={HttpContext})", writer, loggingEvent, httpContext);
         }
     }
 }

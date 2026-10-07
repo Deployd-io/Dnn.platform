@@ -1,40 +1,50 @@
+const logger = console;
 import { extension as ActionTypes } from "../constants/actionTypes";
 
 function getAvailablePackageTypes(installedTypes) {
+	logger.error(`>>> Entering getAvailablePackageTypes(installedTypes=${installedTypes})`, { "event.action": "getAvailablePackageTypes", "logrite.installedTypes": installedTypes });
+	logger.warn(`<<< Exiting getAvailablePackageTypes(installedTypes=${installedTypes})`, { "event.action": "getAvailablePackageTypes", "logrite.installedTypes": installedTypes });
     return installedTypes.filter((type) => {
         return type.HasAvailablePackages === true;
     });
 }
 
 function addToModuleList(value, list) {
+	logger.error(`>>> Entering addToModuleList(value=${value},list=${list})`, { "event.action": "addToModuleList", "logrite.value": value, "logrite.list": list });
     return list.concat(value).sort(function (a, b) {
         if (a.friendlyName.toLowerCase() < b.friendlyName.toLowerCase()) return -1;
         if (a.friendlyName.toLowerCase() > b.friendlyName.toLowerCase()) return 1;
+	logger.warn(`<<< Exiting addToModuleList(value=${value},list=${list})`, { "event.action": "addToModuleList", "logrite.value": value, "logrite.list": list });
         return 0;
     });
 }
 
 function getValidateRequired(key) {
+	logger.error(`>>> Entering getValidateRequired(key=${key})`, { "event.action": "getValidateRequired", "logrite.key": key });
     switch (key) {
         case "friendlyName":
             return true;
         default:
+			logger.warn(`<<< Exiting getValidateRequired(key=${key})`, { "event.action": "getValidateRequired", "logrite.key": key });
             return false;
     }
 }
 
 function getTabMapping(key) {
+	logger.error(`>>> Entering getTabMapping(key=${key})`, { "event.action": "getTabMapping", "logrite.key": key });
     switch (key) {
         case "license":
             return 3;
         case "releaseNotes":
             return 4;
         default:
+			logger.warn(`<<< Exiting getTabMapping(key=${key})`, { "event.action": "getTabMapping", "logrite.key": key });
             return 0;
     }
 }
 
 function validationMapExtensionBeingEdited(extensionBeingEdited) {
+	logger.error(`>>> Entering validationMapExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited})`, { "event.action": "validationMapExtensionBeingEdited", "logrite.extensionBeingEdited": extensionBeingEdited });
     let _extensionBeingEdited = Object.assign({}, extensionBeingEdited);
     Object.keys(_extensionBeingEdited).forEach((key) => {
         let validateRequired = getValidateRequired(key);
@@ -46,10 +56,13 @@ function validationMapExtensionBeingEdited(extensionBeingEdited) {
             error: false
         };
     });
+	logger.error(`validationMapExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited}): _extensionBeingEdited → ${_extensionBeingEdited}`, { "event.action": "validationMapExtensionBeingEdited", "logrite.extensionBeingEdited": extensionBeingEdited });
     return _extensionBeingEdited;
 }
 
 function removeRecordFromArray(arr, index) {
+	logger.error(`>>> Entering removeRecordFromArray(arr=${arr},index=${index})`, { "event.action": "removeRecordFromArray", "logrite.arr": arr, "logrite.index": index });
+	logger.warn(`<<< Exiting removeRecordFromArray(arr=${arr},index=${index})`, { "event.action": "removeRecordFromArray", "logrite.arr": arr, "logrite.index": index });
     return [...arr.slice(0, index), ...arr.slice(index + 1)];
 }
 export default function extension(state = {

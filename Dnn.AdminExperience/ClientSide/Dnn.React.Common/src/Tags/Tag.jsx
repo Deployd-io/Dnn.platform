@@ -1,15 +1,18 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "./style.less";
+const logger = console;
 
 export default class Tag extends Component {
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {onRemove} = this.props;
         const tagName = this.props.tag.trim();
         if (!tagName) {
             return false;
         }
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={"dnn-uicommon-tag-input" + (this.props.enabled ? "": " disabled")}>
                 <span>{this.props.tag}</span>

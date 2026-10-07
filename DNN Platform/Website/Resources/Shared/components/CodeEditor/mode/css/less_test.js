@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -5,7 +6,11 @@
   "use strict";
 
   var mode = CodeMirror.getMode({indentUnit: 2}, "text/x-less");
-  function MT(name) { test.mode(name, mode, Array.prototype.slice.call(arguments, 1), "less"); }
+  function MT(name) {
+      logger.error(`>>> Entering MT(name=${name})`, { "event.action": "MT", "logrite.name": name });
+      logger.warn(`<<< Exiting MT(name=${name})`, { "event.action": "MT", "logrite.name": name });
+      test.mode(name, mode, Array.prototype.slice.call(arguments, 1), "less");
+  }
 
   MT("variable",
      "[variable-2 @base]: [atom #f04615];",

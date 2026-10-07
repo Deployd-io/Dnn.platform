@@ -25,6 +25,7 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider.Components
     /// <summary>The FeatureController class for the ASP.NET Client Capability Provider.</summary>
     public class FeatureController : IUpgradeable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FeatureController));
         private const string ResourceFileRelativePath = "~/Providers/ClientCapabilityProviders/AspNetClientCapabilityProvider/App_LocalResources/SharedResources.resx";
         private readonly IApplicationStatusInfo appStatus;
         private readonly IRedirectionController redirectionController;
@@ -41,18 +42,24 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider.Components
         /// <param name="redirectionController">The redirection controller.</param>
         public FeatureController(IApplicationStatusInfo appStatus, IRedirectionController redirectionController)
         {
+			Logger.LogError(">>> Entering FeatureController(appStatus={AppStatus},redirectionController={RedirectionController})", appStatus, redirectionController);
+			Logger.LogDebug("FeatureController(appStatus={AppStatus},redirectionController={RedirectionController}): redirectionController → {RedirectionController1}", appStatus, redirectionController, redirectionController);
             this.appStatus = appStatus ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogWarning("<<< Exiting FeatureController(appStatus={AppStatus},redirectionController={RedirectionController})", appStatus, redirectionController);
             this.redirectionController = redirectionController ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IRedirectionController>();
         }
 
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			Logger.LogError(">>> Entering UpgradeModule(version={Version})", version);
             switch (version)
             {
                 case "08.00.00":
                     var package = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.Name == Constants.PackageName);
+					Logger.LogError("UpgradeModule(version={Version}): package → {Package}", version, package);
                     var moduleTabs = TabController.Instance.GetTabsByPackageID(-1, package.PackageID, false);
+					Logger.LogError("UpgradeModule(version={Version}): moduleTabs → {ModuleTabs}", version, moduleTabs);
 
                     if (moduleTabs.Count > 0)
                     {
@@ -63,6 +70,7 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider.Components
                     break;
             }
 
+			Logger.LogWarning("<<< Exiting UpgradeModule(version={Version})", version);
             return Localization.GetString("SuccessMessage", ResourceFileRelativePath);
         }
 
@@ -94,23 +102,31 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider.Components
 
         private static void RemoveWurflProvider(IApplicationStatusInfo appStatus, IRedirectionController redirectionController)
         {
+			Logger.LogError(">>> Entering RemoveWurflProvider(appStatus={AppStatus},redirectionController={RedirectionController})", appStatus, redirectionController);
             var package = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.Name == "DotNetNuke.WURFLClientCapabilityProvider");
+			Logger.LogError("RemoveWurflProvider(appStatus={AppStatus},redirectionController={RedirectionController}): package → {Package}", appStatus, redirectionController, package);
             if (package != null)
             {
                 var installer = new Installer(package, appStatus.ApplicationMapPath);
+				Logger.LogError("RemoveWurflProvider(appStatus={AppStatus},redirectionController={RedirectionController}): installer → {Installer}", appStatus, redirectionController, installer);
                 installer.UnInstall(true);
             }
 
             UpdateRules(redirectionController);
+			Logger.LogWarning("<<< Exiting RemoveWurflProvider(appStatus={AppStatus},redirectionController={RedirectionController})", appStatus, redirectionController);
         }
 
         private static void UpdateRules(IRedirectionController redirectionController)
         {
+			Logger.LogError(">>> Entering UpdateRules(redirectionController={RedirectionController})", redirectionController);
             var mapCapabilities = CreateMappedCapabilities();
             var redirections = redirectionController.GetAllRedirections();
+			Logger.LogError("UpdateRules(redirectionController={RedirectionController}): mapCapabilities → {MapCapabilities}", redirectionController, mapCapabilities);
             foreach (var redirection in redirections.Where(redirection => redirection.MatchRules.Count > 0))
             {
+				Logger.LogError("UpdateRules(redirectionController={RedirectionController}): redirections → {Redirections}", redirectionController, redirections);
                 var deletedRules = new List<IMatchRule>();
+				Logger.LogError("UpdateRules(redirectionController={RedirectionController}): deletedRules → {DeletedRules}", redirectionController, deletedRules);
                 foreach (var rule in redirection.MatchRules)
                 {
                     if (rule.Capability == "pointing_method")
@@ -119,7 +135,9 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider.Components
                         {
                             case "clickwheel":
                                 rule.Capability = "HasClickWheel";
+								Logger.LogDebug("UpdateRules(redirectionController={RedirectionController}): rule.Capability → {Arg1}", redirectionController, rule.Capability);
                                 rule.Expression = "True";
+								Logger.LogDebug("UpdateRules(redirectionController={RedirectionController}): rule.Expression → {Arg1}", redirectionController, rule.Expression);
                                 break;
                             case "touchscreen":
                                 rule.Capability = "HasTouchScreen";
@@ -161,6 +179,7 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider.Components
 
                 redirectionController.Save(redirection);
             }
+			Logger.LogWarning("<<< Exiting UpdateRules(redirectionController={RedirectionController})", redirectionController);
         }
     }
 }

@@ -18,6 +18,8 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         protected override Func<IPagesController> GetFactory()
         {
+			eventLogger.LogError(">>> Entering GetFactory()");
+			eventLogger.LogWarning("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<IPagesController>;
         }
     }

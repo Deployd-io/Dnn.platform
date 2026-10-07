@@ -10,12 +10,15 @@ import * as dayjs from "dayjs";
 import styles from "./style.module.less";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
+const logger = console;
 
 class ListView extends Component {
     constructor() {
         super();
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
     onDelete(portal, index) {
+		logger.error(`>>> Entering onDelete(portal=${portal},index=${index})`, { "event.action": "onDelete", "logrite.portal": portal, "logrite.index": index });
         const { props } = this;
         utilities.confirm(Localization.get("deletePortal").replace("{0}", portal.PortalName),
             Localization.get("ConfirmPortalDelete"),
@@ -23,15 +26,19 @@ class ListView extends Component {
             () => {
                 props.dispatch(CommonPortalListActions.deletePortal(portal.PortalID, index));
             });
+			logger.warn(`<<< Exiting onDelete(portal=${portal},index=${index})`, { "event.action": "onDelete", "logrite.portal": portal, "logrite.index": index });
     }
     backToSites() {
         utilities.loadPanel(this.props.sitesModule, {});
+		logger.warn('<<< Exiting backToSites()', { "event.action": "backToSites" });
     }
     onSetting(portal /*, index*/) {
         let event = document.createEvent("Event");
         event.initEvent("portalIdChanged", true, true);
+		logger.error(`onSetting(): event → ${event}`, { "event.action": "onSetting" });
 
         let event2 = document.createEvent("Event");
+		logger.error(`onSetting(): event2 → ${event2}`, { "event.action": "onSetting" });
         event2.initEvent("reloadPortalList", true, true);
 
         let settings = {
@@ -57,20 +64,26 @@ class ListView extends Component {
 
         document.dispatchEvent(event);
         document.dispatchEvent(event2);
+		logger.warn('<<< Exiting onSetting()', { "event.action": "onSetting" });
     }
     onPreview(portal /*, index*/) {
         if (portal.PortalAliases && portal.PortalAliases.length > 0) {
             window.open(portal.PortalAliases[0].link);
         }
+		logger.warn('<<< Exiting onPreview()', { "event.action": "onPreview" });
     }
     navigateMap(page) {
+		logger.error(`>>> Entering navigateMap(page=${page})`, { "event.action": "navigateMap", "logrite.page": page });
         const { props } = this;
         props.dispatch(CommonVisiblePanelActions.selectPanel(page));
+		logger.warn(`<<< Exiting navigateMap(page=${page})`, { "event.action": "navigateMap", "logrite.page": page });
     }
 
     onImportExport(portal, type) {
+		logger.error(`>>> Entering onImportExport(portal=${portal},type=${type})`, { "event.action": "onImportExport", "logrite.portal": portal, "logrite.type": type });
         let event = document.createEvent("Event");
 
+		logger.error(`onImportExport(portal=${portal},type=${type}): event → ${event}`, { "event.action": "onImportExport", "logrite.portal": portal, "logrite.type": type });
         event.initEvent("siteImportExport", true, true);
 
         let settings = {
@@ -91,9 +104,11 @@ class ListView extends Component {
         });
 
         document.dispatchEvent(event);
+		logger.warn(`<<< Exiting onImportExport(portal=${portal},type=${type})`, { "event.action": "onImportExport", "logrite.portal": portal, "logrite.type": type });
     }
 
     getPortalButtons(portal, index) {
+		logger.error(`>>> Entering getPortalButtons(portal=${portal},index=${index})`, { "event.action": "getPortalButtons", "logrite.portal": portal, "logrite.index": index });
         let portalButtons = [
             {
                 icon: SvgIcons.PreviewIcon,
@@ -133,6 +148,7 @@ class ListView extends Component {
 
          
         let i = 0;
+		logger.warn(`<<< Exiting getPortalButtons(portal=${portal},index=${index})`, { "event.action": "getPortalButtons", "logrite.portal": portal, "logrite.index": index });
         return portalButtons.map((_button) => {
             let ButtonIcon = _button.icon;
             let element = <div key={`portalButton_${i}`} title={_button.title} onClick={_button.onClick}><ButtonIcon /></div>;
@@ -141,11 +157,13 @@ class ListView extends Component {
         });
     }
     getPortalMapping(portal) {
+		logger.error(`>>> Entering getPortalMapping(portal=${portal})`, { "event.action": "getPortalMapping", "logrite.portal": portal });
         dayjs.extend(localizedFormat);
         dayjs.extend(relativeTime);
          
         require("dayjs/locale/" + this.props.culture.substring(0,2));
 
+		logger.warn(`<<< Exiting getPortalMapping(portal=${portal})`, { "event.action": "getPortalMapping", "logrite.portal": portal });
         return [
             {
                 label: Localization.get("SiteDetails_SiteID"),
@@ -174,18 +192,22 @@ class ListView extends Component {
                 portalButtons={this.getPortalButtons(portal, index)}
                 portalStatisticInfo={this.getPortalMapping(portal)} />);
         });
+		logger.warn('<<< Exiting getDetailList()', { "event.action": "getDetailList" });
     }
     cancelExport(event) {
+		logger.error(`>>> Entering cancelExport(event=${event})`, { "event.action": "cancelExport", "logrite.event": event });
         if (event !== undefined)
             event.preventDefault();
         this.setState({
             portalBeingExported: {}
         });
         this.navigateMap(0);
+		logger.warn(`<<< Exiting cancelExport(event=${event})`, { "event.action": "cancelExport", "logrite.event": event });
     }
     render() {
         const portalList = this.getDetailList(), { props } = this;
 
+		logger.error(`render(): portalList → ${portalList}`, { "event.action": "render" });
         return (
             <GridCell className={styles.siteList}>
                 <GridCell className={"portal-list-container " + props.className}>
@@ -221,6 +243,8 @@ ListView.defaultProps = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         portals: state.portal.portals,
         totalCount: state.portal.totalCount

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Dropdown from "./Dropdown";
+const logger = console;
 
 let timeArray = [];
 for (let i = 0; i < 24; i++) {
@@ -13,6 +14,7 @@ for (let i = 0; i < 24; i++) {
 timeArray = timeArray.map(t => {return {label: t, value: t};});
 
 function getHour(number) {
+	logger.error(`>>> Entering getHour(number=${number})`, { "event.action": "getHour", "logrite.number": number });
     let hour = number;
     if (number > 12) {
         hour = number - 12;
@@ -20,6 +22,7 @@ function getHour(number) {
     if (hour < 10) {
         hour = "0" + hour;
     }
+	logger.error(`getHour(number=${number}): hour → ${hour}`, { "event.action": "getHour", "logrite.number": number });
     return hour;
 }
 

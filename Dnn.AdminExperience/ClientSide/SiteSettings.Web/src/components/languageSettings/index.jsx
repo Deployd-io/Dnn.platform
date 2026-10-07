@@ -8,28 +8,37 @@ import Languages from "./languages";
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 import { InputGroup, GridSystem, Dropdown, Flag, RadioButtons, Switch, Tooltip, Label, Button } from "@dnnsoftware/dnn-react-common";
 
 class LanguageSettingsPanelBody extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             languageSettings: undefined
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     isHost() {
+		logger.error('>>> Entering isHost()', { "event.action": "isHost" });
+		logger.warn('<<< Exiting isHost()', { "event.action": "isHost" });
         return util.settings.isHost === true;
     }
 
     allowContentLocalization() {
+		logger.error('>>> Entering allowContentLocalization()', { "event.action": "allowContentLocalization" });
         const { props } = this;
+		logger.warn('<<< Exiting allowContentLocalization()', { "event.action": "allowContentLocalization" });
         return props.languageSettings !== undefined && props.languageSettings.AllowContentLocalization === true;
     }
 
     loadData() {
+		logger.error('>>> Entering loadData()', { "event.action": "loadData" });
         const {props} = this;
         props.dispatch(LanguagesActions.getLanguageSettings(props.portalId, props.cultureCode, (data) => {
+			logger.warn('<<< Exiting loadData()', { "event.action": "loadData" });
             this.setState({
                 languageSettings: Object.assign({}, data.Settings)
             });
@@ -37,10 +46,13 @@ class LanguageSettingsPanelBody extends Component {
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.loadData();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         const { props } = this;
         if (props.languageSettings) {
             let portalIdChanged = props.portalId !== undefined && prevProps.portalId !== props.portalId;
@@ -48,16 +60,20 @@ class LanguageSettingsPanelBody extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
             }
         }
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {props} = this;
         let languageSettings = Object.assign({}, props.languageSettings);
+		logger.error(`onSettingChange(key=${key},event=${event}): languageSettings → ${languageSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
 
         if (key === "LanguageDisplayMode") {
             languageSettings[key] = event;
+			logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         }
         else if (key === "SiteDefaultLanguage") {
             languageSettings[key] = event.value;
@@ -74,6 +90,7 @@ class LanguageSettingsPanelBody extends Component {
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const {props} = this;
 
@@ -81,13 +98,16 @@ class LanguageSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         }));
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(LanguagesActions.getLanguageSettings(props.portalId, props.cultureCode, (data) => {
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
                 this.setState({
                     languageSettings: Object.assign({}, data.Settings)
                 });
@@ -96,6 +116,7 @@ class LanguageSettingsPanelBody extends Component {
     }
 
     getLanguageOptions() {
+		logger.error('>>> Entering getLanguageOptions()', { "event.action": "getLanguageOptions" });
         const {props} = this;
         let options = [];
         if (props.languages !== undefined) {
@@ -122,10 +143,12 @@ class LanguageSettingsPanelBody extends Component {
                 }
             });
         }
+		logger.warn('<<< Exiting getLanguageOptions()', { "event.action": "getLanguageOptions" });
         return options;
     }
 
     getLanguageDisplayModes() {
+		logger.error('>>> Entering getLanguageDisplayModes()', { "event.action": "getLanguageDisplayModes" });
         const {props} = this;
         let options = [];
         if (props.languageDisplayModes !== undefined) {
@@ -133,20 +156,24 @@ class LanguageSettingsPanelBody extends Component {
                 return { label: item.Key, value: item.Value };
             });
         }
+		logger.warn('<<< Exiting getLanguageDisplayModes()', { "event.action": "getLanguageDisplayModes" });
         return options;
     }
 
     enableLocalizedContent() {
+		logger.error('>>> Entering enableLocalizedContent()', { "event.action": "enableLocalizedContent" });
         const {props} = this;
         if (props.languageSettingsClientModified) {
             util.utilities.notifyError(resx.get("SaveOrCancelWarning"));
         }
         else {
             props.openLocalizedContent();
+			logger.warn('<<< Exiting enableLocalizedContent()', { "event.action": "enableLocalizedContent" });
         }
     }
 
     disableLocalizedContent() {
+		logger.error('>>> Entering disableLocalizedContent()', { "event.action": "disableLocalizedContent" });
         const {props} = this;
         if (props.languageSettingsClientModified) {
             util.utilities.notifyError(resx.get("SaveOrCancelWarning"));
@@ -154,23 +181,28 @@ class LanguageSettingsPanelBody extends Component {
         else {
             props.dispatch(LanguagesActions.disableLocalizedContent(props.portalId, () => {
                 props.dispatch(LanguagesActions.getLanguageSettings(props.portalId, props.cultureCode));
+				logger.warn('<<< Exiting disableLocalizedContent()', { "event.action": "disableLocalizedContent" });
             }));
         }
     }
 
     disableLocalizedContentButton() {
+		logger.error('>>> Entering disableLocalizedContentButton()', { "event.action": "disableLocalizedContentButton" });
         const {props} = this;
 
         if (this.allowContentLocalization() !== props.languageSettings.AllowContentLocalization) {
             return true;
         }
         else {
+			logger.warn('<<< Exiting disableLocalizedContentButton()', { "event.action": "disableLocalizedContentButton" });
             return false;
         }
     }
 
     getDefaultLanguageDisplay() {
+		logger.error('>>> Entering getDefaultLanguageDisplay()', { "event.action": "getDefaultLanguageDisplay" });
         const {props} = this;
+		logger.warn('<<< Exiting getDefaultLanguageDisplay()', { "event.action": "getDefaultLanguageDisplay" });
         return (
             <div className="default-language">
                 <div className="language-container">
@@ -186,6 +218,7 @@ class LanguageSettingsPanelBody extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         if (props.languageSettings) {
             const columnOne = <div className="left-column" key="language-settings-left-column">
@@ -362,6 +395,8 @@ LanguageSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         languageSettings: state.languages.languageSettings,

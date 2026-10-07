@@ -23,6 +23,7 @@ namespace DotNetNuke.UI.WebControls
 
     public class RolesSelectionGrid : Control, INamingContainer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RolesSelectionGrid));
         private static readonly string[] RoleSeparator = ["##",];
         private readonly DataTable dtRoleSelections = new DataTable();
         private IList<RoleInfo> roles;
@@ -208,10 +209,12 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="savedState">The saved state.</param>
         protected override void LoadViewState(object savedState)
         {
+			Logger.LogError(">>> Entering LoadViewState(savedState={SavedState})", savedState);
             if (savedState != null)
             {
                 // Load State from the array of objects that was saved with SaveViewState.
                 var myState = (object[])savedState;
+				Logger.LogError("LoadViewState(savedState={SavedState}): myState → {MyState}", savedState, myState);
 
                 // Load Base Controls ViewState
                 if (myState[0] != null)
@@ -228,11 +231,13 @@ namespace DotNetNuke.UI.WebControls
                                         : new List<string>();
                 }
             }
+			Logger.LogWarning("<<< Exiting LoadViewState(savedState={SavedState})", savedState);
         }
 
         /// <inheritdoc />
         protected override object SaveViewState()
         {
+			Logger.LogError(">>> Entering SaveViewState()");
             var allStates = new object[2];
 
             // Save the Base Controls ViewState
@@ -240,7 +245,9 @@ namespace DotNetNuke.UI.WebControls
 
             // Persist the TabPermisisons
             var sb = new StringBuilder();
+			Logger.LogError("SaveViewState(): sb → {Sb}", sb);
             bool addDelimiter = false;
+			Logger.LogError("SaveViewState(): addDelimiter → {AddDelimiter}", addDelimiter);
             foreach (string role in this.CurrentRoleSelection)
             {
                 if (addDelimiter)
@@ -256,28 +263,38 @@ namespace DotNetNuke.UI.WebControls
             }
 
             allStates[1] = sb.ToString();
+			Logger.LogWarning("<<< Exiting SaveViewState()");
             return allStates;
         }
 
         /// <summary>Creates the Child Controls.</summary>
         protected override void CreateChildControls()
         {
+			Logger.LogError(">>> Entering CreateChildControls()");
             this.pnlRoleSlections = new Panel { CssClass = "dnnRolesGrid" };
 
+			Logger.LogDebug("CreateChildControls(): this.pnlRoleSlections → {Arg0}", this.pnlRoleSlections);
+			Logger.LogDebug("CreateChildControls(): pnlRoleSlections → {PnlRoleSlections}", pnlRoleSlections);
             // Optionally Add Role Group Filter
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogError("CreateChildControls(): portalSettings → {PortalSettings}", portalSettings);
             ArrayList arrGroups = RoleController.GetRoleGroups(portalSettings.PortalId);
+			Logger.LogError("CreateChildControls(): arrGroups → {ArrGroups}", arrGroups);
             if (arrGroups.Count > 0)
             {
                 this.lblGroups = new Label { Text = Localization.GetString("RoleGroupFilter") };
+				Logger.LogDebug("CreateChildControls(): lblGroups → {LblGroups}", lblGroups);
                 this.pnlRoleSlections.Controls.Add(this.lblGroups);
 
                 this.pnlRoleSlections.Controls.Add(new LiteralControl("&nbsp;&nbsp;"));
 
                 this.cboRoleGroups = new DropDownList { AutoPostBack = true };
+				Logger.LogDebug("CreateChildControls(): cboRoleGroups → {CboRoleGroups}", cboRoleGroups);
+				Logger.LogDebug("CreateChildControls(): this.cboRoleGroups → {Arg0}", this.cboRoleGroups);
 
                 this.cboRoleGroups.Items.Add(new ListItem(Localization.GetString("AllRoles"), "-2"));
                 var liItem = new ListItem(Localization.GetString("GlobalRoles"), "-1") { Selected = true };
+				Logger.LogError("CreateChildControls(): liItem → {LiItem}", liItem);
                 this.cboRoleGroups.Items.Add(liItem);
                 foreach (RoleGroupInfo roleGroup in arrGroups)
                 {
@@ -290,6 +307,8 @@ namespace DotNetNuke.UI.WebControls
             }
 
             this.dgRoleSelection = new DataGrid { AutoGenerateColumns = false, CellSpacing = 0, GridLines = GridLines.None };
+			Logger.LogDebug("CreateChildControls(): dgRoleSelection → {DgRoleSelection}", dgRoleSelection);
+			Logger.LogDebug("CreateChildControls(): this.dgRoleSelection → {Arg0}", this.dgRoleSelection);
             this.dgRoleSelection.FooterStyle.CssClass = "dnnGridFooter";
             this.dgRoleSelection.HeaderStyle.CssClass = "dnnGridHeader";
             this.dgRoleSelection.ItemStyle.CssClass = "dnnGridItem";
@@ -298,13 +317,16 @@ namespace DotNetNuke.UI.WebControls
             this.pnlRoleSlections.Controls.Add(this.dgRoleSelection);
 
             this.Controls.Add(this.pnlRoleSlections);
+			Logger.LogWarning("<<< Exiting CreateChildControls()");
         }
 
         /// <summary>Overrides the base OnPreRender method to Bind the Grid to the Permissions.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             this.BindData();
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>Updates a Selection.</summary>
@@ -312,7 +334,9 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="selected">Whether it's selected.</param>
         protected virtual void UpdateSelection(string roleName, bool selected)
         {
+			Logger.LogError(">>> Entering UpdateSelection(roleName={RoleName},selected={Selected})", roleName, selected);
             var isMatch = false;
+			Logger.LogError("UpdateSelection(roleName={RoleName},selected={Selected}): isMatch → {IsMatch}", roleName, selected, isMatch);
             foreach (string currentRoleName in this.CurrentRoleSelection)
             {
                 if (currentRoleName == roleName)
@@ -334,19 +358,23 @@ namespace DotNetNuke.UI.WebControls
             {
                 this.CurrentRoleSelection.Add(roleName);
             }
+			Logger.LogWarning("<<< Exiting UpdateSelection(roleName={RoleName},selected={Selected})", roleName, selected);
         }
 
         /// <summary>Updates the Selections.</summary>
         protected void UpdateSelections()
         {
+			Logger.LogError(">>> Entering UpdateSelections()");
             this.EnsureChildControls();
 
             this.UpdateRoleSelections();
+			Logger.LogWarning("<<< Exiting UpdateSelections()");
         }
 
         /// <summary>Updates the permissions.</summary>
         protected void UpdateRoleSelections()
         {
+			Logger.LogError(">>> Entering UpdateRoleSelections()");
             if (this.dgRoleSelection != null)
             {
                 foreach (DataGridItem dgi in this.dgRoleSelection.Items)
@@ -355,28 +383,34 @@ namespace DotNetNuke.UI.WebControls
                     if (dgi.Cells[i].Controls.Count > 0)
                     {
                         var cb = (CheckBox)dgi.Cells[i].Controls[0];
+						Logger.LogError("UpdateRoleSelections(): cb → {Cb}", cb);
                         this.UpdateSelection(dgi.Cells[0].Text, cb.Checked);
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting UpdateRoleSelections()");
         }
 
         /// <summary>Bind the data to the controls.</summary>
         private void BindData()
         {
+			Logger.LogError(">>> Entering BindData()");
             this.EnsureChildControls();
 
             this.BindRolesGrid();
+			Logger.LogWarning("<<< Exiting BindData()");
         }
 
         /// <summary>Bind the Roles data to the Grid.</summary>
         private void BindRolesGrid()
         {
+			Logger.LogError(">>> Entering BindRolesGrid()");
             this.DtRolesSelection.Columns.Clear();
             this.DtRolesSelection.Rows.Clear();
 
             // Add Roles Column
             var col = new DataColumn("RoleId", typeof(string));
+			Logger.LogError("BindRolesGrid(): col → {Col}", col);
             this.DtRolesSelection.Columns.Add(col);
 
             // Add Roles Column
@@ -394,6 +428,7 @@ namespace DotNetNuke.UI.WebControls
             {
                 var role = this.roles[i];
                 DataRow row = this.DtRolesSelection.NewRow();
+				Logger.LogError("BindRolesGrid(): row → {Row}", row);
                 row["RoleId"] = role.RoleID;
                 row["RoleName"] = Localization.LocalizeRole(role.RoleName);
                 row["Selected"] = this.GetSelection(role.RoleName);
@@ -403,17 +438,22 @@ namespace DotNetNuke.UI.WebControls
 
             this.dgRoleSelection.DataSource = this.DtRolesSelection;
             this.dgRoleSelection.DataBind();
+			Logger.LogWarning("<<< Exiting BindRolesGrid()");
         }
 
         private bool GetSelection(string roleName)
         {
+			Logger.LogError(">>> Entering GetSelection(roleName={RoleName})", roleName);
+			Logger.LogWarning("<<< Exiting GetSelection(roleName={RoleName})", roleName);
             return this.CurrentRoleSelection.Any(r => r == roleName);
         }
 
         /// <summary>Gets the roles from the Database and loads them into the Roles property.</summary>
         private void GetRoles()
         {
+			Logger.LogError(">>> Entering GetRoles()");
             int roleGroupId = -2;
+			Logger.LogError("GetRoles(): roleGroupId → {RoleGroupId}", roleGroupId);
             if (this.cboRoleGroups is { SelectedValue: not null, })
             {
                 roleGroupId = int.Parse(this.cboRoleGroups.SelectedValue, CultureInfo.InvariantCulture);
@@ -422,6 +462,8 @@ namespace DotNetNuke.UI.WebControls
             this.roles = roleGroupId > -2
                     ? RoleController.Instance.GetRoles(PortalController.Instance.GetCurrentSettings().PortalId, r => r.RoleGroupID == roleGroupId && r.SecurityMode != SecurityMode.SocialGroup && r.Status == RoleStatus.Approved)
                     : RoleController.Instance.GetRoles(PortalController.Instance.GetCurrentSettings().PortalId, r => r.SecurityMode != SecurityMode.SocialGroup && r.Status == RoleStatus.Approved);
+					Logger.LogDebug("GetRoles(): roles → {Roles}", roles);
+					Logger.LogDebug("GetRoles(): this.roles → {Arg0}", this.roles);
 
             if (roleGroupId < 0)
             {
@@ -436,25 +478,33 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetRoles()");
             this.roles = this.roles.OrderBy(r => r.RoleName).ToList();
         }
 
         /// <summary>Sets up the columns for the Grid.</summary>
         private void SetUpRolesGrid()
         {
+			Logger.LogError(">>> Entering SetUpRolesGrid()");
             this.dgRoleSelection.Columns.Clear();
             var textCol = new BoundColumn { HeaderText = "&nbsp;", DataField = "RoleName" };
+			Logger.LogError("SetUpRolesGrid(): textCol → {TextCol}", textCol);
             textCol.ItemStyle.Width = Unit.Parse("150px", CultureInfo.InvariantCulture);
             this.dgRoleSelection.Columns.Add(textCol);
             var idCol = new BoundColumn { HeaderText = string.Empty, DataField = "roleid", Visible = false };
+			Logger.LogError("SetUpRolesGrid(): idCol → {IdCol}", idCol);
             this.dgRoleSelection.Columns.Add(idCol);
             var checkCol = new TemplateColumn();
+			Logger.LogError("SetUpRolesGrid(): checkCol → {CheckCol}", checkCol);
+			Logger.LogDebug("SetUpRolesGrid(): checkCol.ItemTemplate → {Arg0}", checkCol.ItemTemplate);
             var columnTemplate = new CheckBoxColumnTemplate { DataField = "Selected" };
+			Logger.LogError("SetUpRolesGrid(): columnTemplate → {ColumnTemplate}", columnTemplate);
             checkCol.ItemTemplate = columnTemplate;
             checkCol.HeaderText = Localization.GetString("SelectedRole");
             checkCol.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
             checkCol.HeaderStyle.Wrap = true;
             this.dgRoleSelection.Columns.Add(checkCol);
+			Logger.LogWarning("<<< Exiting SetUpRolesGrid()");
         }
     }
 }

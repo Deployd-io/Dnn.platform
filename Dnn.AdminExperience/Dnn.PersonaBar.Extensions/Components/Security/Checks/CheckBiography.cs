@@ -28,6 +28,8 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         public CheckBiography()
             : this(null, null, null, null, null)
         {
+		eventLogger.LogError(">>> Entering CheckBiography()");
+        eventLogger.LogWarning("<<< Exiting CheckBiography()");
         }
 
         /// <inheritdoc />
@@ -39,14 +41,19 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			eventLogger.LogError(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
+			eventLogger.LogError("Execute(): result → {Result}", result);
             try
             {
                 var richTextDataType = this.listController.GetListEntryInfo("DataType", "RichText");
+				eventLogger.LogError("Execute(): richTextDataType → {RichTextDataType}", richTextDataType);
+				eventLogger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                 result.Severity = SeverityEnum.Pass;
                 foreach (IPortalInfo portal in this.portalController.GetPortals())
                 {
                     var pd = ProfileController.GetPropertyDefinitionByName(this.hostSettings, this.portalController, this.appStatus, this.portalGroupController, portal.PortalId, "Biography");
+					eventLogger.LogError("Execute(): pd → {Pd}", pd);
                     if (pd != null && pd.DataType == richTextDataType.EntryID && !pd.Deleted)
                     {
                         result.Severity = SeverityEnum.Warning;
@@ -56,6 +63,8 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in Execute(): {Arg0}", Exception.Message);
+			eventLogger.LogWarning("<<< Exiting Execute()");
                 throw;
             }
 

@@ -73,6 +73,8 @@ namespace log4net.Config
         /// </remarks>
         private BasicConfigurator()
         {
+		value.LogError(">>> Entering BasicConfigurator()");
+        value.LogWarning("<<< Exiting BasicConfigurator()");
         }
 
 #if !NETSTANDARD1_3
@@ -90,6 +92,11 @@ namespace log4net.Config
         /// </remarks>
         public static ICollection Configure()
         {
+			value.LogError(">>> Entering Configure()");
+            value.LogWarning("<<< Exiting Configure()");
+			value.LogWarning("<<< Exiting Configure(appenders={Appenders})", appenders);
+			value.LogWarning("<<< Exiting Configure(repository={Repository})", repository);
+			value.LogWarning("<<< Exiting Configure(repository={Repository},appenders={Appenders})", repository, appenders);
             return Configure(LogManager.GetRepository(Assembly.GetCallingAssembly()));
         }
 
@@ -211,15 +218,19 @@ namespace log4net.Config
         
         private static void InternalConfigure(ILoggerRepository repository, params IAppender[] appenders) 
         {
+			value.LogError(">>> Entering InternalConfigure(repository={Repository},appenders={Appenders})", repository, appenders);
             IBasicRepositoryConfigurator configurableRepository = repository as IBasicRepositoryConfigurator;
             if (configurableRepository != null)
             {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				value.LogError("InternalConfigure(repository,appenders)={Repository},{Appenders}: database query executed in {Arg2} ms", repository, appenders, __logStart.ElapsedMilliseconds);
                 configurableRepository.Configure(appenders);
             }
             else
             {
                 LogLog.Warn(declaringType, "BasicConfigurator: Repository [" + repository + "] does not support the BasicConfigurator");
             }
+			value.LogWarning("<<< Exiting InternalConfigure(repository={Repository},appenders={Appenders})", repository, appenders);
         }
     }
 }

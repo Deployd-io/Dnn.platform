@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import resx from "resources";
 import { Scrollbars } from "react-custom-scrollbars";
 import Folder from "./folder";
+const logger = console;
 import { GridCell, SvgIcons, Label, Collapsible } from "@dnnsoftware/dnn-react-common";
 const parentTermTreeStyle = {
     width: "100%",
@@ -14,6 +15,8 @@ const parentTermTreeStyle = {
 
  
 function mapChildFolders(folders, getChildFolders, getResxEntries, resxBeingEdited) {
+	logger.error(`>>> Entering mapChildFolders(folders=${folders},getChildFolders=${getChildFolders},getResxEntries=${getResxEntries},resxBeingEdited=${resxBeingEdited})`, { "event.action": "mapChildFolders", "logrite.folders": folders, "logrite.getChildFolders": getChildFolders, "logrite.getResxEntries": getResxEntries, "logrite.resxBeingEdited": resxBeingEdited });
+	logger.warn(`<<< Exiting mapChildFolders(folders=${folders},getChildFolders=${getChildFolders},getResxEntries=${getResxEntries},resxBeingEdited=${resxBeingEdited})`, { "event.action": "mapChildFolders", "logrite.folders": folders, "logrite.getChildFolders": getChildFolders, "logrite.getResxEntries": getResxEntries, "logrite.resxBeingEdited": resxBeingEdited });
     return folders.map((folder, i) => {
         const isResxFile = folder.NewValue.indexOf(".resx") !== -1;
 
@@ -32,40 +35,54 @@ class ResourceTree extends Component {
 
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             treeOpened: false
         };
         this.handleClick = this.handleClick.bind(this);
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
         this.node = React.createRef();
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         document.addEventListener("click", this.handleClick, false);
         this._isMounted = true;
+		logger.debug(`componentDidMount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentDidMount" });
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         document.removeEventListener("click", this.handleClick, false);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentWillUnmount" });
     }
 
     handleClick(e) {
+		logger.error(`>>> Entering handleClick(e=${e})`, { "event.action": "handleClick", "logrite.e": e });
         if (!this._isMounted) { return; }
         const node = this.node.current;
         if (node && node.contains(e.target)) {
             return;
         }
         this.hide();
+		logger.warn(`<<< Exiting handleClick(e=${e})`, { "event.action": "handleClick", "logrite.e": e });
     }
     hide() {
+		logger.error('>>> Entering hide()', { "event.action": "hide" });
         this.setState({ treeOpened: false });
+		logger.warn('<<< Exiting hide()', { "event.action": "hide" });
     }
     onToggleTree() {
+		logger.error('>>> Entering onToggleTree()', { "event.action": "onToggleTree" });
         this.setState({
             treeOpened: !this.state.treeOpened
         });
+		logger.warn('<<< Exiting onToggleTree()', { "event.action": "onToggleTree" });
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {
             languageFolders,
             getChildFolders,
@@ -73,6 +90,7 @@ class ResourceTree extends Component {
             resxBeingEdited,
             resxBeingEditedDisplay
         } = this.props;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div ref={this.node}>
                 <GridCell columnSize={100} className="resource-file-tree-container">

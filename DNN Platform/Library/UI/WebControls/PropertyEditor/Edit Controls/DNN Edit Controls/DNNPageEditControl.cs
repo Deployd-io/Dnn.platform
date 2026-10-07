@@ -20,14 +20,18 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:DNNPageEditControl runat=server></{0}:DNNPageEditControl>")]
     public class DNNPageEditControl : IntegerEditControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DNNPageEditControl));
         /// <summary>RenderEditMode renders the Edit mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderEditMode(writer={Writer})", writer);
             PortalSettings portalSettings = Globals.GetPortalSettings();
 
+			Logger.LogError("RenderEditMode(writer={Writer}): portalSettings → {PortalSettings}", writer, portalSettings);
             // Get the Pages
             List<TabInfo> listTabs = TabController.GetPortalTabs(portalSettings.PortalId, Null.NullInteger, true, "<" + Localization.GetString("None_Specified") + ">", true, false, true, true, false);
+			Logger.LogError("RenderEditMode(writer={Writer}): listTabs → {ListTabs}", writer, listTabs);
 
             // Render the Select Tag
             this.ControlStyle.AddAttributesToRender(writer);
@@ -55,14 +59,17 @@ namespace DotNetNuke.UI.WebControls
 
             // Close Select Tag
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
 
         /// <summary>RenderViewMode renders the View mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderViewMode(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderViewMode(writer={Writer})", writer);
             TabInfo linkedTabInfo = TabController.Instance.GetTab(this.IntegerValue, Globals.GetPortalSettings().PortalId, false);
 
+			Logger.LogError("RenderViewMode(writer={Writer}): linkedTabInfo → {LinkedTabInfo}", writer, linkedTabInfo);
             // don't render anything if we didn't find the tab
             if (linkedTabInfo == null)
             {
@@ -73,11 +80,13 @@ namespace DotNetNuke.UI.WebControls
             if (!int.TryParse(this.Page.Request.QueryString["tabid"], out var tabId))
             {
                 tabId = Null.NullInteger;
+				Logger.LogDebug("RenderViewMode(writer={Writer}): tabId → {TabId}", writer, tabId);
             }
 
             if (!int.TryParse(this.Page.Request.QueryString["mid"], out var moduleId))
             {
                 moduleId = Null.NullInteger;
+				Logger.LogDebug("RenderViewMode(writer={Writer}): moduleId → {ModuleId}", writer, moduleId);
             }
 
             string url = Globals.LinkClick(this.StringValue, tabId, moduleId, true);
@@ -87,6 +96,7 @@ namespace DotNetNuke.UI.WebControls
             writer.RenderBeginTag(HtmlTextWriterTag.A);
             writer.Write(linkedTabInfo.LocalizedTabName);
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderViewMode(writer={Writer})", writer);
         }
     }
 }

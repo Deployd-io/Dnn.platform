@@ -9,11 +9,13 @@ import { GridCell, Button, RadioButtons, DropdownWithError, SingleLineInputWithE
 import Collapsible from "react-collapse";
 import utils from "utils";
 import "./style.less";
+const logger = console;
 
 /*eslint-disable eqeqeq*/
 class EditThemeAttributes extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             themeType: "layout",
             themeName: "",
@@ -29,25 +31,32 @@ class EditThemeAttributes extends Component {
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
 
         if (props.tokens.length === 0) {
             props.dispatch(ThemeActions.getEditableTokens());
+			logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         }
     }
 
     getThemeType() {
+		logger.error('>>> Entering getThemeType()', { "event.action": "getThemeType" });
         const {state} = this;
 
+		logger.warn('<<< Exiting getThemeType()', { "event.action": "getThemeType" });
         return state.themeType == "container" ? 1 : 0;
     }
 
     getThemeOptions() {
+		logger.error('>>> Entering getThemeOptions()', { "event.action": "getThemeOptions" });
         const {props} = this;
 
         let type = this.getThemeType();
+		logger.error(`getThemeOptions(): type → ${type}`, { "event.action": "getThemeOptions" });
         let source = type == 1 ? props.themes.containers : props.themes.layouts;
         let isHost = utils.params.settings.isHost;
+		logger.warn('<<< Exiting getThemeOptions()', { "event.action": "getThemeOptions" });
         return source.filter(l => {
             return isHost || l.level === 1 || l.level === 2;
         }).map(function (t) {
@@ -57,6 +66,7 @@ class EditThemeAttributes extends Component {
 
 
     getThemeFileOptions() {
+		logger.error('>>> Entering getThemeFileOptions()', { "event.action": "getThemeFileOptions" });
         const {props, state} = this;
 
         if (!state.themeName) {
@@ -64,11 +74,13 @@ class EditThemeAttributes extends Component {
         }
 
         return props.themeFiles.map(function (f) {
+		logger.warn('<<< Exiting getThemeFileOptions()', { "event.action": "getThemeFileOptions" });
             return { value: f.path, label: f.name };
         });
     }
 
     getTokenOptions() {
+		logger.error('>>> Entering getTokenOptions()', { "event.action": "getTokenOptions" });
         const {props, state} = this;
 
         if (!state.path) {
@@ -76,11 +88,13 @@ class EditThemeAttributes extends Component {
         }
 
         return props.tokens.map(function (t) {
+		logger.warn('<<< Exiting getTokenOptions()', { "event.action": "getTokenOptions" });
             return { value: t.value, label: t.text };
         });
     }
 
     getSettingOptions() {
+		logger.error('>>> Entering getSettingOptions()', { "event.action": "getSettingOptions" });
         const {props, state} = this;
 
         if (!state.path || !state.token) {
@@ -88,28 +102,36 @@ class EditThemeAttributes extends Component {
         }
 
         return props.settings.map(function (t) {
+		logger.warn('<<< Exiting getSettingOptions()', { "event.action": "getSettingOptions" });
             return { value: t.value, label: t.text };
         });
     }
 
     onThemeTypeChanged(type) {
+		logger.error(`>>> Entering onThemeTypeChanged(type=${type})`, { "event.action": "onThemeTypeChanged", "logrite.type": type });
         this.setState({ themeType: type, themeName: "", path: "", token: "", setting: "", value: "" });
+		logger.warn(`<<< Exiting onThemeTypeChanged(type=${type})`, { "event.action": "onThemeTypeChanged", "logrite.type": type });
     }
 
 
     onThemeChanged(themeName) {
+		logger.error(`>>> Entering onThemeChanged(themeName=${themeName})`, { "event.action": "onThemeChanged", "logrite.themeName": themeName });
         const {props} = this;
         this.setState({ themeName: themeName.value, level: themeName.level, path: "", token: "", setting: "", value: "" }, function () {
             let themeName = this.state.themeName;
             let type = this.getThemeType();
+			logger.error(`onThemeChanged(themeName=${themeName}): type → ${type}`, { "event.action": "onThemeChanged", "logrite.themeName": themeName });
             let level = this.state.level;
 
             props.dispatch(ThemeActions.getEditableThemeFiles(themeName, type, level));
         });
+		logger.warn(`<<< Exiting onThemeChanged(themeName=${themeName})`, { "event.action": "onThemeChanged", "logrite.themeName": themeName });
     }
 
     onThemeFileChanged(themeFile) {
+		logger.error(`>>> Entering onThemeFileChanged(themeFile=${themeFile})`, { "event.action": "onThemeFileChanged", "logrite.themeFile": themeFile });
         this.setState({ path: themeFile.value, token: "", setting: "", value: "" });
+		logger.warn(`<<< Exiting onThemeFileChanged(themeFile=${themeFile})`, { "event.action": "onThemeFileChanged", "logrite.themeFile": themeFile });
     }
 
     onTokenChanged(token) {
@@ -123,25 +145,33 @@ class EditThemeAttributes extends Component {
     }
 
     onSettingChanged(setting) {
+		logger.error(`>>> Entering onSettingChanged(setting=${setting})`, { "event.action": "onSettingChanged", "logrite.setting": setting });
         const {props} = this;
 
         this.setState({ setting: setting.value, value: "" }, function () {
             let token = this.state.token;
             let setting = this.state.setting;
+			logger.error(`onSettingChanged(setting=${setting}): setting → ${setting}`, { "event.action": "onSettingChanged", "logrite.setting": setting });
 
             props.dispatch(ThemeActions.getEditableValues(token, setting));
         });
+		logger.warn(`<<< Exiting onSettingChanged(setting=${setting})`, { "event.action": "onSettingChanged", "logrite.setting": setting });
     }
 
     startEdit() {
+		logger.error('>>> Entering startEdit()', { "event.action": "startEdit" });
         this.setState({ openEditPopup: true, themeName: "", path: "", token: "", setting: "", value: "" });
+		logger.warn('<<< Exiting startEdit()', { "event.action": "startEdit" });
     }
 
     cancelEdit() {
+		logger.error('>>> Entering cancelEdit()', { "event.action": "cancelEdit" });
         this.setState({ openEditPopup: false, themeName: "", path: "", token: "", setting: "", value: "" });
+		logger.warn('<<< Exiting cancelEdit()', { "event.action": "cancelEdit" });
     }
 
     Save() {
+		logger.error('>>> Entering Save()', { "event.action": "Save" });
         const {props, state} = this;
 
         this.setState({ startSave: true }, function () {
@@ -156,18 +186,22 @@ class EditThemeAttributes extends Component {
                 utils.utilities.notify(Localization.get("Successful"));
             }));
         });
+		logger.warn('<<< Exiting Save()', { "event.action": "Save" });
     }
 
     renderValueField() {
+		logger.error('>>> Entering renderValueField()', { "event.action": "renderValueField" });
         const {props, state} = this;
 
         let onFieldChange = function (value) {
+			logger.error(`>>> Entering onFieldChange(value=${value})`, { "event.action": "onFieldChange", "logrite.value": value });
             let editValue = value.value;
             if (value.target) {
                 editValue = value.target.value;
             }
 
             this.setState({ value: editValue });
+			logger.warn(`<<< Exiting onFieldChange(value=${value})`, { "event.action": "onFieldChange", "logrite.value": value });
         };
 
         if (!props.value) {
@@ -188,6 +222,8 @@ class EditThemeAttributes extends Component {
             }
         });
 
+		logger.error(`renderValueField(): options → ${options}`, { "event.action": "renderValueField" });
+		logger.warn('<<< Exiting renderValueField()', { "event.action": "renderValueField" });
         return <DropdownWithError
             options={options}
             value={state.value}
@@ -197,8 +233,10 @@ class EditThemeAttributes extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {state} = this;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="edit-theme-attributes">
                 <Button size="small" onClick={this.startEdit.bind(this)}>{Localization.get("EditThemeAttributes")}</Button>
@@ -280,6 +318,8 @@ EditThemeAttributes.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         themes: state.theme.themes,
         themeFiles: state.theme.editableThemeFiles,

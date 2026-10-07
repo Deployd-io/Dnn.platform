@@ -15,6 +15,7 @@ namespace DotNetNuke.Web.UI.WebControls
     [DataContract]
     public class DnnPaswordStrengthOptions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnPaswordStrengthOptions));
         /// <summary>Gets or sets the minimum password length.</summary>
         [DataMember(Name = "minLength")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
@@ -114,6 +115,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <summary>Initializes a new instance of the <see cref="DnnPaswordStrengthOptions"/> class.</summary>
         public DnnPaswordStrengthOptions()
         {
+			Logger.LogError(">>> Entering DnnPaswordStrengthOptions()");
             // all the PasswordStrength related resources are located under the Website\App_GlobalResources\WebControls.resx
             this.MinLengthText = Utilities.GetLocalizedString("PasswordStrengthMinLength");
             this.WeakText = Utilities.GetLocalizedString("PasswordStrengthWeak");
@@ -124,11 +126,15 @@ namespace DotNetNuke.Web.UI.WebControls
             this.CriteriaAtLeastNSpecialCharsText = Utilities.GetLocalizedString("CriteriaAtLeastNSpecialChars");
             this.CriteriaValidationExpressionText = Utilities.GetLocalizedString("CriteriaValidationExpression");
 
+			Logger.LogWarning("<<< Exiting DnnPaswordStrengthOptions()");
             this.PasswordRulesHeadText = Utilities.GetLocalizedString("PasswordRulesHeadText");
 
             this.WeakColor = "#ed1e24";
+			Logger.LogDebug("DnnPaswordStrengthOptions(): this.WeakColor → {Arg0}", this.WeakColor);
             this.FairColor = "#f6d50a";
             this.StrongColor = "#69bd44";
+			Logger.LogDebug("DnnPaswordStrengthOptions(): this.FairColor → {Arg0}", this.FairColor);
+			Logger.LogDebug("DnnPaswordStrengthOptions(): this.StrongColor → {Arg0}", this.StrongColor);
 
             this.LabelCss = "min-length-text";
             this.MeterCss = "meter";
@@ -139,16 +145,25 @@ namespace DotNetNuke.Web.UI.WebControls
         [OnSerializing]
         public void OnSerializing(StreamingContext context)
         {
+			Logger.LogError(">>> Entering OnSerializing(context={Context})", context);
             int portalId = PortalController.Instance.GetCurrentSettings()?.PortalId ?? -1;
             var settings = new MembershipPasswordSettings(portalId);
+			Logger.LogError("OnSerializing(context={Context}): settings → {Settings}", context, settings);
+			Logger.LogError("OnSerializing(context={Context}): portalId → {PortalId}", context, portalId);
 
             this.MinLength = settings.MinPasswordLength;
+			Logger.LogDebug("OnSerializing(context={Context}): MinLength → {MinLength}", context, MinLength);
+			Logger.LogDebug("OnSerializing(context={Context}): this.MinLength → {Arg1}", context, this.MinLength);
             this.CriteriaAtLeastNCharsText = string.Format(CultureInfo.CurrentCulture, this.CriteriaAtLeastNCharsText, this.MinLength);
 
             this.MinNumberOfSpecialChars = settings.MinNonAlphanumericCharacters;
+			Logger.LogDebug("OnSerializing(context={Context}): MinNumberOfSpecialChars → {MinNumberOfSpecialChars}", context, MinNumberOfSpecialChars);
+			Logger.LogDebug("OnSerializing(context={Context}): this.MinNumberOfSpecialChars → {Arg1}", context, this.MinNumberOfSpecialChars);
             this.CriteriaAtLeastNSpecialCharsText = string.Format(CultureInfo.CurrentCulture, this.CriteriaAtLeastNSpecialCharsText, this.MinNumberOfSpecialChars);
 
             this.ValidationExpression = settings.ValidationExpression;
+			Logger.LogDebug("OnSerializing(context={Context}): this.ValidationExpression → {Arg1}", context, this.ValidationExpression);
+        Logger.LogWarning("<<< Exiting OnSerializing(context={Context})", context);
             this.CriteriaValidationExpressionText = string.Format(CultureInfo.CurrentCulture, this.CriteriaValidationExpressionText, this.ValidationExpression);
         }
     }

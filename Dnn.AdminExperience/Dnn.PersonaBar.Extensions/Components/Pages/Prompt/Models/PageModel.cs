@@ -16,9 +16,13 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Models
         public PageModel(DotNetNuke.Entities.Tabs.TabInfo tab)
             : base(tab)
         {
+			eventLogger.LogError(">>> Entering PageModel(tab={Tab})", tab);
             this.Container = tab.ContainerSrc;
+			eventLogger.LogDebug("PageModel(tab={Tab}): this.Container → {Arg1}", tab, this.Container);
             this.Url = tab.Url;
             this.Keywords = tab.KeyWords;
+			eventLogger.LogDebug("PageModel(tab={Tab}): this.Url → {Arg1}", tab, this.Url);
+			eventLogger.LogWarning("<<< Exiting PageModel(tab={Tab})", tab);
             this.Description = tab.Description;
         }
 

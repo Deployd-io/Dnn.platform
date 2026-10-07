@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -22,8 +23,10 @@
     atom = new RegExp("((" + atom.join(")|(") + "))\\b");
 
     function tokenBase (stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       var ch = stream.peek();
 
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       //Comment
       if (state.incomment) {
         if (!stream.skipTo("#}")) {
@@ -31,6 +34,7 @@
         } else {
           stream.eatWhile(/\#|}/);
           state.incomment = false;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.incomment → ${state.incomment}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         }
         return "comment";
       //Tag
@@ -38,6 +42,7 @@
         //After operator
         if (state.operator) {
           state.operator = false;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.operator → ${state.operator}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
           if (stream.match(atom)) {
             return "atom";
           }
@@ -48,6 +53,7 @@
         //After sign
         if (state.sign) {
           state.sign = false;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.sign → ${state.sign}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
           if (stream.match(atom)) {
             return "atom";
           }
@@ -59,6 +65,7 @@
         if (state.instring) {
           if (ch == state.instring) {
             state.instring = false;
+			logger.debug(`tokenBase(stream=${stream},state=${state}): state.instring → ${state.instring}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
           }
           stream.next();
           return "string";
@@ -68,6 +75,7 @@
           return "string";
         } else if (stream.match(state.intag + "}") || stream.eat("-") && stream.match(state.intag + "}")) {
           state.intag = false;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.intag → ${state.intag}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
           return "tag";
         } else if (stream.match(operator)) {
           state.operator = true;
@@ -112,6 +120,7 @@
             state.intag = "}";
           }
           stream.eat("-");
+		logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
           return "tag";
         }
       }
@@ -120,9 +129,13 @@
 
     return {
       startState: function () {
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
+		logger.warn('<<< Exiting startState()', { "event.action": "startState" });
         return {};
       },
       token: function (stream, state) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return tokenBase(stream, state);
       }
     };

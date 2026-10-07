@@ -24,6 +24,7 @@ namespace DotNetNuke.Web.InternalServices
     [DnnAuthorize]
     public class LanguageServiceController : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LanguageServiceController));
         private readonly ILocaleController localeController;
         private readonly ITabController tabController;
 
@@ -33,7 +34,9 @@ namespace DotNetNuke.Web.InternalServices
         public LanguageServiceController(INavigationManager navigationManager)
             : this(navigationManager, null, null)
         {
+			Logger.LogError(">>> Entering LanguageServiceController(navigationManager={NavigationManager})", navigationManager);
             this.NavigationManager = navigationManager;
+			Logger.LogWarning("<<< Exiting LanguageServiceController(navigationManager={NavigationManager},localeController={LocaleController},tabController={TabController})", navigationManager, localeController, tabController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="LanguageServiceController"/> class.</summary>
@@ -42,6 +45,9 @@ namespace DotNetNuke.Web.InternalServices
         /// <param name="tabController">The tab controller.</param>
         public LanguageServiceController(INavigationManager navigationManager, ILocaleController localeController, ITabController tabController)
         {
+			Logger.LogError(">>> Entering LanguageServiceController(navigationManager={NavigationManager},localeController={LocaleController},tabController={TabController})", navigationManager, localeController, tabController);
+			Logger.LogDebug("LanguageServiceController(navigationManager={NavigationManager},localeController={LocaleController},tabController={TabController}): localeController → {LocaleController1}", navigationManager, localeController, tabController, localeController);
+			Logger.LogDebug("LanguageServiceController(navigationManager={NavigationManager},localeController={LocaleController},tabController={TabController}): tabController → {TabController1}", navigationManager, localeController, tabController, tabController);
             this.NavigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
             this.localeController = localeController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ILocaleController>();
             this.tabController = tabController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITabController>();
@@ -56,13 +62,16 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage GetNonTranslatedPages(string languageCode)
         {
+			Logger.LogError(">>> Entering GetNonTranslatedPages(languageCode={LanguageCode})", languageCode);
             var request = HttpContext.Current.Request;
             var locale = this.localeController.GetLocale(languageCode);
+			Logger.LogError("GetNonTranslatedPages(languageCode={LanguageCode}): locale → {Locale}", languageCode, locale);
 
             List<PageDto> pages = [];
             if (!this.IsDefaultLanguage(locale.Code))
             {
                 var nonTranslated = from t in this.tabController.GetTabsByPortal(this.PortalSettings.PortalId).WithCulture(locale.Code, false).Values where !t.IsTranslated && !t.IsDeleted select t;
+				Logger.LogError("GetNonTranslatedPages(languageCode={LanguageCode}): nonTranslated → {NonTranslated}", languageCode, nonTranslated);
                 foreach (TabInfo page in nonTranslated)
                 {
                     pages.Add(new PageDto()
@@ -79,6 +88,8 @@ namespace DotNetNuke.Web.InternalServices
 
         private bool IsDefaultLanguage(string code)
         {
+			Logger.LogError(">>> Entering IsDefaultLanguage(code={Code})", code);
+            Logger.LogWarning("<<< Exiting IsDefaultLanguage(code={Code})", code);
             return code == this.PortalSettings.DefaultLanguage;
         }
 
