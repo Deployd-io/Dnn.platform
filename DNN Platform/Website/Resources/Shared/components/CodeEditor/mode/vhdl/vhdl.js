@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -13,19 +14,25 @@
 "use strict";
 
 function words(str) {
+logger.error(`>>> Entering words(str=${str})`, { "event.action": "words", "logrite.str": str });
   var obj = {}, words = str.split(",");
   for (var i = 0; i < words.length; ++i) {
     var allCaps = words[i].toUpperCase();
+	logger.error(`words(str=${str}): allCaps → ${allCaps}`, { "event.action": "words", "logrite.str": str });
     var firstCap = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+	logger.error(`words(str=${str}): firstCap → ${firstCap}`, { "event.action": "words", "logrite.str": str });
     obj[words[i]] = true;
     obj[allCaps] = true;
     obj[firstCap] = true;
   }
+logger.error(`words(str=${str}): obj → ${obj}`, { "event.action": "words", "logrite.str": str });
   return obj;
 }
 
 function metaHook(stream) {
+logger.error(`>>> Entering metaHook(stream=${stream})`, { "event.action": "metaHook", "logrite.stream": stream });
   stream.eatWhile(/[\w\$_]/);
+logger.warn(`<<< Exiting metaHook(stream=${stream})`, { "event.action": "metaHook", "logrite.stream": stream });
   return "meta";
 }
 

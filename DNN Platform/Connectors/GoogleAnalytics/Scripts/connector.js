@@ -1,4 +1,5 @@
-﻿"use strict";
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+"use strict";
 define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scripts/PersonaBarDialog"], function ($, ko, cf) {
     var helper,
         bindViewModel,
@@ -11,6 +12,7 @@ define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scrip
     var wasDeactivated = false;
 
     var init = function (koObject, connectionHelper, pluginFolder, util) {
+	logger.error(`>>> Entering init(koObject=${koObject},connectionHelper=${connectionHelper},pluginFolder=${pluginFolder},util=${util})`, { "event.action": "init", "logrite.koObject": koObject, "logrite.connectionHelper": connectionHelper, "logrite.pluginFolder": pluginFolder, "logrite.util": util });
 
         helper = connectionHelper;
         bindViewModel = koObject;
@@ -25,17 +27,21 @@ define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scrip
             window.String.format = !window.String.format ? window.top.String.format : window.String.format;
         }
 
+	logger.warn(`<<< Exiting init(koObject=${koObject},connectionHelper=${connectionHelper},pluginFolder=${pluginFolder},util=${util})`, { "event.action": "init", "logrite.koObject": koObject, "logrite.connectionHelper": connectionHelper, "logrite.pluginFolder": pluginFolder, "logrite.util": util });
     };
 
     var onSave = function (conn) {
+	logger.error(`>>> Entering onSave(conn=${conn})`, { "event.action": "onSave", "logrite.conn": conn });
 
         // Convert boolean to string as the API requires a dictionary of string values
         conn.configurations[2].value(conn.configurations[2].value() || 'false');
         conn.configurations[3].value(conn.configurations[3].value() || 'false');
         conn.configurations[4].value(conn.configurations[4].value() || 'false');
+		logger.warn(`<<< Exiting onSave(conn=${conn})`, { "event.action": "onSave", "logrite.conn": conn });
     };
 
     var onSaveComplete = function (conn, id) {
+	logger.error(`>>> Entering onSaveComplete(conn=${conn},id=${id})`, { "event.action": "onSaveComplete", "logrite.conn": conn, "logrite.id": id });
 
         // Deactivation / delete handled through the save since the delete function as
         // of v9.2.2 only works with multiple connector support. This should be
@@ -57,10 +63,12 @@ define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scrip
                 activateDeleteButton(conn);
             }
             utility.notify((utility.resx.Connectors || utility.resx.PersonaBar).txt_Saved, true);
+			logger.warn(`<<< Exiting onSaveComplete(conn=${conn},id=${id})`, { "event.action": "onSaveComplete", "logrite.conn": conn, "logrite.id": id });
         }
     };
 
     var activateDeleteButton = function (conn) {
+	logger.error(`>>> Entering activateDeleteButton(conn=${conn})`, { "event.action": "activateDeleteButton", "logrite.conn": conn });
 
         if (conn.buttons().length === 1) {
 
@@ -68,7 +76,9 @@ define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scrip
                 className: "secondarybtn",
                 text: bindViewModel.resx.btnDelete,
                 action: function (conn, e) {
+				logger.error(`>>> Entering action(conn=${conn},e=${e})`, { "event.action": "action", "logrite.conn": conn, "logrite.e": e });
 
+					logger.warn(`<<< Exiting action(conn=${conn},e=${e})`, { "event.action": "action", "logrite.conn": conn, "logrite.e": e });
                     // Set the isDeactivating flag to true to override the default save behaviour
                     // Temporary workaround until delete functionality on connectors is improved
                     conn.configurations[6].value("true");
@@ -79,9 +89,11 @@ define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scrip
 
         }
 
+	logger.warn(`<<< Exiting activateDeleteButton(conn=${conn})`, { "event.action": "activateDeleteButton", "logrite.conn": conn });
     };
 
     var getActionButtons = function () {
+	logger.error('>>> Entering getActionButtons()', { "event.action": "getActionButtons" });
 
 
         if (bindViewModel.connected()) {
@@ -121,6 +133,7 @@ define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scrip
                 }
             ];
         }
+		logger.warn('<<< Exiting getActionButtons()', { "event.action": "getActionButtons" });
     };
 
     return {

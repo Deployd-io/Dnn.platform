@@ -10,6 +10,7 @@ namespace DotNetNuke.Web.UI
     /// <summary>An exception with a <see cref="DotNetNukeErrorCode"/>.</summary>
     public class DotNetNukeException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DotNetNukeException));
         private readonly DotNetNukeErrorCode errorCode = DotNetNukeErrorCode.NotSet;
 
         /// <summary>Initializes a new instance of the <see cref="DotNetNukeException"/> class.</summary>
@@ -22,6 +23,8 @@ namespace DotNetNuke.Web.UI
         public DotNetNukeException(string message)
             : base(message)
         {
+		Logger.LogError(">>> Entering DotNetNukeException(message={Message})", message);
+        Logger.LogWarning("<<< Exiting DotNetNukeException(message={Message})", message);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DotNetNukeException"/> class.</summary>
@@ -30,6 +33,13 @@ namespace DotNetNuke.Web.UI
         public DotNetNukeException(string message, Exception innerException)
             : base(message, innerException)
         {
+		Logger.LogError(">>> Entering DotNetNukeException(message={Message},innerException={InnerException})", message, innerException);
+        Logger.LogWarning("<<< Exiting DotNetNukeException(message={Message},innerException={InnerException})", message, innerException);
+		Logger.LogError(">>> Entering DotNetNukeException(message={Message},errorCode={ErrorCode})", message, errorCode);
+		Logger.LogDebug("DotNetNukeException(message={Message},errorCode={ErrorCode}): errorCode → {ErrorCode1}", message, errorCode, errorCode);
+        Logger.LogWarning("<<< Exiting DotNetNukeException(message={Message},errorCode={ErrorCode})", message, errorCode);
+		Logger.LogDebug("DotNetNukeException(message={Message},innerException={InnerException},errorCode={ErrorCode}): errorCode → {ErrorCode1}", message, innerException, errorCode, errorCode);
+        Logger.LogWarning("<<< Exiting DotNetNukeException(message={Message},innerException={InnerException},errorCode={ErrorCode})", message, innerException, errorCode);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DotNetNukeException"/> class.</summary>

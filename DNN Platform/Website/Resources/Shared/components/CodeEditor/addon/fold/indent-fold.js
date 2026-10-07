@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -15,6 +16,8 @@ CodeMirror.registerHelper("fold", "indent", function(cm, start) {
   var tabSize = cm.getOption("tabSize"), firstLine = cm.getLine(start.line);
   if (!/\S/.test(firstLine)) return;
   var getIndent = function(line) {
+	logger.error(`>>> Entering getIndent(line=${line})`, { "event.action": "getIndent", "logrite.line": line });
+	logger.warn(`<<< Exiting getIndent(line=${line})`, { "event.action": "getIndent", "logrite.line": line });
     return CodeMirror.countColumn(line, null, tabSize);
   };
   var myIndent = getIndent(firstLine);

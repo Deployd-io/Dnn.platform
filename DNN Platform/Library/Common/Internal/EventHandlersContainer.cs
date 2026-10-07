@@ -27,6 +27,7 @@ namespace DotNetNuke.Common.Internal
         /// <summary>Initializes a new instance of the <see cref="EventHandlersContainer{T}"/> class.</summary>
         public EventHandlersContainer()
         {
+			Logger.LogError(">>> Entering EventHandlersContainer()");
             try
             {
                 if (GetCurrentStatus() != UpgradeStatus.None)
@@ -40,6 +41,7 @@ namespace DotNetNuke.Common.Internal
             {
                 Logger.Error(ex.Message, ex);
             }
+			Logger.LogWarning("<<< Exiting EventHandlersContainer()");
         }
 
         /// <inheritdoc />
@@ -53,12 +55,15 @@ namespace DotNetNuke.Common.Internal
 
         private static UpgradeStatus GetCurrentStatus()
         {
+			Logger.LogError(">>> Entering GetCurrentStatus()");
             try
             {
                 return Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>().Status;
             }
             catch (NullReferenceException)
             {
+				Logger.LogError("Exception in GetCurrentStatus(): {Arg0}", NullReferenceException.Message);
+				Logger.LogWarning("<<< Exiting GetCurrentStatus()");
                 return UpgradeStatus.Unknown;
             }
         }

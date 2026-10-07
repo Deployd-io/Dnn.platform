@@ -11,31 +11,39 @@ namespace DotNetNuke.Modules.Admin.Authentication
     /// <summary>A settings control for DNN authentication.</summary>
     public partial class Settings : AuthenticationSettingsBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Settings.ascx));
         /// <inheritdoc />
         public override void UpdateSettings()
         {
+			Logger.LogError(">>> Entering UpdateSettings()");
             if (this.SettingsEditor.IsValid && this.SettingsEditor.IsDirty)
             {
                 var config = (AuthenticationConfig)this.SettingsEditor.DataSource;
+				Logger.LogError("UpdateSettings(): config → {Config}", config);
                 AuthenticationConfig.UpdateConfig(config);
             }
+			Logger.LogWarning("<<< Exiting UpdateSettings()");
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             try
             {
                 AuthenticationConfig config = AuthenticationConfig.GetConfig(this.PortalId);
+				Logger.LogError("OnLoad(e={E}): config → {Config}", e, config);
                 this.SettingsEditor.DataSource = config;
                 this.SettingsEditor.DataBind();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

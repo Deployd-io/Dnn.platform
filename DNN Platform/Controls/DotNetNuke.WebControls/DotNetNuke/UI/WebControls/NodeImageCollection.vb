@@ -6,18 +6,25 @@ Imports System
 Imports System.Collections
 Imports System.Reflection
 Imports System.Web.UI
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     <DefaultMember("Item")> _
     Public Class NodeImageCollection
         Inherits CollectionBase
         Implements IStateManager
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Public Sub New()
+		_logger.LogError(">>> Entering New()")
+		_logger.LogError(">>> Entering New(value={Value})", value)
+		_logger.LogWarning("<<< Exiting New(value={Value})", value)
         End Sub
 
         Public Sub New(ByVal value As NodeImageCollection)
+			_logger.LogError(">>> Entering New(value={Value})", value)
             Me.AddRange(value)
+			_logger.LogWarning("<<< Exiting New(value={Value})", value)
         End Sub
 
         Public Sub New(ByVal value As NodeImage())
@@ -25,11 +32,16 @@ Namespace DotNetNuke.UI.WebControls
         End Sub
 
         Public Function Add(ByVal value As NodeImage) As Integer
+			_logger.LogError(">>> Entering Add(value={Value})", value)
+			_logger.LogError("Add(value={Value}): num2 → {Num2}", value, num2)
             Dim num2 As Integer = Me.List.Add(value)
             If Me.m_isTrackingViewState Then
                 value.TrackViewState
                 value.SetDirty
             End If
+			_logger.LogError(">>> Entering Add(ImageUrl={ImageUrl})", ImageUrl)
+			_logger.LogWarning("<<< Exiting Add(value={Value})", value)
+			_logger.LogWarning("<<< Exiting Add(ImageUrl={ImageUrl})", ImageUrl)
             Return num2
         End Function
 
@@ -48,6 +60,9 @@ Namespace DotNetNuke.UI.WebControls
                 Me.Add(value(index))
                 index += 1
             Loop
+			_logger.LogError(">>> Entering AddRange(value={Value})", value)
+			_logger.LogError("AddRange(value={Value}): num2 → {Num2}", value, num2)
+			_logger.LogWarning("<<< Exiting AddRange(value={Value})", value)
         End Sub
 
         Public Sub AddRange(ByVal value As NodeImageCollection)
@@ -64,6 +79,10 @@ Namespace DotNetNuke.UI.WebControls
         End Sub
 
         Public Function Contains(ByVal value As NodeImage) As Boolean
+			_logger.LogError(">>> Entering Contains(value={Value})", value)
+			_logger.LogError(">>> Entering Contains(strImageUrl={StrImageUrl})", strImageUrl)
+			_logger.LogWarning("<<< Exiting Contains(value={Value})", value)
+			_logger.LogWarning("<<< Exiting Contains(strImageUrl={StrImageUrl})", strImageUrl)
             Return Not Object.ReferenceEquals(Me.GetImage(value.ImageUrl), Nothing)
         End Function
 
@@ -72,18 +91,23 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Sub CopyTo(ByVal array As NodeImage(), ByVal index As Integer)
+			_logger.LogError(">>> Entering CopyTo(array={Array},index={Index})", array, index)
             Me.List.CopyTo(array, index)
+			_logger.LogWarning("<<< Exiting CopyTo(array={Array},index={Index})", array, index)
         End Sub
 
         Private Function GetImage(ByVal strUrl As String) As NodeImage
+			_logger.LogError(">>> Entering GetImage(strUrl={StrUrl})", strUrl)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = Me.List.GetEnumerator
+				_logger.LogDebug("GetImage(strUrl={StrUrl}): enumerator → {Enumerator}", strUrl, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
                     End If
                     Dim current As NodeImage = DirectCast(enumerator.Current, NodeImage)
+					_logger.LogError("GetImage(strUrl={StrUrl}): current → {Current}", strUrl, current)
                     If (strUrl = current.ImageUrl) Then
                         Return current
                     End If
@@ -93,10 +117,13 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			_logger.LogWarning("<<< Exiting GetImage(strUrl={StrUrl})", strUrl)
             Return Nothing
         End Function
 
         Private Function GetImageIndex(ByVal strUrl As String) As Integer
+			_logger.LogError(">>> Entering GetImageIndex(strUrl={StrUrl})", strUrl)
+			_logger.LogError("GetImageIndex(strUrl={StrUrl}): num3 → {Num3}", strUrl, num3)
             Dim num3 As Integer = (Me.List.Count - 1)
             Dim num2 As Integer = 0
             Do While True
@@ -104,6 +131,7 @@ Namespace DotNetNuke.UI.WebControls
                 Dim num4 As Integer = num3
                 If (num2 > num4) Then
                     num = -1
+					_logger.LogDebug("GetImageIndex(strUrl={StrUrl}): num → {Num}", strUrl, num)
                 Else
                     If (strUrl <> DirectCast(Me.List(num2), NodeImage).ImageUrl) Then
                         num2 += 1
@@ -114,10 +142,15 @@ Namespace DotNetNuke.UI.WebControls
                 Return num
             Loop
 
+			_logger.LogWarning("<<< Exiting GetImageIndex(strUrl={StrUrl})", strUrl)
             Return Nothing
         End Function
 
         Public Function IndexOf(ByVal value As NodeImage) As Integer
+			_logger.LogError(">>> Entering IndexOf(value={Value})", value)
+			_logger.LogError(">>> Entering IndexOf(strImageUrl={StrImageUrl})", strImageUrl)
+			_logger.LogWarning("<<< Exiting IndexOf(value={Value})", value)
+			_logger.LogWarning("<<< Exiting IndexOf(strImageUrl={StrImageUrl})", strImageUrl)
             Return Me.GetImageIndex(value.ImageUrl)
         End Function
 
@@ -126,12 +159,17 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Sub Insert(ByVal index As Integer, ByVal value As NodeImage)
+			_logger.LogError(">>> Entering Insert(index={Index},value={Value})", index, value)
             Me.List.Insert(index, value)
+			_logger.LogWarning("<<< Exiting Insert(index={Index},value={Value})", index, value)
         End Sub
 
         Public Sub LoadViewState(ByVal state As Object) Implements IStateManager.LoadViewState
+			_logger.LogError(">>> Entering LoadViewState(state={State})", state)
             If (Not state Is Nothing) Then
                 Dim objArray As Object() = DirectCast(state, Object())
+				_logger.LogError("LoadViewState(state={State}): objArray → {ObjArray}", state, objArray)
+				_logger.LogError("LoadViewState(state={State}): num2 → {Num2}", state, num2)
                 Dim num2 As Integer = (objArray.Length - 1)
                 Dim index As Integer = 0
                 Do While True
@@ -146,18 +184,25 @@ Namespace DotNetNuke.UI.WebControls
                     index += 1
                 Loop
             End If
+			_logger.LogWarning("<<< Exiting LoadViewState(state={State})", state)
         End Sub
 
         Public Sub Remove(ByVal value As NodeImage)
+			_logger.LogError(">>> Entering Remove(value={Value})", value)
             Me.List.Remove(value)
+			_logger.LogWarning("<<< Exiting Remove(value={Value})", value)
         End Sub
 
         Public Function SaveViewState() As Object Implements IStateManager.SaveViewState
+			_logger.LogError(">>> Entering SaveViewState()")
             Dim obj2 As Object = Nothing
             If (Me.Count = 0) Then
                 obj2 = Nothing
+				_logger.LogDebug("SaveViewState(): obj2 → {Obj2}", obj2)
             Else
                 Dim objArray As Object() = New Object((Me.Count + 1)  - 1) {}
+				_logger.LogError("SaveViewState(): objArray → {ObjArray}", objArray)
+				_logger.LogError("SaveViewState(): num2 → {Num2}", num2)
                 Dim num2 As Integer = (Me.Count - 1)
                 Dim index As Integer = 0
                 Do While True
@@ -170,19 +215,26 @@ Namespace DotNetNuke.UI.WebControls
                     index += 1
                 Loop
             End If
+			_logger.LogWarning("<<< Exiting SaveViewState()")
             Return obj2
         End Function
 
         Public Function ToArray() As NodeImage()
+			_logger.LogError(">>> Entering ToArray()")
+			_logger.LogWarning("<<< Exiting ToArray()")
             Dim imageArray As NodeImage() = Nothing
 #Disable Warning CA1861
             imageArray = DirectCast(Utils.CopyArray(DirectCast(imageArray, Array), New NodeImage(((Me.Count - 1) + 1)  - 1) {}), NodeImage())
+			_logger.LogDebug("ToArray(): imageArray → {ImageArray}", imageArray)
 #Enable Warning CA1861
             Me.CopyTo(imageArray, 0)
             Return imageArray
         End Function
 
         Public Sub TrackViewState() Implements IStateManager.TrackViewState
+			_logger.LogError(">>> Entering TrackViewState()")
+			_logger.LogDebug("TrackViewState(): Me.m_isTrackingViewState → {Arg0}", Me.m_isTrackingViewState)
+        _logger.LogWarning("<<< Exiting TrackViewState()")
             Me.m_isTrackingViewState = True
         End Sub
 

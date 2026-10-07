@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -142,6 +143,7 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
   var registers = {};
 
   function x86(_parserConfig) {
+	logger.error(`>>> Entering x86(_parserConfig=${_parserConfig})`, { "event.action": "x86", "logrite._parserConfig": _parserConfig });
     lineCommentStartSymbol = "#";
 
     registers.ax  = "variable";
@@ -186,9 +188,11 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
     registers.es  = "keyword";
     registers.fs  = "keyword";
     registers.gs  = "keyword";
+	logger.warn(`<<< Exiting x86(_parserConfig=${_parserConfig})`, { "event.action": "x86", "logrite._parserConfig": _parserConfig });
   }
 
   function armv6(_parserConfig) {
+	logger.error(`>>> Entering armv6(_parserConfig=${_parserConfig})`, { "event.action": "armv6", "logrite._parserConfig": _parserConfig });
     // Reference:
     // http://infocenter.arm.com/help/topic/com.arm.doc.qrc0001l/QRC0001_UAL.pdf
     // http://infocenter.arm.com/help/topic/com.arm.doc.ddi0301h/DDI0301H_arm1176jzfs_r0p7_trm.pdf
@@ -222,6 +226,7 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
         return "number";
       }
     });
+	logger.warn(`<<< Exiting armv6(_parserConfig=${_parserConfig})`, { "event.action": "armv6", "logrite._parserConfig": _parserConfig });
   }
 
   var arch = (parserConfig.architecture || "x86").toLowerCase();
@@ -232,6 +237,7 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
   }
 
   function nextUntilUnescaped(stream, end) {
+	logger.error(`>>> Entering nextUntilUnescaped(stream=${stream},end=${end})`, { "event.action": "nextUntilUnescaped", "logrite.stream": stream, "logrite.end": end });
     var escaped = false, next;
     while ((next = stream.next()) != null) {
       if (next === end && !escaped) {
@@ -239,29 +245,36 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
       }
       escaped = !escaped && next === "\\";
     }
+	logger.error(`nextUntilUnescaped(stream=${stream},end=${end}): escaped → ${escaped}`, { "event.action": "nextUntilUnescaped", "logrite.stream": stream, "logrite.end": end });
     return escaped;
   }
 
   function clikeComment(stream, state) {
+	logger.error(`>>> Entering clikeComment(stream=${stream},state=${state})`, { "event.action": "clikeComment", "logrite.stream": stream, "logrite.state": state });
     var maybeEnd = false, ch;
     while ((ch = stream.next()) != null) {
       if (ch === "/" && maybeEnd) {
         state.tokenize = null;
+		logger.debug(`clikeComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "clikeComment", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       maybeEnd = (ch === "*");
     }
+	logger.error(`clikeComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "clikeComment", "logrite.stream": stream, "logrite.state": state });
     return "comment";
   }
 
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         tokenize: null
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (state.tokenize) {
         return state.tokenize(stream, state);
       }
@@ -275,6 +288,7 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
       if (ch === "/") {
         if (stream.eat("*")) {
           state.tokenize = clikeComment;
+		logger.debug(`token(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           return clikeComment(stream, state);
         }
       }
@@ -293,6 +307,7 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
         stream.eatWhile(/\w/);
         cur = stream.current().toLowerCase();
         style = directives[cur];
+		logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return style || null;
       }
 
@@ -331,6 +346,7 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
       for (var i = 0; i < custom.length; i++) {
         style = custom[i](ch, stream, state);
         if (style) {
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           return style;
         }
       }

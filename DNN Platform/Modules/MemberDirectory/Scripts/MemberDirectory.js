@@ -1,10 +1,15 @@
-﻿function MemberDirectory($, ko, settings, composeMessageSettings) {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+function MemberDirectory($, ko, settings, composeMessageSettings) {
+	logger.error(`>>> Entering MemberDirectory(ko=${ko},settings=${settings},composeMessageSettings=${composeMessageSettings})`, { "event.action": "MemberDirectory", "logrite.ko": ko, "logrite.settings": settings, "logrite.composeMessageSettings": composeMessageSettings });
     var opts = $.extend({}, MemberDirectory.defaultSettings, settings);
     var serviceFramework = settings.servicesFramework;
+	logger.error(`MemberDirectory(ko=${ko},settings=${settings},composeMessageSettings=${composeMessageSettings}): opts → ${opts}`, { "event.action": "MemberDirectory", "logrite.ko": ko, "logrite.settings": settings, "logrite.composeMessageSettings": composeMessageSettings });
     var baseServicepath = serviceFramework.getServiceRoot('MemberDirectory') + 'MemberDirectory/';
+	logger.error(`MemberDirectory(ko=${ko},settings=${settings},composeMessageSettings=${composeMessageSettings}): baseServicepath → ${baseServicepath}`, { "event.action": "MemberDirectory", "logrite.ko": ko, "logrite.settings": settings, "logrite.composeMessageSettings": composeMessageSettings });
     var pageIndex = 0;
     var pageSize = opts.pageSize;
     var userId = opts.userId;
+	logger.error(`MemberDirectory(ko=${ko},settings=${settings},composeMessageSettings=${composeMessageSettings}): userId → ${userId}`, { "event.action": "MemberDirectory", "logrite.ko": ko, "logrite.settings": settings, "logrite.composeMessageSettings": composeMessageSettings });
     var groupId = opts.groupId;
     var viewerId = opts.viewerId;
     var profileUrl = opts.profileUrl;
@@ -13,15 +18,29 @@
     var containerElement = null;
 
     function displayMessage(message, cssclass) {
+		logger.error(`>>> Entering displayMessage(message=${message},cssclass=${cssclass})`, { "event.action": "displayMessage", "logrite.message": message, "logrite.cssclass": cssclass });
         var messageNode = $("<div/>").addClass('dnnFormMessage ' + cssclass).text(message);
         $(containerElement).prepend(messageNode);
+		logger.error(`displayMessage(message=${message},cssclass=${cssclass}): messageNode → ${messageNode}`, { "event.action": "displayMessage", "logrite.message": message, "logrite.cssclass": cssclass });
         messageNode.fadeOut(3000, 'easeInExpo', function () { messageNode.remove(); });
+		logger.warn(`<<< Exiting displayMessage(message=${message},cssclass=${cssclass})`, { "event.action": "displayMessage", "logrite.message": message, "logrite.cssclass": cssclass });
     };
 
     function Member(item) {
+		logger.error(`>>> Entering Member(item=${item})`, { "event.action": "Member", "logrite.item": item });
         var self = this;
         self.AddFriendText = opts.addFriendText;
+		logger.debug(`Member(item=${item}): self.AddFriendText → ${self.AddFriendText}`, { "event.action": "Member", "logrite.item": item });
+		logger.debug(`Member(item=${item}): self.FriendPendingText → ${self.FriendPendingText}`, { "event.action": "Member", "logrite.item": item });
+		logger.debug(`Member(item=${item}): self.RemoveFriendText → ${self.RemoveFriendText}`, { "event.action": "Member", "logrite.item": item });
+		logger.debug(`Member(item=${item}): self.FollowText → ${self.FollowText}`, { "event.action": "Member", "logrite.item": item });
+		logger.debug(`Member(item=${item}): self.UnFollowText → ${self.UnFollowText}`, { "event.action": "Member", "logrite.item": item });
+		logger.debug(`Member(item=${item}): self.SendMessageText → ${self.SendMessageText}`, { "event.action": "Member", "logrite.item": item });
+		logger.debug(`Member(item=${item}): self.UserNameText → ${self.UserNameText}`, { "event.action": "Member", "logrite.item": item });
+		logger.debug(`Member(item=${item}): self.EmailText → ${self.EmailText}`, { "event.action": "Member", "logrite.item": item });
+		logger.debug(`Member(item=${item}): self.CityText → ${self.CityText}`, { "event.action": "Member", "logrite.item": item });
         self.AcceptFriendText = opts.acceptFriendText;
+		logger.debug(`Member(item=${item}): self.AcceptFriendText → ${self.AcceptFriendText}`, { "event.action": "Member", "logrite.item": item });
         self.FriendPendingText = opts.friendPendingText;
         self.RemoveFriendText = opts.removeFriendText;
         self.FollowText = opts.followText;
@@ -96,11 +115,14 @@
         });
         
         self.getProfilePicture = function (w, h) {
+			logger.error(`>>> Entering getProfilePicture(w=${w},h=${h})`, { "event.action": "getProfilePicture", "logrite.w": w, "logrite.h": h });
+			logger.warn(`<<< Exiting getProfilePicture(w=${w},h=${h})`, { "event.action": "getProfilePicture", "logrite.w": w, "logrite.h": h });
             return profilePicHandler.replace("{0}", self.UserId()).replace("{1}", h).replace("{2}", w);
         };
 
         //Actions
         self.acceptFriend = function () {
+			logger.error('>>> Entering acceptFriend()', { "event.action": "acceptFriend" });
             $.ajax({
                 type: "POST",
                 cache: false,
@@ -116,9 +138,11 @@
             }).fail(function (xhr, status) {
                 displayMessage(settings.serverErrorWithDescriptionText + status, "dnnFormWarning");
             });
+			logger.warn('<<< Exiting acceptFriend()', { "event.action": "acceptFriend" });
         };
 
         self.addFriend = function () {
+			logger.error('>>> Entering addFriend()', { "event.action": "addFriend" });
             $.ajax({
                 type: "POST",
                 cache: false,
@@ -135,9 +159,11 @@
             }).fail(function (xhr, status) {
                 displayMessage(settings.serverErrorWithDescriptionText + status, "dnnFormWarning");
             });
+			logger.warn('<<< Exiting addFriend()', { "event.action": "addFriend" });
         };
 
         self.follow = function () {
+			logger.error('>>> Entering follow()', { "event.action": "follow" });
             $.ajax({
                 type: "POST",
                 cache: false,
@@ -153,9 +179,11 @@
             }).fail(function (xhr, status) {
                 displayMessage(settings.serverErrorWithDescriptionText + status, "dnnFormWarning");
             });
+			logger.warn('<<< Exiting follow()', { "event.action": "follow" });
         };
 
         self.removeFriend = function () {
+			logger.error('>>> Entering removeFriend()', { "event.action": "removeFriend" });
             $.ajax({
                 type: "POST",
                 cache: false,
@@ -171,9 +199,11 @@
             }).fail(function (xhr, status) {
                 displayMessage(settings.serverErrorWithDescriptionText + status, "dnnFormWarning");
             });
+			logger.warn('<<< Exiting removeFriend()', { "event.action": "removeFriend" });
         };
 
         self.unFollow = function () {
+			logger.error('>>> Entering unFollow()', { "event.action": "unFollow" });
             $.ajax({
                 type: "POST",
                 cache: false,
@@ -189,14 +219,18 @@
             }).fail(function (xhr, status) {
                 displayMessage(settings.serverErrorWithDescriptionText + status, "dnnFormWarning");
             });
+			logger.warn('<<< Exiting unFollow()', { "event.action": "unFollow" });
         };
+		logger.warn(`<<< Exiting Member(item=${item})`, { "event.action": "Member", "logrite.item": item });
     };
 
     function MemberDirectoryViewModel(initialData) {
+		logger.error(`>>> Entering MemberDirectoryViewModel(initialData=${initialData})`, { "event.action": "MemberDirectoryViewModel", "logrite.initialData": initialData });
         // Data
         var self = this;
 
         var initialMembers = $.map(initialData, function (item) { return new Member(item); });
+		logger.error(`MemberDirectoryViewModel(initialData=${initialData}): initialMembers → ${initialMembers}`, { "event.action": "MemberDirectoryViewModel", "logrite.initialData": initialData });
 
         self.Visible = ko.observable(true);
         self.Members = ko.observableArray(initialMembers);
@@ -221,15 +255,18 @@
 
         //Action Methods
         self.advancedSearch = function () {
+			logger.error('>>> Entering advancedSearch()', { "event.action": "advancedSearch" });
             pageIndex = 0;
             self.SearchTerm('');
 
             self.xhrAdvancedSearch();
             self.LastSearch('Advanced');
             self.ResetEnabled(true);
+			logger.warn('<<< Exiting advancedSearch()', { "event.action": "advancedSearch" });
         };
 
         self.basicSearch = function () {
+			logger.error('>>> Entering basicSearch()', { "event.action": "basicSearch" });
             pageIndex = 0;
             self.AdvancedSearchTerm1('');
             self.AdvancedSearchTerm2('');
@@ -240,9 +277,11 @@
 
             self.LastSearch('Basic');
             self.ResetEnabled(true);
+			logger.warn('<<< Exiting basicSearch()', { "event.action": "basicSearch" });
         };
 
         self.getMember = function (item) {
+			logger.error(`>>> Entering getMember(item=${item})`, { "event.action": "getMember", "logrite.item": item });
             self.SearchTerm(item.value);
             $.ajax({
                 type: "GET",
@@ -263,9 +302,11 @@
             }).fail(function (xhr, status) {
                 displayMessage(settings.serverErrorWithDescriptionText + status, "dnnFormWarning");
             });
+			logger.warn(`<<< Exiting getMember(item=${item})`, { "event.action": "getMember", "logrite.item": item });
         };
 
         self.getSuggestions = function (term, response) {
+			logger.error(`>>> Entering getSuggestions(term=${term},response=${response})`, { "event.action": "getSuggestions", "logrite.term": term, "logrite.response": response });
             $.ajax({
                 type: "GET",
                 cache: false,
@@ -281,41 +322,53 @@
                 displayMessage(settings.searchErrorText, "dnnFormWarning");
                 response({}); // From jQuery UI docs: You must always call the response callback even if you encounter an error
             });
+			logger.warn(`<<< Exiting getSuggestions(term=${term},response=${response})`, { "event.action": "getSuggestions", "logrite.term": term, "logrite.response": response });
         };
 
         self.handleAfterRender = function (elements, data) {
+			logger.error(`>>> Entering handleAfterRender(elements=${elements},data=${data})`, { "event.action": "handleAfterRender", "logrite.elements": elements, "logrite.data": data });
             for (var i in elements) {
                 var element = elements[i];
                 if (element.nodeType == 1) {
                     var config = {
                         over: function () {
+							logger.error('>>> Entering over()', { "event.action": "over" });
                             $(this).find("div[id$='popUpPanel']").fadeIn("slow");
+							logger.warn('<<< Exiting over()', { "event.action": "over" });
                         },
                         timeout: 500,
                         out: function () {
+							logger.error('>>> Entering out()', { "event.action": "out" });
                             $(this).find("div[id$='popUpPanel']").fadeOut("fast");
+							logger.warn('<<< Exiting out()', { "event.action": "out" });
                         }
                     };
                     $(element).hoverIntent(config);
+					logger.error(`handleAfterRender(elements=${elements},data=${data}): config → ${config}`, { "event.action": "handleAfterRender", "logrite.elements": elements, "logrite.data": data });
                 }
             }
         };
 
         self.isEven = function (item) {
+			logger.error(`>>> Entering isEven(item=${item})`, { "event.action": "isEven", "logrite.item": item });
+			logger.warn(`<<< Exiting isEven(item=${item})`, { "event.action": "isEven", "logrite.item": item });
             return (self.Members.indexOf(item) % 2 == 0);
         };
 
         self.loadMore = function () {
+			logger.error('>>> Entering loadMore()', { "event.action": "loadMore" });
             pageIndex++;
             if (self.LastSearch() === 'Advanced') {
                 self.xhrAdvancedSearch();
             }
             else {
                 self.xhrBasicSearch();
+				logger.warn('<<< Exiting loadMore()', { "event.action": "loadMore" });
             }
         };
 
         self.resetSearch = function () {
+			logger.error('>>> Entering resetSearch()', { "event.action": "resetSearch" });
             self.SearchTerm('');
             self.AdvancedSearchTerm1('');
             self.AdvancedSearchTerm2('');
@@ -325,9 +378,11 @@
             self.xhrAdvancedSearch();
             self.LastSearch('Advanced');
             self.ResetEnabled(false);
+			logger.warn('<<< Exiting resetSearch()', { "event.action": "resetSearch" });
         };
 
         self.xhrAdvancedSearch = function () {
+			logger.error('>>> Entering xhrAdvancedSearch()', { "event.action": "xhrAdvancedSearch" });
             $.ajax({
                 type: "GET",
                 cache: false,
@@ -360,9 +415,12 @@
             }).fail(function (xhr, status) {
                 displayMessage(settings.searchErrorText, "dnnFormWarning");
             });
+			logger.warn('<<< Exiting xhrAdvancedSearch()', { "event.action": "xhrAdvancedSearch" });
         };
 
+		logger.warn(`<<< Exiting MemberDirectoryViewModel(initialData=${initialData})`, { "event.action": "MemberDirectoryViewModel", "logrite.initialData": initialData });
         self.xhrBasicSearch = function () {
+			logger.error('>>> Entering xhrBasicSearch()', { "event.action": "xhrBasicSearch" });
             $.ajax({
                 type: "GET",
                 cache: false,
@@ -391,10 +449,12 @@
             }).fail(function (xhr, status) {
                 displayMessage(settings.searchErrorText, "dnnFormWarning");
             });
+			logger.warn('<<< Exiting xhrBasicSearch()', { "event.action": "xhrBasicSearch" });
         };
     };
 
     this.init = function (element) {
+		logger.error(`>>> Entering init(element=${element})`, { "event.action": "init", "logrite.element": element });
         containerElement = element;
 
         //load initial state of inbox
@@ -421,12 +481,16 @@
                 //Basic Search
                 $('input#mdBasicSearch').autocomplete({
                     source: function (request, response) {
+						logger.error(`>>> Entering source(request=${request},response=${response})`, { "event.action": "source", "logrite.request": request, "logrite.response": response });
                         viewModel.getSuggestions(request.term, response);
+						logger.warn(`<<< Exiting source(request=${request},response=${response})`, { "event.action": "source", "logrite.request": request, "logrite.response": response });
                         return;
                     },
                     minLength: 1,
                     select: function (event, ui) {
+						logger.error(`>>> Entering select(event=${event},ui=${ui})`, { "event.action": "select", "logrite.event": event, "logrite.ui": ui });
                         viewModel.getMember(ui.item);
+						logger.warn(`<<< Exiting select(event=${event},ui=${ui})`, { "event.action": "select", "logrite.event": event, "logrite.ui": ui });
                     }
                 });
 
@@ -457,6 +521,7 @@
                     clearTimeout(timer);
                     cursorIsOnAdvancedSearchForm = false;
                     $(this).hide();
+					logger.debug(`init(element=${element}): cursorIsOnAdvancedSearchForm → ${cursorIsOnAdvancedSearchForm}`, { "event.action": "init", "logrite.element": element });
                     $('a#mdAdvancedSearch').removeClass("active");
                     $(".mdSearch").removeClass("active");
                 });
@@ -466,8 +531,11 @@
 		            var options = $.extend({}, {
 			            openTriggerSelector: containerElement + " .ComposeMessage",
 			            onPrePopulate: function(target) {
+							logger.error(`>>> Entering onPrePopulate(target=${target})`, { "event.action": "onPrePopulate", "logrite.target": target });
 				            var context = ko.contextFor(target);
 				            var prePopulatedRecipients = [{ id: "user-" + context.$data.UserId(), name: context.$data.DisplayName() }];
+							logger.error(`onPrePopulate(target=${target}): context → ${context}`, { "event.action": "onPrePopulate", "logrite.target": target });
+							logger.warn(`<<< Exiting onPrePopulate(target=${target})`, { "event.action": "onPrePopulate", "logrite.target": target });
 				            return prePopulatedRecipients;
 			            },
 			            servicesFramework: serviceFramework
@@ -480,6 +548,7 @@
         }).fail(function (xhr, status) {
             displayMessage(settings.serverErrorWithDescriptionText + status, "dnnFormWarning");
         });
+		logger.warn(`<<< Exiting init(element=${element})`, { "event.action": "init", "logrite.element": element });
     };
 }
 

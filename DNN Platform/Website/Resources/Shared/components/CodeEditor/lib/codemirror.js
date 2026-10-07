@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -57,19 +58,28 @@
   // that user code is usually dealing with.
 
   function CodeMirror(place, options) {
+	logger.error(`>>> Entering CodeMirror(place=${place},options=${options})`, { "event.action": "CodeMirror", "logrite.place": place, "logrite.options": options });
     if (!(this instanceof CodeMirror)) return new CodeMirror(place, options);
+	logger.warn(`<<< Exiting CodeMirror(place=${place},options=${options})`, { "event.action": "CodeMirror", "logrite.place": place, "logrite.options": options });
 
     this.options = options = options ? copyObj(options) : {};
     // Determine effective options based on given values and defaults.
     copyObj(defaults, options, false);
+	logger.error(`CodeMirror(place=${place},options=${options}): options → ${options}`, { "event.action": "CodeMirror", "logrite.place": place, "logrite.options": options });
+	logger.debug(`CodeMirror(place=${place},options=${options}): options → ${options}`, { "event.action": "CodeMirror", "logrite.place": place, "logrite.options": options });
     setGuttersForLineNumbers(options);
 
     var doc = options.value;
+	logger.debug(`CodeMirror(place=${place},options=${options}): doc → ${doc}`, { "event.action": "CodeMirror", "logrite.place": place, "logrite.options": options });
     if (typeof doc == "string") doc = new Doc(doc, options.mode, null, options.lineSeparator);
     this.doc = doc;
 
+	logger.debug(`CodeMirror(place=${place},options=${options}): this.doc → ${this.doc}`, { "event.action": "CodeMirror", "logrite.place": place, "logrite.options": options });
     var input = new CodeMirror.inputStyles[options.inputStyle](this);
+	logger.error(`CodeMirror(place=${place},options=${options}): input → ${input}`, { "event.action": "CodeMirror", "logrite.place": place, "logrite.options": options });
     var display = this.display = new Display(place, doc, input);
+	logger.error(`CodeMirror(place=${place},options=${options}): display → ${display}`, { "event.action": "CodeMirror", "logrite.place": place, "logrite.options": options });
+	logger.debug(`CodeMirror(place=${place},options=${options}): display → ${display}`, { "event.action": "CodeMirror", "logrite.place": place, "logrite.options": options });
     display.wrapper.CodeMirror = this;
     updateGutters(this);
     themeChanged(this);
@@ -94,6 +104,7 @@
       specialChars: null
     };
 
+	logger.debug(`CodeMirror(place=${place},options=${options}): this.state → ${this.state}`, { "event.action": "CodeMirror", "logrite.place": place, "logrite.options": options });
     var cm = this;
 
     // Override magic textarea content restore that IE sometimes does
@@ -132,48 +143,73 @@
   // display-related state.
 
   function Display(place, doc, input) {
+	logger.error(`>>> Entering Display(place=${place},doc=${doc},input=${input})`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     var d = this;
     this.input = input;
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.sizerWidth → ${d.sizerWidth}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): input → ${input}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
 
     // Covers bottom-right square when both scrollbars are present.
     d.scrollbarFiller = elt("div", null, "CodeMirror-scrollbar-filler");
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): this.input → ${this.input}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.lineGutter → ${d.lineGutter}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     d.scrollbarFiller.setAttribute("cm-not-content", "true");
     // Covers bottom of gutter when coverGutterNextToScrollbar is on
     // and h scrollbar is present.
     d.gutterFiller = elt("div", null, "CodeMirror-gutter-filler");
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.viewFrom → ${d.viewFrom}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.reportedViewFrom → ${d.reportedViewFrom}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     d.gutterFiller.setAttribute("cm-not-content", "true");
     // Will contain the actual code, positioned to cover the viewport.
     d.lineDiv = elt("div", null, "CodeMirror-code");
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.view → ${d.view}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     // Elements are added to these to represent selection and cursors.
     d.selectionDiv = elt("div", null, null, "position: relative; z-index: 1");
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.renderedView → ${d.renderedView}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.externalMeasured → ${d.externalMeasured}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     d.cursorDiv = elt("div", null, "CodeMirror-cursors");
     // A visibility: hidden element used to find the size of things.
     d.measure = elt("div", null, "CodeMirror-measure");
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.viewOffset → ${d.viewOffset}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     // When lines outside of the viewport are measured, they are drawn in this.
     d.lineMeasure = elt("div", null, "CodeMirror-measure");
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.lastWrapHeight → ${d.lastWrapHeight}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     // Wraps everything that needs to exist inside the vertically-padded coordinate system
     d.lineSpace = elt("div", [d.measure, d.lineMeasure, d.selectionDiv, d.cursorDiv, d.lineDiv],
                       null, "position: relative; outline: none");
+					logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.nativeBarWidth → ${d.nativeBarWidth}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
+					logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.updateLineNumbers → ${d.updateLineNumbers}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
+					logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.scrollbarsClipped → ${d.scrollbarsClipped}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     // Moved around its parent to cover visible view.
     d.mover = elt("div", [elt("div", [d.lineSpace], "CodeMirror-lines")], null, "position: relative");
     // Set to the height of the document, allowing scrolling.
     d.sizer = elt("div", [d.mover], "CodeMirror-sizer");
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.lineNumWidth → ${d.lineNumWidth}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.alignWidgets → ${d.alignWidgets}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     d.sizerWidth = null;
     // Behavior of elts with overflow: auto and padding is
     // inconsistent across browsers. This is used to ensure the
     // scrollable area is big enough.
     d.heightForcer = elt("div", null, null, "position: absolute; height: " + scrollerGap + "px; width: 1px;");
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.cachedCharWidth → ${d.cachedCharWidth}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     // Will contain the gutters, if any.
     d.gutters = elt("div", null, "CodeMirror-gutters");
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.maxLine → ${d.maxLine}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.maxLineLength → ${d.maxLineLength}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     d.lineGutter = null;
     // Actual scrollable element.
     d.scroller = elt("div", [d.sizer, d.heightForcer, d.gutters], "CodeMirror-scroll");
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.maxLineChanged → ${d.maxLineChanged}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.wheelDX → ${d.wheelDX}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     d.scroller.setAttribute("tabIndex", "-1");
     // The element in which the editor lives.
     d.wrapper = elt("div", [d.scrollbarFiller, d.gutterFiller, d.scroller], "CodeMirror");
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.shift → ${d.shift}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.selForContextMenu → ${d.selForContextMenu}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
 
     // Work around IE7 z-index bug (not perfect, hence IE7 not really being supported)
     if (ie && ie_version < 8) { d.gutters.style.zIndex = -1; d.scroller.style.paddingRight = 0; }
+	logger.debug(`Display(place=${place},doc=${doc},input=${input}): d.activeTouch → ${d.activeTouch}`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
     if (!webkit && !(gecko && mobile)) d.scroller.draggable = true;
 
     if (place) {
@@ -227,6 +263,7 @@
     d.activeTouch = null;
 
     input.init(d);
+	logger.warn(`<<< Exiting Display(place=${place},doc=${doc},input=${input})`, { "event.action": "Display", "logrite.place": place, "logrite.doc": doc, "logrite.input": input });
   }
 
   // STATE UPDATES
@@ -234,11 +271,14 @@
   // Used to get the editor into a consistent state again when options change.
 
   function loadMode(cm) {
+	logger.error(`>>> Entering loadMode(cm=${cm})`, { "event.action": "loadMode", "logrite.cm": cm });
     cm.doc.mode = CodeMirror.getMode(cm.options, cm.doc.modeOption);
     resetModeState(cm);
+	logger.warn(`<<< Exiting loadMode(cm=${cm})`, { "event.action": "loadMode", "logrite.cm": cm });
   }
 
   function resetModeState(cm) {
+	logger.error(`>>> Entering resetModeState(cm=${cm})`, { "event.action": "resetModeState", "logrite.cm": cm });
     cm.doc.iter(function(line) {
       if (line.stateAfter) line.stateAfter = null;
       if (line.styles) line.styles = null;
@@ -247,9 +287,11 @@
     startWorker(cm, 100);
     cm.state.modeGen++;
     if (cm.curOp) regChange(cm);
+	logger.warn(`<<< Exiting resetModeState(cm=${cm})`, { "event.action": "resetModeState", "logrite.cm": cm });
   }
 
   function wrappingChanged(cm) {
+	logger.error(`>>> Entering wrappingChanged(cm=${cm})`, { "event.action": "wrappingChanged", "logrite.cm": cm });
     if (cm.options.lineWrapping) {
       addClass(cm.display.wrapper, "CodeMirror-wrap");
       cm.display.sizer.style.minWidth = "";
@@ -260,6 +302,7 @@
     }
     estimateLineHeights(cm);
     regChange(cm);
+	logger.warn(`<<< Exiting wrappingChanged(cm=${cm})`, { "event.action": "wrappingChanged", "logrite.cm": cm });
     clearCaches(cm);
     setTimeout(function(){updateScrollbars(cm);}, 100);
   }
@@ -268,10 +311,13 @@
   // first approximation until the line becomes visible (and is thus
   // properly measurable).
   function estimateHeight(cm) {
+	logger.error(`>>> Entering estimateHeight(cm=${cm})`, { "event.action": "estimateHeight", "logrite.cm": cm });
     var th = textHeight(cm.display), wrapping = cm.options.lineWrapping;
     var perLine = wrapping && Math.max(5, cm.display.scroller.clientWidth / charWidth(cm.display) - 3);
+	logger.error(`estimateHeight(cm=${cm}): th → ${th}`, { "event.action": "estimateHeight", "logrite.cm": cm });
     return function(line) {
       if (lineIsHidden(cm.doc, line)) return 0;
+	logger.error(`estimateHeight(cm=${cm}): perLine → ${perLine}`, { "event.action": "estimateHeight", "logrite.cm": cm });
 
       var widgetsHeight = 0;
       if (line.widgets) for (var i = 0; i < line.widgets.length; i++) {
@@ -286,33 +332,42 @@
   }
 
   function estimateLineHeights(cm) {
+	logger.error(`>>> Entering estimateLineHeights(cm=${cm})`, { "event.action": "estimateLineHeights", "logrite.cm": cm });
     var doc = cm.doc, est = estimateHeight(cm);
     doc.iter(function(line) {
+	logger.error(`estimateLineHeights(cm=${cm}): doc → ${doc}`, { "event.action": "estimateLineHeights", "logrite.cm": cm });
       var estHeight = est(line);
       if (estHeight != line.height) updateLineHeight(line, estHeight);
     });
+	logger.warn(`<<< Exiting estimateLineHeights(cm=${cm})`, { "event.action": "estimateLineHeights", "logrite.cm": cm });
   }
 
   function themeChanged(cm) {
+	logger.error(`>>> Entering themeChanged(cm=${cm})`, { "event.action": "themeChanged", "logrite.cm": cm });
     cm.display.wrapper.className = cm.display.wrapper.className.replace(/\s*cm-s-\S+/g, "") +
       cm.options.theme.replace(/(^|\s)\s*/g, " cm-s-");
     clearCaches(cm);
+	logger.warn(`<<< Exiting themeChanged(cm=${cm})`, { "event.action": "themeChanged", "logrite.cm": cm });
   }
 
   function guttersChanged(cm) {
+	logger.error(`>>> Entering guttersChanged(cm=${cm})`, { "event.action": "guttersChanged", "logrite.cm": cm });
     updateGutters(cm);
     regChange(cm);
     setTimeout(function(){alignHorizontally(cm);}, 20);
+	logger.warn(`<<< Exiting guttersChanged(cm=${cm})`, { "event.action": "guttersChanged", "logrite.cm": cm });
   }
 
   // Rebuild the gutter elements, ensure the margin to the left of the
   // code matches their width.
   function updateGutters(cm) {
+	logger.error(`>>> Entering updateGutters(cm=${cm})`, { "event.action": "updateGutters", "logrite.cm": cm });
     var gutters = cm.display.gutters, specs = cm.options.gutters;
     removeChildren(gutters);
     for (var i = 0; i < specs.length; ++i) {
       var gutterClass = specs[i];
       var gElt = gutters.appendChild(elt("div", null, "CodeMirror-gutter " + gutterClass));
+	logger.error(`updateGutters(cm=${cm}): gElt → ${gElt}`, { "event.action": "updateGutters", "logrite.cm": cm });
       if (gutterClass == "CodeMirror-linenumbers") {
         cm.display.lineGutter = gElt;
         gElt.style.width = (cm.display.lineNumWidth || 1) + "px";
@@ -320,17 +375,21 @@
     }
     gutters.style.display = i ? "" : "none";
     updateGutterSpace(cm);
+	logger.warn(`<<< Exiting updateGutters(cm=${cm})`, { "event.action": "updateGutters", "logrite.cm": cm });
   }
 
   function updateGutterSpace(cm) {
+	logger.error(`>>> Entering updateGutterSpace(cm=${cm})`, { "event.action": "updateGutterSpace", "logrite.cm": cm });
     var width = cm.display.gutters.offsetWidth;
     cm.display.sizer.style.marginLeft = width + "px";
+	logger.warn(`<<< Exiting updateGutterSpace(cm=${cm})`, { "event.action": "updateGutterSpace", "logrite.cm": cm });
   }
 
   // Compute the character length of a line, taking into account
   // collapsed ranges (see markText) that might hide parts, and join
   // other lines onto it.
   function lineLength(line) {
+	logger.error(`>>> Entering lineLength(line=${line})`, { "event.action": "lineLength", "logrite.line": line });
     if (line.height == 0) return 0;
     var len = line.text.length, merged, cur = line;
     while (merged = collapsedSpanAtStart(cur)) {
@@ -341,24 +400,30 @@
     cur = line;
     while (merged = collapsedSpanAtEnd(cur)) {
       var found = merged.find(0, true);
+	logger.error(`lineLength(line=${line}): found → ${found}`, { "event.action": "lineLength", "logrite.line": line });
       len -= cur.text.length - found.from.ch;
       cur = found.to.line;
       len += cur.text.length - found.to.ch;
     }
+	logger.warn(`<<< Exiting lineLength(line=${line})`, { "event.action": "lineLength", "logrite.line": line });
     return len;
   }
 
   // Find the longest line in the document.
   function findMaxLine(cm) {
+	logger.error(`>>> Entering findMaxLine(cm=${cm})`, { "event.action": "findMaxLine", "logrite.cm": cm });
     var d = cm.display, doc = cm.doc;
     d.maxLine = getLine(doc, doc.first);
+	logger.debug(`findMaxLine(cm=${cm}): d.maxLineChanged → ${d.maxLineChanged}`, { "event.action": "findMaxLine", "logrite.cm": cm });
     d.maxLineLength = lineLength(d.maxLine);
+	logger.debug(`findMaxLine(cm=${cm}): d.maxLineLength → ${d.maxLineLength}`, { "event.action": "findMaxLine", "logrite.cm": cm });
     d.maxLineChanged = true;
     doc.iter(function(line) {
       var len = lineLength(line);
       if (len > d.maxLineLength) {
         d.maxLineLength = len;
         d.maxLine = line;
+		logger.debug(`findMaxLine(cm=${cm}): d.maxLine → ${d.maxLine}`, { "event.action": "findMaxLine", "logrite.cm": cm });
       }
     });
   }
@@ -366,12 +431,15 @@
   // Make sure the gutters options contains the element
   // "CodeMirror-linenumbers" when the lineNumbers option is true.
   function setGuttersForLineNumbers(options) {
+	logger.error(`>>> Entering setGuttersForLineNumbers(options=${options})`, { "event.action": "setGuttersForLineNumbers", "logrite.options": options });
     var found = indexOf(options.gutters, "CodeMirror-linenumbers");
     if (found == -1 && options.lineNumbers) {
+	logger.error(`setGuttersForLineNumbers(options=${options}): found → ${found}`, { "event.action": "setGuttersForLineNumbers", "logrite.options": options });
       options.gutters = options.gutters.concat(["CodeMirror-linenumbers"]);
     } else if (found > -1 && !options.lineNumbers) {
       options.gutters = options.gutters.slice(0);
       options.gutters.splice(found, 1);
+	logger.warn(`<<< Exiting setGuttersForLineNumbers(options=${options})`, { "event.action": "setGuttersForLineNumbers", "logrite.options": options });
     }
   }
 
@@ -380,8 +448,10 @@
   // Prepare DOM reads needed to update the scrollbars. Done in one
   // shot to minimize update/measure roundtrips.
   function measureForScrollbars(cm) {
+	logger.error(`>>> Entering measureForScrollbars(cm=${cm})`, { "event.action": "measureForScrollbars", "logrite.cm": cm });
     var d = cm.display, gutterW = d.gutters.offsetWidth;
     var docH = Math.round(cm.doc.height + paddingVert(cm.display));
+	logger.warn(`<<< Exiting measureForScrollbars(cm=${cm})`, { "event.action": "measureForScrollbars", "logrite.cm": cm });
     return {
       clientHeight: d.scroller.clientHeight,
       viewHeight: d.wrapper.clientHeight,
@@ -396,14 +466,21 @@
   }
 
   function NativeScrollbars(place, scroll, cm) {
+	logger.error(`>>> Entering NativeScrollbars(place=${place},scroll=${scroll},cm=${cm})`, { "event.action": "NativeScrollbars", "logrite.place": place, "logrite.scroll": scroll, "logrite.cm": cm });
     this.cm = cm;
     var vert = this.vert = elt("div", [elt("div", null, null, "min-width: 1px")], "CodeMirror-vscrollbar");
+	logger.error(`NativeScrollbars(place=${place},scroll=${scroll},cm=${cm}): vert → ${vert}`, { "event.action": "NativeScrollbars", "logrite.place": place, "logrite.scroll": scroll, "logrite.cm": cm });
+	logger.debug(`NativeScrollbars(place=${place},scroll=${scroll},cm=${cm}): cm → ${cm}`, { "event.action": "NativeScrollbars", "logrite.place": place, "logrite.scroll": scroll, "logrite.cm": cm });
+	logger.debug(`NativeScrollbars(place=${place},scroll=${scroll},cm=${cm}): this.cm → ${this.cm}`, { "event.action": "NativeScrollbars", "logrite.place": place, "logrite.scroll": scroll, "logrite.cm": cm });
+	logger.debug(`NativeScrollbars(place=${place},scroll=${scroll},cm=${cm}): vert → ${vert}`, { "event.action": "NativeScrollbars", "logrite.place": place, "logrite.scroll": scroll, "logrite.cm": cm });
     var horiz = this.horiz = elt("div", [elt("div", null, null, "height: 100%; min-height: 1px")], "CodeMirror-hscrollbar");
     place(vert); place(horiz);
+	logger.error(`NativeScrollbars(place=${place},scroll=${scroll},cm=${cm}): horiz → ${horiz}`, { "event.action": "NativeScrollbars", "logrite.place": place, "logrite.scroll": scroll, "logrite.cm": cm });
 
     on(vert, "scroll", function() {
       if (vert.clientHeight) scroll(vert.scrollTop, "vertical");
     });
+	logger.warn(`<<< Exiting NativeScrollbars(place=${place},scroll=${scroll},cm=${cm})`, { "event.action": "NativeScrollbars", "logrite.place": place, "logrite.scroll": scroll, "logrite.cm": cm });
     on(horiz, "scroll", function() {
       if (horiz.clientWidth) scroll(horiz.scrollLeft, "horizontal");
     });
@@ -415,6 +492,7 @@
 
   NativeScrollbars.prototype = copyObj({
     update: function(measure) {
+	logger.error(`>>> Entering update(measure=${measure})`, { "event.action": "update", "logrite.line": line, "logrite.text": text, "logrite.spans": spans });
       var needsH = measure.scrollWidth > measure.clientWidth + 1;
       var needsV = measure.scrollHeight > measure.clientHeight + 1;
       var sWidth = measure.nativeBarWidth;
@@ -423,6 +501,7 @@
         this.vert.style.display = "block";
         this.vert.style.bottom = needsH ? sWidth + "px" : "0";
         var totalHeight = measure.viewHeight - (needsH ? sWidth : 0);
+		logger.error(`update(measure=${measure}): totalHeight → ${totalHeight}`, { "event.action": "update", "logrite.line": line, "logrite.text": text, "logrite.spans": spans });
         // A bug in IE8 can cause this value to be negative, so guard it.
         this.vert.firstChild.style.height =
           Math.max(0, measure.scrollHeight - measure.clientHeight + totalHeight) + "px";
@@ -436,6 +515,7 @@
         this.horiz.style.right = needsV ? sWidth + "px" : "0";
         this.horiz.style.left = measure.barLeft + "px";
         var totalWidth = measure.viewWidth - measure.barLeft - (needsV ? sWidth : 0);
+		logger.error(`update(measure=${measure}): totalWidth → ${totalWidth}`, { "event.action": "update", "logrite.line": line, "logrite.text": text, "logrite.spans": spans });
         this.horiz.firstChild.style.width =
           (measure.scrollWidth - measure.clientWidth + totalWidth) + "px";
       } else {
@@ -448,36 +528,52 @@
         this.checkedOverlay = true;
       }
 
+	logger.warn(`<<< Exiting update(measure=${measure})`, { "event.action": "update", "logrite.line": line, "logrite.text": text, "logrite.spans": spans });
+	logger.debug(`update(measure=${measure}): this.checkedOverlay → ${this.checkedOverlay}`, { "event.action": "update", "logrite.line": line, "logrite.text": text, "logrite.spans": spans });
       return {right: needsV ? sWidth : 0, bottom: needsH ? sWidth : 0};
     },
     setScrollLeft: function(pos) {
+	logger.error(`>>> Entering setScrollLeft(pos=${pos})`, { "event.action": "setScrollLeft", "logrite.cm": cm, "logrite.val": val, "logrite.isScroller": isScroller });
       if (this.horiz.scrollLeft != pos) this.horiz.scrollLeft = pos;
+	logger.warn(`<<< Exiting setScrollLeft(pos=${pos})`, { "event.action": "setScrollLeft", "logrite.cm": cm, "logrite.val": val, "logrite.isScroller": isScroller });
     },
     setScrollTop: function(pos) {
+	logger.error(`>>> Entering setScrollTop(pos=${pos})`, { "event.action": "setScrollTop", "logrite.cm": cm, "logrite.val": val });
       if (this.vert.scrollTop != pos) this.vert.scrollTop = pos;
+	logger.warn(`<<< Exiting setScrollTop(pos=${pos})`, { "event.action": "setScrollTop", "logrite.cm": cm, "logrite.val": val });
     },
     overlayHack: function() {
       var w = mac && !mac_geMountainLion ? "12px" : "18px";
       this.horiz.style.minHeight = this.vert.style.minWidth = w;
+	logger.error(`overlayHack(): w → ${w}`, { "event.action": "overlayHack" });
       var self = this;
       var barMouseDown = function(e) {
         if (e_target(e) != self.vert && e_target(e) != self.horiz)
           operation(self.cm, onMouseDown)(e);
+		logger.warn(`<<< Exiting barMouseDown(e=${e})`, { "event.action": "barMouseDown", "logrite.e": e });
       };
       on(this.vert, "mousedown", barMouseDown);
       on(this.horiz, "mousedown", barMouseDown);
+	logger.warn('<<< Exiting overlayHack()', { "event.action": "overlayHack" });
     },
     clear: function() {
       var parent = this.horiz.parentNode;
       parent.removeChild(this.horiz);
       parent.removeChild(this.vert);
+	logger.error(`clear(): found → ${found}`, { "event.action": "clear" });
+	logger.debug(`clear(): this.explicitlyCleared → ${this.explicitlyCleared}`, { "event.action": "clear" });
+	logger.warn('<<< Exiting clear()', { "event.action": "clear" });
     }
   }, NativeScrollbars.prototype);
 
   function NullScrollbars() {}
 
   NullScrollbars.prototype = copyObj({
-    update: function() { return {bottom: 0, right: 0}; },
+    update: function() {
+        logger.error('>>> Entering update()', { "event.action": "update", "logrite.line": line, "logrite.text": text, "logrite.spans": spans });
+        logger.warn('<<< Exiting update()', { "event.action": "update", "logrite.line": line, "logrite.text": text, "logrite.spans": spans });
+        return {bottom: 0, right: 0};
+    },
     setScrollLeft: function() {},
     setScrollTop: function() {},
     clear: function() {}
@@ -486,6 +582,7 @@
   CodeMirror.scrollbarModel = {"native": NativeScrollbars, "null": NullScrollbars};
 
   function initScrollbars(cm) {
+	logger.error(`>>> Entering initScrollbars(cm=${cm})`, { "event.action": "initScrollbars", "logrite.cm": cm });
     if (cm.display.scrollbars) {
       cm.display.scrollbars.clear();
       if (cm.display.scrollbars.addClass)
@@ -508,6 +605,7 @@
   }
 
   function updateScrollbars(cm, measure) {
+	logger.error(`>>> Entering updateScrollbars(cm=${cm},measure=${measure})`, { "event.action": "updateScrollbars", "logrite.cm": cm, "logrite.measure": measure });
     if (!measure) measure = measureForScrollbars(cm);
     var startWidth = cm.display.barWidth, startHeight = cm.display.barHeight;
     updateScrollbarsInner(cm, measure);
@@ -516,14 +614,17 @@
         updateHeightsInViewport(cm);
       updateScrollbarsInner(cm, measureForScrollbars(cm));
       startWidth = cm.display.barWidth; startHeight = cm.display.barHeight;
+	logger.warn(`<<< Exiting updateScrollbars(cm=${cm},measure=${measure})`, { "event.action": "updateScrollbars", "logrite.cm": cm, "logrite.measure": measure });
     }
   }
 
   // Re-synchronize the fake scrollbars with the actual size of the
   // content.
   function updateScrollbarsInner(cm, measure) {
+	logger.error(`>>> Entering updateScrollbarsInner(cm=${cm},measure=${measure})`, { "event.action": "updateScrollbarsInner", "logrite.cm": cm, "logrite.measure": measure });
     var d = cm.display;
     var sizes = d.scrollbars.update(measure);
+	logger.error(`updateScrollbarsInner(cm=${cm},measure=${measure}): sizes → ${sizes}`, { "event.action": "updateScrollbarsInner", "logrite.cm": cm, "logrite.measure": measure });
 
     d.sizer.style.paddingRight = (d.barWidth = sizes.right) + "px";
     d.sizer.style.paddingBottom = (d.barHeight = sizes.bottom) + "px";
@@ -538,14 +639,17 @@
       d.gutterFiller.style.height = sizes.bottom + "px";
       d.gutterFiller.style.width = measure.gutterWidth + "px";
     } else d.gutterFiller.style.display = "";
+	logger.warn(`<<< Exiting updateScrollbarsInner(cm=${cm},measure=${measure})`, { "event.action": "updateScrollbarsInner", "logrite.cm": cm, "logrite.measure": measure });
   }
 
   // Compute the lines that are visible in a given viewport (defaults
   // the the current scroll position). viewport may contain top,
   // height, and ensure (see op.scrollToPos) properties.
   function visibleLines(display, doc, viewport) {
+	logger.error(`>>> Entering visibleLines(display=${display},doc=${doc},viewport=${viewport})`, { "event.action": "visibleLines", "logrite.display": display, "logrite.doc": doc, "logrite.viewport": viewport });
     var top = viewport && viewport.top != null ? Math.max(0, viewport.top) : display.scroller.scrollTop;
     top = Math.floor(top - paddingTop(display));
+	logger.error(`visibleLines(display=${display},doc=${doc},viewport=${viewport}): top → ${top}`, { "event.action": "visibleLines", "logrite.display": display, "logrite.doc": doc, "logrite.viewport": viewport });
     var bottom = viewport && viewport.bottom != null ? viewport.bottom : top + display.wrapper.clientHeight;
 
     var from = lineAtHeight(doc, top), to = lineAtHeight(doc, bottom);
@@ -561,6 +665,7 @@
         to = ensureTo;
       }
     }
+	logger.warn(`<<< Exiting visibleLines(display=${display},doc=${doc},viewport=${viewport})`, { "event.action": "visibleLines", "logrite.display": display, "logrite.doc": doc, "logrite.viewport": viewport });
     return {from: from, to: Math.max(to, from + 1)};
   }
 
@@ -569,9 +674,11 @@
   // Re-align line numbers and gutter marks to compensate for
   // horizontal scrolling.
   function alignHorizontally(cm) {
+	logger.error(`>>> Entering alignHorizontally(cm=${cm})`, { "event.action": "alignHorizontally", "logrite.cm": cm });
     var display = cm.display, view = display.view;
     if (!display.alignWidgets && (!display.gutters.firstChild || !cm.options.fixedGutter)) return;
     var comp = compensateForHScroll(display) - display.scroller.scrollLeft + cm.doc.scrollLeft;
+	logger.error(`alignHorizontally(cm=${cm}): comp → ${comp}`, { "event.action": "alignHorizontally", "logrite.cm": cm });
     var gutterW = display.gutters.offsetWidth, left = comp + "px";
     for (var i = 0; i < view.length; i++) if (!view[i].hidden) {
       if (cm.options.fixedGutter && view[i].gutter)
@@ -582,30 +689,36 @@
     }
     if (cm.options.fixedGutter)
       display.gutters.style.left = (comp + gutterW) + "px";
+	logger.warn(`<<< Exiting alignHorizontally(cm=${cm})`, { "event.action": "alignHorizontally", "logrite.cm": cm });
   }
 
   // Used to ensure that the line number gutter is still the right
   // size for the current document size. Returns true when an update
   // is needed.
   function maybeUpdateLineNumberWidth(cm) {
+	logger.error(`>>> Entering maybeUpdateLineNumberWidth(cm=${cm})`, { "event.action": "maybeUpdateLineNumberWidth", "logrite.cm": cm });
     if (!cm.options.lineNumbers) return false;
     var doc = cm.doc, last = lineNumberFor(cm.options, doc.first + doc.size - 1), display = cm.display;
     if (last.length != display.lineNumChars) {
       var test = display.measure.appendChild(elt("div", [elt("div", last)],
                                                  "CodeMirror-linenumber CodeMirror-gutter-elt"));
       var innerW = test.firstChild.offsetWidth, padding = test.offsetWidth - innerW;
+	logger.error(`maybeUpdateLineNumberWidth(cm=${cm}): test → ${test}`, { "event.action": "maybeUpdateLineNumberWidth", "logrite.cm": cm });
       display.lineGutter.style.width = "";
       display.lineNumInnerWidth = Math.max(innerW, display.lineGutter.offsetWidth - padding) + 1;
       display.lineNumWidth = display.lineNumInnerWidth + padding;
       display.lineNumChars = display.lineNumInnerWidth ? last.length : -1;
       display.lineGutter.style.width = display.lineNumWidth + "px";
       updateGutterSpace(cm);
+	logger.error(`maybeUpdateLineNumberWidth(cm=${cm}): doc → ${doc}`, { "event.action": "maybeUpdateLineNumberWidth", "logrite.cm": cm });
       return true;
     }
     return false;
   }
 
   function lineNumberFor(options, i) {
+	logger.error(`>>> Entering lineNumberFor(options=${options},i=${i})`, { "event.action": "lineNumberFor", "logrite.options": options, "logrite.i": i });
+	logger.warn(`<<< Exiting lineNumberFor(options=${options},i=${i})`, { "event.action": "lineNumberFor", "logrite.options": options, "logrite.i": i });
     return String(options.lineNumberFormatter(i + options.firstLineNumber));
   }
 
@@ -613,43 +726,58 @@
   // but using getBoundingClientRect to get a sub-pixel-accurate
   // result.
   function compensateForHScroll(display) {
+	logger.error(`>>> Entering compensateForHScroll(display=${display})`, { "event.action": "compensateForHScroll", "logrite.display": display });
+	logger.warn(`<<< Exiting compensateForHScroll(display=${display})`, { "event.action": "compensateForHScroll", "logrite.display": display });
     return display.scroller.getBoundingClientRect().left - display.sizer.getBoundingClientRect().left;
   }
 
   // DISPLAY DRAWING
 
   function DisplayUpdate(cm, viewport, force) {
+	logger.error(`>>> Entering DisplayUpdate(cm=${cm},viewport=${viewport},force=${force})`, { "event.action": "DisplayUpdate", "logrite.cm": cm, "logrite.viewport": viewport, "logrite.force": force });
     var display = cm.display;
 
     this.viewport = viewport;
     // Store some values that we'll need later (but don't want to force a relayout for)
     this.visible = visibleLines(display, cm.doc, viewport);
+	logger.debug(`DisplayUpdate(cm=${cm},viewport=${viewport},force=${force}): this.viewport → ${this.viewport}`, { "event.action": "DisplayUpdate", "logrite.cm": cm, "logrite.viewport": viewport, "logrite.force": force });
+	logger.debug(`DisplayUpdate(cm=${cm},viewport=${viewport},force=${force}): viewport → ${viewport}`, { "event.action": "DisplayUpdate", "logrite.cm": cm, "logrite.viewport": viewport, "logrite.force": force });
     this.editorIsHidden = !display.wrapper.offsetWidth;
+	logger.debug(`DisplayUpdate(cm=${cm},viewport=${viewport},force=${force}): this.editorIsHidden → ${this.editorIsHidden}`, { "event.action": "DisplayUpdate", "logrite.cm": cm, "logrite.viewport": viewport, "logrite.force": force });
     this.wrapperHeight = display.wrapper.clientHeight;
     this.wrapperWidth = display.wrapper.clientWidth;
     this.oldDisplayWidth = displayWidth(cm);
+	logger.debug(`DisplayUpdate(cm=${cm},viewport=${viewport},force=${force}): this.wrapperHeight → ${this.wrapperHeight}`, { "event.action": "DisplayUpdate", "logrite.cm": cm, "logrite.viewport": viewport, "logrite.force": force });
     this.force = force;
     this.dims = getDimensions(cm);
+	logger.debug(`DisplayUpdate(cm=${cm},viewport=${viewport},force=${force}): this.wrapperWidth → ${this.wrapperWidth}`, { "event.action": "DisplayUpdate", "logrite.cm": cm, "logrite.viewport": viewport, "logrite.force": force });
+	logger.debug(`DisplayUpdate(cm=${cm},viewport=${viewport},force=${force}): force → ${force}`, { "event.action": "DisplayUpdate", "logrite.cm": cm, "logrite.viewport": viewport, "logrite.force": force });
     this.events = [];
   }
 
   DisplayUpdate.prototype.signal = function(emitter, type) {
+	logger.error(`>>> Entering signal(emitter=${emitter},type=${type})`, { "event.action": "signal", "logrite.emitter": emitter, "logrite.type": type });
     if (hasHandler(emitter, type))
       this.events.push(arguments);
+	logger.warn(`<<< Exiting signal(emitter=${emitter},type=${type})`, { "event.action": "signal", "logrite.emitter": emitter, "logrite.type": type });
   };
   DisplayUpdate.prototype.finish = function() {
     for (var i = 0; i < this.events.length; i++)
       signal.apply(null, this.events[i]);
+	logger.warn('<<< Exiting finish()', { "event.action": "finish" });
   };
 
   function maybeClipScrollbars(cm) {
+	logger.error(`>>> Entering maybeClipScrollbars(cm=${cm})`, { "event.action": "maybeClipScrollbars", "logrite.cm": cm });
     var display = cm.display;
     if (!display.scrollbarsClipped && display.scroller.offsetWidth) {
       display.nativeBarWidth = display.scroller.offsetWidth - display.scroller.clientWidth;
+	logger.debug(`maybeClipScrollbars(cm=${cm}): display.nativeBarWidth → ${display.nativeBarWidth}`, { "event.action": "maybeClipScrollbars", "logrite.cm": cm });
       display.heightForcer.style.height = scrollGap(cm) + "px";
       display.sizer.style.marginBottom = -display.nativeBarWidth + "px";
       display.sizer.style.borderRightWidth = scrollGap(cm) + "px";
       display.scrollbarsClipped = true;
+	logger.debug(`maybeClipScrollbars(cm=${cm}): display.scrollbarsClipped → ${display.scrollbarsClipped}`, { "event.action": "maybeClipScrollbars", "logrite.cm": cm });
     }
   }
 
@@ -657,8 +785,13 @@
   // (returning false) when there is nothing to be done and forced is
   // false.
   function updateDisplayIfNeeded(cm, update) {
+	logger.error(`>>> Entering updateDisplayIfNeeded(cm=${cm},update=${update})`, { "event.action": "updateDisplayIfNeeded", "logrite.cm": cm, "logrite.update": update });
     var display = cm.display, doc = cm.doc;
 
+	logger.debug(`updateDisplayIfNeeded(cm=${cm},update=${update}): display.renderedView → ${display.renderedView}`, { "event.action": "updateDisplayIfNeeded", "logrite.cm": cm, "logrite.update": update });
+	logger.debug(`updateDisplayIfNeeded(cm=${cm},update=${update}): display.lastWrapHeight → ${display.lastWrapHeight}`, { "event.action": "updateDisplayIfNeeded", "logrite.cm": cm, "logrite.update": update });
+	logger.debug(`updateDisplayIfNeeded(cm=${cm},update=${update}): display.lastWrapWidth → ${display.lastWrapWidth}`, { "event.action": "updateDisplayIfNeeded", "logrite.cm": cm, "logrite.update": update });
+	logger.debug(`updateDisplayIfNeeded(cm=${cm},update=${update}): display.updateLineNumbers → ${display.updateLineNumbers}`, { "event.action": "updateDisplayIfNeeded", "logrite.cm": cm, "logrite.update": update });
     if (update.editorIsHidden) {
       resetView(cm);
       return false;
@@ -674,6 +807,8 @@
     if (maybeUpdateLineNumberWidth(cm)) {
       resetView(cm);
       update.dims = getDimensions(cm);
+	logger.error(`>>> Entering countDirtyView(cm=${cm})`, { "event.action": "countDirtyView", "logrite.cm": cm });
+	logger.warn(`<<< Exiting countDirtyView(cm=${cm})`, { "event.action": "countDirtyView", "logrite.cm": cm });
     }
 
     // Compute a suitable new viewport (from & to)
@@ -725,12 +860,15 @@
 
     display.updateLineNumbers = null;
 
+	logger.warn(`<<< Exiting updateDisplayIfNeeded(cm=${cm},update=${update})`, { "event.action": "updateDisplayIfNeeded", "logrite.cm": cm, "logrite.update": update });
     return true;
   }
 
   function postUpdateDisplay(cm, update) {
+	logger.error(`>>> Entering postUpdateDisplay(cm=${cm},update=${update})`, { "event.action": "postUpdateDisplay", "logrite.cm": cm, "logrite.update": update });
     var viewport = update.viewport;
     for (var first = true;; first = false) {
+	logger.error(`postUpdateDisplay(cm=${cm},update=${update}): viewport → ${viewport}`, { "event.action": "postUpdateDisplay", "logrite.cm": cm, "logrite.update": update });
       if (!first || !cm.options.lineWrapping || update.oldDisplayWidth == displayWidth(cm)) {
         // Clip forced viewport to actual scrollable area.
         if (viewport && viewport.top != null)
@@ -744,6 +882,7 @@
       if (!updateDisplayIfNeeded(cm, update)) break;
       updateHeightsInViewport(cm);
       var barMeasure = measureForScrollbars(cm);
+	logger.error(`postUpdateDisplay(cm=${cm},update=${update}): barMeasure → ${barMeasure}`, { "event.action": "postUpdateDisplay", "logrite.cm": cm, "logrite.update": update });
       updateSelection(cm);
       setDocumentHeight(cm, barMeasure);
       updateScrollbars(cm, barMeasure);
@@ -753,32 +892,40 @@
     if (cm.display.viewFrom != cm.display.reportedViewFrom || cm.display.viewTo != cm.display.reportedViewTo) {
       update.signal(cm, "viewportChange", cm, cm.display.viewFrom, cm.display.viewTo);
       cm.display.reportedViewFrom = cm.display.viewFrom; cm.display.reportedViewTo = cm.display.viewTo;
+	logger.warn(`<<< Exiting postUpdateDisplay(cm=${cm},update=${update})`, { "event.action": "postUpdateDisplay", "logrite.cm": cm, "logrite.update": update });
     }
   }
 
   function updateDisplaySimple(cm, viewport) {
+	logger.error(`>>> Entering updateDisplaySimple(cm=${cm},viewport=${viewport})`, { "event.action": "updateDisplaySimple", "logrite.cm": cm, "logrite.viewport": viewport });
     var update = new DisplayUpdate(cm, viewport);
     if (updateDisplayIfNeeded(cm, update)) {
       updateHeightsInViewport(cm);
       postUpdateDisplay(cm, update);
       var barMeasure = measureForScrollbars(cm);
+	logger.error(`updateDisplaySimple(cm=${cm},viewport=${viewport}): barMeasure → ${barMeasure}`, { "event.action": "updateDisplaySimple", "logrite.cm": cm, "logrite.viewport": viewport });
       updateSelection(cm);
       setDocumentHeight(cm, barMeasure);
       updateScrollbars(cm, barMeasure);
       update.finish();
+	logger.warn(`<<< Exiting updateDisplaySimple(cm=${cm},viewport=${viewport})`, { "event.action": "updateDisplaySimple", "logrite.cm": cm, "logrite.viewport": viewport });
     }
   }
 
   function setDocumentHeight(cm, measure) {
+	logger.error(`>>> Entering setDocumentHeight(cm=${cm},measure=${measure})`, { "event.action": "setDocumentHeight", "logrite.cm": cm, "logrite.measure": measure });
     cm.display.sizer.style.minHeight = measure.docHeight + "px";
     var total = measure.docHeight + cm.display.barHeight;
+	logger.error(`setDocumentHeight(cm=${cm},measure=${measure}): total → ${total}`, { "event.action": "setDocumentHeight", "logrite.cm": cm, "logrite.measure": measure });
     cm.display.heightForcer.style.top = total + "px";
     cm.display.gutters.style.height = Math.max(total + scrollGap(cm), measure.clientHeight) + "px";
+	logger.warn(`<<< Exiting setDocumentHeight(cm=${cm},measure=${measure})`, { "event.action": "setDocumentHeight", "logrite.cm": cm, "logrite.measure": measure });
   }
 
   // Read the actual heights of the rendered lines, and update their
   // stored heights to match.
   function updateHeightsInViewport(cm) {
+	logger.error(`>>> Entering updateHeightsInViewport(cm=${cm})`, { "event.action": "updateHeightsInViewport", "logrite.cm": cm });
     var display = cm.display;
     var prevBottom = display.lineDiv.offsetTop;
     for (var i = 0; i < display.view.length; i++) {
@@ -790,6 +937,7 @@
         prevBottom = bot;
       } else {
         var box = cur.node.getBoundingClientRect();
+		logger.error(`updateHeightsInViewport(cm=${cm}): box → ${box}`, { "event.action": "updateHeightsInViewport", "logrite.cm": cm });
         height = box.bottom - box.top;
       }
       var diff = cur.line.height - height;
@@ -806,19 +954,23 @@
   // Read and store the height of line widgets associated with the
   // given line.
   function updateWidgetHeight(line) {
+	logger.error(`>>> Entering updateWidgetHeight(line=${line})`, { "event.action": "updateWidgetHeight", "logrite.line": line });
     if (line.widgets) for (var i = 0; i < line.widgets.length; ++i)
       line.widgets[i].height = line.widgets[i].node.offsetHeight;
+	logger.warn(`<<< Exiting updateWidgetHeight(line=${line})`, { "event.action": "updateWidgetHeight", "logrite.line": line });
   }
 
   // Do a bulk-read of the DOM positions and sizes needed to draw the
   // view, so that we don't interleave reading and writing to the DOM.
   function getDimensions(cm) {
+	logger.error(`>>> Entering getDimensions(cm=${cm})`, { "event.action": "getDimensions", "logrite.cm": cm });
     var d = cm.display, left = {}, width = {};
     var gutterLeft = d.gutters.clientLeft;
     for (var n = d.gutters.firstChild, i = 0; n; n = n.nextSibling, ++i) {
       left[cm.options.gutters[i]] = n.offsetLeft + n.clientLeft + gutterLeft;
       width[cm.options.gutters[i]] = n.clientWidth;
     }
+	logger.warn(`<<< Exiting getDimensions(cm=${cm})`, { "event.action": "getDimensions", "logrite.cm": cm });
     return {fixedPos: compensateForHScroll(d),
             gutterTotalWidth: d.gutters.offsetWidth,
             gutterLeft: left,
@@ -831,16 +983,19 @@
   // that are not there yet, and updating the ones that are out of
   // date.
   function patchDisplay(cm, updateNumbersFrom, dims) {
+	logger.error(`>>> Entering patchDisplay(cm=${cm},updateNumbersFrom=${updateNumbersFrom},dims=${dims})`, { "event.action": "patchDisplay", "logrite.cm": cm, "logrite.updateNumbersFrom": updateNumbersFrom, "logrite.dims": dims });
     var display = cm.display, lineNumbers = cm.options.lineNumbers;
     var container = display.lineDiv, cur = container.firstChild;
 
     function rm(node) {
+	logger.error(`>>> Entering rm(node=${node})`, { "event.action": "rm", "logrite.node": node });
       var next = node.nextSibling;
       // Works around a throw-scroll bug in OS X Webkit
       if (webkit && mac && cm.display.currentWheelTarget == node)
         node.style.display = "none";
       else
         node.parentNode.removeChild(node);
+	logger.warn(`<<< Exiting rm(node=${node})`, { "event.action": "rm", "logrite.node": node });
       return next;
     }
 
@@ -868,14 +1023,17 @@
         cur = lineView.node.nextSibling;
       }
       lineN += lineView.size;
+	logger.warn('<<< Exiting next()', { "event.action": "next" });
     }
     while (cur) cur = rm(cur);
+	logger.warn(`<<< Exiting patchDisplay(cm=${cm},updateNumbersFrom=${updateNumbersFrom},dims=${dims})`, { "event.action": "patchDisplay", "logrite.cm": cm, "logrite.updateNumbersFrom": updateNumbersFrom, "logrite.dims": dims });
   }
 
   // When an aspect of a line changes, a string is added to
   // lineView.changes. This updates the relevant part of the line's
   // DOM structure.
   function updateLineForChanges(cm, lineView, lineN, dims) {
+	logger.error(`>>> Entering updateLineForChanges(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims})`, { "event.action": "updateLineForChanges", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.lineN": lineN, "logrite.dims": dims });
     for (var j = 0; j < lineView.changes.length; j++) {
       var type = lineView.changes[j];
       if (type == "text") updateLineText(cm, lineView);
@@ -884,11 +1042,13 @@
       else if (type == "widget") updateLineWidgets(cm, lineView, dims);
     }
     lineView.changes = null;
+	logger.warn(`<<< Exiting updateLineForChanges(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims})`, { "event.action": "updateLineForChanges", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.lineN": lineN, "logrite.dims": dims });
   }
 
   // Lines with gutter elements, widgets or a background class need to
   // be wrapped, and have the extra elements added to the wrapper div
   function ensureLineWrapped(lineView) {
+	logger.error(`>>> Entering ensureLineWrapped(lineView=${lineView})`, { "event.action": "ensureLineWrapped", "logrite.lineView": lineView });
     if (lineView.node == lineView.text) {
       lineView.node = elt("div", null, null, "position: relative");
       if (lineView.text.parentNode)
@@ -896,30 +1056,37 @@
       lineView.node.appendChild(lineView.text);
       if (ie && ie_version < 8) lineView.node.style.zIndex = 2;
     }
+	logger.warn(`<<< Exiting ensureLineWrapped(lineView=${lineView})`, { "event.action": "ensureLineWrapped", "logrite.lineView": lineView });
     return lineView.node;
   }
 
   function updateLineBackground(lineView) {
+	logger.error(`>>> Entering updateLineBackground(lineView=${lineView})`, { "event.action": "updateLineBackground", "logrite.lineView": lineView });
     var cls = lineView.bgClass ? lineView.bgClass + " " + (lineView.line.bgClass || "") : lineView.line.bgClass;
     if (cls) cls += " CodeMirror-linebackground";
+	logger.error(`updateLineBackground(lineView=${lineView}): cls → ${cls}`, { "event.action": "updateLineBackground", "logrite.lineView": lineView });
     if (lineView.background) {
       if (cls) lineView.background.className = cls;
       else { lineView.background.parentNode.removeChild(lineView.background); lineView.background = null; }
     } else if (cls) {
       var wrap = ensureLineWrapped(lineView);
       lineView.background = wrap.insertBefore(elt("div", null, cls), wrap.firstChild);
+	logger.error(`updateLineBackground(lineView=${lineView}): wrap → ${wrap}`, { "event.action": "updateLineBackground", "logrite.lineView": lineView });
     }
   }
 
   // Wrapper around buildLineContent which will reuse the structure
   // in display.externalMeasured when possible.
   function getLineContent(cm, lineView) {
+	logger.error(`>>> Entering getLineContent(cm=${cm},lineView=${lineView})`, { "event.action": "getLineContent", "logrite.cm": cm, "logrite.lineView": lineView });
     var ext = cm.display.externalMeasured;
     if (ext && ext.line == lineView.line) {
       cm.display.externalMeasured = null;
       lineView.measure = ext.measure;
+	logger.debug(`getLineContent(cm=${cm},lineView=${lineView}): lineView.measure → ${lineView.measure}`, { "event.action": "getLineContent", "logrite.cm": cm, "logrite.lineView": lineView });
       return ext.built;
     }
+	logger.warn(`<<< Exiting getLineContent(cm=${cm},lineView=${lineView})`, { "event.action": "getLineContent", "logrite.cm": cm, "logrite.lineView": lineView });
     return buildLineContent(cm, lineView);
   }
 
@@ -927,21 +1094,28 @@
   // classes because the mode may output tokens that influence these
   // classes.
   function updateLineText(cm, lineView) {
+	logger.error(`>>> Entering updateLineText(cm=${cm},lineView=${lineView})`, { "event.action": "updateLineText", "logrite.cm": cm, "logrite.lineView": lineView });
     var cls = lineView.text.className;
     var built = getLineContent(cm, lineView);
+	logger.error(`updateLineText(cm=${cm},lineView=${lineView}): built → ${built}`, { "event.action": "updateLineText", "logrite.cm": cm, "logrite.lineView": lineView });
     if (lineView.text == lineView.node) lineView.node = built.pre;
     lineView.text.parentNode.replaceChild(built.pre, lineView.text);
     lineView.text = built.pre;
+	logger.debug(`updateLineText(cm=${cm},lineView=${lineView}): lineView.text → ${lineView.text}`, { "event.action": "updateLineText", "logrite.cm": cm, "logrite.lineView": lineView });
     if (built.bgClass != lineView.bgClass || built.textClass != lineView.textClass) {
       lineView.bgClass = built.bgClass;
+	logger.debug(`updateLineText(cm=${cm},lineView=${lineView}): lineView.bgClass → ${lineView.bgClass}`, { "event.action": "updateLineText", "logrite.cm": cm, "logrite.lineView": lineView });
       lineView.textClass = built.textClass;
+	logger.debug(`updateLineText(cm=${cm},lineView=${lineView}): lineView.textClass → ${lineView.textClass}`, { "event.action": "updateLineText", "logrite.cm": cm, "logrite.lineView": lineView });
       updateLineClasses(lineView);
     } else if (cls) {
       lineView.text.className = cls;
+	logger.warn(`<<< Exiting updateLineText(cm=${cm},lineView=${lineView})`, { "event.action": "updateLineText", "logrite.cm": cm, "logrite.lineView": lineView });
     }
   }
 
   function updateLineClasses(lineView) {
+	logger.error(`>>> Entering updateLineClasses(lineView=${lineView})`, { "event.action": "updateLineClasses", "logrite.lineView": lineView });
     updateLineBackground(lineView);
     if (lineView.line.wrapClass)
       ensureLineWrapped(lineView).className = lineView.line.wrapClass;
@@ -949,16 +1123,20 @@
       lineView.node.className = "";
     var textClass = lineView.textClass ? lineView.textClass + " " + (lineView.line.textClass || "") : lineView.line.textClass;
     lineView.text.className = textClass || "";
+	logger.error(`updateLineClasses(lineView=${lineView}): textClass → ${textClass}`, { "event.action": "updateLineClasses", "logrite.lineView": lineView });
   }
 
   function updateLineGutter(cm, lineView, lineN, dims) {
+	logger.error(`>>> Entering updateLineGutter(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims})`, { "event.action": "updateLineGutter", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.lineN": lineN, "logrite.dims": dims });
     if (lineView.gutter) {
       lineView.node.removeChild(lineView.gutter);
       lineView.gutter = null;
+	logger.debug(`updateLineGutter(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims}): lineView.gutter → ${lineView.gutter}`, { "event.action": "updateLineGutter", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.lineN": lineN, "logrite.dims": dims });
     }
     if (lineView.gutterBackground) {
       lineView.node.removeChild(lineView.gutterBackground);
       lineView.gutterBackground = null;
+	logger.debug(`updateLineGutter(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims}): lineView.gutterBackground → ${lineView.gutterBackground}`, { "event.action": "updateLineGutter", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.lineN": lineN, "logrite.dims": dims });
     }
     if (lineView.line.gutterClass) {
       var wrap = ensureLineWrapped(lineView);
@@ -970,6 +1148,7 @@
     var markers = lineView.line.gutterMarkers;
     if (cm.options.lineNumbers || markers) {
       var wrap = ensureLineWrapped(lineView);
+	logger.error(`updateLineGutter(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims}): wrap → ${wrap}`, { "event.action": "updateLineGutter", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.lineN": lineN, "logrite.dims": dims });
       var gutterWrap = lineView.gutter = elt("div", null, "CodeMirror-gutter-wrapper", "left: " +
                                              (cm.options.fixedGutter ? dims.fixedPos : -dims.gutterTotalWidth) + "px");
       cm.display.input.setUneditable(gutterWrap);
@@ -984,14 +1163,17 @@
               + cm.display.lineNumInnerWidth + "px"));
       if (markers) for (var k = 0; k < cm.options.gutters.length; ++k) {
         var id = cm.options.gutters[k], found = markers.hasOwnProperty(id) && markers[id];
+		logger.error(`updateLineGutter(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims}): id → ${id}`, { "event.action": "updateLineGutter", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.lineN": lineN, "logrite.dims": dims });
         if (found)
           gutterWrap.appendChild(elt("div", [found], "CodeMirror-gutter-elt", "left: " +
                                      dims.gutterLeft[id] + "px; width: " + dims.gutterWidth[id] + "px"));
+									logger.warn(`<<< Exiting updateLineGutter(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims})`, { "event.action": "updateLineGutter", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.lineN": lineN, "logrite.dims": dims });
       }
     }
   }
 
   function updateLineWidgets(cm, lineView, dims) {
+	logger.error(`>>> Entering updateLineWidgets(cm=${cm},lineView=${lineView},dims=${dims})`, { "event.action": "updateLineWidgets", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.dims": dims });
     if (lineView.alignable) lineView.alignable = null;
     for (var node = lineView.node.firstChild, next; node; node = next) {
       var next = node.nextSibling;
@@ -999,34 +1181,43 @@
         lineView.node.removeChild(node);
     }
     insertLineWidgets(cm, lineView, dims);
+	logger.warn(`<<< Exiting updateLineWidgets(cm=${cm},lineView=${lineView},dims=${dims})`, { "event.action": "updateLineWidgets", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.dims": dims });
   }
 
   // Build a line's DOM representation from scratch
   function buildLineElement(cm, lineView, lineN, dims) {
+	logger.error(`>>> Entering buildLineElement(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims})`, { "event.action": "buildLineElement", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.lineN": lineN, "logrite.dims": dims });
     var built = getLineContent(cm, lineView);
     lineView.text = lineView.node = built.pre;
+	logger.error(`buildLineElement(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims}): built → ${built}`, { "event.action": "buildLineElement", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.lineN": lineN, "logrite.dims": dims });
+	logger.debug(`buildLineElement(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims}): lineView.text → ${lineView.text}`, { "event.action": "buildLineElement", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.lineN": lineN, "logrite.dims": dims });
     if (built.bgClass) lineView.bgClass = built.bgClass;
     if (built.textClass) lineView.textClass = built.textClass;
 
     updateLineClasses(lineView);
     updateLineGutter(cm, lineView, lineN, dims);
     insertLineWidgets(cm, lineView, dims);
+	logger.warn(`<<< Exiting buildLineElement(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims})`, { "event.action": "buildLineElement", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.lineN": lineN, "logrite.dims": dims });
     return lineView.node;
   }
 
   // A lineView may contain multiple logical lines (when merged by
   // collapsed spans). The widgets for all of them need to be drawn.
   function insertLineWidgets(cm, lineView, dims) {
+	logger.error(`>>> Entering insertLineWidgets(cm=${cm},lineView=${lineView},dims=${dims})`, { "event.action": "insertLineWidgets", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.dims": dims });
     insertLineWidgetsFor(cm, lineView.line, lineView, dims, true);
     if (lineView.rest) for (var i = 0; i < lineView.rest.length; i++)
       insertLineWidgetsFor(cm, lineView.rest[i], lineView, dims, false);
   }
 
   function insertLineWidgetsFor(cm, line, lineView, dims, allowAbove) {
+	logger.error(`>>> Entering insertLineWidgetsFor(cm=${cm},line=${line},lineView=${lineView},dims=${dims},allowAbove=${allowAbove})`, { "event.action": "insertLineWidgetsFor", "logrite.cm": cm, "logrite.line": line, "logrite.lineView": lineView, "logrite.dims": dims, "logrite.allowAbove": allowAbove });
     if (!line.widgets) return;
     var wrap = ensureLineWrapped(lineView);
+	logger.error(`insertLineWidgetsFor(cm=${cm},line=${line},lineView=${lineView},dims=${dims},allowAbove=${allowAbove}): wrap → ${wrap}`, { "event.action": "insertLineWidgetsFor", "logrite.cm": cm, "logrite.line": line, "logrite.lineView": lineView, "logrite.dims": dims, "logrite.allowAbove": allowAbove });
     for (var i = 0, ws = line.widgets; i < ws.length; ++i) {
       var widget = ws[i], node = elt("div", [widget.node], "CodeMirror-linewidget");
+	logger.error(`insertLineWidgetsFor(cm=${cm},line=${line},lineView=${lineView},dims=${dims},allowAbove=${allowAbove}): widget → ${widget}`, { "event.action": "insertLineWidgetsFor", "logrite.cm": cm, "logrite.line": line, "logrite.lineView": lineView, "logrite.dims": dims, "logrite.allowAbove": allowAbove });
       if (!widget.handleMouseEvents) node.setAttribute("cm-ignore-events", "true");
       positionLineWidget(widget, node, lineView, dims);
       cm.display.input.setUneditable(node);
@@ -1035,10 +1226,12 @@
       else
         wrap.appendChild(node);
       signalLater(widget, "redraw");
+	logger.warn(`<<< Exiting insertLineWidgetsFor(cm=${cm},line=${line},lineView=${lineView},dims=${dims},allowAbove=${allowAbove})`, { "event.action": "insertLineWidgetsFor", "logrite.cm": cm, "logrite.line": line, "logrite.lineView": lineView, "logrite.dims": dims, "logrite.allowAbove": allowAbove });
     }
   }
 
   function positionLineWidget(widget, node, lineView, dims) {
+	logger.error(`>>> Entering positionLineWidget(widget=${widget},node=${node},lineView=${lineView},dims=${dims})`, { "event.action": "positionLineWidget", "logrite.widget": widget, "logrite.node": node, "logrite.lineView": lineView, "logrite.dims": dims });
     if (widget.noHScroll) {
       (lineView.alignable || (lineView.alignable = [])).push(node);
       var width = dims.wrapperWidth;
@@ -1053,6 +1246,7 @@
       node.style.zIndex = 5;
       node.style.position = "relative";
       if (!widget.noHScroll) node.style.marginLeft = -dims.gutterTotalWidth + "px";
+	logger.warn(`<<< Exiting positionLineWidget(widget=${widget},node=${node},lineView=${lineView},dims=${dims})`, { "event.action": "positionLineWidget", "logrite.widget": widget, "logrite.node": node, "logrite.lineView": lineView, "logrite.dims": dims });
     }
   }
 
@@ -1060,7 +1254,10 @@
 
   // A Pos instance represents a position within the text.
   var Pos = CodeMirror.Pos = function(line, ch) {
+	logger.error(`>>> Entering Pos(line=${line},ch=${ch})`, { "event.action": "Pos", "logrite.line": line, "logrite.ch": ch });
+	logger.debug(`Pos(line=${line},ch=${ch}): this.line → ${this.line}`, { "event.action": "Pos", "logrite.line": line, "logrite.ch": ch });
     if (!(this instanceof Pos)) return new Pos(line, ch);
+	logger.warn(`<<< Exiting Pos(line=${line},ch=${ch})`, { "event.action": "Pos", "logrite.line": line, "logrite.ch": ch });
     this.line = line; this.ch = ch;
   };
 
@@ -1068,17 +1265,33 @@
   // number when a is less, and a positive number otherwise.
   var cmp = CodeMirror.cmpPos = function(a, b) { return a.line - b.line || a.ch - b.ch; };
 
-  function copyPos(x) {return Pos(x.line, x.ch);}
-  function maxPos(a, b) { return cmp(a, b) < 0 ? b : a; }
-  function minPos(a, b) { return cmp(a, b) < 0 ? a : b; }
+  function copyPos(x) {
+      logger.error(`>>> Entering copyPos(x=${x})`, { "event.action": "copyPos", "logrite.x": x });
+      logger.warn(`<<< Exiting copyPos(x=${x})`, { "event.action": "copyPos", "logrite.x": x });
+      return Pos(x.line, x.ch);
+  }
+  function maxPos(a, b) {
+      logger.error(`>>> Entering maxPos(a=${a},b=${b})`, { "event.action": "maxPos", "logrite.a": a, "logrite.b": b });
+      logger.warn(`<<< Exiting maxPos(a=${a},b=${b})`, { "event.action": "maxPos", "logrite.a": a, "logrite.b": b });
+      return cmp(a, b) < 0 ? b : a;
+  }
+  function minPos(a, b) {
+      logger.error(`>>> Entering minPos(a=${a},b=${b})`, { "event.action": "minPos", "logrite.a": a, "logrite.b": b });
+      logger.warn(`<<< Exiting minPos(a=${a},b=${b})`, { "event.action": "minPos", "logrite.a": a, "logrite.b": b });
+      return cmp(a, b) < 0 ? a : b;
+  }
 
   // INPUT HANDLING
 
   function ensureFocus(cm) {
+	logger.error(`>>> Entering ensureFocus(cm=${cm})`, { "event.action": "ensureFocus", "logrite.cm": cm });
     if (!cm.state.focused) { cm.display.input.focus(); onFocus(cm); }
+	logger.warn(`<<< Exiting ensureFocus(cm=${cm})`, { "event.action": "ensureFocus", "logrite.cm": cm });
   }
 
   function isReadOnly(cm) {
+	logger.error(`>>> Entering isReadOnly(cm=${cm})`, { "event.action": "isReadOnly", "logrite.cm": cm });
+	logger.warn(`<<< Exiting isReadOnly(cm=${cm})`, { "event.action": "isReadOnly", "logrite.cm": cm });
     return cm.options.readOnly || cm.doc.cantEdit;
   }
 
@@ -1088,12 +1301,15 @@
   var lastCopied = null;
 
   function applyTextInput(cm, inserted, deleted, sel, origin) {
+	logger.error(`>>> Entering applyTextInput(cm=${cm},inserted=${inserted},deleted=${deleted},sel=${sel},origin=${origin})`, { "event.action": "applyTextInput", "logrite.cm": cm, "logrite.inserted": inserted, "logrite.deleted": deleted, "logrite.sel": sel, "logrite.origin": origin });
     var doc = cm.doc;
     cm.display.shift = false;
     if (!sel) sel = doc.sel;
 
     var paste = cm.state.pasteIncoming || origin == "paste";
+	logger.error(`applyTextInput(cm=${cm},inserted=${inserted},deleted=${deleted},sel=${sel},origin=${origin}): paste → ${paste}`, { "event.action": "applyTextInput", "logrite.cm": cm, "logrite.inserted": inserted, "logrite.deleted": deleted, "logrite.sel": sel, "logrite.origin": origin });
     var textLines = doc.splitLines(inserted), multiPaste = null;
+	logger.error(`applyTextInput(cm=${cm},inserted=${inserted},deleted=${deleted},sel=${sel},origin=${origin}): textLines → ${textLines}`, { "event.action": "applyTextInput", "logrite.cm": cm, "logrite.inserted": inserted, "logrite.deleted": deleted, "logrite.sel": sel, "logrite.origin": origin });
     // When pasing N lines into N selections, insert one line per selection
     if (paste && sel.ranges.length > 1) {
       if (lastCopied && lastCopied.join("\n") == inserted) {
@@ -1116,6 +1332,7 @@
           from = Pos(from.line, from.ch - deleted);
         else if (cm.state.overwrite && !paste) // Handle overwrite
           to = Pos(to.line, Math.min(getLine(doc, to.line).text.length, to.ch + lst(textLines).length));
+		logger.warn(`<<< Exiting range(node=${node},start=${start},end=${end},endNode=${endNode})`, { "event.action": "range", "logrite.node": node, "logrite.start": start, "logrite.end": end });
       }
       var updateInput = cm.curOp.updateInput;
       var changeEvent = {from: from, to: to, text: multiPaste ? multiPaste[i % multiPaste.length] : textLines,
@@ -1130,11 +1347,14 @@
     cm.curOp.updateInput = updateInput;
     cm.curOp.typing = true;
     cm.state.pasteIncoming = cm.state.cutIncoming = false;
+	logger.warn(`<<< Exiting applyTextInput(cm=${cm},inserted=${inserted},deleted=${deleted},sel=${sel},origin=${origin})`, { "event.action": "applyTextInput", "logrite.cm": cm, "logrite.inserted": inserted, "logrite.deleted": deleted, "logrite.sel": sel, "logrite.origin": origin });
   }
 
   function handlePaste(e, cm) {
+	logger.error(`>>> Entering handlePaste(e=${e},cm=${cm})`, { "event.action": "handlePaste", "logrite.e": e, "logrite.cm": cm });
     var pasted = e.clipboardData && e.clipboardData.getData("text/plain");
     if (pasted) {
+	logger.error(`handlePaste(e=${e},cm=${cm}): pasted → ${pasted}`, { "event.action": "handlePaste", "logrite.e": e, "logrite.cm": cm });
       e.preventDefault();
       if (!isReadOnly(cm) && !cm.options.disableInput)
         runInOp(cm, function() { applyTextInput(cm, pasted, 0, null, "paste"); });
@@ -1143,6 +1363,7 @@
   }
 
   function triggerElectric(cm, inserted) {
+	logger.error(`>>> Entering triggerElectric(cm=${cm},inserted=${inserted})`, { "event.action": "triggerElectric", "logrite.cm": cm, "logrite.inserted": inserted });
     // When an 'electric' character is inserted, immediately trigger a reindent
     if (!cm.options.electricChars || !cm.options.smartIndent) return;
     var sel = cm.doc.sel;
@@ -1151,6 +1372,7 @@
       var range = sel.ranges[i];
       if (range.head.ch > 100 || (i && sel.ranges[i - 1].head.line == range.head.line)) continue;
       var mode = cm.getModeAt(range.head);
+	logger.error(`triggerElectric(cm=${cm},inserted=${inserted}): mode → ${mode}`, { "event.action": "triggerElectric", "logrite.cm": cm, "logrite.inserted": inserted });
       var indented = false;
       if (mode.electricChars) {
         for (var j = 0; j < mode.electricChars.length; j++)
@@ -1163,56 +1385,71 @@
           indented = indentLine(cm, range.head.line, "smart");
       }
       if (indented) signalLater(cm, "electricInput", cm, range.head.line);
+	logger.error(`triggerElectric(cm=${cm},inserted=${inserted}): indented → ${indented}`, { "event.action": "triggerElectric", "logrite.cm": cm, "logrite.inserted": inserted });
     }
   }
 
   function copyableRanges(cm) {
+	logger.error(`>>> Entering copyableRanges(cm=${cm})`, { "event.action": "copyableRanges", "logrite.cm": cm });
     var text = [], ranges = [];
     for (var i = 0; i < cm.doc.sel.ranges.length; i++) {
       var line = cm.doc.sel.ranges[i].head.line;
       var lineRange = {anchor: Pos(line, 0), head: Pos(line + 1, 0)};
+	logger.error(`copyableRanges(cm=${cm}): lineRange → ${lineRange}`, { "event.action": "copyableRanges", "logrite.cm": cm });
       ranges.push(lineRange);
       text.push(cm.getRange(lineRange.anchor, lineRange.head));
     }
+	logger.warn(`<<< Exiting copyableRanges(cm=${cm})`, { "event.action": "copyableRanges", "logrite.cm": cm });
     return {text: text, ranges: ranges};
   }
 
   function disableBrowserMagic(field) {
+	logger.error(`>>> Entering disableBrowserMagic(field=${field})`, { "event.action": "disableBrowserMagic", "logrite.field": field });
     field.setAttribute("autocorrect", "off");
     field.setAttribute("autocapitalize", "off");
     field.setAttribute("spellcheck", "false");
+	logger.warn(`<<< Exiting disableBrowserMagic(field=${field})`, { "event.action": "disableBrowserMagic", "logrite.field": field });
   }
 
   // TEXTAREA INPUT STYLE
 
   function TextareaInput(cm) {
+	logger.error(`>>> Entering TextareaInput(cm=${cm})`, { "event.action": "TextareaInput", "logrite.cm": cm });
     this.cm = cm;
     // See input.poll and input.reset
     this.prevInput = "";
+	logger.debug(`TextareaInput(cm=${cm}): cm → ${cm}`, { "event.action": "TextareaInput", "logrite.cm": cm });
+	logger.debug(`TextareaInput(cm=${cm}): this.cm → ${this.cm}`, { "event.action": "TextareaInput", "logrite.cm": cm });
 
     // Flag that indicates whether we expect input to appear real soon
     // now (after some event like 'keypress' or 'input') and are
     // polling intensively.
     this.pollingFast = false;
+	logger.debug(`TextareaInput(cm=${cm}): this.prevInput → ${this.prevInput}`, { "event.action": "TextareaInput", "logrite.cm": cm });
     // Self-resetting timeout for the poller
     this.polling = new Delayed();
+	logger.debug(`TextareaInput(cm=${cm}): this.pollingFast → ${this.pollingFast}`, { "event.action": "TextareaInput", "logrite.cm": cm });
     // Tracks when input.reset has punted to just putting a short
     // string into the textarea instead of the full selection.
     this.inaccurateSelection = false;
     // Used to work around IE issue with selection being forgotten when focus moves away from textarea
     this.hasSelection = false;
+	logger.debug(`TextareaInput(cm=${cm}): this.inaccurateSelection → ${this.inaccurateSelection}`, { "event.action": "TextareaInput", "logrite.cm": cm });
+	logger.debug(`TextareaInput(cm=${cm}): this.hasSelection → ${this.hasSelection}`, { "event.action": "TextareaInput", "logrite.cm": cm });
     this.composing = null;
   };
 
   function hiddenTextarea() {
     var te = elt("textarea", null, null, "position: absolute; padding: 0; width: 1px; height: 1em; outline: none");
     var div = elt("div", [te], null, "overflow: hidden; position: relative; width: 3px; height: 0px;");
+	logger.error(`hiddenTextarea(): te → ${te}`, { "event.action": "hiddenTextarea" });
     // The textarea is kept positioned near the cursor to prevent the
     // fact that it'll be scrolled into view on input from scrolling
     // our fake cursor out of view. On webkit, when wrap=off, paste is
     // very slow. So make the area wide instead.
     if (webkit) te.style.width = "1000px";
     else te.setAttribute("wrap", "off");
+	logger.error(`hiddenTextarea(): div → ${div}`, { "event.action": "hiddenTextarea" });
     // If border: 0; -- iOS fails to open keyboard (issue #1287)
     if (ios) te.style.border = "1px solid black";
     disableBrowserMagic(te);
@@ -1221,10 +1458,12 @@
 
   TextareaInput.prototype = copyObj({
     init: function(display) {
+	logger.error(`>>> Entering init(display=${display})`, { "event.action": "init", "logrite.display": display });
       var input = this, cm = this.cm;
 
       // Wraps and hides input textarea
       var div = this.wrapper = hiddenTextarea();
+	logger.error(`init(display=${display}): div → ${div}`, { "event.action": "init", "logrite.display": display });
       // The semihidden textarea that is focused when the editor is
       // focused, and receives input.
       var te = this.textarea = div.firstChild;
@@ -1232,6 +1471,7 @@
 
       // Needed to hide big blue blinking cursor on Mobile Safari (doesn't seem to work in iOS 8 anymore)
       if (ios) te.style.width = "0px";
+	logger.warn(`<<< Exiting init(display=${display})`, { "event.action": "init", "logrite.display": display });
 
       on(te, "input", function() {
         if (ie && ie_version >= 9 && input.hasSelection) input.hasSelection = null;
@@ -1246,6 +1486,7 @@
       });
 
       function prepareCopyCut(e) {
+		logger.error(`>>> Entering prepareCopyCut(e=${e})`, { "event.action": "prepareCopyCut", "logrite.e": e });
         if (cm.somethingSelected()) {
           lastCopied = cm.getSelections();
           if (input.inaccurateSelection) {
@@ -1258,6 +1499,7 @@
           return;
         } else {
           var ranges = copyableRanges(cm);
+		logger.error(`prepareCopyCut(e=${e}): ranges → ${ranges}`, { "event.action": "prepareCopyCut", "logrite.e": e });
           lastCopied = ranges.text;
           if (e.type == "cut") {
             cm.setSelections(ranges.ranges, null, sel_dontScroll);
@@ -1268,6 +1510,7 @@
           }
         }
         if (e.type == "cut") cm.state.cutIncoming = true;
+		logger.warn(`<<< Exiting prepareCopyCut(e=${e})`, { "event.action": "prepareCopyCut", "logrite.e": e });
       }
       on(te, "cut", prepareCopyCut);
       on(te, "copy", prepareCopyCut);
@@ -1303,10 +1546,12 @@
       // Redraw the selection and/or cursor
       var cm = this.cm, display = cm.display, doc = cm.doc;
       var result = prepareSelection(cm);
+	logger.error(`prepareSelection(): result → ${result}`, { "event.action": "prepareSelection", "logrite.cm": cm, "logrite.primary": primary });
 
       // Move the hidden textarea near the cursor to prevent scrolling artifacts
       if (cm.options.moveInputWithCursor) {
         var headPos = cursorCoords(cm, doc.sel.primary().head, "div");
+		logger.error(`prepareSelection(): headPos → ${headPos}`, { "event.action": "prepareSelection", "logrite.cm": cm, "logrite.primary": primary });
         var wrapOff = display.wrapper.getBoundingClientRect(), lineOff = display.lineDiv.getBoundingClientRect();
         result.teTop = Math.max(0, Math.min(display.wrapper.clientHeight - 10,
                                             headPos.top + lineOff.top - wrapOff.top));
@@ -1314,16 +1559,20 @@
                                              headPos.left + lineOff.left - wrapOff.left));
       }
 
+	logger.error(`prepareSelection(): wrapOff → ${wrapOff}`, { "event.action": "prepareSelection", "logrite.cm": cm, "logrite.primary": primary });
+	logger.debug(`prepareSelection(): result.focus → ${result.focus}`, { "event.action": "prepareSelection", "logrite.cm": cm, "logrite.primary": primary });
       return result;
     },
 
     showSelection: function(drawn) {
+	logger.error(`>>> Entering showSelection(drawn=${drawn})`, { "event.action": "showSelection", "logrite.info": info });
       var cm = this.cm, display = cm.display;
       removeChildrenAndAdd(display.cursorDiv, drawn.cursors);
       removeChildrenAndAdd(display.selectionDiv, drawn.selection);
       if (drawn.teTop != null) {
         this.wrapper.style.top = drawn.teTop + "px";
         this.wrapper.style.left = drawn.teLeft + "px";
+		logger.warn(`<<< Exiting showSelection(drawn=${drawn})`, { "event.action": "showSelection", "logrite.info": info });
       }
     },
 
@@ -1350,7 +1599,11 @@
 
     getField: function() { return this.textarea; },
 
-    supportsTouch: function() { return false; },
+    supportsTouch: function() {
+        logger.error('>>> Entering supportsTouch()', { "event.action": "supportsTouch" });
+        logger.warn('<<< Exiting supportsTouch()', { "event.action": "supportsTouch" });
+        return false;
+    },
 
     focus: function() {
       if (this.cm.options.readOnly != "nocursor" && (!mobile || activeElt() != this.textarea)) {
@@ -1359,13 +1612,22 @@
       }
     },
 
-    blur: function() { this.textarea.blur(); },
+    blur: function() {
+        logger.error('>>> Entering blur()', { "event.action": "blur" });
+        logger.warn('<<< Exiting blur()', { "event.action": "blur" });
+        this.textarea.blur();
+    },
 
     resetPosition: function() {
       this.wrapper.style.top = this.wrapper.style.left = 0;
+	logger.warn('<<< Exiting resetPosition()', { "event.action": "resetPosition" });
     },
 
-    receivedFocus: function() { this.slowPoll(); },
+    receivedFocus: function() {
+        logger.error('>>> Entering receivedFocus()', { "event.action": "receivedFocus" });
+        logger.warn('<<< Exiting receivedFocus()', { "event.action": "receivedFocus" });
+        this.slowPoll();
+    },
 
     // Poll for input changes, using the normal rate of polling. This
     // runs as long as the editor is focused.
@@ -1376,6 +1638,7 @@
         input.poll();
         if (input.cm.state.focused) input.slowPoll();
       });
+	logger.warn('<<< Exiting slowPoll()', { "event.action": "slowPoll" });
     },
 
     // When an event has just come in that is likely to add or change
@@ -1388,8 +1651,10 @@
         var changed = input.poll();
         if (!changed && !missed) {missed = true; input.polling.set(60, p);}
         else {input.pollingFast = false; input.slowPoll();}
+		logger.warn('<<< Exiting changed()', { "event.action": "changed" });
       }
       input.polling.set(20, p);
+	logger.warn('<<< Exiting fastPoll()', { "event.action": "fastPoll" });
     },
 
     // Read input from the textarea, and update the document to match.
@@ -1445,11 +1710,13 @@
                                              {className: "CodeMirror-composing"});
         }
       });
+	logger.warn('<<< Exiting poll()', { "event.action": "poll" });
       return true;
     },
 
     ensurePolled: function() {
       if (this.pollingFast && this.poll()) this.pollingFast = false;
+	logger.warn('<<< Exiting ensurePolled()', { "event.action": "ensurePolled" });
     },
 
     onKeyPress: function() {
@@ -1458,8 +1725,11 @@
     },
 
     onContextMenu: function(e) {
+	logger.error(`>>> Entering onContextMenu(e=${e})`, { "event.action": "onContextMenu", "logrite.cm": cm, "logrite.e": e });
       var input = this, cm = input.cm, display = cm.display, te = input.textarea;
       var pos = posFromMouse(cm, e), scrollPos = display.scroller.scrollTop;
+	logger.error(`onContextMenu(e=${e}): pos → ${pos}`, { "event.action": "onContextMenu", "logrite.cm": cm, "logrite.e": e });
+	logger.debug(`onContextMenu(e=${e}): input.contextMenuPending → ${input.contextMenuPending}`, { "event.action": "onContextMenu", "logrite.cm": cm, "logrite.e": e });
       if (!pos || presto) return; // Opera is difficult.
 
       // Reset the current text selection only if the click is done outside of the selection
@@ -1475,6 +1745,7 @@
         (ie ? "rgba(255, 255, 255, .05)" : "transparent") +
         "; outline: none; border-width: 0; outline: none; overflow: hidden; opacity: .05; filter: alpha(opacity=5);";
       if (webkit) var oldScrollY = window.scrollY; // Work around Chrome issue (#2712)
+	logger.error(`onContextMenu(e=${e}): oldScrollY → ${oldScrollY}`, { "event.action": "onContextMenu", "logrite.cm": cm, "logrite.e": e });
       display.input.focus();
       if (webkit) window.scrollTo(null, oldScrollY);
       display.input.reset();
@@ -1484,13 +1755,16 @@
       display.selForContextMenu = cm.doc.sel;
       clearTimeout(display.detectingSelectAll);
 
+	logger.warn(`<<< Exiting onContextMenu(e=${e})`, { "event.action": "onContextMenu", "logrite.cm": cm, "logrite.e": e });
       // Select-all will be greyed out if there's nothing to select, so
       // this adds a zero-width space so that we can later check whether
       // it got selected.
       function prepareSelectAllHack() {
         if (te.selectionStart != null) {
           var selected = cm.somethingSelected();
+		logger.error(`prepareSelectAllHack(): selected → ${selected}`, { "event.action": "prepareSelectAllHack" });
           var extval = "\u200b" + (selected ? te.value : "");
+		logger.error(`prepareSelectAllHack(): extval → ${extval}`, { "event.action": "prepareSelectAllHack" });
           te.value = "\u21da"; // Used to catch context-menu undo
           te.value = extval;
           input.prevInput = selected ? "" : "\u200b";
@@ -1499,6 +1773,7 @@
           // selection in the meantime.
           display.selForContextMenu = cm.doc.sel;
         }
+		logger.warn('<<< Exiting prepareSelectAllHack()', { "event.action": "prepareSelectAllHack" });
       }
       function rehide() {
         input.contextMenuPending = false;
@@ -1518,6 +1793,7 @@
           };
           display.detectingSelectAll = setTimeout(poll, 200);
         }
+		logger.warn('<<< Exiting rehide()', { "event.action": "rehide" });
       }
 
       if (ie && ie_version >= 9) prepareSelectAllHack();
@@ -1526,6 +1802,7 @@
         var mouseup = function() {
           off(window, "mouseup", mouseup);
           setTimeout(rehide, 20);
+		logger.warn('<<< Exiting mouseup()', { "event.action": "mouseup" });
         };
         on(window, "mouseup", mouseup);
       } else {
@@ -1541,8 +1818,12 @@
   // CONTENTEDITABLE INPUT STYLE
 
   function ContentEditableInput(cm) {
+	logger.error(`>>> Entering ContentEditableInput(cm=${cm})`, { "event.action": "ContentEditableInput", "logrite.cm": cm });
     this.cm = cm;
     this.lastAnchorNode = this.lastAnchorOffset = this.lastFocusNode = this.lastFocusOffset = null;
+	logger.debug(`ContentEditableInput(cm=${cm}): cm → ${cm}`, { "event.action": "ContentEditableInput", "logrite.cm": cm });
+	logger.debug(`ContentEditableInput(cm=${cm}): this.cm → ${this.cm}`, { "event.action": "ContentEditableInput", "logrite.cm": cm });
+	logger.debug(`ContentEditableInput(cm=${cm}): this.gracePeriod → ${this.gracePeriod}`, { "event.action": "ContentEditableInput", "logrite.cm": cm });
     this.polling = new Delayed();
     this.gracePeriod = false;
   }
@@ -1552,6 +1833,7 @@
       var input = this, cm = input.cm;
       var div = input.div = display.lineDiv;
       div.contentEditable = "true";
+	logger.debug(`init(display=${display}): div.contentEditable → ${div.contentEditable}`, { "event.action": "init", "logrite.display": display });
       disableBrowserMagic(div);
 
       on(div, "paste", function(e) { handlePaste(e, cm); })
@@ -1597,6 +1879,7 @@
       });
 
       function onCopyCut(e) {
+		logger.error(`>>> Entering onCopyCut(e=${e})`, { "event.action": "onCopyCut", "logrite.e": e });
         if (cm.somethingSelected()) {
           lastCopied = cm.getSelections();
           if (e.type == "cut") cm.replaceSelection("", null, "cut");
@@ -1604,6 +1887,7 @@
           return;
         } else {
           var ranges = copyableRanges(cm);
+		logger.error(`onCopyCut(e=${e}): ranges → ${ranges}`, { "event.action": "onCopyCut", "logrite.e": e });
           lastCopied = ranges.text;
           if (e.type == "cut") {
             cm.operation(function() {
@@ -1620,6 +1904,7 @@
         } else {
           // Old-fashioned briefly-focus-a-textarea hack
           var kludge = hiddenTextarea(), te = kludge.firstChild;
+		logger.error(`onCopyCut(e=${e}): kludge → ${kludge}`, { "event.action": "onCopyCut", "logrite.e": e });
           cm.display.lineSpace.insertBefore(kludge, cm.display.lineSpace.firstChild);
           te.value = lastCopied.join("\n");
           var hadFocus = document.activeElement;
@@ -1629,6 +1914,7 @@
             hadFocus.focus();
           }, 50);
         }
+		logger.warn(`<<< Exiting onCopyCut(e=${e})`, { "event.action": "onCopyCut", "logrite.e": e });
       }
       on(div, "copy", onCopyCut);
       on(div, "cut", onCopyCut);
@@ -1649,6 +1935,7 @@
     showPrimarySelection: function() {
       var sel = window.getSelection(), prim = this.cm.doc.sel.primary();
       var curAnchor = domToPos(this.cm, sel.anchorNode, sel.anchorOffset);
+	logger.error(`showPrimarySelection(): sel → ${sel}`, { "event.action": "showPrimarySelection" });
       var curFocus = domToPos(this.cm, sel.focusNode, sel.focusOffset);
       if (curAnchor && !curAnchor.bad && curFocus && !curFocus.bad &&
           cmp(minPos(curAnchor, curFocus), prim.from()) == 0 &&
@@ -1678,43 +1965,65 @@
         else if (gecko) this.startGracePeriod();
       }
       this.rememberSelection();
+	logger.warn('<<< Exiting showPrimarySelection()', { "event.action": "showPrimarySelection" });
     },
 
     startGracePeriod: function() {
       var input = this;
       clearTimeout(this.gracePeriod);
+	logger.debug(`startGracePeriod(): input.gracePeriod → ${input.gracePeriod}`, { "event.action": "startGracePeriod" });
       this.gracePeriod = setTimeout(function() {
         input.gracePeriod = false;
         if (input.selectionChanged())
           input.cm.operation(function() { input.cm.curOp.selectionChanged = true; });
       }, 20);
+	logger.warn('<<< Exiting startGracePeriod()', { "event.action": "startGracePeriod" });
     },
 
     showMultipleSelections: function(info) {
+	logger.error(`>>> Entering showMultipleSelections(info=${info})`, { "event.action": "showMultipleSelections", "logrite.info": info });
       removeChildrenAndAdd(this.cm.display.cursorDiv, info.cursors);
       removeChildrenAndAdd(this.cm.display.selectionDiv, info.selection);
+	logger.warn(`<<< Exiting showMultipleSelections(info=${info})`, { "event.action": "showMultipleSelections", "logrite.info": info });
     },
 
     rememberSelection: function() {
       var sel = window.getSelection();
       this.lastAnchorNode = sel.anchorNode; this.lastAnchorOffset = sel.anchorOffset;
+	logger.error(`rememberSelection(): sel → ${sel}`, { "event.action": "rememberSelection" });
+	logger.debug(`rememberSelection(): this.lastAnchorNode → ${this.lastAnchorNode}`, { "event.action": "rememberSelection" });
       this.lastFocusNode = sel.focusNode; this.lastFocusOffset = sel.focusOffset;
     },
 
     selectionInEditor: function() {
       var sel = window.getSelection();
       if (!sel.rangeCount) return false;
+	logger.error(`selectionInEditor(): sel → ${sel}`, { "event.action": "selectionInEditor" });
       var node = sel.getRangeAt(0).commonAncestorContainer;
+	logger.error(`selectionInEditor(): node → ${node}`, { "event.action": "selectionInEditor" });
+	logger.warn('<<< Exiting selectionInEditor()', { "event.action": "selectionInEditor" });
       return contains(this.div, node);
     },
 
     focus: function() {
       if (this.cm.options.readOnly != "nocursor") this.div.focus();
     },
-    blur: function() { this.div.blur(); },
-    getField: function() { return this.div; },
+    blur: function() {
+        logger.error('>>> Entering blur()', { "event.action": "blur" });
+        logger.warn('<<< Exiting blur()', { "event.action": "blur" });
+        this.div.blur();
+    },
+    getField: function() {
+        logger.error('>>> Entering getField()', { "event.action": "getField" });
+        logger.warn('<<< Exiting getField()', { "event.action": "getField" });
+        return this.div;
+    },
 
-    supportsTouch: function() { return true; },
+    supportsTouch: function() {
+        logger.error('>>> Entering supportsTouch()', { "event.action": "supportsTouch" });
+        logger.warn('<<< Exiting supportsTouch()', { "event.action": "supportsTouch" });
+        return true;
+    },
 
     receivedFocus: function() {
       var input = this;
@@ -1736,24 +2045,30 @@
       var sel = window.getSelection();
       return sel.anchorNode != this.lastAnchorNode || sel.anchorOffset != this.lastAnchorOffset ||
         sel.focusNode != this.lastFocusNode || sel.focusOffset != this.lastFocusOffset;
+		logger.warn('<<< Exiting selectionChanged()', { "event.action": "selectionChanged" });
     },
 
     pollSelection: function() {
       if (!this.composing && !this.gracePeriod && this.selectionChanged()) {
         var sel = window.getSelection(), cm = this.cm;
+		logger.error(`pollSelection(): sel → ${sel}`, { "event.action": "pollSelection" });
         this.rememberSelection();
         var anchor = domToPos(cm, sel.anchorNode, sel.anchorOffset);
+		logger.error(`pollSelection(): anchor → ${anchor}`, { "event.action": "pollSelection" });
         var head = domToPos(cm, sel.focusNode, sel.focusOffset);
+		logger.error(`pollSelection(): head → ${head}`, { "event.action": "pollSelection" });
         if (anchor && head) runInOp(cm, function() {
           setSelection(cm.doc, simpleSelection(anchor, head), sel_dontScroll);
           if (anchor.bad || head.bad) cm.curOp.selectionChanged = true;
         });
       }
+	logger.warn('<<< Exiting pollSelection()', { "event.action": "pollSelection" });
     },
 
     pollContent: function() {
       var cm = this.cm, display = cm.display, sel = cm.doc.sel.primary();
       var from = sel.from(), to = sel.to();
+	logger.error(`pollContent(): cm → ${cm}`, { "event.action": "pollContent" });
       if (from.line < display.viewFrom || to.line > display.viewTo - 1) return false;
 
       var fromIndex;
@@ -1762,20 +2077,25 @@
         var fromNode = display.view[0].node;
       } else {
         var fromLine = lineNo(display.view[fromIndex].line);
+		logger.error(`pollContent(): fromLine → ${fromLine}`, { "event.action": "pollContent" });
         var fromNode = display.view[fromIndex - 1].node.nextSibling;
       }
       var toIndex = findViewIndex(cm, to.line);
+	logger.error(`pollContent(): toIndex → ${toIndex}`, { "event.action": "pollContent" });
       if (toIndex == display.view.length - 1) {
         var toLine = display.viewTo - 1;
         var toNode = display.lineDiv.lastChild;
       } else {
         var toLine = lineNo(display.view[toIndex + 1].line) - 1;
+		logger.error(`pollContent(): toLine → ${toLine}`, { "event.action": "pollContent" });
         var toNode = display.view[toIndex + 1].node.previousSibling;
       }
 
       var newText = cm.doc.splitLines(domTextBetween(cm, fromNode, toNode, fromLine, toLine));
+	logger.error(`pollContent(): newText → ${newText}`, { "event.action": "pollContent" });
       var oldText = getBetween(cm.doc, Pos(fromLine, 0), Pos(toLine, getLine(cm.doc, toLine).text.length));
       while (newText.length > 1 && oldText.length > 1) {
+		logger.error(`pollContent(): oldText → ${oldText}`, { "event.action": "pollContent" });
         if (lst(newText) == lst(oldText)) { newText.pop(); oldText.pop(); toLine--; }
         else if (newText[0] == oldText[0]) { newText.shift(); oldText.shift(); fromLine++; }
         else break;
@@ -1801,6 +2121,7 @@
         replaceRange(cm.doc, newText, chFrom, chTo, "+input");
         return true;
       }
+	logger.warn('<<< Exiting pollContent()', { "event.action": "pollContent" });
     },
 
     ensurePolled: function() {
@@ -1815,14 +2136,19 @@
       this.composing.handled = true;
       this.div.blur();
       this.div.focus();
+	logger.warn('<<< Exiting forceCompositionEnd()', { "event.action": "forceCompositionEnd" });
     },
     applyComposition: function(composing) {
+	logger.error(`>>> Entering applyComposition(composing=${composing})`, { "event.action": "applyComposition", "logrite.composing": composing });
       if (composing.data && composing.data != composing.startData)
         operation(this.cm, applyTextInput)(this.cm, composing.data, 0, composing.sel);
+		logger.warn(`<<< Exiting applyComposition(composing=${composing})`, { "event.action": "applyComposition", "logrite.composing": composing });
     },
 
     setUneditable: function(node) {
+	logger.error(`>>> Entering setUneditable(node=${node})`, { "event.action": "setUneditable", "logrite.node": node });
       node.setAttribute("contenteditable", "false");
+	logger.warn(`<<< Exiting setUneditable(node=${node})`, { "event.action": "setUneditable", "logrite.node": node });
     },
 
     onKeyPress: function(e) {
@@ -1837,28 +2163,42 @@
   }, ContentEditableInput.prototype);
 
   function posToDOM(cm, pos) {
+	logger.error(`>>> Entering posToDOM(cm=${cm},pos=${pos})`, { "event.action": "posToDOM", "logrite.cm": cm, "logrite.pos": pos });
     var view = findViewForLine(cm, pos.line);
     if (!view || view.hidden) return null;
+	logger.error(`posToDOM(cm=${cm},pos=${pos}): view → ${view}`, { "event.action": "posToDOM", "logrite.cm": cm, "logrite.pos": pos });
     var line = getLine(cm.doc, pos.line);
+	logger.error(`posToDOM(cm=${cm},pos=${pos}): line → ${line}`, { "event.action": "posToDOM", "logrite.cm": cm, "logrite.pos": pos });
     var info = mapFromLineView(view, line, pos.line);
+	logger.error(`posToDOM(cm=${cm},pos=${pos}): info → ${info}`, { "event.action": "posToDOM", "logrite.cm": cm, "logrite.pos": pos });
 
     var order = getOrder(line), side = "left";
+	logger.error(`posToDOM(cm=${cm},pos=${pos}): order → ${order}`, { "event.action": "posToDOM", "logrite.cm": cm, "logrite.pos": pos });
     if (order) {
       var partPos = getBidiPartAt(order, pos.ch);
+	logger.error(`posToDOM(cm=${cm},pos=${pos}): partPos → ${partPos}`, { "event.action": "posToDOM", "logrite.cm": cm, "logrite.pos": pos });
       side = partPos % 2 ? "right" : "left";
     }
     var result = nodeAndOffsetInLineMap(info.map, pos.ch, side);
     result.offset = result.collapse == "right" ? result.end : result.start;
+	logger.error(`posToDOM(cm=${cm},pos=${pos}): result → ${result}`, { "event.action": "posToDOM", "logrite.cm": cm, "logrite.pos": pos });
+	logger.warn(`<<< Exiting posToDOM(cm=${cm},pos=${pos})`, { "event.action": "posToDOM", "logrite.cm": cm, "logrite.pos": pos });
     return result;
   }
 
-  function badPos(pos, bad) { if (bad) pos.bad = true; return pos; }
+  function badPos(pos, bad) {
+      logger.error(`>>> Entering badPos(pos=${pos},bad=${bad})`, { "event.action": "badPos", "logrite.pos": pos, "logrite.bad": bad });
+      logger.warn(`<<< Exiting badPos(pos=${pos},bad=${bad})`, { "event.action": "badPos", "logrite.pos": pos, "logrite.bad": bad });
+      if (bad) pos.bad = true; return pos;
+  }
 
   function domToPos(cm, node, offset) {
+	logger.error(`>>> Entering domToPos(cm=${cm},node=${node},offset=${offset})`, { "event.action": "domToPos", "logrite.cm": cm, "logrite.node": node, "logrite.offset": offset });
     var lineNode;
     if (node == cm.display.lineDiv) {
       lineNode = cm.display.lineDiv.childNodes[offset];
       if (!lineNode) return badPos(cm.clipPos(Pos(cm.display.viewTo - 1)), true);
+	logger.debug(`domToPos(cm=${cm},node=${node},offset=${offset}): lineNode → ${lineNode}`, { "event.action": "domToPos", "logrite.cm": cm, "logrite.node": node, "logrite.offset": offset });
       node = null; offset = 0;
     } else {
       for (lineNode = node;; lineNode = lineNode.parentNode) {
@@ -1874,6 +2214,7 @@
   }
 
   function locateNodeInLineView(lineView, node, offset) {
+	logger.error(`>>> Entering locateNodeInLineView(lineView=${lineView},node=${node},offset=${offset})`, { "event.action": "locateNodeInLineView", "logrite.lineView": lineView, "logrite.node": node, "logrite.offset": offset });
     var wrapper = lineView.text.firstChild, bad = false;
     if (!node || !contains(wrapper, node)) return badPos(Pos(lineNo(lineView.line), 0), true);
     if (node == wrapper) {
@@ -1882,6 +2223,7 @@
       offset = 0;
       if (!node) {
         var line = lineView.rest ? lst(lineView.rest) : lineView.line;
+		logger.error(`locateNodeInLineView(lineView=${lineView},node=${node},offset=${offset}): line → ${line}`, { "event.action": "locateNodeInLineView", "logrite.lineView": lineView, "logrite.node": node, "logrite.offset": offset });
         return badPos(Pos(lineNo(line), line.text.length), bad);
       }
     }
@@ -1895,14 +2237,17 @@
     var measure = lineView.measure, maps = measure.maps;
 
     function find(textNode, topNode, offset) {
+	logger.error(`>>> Entering find(textNode=${textNode},topNode=${topNode},offset=${offset})`, { "event.action": "find", "logrite.side": side, "logrite.lineObj": lineObj });
       for (var i = -1; i < (maps ? maps.length : 0); i++) {
         var map = i < 0 ? measure.map : maps[i];
         for (var j = 0; j < map.length; j += 3) {
           var curNode = map[j + 2];
           if (curNode == textNode || curNode == topNode) {
             var line = lineNo(i < 0 ? lineView.line : lineView.rest[i]);
+			logger.error(`find(textNode=${textNode},topNode=${topNode},offset=${offset}): line → ${line}`, { "event.action": "find", "logrite.side": side, "logrite.lineObj": lineObj });
             var ch = map[j] + offset;
             if (offset < 0 || curNode != textNode) ch = map[j + (offset ? 1 : 0)];
+			logger.warn(`<<< Exiting find(textNode=${textNode},topNode=${topNode},offset=${offset})`, { "event.action": "find", "logrite.side": side, "logrite.lineObj": lineObj });
             return Pos(line, ch);
           }
         }
@@ -1929,19 +2274,28 @@
   }
 
   function domTextBetween(cm, from, to, fromLine, toLine) {
+	logger.error(`>>> Entering domTextBetween(cm=${cm},from=${from},to=${to},fromLine=${fromLine},toLine=${toLine})`, { "event.action": "domTextBetween", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.fromLine": fromLine, "logrite.toLine": toLine });
     var text = "", closing = false, lineSep = cm.doc.lineSeparator();
-    function recognizeMarker(id) { return function(marker) { return marker.id == id; }; }
+    function recognizeMarker(id) {
+        logger.error(`>>> Entering recognizeMarker(id=${id})`, { "event.action": "recognizeMarker", "logrite.id": id });
+        logger.warn(`<<< Exiting recognizeMarker(id=${id})`, { "event.action": "recognizeMarker", "logrite.id": id });
+        return function(marker) { return marker.id == id; };
+    }
     function walk(node) {
+	logger.error(`>>> Entering walk(node=${node})`, { "event.action": "walk", "logrite.node": node });
       if (node.nodeType == 1) {
         var cmText = node.getAttribute("cm-text");
+		logger.error(`walk(node=${node}): cmText → ${cmText}`, { "event.action": "walk", "logrite.node": node });
         if (cmText != null) {
           if (cmText == "") cmText = node.textContent.replace(/\u200b/g, "");
           text += cmText;
           return;
         }
         var markerID = node.getAttribute("cm-marker"), range;
+		logger.error(`walk(node=${node}): markerID → ${markerID}`, { "event.action": "walk", "logrite.node": node });
         if (markerID) {
           var found = cm.findMarks(Pos(fromLine, 0), Pos(toLine + 1, 0), recognizeMarker(+markerID));
+		logger.error(`walk(node=${node}): found → ${found}`, { "event.action": "walk", "logrite.node": node });
           if (found.length && (range = found[0].find()))
             text += getBetween(cm.doc, range.from, range.to).join(lineSep);
           return;
@@ -1960,6 +2314,7 @@
         }
         text += val;
       }
+	logger.warn(`<<< Exiting walk(node=${node})`, { "event.action": "walk", "logrite.node": node });
     }
     for (;;) {
       walk(from);
@@ -1979,12 +2334,18 @@
   // which one is the primary selection (the one that's scrolled into
   // view, that getCursor returns, etc).
   function Selection(ranges, primIndex) {
+	logger.error(`>>> Entering Selection(ranges=${ranges},primIndex=${primIndex})`, { "event.action": "Selection", "logrite.ranges": ranges, "logrite.primIndex": primIndex });
     this.ranges = ranges;
     this.primIndex = primIndex;
+	logger.debug(`Selection(ranges=${ranges},primIndex=${primIndex}): this.primIndex → ${this.primIndex}`, { "event.action": "Selection", "logrite.ranges": ranges, "logrite.primIndex": primIndex });
   }
 
   Selection.prototype = {
-    primary: function() { return this.ranges[this.primIndex]; },
+    primary: function() {
+        logger.error('>>> Entering primary()', { "event.action": "primary" });
+        logger.warn('<<< Exiting primary()', { "event.action": "primary" });
+        return this.ranges[this.primIndex];
+    },
     equals: function(other) {
       if (other == this) return true;
       if (other.primIndex != this.primIndex || other.ranges.length != this.ranges.length) return false;
@@ -1992,11 +2353,13 @@
         var here = this.ranges[i], there = other.ranges[i];
         if (cmp(here.anchor, there.anchor) != 0 || cmp(here.head, there.head) != 0) return false;
       }
+	logger.warn(`<<< Exiting equals(other=${other})`, { "event.action": "equals", "logrite.other": other });
       return true;
     },
     deepCopy: function() {
       for (var out = [], i = 0; i < this.ranges.length; i++)
         out[i] = new Range(copyPos(this.ranges[i].anchor), copyPos(this.ranges[i].head));
+	logger.warn('<<< Exiting deepCopy()', { "event.action": "deepCopy" });
       return new Selection(out, this.primIndex);
     },
     somethingSelected: function() {
@@ -2011,18 +2374,30 @@
         if (cmp(end, range.from()) >= 0 && cmp(pos, range.to()) <= 0)
           return i;
       }
+	logger.warn(`<<< Exiting contains(pos=${pos},end=${end})`, { "event.action": "contains", "logrite.parent": parent, "logrite.child": child });
       return -1;
     }
   };
 
   function Range(anchor, head) {
+	logger.error(`>>> Entering Range(anchor=${anchor},head=${head})`, { "event.action": "Range", "logrite.anchor": anchor, "logrite.head": head });
+	logger.debug(`Range(anchor=${anchor},head=${head}): anchor → ${anchor}`, { "event.action": "Range", "logrite.anchor": anchor, "logrite.head": head });
     this.anchor = anchor; this.head = head;
   }
 
   Range.prototype = {
-    from: function() { return minPos(this.anchor, this.head); },
-    to: function() { return maxPos(this.anchor, this.head); },
+    from: function() {
+        logger.error('>>> Entering from()', { "event.action": "from" });
+        logger.warn('<<< Exiting from()', { "event.action": "from" });
+        return minPos(this.anchor, this.head);
+    },
+    to: function() {
+        logger.error('>>> Entering to()', { "event.action": "to" });
+        logger.warn('<<< Exiting to()', { "event.action": "to" });
+        return maxPos(this.anchor, this.head);
+    },
     empty: function() {
+	logger.warn('<<< Exiting empty()', { "event.action": "empty" });
       return this.head.line == this.anchor.line && this.head.ch == this.anchor.ch;
     }
   };
@@ -2031,6 +2406,7 @@
   // build a selection out of it. 'Consumes' ranges array (modifying
   // it).
   function normalizeSelection(ranges, primIndex) {
+	logger.error(`>>> Entering normalizeSelection(ranges=${ranges},primIndex=${primIndex})`, { "event.action": "normalizeSelection", "logrite.ranges": ranges, "logrite.primIndex": primIndex });
     var prim = ranges[primIndex];
     ranges.sort(function(a, b) { return cmp(a.from(), b.from()); });
     primIndex = indexOf(ranges, prim);
@@ -2039,6 +2415,7 @@
       if (cmp(prev.to(), cur.from()) >= 0) {
         var from = minPos(prev.from(), cur.from()), to = maxPos(prev.to(), cur.to());
         var inv = prev.empty() ? cur.from() == cur.head : prev.from() == prev.head;
+		logger.error(`normalizeSelection(ranges=${ranges},primIndex=${primIndex}): inv → ${inv}`, { "event.action": "normalizeSelection", "logrite.ranges": ranges, "logrite.primIndex": primIndex });
         if (i <= primIndex) --primIndex;
         ranges.splice(--i, 2, new Range(inv ? to : from, inv ? from : to));
       }
@@ -2047,6 +2424,8 @@
   }
 
   function simpleSelection(anchor, head) {
+	logger.error(`>>> Entering simpleSelection(anchor=${anchor},head=${head})`, { "event.action": "simpleSelection", "logrite.anchor": anchor, "logrite.head": head });
+	logger.warn(`<<< Exiting simpleSelection(anchor=${anchor},head=${head})`, { "event.action": "simpleSelection", "logrite.anchor": anchor, "logrite.head": head });
     return new Selection([new Range(anchor, head || anchor)], 0);
   }
 
@@ -2054,12 +2433,15 @@
   // actually exist within the document.
   function clipLine(doc, n) {return Math.max(doc.first, Math.min(n, doc.first + doc.size - 1));}
   function clipPos(doc, pos) {
+	logger.error(`>>> Entering clipPos(doc=${doc},pos=${pos})`, { "event.action": "clipPos", "logrite.pos": pos });
     if (pos.line < doc.first) return Pos(doc.first, 0);
     var last = doc.first + doc.size - 1;
     if (pos.line > last) return Pos(last, getLine(doc, last).text.length);
+	logger.warn(`<<< Exiting clipPos(doc=${doc},pos=${pos})`, { "event.action": "clipPos", "logrite.pos": pos });
     return clipToLen(pos, getLine(doc, pos.line).text.length);
   }
   function clipToLen(pos, linelen) {
+	logger.error(`>>> Entering clipToLen(pos=${pos},linelen=${linelen})`, { "event.action": "clipToLen", "logrite.pos": pos, "logrite.linelen": linelen });
     var ch = pos.ch;
     if (ch == null || ch > linelen) return Pos(pos.line, linelen);
     else if (ch < 0) return Pos(pos.line, 0);
@@ -2067,7 +2449,9 @@
   }
   function isLine(doc, l) {return l >= doc.first && l < doc.first + doc.size;}
   function clipPosArray(doc, array) {
+	logger.error(`>>> Entering clipPosArray(doc=${doc},array=${array})`, { "event.action": "clipPosArray", "logrite.doc": doc, "logrite.array": array });
     for (var out = [], i = 0; i < array.length; i++) out[i] = clipPos(doc, array[i]);
+	logger.error(`clipPosArray(doc=${doc},array=${array}): out → ${out}`, { "event.action": "clipPosArray", "logrite.doc": doc, "logrite.array": array });
     return out;
   }
 
@@ -2082,10 +2466,12 @@
   // Otherwise, simply returns the range between the given positions.
   // Used for cursor motion and such.
   function extendRange(doc, range, head, other) {
+	logger.error(`>>> Entering extendRange(doc=${doc},range=${range},head=${head},other=${other})`, { "event.action": "extendRange", "logrite.doc": doc, "logrite.range": range, "logrite.head": head, "logrite.other": other });
     if (doc.cm && doc.cm.display.shift || doc.extend) {
       var anchor = range.anchor;
       if (other) {
         var posBefore = cmp(head, anchor) < 0;
+		logger.error(`extendRange(doc=${doc},range=${range},head=${head},other=${other}): posBefore → ${posBefore}`, { "event.action": "extendRange", "logrite.doc": doc, "logrite.range": range, "logrite.head": head, "logrite.other": other });
         if (posBefore != (cmp(other, anchor) < 0)) {
           anchor = head;
           head = other;
@@ -2095,39 +2481,50 @@
       }
       return new Range(anchor, head);
     } else {
+	logger.warn(`<<< Exiting extendRange(doc=${doc},range=${range},head=${head},other=${other})`, { "event.action": "extendRange", "logrite.doc": doc, "logrite.range": range, "logrite.head": head, "logrite.other": other });
       return new Range(other || head, head);
     }
   }
 
   // Extend the primary selection range, discard the rest.
   function extendSelection(doc, head, other, options) {
+	logger.error(`>>> Entering extendSelection(doc=${doc},head=${head},other=${other},options=${options})`, { "event.action": "extendSelection", "logrite.doc": doc, "logrite.head": head, "logrite.other": other, "logrite.options": options });
     setSelection(doc, new Selection([extendRange(doc, doc.sel.primary(), head, other)], 0), options);
+	logger.warn(`<<< Exiting extendSelection(doc=${doc},head=${head},other=${other},options=${options})`, { "event.action": "extendSelection", "logrite.doc": doc, "logrite.head": head, "logrite.other": other, "logrite.options": options });
   }
 
   // Extend all selections (pos is an array of selections with length
   // equal the number of selections)
   function extendSelections(doc, heads, options) {
+	logger.error(`>>> Entering extendSelections(doc=${doc},heads=${heads},options=${options})`, { "event.action": "extendSelections", "logrite.doc": doc, "logrite.heads": heads, "logrite.options": options });
     for (var out = [], i = 0; i < doc.sel.ranges.length; i++)
       out[i] = extendRange(doc, doc.sel.ranges[i], heads[i], null);
     var newSel = normalizeSelection(out, doc.sel.primIndex);
     setSelection(doc, newSel, options);
+	logger.error(`extendSelections(doc=${doc},heads=${heads},options=${options}): newSel → ${newSel}`, { "event.action": "extendSelections", "logrite.doc": doc, "logrite.heads": heads, "logrite.options": options });
   }
 
   // Updates a single range in the selection.
   function replaceOneSelection(doc, i, range, options) {
+	logger.error(`>>> Entering replaceOneSelection(doc=${doc},i=${i},range=${range},options=${options})`, { "event.action": "replaceOneSelection", "logrite.doc": doc, "logrite.i": i, "logrite.range": range, "logrite.options": options });
     var ranges = doc.sel.ranges.slice(0);
     ranges[i] = range;
+	logger.error(`replaceOneSelection(doc=${doc},i=${i},range=${range},options=${options}): ranges → ${ranges}`, { "event.action": "replaceOneSelection", "logrite.doc": doc, "logrite.i": i, "logrite.range": range, "logrite.options": options });
     setSelection(doc, normalizeSelection(ranges, doc.sel.primIndex), options);
+	logger.warn(`<<< Exiting replaceOneSelection(doc=${doc},i=${i},range=${range},options=${options})`, { "event.action": "replaceOneSelection", "logrite.doc": doc, "logrite.i": i, "logrite.range": range, "logrite.options": options });
   }
 
   // Reset the selection to a single range.
   function setSimpleSelection(doc, anchor, head, options) {
+	logger.error(`>>> Entering setSimpleSelection(doc=${doc},anchor=${anchor},head=${head},options=${options})`, { "event.action": "setSimpleSelection", "logrite.doc": doc, "logrite.anchor": anchor, "logrite.head": head, "logrite.options": options });
     setSelection(doc, simpleSelection(anchor, head), options);
+	logger.warn(`<<< Exiting setSimpleSelection(doc=${doc},anchor=${anchor},head=${head},options=${options})`, { "event.action": "setSimpleSelection", "logrite.doc": doc, "logrite.anchor": anchor, "logrite.head": head, "logrite.options": options });
   }
 
   // Give beforeSelectionChange handlers a change to influence a
   // selection update.
   function filterSelectionChange(doc, sel) {
+	logger.error(`>>> Entering filterSelectionChange(doc=${doc},sel=${sel})`, { "event.action": "filterSelectionChange", "logrite.doc": doc, "logrite.sel": sel });
     var obj = {
       ranges: sel.ranges,
       update: function(ranges) {
@@ -2144,27 +2541,33 @@
   }
 
   function setSelectionReplaceHistory(doc, sel, options) {
+	logger.error(`>>> Entering setSelectionReplaceHistory(doc=${doc},sel=${sel},options=${options})`, { "event.action": "setSelectionReplaceHistory", "logrite.doc": doc, "logrite.sel": sel, "logrite.options": options });
     var done = doc.history.done, last = lst(done);
     if (last && last.ranges) {
       done[done.length - 1] = sel;
       setSelectionNoUndo(doc, sel, options);
     } else {
       setSelection(doc, sel, options);
+	logger.warn(`<<< Exiting setSelectionReplaceHistory(doc=${doc},sel=${sel},options=${options})`, { "event.action": "setSelectionReplaceHistory", "logrite.doc": doc, "logrite.sel": sel, "logrite.options": options });
     }
   }
 
   // Set a new selection.
   function setSelection(doc, sel, options) {
+	logger.error(`>>> Entering setSelection(doc=${doc},sel=${sel},options=${options})`, { "event.action": "setSelection", "logrite.doc": doc, "logrite.sel": sel, "logrite.options": options });
     setSelectionNoUndo(doc, sel, options);
     addSelectionToHistory(doc, doc.sel, doc.cm ? doc.cm.curOp.id : NaN, options);
+	logger.warn(`<<< Exiting setSelection(doc=${doc},sel=${sel},options=${options})`, { "event.action": "setSelection", "logrite.doc": doc, "logrite.sel": sel, "logrite.options": options });
   }
 
   function setSelectionNoUndo(doc, sel, options) {
+	logger.error(`>>> Entering setSelectionNoUndo(doc=${doc},sel=${sel},options=${options})`, { "event.action": "setSelectionNoUndo", "logrite.doc": doc, "logrite.sel": sel, "logrite.options": options });
     if (hasHandler(doc, "beforeSelectionChange") || doc.cm && hasHandler(doc.cm, "beforeSelectionChange"))
       sel = filterSelectionChange(doc, sel);
 
     var bias = options && options.bias ||
       (cmp(sel.primary().head, doc.sel.primary().head) < 0 ? -1 : 1);
+	logger.error(`setSelectionNoUndo(doc=${doc},sel=${sel},options=${options}): sel → ${sel}`, { "event.action": "setSelectionNoUndo", "logrite.doc": doc, "logrite.sel": sel, "logrite.options": options });
     setSelectionInner(doc, skipAtomicInSelection(doc, sel, bias, true));
 
     if (!(options && options.scroll === false) && doc.cm)
@@ -2172,44 +2575,54 @@
   }
 
   function setSelectionInner(doc, sel) {
+	logger.error(`>>> Entering setSelectionInner(doc=${doc},sel=${sel})`, { "event.action": "setSelectionInner", "logrite.doc": doc, "logrite.sel": sel });
     if (sel.equals(doc.sel)) return;
 
     doc.sel = sel;
+	logger.debug(`setSelectionInner(doc=${doc},sel=${sel}): doc.sel → ${doc.sel}`, { "event.action": "setSelectionInner", "logrite.doc": doc, "logrite.sel": sel });
 
     if (doc.cm) {
       doc.cm.curOp.updateInput = doc.cm.curOp.selectionChanged = true;
       signalCursorActivity(doc.cm);
     }
     signalLater(doc, "cursorActivity", doc);
+	logger.warn(`<<< Exiting setSelectionInner(doc=${doc},sel=${sel})`, { "event.action": "setSelectionInner", "logrite.doc": doc, "logrite.sel": sel });
   }
 
   // Verify that the selection does not partially select any atomic
   // marked ranges.
   function reCheckSelection(doc) {
+	logger.error(`>>> Entering reCheckSelection(doc=${doc})`, { "event.action": "reCheckSelection", "logrite.doc": doc });
     setSelectionInner(doc, skipAtomicInSelection(doc, doc.sel, null, false), sel_dontScroll);
+	logger.warn(`<<< Exiting reCheckSelection(doc=${doc})`, { "event.action": "reCheckSelection", "logrite.doc": doc });
   }
 
   // Return a selection that does not partially select any atomic
   // ranges.
   function skipAtomicInSelection(doc, sel, bias, mayClear) {
+	logger.error(`>>> Entering skipAtomicInSelection(doc=${doc},sel=${sel},bias=${bias},mayClear=${mayClear})`, { "event.action": "skipAtomicInSelection", "logrite.doc": doc, "logrite.sel": sel, "logrite.bias": bias, "logrite.mayClear": mayClear });
     var out;
     for (var i = 0; i < sel.ranges.length; i++) {
       var range = sel.ranges[i];
       var newAnchor = skipAtomic(doc, range.anchor, bias, mayClear);
+	logger.error(`skipAtomicInSelection(doc=${doc},sel=${sel},bias=${bias},mayClear=${mayClear}): newAnchor → ${newAnchor}`, { "event.action": "skipAtomicInSelection", "logrite.doc": doc, "logrite.sel": sel, "logrite.bias": bias, "logrite.mayClear": mayClear });
       var newHead = skipAtomic(doc, range.head, bias, mayClear);
       if (out || newAnchor != range.anchor || newHead != range.head) {
         if (!out) out = sel.ranges.slice(0, i);
         out[i] = new Range(newAnchor, newHead);
       }
     }
+	logger.error(`skipAtomicInSelection(doc=${doc},sel=${sel},bias=${bias},mayClear=${mayClear}): newHead → ${newHead}`, { "event.action": "skipAtomicInSelection", "logrite.doc": doc, "logrite.sel": sel, "logrite.bias": bias, "logrite.mayClear": mayClear });
     return out ? normalizeSelection(out, sel.primIndex) : sel;
   }
 
   // Ensure a given position is not inside an atomic range.
   function skipAtomic(doc, pos, bias, mayClear) {
+	logger.error(`>>> Entering skipAtomic(doc=${doc},pos=${pos},bias=${bias},mayClear=${mayClear})`, { "event.action": "skipAtomic", "logrite.doc": doc, "logrite.pos": pos, "logrite.bias": bias, "logrite.mayClear": mayClear });
     var flipped = false, curPos = pos;
     var dir = bias || 1;
     doc.cantEdit = false;
+	logger.debug(`skipAtomic(doc=${doc},pos=${pos},bias=${bias},mayClear=${mayClear}): doc.cantEdit → ${doc.cantEdit}`, { "event.action": "skipAtomic", "logrite.doc": doc, "logrite.pos": pos, "logrite.bias": bias, "logrite.mayClear": mayClear });
     search: for (;;) {
       var line = getLine(doc, curPos.line);
       if (line.markedSpans) {
@@ -2226,6 +2639,7 @@
             }
             if (!m.atomic) continue;
             var newPos = m.find(dir < 0 ? -1 : 1);
+			logger.error(`skipAtomic(doc=${doc},pos=${pos},bias=${bias},mayClear=${mayClear}): newPos → ${newPos}`, { "event.action": "skipAtomic", "logrite.doc": doc, "logrite.pos": pos, "logrite.bias": bias, "logrite.mayClear": mayClear });
             if (cmp(newPos, curPos) == 0) {
               newPos.ch += dir;
               if (newPos.ch < 0) {
@@ -2252,6 +2666,7 @@
           }
         }
       }
+	logger.error(`skipAtomic(doc=${doc},pos=${pos},bias=${bias},mayClear=${mayClear}): line → ${line}`, { "event.action": "skipAtomic", "logrite.doc": doc, "logrite.pos": pos, "logrite.bias": bias, "logrite.mayClear": mayClear });
       return curPos;
     }
   }
@@ -2259,31 +2674,42 @@
   // SELECTION DRAWING
 
   function updateSelection(cm) {
+	logger.error(`>>> Entering updateSelection(cm=${cm})`, { "event.action": "updateSelection", "logrite.cm": cm });
     cm.display.input.showSelection(cm.display.input.prepareSelection());
+	logger.warn(`<<< Exiting updateSelection(cm=${cm})`, { "event.action": "updateSelection", "logrite.cm": cm });
   }
 
   function prepareSelection(cm, primary) {
+	logger.error(`>>> Entering prepareSelection(cm=${cm},primary=${primary})`, { "event.action": "prepareSelection", "logrite.cm": cm, "logrite.primary": primary });
     var doc = cm.doc, result = {};
     var curFragment = result.cursors = document.createDocumentFragment();
+	logger.error(`prepareSelection(cm=${cm},primary=${primary}): curFragment → ${curFragment}`, { "event.action": "prepareSelection", "logrite.cm": cm, "logrite.primary": primary });
     var selFragment = result.selection = document.createDocumentFragment();
+	logger.error(`prepareSelection(cm=${cm},primary=${primary}): selFragment → ${selFragment}`, { "event.action": "prepareSelection", "logrite.cm": cm, "logrite.primary": primary });
 
     for (var i = 0; i < doc.sel.ranges.length; i++) {
       if (primary === false && i == doc.sel.primIndex) continue;
       var range = doc.sel.ranges[i];
       var collapsed = range.empty();
+	logger.error(`prepareSelection(cm=${cm},primary=${primary}): collapsed → ${collapsed}`, { "event.action": "prepareSelection", "logrite.cm": cm, "logrite.primary": primary });
       if (collapsed || cm.options.showCursorWhenSelecting)
         drawSelectionCursor(cm, range.head, curFragment);
       if (!collapsed)
         drawSelectionRange(cm, range, selFragment);
     }
+	logger.warn(`<<< Exiting prepareSelection(cm=${cm},primary=${primary})`, { "event.action": "prepareSelection", "logrite.cm": cm, "logrite.primary": primary });
+	logger.warn('<<< Exiting prepareSelection()', { "event.action": "prepareSelection", "logrite.cm": cm, "logrite.primary": primary });
     return result;
   }
 
   // Draws a cursor for the given range
   function drawSelectionCursor(cm, head, output) {
+	logger.error(`>>> Entering drawSelectionCursor(cm=${cm},head=${head},output=${output})`, { "event.action": "drawSelectionCursor", "logrite.cm": cm, "logrite.head": head, "logrite.output": output });
     var pos = cursorCoords(cm, head, "div", null, null, !cm.options.singleCursorHeightPerLine);
 
+	logger.error(`drawSelectionCursor(cm=${cm},head=${head},output=${output}): pos → ${pos}`, { "event.action": "drawSelectionCursor", "logrite.cm": cm, "logrite.head": head, "logrite.output": output });
     var cursor = output.appendChild(elt("div", "\u00a0", "CodeMirror-cursor"));
+	logger.error(`drawSelectionCursor(cm=${cm},head=${head},output=${output}): cursor → ${cursor}`, { "event.action": "drawSelectionCursor", "logrite.cm": cm, "logrite.head": head, "logrite.output": output });
     cursor.style.left = pos.left + "px";
     cursor.style.top = pos.top + "px";
     cursor.style.height = Math.max(0, pos.bottom - pos.top) * cm.options.cursorHeight + "px";
@@ -2291,34 +2717,48 @@
     if (pos.other) {
       // Secondary cursor, shown when on a 'jump' in bi-directional text
       var otherCursor = output.appendChild(elt("div", "\u00a0", "CodeMirror-cursor CodeMirror-secondarycursor"));
+	logger.error(`drawSelectionCursor(cm=${cm},head=${head},output=${output}): otherCursor → ${otherCursor}`, { "event.action": "drawSelectionCursor", "logrite.cm": cm, "logrite.head": head, "logrite.output": output });
       otherCursor.style.display = "";
       otherCursor.style.left = pos.other.left + "px";
       otherCursor.style.top = pos.other.top + "px";
       otherCursor.style.height = (pos.other.bottom - pos.other.top) * .85 + "px";
+	logger.warn(`<<< Exiting drawSelectionCursor(cm=${cm},head=${head},output=${output})`, { "event.action": "drawSelectionCursor", "logrite.cm": cm, "logrite.head": head, "logrite.output": output });
     }
   }
 
   // Draws the given range as a highlighted selection
   function drawSelectionRange(cm, range, output) {
+	logger.error(`>>> Entering drawSelectionRange(cm=${cm},range=${range},output=${output})`, { "event.action": "drawSelectionRange", "logrite.cm": cm, "logrite.range": range, "logrite.output": output });
     var display = cm.display, doc = cm.doc;
     var fragment = document.createDocumentFragment();
+	logger.error(`drawSelectionRange(cm=${cm},range=${range},output=${output}): fragment → ${fragment}`, { "event.action": "drawSelectionRange", "logrite.cm": cm, "logrite.range": range, "logrite.output": output });
     var padding = paddingH(cm.display), leftSide = padding.left;
     var rightSide = Math.max(display.sizerWidth, displayWidth(cm) - display.sizer.offsetLeft) - padding.right;
+	logger.error(`drawSelectionRange(cm=${cm},range=${range},output=${output}): padding → ${padding}`, { "event.action": "drawSelectionRange", "logrite.cm": cm, "logrite.range": range, "logrite.output": output });
+	logger.error(`drawSelectionRange(cm=${cm},range=${range},output=${output}): rightSide → ${rightSide}`, { "event.action": "drawSelectionRange", "logrite.cm": cm, "logrite.range": range, "logrite.output": output });
 
     function add(left, top, width, bottom) {
       if (top < 0) top = 0;
+	logger.error(`>>> Entering add(left=${left},top=${top},width=${width},bottom=${bottom})`, { "event.action": "add", "logrite.left": left, "logrite.top": top, "logrite.width": width, "logrite.bottom": bottom });
       top = Math.round(top);
       bottom = Math.round(bottom);
+	logger.error(`add(left=${left},top=${top},width=${width},bottom=${bottom}): top → ${top}`, { "event.action": "add", "logrite.left": left, "logrite.top": top, "logrite.width": width, "logrite.bottom": bottom });
       fragment.appendChild(elt("div", null, "CodeMirror-selected", "position: absolute; left: " + left +
                                "px; top: " + top + "px; width: " + (width == null ? rightSide - left : width) +
                                "px; height: " + (bottom - top) + "px"));
+							logger.error(`add(left=${left},top=${top},width=${width},bottom=${bottom}): bottom → ${bottom}`, { "event.action": "add", "logrite.left": left, "logrite.top": top, "logrite.width": width, "logrite.bottom": bottom });
     }
 
     function drawForLine(line, fromArg, toArg) {
+	logger.error(`>>> Entering drawForLine(line=${line},fromArg=${fromArg},toArg=${toArg})`, { "event.action": "drawForLine", "logrite.line": line, "logrite.fromArg": fromArg, "logrite.toArg": toArg });
       var lineObj = getLine(doc, line);
       var lineLen = lineObj.text.length;
+	logger.error(`drawForLine(line=${line},fromArg=${fromArg},toArg=${toArg}): lineObj → ${lineObj}`, { "event.action": "drawForLine", "logrite.line": line, "logrite.fromArg": fromArg, "logrite.toArg": toArg });
       var start, end;
+	logger.warn(`<<< Exiting drawForLine(line=${line},fromArg=${fromArg},toArg=${toArg})`, { "event.action": "drawForLine", "logrite.line": line, "logrite.fromArg": fromArg, "logrite.toArg": toArg });
       function coords(ch, bias) {
+		logger.error(`>>> Entering coords(ch=${ch},bias=${bias})`, { "event.action": "coords", "logrite.ch": ch, "logrite.bias": bias });
+		logger.warn(`<<< Exiting coords(ch=${ch},bias=${bias})`, { "event.action": "coords", "logrite.ch": ch, "logrite.bias": bias });
         return charCoords(cm, Pos(line, ch), "div", lineObj, bias);
       }
 
@@ -2371,10 +2811,12 @@
     }
 
     output.appendChild(fragment);
+	logger.warn(`<<< Exiting drawSelectionRange(cm=${cm},range=${range},output=${output})`, { "event.action": "drawSelectionRange", "logrite.cm": cm, "logrite.range": range, "logrite.output": output });
   }
 
   // Cursor-blinking
   function restartBlink(cm) {
+	logger.error(`>>> Entering restartBlink(cm=${cm})`, { "event.action": "restartBlink", "logrite.cm": cm });
     if (!cm.state.focused) return;
     var display = cm.display;
     clearInterval(display.blinker);
@@ -2391,11 +2833,14 @@
   // HIGHLIGHT WORKER
 
   function startWorker(cm, time) {
+	logger.error(`>>> Entering startWorker(cm=${cm},time=${time})`, { "event.action": "startWorker", "logrite.cm": cm, "logrite.time": time });
     if (cm.doc.mode.startState && cm.doc.frontier < cm.display.viewTo)
       cm.state.highlight.set(time, bind(highlightWorker, cm));
+	logger.warn(`<<< Exiting startWorker(cm=${cm},time=${time})`, { "event.action": "startWorker", "logrite.cm": cm, "logrite.time": time });
   }
 
   function highlightWorker(cm) {
+	logger.error(`>>> Entering highlightWorker(cm=${cm})`, { "event.action": "highlightWorker", "logrite.cm": cm });
     var doc = cm.doc;
     if (doc.frontier < doc.first) doc.frontier = doc.first;
     if (doc.frontier >= cm.display.viewTo) return;
@@ -2431,6 +2876,7 @@
       for (var i = 0; i < changedLines.length; i++)
         regLineChange(cm, changedLines[i], "text");
     });
+	logger.warn(`<<< Exiting highlightWorker(cm=${cm})`, { "event.action": "highlightWorker", "logrite.cm": cm });
   }
 
   // Finds the line to start with when starting a parse. Tries to
@@ -2439,11 +2885,13 @@
   // smallest indentation, which tends to need the least context to
   // parse correctly.
   function findStartLine(cm, n, precise) {
+	logger.error(`>>> Entering findStartLine(cm=${cm},n=${n},precise=${precise})`, { "event.action": "findStartLine", "logrite.cm": cm, "logrite.n": n, "logrite.precise": precise });
     var minindent, minline, doc = cm.doc;
     var lim = precise ? -1 : n - (cm.doc.mode.innerMode ? 1000 : 100);
     for (var search = n; search > lim; --search) {
       if (search <= doc.first) return doc.first;
       var line = getLine(doc, search - 1);
+	logger.error(`findStartLine(cm=${cm},n=${n},precise=${precise}): line → ${line}`, { "event.action": "findStartLine", "logrite.cm": cm, "logrite.n": n, "logrite.precise": precise });
       if (line.stateAfter && (!precise || search <= doc.frontier)) return search;
       var indented = countColumn(line.text, null, cm.options.tabSize);
       if (minline == null || minindent > indented) {
@@ -2451,13 +2899,16 @@
         minindent = indented;
       }
     }
+	logger.error(`findStartLine(cm=${cm},n=${n},precise=${precise}): lim → ${lim}`, { "event.action": "findStartLine", "logrite.cm": cm, "logrite.n": n, "logrite.precise": precise });
     return minline;
   }
 
   function getStateBefore(cm, n, precise) {
+	logger.error(`>>> Entering getStateBefore(cm=${cm},n=${n},precise=${precise})`, { "event.action": "getStateBefore", "logrite.cm": cm, "logrite.n": n, "logrite.precise": precise });
     var doc = cm.doc, display = cm.display;
     if (!doc.mode.startState) return true;
     var pos = findStartLine(cm, n, precise), state = pos > doc.first && getLine(doc, pos-1).stateAfter;
+	logger.error(`getStateBefore(cm=${cm},n=${n},precise=${precise}): pos → ${pos}`, { "event.action": "getStateBefore", "logrite.cm": cm, "logrite.n": n, "logrite.precise": precise });
     if (!state) state = startState(doc.mode);
     else state = copyState(doc.mode, state);
     doc.iter(pos, n, function(line) {
@@ -2472,22 +2923,39 @@
 
   // POSITION MEASUREMENT
 
-  function paddingTop(display) {return display.lineSpace.offsetTop;}
-  function paddingVert(display) {return display.mover.offsetHeight - display.lineSpace.offsetHeight;}
+  function paddingTop(display) {
+      logger.error(`>>> Entering paddingTop(display=${display})`, { "event.action": "paddingTop", "logrite.display": display });
+      logger.warn(`<<< Exiting paddingTop(display=${display})`, { "event.action": "paddingTop", "logrite.display": display });
+      return display.lineSpace.offsetTop;
+  }
+  function paddingVert(display) {
+      logger.error(`>>> Entering paddingVert(display=${display})`, { "event.action": "paddingVert", "logrite.display": display });
+      logger.warn(`<<< Exiting paddingVert(display=${display})`, { "event.action": "paddingVert", "logrite.display": display });
+      return display.mover.offsetHeight - display.lineSpace.offsetHeight;
+  }
   function paddingH(display) {
+	logger.error(`>>> Entering paddingH(display=${display})`, { "event.action": "paddingH", "logrite.display": display });
     if (display.cachedPaddingH) return display.cachedPaddingH;
     var e = removeChildrenAndAdd(display.measure, elt("pre", "x"));
     var style = window.getComputedStyle ? window.getComputedStyle(e) : e.currentStyle;
+	logger.error(`paddingH(display=${display}): e → ${e}`, { "event.action": "paddingH", "logrite.display": display });
+	logger.error(`paddingH(display=${display}): style → ${style}`, { "event.action": "paddingH", "logrite.display": display });
     var data = {left: parseInt(style.paddingLeft), right: parseInt(style.paddingRight)};
     if (!isNaN(data.left) && !isNaN(data.right)) display.cachedPaddingH = data;
+	logger.error(`paddingH(display=${display}): data → ${data}`, { "event.action": "paddingH", "logrite.display": display });
+	logger.warn(`<<< Exiting paddingH(display=${display})`, { "event.action": "paddingH", "logrite.display": display });
     return data;
   }
 
   function scrollGap(cm) { return scrollerGap - cm.display.nativeBarWidth; }
   function displayWidth(cm) {
+	logger.error(`>>> Entering displayWidth(cm=${cm})`, { "event.action": "displayWidth", "logrite.cm": cm });
+	logger.warn(`<<< Exiting displayWidth(cm=${cm})`, { "event.action": "displayWidth", "logrite.cm": cm });
     return cm.display.scroller.clientWidth - scrollGap(cm) - cm.display.barWidth;
   }
   function displayHeight(cm) {
+	logger.error(`>>> Entering displayHeight(cm=${cm})`, { "event.action": "displayHeight", "logrite.cm": cm });
+	logger.warn(`<<< Exiting displayHeight(cm=${cm})`, { "event.action": "displayHeight", "logrite.cm": cm });
     return cm.display.scroller.clientHeight - scrollGap(cm) - cm.display.barHeight;
   }
 
@@ -2496,8 +2964,10 @@
   // line. When lineWrapping is on, there might be more than one
   // height.
   function ensureLineHeights(cm, lineView, rect) {
+	logger.error(`>>> Entering ensureLineHeights(cm=${cm},lineView=${lineView},rect=${rect})`, { "event.action": "ensureLineHeights", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.rect": rect });
     var wrapping = cm.options.lineWrapping;
     var curWidth = wrapping && displayWidth(cm);
+	logger.error(`ensureLineHeights(cm=${cm},lineView=${lineView},rect=${rect}): curWidth → ${curWidth}`, { "event.action": "ensureLineHeights", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.rect": rect });
     if (!lineView.measure.heights || wrapping && lineView.measure.width != curWidth) {
       var heights = lineView.measure.heights = [];
       if (wrapping) {
@@ -2510,6 +2980,7 @@
         }
       }
       heights.push(rect.bottom - rect.top);
+	logger.error(`ensureLineHeights(cm=${cm},lineView=${lineView},rect=${rect}): rects → ${rects}`, { "event.action": "ensureLineHeights", "logrite.cm": cm, "logrite.lineView": lineView, "logrite.rect": rect });
     }
   }
 
@@ -2517,6 +2988,7 @@
   // measurement cache for the given line number. (A line view might
   // contain multiple lines when collapsed ranges are present.)
   function mapFromLineView(lineView, line, lineN) {
+	logger.error(`>>> Entering mapFromLineView(lineView=${lineView},line=${line},lineN=${lineN})`, { "event.action": "mapFromLineView", "logrite.lineView": lineView, "logrite.line": line, "logrite.lineN": lineN });
     if (lineView.line == line)
       return {map: lineView.measure.map, cache: lineView.measure.cache};
     for (var i = 0; i < lineView.rest.length; i++)
@@ -2530,24 +3002,35 @@
   // Render a line into the hidden node display.externalMeasured. Used
   // when measurement is needed for a line that's not in the viewport.
   function updateExternalMeasurement(cm, line) {
+	logger.error(`>>> Entering updateExternalMeasurement(cm=${cm},line=${line})`, { "event.action": "updateExternalMeasurement", "logrite.cm": cm, "logrite.line": line });
     line = visualLine(line);
     var lineN = lineNo(line);
+	logger.error(`updateExternalMeasurement(cm=${cm},line=${line}): line → ${line}`, { "event.action": "updateExternalMeasurement", "logrite.cm": cm, "logrite.line": line });
+	logger.error(`updateExternalMeasurement(cm=${cm},line=${line}): lineN → ${lineN}`, { "event.action": "updateExternalMeasurement", "logrite.cm": cm, "logrite.line": line });
     var view = cm.display.externalMeasured = new LineView(cm.doc, line, lineN);
     view.lineN = lineN;
+	logger.error(`updateExternalMeasurement(cm=${cm},line=${line}): view → ${view}`, { "event.action": "updateExternalMeasurement", "logrite.cm": cm, "logrite.line": line });
+	logger.debug(`updateExternalMeasurement(cm=${cm},line=${line}): view.lineN → ${view.lineN}`, { "event.action": "updateExternalMeasurement", "logrite.cm": cm, "logrite.line": line });
+	logger.debug(`updateExternalMeasurement(cm=${cm},line=${line}): view.text → ${view.text}`, { "event.action": "updateExternalMeasurement", "logrite.cm": cm, "logrite.line": line });
     var built = view.built = buildLineContent(cm, view);
+	logger.error(`updateExternalMeasurement(cm=${cm},line=${line}): built → ${built}`, { "event.action": "updateExternalMeasurement", "logrite.cm": cm, "logrite.line": line });
     view.text = built.pre;
     removeChildrenAndAdd(cm.display.lineMeasure, built.pre);
+	logger.warn(`<<< Exiting updateExternalMeasurement(cm=${cm},line=${line})`, { "event.action": "updateExternalMeasurement", "logrite.cm": cm, "logrite.line": line });
     return view;
   }
 
   // Get a {top, bottom, left, right} box (in line-local coordinates)
   // for a given character.
   function measureChar(cm, line, ch, bias) {
+	logger.error(`>>> Entering measureChar(cm=${cm},line=${line},ch=${ch},bias=${bias})`, { "event.action": "measureChar", "logrite.cm": cm, "logrite.line": line, "logrite.ch": ch, "logrite.bias": bias });
+	logger.warn(`<<< Exiting measureChar(cm=${cm},line=${line},ch=${ch},bias=${bias})`, { "event.action": "measureChar", "logrite.cm": cm, "logrite.line": line, "logrite.ch": ch, "logrite.bias": bias });
     return measureCharPrepared(cm, prepareMeasureForLine(cm, line), ch, bias);
   }
 
   // Find a line view that corresponds to the given line number.
   function findViewForLine(cm, lineN) {
+	logger.error(`>>> Entering findViewForLine(cm=${cm},lineN=${lineN})`, { "event.action": "findViewForLine", "logrite.cm": cm, "logrite.lineN": lineN });
     if (lineN >= cm.display.viewFrom && lineN < cm.display.viewTo)
       return cm.display.view[findViewIndex(cm, lineN)];
     var ext = cm.display.externalMeasured;
@@ -2561,8 +3044,11 @@
   // measurements in a row, can thus ensure that the set-up work is
   // only done once.
   function prepareMeasureForLine(cm, line) {
+	logger.error(`>>> Entering prepareMeasureForLine(cm=${cm},line=${line})`, { "event.action": "prepareMeasureForLine", "logrite.cm": cm, "logrite.line": line });
     var lineN = lineNo(line);
     var view = findViewForLine(cm, lineN);
+	logger.error(`prepareMeasureForLine(cm=${cm},line=${line}): lineN → ${lineN}`, { "event.action": "prepareMeasureForLine", "logrite.cm": cm, "logrite.line": line });
+	logger.error(`prepareMeasureForLine(cm=${cm},line=${line}): view → ${view}`, { "event.action": "prepareMeasureForLine", "logrite.cm": cm, "logrite.line": line });
     if (view && !view.text) {
       view = null;
     } else if (view && view.changes) {
@@ -2573,6 +3059,7 @@
       view = updateExternalMeasurement(cm, line);
 
     var info = mapFromLineView(view, line, lineN);
+	logger.warn(`<<< Exiting prepareMeasureForLine(cm=${cm},line=${line})`, { "event.action": "prepareMeasureForLine", "logrite.cm": cm, "logrite.line": line });
     return {
       line: line, view: view, rect: null,
       map: info.map, cache: info.cache, before: info.before,
@@ -2583,8 +3070,10 @@
   // Given a prepared measurement object, measures the position of an
   // actual character (or fetches it from the cache).
   function measureCharPrepared(cm, prepared, ch, bias, varHeight) {
+	logger.error(`>>> Entering measureCharPrepared(cm=${cm},prepared=${prepared},ch=${ch},bias=${bias},varHeight=${varHeight})`, { "event.action": "measureCharPrepared", "logrite.cm": cm, "logrite.prepared": prepared, "logrite.ch": ch, "logrite.bias": bias, "logrite.varHeight": varHeight });
     if (prepared.before) ch = -1;
     var key = ch + (bias || ""), found;
+	logger.error(`measureCharPrepared(cm=${cm},prepared=${prepared},ch=${ch},bias=${bias},varHeight=${varHeight}): key → ${key}`, { "event.action": "measureCharPrepared", "logrite.cm": cm, "logrite.prepared": prepared, "logrite.ch": ch, "logrite.bias": bias, "logrite.varHeight": varHeight });
     if (prepared.cache.hasOwnProperty(key)) {
       found = prepared.cache[key];
     } else {
@@ -2593,10 +3082,12 @@
       if (!prepared.hasHeights) {
         ensureLineHeights(cm, prepared.view, prepared.rect);
         prepared.hasHeights = true;
+		logger.debug(`measureCharPrepared(cm=${cm},prepared=${prepared},ch=${ch},bias=${bias},varHeight=${varHeight}): prepared.hasHeights → ${prepared.hasHeights}`, { "event.action": "measureCharPrepared", "logrite.cm": cm, "logrite.prepared": prepared, "logrite.ch": ch, "logrite.bias": bias, "logrite.varHeight": varHeight });
       }
       found = measureCharInner(cm, prepared, ch, bias);
       if (!found.bogus) prepared.cache[key] = found;
     }
+	logger.warn(`<<< Exiting measureCharPrepared(cm=${cm},prepared=${prepared},ch=${ch},bias=${bias},varHeight=${varHeight})`, { "event.action": "measureCharPrepared", "logrite.cm": cm, "logrite.prepared": prepared, "logrite.ch": ch, "logrite.bias": bias, "logrite.varHeight": varHeight });
     return {left: found.left, right: found.right,
             top: varHeight ? found.rtop : found.top,
             bottom: varHeight ? found.rbottom : found.bottom};
@@ -2605,6 +3096,7 @@
   var nullRect = {left: 0, right: 0, top: 0, bottom: 0};
 
   function nodeAndOffsetInLineMap(map, ch, bias) {
+	logger.error(`>>> Entering nodeAndOffsetInLineMap(map=${map},ch=${ch},bias=${bias})`, { "event.action": "nodeAndOffsetInLineMap", "logrite.map": map, "logrite.ch": ch, "logrite.bias": bias });
     var node, start, end, collapse;
     // First, search the line map for the text node corresponding to,
     // or closest to, the target character.
@@ -2623,6 +3115,7 @@
       }
       if (start != null) {
         node = map[i + 2];
+		logger.error(`nodeAndOffsetInLineMap(map=${map},ch=${ch},bias=${bias}): node → ${node}`, { "event.action": "nodeAndOffsetInLineMap", "logrite.map": map, "logrite.ch": ch, "logrite.bias": bias });
         if (mStart == mEnd && bias == (node.insertLeft ? "left" : "right"))
           collapse = bias;
         if (bias == "left" && start == 0)
@@ -2638,12 +3131,15 @@
         break;
       }
     }
+	logger.warn(`<<< Exiting nodeAndOffsetInLineMap(map=${map},ch=${ch},bias=${bias})`, { "event.action": "nodeAndOffsetInLineMap", "logrite.map": map, "logrite.ch": ch, "logrite.bias": bias });
     return {node: node, start: start, end: end, collapse: collapse, coverStart: mStart, coverEnd: mEnd};
   }
 
   function measureCharInner(cm, prepared, ch, bias) {
+	logger.error(`>>> Entering measureCharInner(cm=${cm},prepared=${prepared},ch=${ch},bias=${bias})`, { "event.action": "measureCharInner", "logrite.cm": cm, "logrite.prepared": prepared, "logrite.ch": ch, "logrite.bias": bias });
     var place = nodeAndOffsetInLineMap(prepared.map, ch, bias);
     var node = place.node, start = place.start, end = place.end, collapse = place.collapse;
+	logger.error(`measureCharInner(cm=${cm},prepared=${prepared},ch=${ch},bias=${bias}): place → ${place}`, { "event.action": "measureCharInner", "logrite.cm": cm, "logrite.prepared": prepared, "logrite.ch": ch, "logrite.bias": bias });
 
     var rect;
     if (node.nodeType == 3) { // If it is a text node, use a range to retrieve the coordinates.
@@ -2654,6 +3150,7 @@
           rect = node.parentNode.getBoundingClientRect();
         } else if (ie && cm.options.lineWrapping) {
           var rects = range(node, start, end).getClientRects();
+		logger.error(`measureCharInner(cm=${cm},prepared=${prepared},ch=${ch},bias=${bias}): rects → ${rects}`, { "event.action": "measureCharInner", "logrite.cm": cm, "logrite.prepared": prepared, "logrite.ch": ch, "logrite.bias": bias });
           if (rects.length)
             rect = rects[bias == "right" ? rects.length - 1 : 0];
           else
@@ -2677,6 +3174,7 @@
     }
     if (ie && ie_version < 9 && !start && (!rect || !rect.left && !rect.right)) {
       var rSpan = node.parentNode.getClientRects()[0];
+	logger.error(`measureCharInner(cm=${cm},prepared=${prepared},ch=${ch},bias=${bias}): rSpan → ${rSpan}`, { "event.action": "measureCharInner", "logrite.cm": cm, "logrite.prepared": prepared, "logrite.ch": ch, "logrite.bias": bias });
       if (rSpan)
         rect = {left: rSpan.left, right: rSpan.left + charWidth(cm.display), top: rSpan.top, bottom: rSpan.bottom};
       else
@@ -2685,6 +3183,7 @@
 
     var rtop = rect.top - prepared.rect.top, rbot = rect.bottom - prepared.rect.top;
     var mid = (rtop + rbot) / 2;
+	logger.error(`measureCharInner(cm=${cm},prepared=${prepared},ch=${ch},bias=${bias}): mid → ${mid}`, { "event.action": "measureCharInner", "logrite.cm": cm, "logrite.prepared": prepared, "logrite.ch": ch, "logrite.bias": bias });
     var heights = prepared.view.measure.heights;
     for (var i = 0; i < heights.length - 1; i++)
       if (mid < heights[i]) break;
@@ -2693,24 +3192,29 @@
                   right: (collapse == "left" ? rect.left : rect.right) - prepared.rect.left,
                   top: top, bottom: bot};
     if (!rect.left && !rect.right) result.bogus = true;
+	logger.error(`measureCharInner(cm=${cm},prepared=${prepared},ch=${ch},bias=${bias}): result → ${result}`, { "event.action": "measureCharInner", "logrite.cm": cm, "logrite.prepared": prepared, "logrite.ch": ch, "logrite.bias": bias });
     if (!cm.options.singleCursorHeightPerLine) { result.rtop = rtop; result.rbottom = rbot; }
 
+	logger.warn(`<<< Exiting measureCharInner(cm=${cm},prepared=${prepared},ch=${ch},bias=${bias})`, { "event.action": "measureCharInner", "logrite.cm": cm, "logrite.prepared": prepared, "logrite.ch": ch, "logrite.bias": bias });
     return result;
   }
 
   // Work around problem with bounding client rects on ranges being
   // returned incorrectly when zoomed on IE10 and below.
   function maybeUpdateRectForZooming(measure, rect) {
+	logger.error(`>>> Entering maybeUpdateRectForZooming(measure=${measure},rect=${rect})`, { "event.action": "maybeUpdateRectForZooming", "logrite.measure": measure, "logrite.rect": rect });
     if (!window.screen || screen.logicalXDPI == null ||
         screen.logicalXDPI == screen.deviceXDPI || !hasBadZoomedRects(measure))
       return rect;
     var scaleX = screen.logicalXDPI / screen.deviceXDPI;
     var scaleY = screen.logicalYDPI / screen.deviceYDPI;
+	logger.warn(`<<< Exiting maybeUpdateRectForZooming(measure=${measure},rect=${rect})`, { "event.action": "maybeUpdateRectForZooming", "logrite.measure": measure, "logrite.rect": rect });
     return {left: rect.left * scaleX, right: rect.right * scaleX,
             top: rect.top * scaleY, bottom: rect.bottom * scaleY};
   }
 
   function clearLineMeasurementCacheFor(lineView) {
+	logger.error(`>>> Entering clearLineMeasurementCacheFor(lineView=${lineView})`, { "event.action": "clearLineMeasurementCacheFor", "logrite.lineView": lineView });
     if (lineView.measure) {
       lineView.measure.cache = {};
       lineView.measure.heights = null;
@@ -2720,6 +3224,7 @@
   }
 
   function clearLineMeasurementCache(cm) {
+	logger.error(`>>> Entering clearLineMeasurementCache(cm=${cm})`, { "event.action": "clearLineMeasurementCache", "logrite.cm": cm });
     cm.display.externalMeasure = null;
     removeChildren(cm.display.lineMeasure);
     for (var i = 0; i < cm.display.view.length; i++)
@@ -2727,42 +3232,55 @@
   }
 
   function clearCaches(cm) {
+	logger.error(`>>> Entering clearCaches(cm=${cm})`, { "event.action": "clearCaches", "logrite.cm": cm });
     clearLineMeasurementCache(cm);
     cm.display.cachedCharWidth = cm.display.cachedTextHeight = cm.display.cachedPaddingH = null;
     if (!cm.options.lineWrapping) cm.display.maxLineChanged = true;
     cm.display.lineNumChars = null;
+	logger.warn(`<<< Exiting clearCaches(cm=${cm})`, { "event.action": "clearCaches", "logrite.cm": cm });
   }
 
   function pageScrollX() { return window.pageXOffset || (document.documentElement || document.body).scrollLeft; }
-  function pageScrollY() { return window.pageYOffset || (document.documentElement || document.body).scrollTop; }
+  function pageScrollY() {
+      logger.error('>>> Entering pageScrollY()', { "event.action": "pageScrollY" });
+      logger.warn('<<< Exiting pageScrollY()', { "event.action": "pageScrollY" });
+      return window.pageYOffset || (document.documentElement || document.body).scrollTop;
+  }
 
   // Converts a {top, bottom, left, right} box from line-local
   // coordinates into another coordinate system. Context may be one of
   // "line", "div" (display.lineDiv), "local"/null (editor), "window",
   // or "page".
   function intoCoordSystem(cm, lineObj, rect, context) {
+	logger.error(`>>> Entering intoCoordSystem(cm=${cm},lineObj=${lineObj},rect=${rect},context=${context})`, { "event.action": "intoCoordSystem", "logrite.cm": cm, "logrite.lineObj": lineObj, "logrite.rect": rect, "logrite.context": context });
     if (lineObj.widgets) for (var i = 0; i < lineObj.widgets.length; ++i) if (lineObj.widgets[i].above) {
       var size = widgetHeight(lineObj.widgets[i]);
+	logger.error(`intoCoordSystem(cm=${cm},lineObj=${lineObj},rect=${rect},context=${context}): size → ${size}`, { "event.action": "intoCoordSystem", "logrite.cm": cm, "logrite.lineObj": lineObj, "logrite.rect": rect, "logrite.context": context });
       rect.top += size; rect.bottom += size;
     }
     if (context == "line") return rect;
     if (!context) context = "local";
     var yOff = heightAtLine(lineObj);
+	logger.error(`intoCoordSystem(cm=${cm},lineObj=${lineObj},rect=${rect},context=${context}): yOff → ${yOff}`, { "event.action": "intoCoordSystem", "logrite.cm": cm, "logrite.lineObj": lineObj, "logrite.rect": rect, "logrite.context": context });
     if (context == "local") yOff += paddingTop(cm.display);
     else yOff -= cm.display.viewOffset;
     if (context == "page" || context == "window") {
       var lOff = cm.display.lineSpace.getBoundingClientRect();
+	logger.error(`intoCoordSystem(cm=${cm},lineObj=${lineObj},rect=${rect},context=${context}): lOff → ${lOff}`, { "event.action": "intoCoordSystem", "logrite.cm": cm, "logrite.lineObj": lineObj, "logrite.rect": rect, "logrite.context": context });
       yOff += lOff.top + (context == "window" ? 0 : pageScrollY());
       var xOff = lOff.left + (context == "window" ? 0 : pageScrollX());
+	logger.error(`intoCoordSystem(cm=${cm},lineObj=${lineObj},rect=${rect},context=${context}): xOff → ${xOff}`, { "event.action": "intoCoordSystem", "logrite.cm": cm, "logrite.lineObj": lineObj, "logrite.rect": rect, "logrite.context": context });
       rect.left += xOff; rect.right += xOff;
     }
     rect.top += yOff; rect.bottom += yOff;
+	logger.warn(`<<< Exiting intoCoordSystem(cm=${cm},lineObj=${lineObj},rect=${rect},context=${context})`, { "event.action": "intoCoordSystem", "logrite.cm": cm, "logrite.lineObj": lineObj, "logrite.rect": rect, "logrite.context": context });
     return rect;
   }
 
   // Coverts a box from "div" coords to another coordinate system.
   // Context may be "window", "page", "div", or "local"/null.
   function fromCoordSystem(cm, coords, context) {
+	logger.error(`>>> Entering fromCoordSystem(cm=${cm},coords=${coords},context=${context})`, { "event.action": "fromCoordSystem", "logrite.cm": cm, "logrite.coords": coords, "logrite.context": context });
     if (context == "div") return coords;
     var left = coords.left, top = coords.top;
     // First move into "page" coordinate system
@@ -2771,16 +3289,20 @@
       top -= pageScrollY();
     } else if (context == "local" || !context) {
       var localBox = cm.display.sizer.getBoundingClientRect();
+	logger.error(`fromCoordSystem(cm=${cm},coords=${coords},context=${context}): localBox → ${localBox}`, { "event.action": "fromCoordSystem", "logrite.cm": cm, "logrite.coords": coords, "logrite.context": context });
       left += localBox.left;
       top += localBox.top;
     }
 
     var lineSpaceBox = cm.display.lineSpace.getBoundingClientRect();
+	logger.error(`fromCoordSystem(cm=${cm},coords=${coords},context=${context}): lineSpaceBox → ${lineSpaceBox}`, { "event.action": "fromCoordSystem", "logrite.cm": cm, "logrite.coords": coords, "logrite.context": context });
     return {left: left - lineSpaceBox.left, top: top - lineSpaceBox.top};
   }
 
   function charCoords(cm, pos, context, lineObj, bias) {
+	logger.error(`>>> Entering charCoords(cm=${cm},pos=${pos},context=${context},lineObj=${lineObj},bias=${bias})`, { "event.action": "charCoords", "logrite.pos": pos, "logrite.mode": mode });
     if (!lineObj) lineObj = getLine(cm.doc, pos.line);
+	logger.warn(`<<< Exiting charCoords(cm=${cm},pos=${pos},context=${context},lineObj=${lineObj},bias=${bias})`, { "event.action": "charCoords", "logrite.pos": pos, "logrite.mode": mode });
     return intoCoordSystem(cm, lineObj, measureChar(cm, lineObj, pos.ch, bias), context);
   }
 
@@ -2788,14 +3310,20 @@
   // 'other' property containing the position of the secondary cursor
   // on a bidi boundary.
   function cursorCoords(cm, pos, context, lineObj, preparedMeasure, varHeight) {
+	logger.error(`>>> Entering cursorCoords(cm=${cm},pos=${pos},context=${context},lineObj=${lineObj},preparedMeasure=${preparedMeasure},varHeight=${varHeight})`, { "event.action": "cursorCoords", "logrite.start": start, "logrite.mode": mode });
     lineObj = lineObj || getLine(cm.doc, pos.line);
     if (!preparedMeasure) preparedMeasure = prepareMeasureForLine(cm, lineObj);
+	logger.error(`cursorCoords(cm=${cm},pos=${pos},context=${context},lineObj=${lineObj},preparedMeasure=${preparedMeasure},varHeight=${varHeight}): lineObj → ${lineObj}`, { "event.action": "cursorCoords", "logrite.start": start, "logrite.mode": mode });
     function get(ch, right) {
+	logger.error(`>>> Entering get(ch=${ch},right=${right})`, { "event.action": "get", "logrite.ch": ch, "logrite.right": right });
       var m = measureCharPrepared(cm, preparedMeasure, ch, right ? "right" : "left", varHeight);
       if (right) m.left = m.right; else m.right = m.left;
+	logger.error(`get(ch=${ch},right=${right}): m → ${m}`, { "event.action": "get", "logrite.ch": ch, "logrite.right": right });
+	logger.warn(`<<< Exiting get(ch=${ch},right=${right})`, { "event.action": "get", "logrite.ch": ch, "logrite.right": right });
       return intoCoordSystem(cm, lineObj, m, context);
     }
     function getBidi(ch, partPos) {
+	logger.error(`>>> Entering getBidi(ch=${ch},partPos=${partPos})`, { "event.action": "getBidi", "logrite.ch": ch, "logrite.partPos": partPos });
       var part = order[partPos], right = part.level % 2;
       if (ch == bidiLeft(part) && partPos && part.level < order[partPos - 1].level) {
         part = order[--partPos];
@@ -2807,12 +3335,16 @@
         right = false;
       }
       if (right && ch == part.to && ch > part.from) return get(ch - 1);
+	logger.warn(`<<< Exiting getBidi(ch=${ch},partPos=${partPos})`, { "event.action": "getBidi", "logrite.ch": ch, "logrite.partPos": partPos });
       return get(ch, right);
     }
     var order = getOrder(lineObj), ch = pos.ch;
+	logger.error(`cursorCoords(cm=${cm},pos=${pos},context=${context},lineObj=${lineObj},preparedMeasure=${preparedMeasure},varHeight=${varHeight}): order → ${order}`, { "event.action": "cursorCoords", "logrite.start": start, "logrite.mode": mode });
     if (!order) return get(ch);
     var partPos = getBidiPartAt(order, ch);
+	logger.error(`cursorCoords(cm=${cm},pos=${pos},context=${context},lineObj=${lineObj},preparedMeasure=${preparedMeasure},varHeight=${varHeight}): partPos → ${partPos}`, { "event.action": "cursorCoords", "logrite.start": start, "logrite.mode": mode });
     var val = getBidi(ch, partPos);
+	logger.error(`cursorCoords(cm=${cm},pos=${pos},context=${context},lineObj=${lineObj},preparedMeasure=${preparedMeasure},varHeight=${varHeight}): val → ${val}`, { "event.action": "cursorCoords", "logrite.start": start, "logrite.mode": mode });
     if (bidiOther != null) val.other = getBidi(ch, bidiOther);
     return val;
   }
@@ -2820,10 +3352,14 @@
   // Used to cheaply estimate the coordinates for a position. Used for
   // intermediate scroll updates.
   function estimateCoords(cm, pos) {
+	logger.error(`>>> Entering estimateCoords(cm=${cm},pos=${pos})`, { "event.action": "estimateCoords", "logrite.cm": cm, "logrite.pos": pos });
     var left = 0, pos = clipPos(cm.doc, pos);
     if (!cm.options.lineWrapping) left = charWidth(cm.display) * pos.ch;
+	logger.error(`estimateCoords(cm=${cm},pos=${pos}): left → ${left}`, { "event.action": "estimateCoords", "logrite.cm": cm, "logrite.pos": pos });
     var lineObj = getLine(cm.doc, pos.line);
+	logger.error(`estimateCoords(cm=${cm},pos=${pos}): lineObj → ${lineObj}`, { "event.action": "estimateCoords", "logrite.cm": cm, "logrite.pos": pos });
     var top = heightAtLine(lineObj) + paddingTop(cm.display);
+	logger.error(`estimateCoords(cm=${cm},pos=${pos}): top → ${top}`, { "event.action": "estimateCoords", "logrite.cm": cm, "logrite.pos": pos });
     return {left: left, right: left, top: top, bottom: top + lineObj.height};
   }
 
@@ -2834,28 +3370,38 @@
   // is true, that means the coordinates lie outside the line's
   // vertical range.
   function PosWithInfo(line, ch, outside, xRel) {
+	logger.error(`>>> Entering PosWithInfo(line=${line},ch=${ch},outside=${outside},xRel=${xRel})`, { "event.action": "PosWithInfo", "logrite.line": line, "logrite.ch": ch, "logrite.outside": outside, "logrite.xRel": xRel });
     var pos = Pos(line, ch);
     pos.xRel = xRel;
+	logger.error(`PosWithInfo(line=${line},ch=${ch},outside=${outside},xRel=${xRel}): pos → ${pos}`, { "event.action": "PosWithInfo", "logrite.line": line, "logrite.ch": ch, "logrite.outside": outside, "logrite.xRel": xRel });
+	logger.debug(`PosWithInfo(line=${line},ch=${ch},outside=${outside},xRel=${xRel}): pos.xRel → ${pos.xRel}`, { "event.action": "PosWithInfo", "logrite.line": line, "logrite.ch": ch, "logrite.outside": outside, "logrite.xRel": xRel });
     if (outside) pos.outside = true;
+	logger.warn(`<<< Exiting PosWithInfo(line=${line},ch=${ch},outside=${outside},xRel=${xRel})`, { "event.action": "PosWithInfo", "logrite.line": line, "logrite.ch": ch, "logrite.outside": outside, "logrite.xRel": xRel });
     return pos;
   }
 
   // Compute the character position closest to the given coordinates.
   // Input must be lineSpace-local ("div" coordinate system).
   function coordsChar(cm, x, y) {
+	logger.error(`>>> Entering coordsChar(cm=${cm},x=${x},y=${y})`, { "event.action": "coordsChar", "logrite.coords": coords, "logrite.mode": mode });
     var doc = cm.doc;
     y += cm.display.viewOffset;
     if (y < 0) return PosWithInfo(doc.first, 0, true, -1);
     var lineN = lineAtHeight(doc, y), last = doc.first + doc.size - 1;
+	logger.error(`coordsChar(cm=${cm},x=${x},y=${y}): lineN → ${lineN}`, { "event.action": "coordsChar", "logrite.coords": coords, "logrite.mode": mode });
     if (lineN > last)
       return PosWithInfo(doc.first + doc.size - 1, getLine(doc, last).text.length, true, 1);
     if (x < 0) x = 0;
 
     var lineObj = getLine(doc, lineN);
+	logger.error(`coordsChar(cm=${cm},x=${x},y=${y}): lineObj → ${lineObj}`, { "event.action": "coordsChar", "logrite.coords": coords, "logrite.mode": mode });
     for (;;) {
       var found = coordsCharInner(cm, lineObj, lineN, x, y);
+	logger.error(`coordsChar(cm=${cm},x=${x},y=${y}): found → ${found}`, { "event.action": "coordsChar", "logrite.coords": coords, "logrite.mode": mode });
       var merged = collapsedSpanAtEnd(lineObj);
+	logger.error(`coordsChar(cm=${cm},x=${x},y=${y}): merged → ${merged}`, { "event.action": "coordsChar", "logrite.coords": coords, "logrite.mode": mode });
       var mergedPos = merged && merged.find(0, true);
+	logger.error(`coordsChar(cm=${cm},x=${x},y=${y}): mergedPos → ${mergedPos}`, { "event.action": "coordsChar", "logrite.coords": coords, "logrite.mode": mode });
       if (merged && (found.ch > mergedPos.from.ch || found.ch == mergedPos.from.ch && found.xRel > 0))
         lineN = lineNo(lineObj = mergedPos.to.line);
       else
@@ -2864,16 +3410,22 @@
   }
 
   function coordsCharInner(cm, lineObj, lineNo, x, y) {
+	logger.error(`>>> Entering coordsCharInner(cm=${cm},lineObj=${lineObj},lineNo=${lineNo},x=${x},y=${y})`, { "event.action": "coordsCharInner", "logrite.cm": cm, "logrite.lineObj": lineObj, "logrite.lineNo": lineNo, "logrite.x": x, "logrite.y": y });
     var innerOff = y - heightAtLine(lineObj);
     var wrongLine = false, adjust = 2 * cm.display.wrapper.clientWidth;
+	logger.error(`coordsCharInner(cm=${cm},lineObj=${lineObj},lineNo=${lineNo},x=${x},y=${y}): innerOff → ${innerOff}`, { "event.action": "coordsCharInner", "logrite.cm": cm, "logrite.lineObj": lineObj, "logrite.lineNo": lineNo, "logrite.x": x, "logrite.y": y });
     var preparedMeasure = prepareMeasureForLine(cm, lineObj);
+	logger.error(`coordsCharInner(cm=${cm},lineObj=${lineObj},lineNo=${lineNo},x=${x},y=${y}): preparedMeasure → ${preparedMeasure}`, { "event.action": "coordsCharInner", "logrite.cm": cm, "logrite.lineObj": lineObj, "logrite.lineNo": lineNo, "logrite.x": x, "logrite.y": y });
 
     function getX(ch) {
+	logger.error(`>>> Entering getX(ch=${ch})`, { "event.action": "getX", "logrite.ch": ch });
       var sp = cursorCoords(cm, Pos(lineNo, ch), "line", lineObj, preparedMeasure);
       wrongLine = true;
+	logger.error(`getX(ch=${ch}): sp → ${sp}`, { "event.action": "getX", "logrite.ch": ch });
       if (innerOff > sp.bottom) return sp.left - adjust;
       else if (innerOff < sp.top) return sp.left + adjust;
       else wrongLine = false;
+	logger.warn(`<<< Exiting getX(ch=${ch})`, { "event.action": "getX", "logrite.ch": ch });
       return sp.left;
     }
 
@@ -2901,11 +3453,13 @@
       if (middleX > x) {to = middle; toX = middleX; if (toOutside = wrongLine) toX += 1000; dist = step;}
       else {from = middle; fromX = middleX; fromOutside = wrongLine; dist -= step;}
     }
+	logger.warn(`<<< Exiting coordsCharInner(cm=${cm},lineObj=${lineObj},lineNo=${lineNo},x=${x},y=${y})`, { "event.action": "coordsCharInner", "logrite.cm": cm, "logrite.lineObj": lineObj, "logrite.lineNo": lineNo, "logrite.x": x, "logrite.y": y });
   }
 
   var measureText;
   // Compute the default text height.
   function textHeight(display) {
+	logger.error(`>>> Entering textHeight(display=${display})`, { "event.action": "textHeight", "logrite.display": display });
     if (display.cachedTextHeight != null) return display.cachedTextHeight;
     if (measureText == null) {
       measureText = elt("pre");
@@ -2921,16 +3475,21 @@
     var height = measureText.offsetHeight / 50;
     if (height > 3) display.cachedTextHeight = height;
     removeChildren(display.measure);
+	logger.warn(`<<< Exiting textHeight(display=${display})`, { "event.action": "textHeight", "logrite.display": display });
     return height || 1;
   }
 
   // Compute the default character width.
   function charWidth(display) {
+	logger.error(`>>> Entering charWidth(display=${display})`, { "event.action": "charWidth", "logrite.display": display });
     if (display.cachedCharWidth != null) return display.cachedCharWidth;
     var anchor = elt("span", "xxxxxxxxxx");
+	logger.error(`charWidth(display=${display}): anchor → ${anchor}`, { "event.action": "charWidth", "logrite.display": display });
     var pre = elt("pre", [anchor]);
+	logger.error(`charWidth(display=${display}): pre → ${pre}`, { "event.action": "charWidth", "logrite.display": display });
     removeChildrenAndAdd(display.measure, pre);
     var rect = anchor.getBoundingClientRect(), width = (rect.right - rect.left) / 10;
+	logger.error(`charWidth(display=${display}): rect → ${rect}`, { "event.action": "charWidth", "logrite.display": display });
     if (width > 2) display.cachedCharWidth = width;
     return width || 10;
   }
@@ -2948,6 +3507,7 @@
   var nextOpId = 0;
   // Start a new operation.
   function startOperation(cm) {
+	logger.error(`>>> Entering startOperation(cm=${cm})`, { "event.action": "startOperation", "logrite.cm": cm });
     cm.curOp = {
       cm: cm,
       viewChanged: false,      // Flag that indicates that lines might need to be redrawn
@@ -2966,8 +3526,10 @@
       id: ++nextOpId           // Unique ID
     };
     if (operationGroup) {
+	logger.debug(`startOperation(cm=${cm}): cm.curOp → ${cm.curOp}`, { "event.action": "startOperation", "logrite.cm": cm });
       operationGroup.ops.push(cm.curOp);
     } else {
+	logger.warn(`<<< Exiting startOperation(cm=${cm})`, { "event.action": "startOperation", "logrite.cm": cm });
       cm.curOp.ownsGroup = operationGroup = {
         ops: [cm.curOp],
         delayedCallbacks: []
@@ -2976,6 +3538,7 @@
   }
 
   function fireCallbacksForOps(group) {
+	logger.error(`>>> Entering fireCallbacksForOps(group=${group})`, { "event.action": "fireCallbacksForOps", "logrite.group": group });
     // Calls delayed callbacks and cursorActivity handlers until no
     // new ones appear
     var callbacks = group.delayedCallbacks, i = 0;
@@ -2989,10 +3552,12 @@
             op.cursorActivityHandlers[op.cursorActivityCalled++].call(null, op.cm);
       }
     } while (i < callbacks.length);
+	logger.warn(`<<< Exiting fireCallbacksForOps(group=${group})`, { "event.action": "fireCallbacksForOps", "logrite.group": group });
   }
 
   // Finish an operation, updating the display and signalling delayed events
   function endOperation(cm) {
+	logger.error(`>>> Entering endOperation(cm=${cm})`, { "event.action": "endOperation", "logrite.cm": cm });
     var op = cm.curOp, group = op.ownsGroup;
     if (!group) return;
 
@@ -3002,12 +3567,14 @@
       for (var i = 0; i < group.ops.length; i++)
         group.ops[i].cm.curOp = null;
       endOperations(group);
+	logger.warn(`<<< Exiting endOperation(cm=${cm})`, { "event.action": "endOperation", "logrite.cm": cm });
     }
   }
 
   // The DOM updates done when an operation finishes are batched so
   // that the minimum number of relayouts are required.
   function endOperations(group) {
+	logger.error(`>>> Entering endOperations(group=${group})`, { "event.action": "endOperations", "logrite.group": group });
     var ops = group.ops;
     for (var i = 0; i < ops.length; i++) // Read DOM
       endOperation_R1(ops[i]);
@@ -3019,9 +3586,11 @@
       endOperation_W2(ops[i]);
     for (var i = 0; i < ops.length; i++) // Read DOM
       endOperation_finish(ops[i]);
+	logger.warn(`<<< Exiting endOperations(group=${group})`, { "event.action": "endOperations", "logrite.group": group });
   }
 
   function endOperation_R1(op) {
+	logger.error(`>>> Entering endOperation_R1(op=${op})`, { "event.action": "endOperation_R1", "logrite.op": op });
     var cm = op.cm, display = cm.display;
     maybeClipScrollbars(cm);
     if (op.updateMaxLine) findMaxLine(cm);
@@ -3032,13 +3601,17 @@
       display.maxLineChanged && cm.options.lineWrapping;
     op.update = op.mustUpdate &&
       new DisplayUpdate(cm, op.mustUpdate && {top: op.scrollTop, ensure: op.scrollToPos}, op.forceUpdate);
+	logger.warn(`<<< Exiting endOperation_R1(op=${op})`, { "event.action": "endOperation_R1", "logrite.op": op });
   }
 
   function endOperation_W1(op) {
+	logger.error(`>>> Entering endOperation_W1(op=${op})`, { "event.action": "endOperation_W1", "logrite.op": op });
     op.updatedDisplay = op.mustUpdate && updateDisplayIfNeeded(op.cm, op.update);
+	logger.warn(`<<< Exiting endOperation_W1(op=${op})`, { "event.action": "endOperation_W1", "logrite.op": op });
   }
 
   function endOperation_R2(op) {
+	logger.error(`>>> Entering endOperation_R2(op=${op})`, { "event.action": "endOperation_R2", "logrite.op": op });
     var cm = op.cm, display = cm.display;
     if (op.updatedDisplay) updateHeightsInViewport(cm);
 
@@ -3060,6 +3633,7 @@
   }
 
   function endOperation_W2(op) {
+	logger.error(`>>> Entering endOperation_W2(op=${op})`, { "event.action": "endOperation_W2", "logrite.op": op });
     var cm = op.cm;
 
     if (op.adjustWidthTo != null) {
@@ -3081,9 +3655,11 @@
     if (cm.state.focused && op.updateInput)
       cm.display.input.reset(op.typing);
     if (op.focus && op.focus == activeElt()) ensureFocus(op.cm);
+	logger.warn(`<<< Exiting endOperation_W2(op=${op})`, { "event.action": "endOperation_W2", "logrite.op": op });
   }
 
   function endOperation_finish(op) {
+	logger.error(`>>> Entering endOperation_finish(op=${op})`, { "event.action": "endOperation_finish", "logrite.op": op });
     var cm = op.cm, display = cm.display, doc = cm.doc;
 
     if (op.updatedDisplay) postUpdateDisplay(cm, op.update);
@@ -3135,9 +3711,12 @@
     startOperation(cm);
     try { return f(); }
     finally { endOperation(cm); }
+	logger.warn(`<<< Exiting runInOp(cm=${cm},f=${f})`, { "event.action": "runInOp", "logrite.cm": cm, "logrite.f": f });
   }
   // Wraps a function in an operation. Returns the wrapped function.
   function operation(cm, f) {
+	logger.error(`>>> Entering operation(cm=${cm},f=${f})`, { "event.action": "operation", "logrite.f": f });
+	logger.warn(`<<< Exiting operation(cm=${cm},f=${f})`, { "event.action": "operation", "logrite.f": f });
     return function() {
       if (cm.curOp) return f.apply(cm, arguments);
       startOperation(cm);
@@ -3148,14 +3727,17 @@
   // Used to add methods to editor and doc instances, wrapping them in
   // operations.
   function methodOp(f) {
+	logger.error(`>>> Entering methodOp(f=${f})`, { "event.action": "methodOp", "logrite.f": f });
     return function() {
       if (this.curOp) return f.apply(this, arguments);
       startOperation(this);
       try { return f.apply(this, arguments); }
       finally { endOperation(this); }
     };
+	logger.warn(`<<< Exiting methodOp(f=${f})`, { "event.action": "methodOp", "logrite.f": f });
   }
   function docMethodOp(f) {
+	logger.error(`>>> Entering docMethodOp(f=${f})`, { "event.action": "docMethodOp", "logrite.f": f });
     return function() {
       var cm = this.cm;
       if (!cm || cm.curOp) return f.apply(this, arguments);
@@ -3163,6 +3745,7 @@
       try { return f.apply(this, arguments); }
       finally { endOperation(cm); }
     };
+	logger.warn(`<<< Exiting docMethodOp(f=${f})`, { "event.action": "docMethodOp", "logrite.f": f });
   }
 
   // VIEW TRACKING
@@ -3171,24 +3754,31 @@
   // part of the document. A LineView may correspond to multiple
   // logical lines, if those are connected by collapsed ranges.
   function LineView(doc, line, lineN) {
+	logger.error(`>>> Entering LineView(doc=${doc},line=${line},lineN=${lineN})`, { "event.action": "LineView", "logrite.doc": doc, "logrite.line": line, "logrite.lineN": lineN });
     // The starting line
     this.line = line;
     // Continuing lines, if any
     this.rest = visualLineContinued(line);
+	logger.debug(`LineView(doc=${doc},line=${line},lineN=${lineN}): this.line → ${this.line}`, { "event.action": "LineView", "logrite.doc": doc, "logrite.line": line, "logrite.lineN": lineN });
     // Number of logical lines in this visual line
     this.size = this.rest ? lineNo(lst(this.rest)) - lineN + 1 : 1;
+	logger.debug(`LineView(doc=${doc},line=${line},lineN=${lineN}): line → ${line}`, { "event.action": "LineView", "logrite.doc": doc, "logrite.line": line, "logrite.lineN": lineN });
     this.node = this.text = null;
     this.hidden = lineIsHidden(doc, line);
+	logger.debug(`LineView(doc=${doc},line=${line},lineN=${lineN}): this.node → ${this.node}`, { "event.action": "LineView", "logrite.doc": doc, "logrite.line": line, "logrite.lineN": lineN });
   }
 
   // Create a range of LineView objects for the given lines.
   function buildViewArray(cm, from, to) {
+	logger.error(`>>> Entering buildViewArray(cm=${cm},from=${from},to=${to})`, { "event.action": "buildViewArray", "logrite.cm": cm, "logrite.from": from, "logrite.to": to });
     var array = [], nextPos;
     for (var pos = from; pos < to; pos = nextPos) {
       var view = new LineView(cm.doc, getLine(cm.doc, pos), pos);
+	logger.error(`buildViewArray(cm=${cm},from=${from},to=${to}): view → ${view}`, { "event.action": "buildViewArray", "logrite.cm": cm, "logrite.from": from, "logrite.to": to });
       nextPos = pos + view.size;
       array.push(view);
     }
+	logger.warn(`<<< Exiting buildViewArray(cm=${cm},from=${from},to=${to})`, { "event.action": "buildViewArray", "logrite.cm": cm, "logrite.from": from, "logrite.to": to });
     return array;
   }
 
@@ -3199,6 +3789,7 @@
   // lines are divided into visual lines. regLineChange (below)
   // registers single-line changes.
   function regChange(cm, from, to, lendiff) {
+	logger.error(`>>> Entering regChange(cm=${cm},from=${from},to=${to},lendiff=${lendiff})`, { "event.action": "regChange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.lendiff": lendiff });
     if (from == null) from = cm.doc.first;
     if (to == null) to = cm.doc.first + cm.doc.size;
     if (!lendiff) lendiff = 0;
@@ -3207,6 +3798,10 @@
     if (lendiff && to < display.viewTo &&
         (display.updateLineNumbers == null || display.updateLineNumbers > from))
       display.updateLineNumbers = from;
+		logger.debug(`regChange(cm=${cm},from=${from},to=${to},lendiff=${lendiff}): display.updateLineNumbers → ${display.updateLineNumbers}`, { "event.action": "regChange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.lendiff": lendiff });
+		logger.debug(`regChange(cm=${cm},from=${from},to=${to},lendiff=${lendiff}): display.viewFrom → ${display.viewFrom}`, { "event.action": "regChange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.lendiff": lendiff });
+		logger.debug(`regChange(cm=${cm},from=${from},to=${to},lendiff=${lendiff}): display.viewTo → ${display.viewTo}`, { "event.action": "regChange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.lendiff": lendiff });
+		logger.debug(`regChange(cm=${cm},from=${from},to=${to},lendiff=${lendiff}): display.externalMeasured → ${display.externalMeasured}`, { "event.action": "regChange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.lendiff": lendiff });
 
     cm.curOp.viewChanged = true;
 
@@ -3233,6 +3828,7 @@
       }
     } else if (to >= display.viewTo) { // Bottom overlap
       var cut = viewCuttingPoint(cm, from, from, -1);
+	logger.error(`regChange(cm=${cm},from=${from},to=${to},lendiff=${lendiff}): cut → ${cut}`, { "event.action": "regChange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.lendiff": lendiff });
       if (cut) {
         display.view = display.view.slice(0, cut.index);
         display.viewTo = cut.lineN;
@@ -3241,7 +3837,9 @@
       }
     } else { // Gap in the middle
       var cutTop = viewCuttingPoint(cm, from, from, -1);
+	logger.error(`regChange(cm=${cm},from=${from},to=${to},lendiff=${lendiff}): cutTop → ${cutTop}`, { "event.action": "regChange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.lendiff": lendiff });
       var cutBot = viewCuttingPoint(cm, to, to + lendiff, 1);
+	logger.error(`regChange(cm=${cm},from=${from},to=${to},lendiff=${lendiff}): cutBot → ${cutBot}`, { "event.action": "regChange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.lendiff": lendiff });
       if (cutTop && cutBot) {
         display.view = display.view.slice(0, cutTop.index)
           .concat(buildViewArray(cm, cutTop.lineN, cutBot.lineN))
@@ -3250,6 +3848,8 @@
       } else {
         resetView(cm);
       }
+	logger.error(`>>> Entering resetView(cm=${cm})`, { "event.action": "resetView", "logrite.cm": cm });
+	logger.warn(`<<< Exiting resetView(cm=${cm})`, { "event.action": "resetView", "logrite.cm": cm });
     }
 
     var ext = display.externalMeasured;
@@ -3264,16 +3864,20 @@
   // Register a change to a single line. Type must be one of "text",
   // "gutter", "class", "widget"
   function regLineChange(cm, line, type) {
+	logger.error(`>>> Entering regLineChange(cm=${cm},line=${line},type=${type})`, { "event.action": "regLineChange", "logrite.cm": cm, "logrite.line": line, "logrite.type": type });
     cm.curOp.viewChanged = true;
     var display = cm.display, ext = cm.display.externalMeasured;
+	logger.debug(`regLineChange(cm=${cm},line=${line},type=${type}): display.externalMeasured → ${display.externalMeasured}`, { "event.action": "regLineChange", "logrite.cm": cm, "logrite.line": line, "logrite.type": type });
     if (ext && line >= ext.lineN && line < ext.lineN + ext.size)
       display.externalMeasured = null;
 
     if (line < display.viewFrom || line >= display.viewTo) return;
     var lineView = display.view[findViewIndex(cm, line)];
+	logger.error(`regLineChange(cm=${cm},line=${line},type=${type}): lineView → ${lineView}`, { "event.action": "regLineChange", "logrite.cm": cm, "logrite.line": line, "logrite.type": type });
     if (lineView.node == null) return;
     var arr = lineView.changes || (lineView.changes = []);
     if (indexOf(arr, type) == -1) arr.push(type);
+	logger.error(`regLineChange(cm=${cm},line=${line},type=${type}): arr → ${arr}`, { "event.action": "regLineChange", "logrite.cm": cm, "logrite.line": line, "logrite.type": type });
   }
 
   // Clear the view.
@@ -3286,6 +3890,7 @@
   // Find the view element corresponding to a given line. Return null
   // when the line isn't visible.
   function findViewIndex(cm, n) {
+	logger.error(`>>> Entering findViewIndex(cm=${cm},n=${n})`, { "event.action": "findViewIndex", "logrite.cm": cm, "logrite.n": n });
     if (n >= cm.display.viewTo) return null;
     n -= cm.display.viewFrom;
     if (n < 0) return null;
@@ -3293,10 +3898,12 @@
     for (var i = 0; i < view.length; i++) {
       n -= view[i].size;
       if (n < 0) return i;
+	logger.warn(`<<< Exiting findViewIndex(cm=${cm},n=${n})`, { "event.action": "findViewIndex", "logrite.cm": cm, "logrite.n": n });
     }
   }
 
   function viewCuttingPoint(cm, oldN, newN, dir) {
+	logger.error(`>>> Entering viewCuttingPoint(cm=${cm},oldN=${oldN},newN=${newN},dir=${dir})`, { "event.action": "viewCuttingPoint", "logrite.cm": cm, "logrite.oldN": oldN, "logrite.newN": newN, "logrite.dir": dir });
     var index = findViewIndex(cm, oldN), diff, view = cm.display.view;
     if (!sawCollapsedSpans || newN == cm.doc.first + cm.doc.size)
       return {index: index, lineN: newN};
@@ -3317,14 +3924,17 @@
       newN += dir * view[index - (dir < 0 ? 1 : 0)].size;
       index += dir;
     }
+	logger.warn(`<<< Exiting viewCuttingPoint(cm=${cm},oldN=${oldN},newN=${newN},dir=${dir})`, { "event.action": "viewCuttingPoint", "logrite.cm": cm, "logrite.oldN": oldN, "logrite.newN": newN, "logrite.dir": dir });
     return {index: index, lineN: newN};
   }
 
   // Force the view to cover a given range, adding empty view element
   // or clipping off existing ones as needed.
   function adjustView(cm, from, to) {
+	logger.error(`>>> Entering adjustView(cm=${cm},from=${from},to=${to})`, { "event.action": "adjustView", "logrite.cm": cm, "logrite.from": from, "logrite.to": to });
     var display = cm.display, view = display.view;
     if (view.length == 0 || from >= display.viewTo || to <= display.viewFrom) {
+	logger.debug(`adjustView(cm=${cm},from=${from},to=${to}): display.viewFrom → ${display.viewFrom}`, { "event.action": "adjustView", "logrite.cm": cm, "logrite.from": from, "logrite.to": to });
       display.view = buildViewArray(cm, from, to);
       display.viewFrom = from;
     } else {
@@ -3339,6 +3949,7 @@
         display.view = display.view.slice(0, findViewIndex(cm, to));
     }
     display.viewTo = to;
+	logger.debug(`adjustView(cm=${cm},from=${from},to=${to}): display.viewTo → ${display.viewTo}`, { "event.action": "adjustView", "logrite.cm": cm, "logrite.from": from, "logrite.to": to });
   }
 
   // Count the number of lines in the view whose DOM representation is
@@ -3356,6 +3967,7 @@
 
   // Attach the necessary event handlers when initializing the editor
   function registerEventHandlers(cm) {
+	logger.error(`>>> Entering registerEventHandlers(cm=${cm})`, { "event.action": "registerEventHandlers", "logrite.cm": cm });
     var d = cm.display;
     on(d.scroller, "mousedown", operation(cm, onMouseDown));
     // Older IE's will not fire a second mousedown for a double click
@@ -3383,15 +3995,20 @@
         prevTouch = d.activeTouch;
         prevTouch.end = +new Date;
       }
+	logger.warn('<<< Exiting finishTouch()', { "event.action": "finishTouch" });
     };
     function isMouseLikeTouchEvent(e) {
+	logger.error(`>>> Entering isMouseLikeTouchEvent(e=${e})`, { "event.action": "isMouseLikeTouchEvent", "logrite.e": e });
       if (e.touches.length != 1) return false;
       var touch = e.touches[0];
+	logger.warn(`<<< Exiting isMouseLikeTouchEvent(e=${e})`, { "event.action": "isMouseLikeTouchEvent", "logrite.e": e });
       return touch.radiusX <= 1 && touch.radiusY <= 1;
     }
     function farAway(touch, other) {
+	logger.error(`>>> Entering farAway(touch=${touch},other=${other})`, { "event.action": "farAway", "logrite.touch": touch, "logrite.other": other });
       if (other.left == null) return true;
       var dx = other.left - touch.left, dy = other.top - touch.top;
+	logger.warn(`<<< Exiting farAway(touch=${touch},other=${other})`, { "event.action": "farAway", "logrite.touch": touch, "logrite.other": other });
       return dx * dx + dy * dy > 20 * 20;
     }
     on(d.scroller, "touchstart", function(e) {
@@ -3446,11 +4063,27 @@
     on(d.wrapper, "scroll", function() { d.wrapper.scrollTop = d.wrapper.scrollLeft = 0; });
 
     d.dragFunctions = {
-      enter: function(e) {if (!signalDOMEvent(cm, e)) e_stop(e);},
-      over: function(e) {if (!signalDOMEvent(cm, e)) { onDragOver(cm, e); e_stop(e); }},
-      start: function(e){onDragStart(cm, e);},
+      enter: function(e) {
+          logger.error(`>>> Entering enter(e=${e})`, { "event.action": "enter", "logrite.e": e });
+          logger.warn(`<<< Exiting enter(e=${e})`, { "event.action": "enter", "logrite.e": e });
+          if (!signalDOMEvent(cm, e)) e_stop(e);
+      },
+      over: function(e) {
+          logger.error(`>>> Entering over(e=${e})`, { "event.action": "over", "logrite.e": e });
+          if (!signalDOMEvent(cm, e)) { onDragOver(cm, e); e_stop(e); }
+          logger.warn(`<<< Exiting over(e=${e})`, { "event.action": "over", "logrite.e": e });
+      },
+      start: function(e){
+          logger.error(`>>> Entering start(e=${e})`, { "event.action": "start", "logrite.e": e });
+          logger.warn(`<<< Exiting start(e=${e})`, { "event.action": "start", "logrite.e": e });
+          onDragStart(cm, e);
+      },
       drop: operation(cm, onDrop),
-      leave: function() {clearDragCursor(cm);}
+      leave: function() {
+          logger.error('>>> Entering leave()', { "event.action": "leave" });
+          logger.warn('<<< Exiting leave()', { "event.action": "leave" });
+          clearDragCursor(cm);
+      }
     };
 
     var inp = d.input.getField();
@@ -3462,6 +4095,7 @@
   }
 
   function dragDropChanged(cm, value, old) {
+	logger.error(`>>> Entering dragDropChanged(cm=${cm},value=${value},old=${old})`, { "event.action": "dragDropChanged", "logrite.cm": cm, "logrite.value": value, "logrite.old": old });
     var wasOn = old && old != CodeMirror.Init;
     if (!value != !wasOn) {
       var funcs = cm.display.dragFunctions;
@@ -3471,24 +4105,29 @@
       toggle(cm.display.scroller, "dragover", funcs.over);
       toggle(cm.display.scroller, "dragleave", funcs.leave);
       toggle(cm.display.scroller, "drop", funcs.drop);
+	logger.warn(`<<< Exiting dragDropChanged(cm=${cm},value=${value},old=${old})`, { "event.action": "dragDropChanged", "logrite.cm": cm, "logrite.value": value, "logrite.old": old });
     }
   }
 
   // Called when the window resizes
   function onResize(cm) {
+	logger.error(`>>> Entering onResize(cm=${cm})`, { "event.action": "onResize", "logrite.cm": cm });
     var d = cm.display;
     if (d.lastWrapHeight == d.wrapper.clientHeight && d.lastWrapWidth == d.wrapper.clientWidth)
       return;
     // Might be a text scaling operation, clear size caches.
     d.cachedCharWidth = d.cachedTextHeight = d.cachedPaddingH = null;
     d.scrollbarsClipped = false;
+	logger.debug(`onResize(cm=${cm}): d.scrollbarsClipped → ${d.scrollbarsClipped}`, { "event.action": "onResize", "logrite.cm": cm });
     cm.setSize();
+	logger.warn(`<<< Exiting onResize(cm=${cm})`, { "event.action": "onResize", "logrite.cm": cm });
   }
 
   // MOUSE EVENTS
 
   // Return true when the given mouse event happened in a widget
   function eventInWidget(display, e) {
+	logger.error(`>>> Entering eventInWidget(display=${display},e=${e})`, { "event.action": "eventInWidget", "logrite.display": display, "logrite.e": e });
     for (var n = e_target(e); n != display.wrapper; n = n.parentNode) {
       if (!n || (n.nodeType == 1 && n.getAttribute("cm-ignore-events") == "true") ||
           (n.parentNode == display.sizer && n != display.mover))
@@ -3502,6 +4141,7 @@
   // selections, and tries to estimate a character position even for
   // coordinates beyond the right of the text.
   function posFromMouse(cm, e, liberal, forRect) {
+	logger.error(`>>> Entering posFromMouse(cm=${cm},e=${e},liberal=${liberal},forRect=${forRect})`, { "event.action": "posFromMouse", "logrite.cm": cm, "logrite.e": e, "logrite.liberal": liberal, "logrite.forRect": forRect });
     var display = cm.display;
     if (!liberal && e_target(e).getAttribute("cm-not-content") == "true") return null;
 
@@ -3509,11 +4149,14 @@
     // Fails unpredictably on IE[67] when mouse is dragged around quickly.
     try { x = e.clientX - space.left; y = e.clientY - space.top; }
     catch (e) { return null; }
+	logger.error(`Exception in posFromMouse(cm=${cm},e=${e},liberal=${liberal},forRect=${forRect}): ${e.message}`, e, { "event.action": "posFromMouse", "event.category": "process", "logrite.cm": cm, "logrite.e": e, "logrite.liberal": liberal, "logrite.forRect": forRect });
     var coords = coordsChar(cm, x, y), line;
     if (forRect && coords.xRel == 1 && (line = getLine(cm.doc, coords.line).text).length == coords.ch) {
       var colDiff = countColumn(line, line.length, cm.options.tabSize) - line.length;
+	logger.error(`posFromMouse(cm=${cm},e=${e},liberal=${liberal},forRect=${forRect}): colDiff → ${colDiff}`, { "event.action": "posFromMouse", "logrite.cm": cm, "logrite.e": e, "logrite.liberal": liberal, "logrite.forRect": forRect });
       coords = Pos(coords.line, Math.max(0, Math.round((x - paddingH(cm.display).left) / charWidth(cm.display)) - colDiff));
     }
+	logger.warn(`<<< Exiting posFromMouse(cm=${cm},e=${e},liberal=${liberal},forRect=${forRect})`, { "event.action": "posFromMouse", "logrite.cm": cm, "logrite.e": e, "logrite.liberal": liberal, "logrite.forRect": forRect });
     return coords;
   }
 
@@ -3523,6 +4166,7 @@
   // middle-click-paste. Or it might be a click on something we should
   // not interfere with, such as a scrollbar or widget.
   function onMouseDown(e) {
+	logger.error(`>>> Entering onMouseDown(e=${e})`, { "event.action": "onMouseDown", "logrite.e": e });
     var cm = this, display = cm.display;
     if (display.activeTouch && display.input.supportsTouch() || signalDOMEvent(cm, e)) return;
     display.shift = e.shiftKey;
@@ -3561,10 +4205,12 @@
       else delayBlurEvent(cm);
       break;
     }
+	logger.warn(`<<< Exiting onMouseDown(e=${e})`, { "event.action": "onMouseDown", "logrite.e": e });
   }
 
   var lastClick, lastDoubleClick;
   function leftButtonDown(cm, e, start) {
+	logger.error(`>>> Entering leftButtonDown(cm=${cm},e=${e},start=${start})`, { "event.action": "leftButtonDown", "logrite.cm": cm, "logrite.e": e, "logrite.start": start });
     if (ie) setTimeout(bind(ensureFocus, cm), 0);
     else cm.curOp.focus = activeElt();
 
@@ -3587,11 +4233,15 @@
       leftButtonStartDrag(cm, e, start, modifier);
     else
       leftButtonSelect(cm, e, start, type, modifier);
+	logger.error(`>>> Entering delayBlurEvent(cm=${cm})`, { "event.action": "delayBlurEvent", "logrite.cm": cm });
+	logger.warn(`<<< Exiting delayBlurEvent(cm=${cm})`, { "event.action": "delayBlurEvent", "logrite.cm": cm });
   }
 
   // Start a text drag. When it ends, see if any dragging actually
   // happen, and treat as a click if it didn't.
   function leftButtonStartDrag(cm, e, start, modifier) {
+	logger.error(`>>> Entering leftButtonStartDrag(cm=${cm},e=${e},start=${start},modifier=${modifier})`, { "event.action": "leftButtonStartDrag", "logrite.cm": cm, "logrite.e": e, "logrite.start": start, "logrite.modifier": modifier });
+	logger.error(`leftButtonStartDrag(cm=${cm},e=${e},start=${start},modifier=${modifier}): dragEnd → ${dragEnd}`, { "event.action": "leftButtonStartDrag", "logrite.cm": cm, "logrite.e": e, "logrite.start": start, "logrite.modifier": modifier });
     var display = cm.display, startTime = +new Date;
     var dragEnd = operation(cm, function(e2) {
       if (webkit) display.scroller.draggable = false;
@@ -3620,6 +4270,7 @@
 
   // Normal selection, as opposed to text dragging.
   function leftButtonSelect(cm, e, start, type, addNew) {
+	logger.error(`>>> Entering leftButtonSelect(cm=${cm},e=${e},start=${start},type=${type},addNew=${addNew})`, { "event.action": "leftButtonSelect", "logrite.cm": cm, "logrite.e": e, "logrite.start": start, "logrite.type": type, "logrite.addNew": addNew });
     var display = cm.display, doc = cm.doc;
     e_preventDefault(e);
 
@@ -3638,16 +4289,19 @@
     if (e.altKey) {
       type = "rect";
       if (!addNew) ourRange = new Range(start, start);
+	logger.error(`leftButtonSelect(cm=${cm},e=${e},start=${start},type=${type},addNew=${addNew}): type → ${type}`, { "event.action": "leftButtonSelect", "logrite.cm": cm, "logrite.e": e, "logrite.start": start, "logrite.type": type, "logrite.addNew": addNew });
       start = posFromMouse(cm, e, true, true);
       ourIndex = -1;
     } else if (type == "double") {
       var word = cm.findWordAt(start);
+	logger.error(`leftButtonSelect(cm=${cm},e=${e},start=${start},type=${type},addNew=${addNew}): word → ${word}`, { "event.action": "leftButtonSelect", "logrite.cm": cm, "logrite.e": e, "logrite.start": start, "logrite.type": type, "logrite.addNew": addNew });
       if (cm.display.shift || doc.extend)
         ourRange = extendRange(doc, ourRange, word.anchor, word.head);
       else
         ourRange = word;
     } else if (type == "triple") {
       var line = new Range(Pos(start.line, 0), clipPos(doc, Pos(start.line + 1, 0)));
+	logger.error(`leftButtonSelect(cm=${cm},e=${e},start=${start},type=${type},addNew=${addNew}): line → ${line}`, { "event.action": "leftButtonSelect", "logrite.cm": cm, "logrite.e": e, "logrite.start": start, "logrite.type": type, "logrite.addNew": addNew });
       if (cm.display.shift || doc.extend)
         ourRange = extendRange(doc, ourRange, line.anchor, line.head);
       else
@@ -3672,31 +4326,39 @@
       replaceOneSelection(doc, ourIndex, ourRange, sel_mouse);
     }
 
+	logger.warn(`<<< Exiting leftButtonSelect(cm=${cm},e=${e},start=${start},type=${type},addNew=${addNew})`, { "event.action": "leftButtonSelect", "logrite.cm": cm, "logrite.e": e, "logrite.start": start, "logrite.type": type, "logrite.addNew": addNew });
     var lastPos = start;
     function extendTo(pos) {
+	logger.error(`>>> Entering extendTo(pos=${pos})`, { "event.action": "extendTo", "logrite.pos": pos });
       if (cmp(lastPos, pos) == 0) return;
       lastPos = pos;
 
       if (type == "rect") {
         var ranges = [], tabSize = cm.options.tabSize;
         var startCol = countColumn(getLine(doc, start.line).text, start.ch, tabSize);
+		logger.error(`extendTo(pos=${pos}): startCol → ${startCol}`, { "event.action": "extendTo", "logrite.pos": pos });
         var posCol = countColumn(getLine(doc, pos.line).text, pos.ch, tabSize);
+		logger.error(`extendTo(pos=${pos}): posCol → ${posCol}`, { "event.action": "extendTo", "logrite.pos": pos });
         var left = Math.min(startCol, posCol), right = Math.max(startCol, posCol);
+		logger.error(`extendTo(pos=${pos}): left → ${left}`, { "event.action": "extendTo", "logrite.pos": pos });
         for (var line = Math.min(start.line, pos.line), end = Math.min(cm.lastLine(), Math.max(start.line, pos.line));
              line <= end; line++) {
           var text = getLine(doc, line).text, leftPos = findColumn(text, left, tabSize);
+		logger.error(`extendTo(pos=${pos}): text → ${text}`, { "event.action": "extendTo", "logrite.pos": pos });
           if (left == right)
             ranges.push(new Range(Pos(line, leftPos), Pos(line, leftPos)));
           else if (text.length > leftPos)
             ranges.push(new Range(Pos(line, leftPos), Pos(line, findColumn(text, right, tabSize))));
         }
         if (!ranges.length) ranges.push(new Range(start, start));
+		logger.error(`extendTo(pos=${pos}): line → ${line}`, { "event.action": "extendTo", "logrite.pos": pos });
         setSelection(doc, normalizeSelection(startSel.ranges.slice(0, ourIndex).concat(ranges), ourIndex),
                      {origin: "*mouse", scroll: false});
         cm.scrollIntoView(pos);
       } else {
         var oldRange = ourRange;
         var anchor = oldRange.anchor, head = pos;
+		logger.error(`extendTo(pos=${pos}): anchor → ${anchor}`, { "event.action": "extendTo", "logrite.pos": pos });
         if (type != "single") {
           if (type == "double")
             var range = cm.findWordAt(pos);
@@ -3711,8 +4373,10 @@
           }
         }
         var ranges = startSel.ranges.slice(0);
+		logger.error(`extendTo(pos=${pos}): ranges → ${ranges}`, { "event.action": "extendTo", "logrite.pos": pos });
         ranges[ourIndex] = new Range(clipPos(doc, anchor), head);
         setSelection(doc, normalizeSelection(ranges, ourIndex), sel_mouse);
+		logger.warn(`<<< Exiting extendTo(pos=${pos})`, { "event.action": "extendTo", "logrite.pos": pos });
       }
     }
 
@@ -3724,13 +4388,17 @@
     var counter = 0;
 
     function extend(e) {
+	logger.error(`>>> Entering extend(e=${e})`, { "event.action": "extend", "logrite.e": e });
       var curCount = ++counter;
       var cur = posFromMouse(cm, e, true, type == "rect");
+	logger.error(`extend(e=${e}): cur → ${cur}`, { "event.action": "extend", "logrite.e": e });
       if (!cur) return;
       if (cmp(cur, lastPos) != 0) {
         cm.curOp.focus = activeElt();
         extendTo(cur);
         var visible = visibleLines(display, doc);
+		logger.warn(`<<< Exiting extend(e=${e})`, { "event.action": "extend", "logrite.e": e });
+		logger.error(`extend(e=${e}): visible → ${visible}`, { "event.action": "extend", "logrite.e": e });
         if (cur.line >= visible.to || cur.line < visible.from)
           setTimeout(operation(cm, function(){if (counter == curCount) extend(e);}), 150);
       } else {
@@ -3744,6 +4412,7 @@
     }
 
     function done(e) {
+	logger.error(`>>> Entering done(e=${e})`, { "event.action": "done", "logrite.e": e });
       cm.state.selectingText = false;
       counter = Infinity;
       e_preventDefault(e);
@@ -3760,19 +4429,23 @@
     var up = operation(cm, done);
     cm.state.selectingText = up;
     on(document, "mousemove", move);
+	logger.warn(`<<< Exiting done(e=${e})`, { "event.action": "done", "logrite.e": e });
     on(document, "mouseup", up);
   }
 
   // Determines whether an event happened in the gutter, and fires the
   // handlers for the corresponding event.
   function gutterEvent(cm, e, type, prevent, signalfn) {
+	logger.error(`>>> Entering gutterEvent(cm=${cm},e=${e},type=${type},prevent=${prevent},signalfn=${signalfn})`, { "event.action": "gutterEvent", "logrite.cm": cm, "logrite.e": e, "logrite.type": type, "logrite.prevent": prevent, "logrite.signalfn": signalfn });
     try { var mX = e.clientX, mY = e.clientY; }
     catch(e) { return false; }
+	logger.error(`Exception in gutterEvent(cm=${cm},e=${e},type=${type},prevent=${prevent},signalfn=${signalfn}): ${e.message}`, e, { "event.action": "gutterEvent", "event.category": "process", "logrite.cm": cm, "logrite.e": e, "logrite.type": type, "logrite.prevent": prevent, "logrite.signalfn": signalfn });
     if (mX >= Math.floor(cm.display.gutters.getBoundingClientRect().right)) return false;
     if (prevent) e_preventDefault(e);
 
     var display = cm.display;
     var lineBox = display.lineDiv.getBoundingClientRect();
+	logger.error(`gutterEvent(cm=${cm},e=${e},type=${type},prevent=${prevent},signalfn=${signalfn}): lineBox → ${lineBox}`, { "event.action": "gutterEvent", "logrite.cm": cm, "logrite.e": e, "logrite.type": type, "logrite.prevent": prevent, "logrite.signalfn": signalfn });
 
     if (mY > lineBox.bottom || !hasHandler(cm, type)) return e_defaultPrevented(e);
     mY -= lineBox.top - display.viewOffset;
@@ -3781,14 +4454,20 @@
       var g = display.gutters.childNodes[i];
       if (g && g.getBoundingClientRect().right >= mX) {
         var line = lineAtHeight(cm.doc, mY);
+		logger.error(`gutterEvent(cm=${cm},e=${e},type=${type},prevent=${prevent},signalfn=${signalfn}): line → ${line}`, { "event.action": "gutterEvent", "logrite.cm": cm, "logrite.e": e, "logrite.type": type, "logrite.prevent": prevent, "logrite.signalfn": signalfn });
         var gutter = cm.options.gutters[i];
         signalfn(cm, type, cm, line, gutter, e);
+		logger.warn(`<<< Exiting gutterEvent(cm=${cm},e=${e},type=${type},prevent=${prevent},signalfn=${signalfn})`, { "event.action": "gutterEvent", "logrite.cm": cm, "logrite.e": e, "logrite.type": type, "logrite.prevent": prevent, "logrite.signalfn": signalfn });
         return e_defaultPrevented(e);
       }
     }
+	logger.error(`>>> Entering up(e=${e})`, { "event.action": "up", "logrite.e": e });
+	logger.warn(`<<< Exiting up(e=${e})`, { "event.action": "up", "logrite.e": e });
   }
 
   function clickInGutter(cm, e) {
+	logger.error(`>>> Entering clickInGutter(cm=${cm},e=${e})`, { "event.action": "clickInGutter", "logrite.cm": cm, "logrite.e": e });
+	logger.warn(`<<< Exiting clickInGutter(cm=${cm},e=${e})`, { "event.action": "clickInGutter", "logrite.cm": cm, "logrite.e": e });
     return gutterEvent(cm, e, "gutterClick", true, signalLater);
   }
 
@@ -3797,6 +4476,7 @@
   var lastDrop = 0;
 
   function onDrop(e) {
+	logger.error(`>>> Entering onDrop(e=${e})`, { "event.action": "onDrop", "logrite.e": e });
     var cm = this;
     clearDragCursor(cm);
     if (signalDOMEvent(cm, e) || eventInWidget(cm.display, e))
@@ -3809,7 +4489,9 @@
     // and insert it.
     if (files && files.length && window.FileReader && window.File) {
       var n = files.length, text = Array(n), read = 0;
+	logger.error(`onDrop(e=${e}): n → ${n}`, { "event.action": "onDrop", "logrite.e": e });
       var loadFile = function(file, i) {
+		logger.error(`>>> Entering loadFile(file=${file},i=${i})`, { "event.action": "loadFile", "logrite.file": file, "logrite.i": i });
         var reader = new FileReader;
         reader.onload = operation(cm, function() {
           text[i] = reader.result;
@@ -3823,6 +4505,7 @@
           }
         });
         reader.readAsText(file);
+		logger.warn(`<<< Exiting loadFile(file=${file},i=${i})`, { "event.action": "loadFile", "logrite.file": file, "logrite.i": i });
       };
       for (var i = 0; i < n; ++i) loadFile(files[i], i);
     } else { // Normal drop
@@ -3847,9 +4530,11 @@
       }
       catch(e){}
     }
+	logger.warn(`<<< Exiting onDrop(e=${e})`, { "event.action": "onDrop", "logrite.e": e });
   }
 
   function onDragStart(cm, e) {
+	logger.error(`>>> Entering onDragStart(cm=${cm},e=${e})`, { "event.action": "onDragStart", "logrite.cm": cm, "logrite.e": e });
     if (ie && (!cm.state.draggingText || +new Date - lastDrop < 100)) { e_stop(e); return; }
     if (signalDOMEvent(cm, e) || eventInWidget(cm.display, e)) return;
 
@@ -3859,6 +4544,9 @@
     // Recent Safari (~6.0.2) have a tendency to segfault when this happens, so we don't do it there.
     if (e.dataTransfer.setDragImage && !safari) {
       var img = elt("img", null, null, "position: fixed; left: 0; top: 0;");
+	logger.error(`onDragStart(cm=${cm},e=${e}): img → ${img}`, { "event.action": "onDragStart", "logrite.cm": cm, "logrite.e": e });
+	logger.debug(`onDragStart(cm=${cm},e=${e}): img.width → ${img.width}`, { "event.action": "onDragStart", "logrite.cm": cm, "logrite.e": e });
+	logger.debug(`onDragStart(cm=${cm},e=${e}): img._top → ${img._top}`, { "event.action": "onDragStart", "logrite.cm": cm, "logrite.e": e });
       img.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
       if (presto) {
         img.width = img.height = 1;
@@ -3868,25 +4556,32 @@
       }
       e.dataTransfer.setDragImage(img, 0, 0);
       if (presto) img.parentNode.removeChild(img);
+	logger.warn(`<<< Exiting onDragStart(cm=${cm},e=${e})`, { "event.action": "onDragStart", "logrite.cm": cm, "logrite.e": e });
     }
   }
 
   function onDragOver(cm, e) {
+	logger.error(`>>> Entering onDragOver(cm=${cm},e=${e})`, { "event.action": "onDragOver", "logrite.cm": cm, "logrite.e": e });
     var pos = posFromMouse(cm, e);
     if (!pos) return;
+	logger.error(`onDragOver(cm=${cm},e=${e}): pos → ${pos}`, { "event.action": "onDragOver", "logrite.cm": cm, "logrite.e": e });
     var frag = document.createDocumentFragment();
+	logger.error(`onDragOver(cm=${cm},e=${e}): frag → ${frag}`, { "event.action": "onDragOver", "logrite.cm": cm, "logrite.e": e });
     drawSelectionCursor(cm, pos, frag);
     if (!cm.display.dragCursor) {
       cm.display.dragCursor = elt("div", null, "CodeMirror-cursors CodeMirror-dragcursors");
       cm.display.lineSpace.insertBefore(cm.display.dragCursor, cm.display.cursorDiv);
     }
     removeChildrenAndAdd(cm.display.dragCursor, frag);
+	logger.warn(`<<< Exiting onDragOver(cm=${cm},e=${e})`, { "event.action": "onDragOver", "logrite.cm": cm, "logrite.e": e });
   }
 
   function clearDragCursor(cm) {
+	logger.error(`>>> Entering clearDragCursor(cm=${cm})`, { "event.action": "clearDragCursor", "logrite.cm": cm });
     if (cm.display.dragCursor) {
       cm.display.lineSpace.removeChild(cm.display.dragCursor);
       cm.display.dragCursor = null;
+	logger.warn(`<<< Exiting clearDragCursor(cm=${cm})`, { "event.action": "clearDragCursor", "logrite.cm": cm });
     }
   }
 
@@ -3895,6 +4590,7 @@
   // Sync the scrollable area and scrollbars, ensure the viewport
   // covers the visible area.
   function setScrollTop(cm, val) {
+	logger.error(`>>> Entering setScrollTop(cm=${cm},val=${val})`, { "event.action": "setScrollTop", "logrite.cm": cm, "logrite.val": val });
     if (Math.abs(cm.doc.scrollTop - val) < 2) return;
     cm.doc.scrollTop = val;
     if (!gecko) updateDisplaySimple(cm, {top: val});
@@ -3902,16 +4598,20 @@
     cm.display.scrollbars.setScrollTop(val);
     if (gecko) updateDisplaySimple(cm);
     startWorker(cm, 100);
+	logger.warn(`<<< Exiting setScrollTop(cm=${cm},val=${val})`, { "event.action": "setScrollTop", "logrite.cm": cm, "logrite.val": val });
   }
   // Sync scroller and scrollbar, ensure the gutter elements are
   // aligned.
   function setScrollLeft(cm, val, isScroller) {
+	logger.error(`>>> Entering setScrollLeft(cm=${cm},val=${val},isScroller=${isScroller})`, { "event.action": "setScrollLeft", "logrite.cm": cm, "logrite.val": val, "logrite.isScroller": isScroller });
     if (isScroller ? val == cm.doc.scrollLeft : Math.abs(cm.doc.scrollLeft - val) < 2) return;
     val = Math.min(val, cm.display.scroller.scrollWidth - cm.display.scroller.clientWidth);
     cm.doc.scrollLeft = val;
+	logger.error(`setScrollLeft(cm=${cm},val=${val},isScroller=${isScroller}): val → ${val}`, { "event.action": "setScrollLeft", "logrite.cm": cm, "logrite.val": val, "logrite.isScroller": isScroller });
     alignHorizontally(cm);
     if (cm.display.scroller.scrollLeft != val) cm.display.scroller.scrollLeft = val;
     cm.display.scrollbars.setScrollLeft(val);
+	logger.warn(`<<< Exiting setScrollLeft(cm=${cm},val=${val},isScroller=${isScroller})`, { "event.action": "setScrollLeft", "logrite.cm": cm, "logrite.val": val, "logrite.isScroller": isScroller });
   }
 
   // Since the delta values reported on mouse wheel events are
@@ -3936,27 +4636,36 @@
   else if (safari) wheelPixelsPerUnit = -1/3;
 
   var wheelEventDelta = function(e) {
+	logger.error(`>>> Entering wheelEventDelta(e=${e})`, { "event.action": "wheelEventDelta", "logrite.e": e });
     var dx = e.wheelDeltaX, dy = e.wheelDeltaY;
     if (dx == null && e.detail && e.axis == e.HORIZONTAL_AXIS) dx = e.detail;
     if (dy == null && e.detail && e.axis == e.VERTICAL_AXIS) dy = e.detail;
     else if (dy == null) dy = e.wheelDelta;
+	logger.warn(`<<< Exiting wheelEventDelta(e=${e})`, { "event.action": "wheelEventDelta", "logrite.e": e });
     return {x: dx, y: dy};
   };
   CodeMirror.wheelEventPixels = function(e) {
+	logger.error(`>>> Entering wheelEventPixels(e=${e})`, { "event.action": "wheelEventPixels", "logrite.e": e });
     var delta = wheelEventDelta(e);
     delta.x *= wheelPixelsPerUnit;
+	logger.error(`wheelEventPixels(e=${e}): delta → ${delta}`, { "event.action": "wheelEventPixels", "logrite.e": e });
     delta.y *= wheelPixelsPerUnit;
+	logger.warn(`<<< Exiting wheelEventPixels(e=${e})`, { "event.action": "wheelEventPixels", "logrite.e": e });
     return delta;
   };
 
   function onScrollWheel(cm, e) {
+	logger.error(`>>> Entering onScrollWheel(cm=${cm},e=${e})`, { "event.action": "onScrollWheel", "logrite.cm": cm, "logrite.e": e });
     var delta = wheelEventDelta(e), dx = delta.x, dy = delta.y;
 
+	logger.error(`onScrollWheel(cm=${cm},e=${e}): delta → ${delta}`, { "event.action": "onScrollWheel", "logrite.cm": cm, "logrite.e": e });
     var display = cm.display, scroll = display.scroller;
+	logger.debug(`onScrollWheel(cm=${cm},e=${e}): display.wheelStartX → ${display.wheelStartX}`, { "event.action": "onScrollWheel", "logrite.cm": cm, "logrite.e": e });
     // Quit if there's nothing to scroll here
     if (!(dx && scroll.scrollWidth > scroll.clientWidth ||
           dy && scroll.scrollHeight > scroll.clientHeight)) return;
 
+	logger.debug(`onScrollWheel(cm=${cm},e=${e}): display.wheelDX → ${display.wheelDX}`, { "event.action": "onScrollWheel", "logrite.cm": cm, "logrite.e": e });
     // Webkit browsers on OS X abort momentum scrolls when the target
     // of the scroll event is removed from the scrollable element.
     // This hack (see related code in patchDisplay) makes sure the
@@ -4016,12 +4725,14 @@
         display.wheelDX += dx; display.wheelDY += dy;
       }
     }
+	logger.warn(`<<< Exiting onScrollWheel(cm=${cm},e=${e})`, { "event.action": "onScrollWheel", "logrite.cm": cm, "logrite.e": e });
   }
 
   // KEY EVENTS
 
   // Run a handler that was bound to a key.
   function doHandleBinding(cm, bound, dropShift) {
+	logger.error(`>>> Entering doHandleBinding(cm=${cm},bound=${bound},dropShift=${dropShift})`, { "event.action": "doHandleBinding", "logrite.cm": cm, "logrite.bound": bound, "logrite.dropShift": dropShift });
     if (typeof bound == "string") {
       bound = commands[bound];
       if (!bound) return false;
@@ -4038,20 +4749,25 @@
       cm.display.shift = prevShift;
       cm.state.suppressEdits = false;
     }
+	logger.warn(`<<< Exiting doHandleBinding(cm=${cm},bound=${bound},dropShift=${dropShift})`, { "event.action": "doHandleBinding", "logrite.cm": cm, "logrite.bound": bound, "logrite.dropShift": dropShift });
     return done;
   }
 
   function lookupKeyForEditor(cm, name, handle) {
+	logger.error(`>>> Entering lookupKeyForEditor(cm=${cm},name=${name},handle=${handle})`, { "event.action": "lookupKeyForEditor", "logrite.cm": cm, "logrite.name": name, "logrite.handle": handle });
     for (var i = 0; i < cm.state.keyMaps.length; i++) {
       var result = lookupKey(name, cm.state.keyMaps[i], handle, cm);
+	logger.error(`lookupKeyForEditor(cm=${cm},name=${name},handle=${handle}): result → ${result}`, { "event.action": "lookupKeyForEditor", "logrite.cm": cm, "logrite.name": name, "logrite.handle": handle });
       if (result) return result;
     }
+	logger.warn(`<<< Exiting lookupKeyForEditor(cm=${cm},name=${name},handle=${handle})`, { "event.action": "lookupKeyForEditor", "logrite.cm": cm, "logrite.name": name, "logrite.handle": handle });
     return (cm.options.extraKeys && lookupKey(name, cm.options.extraKeys, handle, cm))
       || lookupKey(name, cm.options.keyMap, handle, cm);
   }
 
   var stopSeq = new Delayed;
   function dispatchKey(cm, name, e, handle) {
+	logger.error(`>>> Entering dispatchKey(cm=${cm},name=${name},e=${e},handle=${handle})`, { "event.action": "dispatchKey", "logrite.cm": cm, "logrite.name": name, "logrite.e": e, "logrite.handle": handle });
     var seq = cm.state.keySeq;
     if (seq) {
       if (isModifierKey(name)) return "handled";
@@ -4064,6 +4780,8 @@
       name = seq + " " + name;
     }
     var result = lookupKeyForEditor(cm, name, handle);
+	logger.error(`dispatchKey(cm=${cm},name=${name},e=${e},handle=${handle}): name → ${name}`, { "event.action": "dispatchKey", "logrite.cm": cm, "logrite.name": name, "logrite.e": e, "logrite.handle": handle });
+	logger.error(`dispatchKey(cm=${cm},name=${name},e=${e},handle=${handle}): result → ${result}`, { "event.action": "dispatchKey", "logrite.cm": cm, "logrite.name": name, "logrite.e": e, "logrite.handle": handle });
 
     if (result == "multi")
       cm.state.keySeq = name;
@@ -4084,8 +4802,10 @@
 
   // Handle a key from the keydown event.
   function handleKeyBinding(cm, e) {
+	logger.error(`>>> Entering handleKeyBinding(cm=${cm},e=${e})`, { "event.action": "handleKeyBinding", "logrite.cm": cm, "logrite.e": e });
     var name = keyName(e, true);
     if (!name) return false;
+	logger.error(`handleKeyBinding(cm=${cm},e=${e}): name → ${name}`, { "event.action": "handleKeyBinding", "logrite.cm": cm, "logrite.e": e });
 
     if (e.shiftKey && !cm.state.keySeq) {
       // First try to resolve full name (including 'Shift-'). Failing
@@ -4103,6 +4823,8 @@
 
   // Handle a key from the keypress event
   function handleCharBinding(cm, e, ch) {
+	logger.error(`>>> Entering handleCharBinding(cm=${cm},e=${e},ch=${ch})`, { "event.action": "handleCharBinding", "logrite.cm": cm, "logrite.e": e, "logrite.ch": ch });
+	logger.warn(`<<< Exiting handleCharBinding(cm=${cm},e=${e},ch=${ch})`, { "event.action": "handleCharBinding", "logrite.cm": cm, "logrite.e": e, "logrite.ch": ch });
     return dispatchKey(cm, "'" + ch + "'", e,
                        function(b) { return doHandleBinding(cm, b, true); });
   }
@@ -4130,8 +4852,10 @@
   }
 
   function showCrossHair(cm) {
+	logger.error(`>>> Entering showCrossHair(cm=${cm})`, { "event.action": "showCrossHair", "logrite.cm": cm });
     var lineDiv = cm.display.lineDiv;
     addClass(lineDiv, "CodeMirror-crosshair");
+	logger.warn(`<<< Exiting showCrossHair(cm=${cm})`, { "event.action": "showCrossHair", "logrite.cm": cm });
 
     function up(e) {
       if (e.keyCode == 18 || !e.altKey) {
@@ -4209,12 +4933,16 @@
   // textarea (making it as unobtrusive as possible) to let the
   // right-click take effect on it.
   function onContextMenu(cm, e) {
+	logger.error(`>>> Entering onContextMenu(cm=${cm},e=${e})`, { "event.action": "onContextMenu", "logrite.cm": cm, "logrite.e": e });
     if (eventInWidget(cm.display, e) || contextMenuInGutter(cm, e)) return;
     cm.display.input.onContextMenu(e);
+	logger.warn(`<<< Exiting onContextMenu(cm=${cm},e=${e})`, { "event.action": "onContextMenu", "logrite.cm": cm, "logrite.e": e });
   }
 
   function contextMenuInGutter(cm, e) {
+	logger.error(`>>> Entering contextMenuInGutter(cm=${cm},e=${e})`, { "event.action": "contextMenuInGutter", "logrite.cm": cm, "logrite.e": e });
     if (!hasHandler(cm, "gutterContextMenu")) return false;
+	logger.warn(`<<< Exiting contextMenuInGutter(cm=${cm},e=${e})`, { "event.action": "contextMenuInGutter", "logrite.cm": cm, "logrite.e": e });
     return gutterEvent(cm, e, "gutterContextMenu", false, signal);
   }
 
@@ -4223,7 +4951,9 @@
   // Compute the position of the end of a change (its 'to' property
   // refers to the pre-change end).
   var changeEnd = CodeMirror.changeEnd = function(change) {
+	logger.error(`>>> Entering changeEnd(change=${change})`, { "event.action": "changeEnd", "logrite.change": change });
     if (!change.text) return change.to;
+	logger.warn(`<<< Exiting changeEnd(change=${change})`, { "event.action": "changeEnd", "logrite.change": change });
     return Pos(change.from.line + change.text.length - 1,
                lst(change.text).length + (change.text.length == 1 ? change.from.ch : 0));
   };
@@ -4231,25 +4961,30 @@
   // Adjust a position to refer to the post-change position of the
   // same text, or the end of the change if the change covers it.
   function adjustForChange(pos, change) {
+	logger.error(`>>> Entering adjustForChange(pos=${pos},change=${change})`, { "event.action": "adjustForChange", "logrite.pos": pos, "logrite.change": change });
     if (cmp(pos, change.from) < 0) return pos;
     if (cmp(pos, change.to) <= 0) return changeEnd(change);
 
     var line = pos.line + change.text.length - (change.to.line - change.from.line) - 1, ch = pos.ch;
     if (pos.line == change.to.line) ch += changeEnd(change).ch - change.to.ch;
+	logger.error(`adjustForChange(pos=${pos},change=${change}): line → ${line}`, { "event.action": "adjustForChange", "logrite.pos": pos, "logrite.change": change });
     return Pos(line, ch);
   }
 
   function computeSelAfterChange(doc, change) {
+	logger.error(`>>> Entering computeSelAfterChange(doc=${doc},change=${change})`, { "event.action": "computeSelAfterChange", "logrite.doc": doc, "logrite.change": change });
     var out = [];
     for (var i = 0; i < doc.sel.ranges.length; i++) {
       var range = doc.sel.ranges[i];
       out.push(new Range(adjustForChange(range.anchor, change),
                          adjustForChange(range.head, change)));
     }
+	logger.warn(`<<< Exiting computeSelAfterChange(doc=${doc},change=${change})`, { "event.action": "computeSelAfterChange", "logrite.doc": doc, "logrite.change": change });
     return normalizeSelection(out, doc.sel.primIndex);
   }
 
   function offsetPos(pos, old, nw) {
+	logger.error(`>>> Entering offsetPos(pos=${pos},old=${old},nw=${nw})`, { "event.action": "offsetPos", "logrite.pos": pos, "logrite.old": old, "logrite.nw": nw });
     if (pos.line == old.line)
       return Pos(nw.line, pos.ch - old.ch + nw.ch);
     else
@@ -4259,6 +4994,7 @@
   // Used by replaceSelections to allow moving the selection to the
   // start or around the replaced test. Hint may be "start" or "around".
   function computeReplacedSel(doc, changes, hint) {
+	logger.error(`>>> Entering computeReplacedSel(doc=${doc},changes=${changes},hint=${hint})`, { "event.action": "computeReplacedSel", "logrite.doc": doc, "logrite.changes": changes, "logrite.hint": hint });
     var out = [];
     var oldPrev = Pos(doc.first, 0), newPrev = oldPrev;
     for (var i = 0; i < changes.length; i++) {
@@ -4274,18 +5010,24 @@
         out[i] = new Range(from, from);
       }
     }
+	logger.warn(`<<< Exiting computeReplacedSel(doc=${doc},changes=${changes},hint=${hint})`, { "event.action": "computeReplacedSel", "logrite.doc": doc, "logrite.changes": changes, "logrite.hint": hint });
     return new Selection(out, doc.sel.primIndex);
   }
 
   // Allow "beforeChange" event handlers to influence a change
   function filterChange(doc, change, update) {
+	logger.error(`>>> Entering filterChange(doc=${doc},change=${change},update=${update})`, { "event.action": "filterChange", "logrite.doc": doc, "logrite.change": change, "logrite.update": update });
     var obj = {
       canceled: false,
       from: change.from,
       to: change.to,
       text: change.text,
       origin: change.origin,
-      cancel: function() { this.canceled = true; }
+      cancel: function() {
+          logger.error('>>> Entering cancel()', { "event.action": "cancel" });
+          logger.warn('<<< Exiting cancel()', { "event.action": "cancel" });
+          this.canceled = true;
+      }
     };
     if (update) obj.update = function(from, to, text, origin) {
       if (from) this.from = clipPos(doc, from);
@@ -4303,19 +5045,23 @@
   // Apply a change to a document, and add it to the document's
   // history, and propagating it to all linked documents.
   function makeChange(doc, change, ignoreReadOnly) {
+	logger.error(`>>> Entering makeChange(doc=${doc},change=${change},ignoreReadOnly=${ignoreReadOnly})`, { "event.action": "makeChange", "logrite.doc": doc, "logrite.change": change, "logrite.ignoreReadOnly": ignoreReadOnly });
     if (doc.cm) {
       if (!doc.cm.curOp) return operation(doc.cm, makeChange)(doc, change, ignoreReadOnly);
+	logger.warn(`<<< Exiting makeChange(doc=${doc},change=${change},ignoreReadOnly=${ignoreReadOnly})`, { "event.action": "makeChange", "logrite.doc": doc, "logrite.change": change, "logrite.ignoreReadOnly": ignoreReadOnly });
       if (doc.cm.state.suppressEdits) return;
     }
 
     if (hasHandler(doc, "beforeChange") || doc.cm && hasHandler(doc.cm, "beforeChange")) {
       change = filterChange(doc, change, true);
       if (!change) return;
+	logger.error(`makeChange(doc=${doc},change=${change},ignoreReadOnly=${ignoreReadOnly}): change → ${change}`, { "event.action": "makeChange", "logrite.doc": doc, "logrite.change": change, "logrite.ignoreReadOnly": ignoreReadOnly });
     }
 
     // Possibly split or suppress the update based on the presence
     // of read-only spans in its range.
     var split = sawReadOnlySpans && !ignoreReadOnly && removeReadOnlyRanges(doc, change.from, change.to);
+	logger.error(`makeChange(doc=${doc},change=${change},ignoreReadOnly=${ignoreReadOnly}): split → ${split}`, { "event.action": "makeChange", "logrite.doc": doc, "logrite.change": change, "logrite.ignoreReadOnly": ignoreReadOnly });
     if (split) {
       for (var i = split.length - 1; i >= 0; --i)
         makeChangeInner(doc, {from: split[i].from, to: split[i].to, text: i ? [""] : change.text});
@@ -4325,12 +5071,15 @@
   }
 
   function makeChangeInner(doc, change) {
+	logger.error(`>>> Entering makeChangeInner(doc=${doc},change=${change})`, { "event.action": "makeChangeInner", "logrite.doc": doc, "logrite.change": change });
     if (change.text.length == 1 && change.text[0] == "" && cmp(change.from, change.to) == 0) return;
     var selAfter = computeSelAfterChange(doc, change);
+	logger.error(`makeChangeInner(doc=${doc},change=${change}): selAfter → ${selAfter}`, { "event.action": "makeChangeInner", "logrite.doc": doc, "logrite.change": change });
     addChangeToHistory(doc, change, selAfter, doc.cm ? doc.cm.curOp.id : NaN);
 
     makeChangeSingleDoc(doc, change, selAfter, stretchSpansOverChange(doc, change));
     var rebased = [];
+	logger.warn(`<<< Exiting makeChangeInner(doc=${doc},change=${change})`, { "event.action": "makeChangeInner", "logrite.doc": doc, "logrite.change": change });
 
     linkedDocs(doc, function(doc, sharedHist) {
       if (!sharedHist && indexOf(rebased, doc.history) == -1) {
@@ -4343,10 +5092,12 @@
 
   // Revert a change stored in a document's history.
   function makeChangeFromHistory(doc, type, allowSelectionOnly) {
+	logger.error(`>>> Entering makeChangeFromHistory(doc=${doc},type=${type},allowSelectionOnly=${allowSelectionOnly})`, { "event.action": "makeChangeFromHistory", "logrite.doc": doc, "logrite.type": type, "logrite.allowSelectionOnly": allowSelectionOnly });
     if (doc.cm && doc.cm.state.suppressEdits) return;
 
     var hist = doc.history, event, selAfter = doc.sel;
     var source = type == "undo" ? hist.done : hist.undone, dest = type == "undo" ? hist.undone : hist.done;
+	logger.error(`makeChangeFromHistory(doc=${doc},type=${type},allowSelectionOnly=${allowSelectionOnly}): source → ${source}`, { "event.action": "makeChangeFromHistory", "logrite.doc": doc, "logrite.type": type, "logrite.allowSelectionOnly": allowSelectionOnly });
 
     // Verify that there is a useable event (so that ctrl-z won't
     // needlessly clear selection events)
@@ -4379,10 +5130,15 @@
     hist.generation = event.generation || ++hist.maxGeneration;
 
     var filter = hasHandler(doc, "beforeChange") || doc.cm && hasHandler(doc.cm, "beforeChange");
+	logger.error(`makeChangeFromHistory(doc=${doc},type=${type},allowSelectionOnly=${allowSelectionOnly}): filter → ${filter}`, { "event.action": "makeChangeFromHistory", "logrite.doc": doc, "logrite.type": type, "logrite.allowSelectionOnly": allowSelectionOnly });
 
     for (var i = event.changes.length - 1; i >= 0; --i) {
       var change = event.changes[i];
+	logger.debug(`makeChangeFromHistory(doc=${doc},type=${type},allowSelectionOnly=${allowSelectionOnly}): hist.lastOrigin → ${hist.lastOrigin}`, { "event.action": "makeChangeFromHistory", "logrite.doc": doc, "logrite.type": type, "logrite.allowSelectionOnly": allowSelectionOnly });
+	logger.debug(`makeChangeFromHistory(doc=${doc},type=${type},allowSelectionOnly=${allowSelectionOnly}): source.length → ${source.length}`, { "event.action": "makeChangeFromHistory", "logrite.doc": doc, "logrite.type": type, "logrite.allowSelectionOnly": allowSelectionOnly });
+	logger.debug(`makeChangeFromHistory(doc=${doc},type=${type},allowSelectionOnly=${allowSelectionOnly}): hist.generation → ${hist.generation}`, { "event.action": "makeChangeFromHistory", "logrite.doc": doc, "logrite.type": type, "logrite.allowSelectionOnly": allowSelectionOnly });
       change.origin = type;
+	logger.debug(`makeChangeFromHistory(doc=${doc},type=${type},allowSelectionOnly=${allowSelectionOnly}): change.origin → ${change.origin}`, { "event.action": "makeChangeFromHistory", "logrite.doc": doc, "logrite.type": type, "logrite.allowSelectionOnly": allowSelectionOnly });
       if (filter && !filterChange(doc, change, false)) {
         source.length = 0;
         return;
@@ -4391,6 +5147,7 @@
       antiChanges.push(historyChangeFromChange(doc, change));
 
       var after = i ? computeSelAfterChange(doc, change) : lst(source);
+	logger.error(`makeChangeFromHistory(doc=${doc},type=${type},allowSelectionOnly=${allowSelectionOnly}): after → ${after}`, { "event.action": "makeChangeFromHistory", "logrite.doc": doc, "logrite.type": type, "logrite.allowSelectionOnly": allowSelectionOnly });
       makeChangeSingleDoc(doc, change, after, mergeOldSpans(doc, change));
       if (!i && doc.cm) doc.cm.scrollIntoView({from: change.from, to: changeEnd(change)});
       var rebased = [];
@@ -4404,11 +5161,13 @@
         makeChangeSingleDoc(doc, change, null, mergeOldSpans(doc, change));
       });
     }
+	logger.warn(`<<< Exiting makeChangeFromHistory(doc=${doc},type=${type},allowSelectionOnly=${allowSelectionOnly})`, { "event.action": "makeChangeFromHistory", "logrite.doc": doc, "logrite.type": type, "logrite.allowSelectionOnly": allowSelectionOnly });
   }
 
   // Sub-views need their line numbers shifted when text is added
   // above or below them in the parent document.
   function shiftDoc(doc, distance) {
+	logger.error(`>>> Entering shiftDoc(doc=${doc},distance=${distance})`, { "event.action": "shiftDoc", "logrite.doc": doc, "logrite.distance": distance });
     if (distance == 0) return;
     doc.first += distance;
     doc.sel = new Selection(map(doc.sel.ranges, function(range) {
@@ -4420,11 +5179,13 @@
       for (var d = doc.cm.display, l = d.viewFrom; l < d.viewTo; l++)
         regLineChange(doc.cm, l, "gutter");
     }
+	logger.warn(`<<< Exiting shiftDoc(doc=${doc},distance=${distance})`, { "event.action": "shiftDoc", "logrite.doc": doc, "logrite.distance": distance });
   }
 
   // More lower-level change function, handling only a single document
   // (not linked ones).
   function makeChangeSingleDoc(doc, change, selAfter, spans) {
+	logger.error(`>>> Entering makeChangeSingleDoc(doc=${doc},change=${change},selAfter=${selAfter},spans=${spans})`, { "event.action": "makeChangeSingleDoc", "logrite.doc": doc, "logrite.change": change, "logrite.selAfter": selAfter, "logrite.spans": spans });
     if (doc.cm && !doc.cm.curOp)
       return operation(doc.cm, makeChangeSingleDoc)(doc, change, selAfter, spans);
 
@@ -4437,11 +5198,13 @@
     // Clip the change to the size of this doc
     if (change.from.line < doc.first) {
       var shift = change.text.length - 1 - (doc.first - change.from.line);
+	logger.error(`makeChangeSingleDoc(doc=${doc},change=${change},selAfter=${selAfter},spans=${spans}): shift → ${shift}`, { "event.action": "makeChangeSingleDoc", "logrite.doc": doc, "logrite.change": change, "logrite.selAfter": selAfter, "logrite.spans": spans });
       shiftDoc(doc, shift);
       change = {from: Pos(doc.first, 0), to: Pos(change.to.line + shift, change.to.ch),
                 text: [lst(change.text)], origin: change.origin};
     }
     var last = doc.lastLine();
+	logger.error(`makeChangeSingleDoc(doc=${doc},change=${change},selAfter=${selAfter},spans=${spans}): last → ${last}`, { "event.action": "makeChangeSingleDoc", "logrite.doc": doc, "logrite.change": change, "logrite.selAfter": selAfter, "logrite.spans": spans });
     if (change.to.line > last) {
       change = {from: change.from, to: Pos(last, getLine(doc, last).text.length),
                 text: [change.text[0]], origin: change.origin};
@@ -4453,11 +5216,13 @@
     if (doc.cm) makeChangeSingleDocInEditor(doc.cm, change, spans);
     else updateDoc(doc, change, spans);
     setSelectionNoUndo(doc, selAfter, sel_dontScroll);
+	logger.warn(`<<< Exiting makeChangeSingleDoc(doc=${doc},change=${change},selAfter=${selAfter},spans=${spans})`, { "event.action": "makeChangeSingleDoc", "logrite.doc": doc, "logrite.change": change, "logrite.selAfter": selAfter, "logrite.spans": spans });
   }
 
   // Handle the interaction of a change to a document with the editor
   // that this document is part of.
   function makeChangeSingleDocInEditor(cm, change, spans) {
+	logger.error(`>>> Entering makeChangeSingleDocInEditor(cm=${cm},change=${change},spans=${spans})`, { "event.action": "makeChangeSingleDocInEditor", "logrite.cm": cm, "logrite.change": change, "logrite.spans": spans });
     var doc = cm.doc, display = cm.display, from = change.from, to = change.to;
 
     var recomputeMaxLength = false, checkWidthStart = from.line;
@@ -4494,6 +5259,7 @@
     startWorker(cm, 400);
 
     var lendiff = change.text.length - (to.line - from.line) - 1;
+	logger.error(`makeChangeSingleDocInEditor(cm=${cm},change=${change},spans=${spans}): lendiff → ${lendiff}`, { "event.action": "makeChangeSingleDocInEditor", "logrite.cm": cm, "logrite.change": change, "logrite.spans": spans });
     // Remember that these lines changed, for updating the display
     if (change.full)
       regChange(cm);
@@ -4514,13 +5280,18 @@
       if (changesHandler) (cm.curOp.changeObjs || (cm.curOp.changeObjs = [])).push(obj);
     }
     cm.display.selForContextMenu = null;
+	logger.error(`makeChangeSingleDocInEditor(cm=${cm},change=${change},spans=${spans}): changesHandler → ${changesHandler}`, { "event.action": "makeChangeSingleDocInEditor", "logrite.cm": cm, "logrite.change": change, "logrite.spans": spans });
   }
 
   function replaceRange(doc, code, from, to, origin) {
+	logger.error(`>>> Entering replaceRange(doc=${doc},code=${code},from=${from},to=${to},origin=${origin})`, { "event.action": "replaceRange", "logrite.code": code, "logrite.from": from, "logrite.to": to, "logrite.origin": origin });
     if (!to) to = from;
     if (cmp(to, from) < 0) { var tmp = to; to = from; from = tmp; }
     if (typeof code == "string") code = doc.splitLines(code);
     makeChange(doc, {from: from, to: to, text: code, origin: origin});
+	logger.warn(`<<< Exiting replaceRange(doc=${doc},code=${code},from=${from},to=${to},origin=${origin})`, { "event.action": "replaceRange", "logrite.code": code, "logrite.from": from, "logrite.to": to, "logrite.origin": origin });
+	logger.error(`>>> Entering replaceRange(code=${code},from=${from},to=${to},origin=${origin})`, { "event.action": "replaceRange", "logrite.code": code, "logrite.from": from, "logrite.to": to, "logrite.origin": origin });
+	logger.warn(`<<< Exiting replaceRange(code=${code},from=${from},to=${to},origin=${origin})`, { "event.action": "replaceRange", "logrite.code": code, "logrite.from": from, "logrite.to": to, "logrite.origin": origin });
   }
 
   // SCROLLING THINGS INTO VIEW
@@ -4528,9 +5299,11 @@
   // If an editor sits on the top or bottom of the window, partially
   // scrolled out of view, this ensures that the cursor is visible.
   function maybeScrollWindow(cm, coords) {
+	logger.error(`>>> Entering maybeScrollWindow(cm=${cm},coords=${coords})`, { "event.action": "maybeScrollWindow", "logrite.cm": cm, "logrite.coords": coords });
     if (signalDOMEvent(cm, "scrollCursorIntoView")) return;
 
     var display = cm.display, box = display.sizer.getBoundingClientRect(), doScroll = null;
+	logger.error(`maybeScrollWindow(cm=${cm},coords=${coords}): display → ${display}`, { "event.action": "maybeScrollWindow", "logrite.cm": cm, "logrite.coords": coords });
     if (coords.top + box.top < 0) doScroll = true;
     else if (coords.bottom + box.top > (window.innerHeight || document.documentElement.clientHeight)) doScroll = false;
     if (doScroll != null && !phantom) {
@@ -4541,6 +5314,7 @@
       cm.display.lineSpace.appendChild(scrollNode);
       scrollNode.scrollIntoView(doScroll);
       cm.display.lineSpace.removeChild(scrollNode);
+	logger.warn(`<<< Exiting maybeScrollWindow(cm=${cm},coords=${coords})`, { "event.action": "maybeScrollWindow", "logrite.cm": cm, "logrite.coords": coords });
     }
   }
 
@@ -4548,15 +5322,18 @@
   // it actually became visible (as line heights are accurately
   // measured, the position of something may 'drift' during drawing).
   function scrollPosIntoView(cm, pos, end, margin) {
+	logger.error(`>>> Entering scrollPosIntoView(cm=${cm},pos=${pos},end=${end},margin=${margin})`, { "event.action": "scrollPosIntoView", "logrite.cm": cm, "logrite.pos": pos, "logrite.end": end, "logrite.margin": margin });
     if (margin == null) margin = 0;
     for (var limit = 0; limit < 5; limit++) {
       var changed = false, coords = cursorCoords(cm, pos);
       var endCoords = !end || end == pos ? coords : cursorCoords(cm, end);
+	logger.error(`scrollPosIntoView(cm=${cm},pos=${pos},end=${end},margin=${margin}): endCoords → ${endCoords}`, { "event.action": "scrollPosIntoView", "logrite.cm": cm, "logrite.pos": pos, "logrite.end": end, "logrite.margin": margin });
       var scrollPos = calculateScrollPos(cm, Math.min(coords.left, endCoords.left),
                                          Math.min(coords.top, endCoords.top) - margin,
                                          Math.max(coords.left, endCoords.left),
                                          Math.max(coords.bottom, endCoords.bottom) + margin);
       var startTop = cm.doc.scrollTop, startLeft = cm.doc.scrollLeft;
+	logger.error(`scrollPosIntoView(cm=${cm},pos=${pos},end=${end},margin=${margin}): scrollPos → ${scrollPos}`, { "event.action": "scrollPosIntoView", "logrite.cm": cm, "logrite.pos": pos, "logrite.end": end, "logrite.margin": margin });
       if (scrollPos.scrollTop != null) {
         setScrollTop(cm, scrollPos.scrollTop);
         if (Math.abs(cm.doc.scrollTop - startTop) > 1) changed = true;
@@ -4567,14 +5344,18 @@
       }
       if (!changed) break;
     }
+	logger.warn(`<<< Exiting scrollPosIntoView(cm=${cm},pos=${pos},end=${end},margin=${margin})`, { "event.action": "scrollPosIntoView", "logrite.cm": cm, "logrite.pos": pos, "logrite.end": end, "logrite.margin": margin });
     return coords;
   }
 
   // Scroll a given set of coordinates into view (immediately).
   function scrollIntoView(cm, x1, y1, x2, y2) {
+	logger.error(`>>> Entering scrollIntoView(cm=${cm},x1=${x1},y1=${y1},x2=${x2},y2=${y2})`, { "event.action": "scrollIntoView", "logrite.cm": cm, "logrite.x1": x1, "logrite.y1": y1, "logrite.x2": x2, "logrite.y2": y2 });
     var scrollPos = calculateScrollPos(cm, x1, y1, x2, y2);
     if (scrollPos.scrollTop != null) setScrollTop(cm, scrollPos.scrollTop);
+	logger.error(`scrollIntoView(cm=${cm},x1=${x1},y1=${y1},x2=${x2},y2=${y2}): scrollPos → ${scrollPos}`, { "event.action": "scrollIntoView", "logrite.cm": cm, "logrite.x1": x1, "logrite.y1": y1, "logrite.x2": x2, "logrite.y2": y2 });
     if (scrollPos.scrollLeft != null) setScrollLeft(cm, scrollPos.scrollLeft);
+	logger.warn(`<<< Exiting scrollIntoView(cm=${cm},x1=${x1},y1=${y1},x2=${x2},y2=${y2})`, { "event.action": "scrollIntoView", "logrite.cm": cm, "logrite.x1": x1, "logrite.y1": y1, "logrite.x2": x2, "logrite.y2": y2 });
   }
 
   // Calculate a new scroll position needed to scroll the given
@@ -4582,22 +5363,28 @@
   // scrollLeft properties. When these are undefined, the
   // vertical/horizontal position does not need to be adjusted.
   function calculateScrollPos(cm, x1, y1, x2, y2) {
+	logger.error(`>>> Entering calculateScrollPos(cm=${cm},x1=${x1},y1=${y1},x2=${x2},y2=${y2})`, { "event.action": "calculateScrollPos", "logrite.cm": cm, "logrite.x1": x1, "logrite.y1": y1, "logrite.x2": x2, "logrite.y2": y2 });
     var display = cm.display, snapMargin = textHeight(cm.display);
     if (y1 < 0) y1 = 0;
+	logger.error(`calculateScrollPos(cm=${cm},x1=${x1},y1=${y1},x2=${x2},y2=${y2}): display → ${display}`, { "event.action": "calculateScrollPos", "logrite.cm": cm, "logrite.x1": x1, "logrite.y1": y1, "logrite.x2": x2, "logrite.y2": y2 });
     var screentop = cm.curOp && cm.curOp.scrollTop != null ? cm.curOp.scrollTop : display.scroller.scrollTop;
     var screen = displayHeight(cm), result = {};
+	logger.error(`calculateScrollPos(cm=${cm},x1=${x1},y1=${y1},x2=${x2},y2=${y2}): screen → ${screen}`, { "event.action": "calculateScrollPos", "logrite.cm": cm, "logrite.x1": x1, "logrite.y1": y1, "logrite.x2": x2, "logrite.y2": y2 });
     if (y2 - y1 > screen) y2 = y1 + screen;
     var docBottom = cm.doc.height + paddingVert(display);
+	logger.error(`calculateScrollPos(cm=${cm},x1=${x1},y1=${y1},x2=${x2},y2=${y2}): docBottom → ${docBottom}`, { "event.action": "calculateScrollPos", "logrite.cm": cm, "logrite.x1": x1, "logrite.y1": y1, "logrite.x2": x2, "logrite.y2": y2 });
     var atTop = y1 < snapMargin, atBottom = y2 > docBottom - snapMargin;
     if (y1 < screentop) {
       result.scrollTop = atTop ? 0 : y1;
     } else if (y2 > screentop + screen) {
       var newTop = Math.min(y1, (atBottom ? docBottom : y2) - screen);
+	logger.error(`calculateScrollPos(cm=${cm},x1=${x1},y1=${y1},x2=${x2},y2=${y2}): newTop → ${newTop}`, { "event.action": "calculateScrollPos", "logrite.cm": cm, "logrite.x1": x1, "logrite.y1": y1, "logrite.x2": x2, "logrite.y2": y2 });
       if (newTop != screentop) result.scrollTop = newTop;
     }
 
     var screenleft = cm.curOp && cm.curOp.scrollLeft != null ? cm.curOp.scrollLeft : display.scroller.scrollLeft;
     var screenw = displayWidth(cm) - (cm.options.fixedGutter ? display.gutters.offsetWidth : 0);
+	logger.error(`calculateScrollPos(cm=${cm},x1=${x1},y1=${y1},x2=${x2},y2=${y2}): screenw → ${screenw}`, { "event.action": "calculateScrollPos", "logrite.cm": cm, "logrite.x1": x1, "logrite.y1": y1, "logrite.x2": x2, "logrite.y2": y2 });
     var tooWide = x2 - x1 > screenw;
     if (tooWide) x2 = x1 + screenw;
     if (x1 < 10)
@@ -4606,12 +5393,14 @@
       result.scrollLeft = Math.max(0, x1 - (tooWide ? 0 : 10));
     else if (x2 > screenw + screenleft - 3)
       result.scrollLeft = x2 + (tooWide ? 0 : 10) - screenw;
+	logger.warn(`<<< Exiting calculateScrollPos(cm=${cm},x1=${x1},y1=${y1},x2=${x2},y2=${y2})`, { "event.action": "calculateScrollPos", "logrite.cm": cm, "logrite.x1": x1, "logrite.y1": y1, "logrite.x2": x2, "logrite.y2": y2 });
     return result;
   }
 
   // Store a relative adjustment to the scroll position in the current
   // operation (to be applied when the operation finishes).
   function addToScrollPos(cm, left, top) {
+	logger.error(`>>> Entering addToScrollPos(cm=${cm},left=${left},top=${top})`, { "event.action": "addToScrollPos", "logrite.cm": cm, "logrite.left": left, "logrite.top": top });
     if (left != null || top != null) resolveScrollToPos(cm);
     if (left != null)
       cm.curOp.scrollLeft = (cm.curOp.scrollLeft == null ? cm.doc.scrollLeft : cm.curOp.scrollLeft) + left;
@@ -4622,6 +5411,7 @@
   // Make sure that at the end of the operation the current cursor is
   // shown.
   function ensureCursorVisible(cm) {
+	logger.error(`>>> Entering ensureCursorVisible(cm=${cm})`, { "event.action": "ensureCursorVisible", "logrite.cm": cm });
     resolveScrollToPos(cm);
     var cur = cm.getCursor(), from = cur, to = cur;
     if (!cm.options.lineWrapping) {
@@ -4629,6 +5419,7 @@
       to = Pos(cur.line, cur.ch + 1);
     }
     cm.curOp.scrollToPos = {from: from, to: to, margin: cm.options.cursorScrollMargin, isCursor: true};
+	logger.error(`ensureCursorVisible(cm=${cm}): cur → ${cur}`, { "event.action": "ensureCursorVisible", "logrite.cm": cm });
   }
 
   // When an operation has its scrollToPos property set, and another
@@ -4636,6 +5427,7 @@
   // 'simulates' scrolling that position into view in a cheap way, so
   // that the effect of intermediate scroll commands is not ignored.
   function resolveScrollToPos(cm) {
+	logger.error(`>>> Entering resolveScrollToPos(cm=${cm})`, { "event.action": "resolveScrollToPos", "logrite.cm": cm });
     var range = cm.curOp.scrollToPos;
     if (range) {
       cm.curOp.scrollToPos = null;
@@ -4645,6 +5437,7 @@
                                     Math.max(from.right, to.right),
                                     Math.max(from.bottom, to.bottom) + range.margin);
       cm.scrollTo(sPos.scrollLeft, sPos.scrollTop);
+	logger.error(`resolveScrollToPos(cm=${cm}): sPos → ${sPos}`, { "event.action": "resolveScrollToPos", "logrite.cm": cm });
     }
   }
 
@@ -4656,6 +5449,7 @@
   // lines are not indented, and places where the mode returns Pass
   // are left alone.
   function indentLine(cm, n, how, aggressive) {
+	logger.error(`>>> Entering indentLine(cm=${cm},n=${n},how=${how},aggressive=${aggressive})`, { "event.action": "indentLine", "logrite.cm": cm, "logrite.n": n, "logrite.how": how, "logrite.aggressive": aggressive });
     var doc = cm.doc, state;
     if (how == null) how = "add";
     if (how == "smart") {
@@ -4667,8 +5461,11 @@
 
     var tabSize = cm.options.tabSize;
     var line = getLine(doc, n), curSpace = countColumn(line.text, null, tabSize);
+	logger.error(`indentLine(cm=${cm},n=${n},how=${how},aggressive=${aggressive}): line → ${line}`, { "event.action": "indentLine", "logrite.cm": cm, "logrite.n": n, "logrite.how": how, "logrite.aggressive": aggressive });
+	logger.debug(`indentLine(cm=${cm},n=${n},how=${how},aggressive=${aggressive}): line.stateAfter → ${line.stateAfter}`, { "event.action": "indentLine", "logrite.cm": cm, "logrite.n": n, "logrite.how": how, "logrite.aggressive": aggressive });
     if (line.stateAfter) line.stateAfter = null;
     var curSpaceString = line.text.match(/^\s*/)[0], indentation;
+	logger.error(`indentLine(cm=${cm},n=${n},how=${how},aggressive=${aggressive}): curSpaceString → ${curSpaceString}`, { "event.action": "indentLine", "logrite.cm": cm, "logrite.n": n, "logrite.how": how, "logrite.aggressive": aggressive });
     if (!aggressive && !/\S/.test(line.text)) {
       indentation = 0;
       how = "not";
@@ -4688,10 +5485,12 @@
       indentation = curSpace - cm.options.indentUnit;
     } else if (typeof how == "number") {
       indentation = curSpace + how;
+	logger.error(`indentLine(cm=${cm},n=${n},how=${how},aggressive=${aggressive}): how → ${how}`, { "event.action": "indentLine", "logrite.cm": cm, "logrite.n": n, "logrite.how": how, "logrite.aggressive": aggressive });
     }
     indentation = Math.max(0, indentation);
 
     var indentString = "", pos = 0;
+	logger.error(`indentLine(cm=${cm},n=${n},how=${how},aggressive=${aggressive}): indentString → ${indentString}`, { "event.action": "indentLine", "logrite.cm": cm, "logrite.n": n, "logrite.how": how, "logrite.aggressive": aggressive });
     if (cm.options.indentWithTabs)
       for (var i = Math.floor(indentation / tabSize); i; --i) {pos += tabSize; indentString += "\t";}
     if (pos < indentation) indentString += spaceStr(indentation - pos);
@@ -4707,33 +5506,39 @@
         var range = doc.sel.ranges[i];
         if (range.head.line == n && range.head.ch < curSpaceString.length) {
           var pos = Pos(n, curSpaceString.length);
+		logger.error(`indentLine(cm=${cm},n=${n},how=${how},aggressive=${aggressive}): pos → ${pos}`, { "event.action": "indentLine", "logrite.cm": cm, "logrite.n": n, "logrite.how": how, "logrite.aggressive": aggressive });
           replaceOneSelection(doc, i, new Range(pos, pos));
           break;
         }
       }
     }
+	logger.warn(`<<< Exiting indentLine(cm=${cm},n=${n},how=${how},aggressive=${aggressive})`, { "event.action": "indentLine", "logrite.cm": cm, "logrite.n": n, "logrite.how": how, "logrite.aggressive": aggressive });
   }
 
   // Utility for applying a change to a line by handle or number,
   // returning the number and optionally registering the line as
   // changed.
   function changeLine(doc, handle, changeType, op) {
+	logger.error(`>>> Entering changeLine(doc=${doc},handle=${handle},changeType=${changeType},op=${op})`, { "event.action": "changeLine", "logrite.doc": doc, "logrite.handle": handle, "logrite.changeType": changeType, "logrite.op": op });
     var no = handle, line = handle;
     if (typeof handle == "number") line = getLine(doc, clipLine(doc, handle));
     else no = lineNo(handle);
     if (no == null) return null;
     if (op(line, no) && doc.cm) regLineChange(doc.cm, no, changeType);
+	logger.warn(`<<< Exiting changeLine(doc=${doc},handle=${handle},changeType=${changeType},op=${op})`, { "event.action": "changeLine", "logrite.doc": doc, "logrite.handle": handle, "logrite.changeType": changeType, "logrite.op": op });
     return line;
   }
 
   // Helper for deleting text near the selection(s), used to implement
   // backspace, delete, and similar functionality.
   function deleteNearSelection(cm, compute) {
+	logger.error(`>>> Entering deleteNearSelection(cm=${cm},compute=${compute})`, { "event.action": "deleteNearSelection", "logrite.cm": cm, "logrite.compute": compute });
     var ranges = cm.doc.sel.ranges, kill = [];
     // Build up a set of ranges to kill first, merging overlapping
     // ranges.
     for (var i = 0; i < ranges.length; i++) {
       var toKill = compute(ranges[i]);
+	logger.debug(`deleteNearSelection(cm=${cm},compute=${compute}): toKill.from → ${toKill.from}`, { "event.action": "deleteNearSelection", "logrite.cm": cm, "logrite.compute": compute });
       while (kill.length && cmp(toKill.from, lst(kill).to) <= 0) {
         var replaced = kill.pop();
         if (cmp(replaced.from, toKill.from) < 0) {
@@ -4742,6 +5547,7 @@
         }
       }
       kill.push(toKill);
+	logger.error(`deleteNearSelection(cm=${cm},compute=${compute}): toKill → ${toKill}`, { "event.action": "deleteNearSelection", "logrite.cm": cm, "logrite.compute": compute });
     }
     // Next, remove those actual ranges.
     runInOp(cm, function() {
@@ -4761,9 +5567,11 @@
   // position. The resulting position will have a hitSide=true
   // property if it reached the end of the document.
   function findPosH(doc, pos, dir, unit, visually) {
+	logger.error(`>>> Entering findPosH(doc=${doc},pos=${pos},dir=${dir},unit=${unit},visually=${visually})`, { "event.action": "findPosH", "logrite.from": from, "logrite.amount": amount, "logrite.unit": unit, "logrite.visually": visually });
     var line = pos.line, ch = pos.ch, origDir = dir;
     var lineObj = getLine(doc, line);
     var possible = true;
+	logger.error(`findPosH(doc=${doc},pos=${pos},dir=${dir},unit=${unit},visually=${visually}): lineObj → ${lineObj}`, { "event.action": "findPosH", "logrite.from": from, "logrite.amount": amount, "logrite.unit": unit, "logrite.visually": visually });
     function findNextLine() {
       var l = line + dir;
       if (l < doc.first || l >= doc.first + doc.size) return (possible = false);
@@ -4771,6 +5579,7 @@
       return lineObj = getLine(doc, l);
     }
     function moveOnce(boundToLine) {
+	logger.error(`>>> Entering moveOnce(boundToLine=${boundToLine})`, { "event.action": "moveOnce", "logrite.boundToLine": boundToLine });
       var next = (visually ? moveVisually : moveLogically)(lineObj, ch, dir, true);
       if (next == null) {
         if (!boundToLine && findNextLine()) {
@@ -4778,6 +5587,7 @@
           else ch = dir < 0 ? lineObj.text.length : 0;
         } else return (possible = false);
       } else ch = next;
+	logger.warn(`<<< Exiting moveOnce(boundToLine=${boundToLine})`, { "event.action": "moveOnce", "logrite.boundToLine": boundToLine });
       return true;
     }
 
@@ -4805,6 +5615,7 @@
     }
     var result = skipAtomic(doc, Pos(line, ch), origDir, true);
     if (!possible) result.hitSide = true;
+	logger.warn(`<<< Exiting findPosH(doc=${doc},pos=${pos},dir=${dir},unit=${unit},visually=${visually})`, { "event.action": "findPosH", "logrite.from": from, "logrite.amount": amount, "logrite.unit": unit, "logrite.visually": visually });
     return result;
   }
 
@@ -4812,19 +5623,23 @@
   // "page" or "line". The resulting position will have a hitSide=true
   // property if it reached the end of the document.
   function findPosV(cm, pos, dir, unit) {
+	logger.error(`>>> Entering findPosV(cm=${cm},pos=${pos},dir=${dir},unit=${unit})`, { "event.action": "findPosV", "logrite.from": from, "logrite.amount": amount, "logrite.unit": unit, "logrite.goalColumn": goalColumn });
     var doc = cm.doc, x = pos.left, y;
     if (unit == "page") {
       var pageSize = Math.min(cm.display.wrapper.clientHeight, window.innerHeight || document.documentElement.clientHeight);
+	logger.error(`findPosV(cm=${cm},pos=${pos},dir=${dir},unit=${unit}): pageSize → ${pageSize}`, { "event.action": "findPosV", "logrite.from": from, "logrite.amount": amount, "logrite.unit": unit, "logrite.goalColumn": goalColumn });
       y = pos.top + dir * (pageSize - (dir < 0 ? 1.5 : .5) * textHeight(cm.display));
     } else if (unit == "line") {
       y = dir > 0 ? pos.bottom + 3 : pos.top - 3;
     }
     for (;;) {
       var target = coordsChar(cm, x, y);
+	logger.error(`findPosV(cm=${cm},pos=${pos},dir=${dir},unit=${unit}): target → ${target}`, { "event.action": "findPosV", "logrite.from": from, "logrite.amount": amount, "logrite.unit": unit, "logrite.goalColumn": goalColumn });
       if (!target.outside) break;
       if (dir < 0 ? y <= 0 : y >= doc.height) { target.hitSide = true; break; }
       y += dir * 5;
     }
+	logger.warn(`<<< Exiting findPosV(cm=${cm},pos=${pos},dir=${dir},unit=${unit})`, { "event.action": "findPosV", "logrite.from": from, "logrite.amount": amount, "logrite.unit": unit, "logrite.goalColumn": goalColumn });
     return target;
   }
 
@@ -4840,7 +5655,11 @@
 
   CodeMirror.prototype = {
     constructor: CodeMirror,
-    focus: function(){window.focus(); this.display.input.focus();},
+    focus: function(){
+        logger.error('>>> Entering focus()', { "event.action": "focus" });
+        logger.warn('<<< Exiting focus()', { "event.action": "focus" });
+        window.focus(); this.display.input.focus();
+    },
 
     setOption: function(option, value) {
       var options = this.options, old = options[option];
@@ -4848,19 +5667,32 @@
       options[option] = value;
       if (optionHandlers.hasOwnProperty(option))
         operation(this, optionHandlers[option])(this, value, old);
+		logger.warn(`<<< Exiting setOption(option=${option},value=${value})`, { "event.action": "setOption", "logrite.option": option, "logrite.value": value });
     },
 
-    getOption: function(option) {return this.options[option];},
-    getDoc: function() {return this.doc;},
+    getOption: function(option) {
+        logger.error(`>>> Entering getOption(option=${option})`, { "event.action": "getOption", "logrite.option": option });
+        logger.warn(`<<< Exiting getOption(option=${option})`, { "event.action": "getOption", "logrite.option": option });
+        return this.options[option];
+    },
+    getDoc: function() {
+        logger.error('>>> Entering getDoc()', { "event.action": "getDoc" });
+        logger.warn('<<< Exiting getDoc()', { "event.action": "getDoc" });
+        return this.doc;
+    },
 
     addKeyMap: function(map, bottom) {
+	logger.error(`>>> Entering addKeyMap(map=${map},bottom=${bottom})`, { "event.action": "addKeyMap", "logrite.map": map, "logrite.bottom": bottom });
       this.state.keyMaps[bottom ? "push" : "unshift"](getKeyMap(map));
+	logger.warn(`<<< Exiting addKeyMap(map=${map},bottom=${bottom})`, { "event.action": "addKeyMap", "logrite.map": map, "logrite.bottom": bottom });
     },
     removeKeyMap: function(map) {
+	logger.error(`>>> Entering removeKeyMap(map=${map})`, { "event.action": "removeKeyMap", "logrite.map": map });
       var maps = this.state.keyMaps;
       for (var i = 0; i < maps.length; ++i)
         if (maps[i] == map || maps[i].name == map) {
           maps.splice(i, 1);
+		logger.warn(`<<< Exiting removeKeyMap(map=${map})`, { "event.action": "removeKeyMap", "logrite.map": map });
           return true;
         }
     },
@@ -4916,18 +5748,26 @@
     // Fetch the parser token for a given character. Useful for hacks
     // that want to inspect the mode state (say, for completion).
     getTokenAt: function(pos, precise) {
+	logger.error(`>>> Entering getTokenAt(pos=${pos},precise=${precise})`, { "event.action": "getTokenAt", "logrite.pos": pos, "logrite.precise": precise });
+	logger.warn(`<<< Exiting getTokenAt(pos=${pos},precise=${precise})`, { "event.action": "getTokenAt", "logrite.pos": pos, "logrite.precise": precise });
       return takeToken(this, pos, precise);
     },
 
     getLineTokens: function(line, precise) {
+	logger.error(`>>> Entering getLineTokens(line=${line},precise=${precise})`, { "event.action": "getLineTokens", "logrite.line": line, "logrite.precise": precise });
+	logger.warn(`<<< Exiting getLineTokens(line=${line},precise=${precise})`, { "event.action": "getLineTokens", "logrite.line": line, "logrite.precise": precise });
       return takeToken(this, Pos(line), precise, true);
     },
 
     getTokenTypeAt: function(pos) {
+	logger.error(`>>> Entering getTokenTypeAt(pos=${pos})`, { "event.action": "getTokenTypeAt", "logrite.pos": pos });
       pos = clipPos(this.doc, pos);
       var styles = getLineStyles(this, getLine(this.doc, pos.line));
+	logger.error(`getTokenTypeAt(pos=${pos}): pos → ${pos}`, { "event.action": "getTokenTypeAt", "logrite.pos": pos });
+	logger.error(`getTokenTypeAt(pos=${pos}): styles → ${styles}`, { "event.action": "getTokenTypeAt", "logrite.pos": pos });
       var before = 0, after = (styles.length - 1) / 2, ch = pos.ch;
       var type;
+	logger.error(`getTokenTypeAt(pos=${pos}): before → ${before}`, { "event.action": "getTokenTypeAt", "logrite.pos": pos });
       if (ch == 0) type = styles[2];
       else for (;;) {
         var mid = (before + after) >> 1;
@@ -4940,12 +5780,16 @@
     },
 
     getModeAt: function(pos) {
+	logger.error(`>>> Entering getModeAt(pos=${pos})`, { "event.action": "getModeAt", "logrite.pos": pos });
       var mode = this.doc.mode;
       if (!mode.innerMode) return mode;
+	logger.warn(`<<< Exiting getModeAt(pos=${pos})`, { "event.action": "getModeAt", "logrite.pos": pos });
       return CodeMirror.innerMode(mode, this.getTokenAt(pos).state).mode;
     },
 
     getHelper: function(pos, type) {
+	logger.error(`>>> Entering getHelper(pos=${pos},type=${type})`, { "event.action": "getHelper", "logrite.pos": pos, "logrite.type": type });
+	logger.warn(`<<< Exiting getHelper(pos=${pos},type=${type})`, { "event.action": "getHelper", "logrite.pos": pos, "logrite.type": type });
       return this.getHelpers(pos, type)[0];
     },
 
@@ -4970,12 +5814,16 @@
         if (cur.pred(mode, this) && indexOf(found, cur.val) == -1)
           found.push(cur.val);
       }
+	logger.warn(`<<< Exiting getHelpers(pos=${pos},type=${type})`, { "event.action": "getHelpers", "logrite.pos": pos, "logrite.type": type });
       return found;
     },
 
     getStateAfter: function(line, precise) {
+	logger.error(`>>> Entering getStateAfter(line=${line},precise=${precise})`, { "event.action": "getStateAfter", "logrite.line": line, "logrite.precise": precise });
       var doc = this.doc;
       line = clipLine(doc, line == null ? doc.first + doc.size - 1: line);
+	logger.warn(`<<< Exiting getStateAfter(line=${line},precise=${precise})`, { "event.action": "getStateAfter", "logrite.line": line, "logrite.precise": precise });
+	logger.error(`getStateAfter(line=${line},precise=${precise}): line → ${line}`, { "event.action": "getStateAfter", "logrite.line": line, "logrite.precise": precise });
       return getStateBefore(this, line + 1, precise);
     },
 
@@ -5001,6 +5849,7 @@
       return lineAtHeight(this.doc, height + this.display.viewOffset);
     },
     heightAtLine: function(line, mode) {
+	logger.error(`>>> Entering heightAtLine(line=${line},mode=${mode})`, { "event.action": "heightAtLine", "logrite.lineObj": lineObj });
       var end = false, lineObj;
       if (typeof line == "number") {
         var last = this.doc.first + this.doc.size - 1;
@@ -5012,10 +5861,15 @@
       }
       return intoCoordSystem(this, lineObj, {top: 0, left: 0}, mode || "page").top +
         (end ? this.doc.height - heightAtLine(lineObj) : 0);
+		logger.warn(`<<< Exiting heightAtLine(line=${line},mode=${mode})`, { "event.action": "heightAtLine", "logrite.lineObj": lineObj });
     },
 
     defaultTextHeight: function() { return textHeight(this.display); },
-    defaultCharWidth: function() { return charWidth(this.display); },
+    defaultCharWidth: function() {
+        logger.error('>>> Entering defaultCharWidth()', { "event.action": "defaultCharWidth" });
+        logger.warn('<<< Exiting defaultCharWidth()', { "event.action": "defaultCharWidth" });
+        return charWidth(this.display);
+    },
 
     setGutterMarker: methodOp(function(line, gutterID, value) {
       return changeLine(this.doc, line, "gutter", function(line) {
@@ -5039,6 +5893,7 @@
     }),
 
     lineInfo: function(line) {
+	logger.error(`>>> Entering lineInfo(line=${line})`, { "event.action": "lineInfo", "logrite.line": line });
       if (typeof line == "number") {
         if (!isLine(this.doc, line)) return null;
         var n = line;
@@ -5046,19 +5901,23 @@
         if (!line) return null;
       } else {
         var n = lineNo(line);
+		logger.error(`lineInfo(line=${line}): n → ${n}`, { "event.action": "lineInfo", "logrite.line": line });
         if (n == null) return null;
       }
       return {line: n, handle: line, text: line.text, gutterMarkers: line.gutterMarkers,
               textClass: line.textClass, bgClass: line.bgClass, wrapClass: line.wrapClass,
               widgets: line.widgets};
+			logger.warn(`<<< Exiting lineInfo(line=${line})`, { "event.action": "lineInfo", "logrite.line": line });
     },
 
     getViewport: function() { return {from: this.display.viewFrom, to: this.display.viewTo};},
 
     addWidget: function(pos, node, scroll, vert, horiz) {
+	logger.error(`>>> Entering addWidget(pos=${pos},node=${node},scroll=${scroll},vert=${vert},horiz=${horiz})`, { "event.action": "addWidget", "logrite.pos": pos, "logrite.node": node, "logrite.scroll": scroll, "logrite.vert": vert, "logrite.horiz": horiz });
       var display = this.display;
       pos = cursorCoords(this, clipPos(this.doc, pos));
       var top = pos.bottom, left = pos.left;
+	logger.error(`addWidget(pos=${pos},node=${node},scroll=${scroll},vert=${vert},horiz=${horiz}): pos → ${pos}`, { "event.action": "addWidget", "logrite.pos": pos, "logrite.node": node, "logrite.scroll": scroll, "logrite.vert": vert, "logrite.horiz": horiz });
       node.style.position = "absolute";
       node.setAttribute("cm-ignore-events", "true");
       this.display.input.setUneditable(node);
@@ -5068,6 +5927,7 @@
       } else if (vert == "above" || vert == "near") {
         var vspace = Math.max(display.wrapper.clientHeight, this.doc.height),
         hspace = Math.max(display.sizer.clientWidth, display.lineSpace.clientWidth);
+		logger.error(`addWidget(pos=${pos},node=${node},scroll=${scroll},vert=${vert},horiz=${horiz}): vspace → ${vspace}`, { "event.action": "addWidget", "logrite.pos": pos, "logrite.node": node, "logrite.scroll": scroll, "logrite.vert": vert, "logrite.horiz": horiz });
         // Default to positioning above (if specified and possible); otherwise default to positioning below
         if ((vert == 'above' || pos.bottom + node.offsetHeight > vspace) && pos.top > node.offsetHeight)
           top = pos.top - node.offsetHeight;
@@ -5095,6 +5955,7 @@
     triggerOnKeyUp: onKeyUp,
 
     execCommand: function(cmd) {
+	logger.error(`>>> Entering execCommand(cmd=${cmd})`, { "event.action": "execCommand", "logrite.cmd": cmd });
       if (commands.hasOwnProperty(cmd))
         return commands[cmd].call(null, this);
     },
@@ -5165,18 +6026,24 @@
 
     // Find the word at the given position (as returned by coordsChar).
     findWordAt: function(pos) {
+	logger.error(`>>> Entering findWordAt(pos=${pos})`, { "event.action": "findWordAt", "logrite.pos": pos });
       var doc = this.doc, line = getLine(doc, pos.line).text;
       var start = pos.ch, end = pos.ch;
+	logger.error(`findWordAt(pos=${pos}): doc → ${doc}`, { "event.action": "findWordAt", "logrite.pos": pos });
       if (line) {
         var helper = this.getHelper(pos, "wordChars");
+		logger.error(`findWordAt(pos=${pos}): helper → ${helper}`, { "event.action": "findWordAt", "logrite.pos": pos });
         if ((pos.xRel < 0 || end == line.length) && start) --start; else ++end;
         var startChar = line.charAt(start);
+		logger.error(`findWordAt(pos=${pos}): startChar → ${startChar}`, { "event.action": "findWordAt", "logrite.pos": pos });
         var check = isWordChar(startChar, helper)
           ? function(ch) { return isWordChar(ch, helper); }
           : /\s/.test(startChar) ? function(ch) {return /\s/.test(ch);}
           : function(ch) {return !/\s/.test(ch) && !isWordChar(ch);};
         while (start > 0 && check(line.charAt(start - 1))) --start;
+		logger.error(`findWordAt(pos=${pos}): check → ${check}`, { "event.action": "findWordAt", "logrite.pos": pos });
         while (end < line.length && check(line.charAt(end))) ++end;
+		logger.warn(`<<< Exiting findWordAt(pos=${pos})`, { "event.action": "findWordAt", "logrite.pos": pos });
       }
       return new Range(Pos(pos.line, start), Pos(pos.line, end));
     },
@@ -5203,6 +6070,7 @@
               height: scroller.scrollHeight - scrollGap(this) - this.display.barHeight,
               width: scroller.scrollWidth - scrollGap(this) - this.display.barWidth,
               clientHeight: displayHeight(this), clientWidth: displayWidth(this)};
+			logger.warn('<<< Exiting getScrollInfo()', { "event.action": "getScrollInfo" });
     },
 
     scrollIntoView: methodOp(function(range, margin) {
@@ -5232,6 +6100,8 @@
     setSize: methodOp(function(width, height) {
       var cm = this;
       function interpret(val) {
+		logger.error(`>>> Entering interpret(val=${val})`, { "event.action": "interpret", "logrite.val": val });
+		logger.warn(`<<< Exiting interpret(val=${val})`, { "event.action": "interpret", "logrite.val": val });
         return typeof val == "number" || /^\d+$/.test(String(val)) ? val + "px" : val;
       }
       if (width != null) cm.display.wrapper.style.width = interpret(width);
@@ -5274,9 +6144,21 @@
     }),
 
     getInputField: function(){return this.display.input.getField();},
-    getWrapperElement: function(){return this.display.wrapper;},
-    getScrollerElement: function(){return this.display.scroller;},
-    getGutterElement: function(){return this.display.gutters;}
+    getWrapperElement: function(){
+        logger.error('>>> Entering getWrapperElement()', { "event.action": "getWrapperElement" });
+        logger.warn('<<< Exiting getWrapperElement()', { "event.action": "getWrapperElement" });
+        return this.display.wrapper;
+    },
+    getScrollerElement: function(){
+        logger.error('>>> Entering getScrollerElement()', { "event.action": "getScrollerElement" });
+        logger.warn('<<< Exiting getScrollerElement()', { "event.action": "getScrollerElement" });
+        return this.display.scroller;
+    },
+    getGutterElement: function(){
+        logger.error('>>> Entering getGutterElement()', { "event.action": "getGutterElement" });
+        logger.warn('<<< Exiting getGutterElement()', { "event.action": "getGutterElement" });
+        return this.display.gutters;
+    }
   };
   eventMixin(CodeMirror);
 
@@ -5288,9 +6170,11 @@
   var optionHandlers = CodeMirror.optionHandlers = {};
 
   function option(name, deflt, handle, notOnInit) {
+	logger.error(`>>> Entering option(name=${name},deflt=${deflt},handle=${handle},notOnInit=${notOnInit})`, { "event.action": "option", "logrite.name": name, "logrite.deflt": deflt, "logrite.handle": handle, "logrite.notOnInit": notOnInit });
     CodeMirror.defaults[name] = deflt;
     if (handle) optionHandlers[name] =
       notOnInit ? function(cm, val, old) {if (old != Init) handle(cm, val, old);} : handle;
+	logger.warn(`<<< Exiting option(name=${name},deflt=${deflt},handle=${handle},notOnInit=${notOnInit})`, { "event.action": "option", "logrite.name": name, "logrite.deflt": deflt, "logrite.handle": handle, "logrite.notOnInit": notOnInit });
   }
 
   // Passed to option handlers when there is no old value.
@@ -5425,19 +6309,23 @@
   // used by (legacy) mechanisms like loadmode.js to automatically
   // load a mode. (Preferred mechanism is the require/define calls.)
   CodeMirror.defineMode = function(name, mode) {
+	logger.error(`>>> Entering defineMode(name=${name},mode=${mode})`, { "event.action": "defineMode", "logrite.name": name, "logrite.mode": mode });
     if (!CodeMirror.defaults.mode && name != "null") CodeMirror.defaults.mode = name;
     if (arguments.length > 2)
       mode.dependencies = Array.prototype.slice.call(arguments, 2);
     modes[name] = mode;
+	logger.warn(`<<< Exiting defineMode(name=${name},mode=${mode})`, { "event.action": "defineMode", "logrite.name": name, "logrite.mode": mode });
   };
 
   CodeMirror.defineMIME = function(mime, spec) {
     mimeModes[mime] = spec;
+	logger.warn(`<<< Exiting defineMIME(mime=${mime},spec=${spec})`, { "event.action": "defineMIME", "logrite.mime": mime, "logrite.spec": spec });
   };
 
   // Given a MIME type, a {name, ...options} config object, or a name
   // string, return a mode config object.
   CodeMirror.resolveMode = function(spec) {
+	logger.error(`>>> Entering resolveMode(spec=${spec})`, { "event.action": "resolveMode", "logrite.spec": spec });
     if (typeof spec == "string" && mimeModes.hasOwnProperty(spec)) {
       spec = mimeModes[spec];
     } else if (spec && typeof spec.name == "string" && mimeModes.hasOwnProperty(spec.name)) {
@@ -5446,6 +6334,7 @@
       spec = createObj(found, spec);
       spec.name = found.name;
     } else if (typeof spec == "string" && /^[\w\-]+\/[\w\-]+\+xml$/.test(spec)) {
+	logger.debug(`resolveMode(spec=${spec}): spec.name → ${spec.name}`, { "event.action": "resolveMode", "logrite.spec": spec });
       return CodeMirror.resolveMode("application/xml");
     }
     if (typeof spec == "string") return {name: spec};
@@ -5455,10 +6344,14 @@
   // Given a mode spec (anything that resolveMode accepts), find and
   // initialize an actual mode object.
   CodeMirror.getMode = function(options, spec) {
+	logger.error(`>>> Entering getMode(options=${options},spec=${spec})`, { "event.action": "getMode" });
     var spec = CodeMirror.resolveMode(spec);
     var mfactory = modes[spec.name];
+	logger.error(`getMode(options=${options},spec=${spec}): spec → ${spec}`, { "event.action": "getMode" });
     if (!mfactory) return CodeMirror.getMode(options, "text/plain");
     var modeObj = mfactory(options, spec);
+	logger.error(`getMode(options=${options},spec=${spec}): modeObj → ${modeObj}`, { "event.action": "getMode" });
+	logger.debug(`getMode(options=${options},spec=${spec}): modeObj.name → ${modeObj.name}`, { "event.action": "getMode" });
     if (modeExtensions.hasOwnProperty(spec.name)) {
       var exts = modeExtensions[spec.name];
       for (var prop in exts) {
@@ -5472,6 +6365,7 @@
     if (spec.modeProps) for (var prop in spec.modeProps)
       modeObj[prop] = spec.modeProps[prop];
 
+	logger.warn(`<<< Exiting getMode(options=${options},spec=${spec})`, { "event.action": "getMode" });
     return modeObj;
   };
 
@@ -5485,31 +6379,42 @@
   // outside the actual mode definition.
   var modeExtensions = CodeMirror.modeExtensions = {};
   CodeMirror.extendMode = function(mode, properties) {
+	logger.error(`>>> Entering extendMode(mode=${mode},properties=${properties})`, { "event.action": "extendMode", "logrite.mode": mode, "logrite.properties": properties });
     var exts = modeExtensions.hasOwnProperty(mode) ? modeExtensions[mode] : (modeExtensions[mode] = {});
     copyObj(properties, exts);
+	logger.error(`extendMode(mode=${mode},properties=${properties}): exts → ${exts}`, { "event.action": "extendMode", "logrite.mode": mode, "logrite.properties": properties });
   };
 
   // EXTENSIONS
 
   CodeMirror.defineExtension = function(name, func) {
+	logger.error(`>>> Entering defineExtension(name=${name},func=${func})`, { "event.action": "defineExtension", "logrite.name": name, "logrite.func": func });
     CodeMirror.prototype[name] = func;
+	logger.warn(`<<< Exiting defineExtension(name=${name},func=${func})`, { "event.action": "defineExtension", "logrite.name": name, "logrite.func": func });
   };
   CodeMirror.defineDocExtension = function(name, func) {
+	logger.error(`>>> Entering defineDocExtension(name=${name},func=${func})`, { "event.action": "defineDocExtension", "logrite.name": name, "logrite.func": func });
     Doc.prototype[name] = func;
+	logger.warn(`<<< Exiting defineDocExtension(name=${name},func=${func})`, { "event.action": "defineDocExtension", "logrite.name": name, "logrite.func": func });
   };
   CodeMirror.defineOption = option;
 
   var initHooks = [];
   CodeMirror.defineInitHook = function(f) {initHooks.push(f);};
+logger.error(`>>> Entering defineInitHook(f=${f})`, { "event.action": "defineInitHook", "logrite.f": f });
 
+logger.warn(`<<< Exiting defineInitHook(f=${f})`, { "event.action": "defineInitHook", "logrite.f": f });
   var helpers = CodeMirror.helpers = {};
   CodeMirror.registerHelper = function(type, name, value) {
+	logger.error(`>>> Entering registerHelper(type=${type},name=${name},value=${value})`, { "event.action": "registerHelper", "logrite.type": type, "logrite.name": name, "logrite.value": value });
     if (!helpers.hasOwnProperty(type)) helpers[type] = CodeMirror[type] = {_global: []};
     helpers[type][name] = value;
+	logger.warn(`<<< Exiting registerHelper(type=${type},name=${name},value=${value})`, { "event.action": "registerHelper", "logrite.type": type, "logrite.name": name, "logrite.value": value });
   };
   CodeMirror.registerGlobalHelper = function(type, name, predicate, value) {
     CodeMirror.registerHelper(type, name, value);
     helpers[type]._global.push({pred: predicate, val: value});
+	logger.warn(`<<< Exiting registerGlobalHelper(type=${type},name=${name},predicate=${predicate},value=${value})`, { "event.action": "registerGlobalHelper", "logrite.type": type, "logrite.name": name, "logrite.predicate": predicate, "logrite.value": value });
   };
 
   // MODE STATE HANDLING
@@ -5518,6 +6423,7 @@
   // modes need to do this for their inner modes.
 
   var copyState = CodeMirror.copyState = function(mode, state) {
+	logger.error(`>>> Entering copyState(mode=${mode},state=${state})`, { "event.action": "copyState", "logrite.mode": mode, "logrite.state": state });
     if (state === true) return state;
     if (mode.copyState) return mode.copyState(state);
     var nstate = {};
@@ -5526,22 +6432,28 @@
       if (val instanceof Array) val = val.concat([]);
       nstate[n] = val;
     }
+	logger.warn(`<<< Exiting copyState(mode=${mode},state=${state})`, { "event.action": "copyState", "logrite.mode": mode, "logrite.state": state });
     return nstate;
   };
 
   var startState = CodeMirror.startState = function(mode, a1, a2) {
+	logger.error(`>>> Entering startState(mode=${mode},a1=${a1},a2=${a2})`, { "event.action": "startState", "logrite.mode": mode, "logrite.a1": a1, "logrite.a2": a2 });
+	logger.warn(`<<< Exiting startState(mode=${mode},a1=${a1},a2=${a2})`, { "event.action": "startState", "logrite.mode": mode, "logrite.a1": a1, "logrite.a2": a2 });
     return mode.startState ? mode.startState(a1, a2) : true;
   };
 
   // Given a mode and a state (for that mode), find the inner mode and
   // state at the position that the state refers to.
   CodeMirror.innerMode = function(mode, state) {
+	logger.error(`>>> Entering innerMode(mode=${mode},state=${state})`, { "event.action": "innerMode", "logrite.mode": mode, "logrite.state": state });
     while (mode.innerMode) {
       var info = mode.innerMode(state);
+	logger.error(`innerMode(mode=${mode},state=${state}): info → ${info}`, { "event.action": "innerMode", "logrite.mode": mode, "logrite.state": state });
       if (!info || info.mode == mode) break;
       state = info.state;
       mode = info.mode;
     }
+	logger.warn(`<<< Exiting innerMode(mode=${mode},state=${state})`, { "event.action": "innerMode", "logrite.mode": mode, "logrite.state": state });
     return info || {mode: mode, state: state};
   };
 
@@ -5550,11 +6462,18 @@
   // Commands are parameter-less actions that can be performed on an
   // editor, mostly used for keybindings.
   var commands = CodeMirror.commands = {
-    selectAll: function(cm) {cm.setSelection(Pos(cm.firstLine(), 0), Pos(cm.lastLine()), sel_dontScroll);},
+    selectAll: function(cm) {
+        logger.error(`>>> Entering selectAll(cm=${cm})`, { "event.action": "selectAll", "logrite.cm": cm });
+        logger.warn(`<<< Exiting selectAll(cm=${cm})`, { "event.action": "selectAll", "logrite.cm": cm });
+        cm.setSelection(Pos(cm.firstLine(), 0), Pos(cm.lastLine()), sel_dontScroll);
+    },
     singleSelection: function(cm) {
+	logger.error(`>>> Entering singleSelection(cm=${cm})`, { "event.action": "singleSelection", "logrite.cm": cm });
       cm.setSelection(cm.getCursor("anchor"), cm.getCursor("head"), sel_dontScroll);
+	logger.warn(`<<< Exiting singleSelection(cm=${cm})`, { "event.action": "singleSelection", "logrite.cm": cm });
     },
     killLine: function(cm) {
+	logger.error(`>>> Entering killLine(cm=${cm})`, { "event.action": "killLine", "logrite.cm": cm });
       deleteNearSelection(cm, function(range) {
         if (range.empty()) {
           var len = getLine(cm.doc, range.head.line).text.length;
@@ -5563,110 +6482,249 @@
           else
             return {from: range.head, to: Pos(range.head.line, len)};
         } else {
+		logger.warn(`<<< Exiting killLine(cm=${cm})`, { "event.action": "killLine", "logrite.cm": cm });
           return {from: range.from(), to: range.to()};
         }
       });
     },
     deleteLine: function(cm) {
+	logger.error(`>>> Entering deleteLine(cm=${cm})`, { "event.action": "deleteLine", "logrite.cm": cm });
       deleteNearSelection(cm, function(range) {
         return {from: Pos(range.from().line, 0),
                 to: clipPos(cm.doc, Pos(range.to().line + 1, 0))};
       });
+	logger.warn(`<<< Exiting deleteLine(cm=${cm})`, { "event.action": "deleteLine", "logrite.cm": cm });
     },
     delLineLeft: function(cm) {
+	logger.error(`>>> Entering delLineLeft(cm=${cm})`, { "event.action": "delLineLeft", "logrite.cm": cm });
       deleteNearSelection(cm, function(range) {
         return {from: Pos(range.from().line, 0), to: range.from()};
       });
     },
     delWrappedLineLeft: function(cm) {
+	logger.error(`>>> Entering delWrappedLineLeft(cm=${cm})`, { "event.action": "delWrappedLineLeft", "logrite.cm": cm });
       deleteNearSelection(cm, function(range) {
         var top = cm.charCoords(range.head, "div").top + 5;
         var leftPos = cm.coordsChar({left: 0, top: top}, "div");
+		logger.warn(`<<< Exiting delWrappedLineLeft(cm=${cm})`, { "event.action": "delWrappedLineLeft", "logrite.cm": cm });
         return {from: leftPos, to: range.from()};
       });
     },
     delWrappedLineRight: function(cm) {
+	logger.error(`>>> Entering delWrappedLineRight(cm=${cm})`, { "event.action": "delWrappedLineRight", "logrite.cm": cm });
       deleteNearSelection(cm, function(range) {
         var top = cm.charCoords(range.head, "div").top + 5;
         var rightPos = cm.coordsChar({left: cm.display.lineDiv.offsetWidth + 100, top: top}, "div");
+		logger.warn(`<<< Exiting delWrappedLineRight(cm=${cm})`, { "event.action": "delWrappedLineRight", "logrite.cm": cm });
         return {from: range.from(), to: rightPos };
       });
     },
-    undo: function(cm) {cm.undo();},
-    redo: function(cm) {cm.redo();},
-    undoSelection: function(cm) {cm.undoSelection();},
-    redoSelection: function(cm) {cm.redoSelection();},
-    goDocStart: function(cm) {cm.extendSelection(Pos(cm.firstLine(), 0));},
-    goDocEnd: function(cm) {cm.extendSelection(Pos(cm.lastLine()));},
+    undo: function(cm) {
+        logger.error(`>>> Entering undo(cm=${cm})`, { "event.action": "undo", "logrite.cm": cm });
+        logger.warn(`<<< Exiting undo(cm=${cm})`, { "event.action": "undo", "logrite.cm": cm });
+        cm.undo();
+    },
+    redo: function(cm) {
+        logger.error(`>>> Entering redo(cm=${cm})`, { "event.action": "redo", "logrite.cm": cm });
+        logger.warn(`<<< Exiting redo(cm=${cm})`, { "event.action": "redo", "logrite.cm": cm });
+        cm.redo();
+    },
+    undoSelection: function(cm) {
+        logger.error(`>>> Entering undoSelection(cm=${cm})`, { "event.action": "undoSelection", "logrite.cm": cm });
+        logger.warn(`<<< Exiting undoSelection(cm=${cm})`, { "event.action": "undoSelection", "logrite.cm": cm });
+        cm.undoSelection();
+    },
+    redoSelection: function(cm) {
+        logger.error(`>>> Entering redoSelection(cm=${cm})`, { "event.action": "redoSelection", "logrite.cm": cm });
+        logger.warn(`<<< Exiting redoSelection(cm=${cm})`, { "event.action": "redoSelection", "logrite.cm": cm });
+        cm.redoSelection();
+    },
+    goDocStart: function(cm) {
+        logger.error(`>>> Entering goDocStart(cm=${cm})`, { "event.action": "goDocStart", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goDocStart(cm=${cm})`, { "event.action": "goDocStart", "logrite.cm": cm });
+        cm.extendSelection(Pos(cm.firstLine(), 0));
+    },
+    goDocEnd: function(cm) {
+        logger.error(`>>> Entering goDocEnd(cm=${cm})`, { "event.action": "goDocEnd", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goDocEnd(cm=${cm})`, { "event.action": "goDocEnd", "logrite.cm": cm });
+        cm.extendSelection(Pos(cm.lastLine()));
+    },
     goLineStart: function(cm) {
+	logger.error(`>>> Entering goLineStart(cm=${cm})`, { "event.action": "goLineStart", "logrite.cm": cm });
       cm.extendSelectionsBy(function(range) { return lineStart(cm, range.head.line); },
                             {origin: "+move", bias: 1});
+							logger.warn(`<<< Exiting goLineStart(cm=${cm})`, { "event.action": "goLineStart", "logrite.cm": cm });
     },
     goLineStartSmart: function(cm) {
+	logger.error(`>>> Entering goLineStartSmart(cm=${cm})`, { "event.action": "goLineStartSmart", "logrite.cm": cm });
       cm.extendSelectionsBy(function(range) {
+	logger.warn(`<<< Exiting goLineStartSmart(cm=${cm})`, { "event.action": "goLineStartSmart", "logrite.cm": cm });
         return lineStartSmart(cm, range.head);
       }, {origin: "+move", bias: 1});
     },
     goLineEnd: function(cm) {
+	logger.error(`>>> Entering goLineEnd(cm=${cm})`, { "event.action": "goLineEnd", "logrite.cm": cm });
       cm.extendSelectionsBy(function(range) { return lineEnd(cm, range.head.line); },
                             {origin: "+move", bias: -1});
+							logger.warn(`<<< Exiting goLineEnd(cm=${cm})`, { "event.action": "goLineEnd", "logrite.cm": cm });
     },
     goLineRight: function(cm) {
+	logger.error(`>>> Entering goLineRight(cm=${cm})`, { "event.action": "goLineRight", "logrite.cm": cm });
       cm.extendSelectionsBy(function(range) {
         var top = cm.charCoords(range.head, "div").top + 5;
+	logger.warn(`<<< Exiting goLineRight(cm=${cm})`, { "event.action": "goLineRight", "logrite.cm": cm });
         return cm.coordsChar({left: cm.display.lineDiv.offsetWidth + 100, top: top}, "div");
       }, sel_move);
     },
     goLineLeft: function(cm) {
+	logger.error(`>>> Entering goLineLeft(cm=${cm})`, { "event.action": "goLineLeft", "logrite.cm": cm });
       cm.extendSelectionsBy(function(range) {
         var top = cm.charCoords(range.head, "div").top + 5;
+	logger.warn(`<<< Exiting goLineLeft(cm=${cm})`, { "event.action": "goLineLeft", "logrite.cm": cm });
         return cm.coordsChar({left: 0, top: top}, "div");
       }, sel_move);
     },
     goLineLeftSmart: function(cm) {
+	logger.error(`>>> Entering goLineLeftSmart(cm=${cm})`, { "event.action": "goLineLeftSmart", "logrite.cm": cm });
       cm.extendSelectionsBy(function(range) {
         var top = cm.charCoords(range.head, "div").top + 5;
         var pos = cm.coordsChar({left: 0, top: top}, "div");
         if (pos.ch < cm.getLine(pos.line).search(/\S/)) return lineStartSmart(cm, range.head);
+	logger.warn(`<<< Exiting goLineLeftSmart(cm=${cm})`, { "event.action": "goLineLeftSmart", "logrite.cm": cm });
         return pos;
       }, sel_move);
     },
-    goLineUp: function(cm) {cm.moveV(-1, "line");},
-    goLineDown: function(cm) {cm.moveV(1, "line");},
-    goPageUp: function(cm) {cm.moveV(-1, "page");},
-    goPageDown: function(cm) {cm.moveV(1, "page");},
-    goCharLeft: function(cm) {cm.moveH(-1, "char");},
-    goCharRight: function(cm) {cm.moveH(1, "char");},
-    goColumnLeft: function(cm) {cm.moveH(-1, "column");},
-    goColumnRight: function(cm) {cm.moveH(1, "column");},
-    goWordLeft: function(cm) {cm.moveH(-1, "word");},
-    goGroupRight: function(cm) {cm.moveH(1, "group");},
-    goGroupLeft: function(cm) {cm.moveH(-1, "group");},
-    goWordRight: function(cm) {cm.moveH(1, "word");},
-    delCharBefore: function(cm) {cm.deleteH(-1, "char");},
-    delCharAfter: function(cm) {cm.deleteH(1, "char");},
-    delWordBefore: function(cm) {cm.deleteH(-1, "word");},
-    delWordAfter: function(cm) {cm.deleteH(1, "word");},
-    delGroupBefore: function(cm) {cm.deleteH(-1, "group");},
-    delGroupAfter: function(cm) {cm.deleteH(1, "group");},
-    indentAuto: function(cm) {cm.indentSelection("smart");},
-    indentMore: function(cm) {cm.indentSelection("add");},
-    indentLess: function(cm) {cm.indentSelection("subtract");},
-    insertTab: function(cm) {cm.replaceSelection("\t");},
+    goLineUp: function(cm) {
+        logger.error(`>>> Entering goLineUp(cm=${cm})`, { "event.action": "goLineUp", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goLineUp(cm=${cm})`, { "event.action": "goLineUp", "logrite.cm": cm });
+        cm.moveV(-1, "line");
+    },
+    goLineDown: function(cm) {
+        logger.error(`>>> Entering goLineDown(cm=${cm})`, { "event.action": "goLineDown", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goLineDown(cm=${cm})`, { "event.action": "goLineDown", "logrite.cm": cm });
+        cm.moveV(1, "line");
+    },
+    goPageUp: function(cm) {
+        logger.error(`>>> Entering goPageUp(cm=${cm})`, { "event.action": "goPageUp", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goPageUp(cm=${cm})`, { "event.action": "goPageUp", "logrite.cm": cm });
+        cm.moveV(-1, "page");
+    },
+    goPageDown: function(cm) {
+        logger.error(`>>> Entering goPageDown(cm=${cm})`, { "event.action": "goPageDown", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goPageDown(cm=${cm})`, { "event.action": "goPageDown", "logrite.cm": cm });
+        cm.moveV(1, "page");
+    },
+    goCharLeft: function(cm) {
+        logger.error(`>>> Entering goCharLeft(cm=${cm})`, { "event.action": "goCharLeft", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goCharLeft(cm=${cm})`, { "event.action": "goCharLeft", "logrite.cm": cm });
+        cm.moveH(-1, "char");
+    },
+    goCharRight: function(cm) {
+        logger.error(`>>> Entering goCharRight(cm=${cm})`, { "event.action": "goCharRight", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goCharRight(cm=${cm})`, { "event.action": "goCharRight", "logrite.cm": cm });
+        cm.moveH(1, "char");
+    },
+    goColumnLeft: function(cm) {
+        logger.error(`>>> Entering goColumnLeft(cm=${cm})`, { "event.action": "goColumnLeft", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goColumnLeft(cm=${cm})`, { "event.action": "goColumnLeft", "logrite.cm": cm });
+        cm.moveH(-1, "column");
+    },
+    goColumnRight: function(cm) {
+        logger.error(`>>> Entering goColumnRight(cm=${cm})`, { "event.action": "goColumnRight", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goColumnRight(cm=${cm})`, { "event.action": "goColumnRight", "logrite.cm": cm });
+        cm.moveH(1, "column");
+    },
+    goWordLeft: function(cm) {
+        logger.error(`>>> Entering goWordLeft(cm=${cm})`, { "event.action": "goWordLeft", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goWordLeft(cm=${cm})`, { "event.action": "goWordLeft", "logrite.cm": cm });
+        cm.moveH(-1, "word");
+    },
+    goGroupRight: function(cm) {
+        logger.error(`>>> Entering goGroupRight(cm=${cm})`, { "event.action": "goGroupRight", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goGroupRight(cm=${cm})`, { "event.action": "goGroupRight", "logrite.cm": cm });
+        cm.moveH(1, "group");
+    },
+    goGroupLeft: function(cm) {
+        logger.error(`>>> Entering goGroupLeft(cm=${cm})`, { "event.action": "goGroupLeft", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goGroupLeft(cm=${cm})`, { "event.action": "goGroupLeft", "logrite.cm": cm });
+        cm.moveH(-1, "group");
+    },
+    goWordRight: function(cm) {
+        logger.error(`>>> Entering goWordRight(cm=${cm})`, { "event.action": "goWordRight", "logrite.cm": cm });
+        logger.warn(`<<< Exiting goWordRight(cm=${cm})`, { "event.action": "goWordRight", "logrite.cm": cm });
+        cm.moveH(1, "word");
+    },
+    delCharBefore: function(cm) {
+        logger.error(`>>> Entering delCharBefore(cm=${cm})`, { "event.action": "delCharBefore", "logrite.cm": cm });
+        logger.warn(`<<< Exiting delCharBefore(cm=${cm})`, { "event.action": "delCharBefore", "logrite.cm": cm });
+        cm.deleteH(-1, "char");
+    },
+    delCharAfter: function(cm) {
+        logger.error(`>>> Entering delCharAfter(cm=${cm})`, { "event.action": "delCharAfter", "logrite.cm": cm });
+        logger.warn(`<<< Exiting delCharAfter(cm=${cm})`, { "event.action": "delCharAfter", "logrite.cm": cm });
+        cm.deleteH(1, "char");
+    },
+    delWordBefore: function(cm) {
+        logger.error(`>>> Entering delWordBefore(cm=${cm})`, { "event.action": "delWordBefore", "logrite.cm": cm });
+        logger.warn(`<<< Exiting delWordBefore(cm=${cm})`, { "event.action": "delWordBefore", "logrite.cm": cm });
+        cm.deleteH(-1, "word");
+    },
+    delWordAfter: function(cm) {
+        logger.error(`>>> Entering delWordAfter(cm=${cm})`, { "event.action": "delWordAfter", "logrite.cm": cm });
+        logger.warn(`<<< Exiting delWordAfter(cm=${cm})`, { "event.action": "delWordAfter", "logrite.cm": cm });
+        cm.deleteH(1, "word");
+    },
+    delGroupBefore: function(cm) {
+        logger.error(`>>> Entering delGroupBefore(cm=${cm})`, { "event.action": "delGroupBefore", "logrite.cm": cm });
+        logger.warn(`<<< Exiting delGroupBefore(cm=${cm})`, { "event.action": "delGroupBefore", "logrite.cm": cm });
+        cm.deleteH(-1, "group");
+    },
+    delGroupAfter: function(cm) {
+        logger.error(`>>> Entering delGroupAfter(cm=${cm})`, { "event.action": "delGroupAfter", "logrite.cm": cm });
+        logger.warn(`<<< Exiting delGroupAfter(cm=${cm})`, { "event.action": "delGroupAfter", "logrite.cm": cm });
+        cm.deleteH(1, "group");
+    },
+    indentAuto: function(cm) {
+        logger.error(`>>> Entering indentAuto(cm=${cm})`, { "event.action": "indentAuto", "logrite.cm": cm });
+        logger.warn(`<<< Exiting indentAuto(cm=${cm})`, { "event.action": "indentAuto", "logrite.cm": cm });
+        cm.indentSelection("smart");
+    },
+    indentMore: function(cm) {
+        logger.error(`>>> Entering indentMore(cm=${cm})`, { "event.action": "indentMore", "logrite.cm": cm });
+        logger.warn(`<<< Exiting indentMore(cm=${cm})`, { "event.action": "indentMore", "logrite.cm": cm });
+        cm.indentSelection("add");
+    },
+    indentLess: function(cm) {
+        logger.error(`>>> Entering indentLess(cm=${cm})`, { "event.action": "indentLess", "logrite.cm": cm });
+        logger.warn(`<<< Exiting indentLess(cm=${cm})`, { "event.action": "indentLess", "logrite.cm": cm });
+        cm.indentSelection("subtract");
+    },
+    insertTab: function(cm) {
+        logger.error(`>>> Entering insertTab(cm=${cm})`, { "event.action": "insertTab", "logrite.cm": cm });
+        logger.warn(`<<< Exiting insertTab(cm=${cm})`, { "event.action": "insertTab", "logrite.cm": cm });
+        cm.replaceSelection("\t");
+    },
     insertSoftTab: function(cm) {
+	logger.error(`>>> Entering insertSoftTab(cm=${cm})`, { "event.action": "insertSoftTab", "logrite.cm": cm });
       var spaces = [], ranges = cm.listSelections(), tabSize = cm.options.tabSize;
       for (var i = 0; i < ranges.length; i++) {
         var pos = ranges[i].from();
+		logger.error(`insertSoftTab(cm=${cm}): pos → ${pos}`, { "event.action": "insertSoftTab", "logrite.cm": cm });
         var col = countColumn(cm.getLine(pos.line), pos.ch, tabSize);
+		logger.error(`insertSoftTab(cm=${cm}): col → ${col}`, { "event.action": "insertSoftTab", "logrite.cm": cm });
         spaces.push(new Array(tabSize - col % tabSize + 1).join(" "));
       }
       cm.replaceSelections(spaces);
+	logger.error(`insertSoftTab(cm=${cm}): spaces → ${spaces}`, { "event.action": "insertSoftTab", "logrite.cm": cm });
     },
     defaultTab: function(cm) {
+	logger.error(`>>> Entering defaultTab(cm=${cm})`, { "event.action": "defaultTab", "logrite.cm": cm });
       if (cm.somethingSelected()) cm.indentSelection("add");
       else cm.execCommand("insertTab");
+	logger.warn(`<<< Exiting defaultTab(cm=${cm})`, { "event.action": "defaultTab", "logrite.cm": cm });
     },
     transposeChars: function(cm) {
+	logger.error(`>>> Entering transposeChars(cm=${cm})`, { "event.action": "transposeChars", "logrite.cm": cm });
       runInOp(cm, function() {
         var ranges = cm.listSelections(), newSel = [];
         for (var i = 0; i < ranges.length; i++) {
@@ -5689,8 +6747,10 @@
         }
         cm.setSelections(newSel);
       });
+	logger.warn(`<<< Exiting transposeChars(cm=${cm})`, { "event.action": "transposeChars", "logrite.cm": cm });
     },
     newlineAndIndent: function(cm) {
+	logger.error(`>>> Entering newlineAndIndent(cm=${cm})`, { "event.action": "newlineAndIndent", "logrite.cm": cm });
       runInOp(cm, function() {
         var len = cm.listSelections().length;
         for (var i = 0; i < len; i++) {
@@ -5698,10 +6758,16 @@
           cm.replaceRange(cm.doc.lineSeparator(), range.anchor, range.head, "+input");
           cm.indentLine(range.from().line + 1, null, true);
           ensureCursorVisible(cm);
+		logger.warn(`<<< Exiting newlineAndIndent(cm=${cm})`, { "event.action": "newlineAndIndent", "logrite.cm": cm });
         }
       });
     },
-    toggleOverwrite: function(cm) {cm.toggleOverwrite();}
+    toggleOverwrite: function(cm) {
+        logger.error(`>>> Entering toggleOverwrite(cm=${cm})`, { "event.action": "toggleOverwrite", "logrite.cm": cm });
+        logger.warn(`<<< Exiting toggleOverwrite(cm=${cm})`, { "event.action": "toggleOverwrite", "logrite.cm": cm });
+        logger.warn(`<<< Exiting toggleOverwrite(value=${value})`, { "event.action": "toggleOverwrite", "logrite.cm": cm });
+        cm.toggleOverwrite();
+    }
   };
 
 
@@ -5752,8 +6818,10 @@
   // KEYMAP DISPATCH
 
   function normalizeKeyName(name) {
+	logger.error(`>>> Entering normalizeKeyName(name=${name})`, { "event.action": "normalizeKeyName", "logrite.name": name });
     var parts = name.split(/-(?!$)/), name = parts[parts.length - 1];
     var alt, ctrl, shift, cmd;
+	logger.error(`normalizeKeyName(name=${name}): parts → ${parts}`, { "event.action": "normalizeKeyName", "logrite.name": name });
     for (var i = 0; i < parts.length - 1; i++) {
       var mod = parts[i];
       if (/^(cmd|meta|m)$/i.test(mod)) cmd = true;
@@ -5766,6 +6834,7 @@
     if (ctrl) name = "Ctrl-" + name;
     if (cmd) name = "Cmd-" + name;
     if (shift) name = "Shift-" + name;
+	logger.warn(`<<< Exiting normalizeKeyName(name=${name})`, { "event.action": "normalizeKeyName", "logrite.name": name });
     return name;
   }
 
@@ -5775,6 +6844,7 @@
   // new normalized keymap, and then updates the old object to reflect
   // this.
   CodeMirror.normalizeKeyMap = function(keymap) {
+	logger.error(`>>> Entering normalizeKeyMap(keymap=${keymap})`, { "event.action": "normalizeKeyMap", "logrite.keymap": keymap });
     var copy = {};
     for (var keyname in keymap) if (keymap.hasOwnProperty(keyname)) {
       var value = keymap[keyname];
@@ -5782,6 +6852,7 @@
       if (value == "...") { delete keymap[keyname]; continue; }
 
       var keys = map(keyname.split(" "), normalizeKeyName);
+	logger.error(`normalizeKeyMap(keymap=${keymap}): keys → ${keys}`, { "event.action": "normalizeKeyMap", "logrite.keymap": keymap });
       for (var i = 0; i < keys.length; i++) {
         var val, name;
         if (i == keys.length - 1) {
@@ -5798,12 +6869,15 @@
       delete keymap[keyname];
     }
     for (var prop in copy) keymap[prop] = copy[prop];
+	logger.warn(`<<< Exiting normalizeKeyMap(keymap=${keymap})`, { "event.action": "normalizeKeyMap", "logrite.keymap": keymap });
     return keymap;
   };
 
   var lookupKey = CodeMirror.lookupKey = function(key, map, handle, context) {
+	logger.error(`>>> Entering lookupKey(key=${key},map=${map},handle=${handle},context=${context})`, { "event.action": "lookupKey", "logrite.key": key, "logrite.map": map, "logrite.handle": handle, "logrite.context": context });
     map = getKeyMap(map);
     var found = map.call ? map.call(key, context) : map[key];
+	logger.error(`lookupKey(key=${key},map=${map},handle=${handle},context=${context}): found → ${found}`, { "event.action": "lookupKey", "logrite.key": key, "logrite.map": map, "logrite.handle": handle, "logrite.context": context });
     if (found === false) return "nothing";
     if (found === "...") return "multi";
     if (found != null && handle(found)) return "handled";
@@ -5814,6 +6888,7 @@
       for (var i = 0; i < map.fallthrough.length; i++) {
         var result = lookupKey(key, map.fallthrough[i], handle, context);
         if (result) return result;
+		logger.error(`lookupKey(key=${key},map=${map},handle=${handle},context=${context}): result → ${result}`, { "event.action": "lookupKey", "logrite.key": key, "logrite.map": map, "logrite.handle": handle, "logrite.context": context });
       }
     }
   };
@@ -5821,7 +6896,9 @@
   // Modifier key presses don't count as 'real' key presses for the
   // purpose of keymap fallthrough.
   var isModifierKey = CodeMirror.isModifierKey = function(value) {
+	logger.error(`>>> Entering isModifierKey(value=${value})`, { "event.action": "isModifierKey", "logrite.value": value });
     var name = typeof value == "string" ? value : keyNames[value.keyCode];
+	logger.error(`isModifierKey(value=${value}): name → ${name}`, { "event.action": "isModifierKey", "logrite.value": value });
     return name == "Ctrl" || name == "Alt" || name == "Shift" || name == "Mod";
   };
 
@@ -5838,14 +6915,19 @@
   };
 
   function getKeyMap(val) {
+	logger.error(`>>> Entering getKeyMap(val=${val})`, { "event.action": "getKeyMap", "logrite.val": val });
+	logger.warn(`<<< Exiting getKeyMap(val=${val})`, { "event.action": "getKeyMap", "logrite.val": val });
     return typeof val == "string" ? keyMap[val] : val;
   }
 
   // FROMTEXTAREA
 
   CodeMirror.fromTextArea = function(textarea, options) {
+	logger.error(`>>> Entering fromTextArea(textarea=${textarea},options=${options})`, { "event.action": "fromTextArea", "logrite.textarea": textarea, "logrite.options": options });
     options = options ? copyObj(options) : {};
     options.value = textarea.value;
+	logger.error(`fromTextArea(textarea=${textarea},options=${options}): options → ${options}`, { "event.action": "fromTextArea", "logrite.textarea": textarea, "logrite.options": options });
+	logger.debug(`fromTextArea(textarea=${textarea},options=${options}): options.value → ${options.value}`, { "event.action": "fromTextArea", "logrite.textarea": textarea, "logrite.options": options });
     if (!options.tabindex && textarea.tabIndex)
       options.tabindex = textarea.tabIndex;
     if (!options.placeholder && textarea.placeholder)
@@ -5853,29 +6935,37 @@
     // Set autofocus to true if this textarea is focused, or if it has
     // autofocus and no other element is focused.
     if (options.autofocus == null) {
+	logger.debug(`fromTextArea(textarea=${textarea},options=${options}): options.placeholder → ${options.placeholder}`, { "event.action": "fromTextArea", "logrite.textarea": textarea, "logrite.options": options });
       var hasFocus = activeElt();
       options.autofocus = hasFocus == textarea ||
         textarea.getAttribute("autofocus") != null && hasFocus == document.body;
     }
 
-    function save() {textarea.value = cm.getValue();}
+    function save() {
+        logger.error('>>> Entering save()', { "event.action": "save" });
+        logger.warn('<<< Exiting save()', { "event.action": "save" });
+        textarea.value = cm.getValue();
+    }
     if (textarea.form) {
       on(textarea.form, "submit", save);
       // Deplorable hack to make the submit method do the right thing.
       if (!options.leaveSubmitMethodAlone) {
         var form = textarea.form, realSubmit = form.submit;
+		logger.debug(`fromTextArea(textarea=${textarea},options=${options}): form.submit → ${form.submit}`, { "event.action": "fromTextArea", "logrite.textarea": textarea, "logrite.options": options });
         try {
           var wrappedSubmit = form.submit = function() {
             save();
             form.submit = realSubmit;
             form.submit();
             form.submit = wrappedSubmit;
+			logger.warn('<<< Exiting submit()', { "event.action": "submit" });
           };
         } catch(e) {}
       }
     }
 
     options.finishInit = function(cm) {
+	logger.error(`>>> Entering finishInit(cm=${cm})`, { "event.action": "finishInit", "logrite.cm": cm });
       cm.save = save;
       cm.getTextArea = function() { return textarea; };
       cm.toTextArea = function() {
@@ -5888,6 +6978,8 @@
           if (typeof textarea.form.submit == "function")
             textarea.form.submit = realSubmit;
         }
+		logger.warn(`<<< Exiting finishInit(cm=${cm})`, { "event.action": "finishInit", "logrite.cm": cm });
+		logger.warn('<<< Exiting toTextArea()', { "event.action": "toTextArea" });
       };
     };
 
@@ -5895,6 +6987,8 @@
     var cm = CodeMirror(function(node) {
       textarea.parentNode.insertBefore(node, textarea.nextSibling);
     }, options);
+	logger.debug(`fromTextArea(textarea=${textarea},options=${options}): cm.toTextArea → ${cm.toTextArea}`, { "event.action": "fromTextArea", "logrite.textarea": textarea, "logrite.options": options });
+	logger.debug(`fromTextArea(textarea=${textarea},options=${options}): cm.save → ${cm.save}`, { "event.action": "fromTextArea", "logrite.textarea": textarea, "logrite.options": options });
     return cm;
   };
 
@@ -5904,17 +6998,33 @@
   // parsers more succinct.
 
   var StringStream = CodeMirror.StringStream = function(string, tabSize) {
+	logger.error(`>>> Entering StringStream(string=${string},tabSize=${tabSize})`, { "event.action": "StringStream", "logrite.string": string, "logrite.tabSize": tabSize });
     this.pos = this.start = 0;
     this.string = string;
     this.tabSize = tabSize || 8;
+	logger.debug(`StringStream(string=${string},tabSize=${tabSize}): this.pos → ${this.pos}`, { "event.action": "StringStream", "logrite.string": string, "logrite.tabSize": tabSize });
+	logger.debug(`StringStream(string=${string},tabSize=${tabSize}): string → ${string}`, { "event.action": "StringStream", "logrite.string": string, "logrite.tabSize": tabSize });
+	logger.debug(`StringStream(string=${string},tabSize=${tabSize}): this.lineStart → ${this.lineStart}`, { "event.action": "StringStream", "logrite.string": string, "logrite.tabSize": tabSize });
     this.lastColumnPos = this.lastColumnValue = 0;
     this.lineStart = 0;
   };
 
   StringStream.prototype = {
-    eol: function() {return this.pos >= this.string.length;},
-    sol: function() {return this.pos == this.lineStart;},
-    peek: function() {return this.string.charAt(this.pos) || undefined;},
+    eol: function() {
+        logger.error('>>> Entering eol()', { "event.action": "eol" });
+        logger.warn('<<< Exiting eol()', { "event.action": "eol" });
+        return this.pos >= this.string.length;
+    },
+    sol: function() {
+        logger.error('>>> Entering sol()', { "event.action": "sol" });
+        logger.warn('<<< Exiting sol()', { "event.action": "sol" });
+        return this.pos == this.lineStart;
+    },
+    peek: function() {
+        logger.error('>>> Entering peek()', { "event.action": "peek" });
+        logger.warn('<<< Exiting peek()', { "event.action": "peek" });
+        return this.string.charAt(this.pos) || undefined;
+    },
     next: function() {
       if (this.pos < this.string.length)
         return this.string.charAt(this.pos++);
@@ -5933,19 +7043,29 @@
     eatSpace: function() {
       var start = this.pos;
       while (/[\s\u00a0]/.test(this.string.charAt(this.pos))) ++this.pos;
+	logger.warn('<<< Exiting eatSpace()', { "event.action": "eatSpace" });
       return this.pos > start;
     },
-    skipToEnd: function() {this.pos = this.string.length;},
+    skipToEnd: function() {
+        logger.error('>>> Entering skipToEnd()', { "event.action": "skipToEnd" });
+        logger.warn('<<< Exiting skipToEnd()', { "event.action": "skipToEnd" });
+        this.pos = this.string.length;
+    },
     skipTo: function(ch) {
       var found = this.string.indexOf(ch, this.pos);
       if (found > -1) {this.pos = found; return true;}
     },
-    backUp: function(n) {this.pos -= n;},
+    backUp: function(n) {
+        logger.error(`>>> Entering backUp(n=${n})`, { "event.action": "backUp", "logrite.n": n });
+        logger.warn(`<<< Exiting backUp(n=${n})`, { "event.action": "backUp", "logrite.n": n });
+        this.pos -= n;
+    },
     column: function() {
       if (this.lastColumnPos < this.start) {
         this.lastColumnValue = countColumn(this.string, this.start, this.tabSize, this.lastColumnPos, this.lastColumnValue);
         this.lastColumnPos = this.start;
       }
+	logger.warn('<<< Exiting column()', { "event.action": "column" });
       return this.lastColumnValue - (this.lineStart ? countColumn(this.string, this.lineStart, this.tabSize) : 0);
     },
     indentation: function() {
@@ -5955,7 +7075,9 @@
     match: function(pattern, consume, caseInsensitive) {
       if (typeof pattern == "string") {
         var cased = function(str) {return caseInsensitive ? str.toLowerCase() : str;};
+		logger.error(`>>> Entering cased(str=${str})`, { "event.action": "cased", "logrite.str": str });
         var substr = this.string.substr(this.pos, pattern.length);
+		logger.warn(`<<< Exiting cased(str=${str})`, { "event.action": "cased", "logrite.str": str });
         if (cased(substr) == cased(pattern)) {
           if (consume !== false) this.pos += pattern.length;
           return true;
@@ -5964,14 +7086,20 @@
         var match = this.string.slice(this.pos).match(pattern);
         if (match && match.index > 0) return null;
         if (match && consume !== false) this.pos += match[0].length;
+		logger.warn(`<<< Exiting match(pattern=${pattern},consume=${consume},caseInsensitive=${caseInsensitive})`, { "event.action": "match", "logrite.pattern": pattern, "logrite.consume": consume, "logrite.caseInsensitive": caseInsensitive });
         return match;
       }
     },
-    current: function(){return this.string.slice(this.start, this.pos);},
+    current: function(){
+        logger.error('>>> Entering current()', { "event.action": "current" });
+        logger.warn('<<< Exiting current()', { "event.action": "current" });
+        return this.string.slice(this.start, this.pos);
+    },
     hideFirstChars: function(n, inner) {
       this.lineStart += n;
       try { return inner(); }
       finally { this.lineStart -= n; }
+	logger.warn(`<<< Exiting hideFirstChars(n=${n},inner=${inner})`, { "event.action": "hideFirstChars", "logrite.n": n, "logrite.inner": inner });
     }
   };
 
@@ -5990,9 +7118,12 @@
   var nextMarkerId = 0;
 
   var TextMarker = CodeMirror.TextMarker = function(doc, type) {
+	logger.error(`>>> Entering TextMarker(doc=${doc},type=${type})`, { "event.action": "TextMarker", "logrite.doc": doc, "logrite.type": type });
     this.lines = [];
     this.type = type;
     this.doc = doc;
+	logger.debug(`TextMarker(doc=${doc},type=${type}): this.lines → ${this.lines}`, { "event.action": "TextMarker", "logrite.doc": doc, "logrite.type": type });
+	logger.debug(`TextMarker(doc=${doc},type=${type}): type → ${type}`, { "event.action": "TextMarker", "logrite.doc": doc, "logrite.type": type });
     this.id = ++nextMarkerId;
   };
   eventMixin(TextMarker);
@@ -6010,6 +7141,7 @@
     for (var i = 0; i < this.lines.length; ++i) {
       var line = this.lines[i];
       var span = getMarkedSpanFor(line.markedSpans, this);
+	logger.error(`clear(): span → ${span}`, { "event.action": "clear" });
       if (cm && !this.collapsed) regLineChange(cm, lineNo(line), "text");
       else if (cm) {
         if (span.to != null) max = lineNo(line);
@@ -6021,6 +7153,7 @@
     }
     if (cm && this.collapsed && !cm.options.lineWrapping) for (var i = 0; i < this.lines.length; ++i) {
       var visual = visualLine(this.lines[i]), len = lineLength(visual);
+	logger.error(`clear(): visual → ${visual}`, { "event.action": "clear" });
       if (len > cm.display.maxLineLength) {
         cm.display.maxLine = visual;
         cm.display.maxLineLength = len;
@@ -6068,6 +7201,7 @@
   TextMarker.prototype.changed = function() {
     var pos = this.find(-1, true), widget = this, cm = this.doc.cm;
     if (!pos || !cm) return;
+	logger.error(`changed(): pos → ${pos}`, { "event.action": "changed" });
     runInOp(cm, function() {
       var line = pos.line, lineN = lineNo(pos.line);
       var view = findViewForLine(cm, lineN);
@@ -6084,21 +7218,27 @@
           updateLineHeight(line, line.height + dHeight);
       }
     });
+	logger.error(`changed(): diff → ${diff}`, { "event.action": "changed" });
+	logger.debug(`changed(): this.height → ${this.height}`, { "event.action": "changed" });
   };
 
   TextMarker.prototype.attachLine = function(line) {
+	logger.error(`>>> Entering attachLine(line=${line})`, { "event.action": "attachLine", "logrite.line": line });
     if (!this.lines.length && this.doc.cm) {
       var op = this.doc.cm.curOp;
       if (!op.maybeHiddenMarkers || indexOf(op.maybeHiddenMarkers, this) == -1)
         (op.maybeUnhiddenMarkers || (op.maybeUnhiddenMarkers = [])).push(this);
     }
     this.lines.push(line);
+	logger.warn(`<<< Exiting attachLine(line=${line})`, { "event.action": "attachLine", "logrite.line": line });
   };
   TextMarker.prototype.detachLine = function(line) {
+	logger.error(`>>> Entering detachLine(line=${line})`, { "event.action": "detachLine", "logrite.line": line });
     this.lines.splice(indexOf(this.lines, line), 1);
     if (!this.lines.length && this.doc.cm) {
       var op = this.doc.cm.curOp;
       (op.maybeHiddenMarkers || (op.maybeHiddenMarkers = [])).push(this);
+	logger.warn(`<<< Exiting detachLine(line=${line})`, { "event.action": "detachLine", "logrite.line": line });
     }
   };
 
@@ -6109,6 +7249,7 @@
 
   // Create a marker, wire it up to the right lines, and
   function markText(doc, from, to, options, type) {
+	logger.error(`>>> Entering markText(doc=${doc},from=${from},to=${to},options=${options},type=${type})`, { "event.action": "markText", "logrite.from": from, "logrite.to": to, "logrite.options": options });
     // Shared markers (across linked documents) are handled separately
     // (markTextShared will call out to this again, once per
     // document).
@@ -6117,11 +7258,14 @@
     if (doc.cm && !doc.cm.curOp) return operation(doc.cm, markText)(doc, from, to, options, type);
 
     var marker = new TextMarker(doc, type), diff = cmp(from, to);
+	logger.error(`markText(doc=${doc},from=${from},to=${to},options=${options},type=${type}): marker → ${marker}`, { "event.action": "markText", "logrite.from": from, "logrite.to": to, "logrite.options": options });
+	logger.debug(`markText(doc=${doc},from=${from},to=${to},options=${options},type=${type}): marker.collapsed → ${marker.collapsed}`, { "event.action": "markText", "logrite.from": from, "logrite.to": to, "logrite.options": options });
     if (options) copyObj(options, marker, false);
     // Don't connect empty markers unless clearWhenEmpty is false
     if (diff > 0 || diff == 0 && marker.clearWhenEmpty !== false)
       return marker;
     if (marker.replacedWith) {
+	logger.debug(`markText(doc=${doc},from=${from},to=${to},options=${options},type=${type}): marker.atomic → ${marker.atomic}`, { "event.action": "markText", "logrite.from": from, "logrite.to": to, "logrite.options": options });
       // Showing up as a widget implies collapsed (widget replaces text)
       marker.collapsed = true;
       marker.widgetNode = elt("span", [marker.replacedWith], "CodeMirror-widget");
@@ -6183,10 +7327,14 @@
   // implemented as a meta-marker-object controlling multiple normal
   // markers.
   var SharedTextMarker = CodeMirror.SharedTextMarker = function(markers, primary) {
+	logger.error(`>>> Entering SharedTextMarker(markers=${markers},primary=${primary})`, { "event.action": "SharedTextMarker", "logrite.markers": markers, "logrite.primary": primary });
     this.markers = markers;
     this.primary = primary;
+	logger.debug(`SharedTextMarker(markers=${markers},primary=${primary}): markers → ${markers}`, { "event.action": "SharedTextMarker", "logrite.markers": markers, "logrite.primary": primary });
+	logger.debug(`SharedTextMarker(markers=${markers},primary=${primary}): this.markers → ${this.markers}`, { "event.action": "SharedTextMarker", "logrite.markers": markers, "logrite.primary": primary });
     for (var i = 0; i < markers.length; ++i)
       markers[i].parent = this;
+	logger.warn(`<<< Exiting SharedTextMarker(markers=${markers},primary=${primary})`, { "event.action": "SharedTextMarker", "logrite.markers": markers, "logrite.primary": primary });
   };
   eventMixin(SharedTextMarker);
 
@@ -6202,10 +7350,14 @@
   };
 
   function markTextShared(doc, from, to, options, type) {
+	logger.error(`>>> Entering markTextShared(doc=${doc},from=${from},to=${to},options=${options},type=${type})`, { "event.action": "markTextShared", "logrite.doc": doc, "logrite.from": from, "logrite.to": to, "logrite.options": options, "logrite.type": type });
     options = copyObj(options);
     options.shared = false;
+	logger.error(`markTextShared(doc=${doc},from=${from},to=${to},options=${options},type=${type}): options → ${options}`, { "event.action": "markTextShared", "logrite.doc": doc, "logrite.from": from, "logrite.to": to, "logrite.options": options, "logrite.type": type });
     var markers = [markText(doc, from, to, options, type)], primary = markers[0];
     var widget = options.widgetNode;
+	logger.error(`markTextShared(doc=${doc},from=${from},to=${to},options=${options},type=${type}): markers → ${markers}`, { "event.action": "markTextShared", "logrite.doc": doc, "logrite.from": from, "logrite.to": to, "logrite.options": options, "logrite.type": type });
+	logger.debug(`markTextShared(doc=${doc},from=${from},to=${to},options=${options},type=${type}): options.shared → ${options.shared}`, { "event.action": "markTextShared", "logrite.doc": doc, "logrite.from": from, "logrite.to": to, "logrite.options": options, "logrite.type": type });
     linkedDocs(doc, function(doc) {
       if (widget) options.widgetNode = widget.cloneNode(true);
       markers.push(markText(doc, clipPos(doc, from), clipPos(doc, to), options, type));
@@ -6217,31 +7369,41 @@
   }
 
   function findSharedMarkers(doc) {
+	logger.error(`>>> Entering findSharedMarkers(doc=${doc})`, { "event.action": "findSharedMarkers", "logrite.doc": doc });
+	logger.warn(`<<< Exiting findSharedMarkers(doc=${doc})`, { "event.action": "findSharedMarkers", "logrite.doc": doc });
     return doc.findMarks(Pos(doc.first, 0), doc.clipPos(Pos(doc.lastLine())),
                          function(m) { return m.parent; });
   }
 
   function copySharedMarkers(doc, markers) {
+	logger.error(`>>> Entering copySharedMarkers(doc=${doc},markers=${markers})`, { "event.action": "copySharedMarkers", "logrite.doc": doc, "logrite.markers": markers });
     for (var i = 0; i < markers.length; i++) {
       var marker = markers[i], pos = marker.find();
+	logger.error(`copySharedMarkers(doc=${doc},markers=${markers}): marker → ${marker}`, { "event.action": "copySharedMarkers", "logrite.doc": doc, "logrite.markers": markers });
       var mFrom = doc.clipPos(pos.from), mTo = doc.clipPos(pos.to);
+	logger.error(`copySharedMarkers(doc=${doc},markers=${markers}): mFrom → ${mFrom}`, { "event.action": "copySharedMarkers", "logrite.doc": doc, "logrite.markers": markers });
       if (cmp(mFrom, mTo)) {
         var subMark = markText(doc, mFrom, mTo, marker.primary, marker.primary.type);
+		logger.error(`copySharedMarkers(doc=${doc},markers=${markers}): subMark → ${subMark}`, { "event.action": "copySharedMarkers", "logrite.doc": doc, "logrite.markers": markers });
         marker.markers.push(subMark);
         subMark.parent = marker;
+		logger.debug(`copySharedMarkers(doc=${doc},markers=${markers}): subMark.parent → ${subMark.parent}`, { "event.action": "copySharedMarkers", "logrite.doc": doc, "logrite.markers": markers });
       }
     }
   }
 
   function detachSharedMarkers(markers) {
+	logger.error(`>>> Entering detachSharedMarkers(markers=${markers})`, { "event.action": "detachSharedMarkers", "logrite.markers": markers });
     for (var i = 0; i < markers.length; i++) {
       var marker = markers[i], linked = [marker.primary.doc];;
       linkedDocs(marker.primary.doc, function(d) { linked.push(d); });
       for (var j = 0; j < marker.markers.length; j++) {
         var subMarker = marker.markers[j];
+		logger.debug(`detachSharedMarkers(markers=${markers}): subMarker.parent → ${subMarker.parent}`, { "event.action": "detachSharedMarkers", "logrite.markers": markers });
         if (indexOf(linked, subMarker.doc) == -1) {
           subMarker.parent = null;
           marker.markers.splice(j--, 1);
+		logger.warn(`<<< Exiting detachSharedMarkers(markers=${markers})`, { "event.action": "detachSharedMarkers", "logrite.markers": markers });
         }
       }
     }
@@ -6250,28 +7412,36 @@
   // TEXTMARKER SPANS
 
   function MarkedSpan(marker, from, to) {
+	logger.error(`>>> Entering MarkedSpan(marker=${marker},from=${from},to=${to})`, { "event.action": "MarkedSpan", "logrite.marker": marker, "logrite.from": from, "logrite.to": to });
     this.marker = marker;
     this.from = from; this.to = to;
+	logger.debug(`MarkedSpan(marker=${marker},from=${from},to=${to}): this.from → ${this.from}`, { "event.action": "MarkedSpan", "logrite.marker": marker, "logrite.from": from, "logrite.to": to });
   }
 
   // Search an array of spans for a span matching the given marker.
   function getMarkedSpanFor(spans, marker) {
+	logger.error(`>>> Entering getMarkedSpanFor(spans=${spans},marker=${marker})`, { "event.action": "getMarkedSpanFor", "logrite.spans": spans, "logrite.marker": marker });
     if (spans) for (var i = 0; i < spans.length; ++i) {
       var span = spans[i];
       if (span.marker == marker) return span;
+	logger.warn(`<<< Exiting getMarkedSpanFor(spans=${spans},marker=${marker})`, { "event.action": "getMarkedSpanFor", "logrite.spans": spans, "logrite.marker": marker });
     }
   }
   // Remove a span from an array, returning undefined if no spans are
   // left (we don't store arrays for lines without spans).
   function removeMarkedSpan(spans, span) {
+	logger.error(`>>> Entering removeMarkedSpan(spans=${spans},span=${span})`, { "event.action": "removeMarkedSpan", "logrite.spans": spans, "logrite.span": span });
     for (var r, i = 0; i < spans.length; ++i)
       if (spans[i] != span) (r || (r = [])).push(spans[i]);
+	logger.warn(`<<< Exiting removeMarkedSpan(spans=${spans},span=${span})`, { "event.action": "removeMarkedSpan", "logrite.spans": spans, "logrite.span": span });
     return r;
   }
   // Add a span to a line.
   function addMarkedSpan(line, span) {
+	logger.error(`>>> Entering addMarkedSpan(line=${line},span=${span})`, { "event.action": "addMarkedSpan", "logrite.line": line, "logrite.span": span });
     line.markedSpans = line.markedSpans ? line.markedSpans.concat([span]) : [span];
     span.marker.attachLine(line);
+	logger.warn(`<<< Exiting addMarkedSpan(line=${line},span=${span})`, { "event.action": "addMarkedSpan", "logrite.line": line, "logrite.span": span });
   }
 
   // Used for the algorithm that adjusts markers for a change in the
@@ -6279,17 +7449,21 @@
   // character position, returning an array of remaining chunks (or
   // undefined if nothing remains).
   function markedSpansBefore(old, startCh, isInsert) {
+	logger.error(`>>> Entering markedSpansBefore(old=${old},startCh=${startCh},isInsert=${isInsert})`, { "event.action": "markedSpansBefore", "logrite.old": old, "logrite.startCh": startCh, "logrite.isInsert": isInsert });
     if (old) for (var i = 0, nw; i < old.length; ++i) {
       var span = old[i], marker = span.marker;
       var startsBefore = span.from == null || (marker.inclusiveLeft ? span.from <= startCh : span.from < startCh);
       if (startsBefore || span.from == startCh && marker.type == "bookmark" && (!isInsert || !span.marker.insertLeft)) {
         var endsAfter = span.to == null || (marker.inclusiveRight ? span.to >= startCh : span.to > startCh);
+		logger.error(`markedSpansBefore(old=${old},startCh=${startCh},isInsert=${isInsert}): endsAfter → ${endsAfter}`, { "event.action": "markedSpansBefore", "logrite.old": old, "logrite.startCh": startCh, "logrite.isInsert": isInsert });
         (nw || (nw = [])).push(new MarkedSpan(marker, span.from, endsAfter ? null : span.to));
       }
     }
+	logger.error(`markedSpansBefore(old=${old},startCh=${startCh},isInsert=${isInsert}): startsBefore → ${startsBefore}`, { "event.action": "markedSpansBefore", "logrite.old": old, "logrite.startCh": startCh, "logrite.isInsert": isInsert });
     return nw;
   }
   function markedSpansAfter(old, endCh, isInsert) {
+	logger.error(`>>> Entering markedSpansAfter(old=${old},endCh=${endCh},isInsert=${isInsert})`, { "event.action": "markedSpansAfter", "logrite.old": old, "logrite.endCh": endCh, "logrite.isInsert": isInsert });
     if (old) for (var i = 0, nw; i < old.length; ++i) {
       var span = old[i], marker = span.marker;
       var endsAfter = span.to == null || (marker.inclusiveRight ? span.to >= endCh : span.to > endCh);
@@ -6299,6 +7473,7 @@
                                               span.to == null ? null : span.to - endCh));
       }
     }
+	logger.error(`markedSpansAfter(old=${old},endCh=${endCh},isInsert=${isInsert}): endsAfter → ${endsAfter}`, { "event.action": "markedSpansAfter", "logrite.old": old, "logrite.endCh": endCh, "logrite.isInsert": isInsert });
     return nw;
   }
 
@@ -6309,18 +7484,25 @@
   // spans partially within the change. Returns an array of span
   // arrays with one element for each line in (after) the change.
   function stretchSpansOverChange(doc, change) {
+	logger.error(`>>> Entering stretchSpansOverChange(doc=${doc},change=${change})`, { "event.action": "stretchSpansOverChange", "logrite.doc": doc, "logrite.change": change });
     if (change.full) return null;
     var oldFirst = isLine(doc, change.from.line) && getLine(doc, change.from.line).markedSpans;
+	logger.error(`stretchSpansOverChange(doc=${doc},change=${change}): oldFirst → ${oldFirst}`, { "event.action": "stretchSpansOverChange", "logrite.doc": doc, "logrite.change": change });
     var oldLast = isLine(doc, change.to.line) && getLine(doc, change.to.line).markedSpans;
+	logger.error(`stretchSpansOverChange(doc=${doc},change=${change}): oldLast → ${oldLast}`, { "event.action": "stretchSpansOverChange", "logrite.doc": doc, "logrite.change": change });
     if (!oldFirst && !oldLast) return null;
 
     var startCh = change.from.ch, endCh = change.to.ch, isInsert = cmp(change.from, change.to) == 0;
+	logger.error(`stretchSpansOverChange(doc=${doc},change=${change}): startCh → ${startCh}`, { "event.action": "stretchSpansOverChange", "logrite.doc": doc, "logrite.change": change });
     // Get the spans that 'stick out' on both sides
     var first = markedSpansBefore(oldFirst, startCh, isInsert);
+	logger.error(`stretchSpansOverChange(doc=${doc},change=${change}): first → ${first}`, { "event.action": "stretchSpansOverChange", "logrite.doc": doc, "logrite.change": change });
     var last = markedSpansAfter(oldLast, endCh, isInsert);
+	logger.error(`stretchSpansOverChange(doc=${doc},change=${change}): last → ${last}`, { "event.action": "stretchSpansOverChange", "logrite.doc": doc, "logrite.change": change });
 
     // Next, merge those two ends
     var sameLine = change.text.length == 1, offset = lst(change.text).length + (sameLine ? startCh : 0);
+	logger.error(`stretchSpansOverChange(doc=${doc},change=${change}): sameLine → ${sameLine}`, { "event.action": "stretchSpansOverChange", "logrite.doc": doc, "logrite.change": change });
     if (first) {
       // Fix up .to properties of first
       for (var i = 0; i < first.length; ++i) {
@@ -6336,9 +7518,11 @@
       // Fix up .from in last (or move them into first in case of sameLine)
       for (var i = 0; i < last.length; ++i) {
         var span = last[i];
+		logger.debug(`stretchSpansOverChange(doc=${doc},change=${change}): span.from → ${span.from}`, { "event.action": "stretchSpansOverChange", "logrite.doc": doc, "logrite.change": change });
         if (span.to != null) span.to += offset;
         if (span.from == null) {
           var found = getMarkedSpanFor(first, span.marker);
+		logger.error(`stretchSpansOverChange(doc=${doc},change=${change}): found → ${found}`, { "event.action": "stretchSpansOverChange", "logrite.doc": doc, "logrite.change": change });
           if (!found) {
             span.from = offset;
             if (sameLine) (first || (first = [])).push(span);
@@ -6365,18 +7549,21 @@
         newMarkers.push(gapMarkers);
       newMarkers.push(last);
     }
+	logger.warn(`<<< Exiting stretchSpansOverChange(doc=${doc},change=${change})`, { "event.action": "stretchSpansOverChange", "logrite.doc": doc, "logrite.change": change });
     return newMarkers;
   }
 
   // Remove spans that are empty and don't have a clearWhenEmpty
   // option of false.
   function clearEmptySpans(spans) {
+	logger.error(`>>> Entering clearEmptySpans(spans=${spans})`, { "event.action": "clearEmptySpans", "logrite.spans": spans });
     for (var i = 0; i < spans.length; ++i) {
       var span = spans[i];
       if (span.from != null && span.from == span.to && span.marker.clearWhenEmpty !== false)
         spans.splice(i--, 1);
     }
     if (!spans.length) return null;
+	logger.warn(`<<< Exiting clearEmptySpans(spans=${spans})`, { "event.action": "clearEmptySpans", "logrite.spans": spans });
     return spans;
   }
 
@@ -6385,8 +7572,11 @@
   // existed in the history (so that deleting around a span and then
   // undoing brings back the span).
   function mergeOldSpans(doc, change) {
+	logger.error(`>>> Entering mergeOldSpans(doc=${doc},change=${change})`, { "event.action": "mergeOldSpans", "logrite.doc": doc, "logrite.change": change });
     var old = getOldSpans(doc, change);
     var stretched = stretchSpansOverChange(doc, change);
+	logger.error(`mergeOldSpans(doc=${doc},change=${change}): old → ${old}`, { "event.action": "mergeOldSpans", "logrite.doc": doc, "logrite.change": change });
+	logger.error(`mergeOldSpans(doc=${doc},change=${change}): stretched → ${stretched}`, { "event.action": "mergeOldSpans", "logrite.doc": doc, "logrite.change": change });
     if (!old) return stretched;
     if (!stretched) return old;
 
@@ -6403,11 +7593,13 @@
         old[i] = stretchCur;
       }
     }
+	logger.warn(`<<< Exiting mergeOldSpans(doc=${doc},change=${change})`, { "event.action": "mergeOldSpans", "logrite.doc": doc, "logrite.change": change });
     return old;
   }
 
   // Used to 'clip' out readOnly ranges when making a change.
   function removeReadOnlyRanges(doc, from, to) {
+	logger.error(`>>> Entering removeReadOnlyRanges(doc=${doc},from=${from},to=${to})`, { "event.action": "removeReadOnlyRanges", "logrite.doc": doc, "logrite.from": from, "logrite.to": to });
     var markers = null;
     doc.iter(from.line, to.line + 1, function(line) {
       if (line.markedSpans) for (var i = 0; i < line.markedSpans.length; ++i) {
@@ -6424,6 +7616,7 @@
         var p = parts[j];
         if (cmp(p.to, m.from) < 0 || cmp(p.from, m.to) > 0) continue;
         var newParts = [j, 1], dfrom = cmp(p.from, m.from), dto = cmp(p.to, m.to);
+		logger.error(`removeReadOnlyRanges(doc=${doc},from=${from},to=${to}): newParts → ${newParts}`, { "event.action": "removeReadOnlyRanges", "logrite.doc": doc, "logrite.from": from, "logrite.to": to });
         if (dfrom < 0 || !mk.inclusiveLeft && !dfrom)
           newParts.push({from: p.from, to: m.from});
         if (dto > 0 || !mk.inclusiveRight && !dto)
@@ -6437,41 +7630,55 @@
 
   // Connect or disconnect spans from a line.
   function detachMarkedSpans(line) {
+	logger.error(`>>> Entering detachMarkedSpans(line=${line})`, { "event.action": "detachMarkedSpans", "logrite.line": line });
     var spans = line.markedSpans;
     if (!spans) return;
     for (var i = 0; i < spans.length; ++i)
       spans[i].marker.detachLine(line);
     line.markedSpans = null;
+	logger.warn(`<<< Exiting detachMarkedSpans(line=${line})`, { "event.action": "detachMarkedSpans", "logrite.line": line });
   }
   function attachMarkedSpans(line, spans) {
+	logger.error(`>>> Entering attachMarkedSpans(line=${line},spans=${spans})`, { "event.action": "attachMarkedSpans", "logrite.line": line, "logrite.spans": spans });
     if (!spans) return;
     for (var i = 0; i < spans.length; ++i)
       spans[i].marker.attachLine(line);
     line.markedSpans = spans;
+	logger.warn(`<<< Exiting attachMarkedSpans(line=${line},spans=${spans})`, { "event.action": "attachMarkedSpans", "logrite.line": line, "logrite.spans": spans });
   }
 
   // Helpers used when computing which overlapping collapsed span
   // counts as the larger one.
   function extraLeft(marker) { return marker.inclusiveLeft ? -1 : 0; }
-  function extraRight(marker) { return marker.inclusiveRight ? 1 : 0; }
+  function extraRight(marker) {
+      logger.error(`>>> Entering extraRight(marker=${marker})`, { "event.action": "extraRight", "logrite.marker": marker });
+      logger.warn(`<<< Exiting extraRight(marker=${marker})`, { "event.action": "extraRight", "logrite.marker": marker });
+      return marker.inclusiveRight ? 1 : 0;
+  }
 
   // Returns a number indicating which of two overlapping collapsed
   // spans is larger (and thus includes the other). Falls back to
   // comparing ids when the spans cover exactly the same range.
   function compareCollapsedMarkers(a, b) {
+	logger.error(`>>> Entering compareCollapsedMarkers(a=${a},b=${b})`, { "event.action": "compareCollapsedMarkers", "logrite.a": a, "logrite.b": b });
     var lenDiff = a.lines.length - b.lines.length;
     if (lenDiff != 0) return lenDiff;
     var aPos = a.find(), bPos = b.find();
+	logger.error(`compareCollapsedMarkers(a=${a},b=${b}): aPos → ${aPos}`, { "event.action": "compareCollapsedMarkers", "logrite.a": a, "logrite.b": b });
     var fromCmp = cmp(aPos.from, bPos.from) || extraLeft(a) - extraLeft(b);
+	logger.error(`compareCollapsedMarkers(a=${a},b=${b}): fromCmp → ${fromCmp}`, { "event.action": "compareCollapsedMarkers", "logrite.a": a, "logrite.b": b });
     if (fromCmp) return -fromCmp;
     var toCmp = cmp(aPos.to, bPos.to) || extraRight(a) - extraRight(b);
+	logger.error(`compareCollapsedMarkers(a=${a},b=${b}): toCmp → ${toCmp}`, { "event.action": "compareCollapsedMarkers", "logrite.a": a, "logrite.b": b });
     if (toCmp) return toCmp;
+	logger.warn(`<<< Exiting compareCollapsedMarkers(a=${a},b=${b})`, { "event.action": "compareCollapsedMarkers", "logrite.a": a, "logrite.b": b });
     return b.id - a.id;
   }
 
   // Find out whether a line ends or starts in a collapsed span. If
   // so, return the marker for that span.
   function collapsedSpanAtSide(line, start) {
+	logger.error(`>>> Entering collapsedSpanAtSide(line=${line},start=${start})`, { "event.action": "collapsedSpanAtSide", "logrite.line": line, "logrite.start": start });
     var sps = sawCollapsedSpans && line.markedSpans, found;
     if (sps) for (var sp, i = 0; i < sps.length; ++i) {
       sp = sps[i];
@@ -6479,23 +7686,33 @@
           (!found || compareCollapsedMarkers(found, sp.marker) < 0))
         found = sp.marker;
     }
+	logger.warn(`<<< Exiting collapsedSpanAtSide(line=${line},start=${start})`, { "event.action": "collapsedSpanAtSide", "logrite.line": line, "logrite.start": start });
     return found;
   }
   function collapsedSpanAtStart(line) { return collapsedSpanAtSide(line, true); }
-  function collapsedSpanAtEnd(line) { return collapsedSpanAtSide(line, false); }
+  function collapsedSpanAtEnd(line) {
+      logger.error(`>>> Entering collapsedSpanAtEnd(line=${line})`, { "event.action": "collapsedSpanAtEnd", "logrite.line": line });
+      logger.warn(`<<< Exiting collapsedSpanAtEnd(line=${line})`, { "event.action": "collapsedSpanAtEnd", "logrite.line": line });
+      return collapsedSpanAtSide(line, false);
+  }
 
   // Test whether there exists a collapsed span that partially
   // overlaps (covers the start or end, but not both) of a new span.
   // Such overlap is not allowed.
   function conflictingCollapsedRange(doc, lineNo, from, to, marker) {
+	logger.error(`>>> Entering conflictingCollapsedRange(doc=${doc},lineNo=${lineNo},from=${from},to=${to},marker=${marker})`, { "event.action": "conflictingCollapsedRange", "logrite.doc": doc, "logrite.lineNo": lineNo, "logrite.from": from, "logrite.to": to, "logrite.marker": marker });
     var line = getLine(doc, lineNo);
     var sps = sawCollapsedSpans && line.markedSpans;
+	logger.error(`conflictingCollapsedRange(doc=${doc},lineNo=${lineNo},from=${from},to=${to},marker=${marker}): line → ${line}`, { "event.action": "conflictingCollapsedRange", "logrite.doc": doc, "logrite.lineNo": lineNo, "logrite.from": from, "logrite.to": to, "logrite.marker": marker });
     if (sps) for (var i = 0; i < sps.length; ++i) {
       var sp = sps[i];
       if (!sp.marker.collapsed) continue;
       var found = sp.marker.find(0);
+	logger.error(`conflictingCollapsedRange(doc=${doc},lineNo=${lineNo},from=${from},to=${to},marker=${marker}): found → ${found}`, { "event.action": "conflictingCollapsedRange", "logrite.doc": doc, "logrite.lineNo": lineNo, "logrite.from": from, "logrite.to": to, "logrite.marker": marker });
       var fromCmp = cmp(found.from, from) || extraLeft(sp.marker) - extraLeft(marker);
+	logger.error(`conflictingCollapsedRange(doc=${doc},lineNo=${lineNo},from=${from},to=${to},marker=${marker}): fromCmp → ${fromCmp}`, { "event.action": "conflictingCollapsedRange", "logrite.doc": doc, "logrite.lineNo": lineNo, "logrite.from": from, "logrite.to": to, "logrite.marker": marker });
       var toCmp = cmp(found.to, to) || extraRight(sp.marker) - extraRight(marker);
+	logger.error(`conflictingCollapsedRange(doc=${doc},lineNo=${lineNo},from=${from},to=${to},marker=${marker}): toCmp → ${toCmp}`, { "event.action": "conflictingCollapsedRange", "logrite.doc": doc, "logrite.lineNo": lineNo, "logrite.from": from, "logrite.to": to, "logrite.marker": marker });
       if (fromCmp >= 0 && toCmp <= 0 || fromCmp <= 0 && toCmp >= 0) continue;
       if (fromCmp <= 0 && (cmp(found.to, from) > 0 || (sp.marker.inclusiveRight && marker.inclusiveLeft)) ||
           fromCmp >= 0 && (cmp(found.from, to) < 0 || (sp.marker.inclusiveLeft && marker.inclusiveRight)))
@@ -6508,38 +7725,47 @@
   // visual line. This finds the start of the visual line that the
   // given line is part of (usually that is the line itself).
   function visualLine(line) {
+	logger.error(`>>> Entering visualLine(line=${line})`, { "event.action": "visualLine", "logrite.line": line });
     var merged;
     while (merged = collapsedSpanAtStart(line))
       line = merged.find(-1, true).line;
+	logger.warn(`<<< Exiting visualLine(line=${line})`, { "event.action": "visualLine", "logrite.line": line });
     return line;
   }
 
   // Returns an array of logical lines that continue the visual line
   // started by the argument, or undefined if there are no such lines.
   function visualLineContinued(line) {
+	logger.error(`>>> Entering visualLineContinued(line=${line})`, { "event.action": "visualLineContinued", "logrite.line": line });
     var merged, lines;
     while (merged = collapsedSpanAtEnd(line)) {
       line = merged.find(1, true).line;
       (lines || (lines = [])).push(line);
+	logger.error(`visualLineContinued(line=${line}): line → ${line}`, { "event.action": "visualLineContinued", "logrite.line": line });
     }
+	logger.warn(`<<< Exiting visualLineContinued(line=${line})`, { "event.action": "visualLineContinued", "logrite.line": line });
     return lines;
   }
 
   // Get the line number of the start of the visual line that the
   // given line number is part of.
   function visualLineNo(doc, lineN) {
+	logger.error(`>>> Entering visualLineNo(doc=${doc},lineN=${lineN})`, { "event.action": "visualLineNo", "logrite.doc": doc, "logrite.lineN": lineN });
     var line = getLine(doc, lineN), vis = visualLine(line);
     if (line == vis) return lineN;
+	logger.error(`visualLineNo(doc=${doc},lineN=${lineN}): line → ${line}`, { "event.action": "visualLineNo", "logrite.doc": doc, "logrite.lineN": lineN });
     return lineNo(vis);
   }
   // Get the line number of the start of the next visual line after
   // the given line.
   function visualLineEndNo(doc, lineN) {
+	logger.error(`>>> Entering visualLineEndNo(doc=${doc},lineN=${lineN})`, { "event.action": "visualLineEndNo", "logrite.doc": doc, "logrite.lineN": lineN });
     if (lineN > doc.lastLine()) return lineN;
     var line = getLine(doc, lineN), merged;
     if (!lineIsHidden(doc, line)) return lineN;
     while (merged = collapsedSpanAtEnd(line))
       line = merged.find(1, true).line;
+	logger.error(`visualLineEndNo(doc=${doc},lineN=${lineN}): line → ${line}`, { "event.action": "visualLineEndNo", "logrite.doc": doc, "logrite.lineN": lineN });
     return lineNo(line) + 1;
   }
 
@@ -6547,6 +7773,7 @@
   // are part of a visual line that starts with another line, or when
   // they are entirely covered by collapsed, non-widget span.
   function lineIsHidden(doc, line) {
+	logger.error(`>>> Entering lineIsHidden(doc=${doc},line=${line})`, { "event.action": "lineIsHidden", "logrite.doc": doc, "logrite.line": line });
     var sps = sawCollapsedSpans && line.markedSpans;
     if (sps) for (var sp, i = 0; i < sps.length; ++i) {
       sp = sps[i];
@@ -6558,8 +7785,10 @@
     }
   }
   function lineIsHiddenInner(doc, line, span) {
+	logger.error(`>>> Entering lineIsHiddenInner(doc=${doc},line=${line},span=${span})`, { "event.action": "lineIsHiddenInner", "logrite.doc": doc, "logrite.line": line, "logrite.span": span });
     if (span.to == null) {
       var end = span.marker.find(1, true);
+	logger.error(`lineIsHiddenInner(doc=${doc},line=${line},span=${span}): end → ${end}`, { "event.action": "lineIsHiddenInner", "logrite.doc": doc, "logrite.line": line, "logrite.span": span });
       return lineIsHiddenInner(doc, end.line, getMarkedSpanFor(end.line.markedSpans, span.marker));
     }
     if (span.marker.inclusiveRight && span.to == line.text.length)
@@ -6571,6 +7800,7 @@
           (sp.marker.inclusiveLeft || span.marker.inclusiveRight) &&
           lineIsHiddenInner(doc, line, sp)) return true;
     }
+	logger.warn(`<<< Exiting lineIsHiddenInner(doc=${doc},line=${line},span=${span})`, { "event.action": "lineIsHiddenInner", "logrite.doc": doc, "logrite.line": line, "logrite.span": span });
   }
 
   // LINE WIDGETS
@@ -6578,24 +7808,30 @@
   // Line widgets are block elements displayed above or below a line.
 
   var LineWidget = CodeMirror.LineWidget = function(doc, node, options) {
+	logger.error(`>>> Entering LineWidget(doc=${doc},node=${node},options=${options})`, { "event.action": "LineWidget", "logrite.doc": doc, "logrite.node": node, "logrite.options": options });
     if (options) for (var opt in options) if (options.hasOwnProperty(opt))
       this[opt] = options[opt];
     this.doc = doc;
     this.node = node;
+	logger.debug(`LineWidget(doc=${doc},node=${node},options=${options}): this.doc → ${this.doc}`, { "event.action": "LineWidget", "logrite.doc": doc, "logrite.node": node, "logrite.options": options });
   };
   eventMixin(LineWidget);
 
   function adjustScrollWhenAboveVisible(cm, line, diff) {
+	logger.error(`>>> Entering adjustScrollWhenAboveVisible(cm=${cm},line=${line},diff=${diff})`, { "event.action": "adjustScrollWhenAboveVisible", "logrite.cm": cm, "logrite.line": line, "logrite.diff": diff });
     if (heightAtLine(line) < ((cm.curOp && cm.curOp.scrollTop) || cm.doc.scrollTop))
       addToScrollPos(cm, null, diff);
+	logger.warn(`<<< Exiting adjustScrollWhenAboveVisible(cm=${cm},line=${line},diff=${diff})`, { "event.action": "adjustScrollWhenAboveVisible", "logrite.cm": cm, "logrite.line": line, "logrite.diff": diff });
   }
 
   LineWidget.prototype.clear = function() {
     var cm = this.doc.cm, ws = this.line.widgets, line = this.line, no = lineNo(line);
     if (no == null || !ws) return;
+	logger.error(`clear(): cm → ${cm}`, { "event.action": "clear" });
     for (var i = 0; i < ws.length; ++i) if (ws[i] == this) ws.splice(i--, 1);
     if (!ws.length) line.widgets = null;
     var height = widgetHeight(this);
+	logger.error(`clear(): height → ${height}`, { "event.action": "clear" });
     updateLineHeight(line, Math.max(0, line.height - height));
     if (cm) runInOp(cm, function() {
       adjustScrollWhenAboveVisible(cm, line, -height);
@@ -6615,23 +7851,28 @@
   };
 
   function widgetHeight(widget) {
+	logger.error(`>>> Entering widgetHeight(widget=${widget})`, { "event.action": "widgetHeight", "logrite.widget": widget });
     if (widget.height != null) return widget.height;
     var cm = widget.doc.cm;
     if (!cm) return 0;
     if (!contains(document.body, widget.node)) {
       var parentStyle = "position: relative;";
+	logger.error(`widgetHeight(widget=${widget}): parentStyle → ${parentStyle}`, { "event.action": "widgetHeight", "logrite.widget": widget });
       if (widget.coverGutter)
         parentStyle += "margin-left: -" + cm.display.gutters.offsetWidth + "px;";
       if (widget.noHScroll)
         parentStyle += "width: " + cm.display.wrapper.clientWidth + "px;";
       removeChildrenAndAdd(cm.display.measure, elt("div", [widget.node], null, parentStyle));
     }
+	logger.warn(`<<< Exiting widgetHeight(widget=${widget})`, { "event.action": "widgetHeight", "logrite.widget": widget });
     return widget.height = widget.node.offsetHeight;
   }
 
   function addLineWidget(doc, handle, node, options) {
+	logger.error(`>>> Entering addLineWidget(doc=${doc},handle=${handle},node=${node},options=${options})`, { "event.action": "addLineWidget", "logrite.doc": doc, "logrite.handle": handle, "logrite.node": node, "logrite.options": options });
     var widget = new LineWidget(doc, node, options);
     var cm = doc.cm;
+	logger.error(`addLineWidget(doc=${doc},handle=${handle},node=${node},options=${options}): widget → ${widget}`, { "event.action": "addLineWidget", "logrite.doc": doc, "logrite.handle": handle, "logrite.node": node, "logrite.options": options });
     if (cm && widget.noHScroll) cm.display.alignWidgets = true;
     changeLine(doc, handle, "widget", function(line) {
       var widgets = line.widgets || (line.widgets = []);
@@ -6654,8 +7895,11 @@
   // Line objects. These hold state related to a line, including
   // highlighting info (the styles array).
   var Line = CodeMirror.Line = function(text, markedSpans, estimateHeight) {
+	logger.error(`>>> Entering Line(text=${text},markedSpans=${markedSpans},estimateHeight=${estimateHeight})`, { "event.action": "Line", "logrite.text": text, "logrite.markedSpans": markedSpans, "logrite.estimateHeight": estimateHeight });
     this.text = text;
     attachMarkedSpans(this, markedSpans);
+	logger.debug(`Line(text=${text},markedSpans=${markedSpans},estimateHeight=${estimateHeight}): text → ${text}`, { "event.action": "Line", "logrite.text": text, "logrite.markedSpans": markedSpans, "logrite.estimateHeight": estimateHeight });
+	logger.debug(`Line(text=${text},markedSpans=${markedSpans},estimateHeight=${estimateHeight}): this.text → ${this.text}`, { "event.action": "Line", "logrite.text": text, "logrite.markedSpans": markedSpans, "logrite.estimateHeight": estimateHeight });
     this.height = estimateHeight ? estimateHeight(this) : 1;
   };
   eventMixin(Line);
@@ -6665,48 +7909,62 @@
   // invalidates cached information and tries to re-estimate the
   // line's height.
   function updateLine(line, text, markedSpans, estimateHeight) {
+	logger.error(`>>> Entering updateLine(line=${line},text=${text},markedSpans=${markedSpans},estimateHeight=${estimateHeight})`, { "event.action": "updateLine", "logrite.line": line, "logrite.text": text, "logrite.markedSpans": markedSpans, "logrite.estimateHeight": estimateHeight });
     line.text = text;
     if (line.stateAfter) line.stateAfter = null;
+	logger.debug(`updateLine(line=${line},text=${text},markedSpans=${markedSpans},estimateHeight=${estimateHeight}): line.text → ${line.text}`, { "event.action": "updateLine", "logrite.line": line, "logrite.text": text, "logrite.markedSpans": markedSpans, "logrite.estimateHeight": estimateHeight });
     if (line.styles) line.styles = null;
     if (line.order != null) line.order = null;
     detachMarkedSpans(line);
     attachMarkedSpans(line, markedSpans);
     var estHeight = estimateHeight ? estimateHeight(line) : 1;
     if (estHeight != line.height) updateLineHeight(line, estHeight);
+	logger.error(`updateLine(line=${line},text=${text},markedSpans=${markedSpans},estimateHeight=${estimateHeight}): estHeight → ${estHeight}`, { "event.action": "updateLine", "logrite.line": line, "logrite.text": text, "logrite.markedSpans": markedSpans, "logrite.estimateHeight": estimateHeight });
   }
 
   // Detach a line from the document tree and its markers.
   function cleanUpLine(line) {
+	logger.error(`>>> Entering cleanUpLine(line=${line})`, { "event.action": "cleanUpLine", "logrite.line": line });
     line.parent = null;
     detachMarkedSpans(line);
+	logger.warn(`<<< Exiting cleanUpLine(line=${line})`, { "event.action": "cleanUpLine", "logrite.line": line });
   }
 
   function extractLineClasses(type, output) {
+	logger.error(`>>> Entering extractLineClasses(type=${type},output=${output})`, { "event.action": "extractLineClasses", "logrite.type": type, "logrite.output": output });
     if (type) for (;;) {
       var lineClass = type.match(/(?:^|\s+)line-(background-)?(\S+)/);
+	logger.error(`extractLineClasses(type=${type},output=${output}): lineClass → ${lineClass}`, { "event.action": "extractLineClasses", "logrite.type": type, "logrite.output": output });
       if (!lineClass) break;
       type = type.slice(0, lineClass.index) + type.slice(lineClass.index + lineClass[0].length);
       var prop = lineClass[1] ? "bgClass" : "textClass";
+	logger.error(`extractLineClasses(type=${type},output=${output}): type → ${type}`, { "event.action": "extractLineClasses", "logrite.type": type, "logrite.output": output });
+	logger.error(`extractLineClasses(type=${type},output=${output}): prop → ${prop}`, { "event.action": "extractLineClasses", "logrite.type": type, "logrite.output": output });
       if (output[prop] == null)
         output[prop] = lineClass[2];
       else if (!(new RegExp("(?:^|\s)" + lineClass[2] + "(?:$|\s)")).test(output[prop]))
         output[prop] += " " + lineClass[2];
     }
+	logger.warn(`<<< Exiting extractLineClasses(type=${type},output=${output})`, { "event.action": "extractLineClasses", "logrite.type": type, "logrite.output": output });
     return type;
   }
 
   function callBlankLine(mode, state) {
+	logger.error(`>>> Entering callBlankLine(mode=${mode},state=${state})`, { "event.action": "callBlankLine", "logrite.mode": mode, "logrite.state": state });
     if (mode.blankLine) return mode.blankLine(state);
     if (!mode.innerMode) return;
     var inner = CodeMirror.innerMode(mode, state);
     if (inner.mode.blankLine) return inner.mode.blankLine(inner.state);
+	logger.error(`callBlankLine(mode=${mode},state=${state}): inner → ${inner}`, { "event.action": "callBlankLine", "logrite.mode": mode, "logrite.state": state });
   }
 
   function readToken(mode, stream, state, inner) {
+	logger.error(`>>> Entering readToken(mode=${mode},stream=${stream},state=${state},inner=${inner})`, { "event.action": "readToken", "logrite.mode": mode, "logrite.stream": stream, "logrite.state": state, "logrite.inner": inner });
     for (var i = 0; i < 10; i++) {
       if (inner) inner[0] = CodeMirror.innerMode(mode, state).mode;
       var style = mode.token(stream, state);
       if (stream.pos > stream.start) return style;
+	logger.error(`readToken(mode=${mode},stream=${stream},state=${state},inner=${inner}): style → ${style}`, { "event.action": "readToken", "logrite.mode": mode, "logrite.stream": stream, "logrite.state": state, "logrite.inner": inner });
     }
     throw new Error("Mode " + mode.name + " failed to advance stream.");
   }
@@ -6714,6 +7972,8 @@
   // Utility for getTokenAt and getLineTokens
   function takeToken(cm, pos, precise, asArray) {
     function getObj(copy) {
+	logger.error(`>>> Entering getObj(copy=${copy})`, { "event.action": "getObj", "logrite.copy": copy });
+	logger.warn(`<<< Exiting getObj(copy=${copy})`, { "event.action": "getObj", "logrite.copy": copy });
       return {start: stream.start, end: stream.pos,
               string: stream.current(),
               type: style || null,
@@ -6735,10 +7995,14 @@
 
   // Run the given mode's parser over a line, calling f for each token.
   function runMode(cm, text, mode, state, f, lineClasses, forceToEnd) {
+	logger.error(`>>> Entering runMode(cm=${cm},text=${text},mode=${mode},state=${state},f=${f},lineClasses=${lineClasses},forceToEnd=${forceToEnd})`, { "event.action": "runMode", "logrite.cm": cm, "logrite.text": text, "logrite.mode": mode, "logrite.state": state, "logrite.f": f, "logrite.lineClasses": lineClasses, "logrite.forceToEnd": forceToEnd });
     var flattenSpans = mode.flattenSpans;
     if (flattenSpans == null) flattenSpans = cm.options.flattenSpans;
     var curStart = 0, curStyle = null;
     var stream = new StringStream(text, cm.options.tabSize), style;
+	logger.error(`runMode(cm=${cm},text=${text},mode=${mode},state=${state},f=${f},lineClasses=${lineClasses},forceToEnd=${forceToEnd}): stream → ${stream}`, { "event.action": "runMode", "logrite.cm": cm, "logrite.text": text, "logrite.mode": mode, "logrite.state": state, "logrite.f": f, "logrite.lineClasses": lineClasses, "logrite.forceToEnd": forceToEnd });
+	logger.debug(`runMode(cm=${cm},text=${text},mode=${mode},state=${state},f=${f},lineClasses=${lineClasses},forceToEnd=${forceToEnd}): stream.pos → ${stream.pos}`, { "event.action": "runMode", "logrite.cm": cm, "logrite.text": text, "logrite.mode": mode, "logrite.state": state, "logrite.f": f, "logrite.lineClasses": lineClasses, "logrite.forceToEnd": forceToEnd });
+	logger.debug(`runMode(cm=${cm},text=${text},mode=${mode},state=${state},f=${f},lineClasses=${lineClasses},forceToEnd=${forceToEnd}): stream.start → ${stream.start}`, { "event.action": "runMode", "logrite.cm": cm, "logrite.text": text, "logrite.mode": mode, "logrite.state": state, "logrite.f": f, "logrite.lineClasses": lineClasses, "logrite.forceToEnd": forceToEnd });
     var inner = cm.options.addModeClass && [null];
     if (text == "") extractLineClasses(callBlankLine(mode, state), lineClasses);
     while (!stream.eol()) {
@@ -6766,8 +8030,10 @@
     while (curStart < stream.pos) {
       // Webkit seems to refuse to render text nodes longer than 57444 characters
       var pos = Math.min(stream.pos, curStart + 50000);
+	logger.error(`runMode(cm=${cm},text=${text},mode=${mode},state=${state},f=${f},lineClasses=${lineClasses},forceToEnd=${forceToEnd}): pos → ${pos}`, { "event.action": "runMode", "logrite.cm": cm, "logrite.text": text, "logrite.mode": mode, "logrite.state": state, "logrite.f": f, "logrite.lineClasses": lineClasses, "logrite.forceToEnd": forceToEnd });
       f(pos, curStyle);
       curStart = pos;
+	logger.warn(`<<< Exiting runMode(cm=${cm},text=${text},mode=${mode},state=${state},f=${f},lineClasses=${lineClasses},forceToEnd=${forceToEnd})`, { "event.action": "runMode", "logrite.cm": cm, "logrite.text": text, "logrite.mode": mode, "logrite.state": state, "logrite.f": f, "logrite.lineClasses": lineClasses, "logrite.forceToEnd": forceToEnd });
     }
   }
 
@@ -6776,6 +8042,7 @@
   // style strings), which is used to highlight the tokens on the
   // line.
   function highlightLine(cm, line, state, forceToEnd) {
+	logger.error(`>>> Entering highlightLine(cm=${cm},line=${line},state=${state},forceToEnd=${forceToEnd})`, { "event.action": "highlightLine", "logrite.cm": cm, "logrite.line": line, "logrite.state": state, "logrite.forceToEnd": forceToEnd });
     // A styles array always starts with a number identifying the
     // mode/overlays that it is based on (for easy invalidation).
     var st = [cm.state.modeGen], lineClasses = {};
@@ -6814,15 +8081,20 @@
   }
 
   function getLineStyles(cm, line, updateFrontier) {
+	logger.error(`>>> Entering getLineStyles(cm=${cm},line=${line},updateFrontier=${updateFrontier})`, { "event.action": "getLineStyles", "logrite.cm": cm, "logrite.line": line, "logrite.updateFrontier": updateFrontier });
     if (!line.styles || line.styles[0] != cm.state.modeGen) {
       var state = getStateBefore(cm, lineNo(line));
       var result = highlightLine(cm, line, line.text.length > cm.options.maxHighlightLength ? copyState(cm.doc.mode, state) : state);
+	logger.error(`getLineStyles(cm=${cm},line=${line},updateFrontier=${updateFrontier}): result → ${result}`, { "event.action": "getLineStyles", "logrite.cm": cm, "logrite.line": line, "logrite.updateFrontier": updateFrontier });
       line.stateAfter = state;
       line.styles = result.styles;
+	logger.debug(`getLineStyles(cm=${cm},line=${line},updateFrontier=${updateFrontier}): line.stateAfter → ${line.stateAfter}`, { "event.action": "getLineStyles", "logrite.cm": cm, "logrite.line": line, "logrite.updateFrontier": updateFrontier });
       if (result.classes) line.styleClasses = result.classes;
       else if (line.styleClasses) line.styleClasses = null;
+	logger.debug(`getLineStyles(cm=${cm},line=${line},updateFrontier=${updateFrontier}): line.styles → ${line.styles}`, { "event.action": "getLineStyles", "logrite.cm": cm, "logrite.line": line, "logrite.updateFrontier": updateFrontier });
       if (updateFrontier === cm.doc.frontier) cm.doc.frontier++;
     }
+	logger.warn(`<<< Exiting getLineStyles(cm=${cm},line=${line},updateFrontier=${updateFrontier})`, { "event.action": "getLineStyles", "logrite.cm": cm, "logrite.line": line, "logrite.updateFrontier": updateFrontier });
     return line.styles;
   }
 
@@ -6830,13 +8102,17 @@
   // update state, but don't save a style array. Used for lines that
   // aren't currently visible.
   function processLine(cm, text, state, startAt) {
+	logger.error(`>>> Entering processLine(cm=${cm},text=${text},state=${state},startAt=${startAt})`, { "event.action": "processLine", "logrite.cm": cm, "logrite.text": text, "logrite.state": state, "logrite.startAt": startAt });
     var mode = cm.doc.mode;
     var stream = new StringStream(text, cm.options.tabSize);
+	logger.error(`processLine(cm=${cm},text=${text},state=${state},startAt=${startAt}): stream → ${stream}`, { "event.action": "processLine", "logrite.cm": cm, "logrite.text": text, "logrite.state": state, "logrite.startAt": startAt });
     stream.start = stream.pos = startAt || 0;
+	logger.debug(`processLine(cm=${cm},text=${text},state=${state},startAt=${startAt}): stream.start → ${stream.start}`, { "event.action": "processLine", "logrite.cm": cm, "logrite.text": text, "logrite.state": state, "logrite.startAt": startAt });
     if (text == "") callBlankLine(mode, state);
     while (!stream.eol()) {
       readToken(mode, stream, state);
       stream.start = stream.pos;
+	logger.warn(`<<< Exiting processLine(cm=${cm},text=${text},state=${state},startAt=${startAt})`, { "event.action": "processLine", "logrite.cm": cm, "logrite.text": text, "logrite.state": state, "logrite.startAt": startAt });
     }
   }
 
@@ -6845,8 +8121,10 @@
   // and also looks for line-wide styles.
   var styleToClassCache = {}, styleToClassCacheWithMode = {};
   function interpretTokenStyle(style, options) {
+	logger.error(`>>> Entering interpretTokenStyle(style=${style},options=${options})`, { "event.action": "interpretTokenStyle", "logrite.style": style, "logrite.options": options });
     if (!style || /^\s*$/.test(style)) return null;
     var cache = options.addModeClass ? styleToClassCacheWithMode : styleToClassCache;
+	logger.warn(`<<< Exiting interpretTokenStyle(style=${style},options=${options})`, { "event.action": "interpretTokenStyle", "logrite.style": style, "logrite.options": options });
     return cache[style] ||
       (cache[style] = style.replace(/\S+/g, "cm-$&"));
   }
@@ -6857,17 +8135,24 @@
   // The returned object contains the DOM node, this map, and
   // information about line-wide styles that were set by the mode.
   function buildLineContent(cm, lineView) {
+	logger.error(`>>> Entering buildLineContent(cm=${cm},lineView=${lineView})`, { "event.action": "buildLineContent", "logrite.cm": cm, "logrite.lineView": lineView });
     // The padding-right forces the element to have a 'border', which
     // is needed on Webkit to be able to get line-level bounding
     // rectangles for it (in measureChar).
     var content = elt("span", null, null, webkit ? "padding-right: .1px" : null);
+	logger.error(`buildLineContent(cm=${cm},lineView=${lineView}): content → ${content}`, { "event.action": "buildLineContent", "logrite.cm": cm, "logrite.lineView": lineView });
     var builder = {pre: elt("pre", [content], "CodeMirror-line"), content: content,
                    col: 0, pos: 0, cm: cm,
                    splitSpaces: (ie || webkit) && cm.getOption("lineWrapping")};
     lineView.measure = {};
+	logger.error(`buildLineContent(cm=${cm},lineView=${lineView}): builder → ${builder}`, { "event.action": "buildLineContent", "logrite.cm": cm, "logrite.lineView": lineView });
+	logger.debug(`buildLineContent(cm=${cm},lineView=${lineView}): lineView.measure → ${lineView.measure}`, { "event.action": "buildLineContent", "logrite.cm": cm, "logrite.lineView": lineView });
 
     // Iterate over the logical lines that make up this visual line.
     for (var i = 0; i <= (lineView.rest ? lineView.rest.length : 0); i++) {
+	logger.debug(`buildLineContent(cm=${cm},lineView=${lineView}): builder.pos → ${builder.pos}`, { "event.action": "buildLineContent", "logrite.cm": cm, "logrite.lineView": lineView });
+	logger.debug(`buildLineContent(cm=${cm},lineView=${lineView}): builder.addToken → ${builder.addToken}`, { "event.action": "buildLineContent", "logrite.cm": cm, "logrite.lineView": lineView });
+	logger.debug(`buildLineContent(cm=${cm},lineView=${lineView}): builder.map → ${builder.map}`, { "event.action": "buildLineContent", "logrite.cm": cm, "logrite.lineView": lineView });
       var line = i ? lineView.rest[i - 1] : lineView.line, order;
       builder.pos = 0;
       builder.addToken = buildToken;
@@ -6877,6 +8162,7 @@
         builder.addToken = buildTokenBadBidi(builder.addToken, order);
       builder.map = [];
       var allowFrontierUpdate = lineView != cm.display.externalMeasured && lineNo(line);
+	logger.error(`buildLineContent(cm=${cm},lineView=${lineView}): allowFrontierUpdate → ${allowFrontierUpdate}`, { "event.action": "buildLineContent", "logrite.cm": cm, "logrite.lineView": lineView });
       insertLineContent(line, builder, getLineStyles(cm, line, allowFrontierUpdate));
       if (line.styleClasses) {
         if (line.styleClasses.bgClass)
@@ -6907,22 +8193,28 @@
     if (builder.pre.className)
       builder.textClass = joinClasses(builder.pre.className, builder.textClass || "");
 
+	logger.warn(`<<< Exiting buildLineContent(cm=${cm},lineView=${lineView})`, { "event.action": "buildLineContent", "logrite.cm": cm, "logrite.lineView": lineView });
     return builder;
   }
 
   function defaultSpecialCharPlaceholder(ch) {
+	logger.error(`>>> Entering defaultSpecialCharPlaceholder(ch=${ch})`, { "event.action": "defaultSpecialCharPlaceholder", "logrite.ch": ch });
     var token = elt("span", "\u2022", "cm-invalidchar");
     token.title = "\\u" + ch.charCodeAt(0).toString(16);
     token.setAttribute("aria-label", token.title);
+	logger.warn(`<<< Exiting defaultSpecialCharPlaceholder(ch=${ch})`, { "event.action": "defaultSpecialCharPlaceholder", "logrite.ch": ch });
     return token;
   }
 
   // Build up the DOM representation for a single token, and add it to
   // the line map. Takes care to render special characters separately.
   function buildToken(builder, text, style, startStyle, endStyle, title, css) {
+	logger.error(`>>> Entering buildToken(builder=${builder},text=${text},style=${style},startStyle=${startStyle},endStyle=${endStyle},title=${title},css=${css})`, { "event.action": "buildToken", "logrite.builder": builder, "logrite.text": text, "logrite.style": style, "logrite.startStyle": startStyle, "logrite.endStyle": endStyle, "logrite.title": title, "logrite.css": css });
     if (!text) return;
     var displayText = builder.splitSpaces ? text.replace(/ {3,}/g, splitSpaces) : text;
+	logger.error(`buildToken(builder=${builder},text=${text},style=${style},startStyle=${startStyle},endStyle=${endStyle},title=${title},css=${css}): displayText → ${displayText}`, { "event.action": "buildToken", "logrite.builder": builder, "logrite.text": text, "logrite.style": style, "logrite.startStyle": startStyle, "logrite.endStyle": endStyle, "logrite.title": title, "logrite.css": css });
     var special = builder.cm.state.specialChars, mustWrap = false;
+	logger.debug(`buildToken(builder=${builder},text=${text},style=${style},startStyle=${startStyle},endStyle=${endStyle},title=${title},css=${css}): special.lastIndex → ${special.lastIndex}`, { "event.action": "buildToken", "logrite.builder": builder, "logrite.text": text, "logrite.style": style, "logrite.startStyle": startStyle, "logrite.endStyle": endStyle, "logrite.title": title, "logrite.css": css });
     if (!special.test(text)) {
       builder.col += text.length;
       var content = document.createTextNode(displayText);
@@ -6931,9 +8223,11 @@
       builder.pos += text.length;
     } else {
       var content = document.createDocumentFragment(), pos = 0;
+	logger.error(`buildToken(builder=${builder},text=${text},style=${style},startStyle=${startStyle},endStyle=${endStyle},title=${title},css=${css}): content → ${content}`, { "event.action": "buildToken", "logrite.builder": builder, "logrite.text": text, "logrite.style": style, "logrite.startStyle": startStyle, "logrite.endStyle": endStyle, "logrite.title": title, "logrite.css": css });
       while (true) {
         special.lastIndex = pos;
         var m = special.exec(text);
+		logger.error(`buildToken(builder=${builder},text=${text},style=${style},startStyle=${startStyle},endStyle=${endStyle},title=${title},css=${css}): m → ${m}`, { "event.action": "buildToken", "logrite.builder": builder, "logrite.text": text, "logrite.style": style, "logrite.startStyle": startStyle, "logrite.endStyle": endStyle, "logrite.title": title, "logrite.css": css });
         var skipped = m ? m.index - pos : text.length - pos;
         if (skipped) {
           var txt = document.createTextNode(displayText.slice(pos, pos + skipped));
@@ -6957,6 +8251,7 @@
           builder.col += 1;
         } else {
           var txt = builder.cm.options.specialCharPlaceholder(m[0]);
+		logger.error(`buildToken(builder=${builder},text=${text},style=${style},startStyle=${startStyle},endStyle=${endStyle},title=${title},css=${css}): txt → ${txt}`, { "event.action": "buildToken", "logrite.builder": builder, "logrite.text": text, "logrite.style": style, "logrite.startStyle": startStyle, "logrite.endStyle": endStyle, "logrite.title": title, "logrite.css": css });
           txt.setAttribute("cm-text", m[0]);
           if (ie && ie_version < 9) content.appendChild(elt("span", [txt]));
           else content.appendChild(txt);
@@ -6968,6 +8263,7 @@
     }
     if (style || startStyle || endStyle || mustWrap || css) {
       var fullStyle = style || "";
+	logger.error(`buildToken(builder=${builder},text=${text},style=${style},startStyle=${startStyle},endStyle=${endStyle},title=${title},css=${css}): fullStyle → ${fullStyle}`, { "event.action": "buildToken", "logrite.builder": builder, "logrite.text": text, "logrite.style": style, "logrite.startStyle": startStyle, "logrite.endStyle": endStyle, "logrite.title": title, "logrite.css": css });
       if (startStyle) fullStyle += startStyle;
       if (endStyle) fullStyle += endStyle;
       var token = elt("span", [content], fullStyle, css);
@@ -6975,18 +8271,23 @@
       return builder.content.appendChild(token);
     }
     builder.content.appendChild(content);
+	logger.warn(`<<< Exiting buildToken(builder=${builder},text=${text},style=${style},startStyle=${startStyle},endStyle=${endStyle},title=${title},css=${css})`, { "event.action": "buildToken", "logrite.builder": builder, "logrite.text": text, "logrite.style": style, "logrite.startStyle": startStyle, "logrite.endStyle": endStyle, "logrite.title": title, "logrite.css": css });
   }
 
   function splitSpaces(old) {
+	logger.error(`>>> Entering splitSpaces(old=${old})`, { "event.action": "splitSpaces", "logrite.old": old });
     var out = " ";
     for (var i = 0; i < old.length - 2; ++i) out += i % 2 ? " " : "\u00a0";
+	logger.error(`splitSpaces(old=${old}): out → ${out}`, { "event.action": "splitSpaces", "logrite.old": old });
     out += " ";
+	logger.warn(`<<< Exiting splitSpaces(old=${old})`, { "event.action": "splitSpaces", "logrite.old": old });
     return out;
   }
 
   // Work around nonsense dimensions being reported for stretches of
   // right-to-left text.
   function buildTokenBadBidi(inner, order) {
+	logger.error(`>>> Entering buildTokenBadBidi(inner=${inner},order=${order})`, { "event.action": "buildTokenBadBidi", "logrite.inner": inner, "logrite.order": order });
     return function(builder, text, style, startStyle, endStyle, title, css) {
       style = style ? style + " cm-force-border" : "cm-force-border";
       var start = builder.pos, end = start + text.length;
@@ -7003,11 +8304,14 @@
         start = part.to;
       }
     };
+	logger.warn(`<<< Exiting buildTokenBadBidi(inner=${inner},order=${order})`, { "event.action": "buildTokenBadBidi", "logrite.inner": inner, "logrite.order": order });
   }
 
   function buildCollapsedSpan(builder, size, marker, ignoreWidget) {
+	logger.error(`>>> Entering buildCollapsedSpan(builder=${builder},size=${size},marker=${marker},ignoreWidget=${ignoreWidget})`, { "event.action": "buildCollapsedSpan", "logrite.builder": builder, "logrite.size": size, "logrite.marker": marker, "logrite.ignoreWidget": ignoreWidget });
     var widget = !ignoreWidget && marker.widgetNode;
     if (widget) builder.map.push(builder.pos, builder.pos + size, widget);
+	logger.error(`buildCollapsedSpan(builder=${builder},size=${size},marker=${marker},ignoreWidget=${ignoreWidget}): widget → ${widget}`, { "event.action": "buildCollapsedSpan", "logrite.builder": builder, "logrite.size": size, "logrite.marker": marker, "logrite.ignoreWidget": ignoreWidget });
     if (!ignoreWidget && builder.cm.display.input.needsContentAttribute) {
       if (!widget)
         widget = builder.content.appendChild(document.createElement("span"));
@@ -7018,11 +8322,13 @@
       builder.content.appendChild(widget);
     }
     builder.pos += size;
+	logger.warn(`<<< Exiting buildCollapsedSpan(builder=${builder},size=${size},marker=${marker},ignoreWidget=${ignoreWidget})`, { "event.action": "buildCollapsedSpan", "logrite.builder": builder, "logrite.size": size, "logrite.marker": marker, "logrite.ignoreWidget": ignoreWidget });
   }
 
   // Outputs a number of spans to make up a line, taking highlighting
   // and marked text into account.
   function insertLineContent(line, builder, styles) {
+	logger.error(`>>> Entering insertLineContent(line=${line},builder=${builder},styles=${styles})`, { "event.action": "insertLineContent", "logrite.line": line, "logrite.builder": builder, "logrite.styles": styles });
     var spans = line.markedSpans, allText = line.text, at = 0;
     if (!spans) {
       for (var i = 1; i < styles.length; i+=2)
@@ -7031,6 +8337,7 @@
     }
 
     var len = allText.length, pos = 0, i = 1, text = "", style, css;
+	logger.error(`insertLineContent(line=${line},builder=${builder},styles=${styles}): len → ${len}`, { "event.action": "insertLineContent", "logrite.line": line, "logrite.builder": builder, "logrite.styles": styles });
     var nextChange = 0, spanStyle, spanEndStyle, spanStartStyle, title, collapsed;
     for (;;) {
       if (nextChange == pos) { // Update current marker set
@@ -7069,6 +8376,7 @@
       if (pos >= len) break;
 
       var upto = Math.min(len, nextChange);
+	logger.error(`insertLineContent(line=${line},builder=${builder},styles=${styles}): upto → ${upto}`, { "event.action": "insertLineContent", "logrite.line": line, "logrite.builder": builder, "logrite.styles": styles });
       while (true) {
         if (text) {
           var end = pos + text.length;
@@ -7085,6 +8393,7 @@
         style = interpretTokenStyle(styles[i++], builder.cm.options);
       }
     }
+	logger.warn(`<<< Exiting insertLineContent(line=${line},builder=${builder},styles=${styles})`, { "event.action": "insertLineContent", "logrite.line": line, "logrite.builder": builder, "logrite.styles": styles });
   }
 
   // DOCUMENT DATA STRUCTURE
@@ -7093,6 +8402,8 @@
   // are treated specially, in order to make the association of line
   // widgets and marker elements with the text behave more intuitive.
   function isWholeLineUpdate(doc, change) {
+	logger.error(`>>> Entering isWholeLineUpdate(doc=${doc},change=${change})`, { "event.action": "isWholeLineUpdate", "logrite.doc": doc, "logrite.change": change });
+	logger.warn(`<<< Exiting isWholeLineUpdate(doc=${doc},change=${change})`, { "event.action": "isWholeLineUpdate", "logrite.doc": doc, "logrite.change": change });
     return change.from.ch == 0 && change.to.ch == 0 && lst(change.text) == "" &&
       (!doc.cm || doc.cm.options.wholeLineUpdateBefore);
   }
@@ -7105,8 +8416,10 @@
       signalLater(line, "change", line, change);
     }
     function linesFor(start, end) {
+	logger.error(`>>> Entering linesFor(start=${start},end=${end})`, { "event.action": "linesFor", "logrite.start": start, "logrite.end": end });
       for (var i = start, result = []; i < end; ++i)
         result.push(new Line(text[i], spansFor(i), estimateHeight));
+	logger.warn(`<<< Exiting linesFor(start=${start},end=${end})`, { "event.action": "linesFor", "logrite.start": start, "logrite.end": end });
       return result;
     }
 
@@ -7162,19 +8475,29 @@
   // See also http://marijnhaverbeke.nl/blog/codemirror-line-tree.html
 
   function LeafChunk(lines) {
+	logger.error(`>>> Entering LeafChunk(lines=${lines})`, { "event.action": "LeafChunk", "logrite.lines": lines });
     this.lines = lines;
     this.parent = null;
+	logger.debug(`LeafChunk(lines=${lines}): lines → ${lines}`, { "event.action": "LeafChunk", "logrite.lines": lines });
+	logger.debug(`LeafChunk(lines=${lines}): this.lines → ${this.lines}`, { "event.action": "LeafChunk", "logrite.lines": lines });
     for (var i = 0, height = 0; i < lines.length; ++i) {
       lines[i].parent = this;
       height += lines[i].height;
+	logger.debug(`LeafChunk(lines=${lines}): this.parent → ${this.parent}`, { "event.action": "LeafChunk", "logrite.lines": lines });
     }
     this.height = height;
+	logger.debug(`LeafChunk(lines=${lines}): this.height → ${this.height}`, { "event.action": "LeafChunk", "logrite.lines": lines });
   }
 
   LeafChunk.prototype = {
-    chunkSize: function() { return this.lines.length; },
+    chunkSize: function() {
+        logger.error('>>> Entering chunkSize()', { "event.action": "chunkSize" });
+        logger.warn('<<< Exiting chunkSize()', { "event.action": "chunkSize" });
+        return this.lines.length;
+    },
     // Remove the n lines at offset 'at'.
     removeInner: function(at, n) {
+	logger.error(`>>> Entering removeInner(at=${at},n=${n})`, { "event.action": "removeInner", "logrite.at": at, "logrite.n": n });
       for (var i = at, e = at + n; i < e; ++i) {
         var line = this.lines[i];
         this.height -= line.height;
@@ -7182,44 +8505,64 @@
         signalLater(line, "delete");
       }
       this.lines.splice(at, n);
+	logger.warn(`<<< Exiting removeInner(at=${at},n=${n})`, { "event.action": "removeInner", "logrite.at": at, "logrite.n": n });
     },
     // Helper used to collapse a small branch into a single leaf.
     collapse: function(lines) {
+	logger.error(`>>> Entering collapse(lines=${lines})`, { "event.action": "collapse", "logrite.lines": lines });
       lines.push.apply(lines, this.lines);
+	logger.warn(`<<< Exiting collapse(lines=${lines})`, { "event.action": "collapse", "logrite.lines": lines });
     },
     // Insert the given array of lines at offset 'at', count them as
     // having the given height.
     insertInner: function(at, lines, height) {
+	logger.error(`>>> Entering insertInner(at=${at},lines=${lines},height=${height})`, { "event.action": "insertInner", "logrite.at": at, "logrite.lines": lines, "logrite.height": height });
       this.height += height;
       this.lines = this.lines.slice(0, at).concat(lines).concat(this.lines.slice(at));
       for (var i = 0; i < lines.length; ++i) lines[i].parent = this;
+	logger.warn(`<<< Exiting insertInner(at=${at},lines=${lines},height=${height})`, { "event.action": "insertInner", "logrite.at": at, "logrite.lines": lines, "logrite.height": height });
     },
     // Used to iterate over a part of the tree.
     iterN: function(at, n, op) {
+	logger.error(`>>> Entering iterN(at=${at},n=${n},op=${op})`, { "event.action": "iterN", "logrite.at": at, "logrite.n": n, "logrite.op": op });
       for (var e = at + n; at < e; ++at)
         if (op(this.lines[at])) return true;
+		logger.warn(`<<< Exiting iterN(at=${at},n=${n},op=${op})`, { "event.action": "iterN", "logrite.at": at, "logrite.n": n, "logrite.op": op });
+		logger.error(`iterN(at=${at},n=${n},op=${op}): used → ${used}`, { "event.action": "iterN", "logrite.at": at, "logrite.n": n, "logrite.op": op });
     }
   };
 
   function BranchChunk(children) {
+	logger.error(`>>> Entering BranchChunk(children=${children})`, { "event.action": "BranchChunk", "logrite.children": children });
     this.children = children;
     var size = 0, height = 0;
+	logger.debug(`BranchChunk(children=${children}): children → ${children}`, { "event.action": "BranchChunk", "logrite.children": children });
+	logger.debug(`BranchChunk(children=${children}): this.children → ${this.children}`, { "event.action": "BranchChunk", "logrite.children": children });
+	logger.debug(`BranchChunk(children=${children}): size → ${size}`, { "event.action": "BranchChunk", "logrite.children": children });
     for (var i = 0; i < children.length; ++i) {
       var ch = children[i];
       size += ch.chunkSize(); height += ch.height;
       ch.parent = this;
+	logger.debug(`BranchChunk(children=${children}): ch.parent → ${ch.parent}`, { "event.action": "BranchChunk", "logrite.children": children });
     }
     this.size = size;
     this.height = height;
+	logger.debug(`BranchChunk(children=${children}): this.size → ${this.size}`, { "event.action": "BranchChunk", "logrite.children": children });
+	logger.debug(`BranchChunk(children=${children}): this.height → ${this.height}`, { "event.action": "BranchChunk", "logrite.children": children });
     this.parent = null;
   }
 
   BranchChunk.prototype = {
-    chunkSize: function() { return this.size; },
+    chunkSize: function() {
+        logger.error('>>> Entering chunkSize()', { "event.action": "chunkSize" });
+        logger.warn('<<< Exiting chunkSize()', { "event.action": "chunkSize" });
+        return this.size;
+    },
     removeInner: function(at, n) {
       this.size -= n;
       for (var i = 0; i < this.children.length; ++i) {
         var child = this.children[i], sz = child.chunkSize();
+		logger.error(`removeInner(at=${at},n=${n}): child → ${child}`, { "event.action": "removeInner", "logrite.at": at, "logrite.n": n });
         if (at < sz) {
           var rm = Math.min(n, sz - at), oldHeight = child.height;
           child.removeInner(at, rm);
@@ -7252,7 +8595,10 @@
           if (child.lines && child.lines.length > 50) {
             while (child.lines.length > 50) {
               var spilled = child.lines.splice(child.lines.length - 25, 25);
+			logger.error(`insertInner(at=${at},lines=${lines},height=${height}): spilled → ${spilled}`, { "event.action": "insertInner", "logrite.at": at, "logrite.lines": lines, "logrite.height": height });
               var newleaf = new LeafChunk(spilled);
+			logger.error(`insertInner(at=${at},lines=${lines},height=${height}): newleaf → ${newleaf}`, { "event.action": "insertInner", "logrite.at": at, "logrite.lines": lines, "logrite.height": height });
+			logger.debug(`insertInner(at=${at},lines=${lines},height=${height}): newleaf.parent → ${newleaf.parent}`, { "event.action": "insertInner", "logrite.at": at, "logrite.lines": lines, "logrite.height": height });
               child.height -= newleaf.height;
               this.children.splice(i + 1, 0, newleaf);
               newleaf.parent = this;
@@ -7268,9 +8614,13 @@
     maybeSpill: function() {
       if (this.children.length <= 10) return;
       var me = this;
+	logger.debug(`maybeSpill(): me.children → ${me.children}`, { "event.action": "maybeSpill" });
       do {
         var spilled = me.children.splice(me.children.length - 5, 5);
+		logger.error(`maybeSpill(): spilled → ${spilled}`, { "event.action": "maybeSpill" });
         var sibling = new BranchChunk(spilled);
+		logger.error(`maybeSpill(): sibling → ${sibling}`, { "event.action": "maybeSpill" });
+		logger.debug(`maybeSpill(): sibling.parent → ${sibling.parent}`, { "event.action": "maybeSpill" });
         if (!me.parent) { // Become the parent node
           var copy = new BranchChunk(me.children);
           copy.parent = me;
@@ -7280,11 +8630,13 @@
           me.size -= sibling.size;
           me.height -= sibling.height;
           var myIndex = indexOf(me.parent.children, me);
+		logger.error(`maybeSpill(): myIndex → ${myIndex}`, { "event.action": "maybeSpill" });
           me.parent.children.splice(myIndex + 1, 0, sibling);
         }
         sibling.parent = me.parent;
       } while (me.children.length > 10);
       me.parent.maybeSpill();
+	logger.warn('<<< Exiting maybeSpill()', { "event.action": "maybeSpill" });
     },
     iterN: function(at, n, op) {
       for (var i = 0; i < this.children.length; ++i) {
@@ -7301,25 +8653,34 @@
 
   var nextDocId = 0;
   var Doc = CodeMirror.Doc = function(text, mode, firstLine, lineSep) {
+	logger.error(`>>> Entering Doc(text=${text},mode=${mode},firstLine=${firstLine},lineSep=${lineSep})`, { "event.action": "Doc", "logrite.text": text, "logrite.mode": mode, "logrite.firstLine": firstLine, "logrite.lineSep": lineSep });
     if (!(this instanceof Doc)) return new Doc(text, mode, firstLine, lineSep);
     if (firstLine == null) firstLine = 0;
 
     BranchChunk.call(this, [new LeafChunk([new Line("", null)])]);
     this.first = firstLine;
     this.scrollTop = this.scrollLeft = 0;
+	logger.debug(`Doc(text=${text},mode=${mode},firstLine=${firstLine},lineSep=${lineSep}): this.first → ${this.first}`, { "event.action": "Doc", "logrite.text": text, "logrite.mode": mode, "logrite.firstLine": firstLine, "logrite.lineSep": lineSep });
     this.cantEdit = false;
     this.cleanGeneration = 1;
+	logger.debug(`Doc(text=${text},mode=${mode},firstLine=${firstLine},lineSep=${lineSep}): this.scrollTop → ${this.scrollTop}`, { "event.action": "Doc", "logrite.text": text, "logrite.mode": mode, "logrite.firstLine": firstLine, "logrite.lineSep": lineSep });
     this.frontier = firstLine;
     var start = Pos(firstLine, 0);
+	logger.debug(`Doc(text=${text},mode=${mode},firstLine=${firstLine},lineSep=${lineSep}): this.cantEdit → ${this.cantEdit}`, { "event.action": "Doc", "logrite.text": text, "logrite.mode": mode, "logrite.firstLine": firstLine, "logrite.lineSep": lineSep });
     this.sel = simpleSelection(start);
     this.history = new History(null);
+	logger.debug(`Doc(text=${text},mode=${mode},firstLine=${firstLine},lineSep=${lineSep}): this.cleanGeneration → ${this.cleanGeneration}`, { "event.action": "Doc", "logrite.text": text, "logrite.mode": mode, "logrite.firstLine": firstLine, "logrite.lineSep": lineSep });
     this.id = ++nextDocId;
     this.modeOption = mode;
+	logger.debug(`Doc(text=${text},mode=${mode},firstLine=${firstLine},lineSep=${lineSep}): this.frontier → ${this.frontier}`, { "event.action": "Doc", "logrite.text": text, "logrite.mode": mode, "logrite.firstLine": firstLine, "logrite.lineSep": lineSep });
     this.lineSep = lineSep;
 
+	logger.debug(`Doc(text=${text},mode=${mode},firstLine=${firstLine},lineSep=${lineSep}): lineSep → ${lineSep}`, { "event.action": "Doc", "logrite.text": text, "logrite.mode": mode, "logrite.firstLine": firstLine, "logrite.lineSep": lineSep });
     if (typeof text == "string") text = this.splitLines(text);
     updateDoc(this, {from: start, to: start, text: text});
+	logger.debug(`Doc(text=${text},mode=${mode},firstLine=${firstLine},lineSep=${lineSep}): this.id → ${this.id}`, { "event.action": "Doc", "logrite.text": text, "logrite.mode": mode, "logrite.firstLine": firstLine, "logrite.lineSep": lineSep });
     setSelection(this, simpleSelection(start), sel_dontScroll);
+	logger.warn(`<<< Exiting Doc(text=${text},mode=${mode},firstLine=${firstLine},lineSep=${lineSep})`, { "event.action": "Doc", "logrite.text": text, "logrite.mode": mode, "logrite.firstLine": firstLine, "logrite.lineSep": lineSep });
   };
 
   Doc.prototype = createObj(BranchChunk.prototype, {
@@ -7335,18 +8696,27 @@
 
     // Non-public interface for adding and removing lines.
     insert: function(at, lines) {
+	logger.error(`>>> Entering insert(at=${at},lines=${lines})`, { "event.action": "insert", "logrite.at": at, "logrite.lines": lines });
       var height = 0;
       for (var i = 0; i < lines.length; ++i) height += lines[i].height;
       this.insertInner(at - this.first, lines, height);
+	logger.warn(`<<< Exiting insert(at=${at},lines=${lines})`, { "event.action": "insert", "logrite.at": at, "logrite.lines": lines });
     },
-    remove: function(at, n) { this.removeInner(at - this.first, n); },
+    remove: function(at, n) {
+        logger.error(`>>> Entering remove(at=${at},n=${n})`, { "event.action": "remove", "logrite.at": at, "logrite.n": n });
+        logger.warn(`<<< Exiting remove(at=${at},n=${n})`, { "event.action": "remove", "logrite.at": at, "logrite.n": n });
+        this.removeInner(at - this.first, n);
+    },
 
     // From here, the methods are part of the public interface. Most
     // are also available from CodeMirror (editor) instances.
 
     getValue: function(lineSep) {
+	logger.error(`>>> Entering getValue(lineSep=${lineSep})`, { "event.action": "getValue", "logrite.lineSep": lineSep });
       var lines = getLines(this, this.first, this.first + this.size);
       if (lineSep === false) return lines;
+	logger.error(`getValue(lineSep=${lineSep}): lines → ${lines}`, { "event.action": "getValue", "logrite.lineSep": lineSep });
+	logger.warn(`<<< Exiting getValue(lineSep=${lineSep})`, { "event.action": "getValue", "logrite.lineSep": lineSep });
       return lines.join(lineSep || this.lineSeparator());
     },
     setValue: docMethodOp(function(code) {
@@ -7361,37 +8731,77 @@
       replaceRange(this, code, from, to, origin);
     },
     getRange: function(from, to, lineSep) {
+	logger.error(`>>> Entering getRange(from=${from},to=${to},lineSep=${lineSep})`, { "event.action": "getRange", "logrite.from": from, "logrite.to": to, "logrite.lineSep": lineSep });
       var lines = getBetween(this, clipPos(this, from), clipPos(this, to));
       if (lineSep === false) return lines;
+	logger.error(`getRange(from=${from},to=${to},lineSep=${lineSep}): lines → ${lines}`, { "event.action": "getRange", "logrite.from": from, "logrite.to": to, "logrite.lineSep": lineSep });
+	logger.warn(`<<< Exiting getRange(from=${from},to=${to},lineSep=${lineSep})`, { "event.action": "getRange", "logrite.from": from, "logrite.to": to, "logrite.lineSep": lineSep });
       return lines.join(lineSep || this.lineSeparator());
     },
 
-    getLine: function(line) {var l = this.getLineHandle(line); return l && l.text;},
+    getLine: function(line) {
+        logger.error(`>>> Entering getLine(line=${line})`, { "event.action": "getLine", "logrite.doc": doc, "logrite.n": n });
+        logger.warn(`<<< Exiting getLine(line=${line})`, { "event.action": "getLine", "logrite.doc": doc, "logrite.n": n });
+        var l = this.getLineHandle(line); return l && l.text;
+    },
 
-    getLineHandle: function(line) {if (isLine(this, line)) return getLine(this, line);},
-    getLineNumber: function(line) {return lineNo(line);},
+    getLineHandle: function(line) {
+        logger.error(`>>> Entering getLineHandle(line=${line})`, { "event.action": "getLineHandle", "logrite.line": line });
+        logger.warn(`<<< Exiting getLineHandle(line=${line})`, { "event.action": "getLineHandle", "logrite.line": line });
+        if (isLine(this, line)) return getLine(this, line);
+    },
+    getLineNumber: function(line) {
+        logger.error(`>>> Entering getLineNumber(line=${line})`, { "event.action": "getLineNumber", "logrite.line": line });
+        logger.warn(`<<< Exiting getLineNumber(line=${line})`, { "event.action": "getLineNumber", "logrite.line": line });
+        return lineNo(line);
+    },
 
     getLineHandleVisualStart: function(line) {
+	logger.error(`>>> Entering getLineHandleVisualStart(line=${line})`, { "event.action": "getLineHandleVisualStart", "logrite.line": line });
       if (typeof line == "number") line = getLine(this, line);
+	logger.error(`>>> Entering lineNo(line=${line})`, { "event.action": "lineNo", "logrite.line": line });
+	logger.warn(`<<< Exiting getLineHandleVisualStart(line=${line})`, { "event.action": "getLineHandleVisualStart", "logrite.line": line });
       return visualLine(line);
     },
 
-    lineCount: function() {return this.size;},
-    firstLine: function() {return this.first;},
-    lastLine: function() {return this.first + this.size - 1;},
+    lineCount: function() {
+        logger.error('>>> Entering lineCount()', { "event.action": "lineCount" });
+        logger.warn('<<< Exiting lineCount()', { "event.action": "lineCount" });
+        return this.size;
+    },
+    firstLine: function() {
+        logger.error('>>> Entering firstLine()', { "event.action": "firstLine" });
+        logger.warn('<<< Exiting firstLine()', { "event.action": "firstLine" });
+        return this.first;
+    },
+    lastLine: function() {
+        logger.error('>>> Entering lastLine()', { "event.action": "lastLine" });
+        logger.warn('<<< Exiting lastLine()', { "event.action": "lastLine" });
+        return this.first + this.size - 1;
+    },
 
-    clipPos: function(pos) {return clipPos(this, pos);},
+    clipPos: function(pos) {
+        logger.error(`>>> Entering clipPos(pos=${pos})`, { "event.action": "clipPos", "logrite.pos": pos });
+        logger.warn(`<<< Exiting clipPos(pos=${pos})`, { "event.action": "clipPos", "logrite.pos": pos });
+        return clipPos(this, pos);
+    },
 
     getCursor: function(start) {
+	logger.error(`>>> Entering getCursor(start=${start})`, { "event.action": "getCursor", "logrite.start": start });
       var range = this.sel.primary(), pos;
       if (start == null || start == "head") pos = range.head;
       else if (start == "anchor") pos = range.anchor;
       else if (start == "end" || start == "to" || start === false) pos = range.to();
       else pos = range.from();
+	logger.warn(`<<< Exiting getCursor(start=${start})`, { "event.action": "getCursor", "logrite.start": start });
       return pos;
     },
     listSelections: function() { return this.sel.ranges; },
-    somethingSelected: function() {return this.sel.somethingSelected();},
+    somethingSelected: function() {
+        logger.error('>>> Entering somethingSelected()', { "event.action": "somethingSelected" });
+        logger.warn('<<< Exiting somethingSelected()', { "event.action": "somethingSelected" });
+        return this.sel.somethingSelected();
+    },
 
     setCursor: docMethodOp(function(line, ch, options) {
       setSimpleSelection(this, clipPos(this, typeof line == "number" ? Pos(line, ch || 0) : line), null, options);
@@ -7423,28 +8833,34 @@
     }),
 
     getSelection: function(lineSep) {
+	logger.error(`>>> Entering getSelection(lineSep=${lineSep})`, { "event.action": "getSelection", "logrite.lineSep": lineSep });
       var ranges = this.sel.ranges, lines;
       for (var i = 0; i < ranges.length; i++) {
         var sel = getBetween(this, ranges[i].from(), ranges[i].to());
+		logger.error(`getSelection(lineSep=${lineSep}): sel → ${sel}`, { "event.action": "getSelection", "logrite.lineSep": lineSep });
         lines = lines ? lines.concat(sel) : sel;
       }
       if (lineSep === false) return lines;
       else return lines.join(lineSep || this.lineSeparator());
     },
     getSelections: function(lineSep) {
+	logger.error(`>>> Entering getSelections(lineSep=${lineSep})`, { "event.action": "getSelections", "logrite.lineSep": lineSep });
       var parts = [], ranges = this.sel.ranges;
       for (var i = 0; i < ranges.length; i++) {
         var sel = getBetween(this, ranges[i].from(), ranges[i].to());
         if (lineSep !== false) sel = sel.join(lineSep || this.lineSeparator());
         parts[i] = sel;
+		logger.error(`getSelections(lineSep=${lineSep}): sel → ${sel}`, { "event.action": "getSelections", "logrite.lineSep": lineSep });
       }
       return parts;
     },
     replaceSelection: function(code, collapse, origin) {
+	logger.error(`>>> Entering replaceSelection(code=${code},collapse=${collapse},origin=${origin})`, { "event.action": "replaceSelection", "logrite.code": code, "logrite.collapse": collapse, "logrite.origin": origin });
       var dup = [];
       for (var i = 0; i < this.sel.ranges.length; i++)
         dup[i] = code;
       this.replaceSelections(dup, collapse, origin || "+input");
+	logger.warn(`<<< Exiting replaceSelection(code=${code},collapse=${collapse},origin=${origin})`, { "event.action": "replaceSelection", "logrite.code": code, "logrite.collapse": collapse, "logrite.origin": origin });
     },
     replaceSelections: docMethodOp(function(code, collapse, origin) {
       var changes = [], sel = this.sel;
@@ -7463,37 +8879,59 @@
     undoSelection: docMethodOp(function() {makeChangeFromHistory(this, "undo", true);}),
     redoSelection: docMethodOp(function() {makeChangeFromHistory(this, "redo", true);}),
 
-    setExtending: function(val) {this.extend = val;},
-    getExtending: function() {return this.extend;},
+    setExtending: function(val) {
+        logger.error(`>>> Entering setExtending(val=${val})`, { "event.action": "setExtending", "logrite.val": val });
+        logger.warn(`<<< Exiting setExtending(val=${val})`, { "event.action": "setExtending", "logrite.val": val });
+        this.extend = val;
+    },
+    getExtending: function() {
+        logger.error('>>> Entering getExtending()', { "event.action": "getExtending" });
+        logger.warn('<<< Exiting getExtending()', { "event.action": "getExtending" });
+        return this.extend;
+    },
 
     historySize: function() {
       var hist = this.history, done = 0, undone = 0;
       for (var i = 0; i < hist.done.length; i++) if (!hist.done[i].ranges) ++done;
       for (var i = 0; i < hist.undone.length; i++) if (!hist.undone[i].ranges) ++undone;
+	logger.warn('<<< Exiting historySize()', { "event.action": "historySize" });
       return {undo: done, redo: undone};
     },
-    clearHistory: function() {this.history = new History(this.history.maxGeneration);},
+    clearHistory: function() {
+        logger.error('>>> Entering clearHistory()', { "event.action": "clearHistory" });
+        logger.warn('<<< Exiting clearHistory()', { "event.action": "clearHistory" });
+        this.history = new History(this.history.maxGeneration);
+    },
 
     markClean: function() {
       this.cleanGeneration = this.changeGeneration(true);
+	logger.warn('<<< Exiting markClean()', { "event.action": "markClean" });
     },
     changeGeneration: function(forceSplit) {
+	logger.error(`>>> Entering changeGeneration(forceSplit=${forceSplit})`, { "event.action": "changeGeneration", "logrite.forceSplit": forceSplit });
       if (forceSplit)
         this.history.lastOp = this.history.lastSelOp = this.history.lastOrigin = null;
+	logger.warn(`<<< Exiting changeGeneration(forceSplit=${forceSplit})`, { "event.action": "changeGeneration", "logrite.forceSplit": forceSplit });
       return this.history.generation;
     },
     isClean: function (gen) {
+	logger.error(`>>> Entering isClean(gen=${gen})`, { "event.action": "isClean", "logrite.gen": gen });
+	logger.warn(`<<< Exiting isClean(gen=${gen})`, { "event.action": "isClean", "logrite.gen": gen });
       return this.history.generation == (gen || this.cleanGeneration);
     },
 
     getHistory: function() {
       return {done: copyHistoryArray(this.history.done),
               undone: copyHistoryArray(this.history.undone)};
+			logger.warn('<<< Exiting getHistory()', { "event.action": "getHistory" });
     },
     setHistory: function(histData) {
+	logger.error(`>>> Entering setHistory(histData=${histData})`, { "event.action": "setHistory", "logrite.histData": histData });
       var hist = this.history = new History(this.history.maxGeneration);
       hist.done = copyHistoryArray(histData.done.slice(0), null, true);
+	logger.error(`setHistory(histData=${histData}): hist → ${hist}`, { "event.action": "setHistory", "logrite.histData": histData });
       hist.undone = copyHistoryArray(histData.undone.slice(0), null, true);
+	logger.warn(`<<< Exiting setHistory(histData=${histData})`, { "event.action": "setHistory", "logrite.histData": histData });
     },
 
     addLineClass: docMethodOp(function(handle, where, cls) {
@@ -7528,27 +8966,38 @@
     addLineWidget: docMethodOp(function(handle, node, options) {
       return addLineWidget(this, handle, node, options);
     }),
-    removeLineWidget: function(widget) { widget.clear(); },
+    removeLineWidget: function(widget) {
+        logger.error(`>>> Entering removeLineWidget(widget=${widget})`, { "event.action": "removeLineWidget", "logrite.widget": widget });
+        logger.warn(`<<< Exiting removeLineWidget(widget=${widget})`, { "event.action": "removeLineWidget", "logrite.widget": widget });
+        widget.clear();
+    },
 
     markText: function(from, to, options) {
       return markText(this, clipPos(this, from), clipPos(this, to), options, "range");
     },
     setBookmark: function(pos, options) {
+	logger.error(`>>> Entering setBookmark(pos=${pos},options=${options})`, { "event.action": "setBookmark", "logrite.pos": pos, "logrite.options": options });
       var realOpts = {replacedWith: options && (options.nodeType == null ? options.widget : options),
                       insertLeft: options && options.insertLeft,
                       clearWhenEmpty: false, shared: options && options.shared,
                       handleMouseEvents: options && options.handleMouseEvents};
       pos = clipPos(this, pos);
+	logger.error(`setBookmark(pos=${pos},options=${options}): realOpts → ${realOpts}`, { "event.action": "setBookmark", "logrite.pos": pos, "logrite.options": options });
+	logger.warn(`<<< Exiting setBookmark(pos=${pos},options=${options})`, { "event.action": "setBookmark", "logrite.pos": pos, "logrite.options": options });
       return markText(this, pos, pos, realOpts, "bookmark");
     },
     findMarksAt: function(pos) {
+	logger.error(`>>> Entering findMarksAt(pos=${pos})`, { "event.action": "findMarksAt", "logrite.pos": pos });
       pos = clipPos(this, pos);
       var markers = [], spans = getLine(this, pos.line).markedSpans;
+	logger.error(`findMarksAt(pos=${pos}): pos → ${pos}`, { "event.action": "findMarksAt", "logrite.pos": pos });
+	logger.error(`findMarksAt(pos=${pos}): markers → ${markers}`, { "event.action": "findMarksAt", "logrite.pos": pos });
       if (spans) for (var i = 0; i < spans.length; ++i) {
         var span = spans[i];
         if ((span.from == null || span.from <= pos.ch) &&
             (span.to == null || span.to >= pos.ch))
           markers.push(span.marker.parent || span.marker);
+		logger.warn(`<<< Exiting findMarksAt(pos=${pos})`, { "event.action": "findMarksAt", "logrite.pos": pos });
       }
       return markers;
     },
@@ -7576,6 +9025,7 @@
         if (sps) for (var i = 0; i < sps.length; ++i)
           if (sps[i].from != null) markers.push(sps[i].marker);
       });
+	logger.warn('<<< Exiting getAllMarks()', { "event.action": "getAllMarks" });
       return markers;
     },
 
@@ -7587,32 +9037,42 @@
         off -= sz;
         ++lineNo;
       });
+	logger.warn(`<<< Exiting posFromIndex(off=${off})`, { "event.action": "posFromIndex", "logrite.off": off });
       return clipPos(this, Pos(lineNo, ch));
     },
     indexFromPos: function (coords) {
+	logger.error(`>>> Entering indexFromPos(coords=${coords})`, { "event.action": "indexFromPos", "logrite.coords": coords });
       coords = clipPos(this, coords);
       var index = coords.ch;
       if (coords.line < this.first || coords.ch < 0) return 0;
       this.iter(this.first, coords.line, function (line) {
         index += line.text.length + 1;
       });
+	logger.warn(`<<< Exiting indexFromPos(coords=${coords})`, { "event.action": "indexFromPos", "logrite.coords": coords });
       return index;
     },
 
     copy: function(copyHistory) {
+	logger.error(`>>> Entering copy(copyHistory=${copyHistory})`, { "event.action": "copy", "logrite.copyHistory": copyHistory });
       var doc = new Doc(getLines(this, this.first, this.first + this.size),
                         this.modeOption, this.first, this.lineSep);
       doc.scrollTop = this.scrollTop; doc.scrollLeft = this.scrollLeft;
+	logger.error(`copy(copyHistory=${copyHistory}): doc → ${doc}`, { "event.action": "copy", "logrite.copyHistory": copyHistory });
+	logger.debug(`copy(copyHistory=${copyHistory}): doc.scrollTop → ${doc.scrollTop}`, { "event.action": "copy", "logrite.copyHistory": copyHistory });
+	logger.debug(`copy(copyHistory=${copyHistory}): doc.extend → ${doc.extend}`, { "event.action": "copy", "logrite.copyHistory": copyHistory });
       doc.sel = this.sel;
+	logger.debug(`copy(copyHistory=${copyHistory}): doc.sel → ${doc.sel}`, { "event.action": "copy", "logrite.copyHistory": copyHistory });
       doc.extend = false;
       if (copyHistory) {
         doc.history.undoDepth = this.history.undoDepth;
         doc.setHistory(this.getHistory());
+		logger.warn(`<<< Exiting copy(copyHistory=${copyHistory})`, { "event.action": "copy", "logrite.copyHistory": copyHistory });
       }
       return doc;
     },
 
     linkedDoc: function(options) {
+	logger.error(`>>> Entering linkedDoc(options=${options})`, { "event.action": "linkedDoc", "logrite.options": options });
       if (!options) options = {};
       var from = this.first, to = this.first + this.size;
       if (options.from != null && options.from > from) from = options.from;
@@ -7622,9 +9082,11 @@
       (this.linked || (this.linked = [])).push({doc: copy, sharedHist: options.sharedHist});
       copy.linked = [{doc: this, isParent: true, sharedHist: options.sharedHist}];
       copySharedMarkers(copy, findSharedMarkers(this));
+	logger.warn(`<<< Exiting linkedDoc(options=${options})`, { "event.action": "linkedDoc", "logrite.options": options });
       return copy;
     },
     unlinkDoc: function(other) {
+	logger.error(`>>> Entering unlinkDoc(other=${other})`, { "event.action": "unlinkDoc", "logrite.other": other });
       if (other instanceof CodeMirror) other = other.doc;
       if (this.linked) for (var i = 0; i < this.linked.length; ++i) {
         var link = this.linked[i];
@@ -7642,14 +9104,25 @@
         other.history.done = copyHistoryArray(this.history.done, splitIds);
         other.history.undone = copyHistoryArray(this.history.undone, splitIds);
       }
+	logger.warn(`<<< Exiting unlinkDoc(other=${other})`, { "event.action": "unlinkDoc", "logrite.other": other });
     },
-    iterLinkedDocs: function(f) {linkedDocs(this, f);},
+    iterLinkedDocs: function(f) {
+        logger.error(`>>> Entering iterLinkedDocs(f=${f})`, { "event.action": "iterLinkedDocs", "logrite.f": f });
+        logger.warn(`<<< Exiting iterLinkedDocs(f=${f})`, { "event.action": "iterLinkedDocs", "logrite.f": f });
+        linkedDocs(this, f);
+    },
 
     getMode: function() {return this.mode;},
-    getEditor: function() {return this.cm;},
+    getEditor: function() {
+        logger.error('>>> Entering getEditor()', { "event.action": "getEditor" });
+        logger.warn('<<< Exiting getEditor()', { "event.action": "getEditor" });
+        return this.cm;
+    },
 
     splitLines: function(str) {
+	logger.error(`>>> Entering splitLines(str=${str})`, { "event.action": "splitLines", "logrite.str": str });
       if (this.lineSep) return str.split(this.lineSep);
+	logger.warn(`<<< Exiting splitLines(str=${str})`, { "event.action": "splitLines", "logrite.str": str });
       return splitLinesAuto(str);
     },
     lineSeparator: function() { return this.lineSep || "\n"; }
@@ -7670,6 +9143,7 @@
   // Call f for all linked documents.
   function linkedDocs(doc, f, sharedHistOnly) {
     function propagate(doc, skip, sharedHist) {
+	logger.error(`>>> Entering propagate(doc=${doc},skip=${skip},sharedHist=${sharedHist})`, { "event.action": "propagate", "logrite.doc": doc, "logrite.skip": skip, "logrite.sharedHist": sharedHist });
       if (doc.linked) for (var i = 0; i < doc.linked.length; ++i) {
         var rel = doc.linked[i];
         if (rel.doc == skip) continue;
@@ -7677,6 +9151,7 @@
         if (sharedHistOnly && !shared) continue;
         f(rel.doc, shared);
         propagate(rel.doc, doc, shared);
+		logger.warn(`<<< Exiting propagate(doc=${doc},skip=${skip},sharedHist=${sharedHist})`, { "event.action": "propagate", "logrite.doc": doc, "logrite.skip": skip, "logrite.sharedHist": sharedHist });
       }
     }
     propagate(doc, null, true);
@@ -7684,14 +9159,18 @@
 
   // Attach a document to an editor.
   function attachDoc(cm, doc) {
+	logger.error(`>>> Entering attachDoc(cm=${cm},doc=${doc})`, { "event.action": "attachDoc", "logrite.cm": cm, "logrite.doc": doc });
     if (doc.cm) throw new Error("This document is already in use.");
     cm.doc = doc;
+	logger.debug(`attachDoc(cm=${cm},doc=${doc}): cm.doc → ${cm.doc}`, { "event.action": "attachDoc", "logrite.cm": cm, "logrite.doc": doc });
     doc.cm = cm;
+	logger.debug(`attachDoc(cm=${cm},doc=${doc}): doc.cm → ${doc.cm}`, { "event.action": "attachDoc", "logrite.cm": cm, "logrite.doc": doc });
     estimateLineHeights(cm);
     loadMode(cm);
     if (!cm.options.lineWrapping) findMaxLine(cm);
     cm.options.mode = doc.modeOption;
     regChange(cm);
+	logger.warn(`<<< Exiting attachDoc(cm=${cm},doc=${doc})`, { "event.action": "attachDoc", "logrite.cm": cm, "logrite.doc": doc });
   }
 
   // LINE UTILITIES
@@ -7703,6 +9182,7 @@
     for (var chunk = doc; !chunk.lines;) {
       for (var i = 0;; ++i) {
         var child = chunk.children[i], sz = child.chunkSize();
+		logger.error(`getLine(doc=${doc},n=${n}): child → ${child}`, { "event.action": "getLine", "logrite.doc": doc, "logrite.n": n });
         if (n < sz) { chunk = child; break; }
         n -= sz;
       }
@@ -7713,6 +9193,7 @@
   // Get the part of a document between two positions, as an array of
   // strings.
   function getBetween(doc, start, end) {
+	logger.error(`>>> Entering getBetween(doc=${doc},start=${start},end=${end})`, { "event.action": "getBetween", "logrite.doc": doc, "logrite.start": start, "logrite.end": end });
     var out = [], n = start.line;
     doc.iter(start.line, end.line + 1, function(line) {
       var text = line.text;
@@ -7725,6 +9206,7 @@
   }
   // Get the lines between from and to, as array of strings.
   function getLines(doc, from, to) {
+	logger.error(`>>> Entering getLines(doc=${doc},from=${from},to=${to})`, { "event.action": "getLines", "logrite.doc": doc, "logrite.from": from, "logrite.to": to });
     var out = [];
     doc.iter(from, to, function(line) { out.push(line.text); });
     return out;
@@ -7733,8 +9215,10 @@
   // Update the height of a line, propagating the height change
   // upwards to parent nodes.
   function updateLineHeight(line, height) {
+	logger.error(`>>> Entering updateLineHeight(line=${line},height=${height})`, { "event.action": "updateLineHeight", "logrite.line": line, "logrite.height": height });
     var diff = height - line.height;
     if (diff) for (var n = line; n; n = n.parent) n.height += diff;
+	logger.warn(`<<< Exiting updateLineHeight(line=${line},height=${height})`, { "event.action": "updateLineHeight", "logrite.line": line, "logrite.height": height });
   }
 
   // Given a line object, find its line number by walking up through
@@ -7754,6 +9238,7 @@
   // Find the line at the given vertical position, using the height
   // information in the document tree.
   function lineAtHeight(chunk, h) {
+	logger.error(`>>> Entering lineAtHeight(chunk=${chunk},h=${h})`, { "event.action": "lineAtHeight", "logrite.chunk": chunk, "logrite.h": h });
     var n = chunk.first;
     outer: do {
       for (var i = 0; i < chunk.children.length; ++i) {
@@ -7769,14 +9254,18 @@
       if (h < lh) break;
       h -= lh;
     }
+	logger.warn(`<<< Exiting lineAtHeight(chunk=${chunk},h=${h})`, { "event.action": "lineAtHeight", "logrite.chunk": chunk, "logrite.h": h });
+	logger.warn(`<<< Exiting lineAtHeight(height=${height},mode=${mode})`, { "event.action": "lineAtHeight", "logrite.chunk": chunk, "logrite.h": h });
     return n + i;
   }
 
 
   // Find the height above the given line.
   function heightAtLine(lineObj) {
+	logger.error(`>>> Entering heightAtLine(lineObj=${lineObj})`, { "event.action": "heightAtLine", "logrite.lineObj": lineObj });
     lineObj = visualLine(lineObj);
 
+	logger.error(`heightAtLine(lineObj=${lineObj}): lineObj → ${lineObj}`, { "event.action": "heightAtLine", "logrite.lineObj": lineObj });
     var h = 0, chunk = lineObj.parent;
     for (var i = 0; i < chunk.lines.length; ++i) {
       var line = chunk.lines[i];
@@ -7790,6 +9279,7 @@
         else h += cur.height;
       }
     }
+	logger.warn(`<<< Exiting heightAtLine(lineObj=${lineObj})`, { "event.action": "heightAtLine", "logrite.lineObj": lineObj });
     return h;
   }
 
@@ -7805,25 +9295,32 @@
   // HISTORY
 
   function History(startGen) {
+	logger.error(`>>> Entering History(startGen=${startGen})`, { "event.action": "History", "logrite.startGen": startGen });
     // Arrays of change events and selections. Doing something adds an
     // event to done and clears undo. Undoing moves events from done
     // to undone, redoing moves them in the other direction.
     this.done = []; this.undone = [];
     this.undoDepth = Infinity;
+	logger.debug(`History(startGen=${startGen}): this.done → ${this.done}`, { "event.action": "History", "logrite.startGen": startGen });
     // Used to track when changes can be merged into a single undo
     // event
     this.lastModTime = this.lastSelTime = 0;
+	logger.debug(`History(startGen=${startGen}): this.undoDepth → ${this.undoDepth}`, { "event.action": "History", "logrite.startGen": startGen });
+	logger.debug(`History(startGen=${startGen}): this.lastModTime → ${this.lastModTime}`, { "event.action": "History", "logrite.startGen": startGen });
     this.lastOp = this.lastSelOp = null;
     this.lastOrigin = this.lastSelOrigin = null;
     // Used by the isClean() method
     this.generation = this.maxGeneration = startGen || 1;
+	logger.debug(`History(startGen=${startGen}): this.lastOp → ${this.lastOp}`, { "event.action": "History", "logrite.startGen": startGen });
   }
 
   // Create a history change event from an updateDoc-style change
   // object.
   function historyChangeFromChange(doc, change) {
+	logger.error(`>>> Entering historyChangeFromChange(doc=${doc},change=${change})`, { "event.action": "historyChangeFromChange", "logrite.doc": doc, "logrite.change": change });
     var histChange = {from: copyPos(change.from), to: changeEnd(change), text: getBetween(doc, change.from, change.to)};
     attachLocalSpans(doc, histChange, change.from.line, change.to.line + 1);
+	logger.error(`historyChangeFromChange(doc=${doc},change=${change}): histChange → ${histChange}`, { "event.action": "historyChangeFromChange", "logrite.doc": doc, "logrite.change": change });
     linkedDocs(doc, function(doc) {attachLocalSpans(doc, histChange, change.from.line, change.to.line + 1);}, true);
     return histChange;
   }
@@ -7831,16 +9328,20 @@
   // Pop all selection events off the end of a history array. Stop at
   // a change event.
   function clearSelectionEvents(array) {
+	logger.error(`>>> Entering clearSelectionEvents(array=${array})`, { "event.action": "clearSelectionEvents", "logrite.array": array });
     while (array.length) {
       var last = lst(array);
+	logger.error(`clearSelectionEvents(array=${array}): last → ${last}`, { "event.action": "clearSelectionEvents", "logrite.array": array });
       if (last.ranges) array.pop();
       else break;
+	logger.warn(`<<< Exiting clearSelectionEvents(array=${array})`, { "event.action": "clearSelectionEvents", "logrite.array": array });
     }
   }
 
   // Find the top change event in the history. Pop off selection
   // events that are in the way.
   function lastChangeEvent(hist, force) {
+	logger.error(`>>> Entering lastChangeEvent(hist=${hist},force=${force})`, { "event.action": "lastChangeEvent", "logrite.hist": hist, "logrite.force": force });
     if (force) {
       clearSelectionEvents(hist.done);
       return lst(hist.done);
@@ -7848,6 +9349,7 @@
       return lst(hist.done);
     } else if (hist.done.length > 1 && !hist.done[hist.done.length - 2].ranges) {
       hist.done.pop();
+	logger.warn(`<<< Exiting lastChangeEvent(hist=${hist},force=${force})`, { "event.action": "lastChangeEvent", "logrite.hist": hist, "logrite.force": force });
       return lst(hist.done);
     }
   }
@@ -7856,8 +9358,11 @@
   // a single operation, ore are close together with an origin that
   // allows merging (starting with "+") into a single event.
   function addChangeToHistory(doc, change, selAfter, opId) {
+	logger.error(`>>> Entering addChangeToHistory(doc=${doc},change=${change},selAfter=${selAfter},opId=${opId})`, { "event.action": "addChangeToHistory", "logrite.doc": doc, "logrite.change": change, "logrite.selAfter": selAfter, "logrite.opId": opId });
     var hist = doc.history;
     hist.undone.length = 0;
+	logger.debug(`addChangeToHistory(doc=${doc},change=${change},selAfter=${selAfter},opId=${opId}): hist.generation → ${hist.generation}`, { "event.action": "addChangeToHistory", "logrite.doc": doc, "logrite.change": change, "logrite.selAfter": selAfter, "logrite.opId": opId });
+	logger.debug(`addChangeToHistory(doc=${doc},change=${change},selAfter=${selAfter},opId=${opId}): hist.lastModTime → ${hist.lastModTime}`, { "event.action": "addChangeToHistory", "logrite.doc": doc, "logrite.change": change, "logrite.selAfter": selAfter, "logrite.opId": opId });
     var time = +new Date, cur;
 
     if ((hist.lastOp == opId ||
@@ -7865,8 +9370,11 @@
          ((change.origin.charAt(0) == "+" && doc.cm && hist.lastModTime > time - doc.cm.options.historyEventDelay) ||
           change.origin.charAt(0) == "*")) &&
         (cur = lastChangeEvent(hist, hist.lastOp == opId))) {
+		logger.debug(`addChangeToHistory(doc=${doc},change=${change},selAfter=${selAfter},opId=${opId}): hist.lastOp → ${hist.lastOp}`, { "event.action": "addChangeToHistory", "logrite.doc": doc, "logrite.change": change, "logrite.selAfter": selAfter, "logrite.opId": opId });
       // Merge this change into the last event
       var last = lst(cur.changes);
+	logger.error(`addChangeToHistory(doc=${doc},change=${change},selAfter=${selAfter},opId=${opId}): last → ${last}`, { "event.action": "addChangeToHistory", "logrite.doc": doc, "logrite.change": change, "logrite.selAfter": selAfter, "logrite.opId": opId });
+	logger.debug(`addChangeToHistory(doc=${doc},change=${change},selAfter=${selAfter},opId=${opId}): hist.lastOrigin → ${hist.lastOrigin}`, { "event.action": "addChangeToHistory", "logrite.doc": doc, "logrite.change": change, "logrite.selAfter": selAfter, "logrite.opId": opId });
       if (cmp(change.from, change.to) == 0 && cmp(change.from, last.to) == 0) {
         // Optimized case for simple insertion -- don't want to add
         // new changesets for every character typed
@@ -7878,6 +9386,7 @@
     } else {
       // Can not be merged, start a new event.
       var before = lst(hist.done);
+	logger.error(`addChangeToHistory(doc=${doc},change=${change},selAfter=${selAfter},opId=${opId}): before → ${before}`, { "event.action": "addChangeToHistory", "logrite.doc": doc, "logrite.change": change, "logrite.selAfter": selAfter, "logrite.opId": opId });
       if (!before || !before.ranges)
         pushSelectionToHistory(doc.sel, hist.done);
       cur = {changes: [historyChangeFromChange(doc, change)],
@@ -7895,10 +9404,13 @@
     hist.lastOrigin = hist.lastSelOrigin = change.origin;
 
     if (!last) signal(doc, "historyAdded");
+	logger.warn(`<<< Exiting addChangeToHistory(doc=${doc},change=${change},selAfter=${selAfter},opId=${opId})`, { "event.action": "addChangeToHistory", "logrite.doc": doc, "logrite.change": change, "logrite.selAfter": selAfter, "logrite.opId": opId });
   }
 
   function selectionEventCanBeMerged(doc, origin, prev, sel) {
+	logger.error(`>>> Entering selectionEventCanBeMerged(doc=${doc},origin=${origin},prev=${prev},sel=${sel})`, { "event.action": "selectionEventCanBeMerged", "logrite.doc": doc, "logrite.origin": origin, "logrite.prev": prev, "logrite.sel": sel });
     var ch = origin.charAt(0);
+	logger.error(`selectionEventCanBeMerged(doc=${doc},origin=${origin},prev=${prev},sel=${sel}): ch → ${ch}`, { "event.action": "selectionEventCanBeMerged", "logrite.doc": doc, "logrite.origin": origin, "logrite.prev": prev, "logrite.sel": sel });
     return ch == "*" ||
       ch == "+" &&
       prev.ranges.length == sel.ranges.length &&
@@ -7911,8 +9423,10 @@
   // selection into the 'done' array when it was significantly
   // different (in number of selected ranges, emptiness, or time).
   function addSelectionToHistory(doc, sel, opId, options) {
+	logger.error(`>>> Entering addSelectionToHistory(doc=${doc},sel=${sel},opId=${opId},options=${options})`, { "event.action": "addSelectionToHistory", "logrite.doc": doc, "logrite.sel": sel, "logrite.opId": opId, "logrite.options": options });
     var hist = doc.history, origin = options && options.origin;
 
+	logger.debug(`addSelectionToHistory(doc=${doc},sel=${sel},opId=${opId},options=${options}): hist.lastSelTime → ${hist.lastSelTime}`, { "event.action": "addSelectionToHistory", "logrite.doc": doc, "logrite.sel": sel, "logrite.opId": opId, "logrite.options": options });
     // A new event is started when the previous origin does not match
     // the current, or the origins don't allow matching. Origins
     // starting with * are always merged, those starting with + are
@@ -7925,6 +9439,8 @@
     else
       pushSelectionToHistory(sel, hist.done);
 
+	logger.debug(`addSelectionToHistory(doc=${doc},sel=${sel},opId=${opId},options=${options}): hist.lastSelOrigin → ${hist.lastSelOrigin}`, { "event.action": "addSelectionToHistory", "logrite.doc": doc, "logrite.sel": sel, "logrite.opId": opId, "logrite.options": options });
+	logger.debug(`addSelectionToHistory(doc=${doc},sel=${sel},opId=${opId},options=${options}): hist.lastSelOp → ${hist.lastSelOp}`, { "event.action": "addSelectionToHistory", "logrite.doc": doc, "logrite.sel": sel, "logrite.opId": opId, "logrite.options": options });
     hist.lastSelTime = +new Date;
     hist.lastSelOrigin = origin;
     hist.lastSelOp = opId;
@@ -7933,44 +9449,55 @@
   }
 
   function pushSelectionToHistory(sel, dest) {
+	logger.error(`>>> Entering pushSelectionToHistory(sel=${sel},dest=${dest})`, { "event.action": "pushSelectionToHistory", "logrite.sel": sel, "logrite.dest": dest });
     var top = lst(dest);
     if (!(top && top.ranges && top.equals(sel)))
       dest.push(sel);
+	logger.warn(`<<< Exiting pushSelectionToHistory(sel=${sel},dest=${dest})`, { "event.action": "pushSelectionToHistory", "logrite.sel": sel, "logrite.dest": dest });
   }
 
   // Used to store marked span information in the history.
   function attachLocalSpans(doc, change, from, to) {
+	logger.error(`>>> Entering attachLocalSpans(doc=${doc},change=${change},from=${from},to=${to})`, { "event.action": "attachLocalSpans", "logrite.doc": doc, "logrite.change": change, "logrite.from": from, "logrite.to": to });
     var existing = change["spans_" + doc.id], n = 0;
     doc.iter(Math.max(doc.first, from), Math.min(doc.first + doc.size, to), function(line) {
+	logger.error(`attachLocalSpans(doc=${doc},change=${change},from=${from},to=${to}): existing → ${existing}`, { "event.action": "attachLocalSpans", "logrite.doc": doc, "logrite.change": change, "logrite.from": from, "logrite.to": to });
       if (line.markedSpans)
         (existing || (existing = change["spans_" + doc.id] = {}))[n] = line.markedSpans;
       ++n;
     });
+	logger.warn(`<<< Exiting attachLocalSpans(doc=${doc},change=${change},from=${from},to=${to})`, { "event.action": "attachLocalSpans", "logrite.doc": doc, "logrite.change": change, "logrite.from": from, "logrite.to": to });
   }
 
   // When un/re-doing restores text containing marked spans, those
   // that have been explicitly cleared should not be restored.
   function removeClearedSpans(spans) {
+	logger.error(`>>> Entering removeClearedSpans(spans=${spans})`, { "event.action": "removeClearedSpans", "logrite.spans": spans });
     if (!spans) return null;
     for (var i = 0, out; i < spans.length; ++i) {
       if (spans[i].marker.explicitlyCleared) { if (!out) out = spans.slice(0, i); }
       else if (out) out.push(spans[i]);
     }
+	logger.warn(`<<< Exiting removeClearedSpans(spans=${spans})`, { "event.action": "removeClearedSpans", "logrite.spans": spans });
     return !out ? spans : out.length ? out : null;
   }
 
   // Retrieve and filter the old marked spans stored in a change event.
   function getOldSpans(doc, change) {
+	logger.error(`>>> Entering getOldSpans(doc=${doc},change=${change})`, { "event.action": "getOldSpans", "logrite.doc": doc, "logrite.change": change });
     var found = change["spans_" + doc.id];
     if (!found) return null;
+	logger.error(`getOldSpans(doc=${doc},change=${change}): found → ${found}`, { "event.action": "getOldSpans", "logrite.doc": doc, "logrite.change": change });
     for (var i = 0, nw = []; i < change.text.length; ++i)
       nw.push(removeClearedSpans(found[i]));
+	logger.warn(`<<< Exiting getOldSpans(doc=${doc},change=${change})`, { "event.action": "getOldSpans", "logrite.doc": doc, "logrite.change": change });
     return nw;
   }
 
   // Used both to provide a JSON-safe object in .getHistory, and, when
   // detaching a document, to split the history in two
   function copyHistoryArray(events, newGroup, instantiateSel) {
+	logger.error(`>>> Entering copyHistoryArray(events=${events},newGroup=${newGroup},instantiateSel=${instantiateSel})`, { "event.action": "copyHistoryArray", "logrite.events": events, "logrite.newGroup": newGroup, "logrite.instantiateSel": instantiateSel });
     for (var i = 0, copy = []; i < events.length; ++i) {
       var event = events[i];
       if (event.ranges) {
@@ -7990,17 +9517,21 @@
         }
       }
     }
+	logger.warn(`<<< Exiting copyHistoryArray(events=${events},newGroup=${newGroup},instantiateSel=${instantiateSel})`, { "event.action": "copyHistoryArray", "logrite.events": events, "logrite.newGroup": newGroup, "logrite.instantiateSel": instantiateSel });
     return copy;
   }
 
   // Rebasing/resetting history to deal with externally-sourced changes
 
   function rebaseHistSelSingle(pos, from, to, diff) {
+	logger.error(`>>> Entering rebaseHistSelSingle(pos=${pos},from=${from},to=${to},diff=${diff})`, { "event.action": "rebaseHistSelSingle", "logrite.pos": pos, "logrite.from": from, "logrite.to": to, "logrite.diff": diff });
     if (to < pos.line) {
       pos.line += diff;
     } else if (from < pos.line) {
       pos.line = from;
+	logger.debug(`rebaseHistSelSingle(pos=${pos},from=${from},to=${to},diff=${diff}): pos.line → ${pos.line}`, { "event.action": "rebaseHistSelSingle", "logrite.pos": pos, "logrite.from": from, "logrite.to": to, "logrite.diff": diff });
       pos.ch = 0;
+	logger.warn(`<<< Exiting rebaseHistSelSingle(pos=${pos},from=${from},to=${to},diff=${diff})`, { "event.action": "rebaseHistSelSingle", "logrite.pos": pos, "logrite.from": from, "logrite.to": to, "logrite.diff": diff });
     }
   }
 
@@ -8012,6 +9543,7 @@
   // reallocate them all on every rebase, but also avoid problems with
   // shared position objects being unsafely updated.
   function rebaseHistArray(array, from, to, diff) {
+	logger.error(`>>> Entering rebaseHistArray(array=${array},from=${from},to=${to},diff=${diff})`, { "event.action": "rebaseHistArray", "logrite.array": array, "logrite.from": from, "logrite.to": to, "logrite.diff": diff });
     for (var i = 0; i < array.length; ++i) {
       var sub = array[i], ok = true;
       if (sub.ranges) {
@@ -8035,14 +9567,17 @@
       if (!ok) {
         array.splice(0, i + 1);
         i = 0;
+		logger.warn(`<<< Exiting rebaseHistArray(array=${array},from=${from},to=${to},diff=${diff})`, { "event.action": "rebaseHistArray", "logrite.array": array, "logrite.from": from, "logrite.to": to, "logrite.diff": diff });
       }
     }
   }
 
   function rebaseHist(hist, change) {
+	logger.error(`>>> Entering rebaseHist(hist=${hist},change=${change})`, { "event.action": "rebaseHist", "logrite.hist": hist, "logrite.change": change });
     var from = change.from.line, to = change.to.line, diff = change.text.length - (to - from) - 1;
     rebaseHistArray(hist.done, from, to, diff);
     rebaseHistArray(hist.undone, from, to, diff);
+	logger.warn(`<<< Exiting rebaseHist(hist=${hist},change=${change})`, { "event.action": "rebaseHist", "logrite.hist": hist, "logrite.change": change });
   }
 
   // EVENT UTILITIES
@@ -8051,20 +9586,29 @@
   // compatibility wrappers are needed.
 
   var e_preventDefault = CodeMirror.e_preventDefault = function(e) {
+	logger.error(`>>> Entering e_preventDefault(e=${e})`, { "event.action": "e_preventDefault", "logrite.e": e });
     if (e.preventDefault) e.preventDefault();
     else e.returnValue = false;
+	logger.warn(`<<< Exiting e_preventDefault(e=${e})`, { "event.action": "e_preventDefault", "logrite.e": e });
   };
   var e_stopPropagation = CodeMirror.e_stopPropagation = function(e) {
+	logger.error(`>>> Entering e_stopPropagation(e=${e})`, { "event.action": "e_stopPropagation", "logrite.e": e });
     if (e.stopPropagation) e.stopPropagation();
     else e.cancelBubble = true;
+	logger.warn(`<<< Exiting e_stopPropagation(e=${e})`, { "event.action": "e_stopPropagation", "logrite.e": e });
   };
   function e_defaultPrevented(e) {
+	logger.error(`>>> Entering e_defaultPrevented(e=${e})`, { "event.action": "e_defaultPrevented", "logrite.e": e });
+	logger.warn(`<<< Exiting e_defaultPrevented(e=${e})`, { "event.action": "e_defaultPrevented", "logrite.e": e });
     return e.defaultPrevented != null ? e.defaultPrevented : e.returnValue == false;
   }
   var e_stop = CodeMirror.e_stop = function(e) {e_preventDefault(e); e_stopPropagation(e);};
+logger.error(`>>> Entering e_stop(e=${e})`, { "event.action": "e_stop", "logrite.e": e });
 
+logger.warn(`<<< Exiting e_stop(e=${e})`, { "event.action": "e_stop", "logrite.e": e });
   function e_target(e) {return e.target || e.srcElement;}
   function e_button(e) {
+	logger.error(`>>> Entering e_button(e=${e})`, { "event.action": "e_button", "logrite.e": e });
     var b = e.which;
     if (b == null) {
       if (e.button & 1) b = 1;
@@ -8072,6 +9616,7 @@
       else if (e.button & 4) b = 2;
     }
     if (mac && e.ctrlKey && b == 1) b = 3;
+	logger.warn(`<<< Exiting e_button(e=${e})`, { "event.action": "e_button", "logrite.e": e });
     return b;
   }
 
@@ -8081,6 +9626,7 @@
   // registering native DOM handlers.
 
   var on = CodeMirror.on = function(emitter, type, f) {
+	logger.error(`>>> Entering on(emitter=${emitter},type=${type},f=${f})`, { "event.action": "on", "logrite.type": type, "logrite.f": f });
     if (emitter.addEventListener)
       emitter.addEventListener(type, f, false);
     else if (emitter.attachEvent)
@@ -8089,10 +9635,13 @@
       var map = emitter._handlers || (emitter._handlers = {});
       var arr = map[type] || (map[type] = []);
       arr.push(f);
+	logger.error(`on(emitter=${emitter},type=${type},f=${f}): arr → ${arr}`, { "event.action": "on", "logrite.type": type, "logrite.f": f });
     }
+	logger.error(`>>> Entering on(type=${type},f=${f})`, { "event.action": "on", "logrite.type": type, "logrite.f": f });
   };
 
   var off = CodeMirror.off = function(emitter, type, f) {
+	logger.error(`>>> Entering off(emitter=${emitter},type=${type},f=${f})`, { "event.action": "off", "logrite.type": type, "logrite.f": f });
     if (emitter.removeEventListener)
       emitter.removeEventListener(type, f, false);
     else if (emitter.detachEvent)
@@ -8110,6 +9659,7 @@
     if (!arr) return;
     var args = Array.prototype.slice.call(arguments, 2);
     for (var i = 0; i < arr.length; ++i) arr[i].apply(null, args);
+	logger.error(`signal(emitter=${emitter},type=${type}): args → ${args}`, { "event.action": "signal", "logrite.emitter": emitter, "logrite.type": type });
   };
 
   var orphanDelayedCallbacks = null;
@@ -8122,9 +9672,11 @@
   // them to be executed when the last operation ends, or, if no
   // operation is active, when a timeout fires.
   function signalLater(emitter, type /*, values...*/) {
+	logger.error(`>>> Entering signalLater(emitter=${emitter})`, { "event.action": "signalLater", "logrite.emitter": emitter });
     var arr = emitter._handlers && emitter._handlers[type];
     if (!arr) return;
     var args = Array.prototype.slice.call(arguments, 2), list;
+	logger.error(`signalLater(emitter=${emitter}): args → ${args}`, { "event.action": "signalLater", "logrite.emitter": emitter });
     if (operationGroup) {
       list = operationGroup.delayedCallbacks;
     } else if (orphanDelayedCallbacks) {
@@ -8132,8 +9684,13 @@
     } else {
       list = orphanDelayedCallbacks = [];
       setTimeout(fireOrphanDelayed, 0);
+	logger.warn(`<<< Exiting signalLater(emitter=${emitter})`, { "event.action": "signalLater", "logrite.emitter": emitter });
     }
-    function bnd(f) {return function(){f.apply(null, args);};};
+    function bnd(f) {
+        logger.error(`>>> Entering bnd(f=${f})`, { "event.action": "bnd", "logrite.f": f });
+        logger.warn(`<<< Exiting bnd(f=${f})`, { "event.action": "bnd", "logrite.f": f });
+        return function(){f.apply(null, args);};
+    };
     for (var i = 0; i < arr.length; ++i)
       list.push(bnd(arr[i]));
   }
@@ -8142,19 +9699,23 @@
     var delayed = orphanDelayedCallbacks;
     orphanDelayedCallbacks = null;
     for (var i = 0; i < delayed.length; ++i) delayed[i]();
+	logger.warn('<<< Exiting fireOrphanDelayed()', { "event.action": "fireOrphanDelayed" });
   }
 
   // The DOM events that CodeMirror handles can be overridden by
   // registering a (non-DOM) handler on the editor for the event name,
   // and preventDefault-ing the event in that handler.
   function signalDOMEvent(cm, e, override) {
+	logger.error(`>>> Entering signalDOMEvent(cm=${cm},e=${e},override=${override})`, { "event.action": "signalDOMEvent", "logrite.cm": cm, "logrite.e": e, "logrite.override": override });
     if (typeof e == "string")
       e = {type: e, preventDefault: function() { this.defaultPrevented = true; }};
     signal(cm, override || e.type, cm, e);
+	logger.error(`signalDOMEvent(cm=${cm},e=${e},override=${override}): e → ${e}`, { "event.action": "signalDOMEvent", "logrite.cm": cm, "logrite.e": e, "logrite.override": override });
     return e_defaultPrevented(e) || e.codemirrorIgnore;
   }
 
   function signalCursorActivity(cm) {
+	logger.error(`>>> Entering signalCursorActivity(cm=${cm})`, { "event.action": "signalCursorActivity", "logrite.cm": cm });
     var arr = cm._handlers && cm._handlers.cursorActivity;
     if (!arr) return;
     var set = cm.curOp.cursorActivityHandlers || (cm.curOp.cursorActivityHandlers = []);
@@ -8163,15 +9724,19 @@
   }
 
   function hasHandler(emitter, type) {
+	logger.error(`>>> Entering hasHandler(emitter=${emitter},type=${type})`, { "event.action": "hasHandler", "logrite.emitter": emitter, "logrite.type": type });
     var arr = emitter._handlers && emitter._handlers[type];
+	logger.warn(`<<< Exiting hasHandler(emitter=${emitter},type=${type})`, { "event.action": "hasHandler", "logrite.emitter": emitter, "logrite.type": type });
     return arr && arr.length > 0;
   }
 
   // Add on and off methods to a constructor's prototype, to make
   // registering events on such objects more convenient.
   function eventMixin(ctor) {
+	logger.error(`>>> Entering eventMixin(ctor=${ctor})`, { "event.action": "eventMixin", "logrite.ctor": ctor });
     ctor.prototype.on = function(type, f) {on(this, type, f);};
     ctor.prototype.off = function(type, f) {off(this, type, f);};
+	logger.warn(`<<< Exiting eventMixin(ctor=${ctor})`, { "event.action": "eventMixin", "logrite.ctor": ctor });
   }
 
   // MISC UTILITIES
@@ -8186,34 +9751,46 @@
   // Reused option objects for setSelection & friends
   var sel_dontScroll = {scroll: false}, sel_mouse = {origin: "*mouse"}, sel_move = {origin: "+move"};
 
-  function Delayed() {this.id = null;}
+  function Delayed() {
+      logger.error('>>> Entering Delayed()', { "event.action": "Delayed" });
+      logger.warn('<<< Exiting Delayed()', { "event.action": "Delayed" });
+      this.id = null;
+  }
   Delayed.prototype.set = function(ms, f) {
+	logger.error(`>>> Entering set(ms=${ms},f=${f})`, { "event.action": "set", "logrite.ms": ms, "logrite.f": f });
     clearTimeout(this.id);
     this.id = setTimeout(f, ms);
+	logger.warn(`<<< Exiting set(ms=${ms},f=${f})`, { "event.action": "set", "logrite.ms": ms, "logrite.f": f });
   };
 
   // Counts the column offset in a string, taking tabs into account.
   // Used mostly to find indentation.
   var countColumn = CodeMirror.countColumn = function(string, end, tabSize, startIndex, startValue) {
+	logger.error(`>>> Entering countColumn(string=${string},end=${end},tabSize=${tabSize},startIndex=${startIndex},startValue=${startValue})`, { "event.action": "countColumn", "logrite.string": string, "logrite.end": end, "logrite.tabSize": tabSize, "logrite.startIndex": startIndex, "logrite.startValue": startValue });
     if (end == null) {
       end = string.search(/[^\s\u00a0]/);
       if (end == -1) end = string.length;
     }
     for (var i = startIndex || 0, n = startValue || 0;;) {
       var nextTab = string.indexOf("\t", i);
+	logger.error(`countColumn(string=${string},end=${end},tabSize=${tabSize},startIndex=${startIndex},startValue=${startValue}): nextTab → ${nextTab}`, { "event.action": "countColumn", "logrite.string": string, "logrite.end": end, "logrite.tabSize": tabSize, "logrite.startIndex": startIndex, "logrite.startValue": startValue });
       if (nextTab < 0 || nextTab >= end)
         return n + (end - i);
       n += nextTab - i;
       n += tabSize - (n % tabSize);
       i = nextTab + 1;
     }
+	logger.warn(`<<< Exiting countColumn(string=${string},end=${end},tabSize=${tabSize},startIndex=${startIndex},startValue=${startValue})`, { "event.action": "countColumn", "logrite.string": string, "logrite.end": end, "logrite.tabSize": tabSize, "logrite.startIndex": startIndex, "logrite.startValue": startValue });
+	logger.error(`countColumn(string=${string},end=${end},tabSize=${tabSize},startIndex=${startIndex},startValue=${startValue}): end → ${end}`, { "event.action": "countColumn", "logrite.string": string, "logrite.end": end, "logrite.tabSize": tabSize, "logrite.startIndex": startIndex, "logrite.startValue": startValue });
   };
 
   // The inverse of countColumn -- find the offset that corresponds to
   // a particular column.
   function findColumn(string, goal, tabSize) {
+	logger.error(`>>> Entering findColumn(string=${string},goal=${goal},tabSize=${tabSize})`, { "event.action": "findColumn", "logrite.string": string, "logrite.goal": goal, "logrite.tabSize": tabSize });
     for (var pos = 0, col = 0;;) {
       var nextTab = string.indexOf("\t", pos);
+	logger.error(`findColumn(string=${string},goal=${goal},tabSize=${tabSize}): nextTab → ${nextTab}`, { "event.action": "findColumn", "logrite.string": string, "logrite.goal": goal, "logrite.tabSize": tabSize });
       if (nextTab == -1) nextTab = string.length;
       var skipped = nextTab - pos;
       if (nextTab == string.length || col + skipped >= goal)
@@ -8223,37 +9800,46 @@
       pos = nextTab + 1;
       if (col >= goal) return pos;
     }
+	logger.warn(`<<< Exiting findColumn(string=${string},goal=${goal},tabSize=${tabSize})`, { "event.action": "findColumn", "logrite.string": string, "logrite.goal": goal, "logrite.tabSize": tabSize });
   }
 
   var spaceStrs = [""];
   function spaceStr(n) {
+	logger.error(`>>> Entering spaceStr(n=${n})`, { "event.action": "spaceStr", "logrite.n": n });
     while (spaceStrs.length <= n)
       spaceStrs.push(lst(spaceStrs) + " ");
+	logger.warn(`<<< Exiting spaceStr(n=${n})`, { "event.action": "spaceStr", "logrite.n": n });
     return spaceStrs[n];
   }
 
   function lst(arr) { return arr[arr.length-1]; }
 
   var selectInput = function(node) { node.select(); };
+logger.error(`>>> Entering selectInput(node=${node})`, { "event.action": "selectInput", "logrite.node": node });
   if (ios) // Mobile Safari apparently has a bug where select() is broken.
     selectInput = function(node) { node.selectionStart = 0; node.selectionEnd = node.value.length; };
   else if (ie) // Suppress mysterious IE10 errors
     selectInput = function(node) { try { node.select(); } catch(_e) {} };
 
   function indexOf(array, elt) {
+	logger.error(`>>> Entering indexOf(array=${array},elt=${elt})`, { "event.action": "indexOf", "logrite.array": array, "logrite.elt": elt });
     for (var i = 0; i < array.length; ++i)
       if (array[i] == elt) return i;
+	logger.warn(`<<< Exiting indexOf(array=${array},elt=${elt})`, { "event.action": "indexOf", "logrite.array": array, "logrite.elt": elt });
     return -1;
   }
   function map(array, f) {
+	logger.error(`>>> Entering map(array=${array},f=${f})`, { "event.action": "map", "logrite.array": array, "logrite.f": f });
     var out = [];
     for (var i = 0; i < array.length; i++) out[i] = f(array[i], i);
+	logger.warn(`<<< Exiting map(array=${array},f=${f})`, { "event.action": "map", "logrite.array": array, "logrite.f": f });
     return out;
   }
 
   function nothing() {}
 
   function createObj(base, props) {
+	logger.error(`>>> Entering createObj(base=${base},props=${props})`, { "event.action": "createObj", "logrite.base": base, "logrite.props": props });
     var inst;
     if (Object.create) {
       inst = Object.create(base);
@@ -8262,24 +9848,31 @@
       inst = new nothing();
     }
     if (props) copyObj(props, inst);
+	logger.error(`createObj(base=${base},props=${props}): inst → ${inst}`, { "event.action": "createObj", "logrite.base": base, "logrite.props": props });
+	logger.warn(`<<< Exiting createObj(base=${base},props=${props})`, { "event.action": "createObj", "logrite.base": base, "logrite.props": props });
     return inst;
   };
 
   function copyObj(obj, target, overwrite) {
+	logger.error(`>>> Entering copyObj(obj=${obj},target=${target},overwrite=${overwrite})`, { "event.action": "copyObj", "logrite.obj": obj, "logrite.target": target, "logrite.overwrite": overwrite });
     if (!target) target = {};
     for (var prop in obj)
       if (obj.hasOwnProperty(prop) && (overwrite !== false || !target.hasOwnProperty(prop)))
         target[prop] = obj[prop];
+	logger.warn(`<<< Exiting copyObj(obj=${obj},target=${target},overwrite=${overwrite})`, { "event.action": "copyObj", "logrite.obj": obj, "logrite.target": target, "logrite.overwrite": overwrite });
     return target;
   }
 
   function bind(f) {
+	logger.error(`>>> Entering bind(f=${f})`, { "event.action": "bind", "logrite.f": f });
     var args = Array.prototype.slice.call(arguments, 1);
     return function(){return f.apply(null, args);};
   }
 
   var nonASCIISingleCaseWordChar = /[\u00df\u0587\u0590-\u05f4\u0600-\u06ff\u3040-\u309f\u30a0-\u30ff\u3400-\u4db5\u4e00-\u9fcc\uac00-\ud7af]/;
   var isWordCharBasic = CodeMirror.isWordChar = function(ch) {
+	logger.error(`>>> Entering isWordChar(ch=${ch})`, { "event.action": "isWordChar", "logrite.ch": ch, "logrite.helper": helper });
+	logger.warn(`<<< Exiting isWordChar(ch=${ch})`, { "event.action": "isWordChar", "logrite.ch": ch, "logrite.helper": helper });
     return /\w/.test(ch) || ch > "\x80" &&
       (ch.toUpperCase() != ch.toLowerCase() || nonASCIISingleCaseWordChar.test(ch));
   };
@@ -8290,7 +9883,9 @@
   }
 
   function isEmpty(obj) {
+	logger.error(`>>> Entering isEmpty(obj=${obj})`, { "event.action": "isEmpty", "logrite.obj": obj });
     for (var n in obj) if (obj.hasOwnProperty(n) && obj[n]) return false;
+	logger.warn(`<<< Exiting isEmpty(obj=${obj})`, { "event.action": "isEmpty", "logrite.obj": obj });
     return true;
   }
 
@@ -8315,28 +9910,40 @@
 
   var range;
   if (document.createRange) range = function(node, start, end, endNode) {
+	logger.error(`>>> Entering range(node=${node},start=${start},end=${end},endNode=${endNode})`, { "event.action": "range", "logrite.node": node, "logrite.start": start, "logrite.end": end });
     var r = document.createRange();
     r.setEnd(endNode || node, end);
+	logger.error(`range(node=${node},start=${start},end=${end},endNode=${endNode}): r → ${r}`, { "event.action": "range", "logrite.node": node, "logrite.start": start, "logrite.end": end });
     r.setStart(node, start);
+	logger.warn(`<<< Exiting range(node=${node},start=${start},end=${end},endNode=${endNode})`, { "event.action": "range", "logrite.node": node, "logrite.start": start, "logrite.end": end });
+	logger.error(`>>> Entering range(node=${node},start=${start},end=${end})`, { "event.action": "range", "logrite.node": node, "logrite.start": start, "logrite.end": end });
+	logger.warn(`<<< Exiting range(node=${node},start=${start},end=${end})`, { "event.action": "range", "logrite.node": node, "logrite.start": start, "logrite.end": end });
     return r;
   };
   else range = function(node, start, end) {
+	logger.error(`>>> Entering range(node=${node},start=${start},end=${end})`, { "event.action": "range", "logrite.node": node, "logrite.start": start, "logrite.end": end });
     var r = document.body.createTextRange();
+	logger.error(`range(node=${node},start=${start},end=${end}): r → ${r}`, { "event.action": "range", "logrite.node": node, "logrite.start": start, "logrite.end": end });
     try { r.moveToElementText(node.parentNode); }
     catch(e) { return r; }
     r.collapse(true);
     r.moveEnd("character", end);
     r.moveStart("character", start);
+	logger.warn(`<<< Exiting range(node=${node},start=${start},end=${end})`, { "event.action": "range", "logrite.node": node, "logrite.start": start, "logrite.end": end });
     return r;
   };
 
   function removeChildren(e) {
+	logger.error(`>>> Entering removeChildren(e=${e})`, { "event.action": "removeChildren", "logrite.e": e });
     for (var count = e.childNodes.length; count > 0; --count)
       e.removeChild(e.firstChild);
+	logger.warn(`<<< Exiting removeChildren(e=${e})`, { "event.action": "removeChildren", "logrite.e": e });
     return e;
   }
 
   function removeChildrenAndAdd(parent, e) {
+	logger.error(`>>> Entering removeChildrenAndAdd(parent=${parent},e=${e})`, { "event.action": "removeChildrenAndAdd", "logrite.parent": parent, "logrite.e": e });
+	logger.warn(`<<< Exiting removeChildrenAndAdd(parent=${parent},e=${e})`, { "event.action": "removeChildrenAndAdd", "logrite.parent": parent, "logrite.e": e });
     return removeChildren(parent).appendChild(e);
   }
 
@@ -8366,6 +9973,7 @@
 
   function classTest(cls) { return new RegExp("(^|\\s)" + cls + "(?:$|\\s)\\s*"); }
   var rmClass = CodeMirror.rmClass = function(node, cls) {
+	logger.error(`>>> Entering rmClass(node=${node},cls=${cls})`, { "event.action": "rmClass", "logrite.node": node });
     var current = node.className;
     var match = classTest(cls).exec(current);
     if (match) {
@@ -8374,13 +9982,17 @@
     }
   };
   var addClass = CodeMirror.addClass = function(node, cls) {
+	logger.error(`>>> Entering addClass(node=${node},cls=${cls})`, { "event.action": "addClass", "logrite.node": node });
     var current = node.className;
     if (!classTest(cls).test(current)) node.className += (current ? " " : "") + cls;
+	logger.warn(`<<< Exiting addClass(node=${node},cls=${cls})`, { "event.action": "addClass", "logrite.node": node });
   };
   function joinClasses(a, b) {
+	logger.error(`>>> Entering joinClasses(a=${a},b=${b})`, { "event.action": "joinClasses", "logrite.a": a, "logrite.b": b });
     var as = a.split(" ");
     for (var i = 0; i < as.length; i++)
       if (as[i] && !classTest(as[i]).test(b)) b += " " + as[i];
+	logger.warn(`<<< Exiting joinClasses(a=${a},b=${b})`, { "event.action": "joinClasses", "logrite.a": a, "logrite.b": b });
     return b;
   }
 
@@ -8391,11 +10003,14 @@
   // garbage collected.
 
   function forEachCodeMirror(f) {
+	logger.error(`>>> Entering forEachCodeMirror(f=${f})`, { "event.action": "forEachCodeMirror", "logrite.f": f });
     if (!document.body.getElementsByClassName) return;
     var byClass = document.body.getElementsByClassName("CodeMirror");
+	logger.error(`forEachCodeMirror(f=${f}): byClass → ${byClass}`, { "event.action": "forEachCodeMirror", "logrite.f": f });
     for (var i = 0; i < byClass.length; i++) {
       var cm = byClass[i].CodeMirror;
       if (cm) f(cm);
+	logger.warn(`<<< Exiting forEachCodeMirror(f=${f})`, { "event.action": "forEachCodeMirror", "logrite.f": f });
     }
   }
 
@@ -8404,6 +10019,7 @@
     if (globalsRegistered) return;
     registerGlobalHandlers();
     globalsRegistered = true;
+	logger.warn('<<< Exiting ensureGlobalHandlers()', { "event.action": "ensureGlobalHandlers" });
   }
   function registerGlobalHandlers() {
     // When the window resizes, we need to refresh active editors.
@@ -8412,12 +10028,14 @@
       if (resizeTimer == null) resizeTimer = setTimeout(function() {
         resizeTimer = null;
         forEachCodeMirror(onResize);
+		logger.debug(`registerGlobalHandlers(): resizeTimer → ${resizeTimer}`, { "event.action": "registerGlobalHandlers" });
       }, 100);
     });
     // When the window loses focus, we want to show the editor as blurred
     on(window, "blur", function() {
       forEachCodeMirror(onBlur);
     });
+	logger.warn('<<< Exiting registerGlobalHandlers()', { "event.action": "registerGlobalHandlers" });
   }
 
   // FEATURE DETECTION
@@ -8433,8 +10051,10 @@
 
   var zwspSupported;
   function zeroWidthElement(measure) {
+	logger.error(`>>> Entering zeroWidthElement(measure=${measure})`, { "event.action": "zeroWidthElement", "logrite.measure": measure });
     if (zwspSupported == null) {
       var test = elt("span", "\u200b");
+	logger.error(`zeroWidthElement(measure=${measure}): test → ${test}`, { "event.action": "zeroWidthElement", "logrite.measure": measure });
       removeChildrenAndAdd(measure, elt("span", [test, document.createTextNode("x")]));
       if (measure.firstChild.offsetHeight != 0)
         zwspSupported = test.offsetWidth <= 1 && test.offsetHeight > 2 && !(ie && ie_version < 8);
@@ -8442,17 +10062,22 @@
     var node = zwspSupported ? elt("span", "\u200b") :
       elt("span", "\u00a0", null, "display: inline-block; width: 1px; margin-right: -1px");
     node.setAttribute("cm-text", "");
+	logger.warn(`<<< Exiting zeroWidthElement(measure=${measure})`, { "event.action": "zeroWidthElement", "logrite.measure": measure });
     return node;
   }
 
   // Feature-detect IE's crummy client rect reporting for bidi text
   var badBidiRects;
   function hasBadBidiRects(measure) {
+	logger.error(`>>> Entering hasBadBidiRects(measure=${measure})`, { "event.action": "hasBadBidiRects", "logrite.measure": measure });
     if (badBidiRects != null) return badBidiRects;
     var txt = removeChildrenAndAdd(measure, document.createTextNode("A\u062eA"));
+	logger.error(`hasBadBidiRects(measure=${measure}): txt → ${txt}`, { "event.action": "hasBadBidiRects", "logrite.measure": measure });
     var r0 = range(txt, 0, 1).getBoundingClientRect();
+	logger.error(`hasBadBidiRects(measure=${measure}): r0 → ${r0}`, { "event.action": "hasBadBidiRects", "logrite.measure": measure });
     if (!r0 || r0.left == r0.right) return false; // Safari returns null in some cases (#2780)
     var r1 = range(txt, 1, 2).getBoundingClientRect();
+	logger.error(`hasBadBidiRects(measure=${measure}): r1 → ${r1}`, { "event.action": "hasBadBidiRects", "logrite.measure": measure });
     return badBidiRects = (r1.right - r0.right < 3);
   }
 
@@ -8495,10 +10120,14 @@
 
   var badZoomedRects = null;
   function hasBadZoomedRects(measure) {
+	logger.error(`>>> Entering hasBadZoomedRects(measure=${measure})`, { "event.action": "hasBadZoomedRects", "logrite.measure": measure });
     if (badZoomedRects != null) return badZoomedRects;
     var node = removeChildrenAndAdd(measure, elt("span", "x"));
+	logger.error(`hasBadZoomedRects(measure=${measure}): node → ${node}`, { "event.action": "hasBadZoomedRects", "logrite.measure": measure });
     var normal = node.getBoundingClientRect();
+	logger.error(`hasBadZoomedRects(measure=${measure}): normal → ${normal}`, { "event.action": "hasBadZoomedRects", "logrite.measure": measure });
     var fromRange = range(node, 0, 1).getBoundingClientRect();
+	logger.error(`hasBadZoomedRects(measure=${measure}): fromRange → ${fromRange}`, { "event.action": "hasBadZoomedRects", "logrite.measure": measure });
     return badZoomedRects = Math.abs(normal.left - fromRange.left) > 1;
   }
 
@@ -8536,10 +10165,22 @@
     if (!found) f(from, to, "ltr");
   }
 
-  function bidiLeft(part) { return part.level % 2 ? part.to : part.from; }
-  function bidiRight(part) { return part.level % 2 ? part.from : part.to; }
+  function bidiLeft(part) {
+      logger.error(`>>> Entering bidiLeft(part=${part})`, { "event.action": "bidiLeft", "logrite.part": part });
+      logger.warn(`<<< Exiting bidiLeft(part=${part})`, { "event.action": "bidiLeft", "logrite.part": part });
+      return part.level % 2 ? part.to : part.from;
+  }
+  function bidiRight(part) {
+      logger.error(`>>> Entering bidiRight(part=${part})`, { "event.action": "bidiRight", "logrite.part": part });
+      logger.warn(`<<< Exiting bidiRight(part=${part})`, { "event.action": "bidiRight", "logrite.part": part });
+      return part.level % 2 ? part.from : part.to;
+  }
 
-  function lineLeft(line) { var order = getOrder(line); return order ? bidiLeft(order[0]) : 0; }
+  function lineLeft(line) {
+      logger.error(`>>> Entering lineLeft(line=${line})`, { "event.action": "lineLeft", "logrite.line": line });
+      logger.warn(`<<< Exiting lineLeft(line=${line})`, { "event.action": "lineLeft", "logrite.line": line });
+      var order = getOrder(line); return order ? bidiLeft(order[0]) : 0;
+  }
   function lineRight(line) {
     var order = getOrder(line);
     if (!order) return line.text.length;

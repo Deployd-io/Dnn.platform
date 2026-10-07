@@ -31,12 +31,17 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Models
 
         public UserModelBase(UserInfo userInfo)
         {
+			eventLogger.LogError(">>> Entering UserModelBase(userInfo={UserInfo})", userInfo);
             this.Email = userInfo.Email;
+			eventLogger.LogWarning("<<< Exiting UserModelBase(userInfo={UserInfo})", userInfo);
+			eventLogger.LogDebug("UserModelBase(userInfo={UserInfo}): this.Email → {Arg1}", userInfo, this.Email);
             this.LastLogin = userInfo.Membership.LastLoginDate.ToPromptShortDateString();
             this.UserId = userInfo.UserID;
+			eventLogger.LogDebug("UserModelBase(userInfo={UserInfo}): this.UserId → {Arg1}", userInfo, this.UserId);
             this.Username = userInfo.Username;
             this.IsDeleted = userInfo.IsDeleted;
             this.IsAuthorized = userInfo.Membership.Approved;
+			eventLogger.LogDebug("UserModelBase(userInfo={UserInfo}): this.Username → {Arg1}", userInfo, this.Username);
             this.IsLockedOut = userInfo.Membership.LockedOut;
         }
 

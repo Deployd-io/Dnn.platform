@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -19,9 +20,11 @@
   var tokens = new RegExp(separators.join("|"),"g")
 
   function getWord(string, pos) {
+	logger.error(`>>> Entering getWord(string=${string},pos=${pos})`, { "event.action": "getWord", "logrite.string": string, "logrite.pos": pos });
     var index = -1, count = 1
     var words = string.split(tokens)
     for (var i = 0; i < words.length; i++) {
+	logger.error(`getWord(string=${string},pos=${pos}): words → ${words}`, { "event.action": "getWord", "logrite.string": string, "logrite.pos": pos });
       for(var j = 1; j <= words[i].length; j++) {
         if (count==pos) index = i
         count++
@@ -36,6 +39,7 @@
       ret[1] = words[index]
       ret[0] = words[index-1]
     }
+	logger.error(`getWord(string=${string},pos=${pos}): ret → ${ret}`, { "event.action": "getWord", "logrite.string": string, "logrite.pos": pos });
     return ret
   }
 

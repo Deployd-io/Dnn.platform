@@ -39,7 +39,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <summary>Adds the necessary configuration to website root <c>web.config</c> to use the Client Dependency component.</summary>
         public static void AddConfiguration()
         {
+			Logger.LogError(">>> Entering AddConfiguration()");
             var configPath = HostingEnvironment.MapPath("~/web.config");
+			Logger.LogError("AddConfiguration(): configPath → {ConfigPath}", configPath);
             if (string.IsNullOrEmpty(configPath))
             {
                 return;
@@ -55,6 +57,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
 
             // Config Sections
             var sectionsConfig = xmlDoc.DocumentElement?.SelectSingleNode("configSections");
+			Logger.LogError("AddConfiguration(): sectionsConfig → {SectionsConfig}", sectionsConfig);
             if (sectionsConfig != null)
             {
                 var clientDependencySectionConfig =
@@ -62,14 +65,17 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
                 if (clientDependencySectionConfig == null)
                 {
                     xmlFrag = xmlDoc.CreateDocumentFragment();
+					Logger.LogError("AddConfiguration(): xmlFrag → {XmlFrag}", xmlFrag);
                     xmlFrag.InnerXml =
                         """<section name="clientDependency" type="ClientDependency.Core.Config.ClientDependencySection, ClientDependency.Core" requirePermission="false" />""";
+						Logger.LogDebug("AddConfiguration(): xmlFrag → {XmlFrag}", xmlFrag);
                     xmlDoc.DocumentElement.SelectSingleNode("configSections")?.AppendChild(xmlFrag);
                 }
             }
 
             // Module Config
             var systemWebServerModulesConfig = xmlDoc.DocumentElement?.SelectSingleNode("system.webServer/modules");
+			Logger.LogError("AddConfiguration(): systemWebServerModulesConfig → {SystemWebServerModulesConfig}", systemWebServerModulesConfig);
             if (systemWebServerModulesConfig != null)
             {
                 var moduleConfig =
@@ -85,6 +91,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
 
             // Handler Config
             var systemWebServerHandlersConfig = xmlDoc.DocumentElement?.SelectSingleNode("system.webServer/handlers");
+			Logger.LogError("AddConfiguration(): systemWebServerHandlersConfig → {SystemWebServerHandlersConfig}", systemWebServerHandlersConfig);
             if (systemWebServerHandlersConfig != null)
             {
                 var handlerConfig =
@@ -100,11 +107,13 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
 
             // ClientDependency Config
             var clientDependencyConfig = xmlDoc.DocumentElement?.SelectSingleNode("clientDependency");
+			Logger.LogError("AddConfiguration(): clientDependencyConfig → {ClientDependencyConfig}", clientDependencyConfig);
             if (clientDependencyConfig == null)
             {
                 xmlFrag = xmlDoc.CreateDocumentFragment();
                 xmlFrag.InnerXml = """
                                    <clientDependency version="0" fileDependencyExtensions=".js,.css">
+									Logger.LogDebug("AddConfiguration(): xmlFrag.InnerXml → {Arg0}", xmlFrag.InnerXml);
                                      <fileRegistration defaultProvider="DnnPageHeaderProvider">
                                        <providers>
                                          <add name="DnnBodyProvider" type="DotNetNuke.Web.Client.Providers.DnnBodyProvider, DotNetNuke.Web.Client" enableCompositeFiles="false" />
@@ -129,14 +138,17 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
 
             // Save Config
             xmlDoc.Save(configPath);
+			Logger.LogWarning("<<< Exiting AddConfiguration()");
         }
 
         /// <summary>Remove the client dependency configuration from the <c>web.config</c>.</summary>
         public static void RemoveConfiguration()
         {
+			Logger.LogError(">>> Entering RemoveConfiguration()");
             Logger.Info("Removing ClientDependency from web.config");
 
             var configPath = HostingEnvironment.MapPath("~/web.config");
+			Logger.LogError("RemoveConfiguration(): configPath → {ConfigPath}", configPath);
             if (string.IsNullOrEmpty(configPath))
             {
                 return;
@@ -150,9 +162,11 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
 
             // Config Sections
             var sectionsConfig = xmlDoc.DocumentElement?.SelectSingleNode("configSections");
+			Logger.LogError("RemoveConfiguration(): sectionsConfig → {SectionsConfig}", sectionsConfig);
             if (sectionsConfig != null)
             {
                 var clientDependencySectionConfig = sectionsConfig.SelectSingleNode("section[@name='clientDependency']");
+				Logger.LogError("RemoveConfiguration(): clientDependencySectionConfig → {ClientDependencySectionConfig}", clientDependencySectionConfig);
                 if (clientDependencySectionConfig != null)
                 {
                     Logger.Info("Removing configSections/clientDependency");
@@ -162,9 +176,11 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
 
             // Module Config
             var systemWebServerModulesConfig = xmlDoc.DocumentElement?.SelectSingleNode("system.webServer/modules");
+			Logger.LogError("RemoveConfiguration(): systemWebServerModulesConfig → {SystemWebServerModulesConfig}", systemWebServerModulesConfig);
             if (systemWebServerModulesConfig != null)
             {
                 var moduleConfig = systemWebServerModulesConfig.SelectSingleNode("add[@name=\"ClientDependencyModule\"]");
+				Logger.LogError("RemoveConfiguration(): moduleConfig → {ModuleConfig}", moduleConfig);
                 if (moduleConfig != null)
                 {
                     Logger.Info("Removing system.webServer/modules/ClientDependencyModule");
@@ -174,9 +190,11 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
 
             // Handler Config
             var systemWebServerHandlersConfig = xmlDoc.DocumentElement?.SelectSingleNode("system.webServer/handlers");
+			Logger.LogError("RemoveConfiguration(): systemWebServerHandlersConfig → {SystemWebServerHandlersConfig}", systemWebServerHandlersConfig);
             if (systemWebServerHandlersConfig != null)
             {
                 var handlerConfig = systemWebServerHandlersConfig.SelectSingleNode("add[@name=\"ClientDependencyHandler\"]");
+				Logger.LogError("RemoveConfiguration(): handlerConfig → {HandlerConfig}", handlerConfig);
                 if (handlerConfig != null)
                 {
                     Logger.Info("Removing system.webServer/handlers/ClientDependencyHandler");
@@ -186,6 +204,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
 
             // ClientDependency Config
             var clientDependencyConfig = xmlDoc.DocumentElement?.SelectSingleNode("clientDependency");
+			Logger.LogError("RemoveConfiguration(): clientDependencyConfig → {ClientDependencyConfig}", clientDependencyConfig);
             if (clientDependencyConfig != null)
             {
                 Logger.Info("Removing clientDependency");
@@ -194,13 +213,16 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
 
             // Save Config
             xmlDoc.Save(configPath);
+			Logger.LogWarning("<<< Exiting RemoveConfiguration()");
         }
 
         /// <summary>Checks if ClientDependency is installed.</summary>
         /// <returns>A value indicating whether the ClientDependency provider is installed.</returns>
         public static bool IsInstalled()
         {
+			Logger.LogError(">>> Entering IsInstalled()");
             var configPath = HostingEnvironment.MapPath("~/web.config");
+			Logger.LogError("IsInstalled(): configPath → {ConfigPath}", configPath);
             if (string.IsNullOrEmpty(configPath))
             {
                 return false;
@@ -212,6 +234,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
                 xmlDoc.Load(configReader);
             }
 
+			Logger.LogWarning("<<< Exiting IsInstalled()");
             return xmlDoc.DocumentElement?.SelectSingleNode("configSections")?.SelectSingleNode("section[@name='clientDependency']") != null;
         }
 
@@ -220,7 +243,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="filePath">The path to the CSS stylesheet.</param>
         public static void RegisterAdminStylesheet(Page page, string filePath)
         {
+			Logger.LogError(">>> Entering RegisterAdminStylesheet(page={Page},filePath={FilePath})", page, filePath);
             RegisterStyleSheet(page, filePath, Client.FileOrder.Css.AdminCss);
+			Logger.LogWarning("<<< Exiting RegisterAdminStylesheet(page={Page},filePath={FilePath})", page, filePath);
         }
 
         /// <summary>Registers the <c>default.css</c> stylesheet.</summary>
@@ -228,7 +253,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="filePath">The path to the CSS stylesheet.</param>
         public static void RegisterDefaultStylesheet(Page page, string filePath)
         {
+			Logger.LogError(">>> Entering RegisterDefaultStylesheet(page={Page},filePath={FilePath})", page, filePath);
             RegisterStyleSheet(page, filePath, (int)Client.FileOrder.Css.DefaultCss, DefaultCssProvider, "dnndefault", "10.0.0");
+			Logger.LogWarning("<<< Exiting RegisterDefaultStylesheet(page={Page},filePath={FilePath})", page, filePath);
         }
 
         /// <summary>Registers a stylesheet for a specific feature.</summary>
@@ -236,7 +263,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="filePath">The path to the CSS stylesheet.</param>
         public static void RegisterFeatureStylesheet(Page page, string filePath)
         {
+			Logger.LogError(">>> Entering RegisterFeatureStylesheet(page={Page},filePath={FilePath})", page, filePath);
             RegisterStyleSheet(page, filePath, Client.FileOrder.Css.FeatureCss);
+			Logger.LogWarning("<<< Exiting RegisterFeatureStylesheet(page={Page},filePath={FilePath})", page, filePath);
         }
 
         /// <summary>Registers a stylesheet specific for Internet Explorer.</summary>
@@ -245,11 +274,13 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         [DnnDeprecated(10, 0, 2, "Internet Explorer is no longer supported.")]
         public static partial void RegisterIEStylesheet(Page page, string filePath)
         {
+			Logger.LogError(">>> Entering RegisterIEStylesheet(page={Page},filePath={FilePath})", page, filePath);
             var browser = HttpContext.Current.Request.Browser;
             if (browser.Browser == "Internet Explorer" || browser.Browser == "IE")
             {
                 RegisterStyleSheet(page, filePath, Client.FileOrder.Css.IeCss);
             }
+			Logger.LogWarning("<<< Exiting RegisterIEStylesheet(page={Page},filePath={FilePath})", page, filePath);
         }
 
         /// <summary>Requests that a JavaScript file be registered on the client browser.</summary>
@@ -257,7 +288,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="filePath">The relative file path to the JavaScript resource.</param>
         public static void RegisterScript(Page page, string filePath)
         {
+			Logger.LogError(">>> Entering RegisterScript(page={Page},filePath={FilePath})", page, filePath);
             RegisterScript(page, filePath, htmlAttributes: null);
+			Logger.LogWarning("<<< Exiting RegisterScript(page={Page},filePath={FilePath})", page, filePath);
         }
 
         /// <summary>Requests that a JavaScript file be registered on the client browser.</summary>
@@ -266,7 +299,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="htmlAttributes">A dictionary of HTML attributes to use for the <c>script</c> tag. The key being the attribute name and the value its value.</param>
         public static void RegisterScript(Page page, string filePath, IDictionary<string, string> htmlAttributes)
         {
+			Logger.LogError(">>> Entering RegisterScript(page={Page},filePath={FilePath},htmlAttributes={HtmlAttributes})", page, filePath, htmlAttributes);
             RegisterScript(page, filePath, Client.FileOrder.Js.DefaultPriority, htmlAttributes);
+			Logger.LogWarning("<<< Exiting RegisterScript(page={Page},filePath={FilePath},htmlAttributes={HtmlAttributes})", page, filePath, htmlAttributes);
         }
 
         /// <summary>Requests that a JavaScript file be registered on the client browser.</summary>
@@ -286,6 +321,8 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         public static void RegisterScript(Page page, string filePath, int priority, IDictionary<string, string> htmlAttributes)
         {
             RegisterScript(page, filePath, priority, DefaultJsProvider, htmlAttributes);
+			Logger.LogError(">>> Entering RegisterScript(page={Page},filePath={FilePath},priority={Priority})", page, filePath, priority);
+			Logger.LogWarning("<<< Exiting RegisterScript(page={Page},filePath={FilePath},priority={Priority})", page, filePath, priority);
         }
 
         /// <summary>Requests that a JavaScript file be registered on the client browser.</summary>
@@ -304,7 +341,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="htmlAttributes">A dictionary of HTML attributes to use for the <c>script</c> tag. The key being the attribute name and the value its value.</param>
         public static void RegisterScript(Page page, string filePath, Client.FileOrder.Js priority, IDictionary<string, string> htmlAttributes)
         {
+			Logger.LogError(">>> Entering RegisterScript(page={Page},filePath={FilePath},priority={Priority},htmlAttributes={HtmlAttributes})", page, filePath, priority, htmlAttributes);
             RegisterScript(page, filePath, (int)priority, DefaultJsProvider, htmlAttributes);
+			Logger.LogWarning("<<< Exiting RegisterScript(page={Page},filePath={FilePath},priority={Priority},htmlAttributes={HtmlAttributes})", page, filePath, priority, htmlAttributes);
         }
 
         /// <summary>Requests that a JavaScript file be registered on the client browser.</summary>
@@ -314,7 +353,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="provider">The name of the provider responsible for rendering the script output.</param>
         public static void RegisterScript(Page page, string filePath, Client.FileOrder.Js priority, string provider)
         {
+			Logger.LogError(">>> Entering RegisterScript(page={Page},filePath={FilePath},priority={Priority},provider={Provider})", page, filePath, priority, provider);
             RegisterScript(page, filePath, priority, provider, htmlAttributes: null);
+			Logger.LogWarning("<<< Exiting RegisterScript(page={Page},filePath={FilePath},priority={Priority},provider={Provider})", page, filePath, priority, provider);
         }
 
         /// <summary>Requests that a JavaScript file be registered on the client browser.</summary>
@@ -346,7 +387,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="htmlAttributes">A dictionary of HTML attributes to use for the <c>script</c> tag. The key being the attribute name and the value its value.</param>
         public static void RegisterScript(Page page, string filePath, int priority, string provider, IDictionary<string, string> htmlAttributes)
         {
+			Logger.LogError(">>> Entering RegisterScript(page={Page},filePath={FilePath},priority={Priority},provider={Provider},htmlAttributes={HtmlAttributes})", page, filePath, priority, provider, htmlAttributes);
             RegisterScript(page, filePath, priority, provider, string.Empty, string.Empty, htmlAttributes);
+			Logger.LogWarning("<<< Exiting RegisterScript(page={Page},filePath={FilePath},priority={Priority},provider={Provider},htmlAttributes={HtmlAttributes})", page, filePath, priority, provider, htmlAttributes);
         }
 
         /// <summary>Requests that a JavaScript file be registered on the client browser.</summary>
@@ -358,7 +401,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="version">Version number of framework.</param>
         public static void RegisterScript(Page page, string filePath, int priority, string provider, string name, string version)
         {
+			Logger.LogError(">>> Entering RegisterScript(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version})", page, filePath, priority, provider, name, version);
             RegisterScript(page, filePath, priority, provider, name, version, htmlAttributes: null);
+			Logger.LogWarning("<<< Exiting RegisterScript(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version})", page, filePath, priority, provider, name, version);
         }
 
         /// <summary>Requests that a JavaScript file be registered on the client browser.</summary>
@@ -378,20 +423,24 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
             string version,
             IDictionary<string, string> htmlAttributes)
         {
+			Logger.LogError(">>> Entering RegisterScript(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version},htmlAttributes={HtmlAttributes})", page, filePath, priority, provider, name, version, htmlAttributes);
             var controller = GetClientResourcesController(page);
             var script = controller.CreateScript(filePath)
                 .SetPriority(priority)
                 .SetProvider(provider)
                 .SetNameAndVersion(name, version, false);
+				Logger.LogError("RegisterScript(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version},htmlAttributes={HtmlAttributes}): controller → {Controller}", page, filePath, priority, provider, name, version, htmlAttributes, controller);
             if (htmlAttributes is not null)
             {
                 foreach (var attribute in htmlAttributes)
                 {
                     script = script.AddAttribute(attribute.Key, attribute.Value);
+					Logger.LogError("RegisterScript(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version},htmlAttributes={HtmlAttributes}): script → {Script}", page, filePath, priority, provider, name, version, htmlAttributes, script);
                 }
             }
 
             script.Register();
+			Logger.LogWarning("<<< Exiting RegisterScript(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version},htmlAttributes={HtmlAttributes})", page, filePath, priority, provider, name, version, htmlAttributes);
         }
 
         /// <summary>Requests that a CSS file be registered on the client browser.</summary>
@@ -399,7 +448,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="filePath">The relative file path to the CSS resource.</param>
         public static void RegisterStyleSheet(Page page, string filePath)
         {
+			Logger.LogError(">>> Entering RegisterStyleSheet(page={Page},filePath={FilePath})", page, filePath);
             RegisterStyleSheet(page, filePath, (int)Client.FileOrder.Css.DefaultPriority, DefaultCssProvider, htmlAttributes: null);
+			Logger.LogWarning("<<< Exiting RegisterStyleSheet(page={Page},filePath={FilePath})", page, filePath);
         }
 
         /// <summary>Requests that a CSS file be registered on the client browser.</summary>
@@ -408,7 +459,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="htmlAttributes">A dictionary of HTML attributes to use for the <c>link</c> tag. The key being the attribute name and the value its value.</param>
         public static void RegisterStyleSheet(Page page, string filePath, IDictionary<string, string> htmlAttributes)
         {
+			Logger.LogError(">>> Entering RegisterStyleSheet(page={Page},filePath={FilePath},htmlAttributes={HtmlAttributes})", page, filePath, htmlAttributes);
             RegisterStyleSheet(page, filePath, (int)Client.FileOrder.Css.DefaultPriority, DefaultCssProvider, htmlAttributes);
+			Logger.LogWarning("<<< Exiting RegisterStyleSheet(page={Page},filePath={FilePath},htmlAttributes={HtmlAttributes})", page, filePath, htmlAttributes);
         }
 
         /// <summary>Requests that a CSS file be registered on the client browser. Defaults to rendering in the page header.</summary>
@@ -428,6 +481,8 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         public static void RegisterStyleSheet(Page page, string filePath, int priority, IDictionary<string, string> htmlAttributes)
         {
             RegisterStyleSheet(page, filePath, priority, DefaultCssProvider, htmlAttributes);
+			Logger.LogError(">>> Entering RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority})", page, filePath, priority);
+			Logger.LogWarning("<<< Exiting RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority})", page, filePath, priority);
         }
 
         /// <summary>Requests that a CSS file be registered on the client browser. Defaults to rendering in the page header.</summary>
@@ -446,7 +501,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="htmlAttributes">A dictionary of HTML attributes to use for the <c>link</c> tag. The key being the attribute name and the value its value.</param>
         public static void RegisterStyleSheet(Page page, string filePath, Client.FileOrder.Css priority, IDictionary<string, string> htmlAttributes)
         {
+			Logger.LogError(">>> Entering RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},htmlAttributes={HtmlAttributes})", page, filePath, priority, htmlAttributes);
             RegisterStyleSheet(page, filePath, (int)priority, DefaultCssProvider, htmlAttributes);
+			Logger.LogWarning("<<< Exiting RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},htmlAttributes={HtmlAttributes})", page, filePath, priority, htmlAttributes);
         }
 
         /// <summary>Requests that a CSS file be registered on the client browser. Allows for overriding the default provider.</summary>
@@ -456,7 +513,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="provider">The provider name to be used to render the css file on the page.</param>
         public static void RegisterStyleSheet(Page page, string filePath, int priority, string provider)
         {
+			Logger.LogError(">>> Entering RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},provider={Provider})", page, filePath, priority, provider);
             RegisterStyleSheet(page, filePath, priority, provider, string.Empty, string.Empty, htmlAttributes: null);
+			Logger.LogWarning("<<< Exiting RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},provider={Provider})", page, filePath, priority, provider);
         }
 
         /// <summary>Requests that a CSS file be registered on the client browser. Allows for overriding the default provider.</summary>
@@ -467,7 +526,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="htmlAttributes">A dictionary of HTML attributes to use for the <c>link</c> tag. The key being the attribute name and the value its value.</param>
         public static void RegisterStyleSheet(Page page, string filePath, int priority, string provider, IDictionary<string, string> htmlAttributes)
         {
+			Logger.LogError(">>> Entering RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},provider={Provider},htmlAttributes={HtmlAttributes})", page, filePath, priority, provider, htmlAttributes);
             RegisterStyleSheet(page, filePath, priority, provider, string.Empty, string.Empty, htmlAttributes);
+			Logger.LogWarning("<<< Exiting RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},provider={Provider},htmlAttributes={HtmlAttributes})", page, filePath, priority, provider, htmlAttributes);
         }
 
         /// <summary>Requests that a CSS file be registered on the client browser. Allows for overriding the default provider.</summary>
@@ -479,7 +540,9 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="version">Version number of framework.</param>
         public static void RegisterStyleSheet(Page page, string filePath, int priority, string provider, string name, string version)
         {
+			Logger.LogError(">>> Entering RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version})", page, filePath, priority, provider, name, version);
             RegisterStyleSheet(page, filePath, priority, provider, name, version, htmlAttributes: null);
+			Logger.LogWarning("<<< Exiting RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version})", page, filePath, priority, provider, name, version);
         }
 
         /// <summary>Requests that a CSS file be registered on the client browser. Allows for overriding the default provider.</summary>
@@ -492,14 +555,17 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="htmlAttributes">A dictionary of HTML attributes to use for the <c>link</c> tag. The key being the attribute name and the value its value.</param>
         public static void RegisterStyleSheet(Page page, string filePath, int priority, string provider, string name, string version, IDictionary<string, string> htmlAttributes)
         {
+			Logger.LogError(">>> Entering RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version},htmlAttributes={HtmlAttributes})", page, filePath, priority, provider, name, version, htmlAttributes);
             var fileExists = false;
 
+			Logger.LogError("RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version},htmlAttributes={HtmlAttributes}): fileExists → {FileExists}", page, filePath, priority, provider, name, version, htmlAttributes, fileExists);
             // Some "legacy URLs" could be using their own query string versioning scheme (and we've forced them to use the new API through re-routing PageBase.RegisterStyleSheet
             // Ensure that physical CSS files with query strings have their query strings removed
             // Ignore absolute urls, they will not exist locally
             if (!Uri.TryCreate(filePath, UriKind.Absolute, out _) && filePath.Contains(".css?"))
             {
                 var filePathSansQueryString = RemoveQueryString(filePath);
+				Logger.LogError("RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version},htmlAttributes={HtmlAttributes}): filePathSansQueryString → {FilePathSansQueryString}", page, filePath, priority, provider, name, version, htmlAttributes, filePathSansQueryString);
                 if (File.Exists(page.Server.MapPath(filePathSansQueryString)))
                 {
                     fileExists = true;
@@ -517,6 +583,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
             }
 
             var controller = GetClientResourcesController(page);
+			Logger.LogError("RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version},htmlAttributes={HtmlAttributes}): controller → {Controller}", page, filePath, priority, provider, name, version, htmlAttributes, controller);
             var stylesheet = controller.CreateStylesheet(filePath)
                 .SetPriority(priority)
                 .SetProvider(provider)
@@ -526,21 +593,26 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
                 foreach (var attribute in htmlAttributes)
                 {
                     stylesheet = stylesheet.AddAttribute(attribute.Key, attribute.Value);
+					Logger.LogError("RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version},htmlAttributes={HtmlAttributes}): stylesheet → {Stylesheet}", page, filePath, priority, provider, name, version, htmlAttributes, stylesheet);
                 }
             }
 
             stylesheet.Register();
+			Logger.LogWarning("<<< Exiting RegisterStyleSheet(page={Page},filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version},htmlAttributes={HtmlAttributes})", page, filePath, priority, provider, name, version, htmlAttributes);
         }
 
         /// <summary>Clear the default composite files so that it can be generated next time.</summary>
         public static void ClearCache()
         {
+		Logger.LogError(">>> Entering ClearCache()");
+        Logger.LogWarning("<<< Exiting ClearCache()");
         }
 
         /// <summary>Clears the cache used for file existence.</summary>
         /// <param name="path">The path for the file.</param>
         public static void ClearFileExistsCache(string path)
         {
+			Logger.LogError(">>> Entering ClearFileExistsCache(path={Path})", path);
             LockFileExistsCache.EnterWriteLock();
             try
             {
@@ -557,22 +629,28 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
             {
                 LockFileExistsCache.ExitWriteLock();
             }
+			Logger.LogWarning("<<< Exiting ClearFileExistsCache(path={Path})", path);
         }
 
         /// <summary>Enables the async postback handler.</summary>
         public static void EnableAsyncPostBackHandler()
         {
+			Logger.LogError(">>> Entering EnableAsyncPostBackHandler()");
             if (HttpContext.Current != null && !HttpContext.Current.Items.Contains("AsyncPostBackHandlerEnabled"))
             {
                 HttpContext.Current.Items.Add("AsyncPostBackHandlerEnabled", true);
             }
+			Logger.LogWarning("<<< Exiting EnableAsyncPostBackHandler()");
         }
 
         private static bool FileExists(Page page, string filePath)
         {
+			Logger.LogError(">>> Entering FileExists(page={Page},filePath={FilePath})", page, filePath);
             // remove query string for the file exists check, won't impact the absoluteness, so just do it either way.
             filePath = RemoveQueryString(filePath);
+			Logger.LogError("FileExists(page={Page},filePath={FilePath}): filePath → {FilePath1}", page, filePath, filePath);
             var cacheKey = filePath.ToLowerInvariant();
+			Logger.LogError("FileExists(page={Page},filePath={FilePath}): cacheKey → {CacheKey}", page, filePath, cacheKey);
 
             // cache css file paths
             if (!FileExistsCache.ContainsKey(cacheKey))
@@ -593,6 +671,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
             LockFileExistsCache.EnterReadLock();
             try
             {
+				Logger.LogWarning("<<< Exiting FileExists(page={Page},filePath={FilePath})", page, filePath);
                 return FileExistsCache[cacheKey];
             }
             finally
@@ -603,28 +682,40 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
 
         private static bool IsAbsoluteUrl(string url)
         {
+			Logger.LogError(">>> Entering IsAbsoluteUrl(url={Url})", url);
+            Logger.LogWarning("<<< Exiting IsAbsoluteUrl(url={Url})", url);
             return Uri.TryCreate(url, UriKind.Absolute, out _);
         }
 
         private static string RemoveQueryString(string filePath)
         {
+			Logger.LogError(">>> Entering RemoveQueryString(filePath={FilePath})", filePath);
             var queryStringPosition = filePath.IndexOf("?", StringComparison.Ordinal);
+			Logger.LogError("RemoveQueryString(filePath={FilePath}): queryStringPosition → {QueryStringPosition}", filePath, queryStringPosition);
+			Logger.LogWarning("<<< Exiting RemoveQueryString(filePath={FilePath})", filePath);
             return queryStringPosition != -1 ? filePath.Substring(0, queryStringPosition) : filePath;
         }
 
         private static IClientResourceController GetClientResourcesController(Page page)
         {
+			Logger.LogError(">>> Entering GetClientResourcesController(page={Page})", page);
             var serviceProvider = GetCurrentServiceProvider(page.Request.RequestContext.HttpContext);
+			Logger.LogError("GetClientResourcesController(page={Page}): serviceProvider → {ServiceProvider}", page, serviceProvider);
+			Logger.LogWarning("<<< Exiting GetClientResourcesController(page={Page})", page);
             return serviceProvider.GetRequiredService<IClientResourceController>();
         }
 
         private static IServiceProvider GetCurrentServiceProvider(HttpContextBase context)
         {
+			Logger.LogError(">>> Entering GetCurrentServiceProvider(context={Context})", context);
+			Logger.LogWarning("<<< Exiting GetCurrentServiceProvider(context={Context})", context);
             return GetScope(context.Items).ServiceProvider;
 
             // Copy of DotNetNuke.Common.Extensions.HttpContextDependencyInjectionExtensions.GetScope
             static IServiceScope GetScope(IDictionary httpContextItems)
             {
+				Logger.LogError(">>> Entering GetScope(httpContextItems={HttpContextItems})", httpContextItems);
+                Logger.LogWarning("<<< Exiting GetScope(httpContextItems={HttpContextItems})", httpContextItems);
                 return httpContextItems[typeof(IServiceScope)] as IServiceScope;
             }
         }

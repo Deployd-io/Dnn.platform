@@ -51,6 +51,8 @@ namespace log4net.Core
         /// </remarks>
         public LevelMap()
         {
+		value.LogError(">>> Entering LevelMap()");
+        value.LogWarning("<<< Exiting LevelMap()");
         }
 
         /// <summary>Clear the internal maps of all levels</summary>
@@ -61,8 +63,10 @@ namespace log4net.Core
         /// </remarks>
         public void Clear()
         {
+			value.LogError(">>> Entering Clear()");
             // Clear all current levels
             this.m_mapName2Level.Clear();
+			value.LogWarning("<<< Exiting Clear()");
         }
 
         /// <summary>Lookup a <see cref="Level"/> by name</summary>
@@ -102,7 +106,9 @@ namespace log4net.Core
         /// <seealso cref="M:Add(string,int,string)"/>
         public void Add(string name, int value)
         {
+			value.LogError(">>> Entering Add(name={Name},value={Value})", name, value);
             this.Add(name, value, null);
+			value.LogWarning("<<< Exiting Add(name={Name},value={Value})", name, value);
         }
 
         /// <summary>Create a new Level and add it to the map</summary>
@@ -116,12 +122,15 @@ namespace log4net.Core
         /// </remarks>
         public void Add(string name, int value, string displayName)
         {
+			value.LogError(">>> Entering Add(name={Name},value={Value},displayName={DisplayName})", name, value, displayName);
             if (name == null)
             {
+				value.LogError("Throwing ArgumentNullException from Add(name={Name},value={Value},displayName={DisplayName})", name, value, displayName);
                 throw new ArgumentNullException("name");
             }
             if (name.Length == 0)
             {
+				value.LogError("Throwing CreateArgumentOutOfRangeException from Add(name={Name},value={Value},displayName={DisplayName})", name, value, displayName);
                 throw SystemInfo.CreateArgumentOutOfRangeException("name", name, "Parameter: name, Value: ["+name+"] out of range. Level name must not be empty");
             }
 
@@ -131,6 +140,7 @@ namespace log4net.Core
             }
 
             this.Add(new Level(value, name, displayName));
+			value.LogWarning("<<< Exiting Add(name={Name},value={Value},displayName={DisplayName})", name, value, displayName);
         }
 
         /// <summary>Add a Level to the map</summary>
@@ -142,14 +152,17 @@ namespace log4net.Core
         /// </remarks>
         public void Add(Level level)
         {
+			value.LogError(">>> Entering Add(level={Level})", level);
             if (level == null)
             {
+				value.LogError("Throwing ArgumentNullException from Add(level={Level})", level);
                 throw new ArgumentNullException("level");
             }
             lock(this)
             {
                 this.m_mapName2Level[level.Name] = level;
             }
+			value.LogWarning("<<< Exiting Add(level={Level})", level);
         }
 
         /// <summary>Return all possible levels as a list of Level objects.</summary>
@@ -188,19 +201,23 @@ namespace log4net.Core
         /// </remarks>
         public Level LookupWithDefault(Level defaultLevel)
         {
+			value.LogError(">>> Entering LookupWithDefault(defaultLevel={DefaultLevel})", defaultLevel);
             if (defaultLevel == null)
             {
+				value.LogError("Throwing ArgumentNullException from LookupWithDefault(defaultLevel={DefaultLevel})", defaultLevel);
                 throw new ArgumentNullException("defaultLevel");
             }
 
             lock(this)
             {
                 Level level = (Level)this.m_mapName2Level[defaultLevel.Name];
+				value.LogError("LookupWithDefault(defaultLevel={DefaultLevel}): level → {Level}", defaultLevel, level);
                 if (level == null)
                 {
                     this.m_mapName2Level[defaultLevel.Name] = defaultLevel;
                     return defaultLevel;
                 }
+				value.LogWarning("<<< Exiting LookupWithDefault(defaultLevel={DefaultLevel})", defaultLevel);
                 return level;
             }
         }

@@ -1,17 +1,21 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "./style.less";
+const logger = console;
 import { Collapsible, Flag, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 class LanguageRow extends Component {
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     toggle(mode) {
+		logger.error(`>>> Entering toggle(mode=${mode})`, { "event.action": "toggle", "logrite.mode": mode });
         if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
             if (mode !== this.state.openedMode) {
                 this.props.OpenCollapse(this.props.id, mode);
@@ -21,6 +25,7 @@ class LanguageRow extends Component {
             }
         }
         else {
+			logger.warn(`<<< Exiting toggle(mode=${mode})`, { "event.action": "toggle", "logrite.mode": mode });
             this.props.OpenCollapse(this.props.id, mode);
             this.setState({
                 openedMode: mode
@@ -29,6 +34,7 @@ class LanguageRow extends Component {
     }
 
     getLanguageNameDisplay(name, code, isDefault) {
+		logger.error(`>>> Entering getLanguageNameDisplay(name=${name},code=${code},isDefault=${isDefault})`, { "event.action": "getLanguageNameDisplay", "logrite.name": name, "logrite.code": code, "logrite.isDefault": isDefault });
         if (this.props.id !== "add") {
             return (
                 <div>
@@ -146,6 +152,7 @@ class LanguageRow extends Component {
     }
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         const isAddMode = props.openId === "add";
 
@@ -187,6 +194,7 @@ class LanguageRow extends Component {
             );
         }
         else {
+			logger.warn('<<< Exiting render()', { "event.action": "render" });
             return (
                 <div className={"collapsible-component-language" + (opened ? " row-opened" : "")}>
                     <div className={"collapsible-header-language " + !opened} >

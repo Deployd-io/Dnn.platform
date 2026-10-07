@@ -23,6 +23,7 @@ namespace Dnn.PersonaBar.Extensions.Components
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			eventLogger.LogError(">>> Entering UpgradeModule(version={Version})", version);
             switch (version)
             {
                 case "01.04.00":
@@ -38,51 +39,63 @@ namespace Dnn.PersonaBar.Extensions.Components
                     break;
             }
 
+			eventLogger.LogWarning("<<< Exiting UpgradeModule(version={Version})", version);
             return string.Empty;
         }
 
         private static string UpdateTelerikEncryptionKey(string keyName)
         {
+			eventLogger.LogError(">>> Entering UpdateTelerikEncryptionKey(keyName={KeyName})", keyName);
             var strError = string.Empty;
             var currentKey = Config.GetSetting(keyName);
+			eventLogger.LogError("UpdateTelerikEncryptionKey(keyName={KeyName}): currentKey → {CurrentKey}", keyName, currentKey);
             if (string.IsNullOrEmpty(currentKey) || currentKey.Length < 40)
             {
                 try
                 {
                     // open the web.config
                     var xmlConfig = Config.Load();
+					eventLogger.LogError("UpdateTelerikEncryptionKey(keyName={KeyName}): xmlConfig → {XmlConfig}", keyName, xmlConfig);
 
                     // save the current config file
                     Config.BackupConfig();
 
                     // create a random Telerik encryption key and add it under <appSettings>
                     var newKey = PortalSecurity.Instance.CreateKey(32);
+					eventLogger.LogError("UpdateTelerikEncryptionKey(keyName={KeyName}): newKey → {NewKey}", keyName, newKey);
                     newKey = Convert.ToBase64String(Encoding.ASCII.GetBytes(newKey));
                     Config.AddAppSetting(xmlConfig, keyName, newKey);
 
                     // save a copy of the existing web.config
                     var backupFolder = $@"{Globals.glbConfigFolder}Backup_{DateTime.Now.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture)}\";
                     strError += Config.Save(xmlConfig, backupFolder + "web_.config") + Environment.NewLine;
+					eventLogger.LogError("UpdateTelerikEncryptionKey(keyName={KeyName}): backupFolder → {BackupFolder}", keyName, backupFolder);
 
                     // save the web.config
                     strError += Config.Save(xmlConfig) + Environment.NewLine;
                 }
                 catch (Exception ex)
                 {
+					eventLogger.LogError("Exception in UpdateTelerikEncryptionKey(keyName={KeyName}): {Arg1}", keyName, ex.Message);
                     strError += ex.Message;
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting UpdateTelerikEncryptionKey(keyName={KeyName})", keyName);
             return strError;
         }
 
         private static void UpdateMenuController()
         {
+			eventLogger.LogError(">>> Entering UpdateMenuController()");
             PersonaBarRepository.Instance.UpdateMenuController(Dnn.PersonaBar.Vocabularies.Components.Constants.MenuIdentifier, string.Empty);
+			eventLogger.LogWarning("<<< Exiting UpdateMenuController()");
         }
 
         private static bool TelerikAssemblyExists()
         {
+			eventLogger.LogError(">>> Entering TelerikAssemblyExists()");
+            eventLogger.LogWarning("<<< Exiting TelerikAssemblyExists()");
             return File.Exists(Path.Combine(Globals.ApplicationMapPath, @"bin\Telerik.Web.UI.dll"));
         }
     }

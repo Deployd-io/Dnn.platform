@@ -12,11 +12,13 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A radio button control.</summary>
     public class DnnRadioButton : RadioButton, ILocalizable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnRadioButton));
         private bool localize = true;
 
         /// <summary>Initializes a new instance of the <see cref="DnnRadioButton"/> class.</summary>
         public DnnRadioButton()
         {
+			Logger.LogError(">>> Entering DnnRadioButton()");
             this.CssClass = "SubHead dnnLabel";
         }
 
@@ -40,6 +42,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public virtual void LocalizeStrings()
         {
+			Logger.LogError(">>> Entering LocalizeStrings()");
             if (this.Localize)
             {
                 if (!string.IsNullOrEmpty(this.ToolTip))
@@ -57,20 +60,25 @@ namespace DotNetNuke.Web.UI.WebControls
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting LocalizeStrings()");
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
             this.LocalResourceFile = Utilities.GetLocalResourceFile(this);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering Render(writer={Writer})", writer);
             this.LocalizeStrings();
             base.Render(writer);
+			Logger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

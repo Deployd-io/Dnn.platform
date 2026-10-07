@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -16,14 +17,18 @@
   var Pos = CodeMirror.Pos;
 
   function firstNonWS(str) {
+	logger.error(`>>> Entering firstNonWS(str=${str})`, { "event.action": "firstNonWS", "logrite.str": str });
     var found = str.search(nonWS);
+	logger.error(`firstNonWS(str=${str}): found → ${found}`, { "event.action": "firstNonWS", "logrite.str": str });
     return found == -1 ? 0 : found;
   }
 
   CodeMirror.commands.toggleComment = function(cm) {
+	logger.error(`>>> Entering toggleComment(cm=${cm})`, { "event.action": "toggleComment", "logrite.cm": cm });
     var minLine = Infinity, ranges = cm.listSelections(), mode = null;
     for (var i = ranges.length - 1; i >= 0; i--) {
       var from = ranges[i].from(), to = ranges[i].to();
+	logger.error(`toggleComment(cm=${cm}): from → ${from}`, { "event.action": "toggleComment", "logrite.cm": cm });
       if (from.line >= minLine) continue;
       if (to.line >= minLine) to = Pos(minLine, 0);
       minLine = from.line;
@@ -34,6 +39,7 @@
         cm.uncomment(from, to);
       } else {
         cm.lineComment(from, to);
+		logger.warn(`<<< Exiting toggleComment(cm=${cm})`, { "event.action": "toggleComment", "logrite.cm": cm });
       }
     }
   };

@@ -10,21 +10,28 @@ namespace DotNetNuke.Web.Mvc.Routing
 
     public static class HttpContextExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HttpContextExtensions));
         public const string ModuleRequestResultKey = "Dnn_ModuleRequestResult";
 
         public static ModuleRequestResult GetModuleRequestResult(this HttpContextBase context)
         {
+			Logger.LogError(">>> Entering GetModuleRequestResult(context={Context})", context);
+            Logger.LogWarning("<<< Exiting GetModuleRequestResult(context={Context})", context);
             return context.Items[ModuleRequestResultKey] as ModuleRequestResult;
         }
 
         public static bool HasModuleRequestResult(this HttpContextBase context)
         {
+			Logger.LogError(">>> Entering HasModuleRequestResult(context={Context})", context);
+            Logger.LogWarning("<<< Exiting HasModuleRequestResult(context={Context})", context);
             return (context.Items[ModuleRequestResultKey] as ModuleRequestResult) != null;
         }
 
         public static void SetModuleRequestResult(this HttpContextBase context, ModuleRequestResult moduleRequestResult)
         {
+			Logger.LogError(">>> Entering SetModuleRequestResult(context={Context},moduleRequestResult={ModuleRequestResult})", context, moduleRequestResult);
             context.Items[ModuleRequestResultKey] = moduleRequestResult;
+			Logger.LogWarning("<<< Exiting SetModuleRequestResult(context={Context},moduleRequestResult={ModuleRequestResult})", context, moduleRequestResult);
         }
     }
 }

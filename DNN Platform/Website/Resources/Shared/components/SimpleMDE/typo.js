@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 'use strict';
 
 /**
@@ -34,31 +35,42 @@
  */
 
 var Typo = function (dictionary, affData, wordsData, settings) {
+	logger.error(`>>> Entering Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings})`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
 	settings = settings || {};
 	
 	/** Determines the method used for auto-loading .aff and .dic files. **/
 	this.platform = settings.platform || "chrome";
 	
+	logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.platform → ${this.platform}`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
 	this.dictionary = null;
 	
+	logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.dictionary → ${this.dictionary}`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
 	this.rules = {};
 	this.dictionaryTable = {};
+	logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.rules → ${this.rules}`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
 	
 	this.compoundRules = [];
+	logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.dictionaryTable → ${this.dictionaryTable}`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
 	this.compoundRuleCodes = {};
 	
+	logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.compoundRules → ${this.compoundRules}`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
 	this.replacementTable = [];
 	
+	logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.compoundRuleCodes → ${this.compoundRuleCodes}`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
 	this.flags = settings.flags || {};
 	
+	logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.replacementTable → ${this.replacementTable}`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
 	if (dictionary) {
 		this.dictionary = dictionary;
+		logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): this.flags → ${this.flags}`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
+		logger.debug(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): dictionary → ${dictionary}`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
 		
 		if (this.platform == "chrome") {
 			if (!affData) affData = this._readFile(chrome.extension.getURL("lib/typo/dictionaries/" + dictionary + "/" + dictionary + ".aff"));
 			if (!wordsData) wordsData = this._readFile(chrome.extension.getURL("lib/typo/dictionaries/" + dictionary + "/" + dictionary + ".dic"));
 		} else {
 			var path = settings.dictionaryPath || '';
+			logger.error(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): path → ${path}`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
 			
 			if (!affData) affData = this._readFile(path + "/" + dictionary + "/" + dictionary + ".aff");
 			if (!wordsData) wordsData = this._readFile(path + "/" + dictionary + "/" + dictionary + ".dic");
@@ -100,6 +112,7 @@ var Typo = function (dictionary, affData, wordsData, settings) {
 			var ruleText = this.compoundRules[i];
 			
 			var expressionText = "";
+			logger.error(`Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings}): expressionText → ${expressionText}`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
 			
 			for (var j = 0, _jlen = ruleText.length; j < _jlen; j++) {
 				var character = ruleText[j];
@@ -116,6 +129,7 @@ var Typo = function (dictionary, affData, wordsData, settings) {
 		}
 	}
 	
+	logger.warn(`<<< Exiting Typo(dictionary=${dictionary},affData=${affData},wordsData=${wordsData},settings=${settings})`, { "event.action": "Typo", "logrite.dictionary": dictionary, "logrite.affData": affData, "logrite.wordsData": wordsData, "logrite.settings": settings });
 	return this;
 };
 
@@ -127,10 +141,12 @@ Typo.prototype = {
 	 */
 	
 	load : function (obj) {
+		logger.error(`>>> Entering load(obj=${obj})`, { "event.action": "load", "logrite.obj": obj });
 		for (var i in obj) {
 			this[i] = obj[i];
 		}
 		
+		logger.warn(`<<< Exiting load(obj=${obj})`, { "event.action": "load", "logrite.obj": obj });
 		return this;
 	},
 	
@@ -143,9 +159,12 @@ Typo.prototype = {
 	 */
 	
 	_readFile : function (path, charset) {
+		logger.error(`>>> Entering _readFile(path=${path},charset=${charset})`, { "event.action": "_readFile", "logrite.path": path, "logrite.charset": charset });
 		if (!charset) charset = "ISO8859-1";
 		
+		const _start__readFile_145 = Date.now();
 		var req = new XMLHttpRequest();
+		logger.error(`_readFile(path=${path},charset=${charset}): req → ${req}`, { "event.action": "_readFile", "logrite.path": path, "logrite.charset": charset });
 		req.open("GET", path, false);
 		
 		if (req.overrideMimeType)
@@ -153,6 +172,8 @@ Typo.prototype = {
 		
 		req.send(null);
 		
+		logger.error(`_readFile(path=${path}, charset=${charset}): API call took ${Date.now() - _start__readFile_145} ms`, { "event.action": "_readFile", "event.category": "network", "logrite.path": path, "logrite.charset": charset });
+		logger.warn(`<<< Exiting _readFile(path=${path},charset=${charset})`, { "event.action": "_readFile", "logrite.path": path, "logrite.charset": charset });
 		return req.responseText;
 	},
 	
@@ -164,17 +185,21 @@ Typo.prototype = {
 	 */
 	
 	_parseAFF : function (data) {
+		logger.error(`>>> Entering _parseAFF(data=${data})`, { "event.action": "_parseAFF", "logrite.data": data });
 		var rules = {};
 		
 		// Remove comment lines
 		data = this._removeAffixComments(data);
 		
+		logger.error(`_parseAFF(data=${data}): data → ${data}`, { "event.action": "_parseAFF", "logrite.data": data });
 		var lines = data.split("\n");
+		logger.error(`_parseAFF(data=${data}): lines → ${lines}`, { "event.action": "_parseAFF", "logrite.data": data });
 		
 		for (var i = 0, _len = lines.length; i < _len; i++) {
 			var line = lines[i];
 			
 			var definitionParts = line.split(/\s+/);
+			logger.error(`_parseAFF(data=${data}): definitionParts → ${definitionParts}`, { "event.action": "_parseAFF", "logrite.data": data });
 			
 			var ruleType = definitionParts[0];
 			
@@ -182,6 +207,7 @@ Typo.prototype = {
 				var ruleCode = definitionParts[1];
 				var combineable = definitionParts[2];
 				var numEntries = parseInt(definitionParts[3], 10);
+				logger.error(`_parseAFF(data=${data}): numEntries → ${numEntries}`, { "event.action": "_parseAFF", "logrite.data": data });
 				
 				var entries = [];
 				
@@ -189,19 +215,24 @@ Typo.prototype = {
 					var line = lines[j];
 					
 					var lineParts = line.split(/\s+/);
+					logger.error(`_parseAFF(data=${data}): lineParts → ${lineParts}`, { "event.action": "_parseAFF", "logrite.data": data });
 					var charactersToRemove = lineParts[2];
 					
 					var additionParts = lineParts[3].split("/");
+					logger.error(`_parseAFF(data=${data}): additionParts → ${additionParts}`, { "event.action": "_parseAFF", "logrite.data": data });
 					
 					var charactersToAdd = additionParts[0];
 					if (charactersToAdd === "0") charactersToAdd = "";
 					
 					var continuationClasses = this.parseRuleCodes(additionParts[1]);
+					logger.error(`_parseAFF(data=${data}): continuationClasses → ${continuationClasses}`, { "event.action": "_parseAFF", "logrite.data": data });
 					
 					var regexToMatch = lineParts[4];
 					
 					var entry = {};
+					logger.debug(`_parseAFF(data=${data}): entry.remove → ${entry.remove}`, { "event.action": "_parseAFF", "logrite.data": data });
 					entry.add = charactersToAdd;
+					logger.debug(`_parseAFF(data=${data}): entry.add → ${entry.add}`, { "event.action": "_parseAFF", "logrite.data": data });
 					
 					if (continuationClasses.length > 0) entry.continuationClasses = continuationClasses;
 					
@@ -229,6 +260,7 @@ Typo.prototype = {
 				rules[ruleCode] = { "type" : ruleType, "combineable" : (combineable == "Y"), "entries" : entries };
 				
 				i += numEntries;
+				logger.warn(`<<< Exiting _parseAFF(data=${data})`, { "event.action": "_parseAFF", "logrite.data": data });
 			}
 			else if (ruleType === "COMPOUNDRULE") {
 				var numEntries = parseInt(definitionParts[1], 10);
@@ -271,6 +303,7 @@ Typo.prototype = {
 	 */
 	
 	_removeAffixComments : function (data) {
+		logger.error(`>>> Entering _removeAffixComments(data=${data})`, { "event.action": "_removeAffixComments", "logrite.data": data });
 		// Remove comments
 		data = data.replace(/#.*$/mg, "");
 		
@@ -283,6 +316,7 @@ Typo.prototype = {
 		// Trim the entire string
 		data = data.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 		
+		logger.warn(`<<< Exiting _removeAffixComments(data=${data})`, { "event.action": "_removeAffixComments", "logrite.data": data });
 		return data;
 	},
 	
@@ -295,18 +329,24 @@ Typo.prototype = {
 	 */
 	
 	_parseDIC : function (data) {
+		logger.error(`>>> Entering _parseDIC(data=${data})`, { "event.action": "_parseDIC", "logrite.data": data });
 		data = this._removeDicComments(data);
 		
+		logger.error(`_parseDIC(data=${data}): data → ${data}`, { "event.action": "_parseDIC", "logrite.data": data });
 		var lines = data.split("\n");
 		var dictionaryTable = {};
+		logger.error(`_parseDIC(data=${data}): lines → ${lines}`, { "event.action": "_parseDIC", "logrite.data": data });
 		
+		logger.warn(`<<< Exiting _parseDIC(data=${data})`, { "event.action": "_parseDIC", "logrite.data": data });
 		function addWord(word, rules) {
+			logger.error(`>>> Entering addWord(word=${word},rules=${rules})`, { "event.action": "addWord", "logrite.word": word, "logrite.rules": rules });
 			// Some dictionaries will list the same word multiple times with different rule sets.
 			if (!(word in dictionaryTable) || typeof dictionaryTable[word] != 'object') {
 				dictionaryTable[word] = [];
 			}
 			
 			dictionaryTable[word].push(rules);
+			logger.warn(`<<< Exiting addWord(word=${word},rules=${rules})`, { "event.action": "addWord", "logrite.word": word, "logrite.rules": rules });
 		}
 		
 		// The first line is the number of words in the dictionary.
@@ -382,6 +422,7 @@ Typo.prototype = {
 	 */
 	
 	_removeDicComments : function (data) {
+		logger.error(`>>> Entering _removeDicComments(data=${data})`, { "event.action": "_removeDicComments", "logrite.data": data });
 		// I can't find any official documentation on it, but at least the de_DE
 		// dictionary uses tab-indented lines as comments.
 		
@@ -399,14 +440,17 @@ Typo.prototype = {
 		// Trim the entire string
 		data = data.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 		
+		logger.warn(`<<< Exiting _removeDicComments(data=${data})`, { "event.action": "_removeDicComments", "logrite.data": data });
 		return data;
 	},
 	
 	parseRuleCodes : function (textCodes) {
+		logger.error(`>>> Entering parseRuleCodes(textCodes=${textCodes})`, { "event.action": "parseRuleCodes", "logrite.textCodes": textCodes });
 		if (!textCodes) {
 			return [];
 		}
 		else if (!("FLAG" in this.flags)) {
+			logger.warn(`<<< Exiting parseRuleCodes(textCodes=${textCodes})`, { "event.action": "parseRuleCodes", "logrite.textCodes": textCodes });
 			return textCodes.split("");
 		}
 		else if (this.flags.FLAG === "long") {
@@ -432,8 +476,10 @@ Typo.prototype = {
 	 */
 	
 	_applyRule : function (word, rule) {
+		logger.error(`>>> Entering _applyRule(word=${word},rule=${rule})`, { "event.action": "_applyRule", "logrite.word": word, "logrite.rule": rule });
 		var entries = rule.entries;
 		var newWords = [];
+		logger.error(`_applyRule(word=${word},rule=${rule}): newWords → ${newWords}`, { "event.action": "_applyRule", "logrite.word": word, "logrite.rule": rule });
 		
 		for (var i = 0, _len = entries.length; i < _len; i++) {
 			var entry = entries[i];
@@ -473,6 +519,7 @@ Typo.prototype = {
 			}
 		}
 		
+		logger.warn(`<<< Exiting _applyRule(word=${word},rule=${rule})`, { "event.action": "_applyRule", "logrite.word": word, "logrite.rule": rule });
 		return newWords;
 	},
 	
@@ -573,6 +620,7 @@ Typo.prototype = {
 		if (flag in this.flags) {
 			if (typeof wordFlags === 'undefined') {
 				var wordFlags = Array.prototype.concat.apply([], this.dictionaryTable[word]);
+				logger.error(`hasFlag(word=${word},flag=${flag},wordFlags=${wordFlags}): wordFlags → ${wordFlags}`, { "event.action": "hasFlag", "logrite.word": word, "logrite.flag": flag, "logrite.wordFlags": wordFlags });
 			}
 			
 			if (wordFlags && wordFlags.indexOf(this.flags[flag]) !== -1) {
@@ -580,6 +628,7 @@ Typo.prototype = {
 			}
 		}
 		
+		logger.warn(`<<< Exiting hasFlag(word=${word},flag=${flag},wordFlags=${wordFlags})`, { "event.action": "hasFlag", "logrite.word": word, "logrite.flag": flag, "logrite.wordFlags": wordFlags });
 		return false;
 	},
 	
@@ -597,6 +646,7 @@ Typo.prototype = {
 	alphabet : "",
 	
 	suggest : function (word, limit) {
+		logger.error(`>>> Entering suggest(word=${word},limit=${limit})`, { "event.action": "suggest", "logrite.word": word, "logrite.limit": limit });
 		if (!limit) limit = 5;
 		
 		if (this.check(word)) return [];
@@ -607,6 +657,7 @@ Typo.prototype = {
 			
 			if (word.indexOf(replacementEntry[0]) !== -1) {
 				var correctedWord = word.replace(replacementEntry[0], replacementEntry[1]);
+				logger.error(`suggest(word=${word},limit=${limit}): correctedWord → ${correctedWord}`, { "event.action": "suggest", "logrite.word": word, "logrite.limit": limit });
 				
 				if (this.check(correctedWord)) {
 					return [ correctedWord ];
@@ -616,6 +667,7 @@ Typo.prototype = {
 		
 		var self = this;
 		self.alphabet = "abcdefghijklmnopqrstuvwxyz";
+		logger.debug(`suggest(word=${word},limit=${limit}): self.alphabet → ${self.alphabet}`, { "event.action": "suggest", "logrite.word": word, "logrite.limit": limit });
 		
 		/*
 		if (!self.alphabet) {
@@ -637,10 +689,14 @@ Typo.prototype = {
 			self.alphabet = alphaArray.join("");
 		}
 		*/
+		logger.error(`suggest(word=${word},limit=${limit}): alphaArray → ${alphaArray}`, { "event.action": "suggest", "logrite.word": word, "logrite.limit": limit });
 		
+		logger.warn(`<<< Exiting suggest(word=${word},limit=${limit})`, { "event.action": "suggest", "logrite.word": word, "logrite.limit": limit });
 		function edits1(words) {
+			logger.error(`>>> Entering edits1(words=${words})`, { "event.action": "edits1", "logrite.words": words });
 			var rv = [];
 			
+			logger.error(`edits1(words=${words}): rv → ${rv}`, { "event.action": "edits1", "logrite.words": words });
 			for (var ii = 0, _iilen = words.length; ii < _iilen; ii++) {
 				var word = words[ii];
 				
@@ -700,10 +756,12 @@ Typo.prototype = {
 				rv = rv.concat(inserts);
 			}
 			
+			logger.warn(`<<< Exiting edits1(words=${words})`, { "event.action": "edits1", "logrite.words": words });
 			return rv;
 		}
 		
 		function known(words) {
+			logger.error(`>>> Entering known(words=${words})`, { "event.action": "known", "logrite.words": words });
 			var rv = [];
 			
 			for (var i = 0; i < words.length; i++) {
@@ -712,15 +770,20 @@ Typo.prototype = {
 				}
 			}
 			
+			logger.warn(`<<< Exiting known(words=${words})`, { "event.action": "known", "logrite.words": words });
 			return rv;
 		}
 		
 		function correct(word) {
+			logger.error(`>>> Entering correct(word=${word})`, { "event.action": "correct", "logrite.word": word });
 			// Get the edit-distance-1 and edit-distance-2 forms of this word.
 			var ed1 = edits1([word]);
+			logger.error(`correct(word=${word}): ed1 → ${ed1}`, { "event.action": "correct", "logrite.word": word });
 			var ed2 = edits1(ed1);
+			logger.error(`correct(word=${word}): ed2 → ${ed2}`, { "event.action": "correct", "logrite.word": word });
 			
 			var corrections = known(ed1).concat(known(ed2));
+			logger.error(`correct(word=${word}): corrections → ${corrections}`, { "event.action": "correct", "logrite.word": word });
 			
 			// Sort the edits based on how many different ways they were created.
 			var weighted_corrections = {};
@@ -741,10 +804,12 @@ Typo.prototype = {
 			}
 			
 			function sorter(a, b) {
+				logger.error(`>>> Entering sorter(a=${a},b=${b})`, { "event.action": "sorter", "logrite.a": a, "logrite.b": b });
 				if (a[1] < b[1]) {
 					return -1;
 				}
 				
+				logger.warn(`<<< Exiting sorter(a=${a},b=${b})`, { "event.action": "sorter", "logrite.a": a, "logrite.b": b });
 				return 1;
 			}
 			
@@ -761,6 +826,7 @@ Typo.prototype = {
 			return rv;
 		}
 		
+	logger.warn(`<<< Exiting checkExact(word=${word})`, { "event.action": "checkExact", "logrite.word": word });
 		return correct(word);
 	}
 };

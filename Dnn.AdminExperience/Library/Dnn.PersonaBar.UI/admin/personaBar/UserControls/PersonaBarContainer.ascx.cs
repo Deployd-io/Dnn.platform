@@ -35,6 +35,7 @@ namespace Dnn.PersonaBar.UI.UserControls
     /// <summary>The control containing the Persona Bar.</summary>
     public partial class PersonaBarContainer : ControlPanelBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PersonaBarContainer.ascx));
         private readonly IPersonaBarContainer personaBarContainer;
         private readonly IPersonaBarController personaBarController;
         private readonly IHostSettings hostSettings;
@@ -59,6 +60,13 @@ namespace Dnn.PersonaBar.UI.UserControls
         public PersonaBarContainer(IPersonaBarContainer personaBarContainer, IPersonaBarController personaBarController, IHostSettings hostSettings, IJavaScriptLibraryHelper javaScript, IClientResourceController clientResourceController)
             : this(null, null, personaBarContainer, personaBarController, hostSettings, javaScript, clientResourceController, null)
         {
+		Logger.LogError(">>> Entering PersonaBarContainer(personaBarContainer={PersonaBarContainer},personaBarController={PersonaBarController},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController})", personaBarContainer, personaBarController, hostSettings, javaScript, clientResourceController);
+        Logger.LogWarning("<<< Exiting PersonaBarContainer(personaBarContainer={PersonaBarContainer},personaBarController={PersonaBarController},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController})", personaBarContainer, personaBarController, hostSettings, javaScript, clientResourceController);
+		Logger.LogDebug("PersonaBarContainer(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},personaBarContainer={PersonaBarContainer},personaBarController={PersonaBarController},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): personaBarController → {PersonaBarController1}", eventLogger, permissionDefinitionService, personaBarContainer, personaBarController, hostSettings, javaScript, clientResourceController, servicesFramework, personaBarController);
+		Logger.LogDebug("PersonaBarContainer(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},personaBarContainer={PersonaBarContainer},personaBarController={PersonaBarController},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): hostSettings → {HostSettings1}", eventLogger, permissionDefinitionService, personaBarContainer, personaBarController, hostSettings, javaScript, clientResourceController, servicesFramework, hostSettings);
+		Logger.LogDebug("PersonaBarContainer(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},personaBarContainer={PersonaBarContainer},personaBarController={PersonaBarController},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): javaScript → {JavaScript1}", eventLogger, permissionDefinitionService, personaBarContainer, personaBarController, hostSettings, javaScript, clientResourceController, servicesFramework, javaScript);
+		Logger.LogDebug("PersonaBarContainer(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},personaBarContainer={PersonaBarContainer},personaBarController={PersonaBarController},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): clientResourceController → {ClientResourceController1}", eventLogger, permissionDefinitionService, personaBarContainer, personaBarController, hostSettings, javaScript, clientResourceController, servicesFramework, clientResourceController);
+		Logger.LogDebug("PersonaBarContainer(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},personaBarContainer={PersonaBarContainer},personaBarController={PersonaBarController},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", eventLogger, permissionDefinitionService, personaBarContainer, personaBarController, hostSettings, javaScript, clientResourceController, servicesFramework, servicesFramework);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PersonaBarContainer"/> class.</summary>
@@ -94,17 +102,20 @@ namespace Dnn.PersonaBar.UI.UserControls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (this.personaBarContainer.Visible)
             {
                 this.personaBarContainer.Initialize(this);
             }
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             this.PersonaBarPanel.Visible = this.InjectPersonaBar();
 
@@ -112,18 +123,22 @@ namespace Dnn.PersonaBar.UI.UserControls
             {
                 this.RemovedAdminStyleSheet();
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             this.Visible = this.Response.StatusCode == (int)HttpStatusCode.OK;
 
             base.OnPreRender(e);
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private bool InjectPersonaBar()
         {
+			Logger.LogError(">>> Entering InjectPersonaBar()");
             if (!this.personaBarContainer.Visible)
             {
                 return false;
@@ -136,6 +151,7 @@ namespace Dnn.PersonaBar.UI.UserControls
             }
 
             var menuStructure = this.personaBarController.GetMenu(this.PortalSettings, UserController.Instance.GetCurrentUserInfo());
+			Logger.LogError("InjectPersonaBar(): menuStructure → {MenuStructure}", menuStructure);
             if (menuStructure.MenuItems == null || !menuStructure.MenuItems.Any())
             {
                 return false;
@@ -152,17 +168,22 @@ namespace Dnn.PersonaBar.UI.UserControls
             this.clientResourceController.RegisterScript("~/Resources/Shared/Components/Tokeninput/jquery.tokeninput.js");
             this.clientResourceController.RegisterStylesheet("~/Resources/Shared/Components/Tokeninput/Themes/token-input-facebook.css");
 
+			Logger.LogWarning("<<< Exiting InjectPersonaBar()");
             return true;
         }
 
         private void RegisterPersonaBarStyleSheet()
         {
+			Logger.LogError(">>> Entering RegisterPersonaBarStyleSheet()");
             this.clientResourceController.RegisterStylesheet("~/DesktopModules/admin/Dnn.PersonaBar/css/personaBarContainer.css");
+			Logger.LogWarning("<<< Exiting RegisterPersonaBarStyleSheet()");
         }
 
         private void RemovedAdminStyleSheet()
         {
+			Logger.LogError(">>> Entering RemovedAdminStyleSheet()");
             var loader = this.Page.FindControl("ClientResourceIncludes");
+			Logger.LogError("RemovedAdminStyleSheet(): loader → {Loader}", loader);
             if (loader != null)
             {
                 for (var i = 0; i < loader.Controls.Count; i++)
@@ -177,6 +198,7 @@ namespace Dnn.PersonaBar.UI.UserControls
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting RemovedAdminStyleSheet()");
         }
     }
 }

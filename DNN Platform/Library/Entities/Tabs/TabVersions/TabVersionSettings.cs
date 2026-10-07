@@ -14,6 +14,7 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
 
     public class TabVersionSettings : ServiceLocator<ITabVersionSettings, TabVersionSettings>, ITabVersionSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabVersionSettings));
         private const int TabVersionsMaxNumber = 5;
         private const string TabVersionQueryStringParam = "DnnTabVersion";
         private const string TabVersioningSettingKey = "TabVersioningSettingKey";
@@ -21,37 +22,48 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         /// <inheritdoc />
         public int GetMaxNumberOfVersions(int portalId)
         {
+			Logger.LogError(">>> Entering GetMaxNumberOfVersions(portalId={PortalId})", portalId);
             Requires.NotNegative("portalId", portalId);
+			Logger.LogWarning("<<< Exiting GetMaxNumberOfVersions(portalId={PortalId})", portalId);
             return portalId == Null.NullInteger ? TabVersionsMaxNumber : PortalController.GetPortalSettingAsInteger("TabVersionsMaxNumber", portalId, TabVersionsMaxNumber);
         }
 
         /// <inheritdoc />
         public void SetMaxNumberOfVersions(int portalId, int maxNumberOfVersions)
         {
+			Logger.LogError(">>> Entering SetMaxNumberOfVersions(portalId={PortalId},maxNumberOfVersions={MaxNumberOfVersions})", portalId, maxNumberOfVersions);
             Requires.NotNegative("portalId", portalId);
             PortalController.UpdatePortalSetting(portalId, "TabVersionsMaxNumber", maxNumberOfVersions.ToString(CultureInfo.InvariantCulture));
+			Logger.LogWarning("<<< Exiting SetMaxNumberOfVersions(portalId={PortalId},maxNumberOfVersions={MaxNumberOfVersions})", portalId, maxNumberOfVersions);
         }
 
         /// <inheritdoc />
         public void SetEnabledVersioningForPortal(int portalId, bool enabled)
         {
+			Logger.LogError(">>> Entering SetEnabledVersioningForPortal(portalId={PortalId},enabled={Enabled})", portalId, enabled);
             Requires.NotNegative("portalId", portalId);
             PortalController.UpdatePortalSetting(portalId, "TabVersionsEnabled", enabled.ToString(CultureInfo.InvariantCulture));
+			Logger.LogWarning("<<< Exiting SetEnabledVersioningForPortal(portalId={PortalId},enabled={Enabled})", portalId, enabled);
         }
 
         /// <inheritdoc />
         public void SetEnabledVersioningForTab(int tabId, bool enabled)
         {
+			Logger.LogError(">>> Entering SetEnabledVersioningForTab(tabId={TabId},enabled={Enabled})", tabId, enabled);
             Requires.NotNegative("tabId", tabId);
 
             TabController.Instance.UpdateTabSetting(tabId, TabVersioningSettingKey, enabled.ToString(CultureInfo.InvariantCulture));
+			Logger.LogWarning("<<< Exiting SetEnabledVersioningForTab(tabId={TabId},enabled={Enabled})", tabId, enabled);
         }
 
         /// <inheritdoc />
         public bool IsVersioningEnabled(int portalId)
         {
+			Logger.LogError(">>> Entering IsVersioningEnabled(portalId={PortalId})", portalId);
             Requires.NotNegative("portalId", portalId);
+				Logger.LogWarning("<<< Exiting IsVersioningEnabled(portalId={PortalId})", portalId);
             return
+			Logger.LogWarning("<<< Exiting IsVersioningEnabled(portalId={PortalId},tabId={TabId})", portalId, tabId);
                 Convert.ToBoolean(PortalController.GetPortalSetting("TabVersionsEnabled", portalId, bool.FalseString));
         }
 
@@ -83,13 +95,17 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         /// <inheritdoc />
         public string GetTabVersionQueryStringParameter(int portalId)
         {
+			Logger.LogError(">>> Entering GetTabVersionQueryStringParameter(portalId={PortalId})", portalId);
             Requires.NotNegative("portalId", portalId);
+			Logger.LogWarning("<<< Exiting GetTabVersionQueryStringParameter(portalId={PortalId})", portalId);
             return PortalController.GetPortalSetting("TabVersionQueryStringParameter", portalId, TabVersionQueryStringParam);
         }
 
         /// <inheritdoc />
         protected override Func<ITabVersionSettings> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new TabVersionSettings();
         }
     }

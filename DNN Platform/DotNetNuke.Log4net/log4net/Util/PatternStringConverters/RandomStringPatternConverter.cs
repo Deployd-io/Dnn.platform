@@ -68,6 +68,7 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         public void ActivateOptions()
         {
+			value.LogError(">>> Entering ActivateOptions()");
             string optionStr = this.Option;
             if (optionStr != null && optionStr.Length > 0)
             {
@@ -75,12 +76,15 @@ namespace log4net.Util.PatternStringConverters
                 if (SystemInfo.TryParse(optionStr, out lengthVal))
                 {
                     this.m_length = lengthVal;
+					value.LogDebug("ActivateOptions(): m_length → {M_length}", m_length);
                 }
                 else
                 {
+					value.LogDebug("ActivateOptions(): this.m_length → {Arg0}", this.m_length);
                     LogLog.Error(declaringType, "RandomStringPatternConverter: Could not convert Option ["+optionStr+"] to Length Int32");
                 }	
             }
+			value.LogWarning("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>Write a randoim string to the output</summary>
@@ -93,6 +97,7 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state) 
         {
+			value.LogError(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             try 
             {
                 lock(s_random)
@@ -100,11 +105,13 @@ namespace log4net.Util.PatternStringConverters
                     for(int i = 0; i< this.m_length; i++)
                     {
                         int randValue = s_random.Next(36);
+						value.LogError("Convert(writer={Writer},state={State}): randValue → {RandValue}", writer, state, randValue);
 
                         if (randValue < 26)
                         {
                             // Letter
                             char ch = (char)('A' + randValue);
+							value.LogError("Convert(writer={Writer},state={State}): ch → {Ch}", writer, state, ch);
                             writer.Write(ch);
                         }
                         else if (randValue < 36)
@@ -125,6 +132,7 @@ namespace log4net.Util.PatternStringConverters
             {
                 LogLog.Error(declaringType, "Error occurred while converting.", ex);
             }
+			value.LogWarning("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
 
         /// <summary>The fully qualified type of the RandomStringPatternConverter class.</summary>

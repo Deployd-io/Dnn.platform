@@ -21,9 +21,11 @@ namespace DotNetNuke.Web
     /// <summary>Configures services for The DotNetNuke.Web project.</summary>
     public class Startup : IDnnStartup
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Startup));
         /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services)
         {
+			Logger.LogError(">>> Entering ConfigureServices(services={Services})", services);
             services.AddTransient<IFilterProvider, DnnActionFilterProvider>();
             services.TryAddEnumerable(new ServiceDescriptor(typeof(IRoutingManager), typeof(ServicesRoutingManager), ServiceLifetime.Singleton));
             services.AddWebApi();
@@ -33,6 +35,7 @@ namespace DotNetNuke.Web
             services.AddTransient<IControlBarController, ControlBarController>();
 
             services.AddTransient<ApiTokenSettingsRepository>();
+			Logger.LogWarning("<<< Exiting ConfigureServices(services={Services})", services);
         }
     }
 }

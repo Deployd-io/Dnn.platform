@@ -16,6 +16,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>Base class for Dnn specific WebControls.</summary>
     public abstract class WebControlBase : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WebControlBase));
         private string styleSheetUrl = string.Empty;
         private string theme = string.Empty;
 
@@ -73,7 +74,9 @@ namespace DotNetNuke.UI.WebControls
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         protected override void RenderContents(HtmlTextWriter output)
         {
+			Logger.LogError(">>> Entering RenderContents(output={Output})", output);
             output.Write(this.HtmlOutput);
+			Logger.LogWarning("<<< Exiting RenderContents(output={Output})", output);
         }
     }
 }

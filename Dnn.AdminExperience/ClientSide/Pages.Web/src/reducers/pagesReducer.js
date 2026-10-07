@@ -1,5 +1,6 @@
 import ActionTypes from "../constants/actionTypes/pageActionTypes";
 import validateFields from "../validation";
+const logger = console;
 
 export default function pagesReducer(state = {
     selectedPage: null,
@@ -14,15 +15,19 @@ export default function pagesReducer(state = {
 
 
     const changeField = function changeField(field, value) {
+		logger.error(`>>> Entering changeField(field=${field},value=${value})`, { "event.action": "changeField", "logrite.field": field, "logrite.value": value });
         const newSelectedPage = {
             ...state.selectedPage
         };
         newSelectedPage[field] = value;
+		logger.warn(`<<< Exiting changeField(field=${field},value=${value})`, { "event.action": "changeField", "logrite.field": field, "logrite.value": value });
         return newSelectedPage;
     };
 
     const changeModuleCopy = function changeModuleCopy(id, key, value) {
+		logger.error(`>>> Entering changeModuleCopy(id=${id},key=${key},value=${value})`, { "event.action": "changeModuleCopy", "logrite.id": id, "logrite.key": key, "logrite.value": value });
         const modules = [...state.selectedPage.modules];
+		logger.warn(`<<< Exiting changeModuleCopy(id=${id},key=${key},value=${value})`, { "event.action": "changeModuleCopy", "logrite.id": id, "logrite.key": key, "logrite.value": value });
         return modules.map((m) => {
             if (m.id === id) {                
                 return {

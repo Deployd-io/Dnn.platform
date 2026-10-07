@@ -23,13 +23,17 @@ import {
 } from "../SvgIcons";
 
 import "./style.less";
+const logger = console;
 
 export default class IconButton extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     getIcon() {
+		logger.error('>>> Entering getIcon()', { "event.action": "getIcon" });
         const {props} = this;
 
         if (props.customIcon) {
@@ -76,22 +80,27 @@ export default class IconButton extends Component {
             case "checkbox":
                 return CheckboxIcon;
             default:
+				logger.warn('<<< Exiting getIcon()', { "event.action": "getIcon" });
                 return null;
         }
     }
 
     getClassName() {
+		logger.error('>>> Entering getClassName()', { "event.action": "getClassName" });
         const {props} = this;
 
         let name = "icon-button";
+		logger.error(`getClassName(): name → ${name}`, { "event.action": "getClassName" });
         if (props.className) {
             name += " " + props.className;
         }
 
+		logger.warn('<<< Exiting getClassName()', { "event.action": "getClassName" });
         return name;
     }
 
     getStyle() {
+		logger.error('>>> Entering getStyle()', { "event.action": "getStyle" });
         const {props} = this;
 
         let style = {};
@@ -102,24 +111,30 @@ export default class IconButton extends Component {
             style["height"] = props.height + "px";
         }
 
+		logger.warn('<<< Exiting getStyle()', { "event.action": "getStyle" });
         return style;
     }
 
     onClick(event) {
+		logger.error(`>>> Entering onClick(event=${event})`, { "event.action": "onClick", "logrite.event": event });
         const {props} = this;
 
         event.preventDefault();
 
         props.onClick(event);
+		logger.warn(`<<< Exiting onClick(event=${event})`, { "event.action": "onClick", "logrite.event": event });
     }
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         const Icon = this.getIcon();
+		logger.error(`render(): Icon → ${Icon}`, { "event.action": "render" });
 
         if (typeof props.onClick === "function") {
             return <a href="#" className={this.getClassName()} style={this.getStyle()} onClick={this.onClick.bind(this)} aria-label={props.type}><Icon /></a>;
         } else {
+			logger.warn('<<< Exiting render()', { "event.action": "render" });
             return <span className="icon-flat" style={this.getStyle()}><Icon /></span>;
         }
     }

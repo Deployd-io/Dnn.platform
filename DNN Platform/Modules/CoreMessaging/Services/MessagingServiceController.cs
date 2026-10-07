@@ -51,6 +51,8 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         public MessagingServiceController()
             : this(null, null, null)
         {
+		Logger.LogError(">>> Entering MessagingServiceController()");
+        Logger.LogWarning("<<< Exiting MessagingServiceController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="MessagingServiceController"/> class.</summary>
@@ -70,10 +72,13 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [HttpGet]
         public HttpResponseMessage Inbox(int afterMessageId, int numberOfRecords)
         {
+			Logger.LogError(">>> Entering Inbox(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords})", afterMessageId, numberOfRecords);
             try
             {
                 var messageBoxView = InternalMessagingController.Instance.GetRecentInbox(this.UserInfo.UserID, afterMessageId, numberOfRecords);
+				Logger.LogError("Inbox(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): messageBoxView → {MessageBoxView}", afterMessageId, numberOfRecords, messageBoxView);
                 var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, UserController.Instance.GetCurrentUserInfo().PortalID);
+				Logger.LogError("Inbox(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): portalId → {PortalId}", afterMessageId, numberOfRecords, portalId);
 
                 messageBoxView.TotalNewThreads = InternalMessagingController.Instance.CountUnreadMessages(this.UserInfo.UserID, portalId);
                 messageBoxView.TotalConversations = InternalMessagingController.Instance.CountConversations(this.UserInfo.UserID, portalId);
@@ -83,7 +88,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while trying to fetch the inbox, consult the server logs for more information.";
+				Logger.LogError("Inbox(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): message → {Message}", afterMessageId, numberOfRecords, message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting Inbox(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords})", afterMessageId, numberOfRecords);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -95,10 +102,13 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [HttpGet]
         public HttpResponseMessage Sentbox(int afterMessageId, int numberOfRecords)
         {
+			Logger.LogError(">>> Entering Sentbox(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords})", afterMessageId, numberOfRecords);
             try
             {
                 var messageBoxView = InternalMessagingController.Instance.GetRecentSentbox(this.UserInfo.UserID, afterMessageId, numberOfRecords);
+				Logger.LogError("Sentbox(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): messageBoxView → {MessageBoxView}", afterMessageId, numberOfRecords, messageBoxView);
                 var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, UserController.Instance.GetCurrentUserInfo().PortalID);
+				Logger.LogError("Sentbox(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): portalId → {PortalId}", afterMessageId, numberOfRecords, portalId);
                 messageBoxView.TotalNewThreads = InternalMessagingController.Instance.CountUnreadMessages(this.UserInfo.UserID, portalId);
                 messageBoxView.TotalConversations = InternalMessagingController.Instance.CountSentConversations(this.UserInfo.UserID, portalId);
 
@@ -107,7 +117,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while attempting to fetch the Sent box, consult the server logs for more information.";
+				Logger.LogError("Sentbox(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): message → {Message}", afterMessageId, numberOfRecords, message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting Sentbox(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords})", afterMessageId, numberOfRecords);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -119,10 +131,13 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [HttpGet]
         public HttpResponseMessage Archived(int afterMessageId, int numberOfRecords)
         {
+			Logger.LogError(">>> Entering Archived(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords})", afterMessageId, numberOfRecords);
             try
             {
                 var messageBoxView = InternalMessagingController.Instance.GetArchivedMessages(this.UserInfo.UserID, afterMessageId, numberOfRecords);
+				Logger.LogError("Archived(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): messageBoxView → {MessageBoxView}", afterMessageId, numberOfRecords, messageBoxView);
                 var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, UserController.Instance.GetCurrentUserInfo().PortalID);
+				Logger.LogError("Archived(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): portalId → {PortalId}", afterMessageId, numberOfRecords, portalId);
                 messageBoxView.TotalNewThreads = InternalMessagingController.Instance.CountUnreadMessages(this.UserInfo.UserID, portalId);
                 messageBoxView.TotalConversations = InternalMessagingController.Instance.CountArchivedConversations(this.UserInfo.UserID, portalId);
 
@@ -131,7 +146,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while attempting to fetch the archived box.";
+				Logger.LogError("Archived(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): message → {Message}", afterMessageId, numberOfRecords, message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting Archived(afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords})", afterMessageId, numberOfRecords);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -144,11 +161,14 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [HttpGet]
         public HttpResponseMessage Thread(int conversationId, int afterMessageId, int numberOfRecords)
         {
+			Logger.LogError(">>> Entering Thread(conversationId={ConversationId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords})", conversationId, afterMessageId, numberOfRecords);
             try
             {
                 var totalRecords = 0;
                 var messageThreadsView = InternalMessagingController.Instance.GetMessageThread(conversationId, this.UserInfo.UserID, afterMessageId, numberOfRecords, ref totalRecords);
+				Logger.LogError("Thread(conversationId={ConversationId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): messageThreadsView → {MessageThreadsView}", conversationId, afterMessageId, numberOfRecords, messageThreadsView);
                 var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, UserController.Instance.GetCurrentUserInfo().PortalID);
+				Logger.LogError("Thread(conversationId={ConversationId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): portalId → {PortalId}", conversationId, afterMessageId, numberOfRecords, portalId);
                 messageThreadsView.TotalNewThreads = InternalMessagingController.Instance.CountUnreadMessages(this.UserInfo.UserID, portalId);
                 messageThreadsView.TotalThreads = InternalMessagingController.Instance.CountMessagesByConversation(conversationId);
                 messageThreadsView.TotalArchivedThreads = InternalMessagingController.Instance.CountArchivedMessagesByConversation(conversationId);
@@ -158,7 +178,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while attempting to fetch the thread, consult the server logs for more information.";
+				Logger.LogError("Thread(conversationId={ConversationId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords}): message → {Message}", conversationId, afterMessageId, numberOfRecords, message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting Thread(conversationId={ConversationId},afterMessageId={AfterMessageId},numberOfRecords={NumberOfRecords})", conversationId, afterMessageId, numberOfRecords);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -170,17 +192,25 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Reply(ReplyDTO postData)
         {
+			Logger.LogError(">>> Entering Reply(postData={PostData})", postData);
             try
             {
                 var body = HttpUtility.UrlDecode(postData.Body);
                 body = WebUtility.HtmlEncode(body);
+				Logger.LogError("Reply(postData={PostData}): body → {Body}", postData, body);
                 var messageId = InternalMessagingController.Instance.ReplyMessage(postData.ConversationId, body, postData.FileIds);
+				Logger.LogError("Reply(postData={PostData}): messageId → {MessageId}", postData, messageId);
                 var message = this.ToExpandoObject(InternalMessagingController.Instance.GetMessage(messageId));
+				Logger.LogError("Reply(postData={PostData}): message → {Message}", postData, message);
                 var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, UserController.Instance.GetCurrentUserInfo().PortalID);
+				Logger.LogError("Reply(postData={PostData}): portalId → {PortalId}", postData, portalId);
 
                 var totalNewThreads = InternalMessagingController.Instance.CountUnreadMessages(this.UserInfo.UserID, portalId);
+				Logger.LogError("Reply(postData={PostData}): totalNewThreads → {TotalNewThreads}", postData, totalNewThreads);
                 var totalThreads = InternalMessagingController.Instance.CountMessagesByConversation(postData.ConversationId);
+				Logger.LogError("Reply(postData={PostData}): totalThreads → {TotalThreads}", postData, totalThreads);
                 var totalArchivedThreads = InternalMessagingController.Instance.CountArchivedMessagesByConversation(postData.ConversationId);
+				Logger.LogError("Reply(postData={PostData}): totalArchivedThreads → {TotalArchivedThreads}", postData, totalArchivedThreads);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Conversation = message, TotalNewThreads = totalNewThreads, TotalThreads = totalThreads, TotalArchivedThreads = totalArchivedThreads });
             }
@@ -188,6 +218,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             {
                 var message = "An unexpected error occurred while attempting to reply to a conversation, see the server logs for more information.";
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting Reply(postData={PostData})", postData);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -199,6 +230,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage MarkArchived(ConversationDTO postData)
         {
+			Logger.LogError(">>> Entering MarkArchived(postData={PostData})", postData);
             try
             {
                 InternalMessagingController.Instance.MarkArchived(postData.ConversationId, this.UserInfo.UserID);
@@ -207,7 +239,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while attempting to fetch the archived box, consult the server logs for more information.";
+				Logger.LogError("MarkArchived(postData={PostData}): message → {Message}", postData, message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting MarkArchived(postData={PostData})", postData);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -219,6 +253,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage MarkUnArchived(ConversationDTO postData)
         {
+			Logger.LogError(">>> Entering MarkUnArchived(postData={PostData})", postData);
             try
             {
                 InternalMessagingController.Instance.MarkUnArchived(postData.ConversationId, this.UserInfo.UserID);
@@ -227,7 +262,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while attempting to restore an archived conversation, consult the server logs for more information.";
+				Logger.LogError("MarkUnArchived(postData={PostData}): message → {Message}", postData, message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting MarkUnArchived(postData={PostData})", postData);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -239,6 +276,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage MarkRead(ConversationDTO postData)
         {
+			Logger.LogError(">>> Entering MarkRead(postData={PostData})", postData);
             try
             {
                 InternalMessagingController.Instance.MarkRead(postData.ConversationId, this.UserInfo.UserID);
@@ -247,7 +285,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while attempting mark a conversation as read, consult the server logs for more information.";
+				Logger.LogError("MarkRead(postData={PostData}): message → {Message}", postData, message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting MarkRead(postData={PostData})", postData);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -259,6 +299,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage MarkUnRead(ConversationDTO postData)
         {
+			Logger.LogError(">>> Entering MarkUnRead(postData={PostData})", postData);
             try
             {
                 InternalMessagingController.Instance.MarkUnRead(postData.ConversationId, this.UserInfo.UserID);
@@ -267,7 +308,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while attempting to restore an archived conversation, consult the server logs for more information.";
+				Logger.LogError("MarkUnRead(postData={PostData}): message → {Message}", postData, message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting MarkUnRead(postData={PostData})", postData);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -279,6 +322,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DeleteUserFromConversation(ConversationDTO postData)
         {
+			Logger.LogError(">>> Entering DeleteUserFromConversation(postData={PostData})", postData);
             try
             {
                 InternalMessagingController.Instance.DeleteUserFromConversation(postData.ConversationId, this.UserInfo.UserID);
@@ -286,8 +330,12 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             }
             catch (Exception ex)
             {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 var message = "An unexpected error occurred while attempting to delete a user from a conversation, consult the server logs for more information.";
                 Logger.Error(message, ex);
+				Logger.LogError("DeleteUserFromConversation(postData)={PostData}: delete query executed in {Arg1} ms", postData, __logStart.ElapsedMilliseconds);
+				Logger.LogError("DeleteUserFromConversation(postData={PostData}): message → {Message}", postData, message);
+				Logger.LogWarning("<<< Exiting DeleteUserFromConversation(postData={PostData})", postData);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -299,10 +347,13 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [HttpGet]
         public HttpResponseMessage Notifications(int afterNotificationId, int numberOfRecords)
         {
+			Logger.LogError(">>> Entering Notifications(afterNotificationId={AfterNotificationId},numberOfRecords={NumberOfRecords})", afterNotificationId, numberOfRecords);
             try
             {
                 var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, UserController.Instance.GetCurrentUserInfo().PortalID);
+				Logger.LogError("Notifications(afterNotificationId={AfterNotificationId},numberOfRecords={NumberOfRecords}): portalId → {PortalId}", afterNotificationId, numberOfRecords, portalId);
                 var notificationsDomainModel = NotificationsController.Instance.GetNotifications(this.UserInfo.UserID, portalId, afterNotificationId, numberOfRecords);
+				Logger.LogError("Notifications(afterNotificationId={AfterNotificationId},numberOfRecords={NumberOfRecords}): notificationsDomainModel → {NotificationsDomainModel}", afterNotificationId, numberOfRecords, notificationsDomainModel);
 
                 var notificationsViewModel = new NotificationsViewModel
                 {
@@ -313,6 +364,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
                 foreach (var notification in notificationsDomainModel)
                 {
                     var user = UserController.Instance.GetUser(this.PortalSettings.PortalId, notification.SenderUserID);
+					Logger.LogError("Notifications(afterNotificationId={AfterNotificationId},numberOfRecords={NumberOfRecords}): user → {User}", afterNotificationId, numberOfRecords, user);
                     var displayName = user != null ? user.DisplayName : string.Empty;
 
                     var notificationViewModel = new NotificationViewModel
@@ -329,7 +381,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
                     };
 
                     var notificationType = NotificationsController.Instance.GetNotificationType(notification.NotificationTypeID);
+					Logger.LogError("Notifications(afterNotificationId={AfterNotificationId},numberOfRecords={NumberOfRecords}): notificationType → {NotificationType}", afterNotificationId, numberOfRecords, notificationType);
                     var notificationTypeActions = NotificationsController.Instance.GetNotificationTypeActions(notification.NotificationTypeID);
+					Logger.LogError("Notifications(afterNotificationId={AfterNotificationId},numberOfRecords={NumberOfRecords}): notificationTypeActions → {NotificationTypeActions}", afterNotificationId, numberOfRecords, notificationTypeActions);
 
                     foreach (var notificationTypeAction in notificationTypeActions)
                     {
@@ -363,7 +417,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while attempting to fetch messaging notifications, consult the server logs for more information.";
+				Logger.LogError("Notifications(afterNotificationId={AfterNotificationId},numberOfRecords={NumberOfRecords}): message → {Message}", afterNotificationId, numberOfRecords, message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting Notifications(afterNotificationId={AfterNotificationId},numberOfRecords={NumberOfRecords})", afterNotificationId, numberOfRecords);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -374,15 +430,19 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [HttpGet]
         public HttpResponseMessage CheckReplyHasRecipients(int conversationId)
         {
+			Logger.LogError(">>> Entering CheckReplyHasRecipients(conversationId={ConversationId})", conversationId);
             try
             {
                 var recipientCount = InternalMessagingController.Instance.CheckReplyHasRecipients(conversationId, UserController.Instance.GetCurrentUserInfo().UserID);
+				Logger.LogError("CheckReplyHasRecipients(conversationId={ConversationId}): recipientCount → {RecipientCount}", conversationId, recipientCount);
                 return this.Request.CreateResponse(HttpStatusCode.OK, recipientCount);
             }
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while attempting to check the recipient count on a reply, consult the server logs for more information.";
+				Logger.LogError("CheckReplyHasRecipients(conversationId={ConversationId}): message → {Message}", conversationId, message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting CheckReplyHasRecipients(conversationId={ConversationId})", conversationId);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -392,16 +452,21 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [HttpGet]
         public HttpResponseMessage CountNotifications()
         {
+			Logger.LogError(">>> Entering CountNotifications()");
             try
             {
                 var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, UserController.Instance.GetCurrentUserInfo().PortalID);
+				Logger.LogError("CountNotifications(): portalId → {PortalId}", portalId);
                 int notifications = NotificationsController.Instance.CountNotifications(this.UserInfo.UserID, portalId);
+				Logger.LogError("CountNotifications(): notifications → {Notifications}", notifications);
                 return this.Request.CreateResponse(HttpStatusCode.OK, notifications);
             }
             catch (Exception ex)
             {
                 const string message = "An unexpected error occurred while attempting to get the notification count, consult the server logs for more information.";
+				Logger.LogError("CountNotifications(): message → {Message}", message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting CountNotifications()");
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -411,16 +476,21 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [HttpGet]
         public HttpResponseMessage CountUnreadMessages()
         {
+			Logger.LogError(">>> Entering CountUnreadMessages()");
             try
             {
                 var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, UserController.Instance.GetCurrentUserInfo().PortalID);
+				Logger.LogError("CountUnreadMessages(): portalId → {PortalId}", portalId);
                 var unreadMessages = InternalMessagingController.Instance.CountUnreadMessages(this.UserInfo.UserID, portalId);
+				Logger.LogError("CountUnreadMessages(): unreadMessages → {UnreadMessages}", unreadMessages);
                 return this.Request.CreateResponse(HttpStatusCode.OK, unreadMessages);
             }
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while attempting to , consult the server logs for more information.";
+				Logger.LogError("CountUnreadMessages(): message → {Message}", message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting CountUnreadMessages()");
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -430,9 +500,11 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [HttpGet]
         public HttpResponseMessage GetTotals()
         {
+			Logger.LogError(">>> Entering GetTotals()");
             try
             {
                 var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, UserController.Instance.GetCurrentUserInfo().PortalID);
+				Logger.LogError("GetTotals(): portalId → {PortalId}", portalId);
                 var totalsViewModel = new TotalsViewModel
                 {
                     TotalUnreadMessages = InternalMessagingController.Instance.CountUnreadMessages(this.UserInfo.UserID, portalId),
@@ -444,7 +516,9 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while attempting to get the unread messages and new notifications count, consult the server logs for more information.";
+				Logger.LogError("GetTotals(): message → {Message}", message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting GetTotals()");
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -455,21 +529,26 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DismissAllNotifications()
         {
+			Logger.LogError(">>> Entering DismissAllNotifications()");
             try
             {
                 var deletedCount = NotificationsController.Instance.DeleteUserNotifications(this.UserInfo);
+				Logger.LogError("DismissAllNotifications(): deletedCount → {DeletedCount}", deletedCount);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", count = deletedCount });
             }
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while attempting to dismiss notifications, consult the server logs for more information.";
+				Logger.LogError("DismissAllNotifications(): message → {Message}", message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting DismissAllNotifications()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message);
             }
         }
 
         private string LocalizeActionString(string key, int desktopModuleId)
         {
+			Logger.LogError(">>> Entering LocalizeActionString(key={Key},desktopModuleId={DesktopModuleId})", key, desktopModuleId);
             if (string.IsNullOrEmpty(key))
             {
                 return string.Empty;
@@ -480,6 +559,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             if (desktopModuleId > 0)
             {
                 var desktopModule = DesktopModuleController.GetDesktopModule(this.hostSettings, desktopModuleId, this.PortalSettings.PortalId);
+				Logger.LogError("LocalizeActionString(key={Key},desktopModuleId={DesktopModuleId}): desktopModule → {DesktopModule}", key, desktopModuleId, desktopModule);
 
                 var folderName = desktopModule.FolderName.Replace(@"\", "/");
                 var resourceFile = $"~/DesktopModules/{folderName}/{Localization.LocalResourceDirectory}/{Localization.LocalSharedResourceFile}";
@@ -489,16 +569,31 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
             else
             {
                 actionString = Localization.GetString(key);
+				Logger.LogDebug("LocalizeActionString(key={Key},desktopModuleId={DesktopModuleId}): actionString → {ActionString}", key, desktopModuleId, actionString);
             }
 
+			Logger.LogError("LocalizeActionString(key={Key},desktopModuleId={DesktopModuleId}): actionString → {ActionString}", key, desktopModuleId, actionString);
+			Logger.LogWarning("<<< Exiting LocalizeActionString(key={Key},desktopModuleId={DesktopModuleId})", key, desktopModuleId);
             return string.IsNullOrEmpty(actionString) ? key : actionString;
         }
 
         private dynamic ToExpandoObject(Message message)
         {
+			Logger.LogError(">>> Entering ToExpandoObject(message={Message})", message);
             dynamic messageObj = new ExpandoObject();
             messageObj.PortalID = message.PortalID;
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.PortalID → {Arg1}", message, messageObj.PortalID);
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.MessageID → {Arg1}", message, messageObj.MessageID);
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.ConversationId → {Arg1}", message, messageObj.ConversationId);
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.SenderUserID → {Arg1}", message, messageObj.SenderUserID);
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.From → {Arg1}", message, messageObj.From);
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.To → {Arg1}", message, messageObj.To);
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.Subject → {Arg1}", message, messageObj.Subject);
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.Body → {Arg1}", message, messageObj.Body);
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.DisplayDate → {Arg1}", message, messageObj.DisplayDate);
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.ReplyAllAllowed → {Arg1}", message, messageObj.ReplyAllAllowed);
             messageObj.KeyID = message.KeyID;
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.KeyID → {Arg1}", message, messageObj.KeyID);
             messageObj.MessageID = message.MessageID;
             messageObj.ConversationId = message.ConversationId;
             messageObj.SenderUserID = message.SenderUserID;
@@ -511,10 +606,15 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
 
             // base entity properties
             messageObj.CreatedByUserID = message.CreatedByUserID;
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.CreatedByUserID → {Arg1}", message, messageObj.CreatedByUserID);
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.LastModifiedByUserID → {Arg1}", message, messageObj.LastModifiedByUserID);
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.LastModifiedOnDate → {Arg1}", message, messageObj.LastModifiedOnDate);
             messageObj.CreatedOnDate = message.CreatedOnDate;
+			Logger.LogDebug("ToExpandoObject(message={Message}): messageObj.CreatedOnDate → {Arg1}", message, messageObj.CreatedOnDate);
             messageObj.LastModifiedByUserID = message.LastModifiedByUserID;
             messageObj.LastModifiedOnDate = message.LastModifiedOnDate;
 
+			Logger.LogWarning("<<< Exiting ToExpandoObject(message={Message})", message);
             return messageObj;
         }
 

@@ -14,34 +14,45 @@ namespace DotNetNuke.Services.Mail.OAuth
     /// <summary>SMTP OAuth controller.</summary>
     public class SmtpOAuthController : ISmtpOAuthController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SmtpOAuthController));
         private readonly IEnumerable<ISmtpOAuthProvider> smtpOAuthProviders;
 
         /// <summary>Initializes a new instance of the <see cref="SmtpOAuthController"/> class.</summary>
         /// <param name="smtpOAuthProviders">The SMTP OAuth providers.</param>
         public SmtpOAuthController(IEnumerable<ISmtpOAuthProvider> smtpOAuthProviders)
         {
+			Logger.LogError(">>> Entering SmtpOAuthController(smtpOAuthProviders={SmtpOAuthProviders})", smtpOAuthProviders);
             this.smtpOAuthProviders = smtpOAuthProviders;
+			Logger.LogDebug("SmtpOAuthController(smtpOAuthProviders={SmtpOAuthProviders}): smtpOAuthProviders → {SmtpOAuthProviders1}", smtpOAuthProviders, smtpOAuthProviders);
+        Logger.LogDebug("SmtpOAuthController(smtpOAuthProviders={SmtpOAuthProviders}): this.smtpOAuthProviders → {Arg1}", smtpOAuthProviders, this.smtpOAuthProviders);
+        Logger.LogWarning("<<< Exiting SmtpOAuthController(smtpOAuthProviders={SmtpOAuthProviders})", smtpOAuthProviders);
         }
 
         /// <summary>Registers all of the <see cref="ISmtpOAuthProvider"/> types with the <paramref name="serviceCollection"/>.</summary>
         /// <param name="serviceCollection">The services collection.</param>
         public static void RegisterOAuthProviders(IServiceCollection serviceCollection)
         {
+			Logger.LogError(">>> Entering RegisterOAuthProviders(serviceCollection={ServiceCollection})", serviceCollection);
             var providerTypes = TypeExtensions.SafeGetTypes()
                 .Types.Where(t => t is { IsClass: true, IsAbstract: false } && typeof(ISmtpOAuthProvider).IsAssignableFrom(t));
 
             serviceCollection.TryAddEnumerable(providerTypes.Select(t => ServiceDescriptor.Transient(typeof(ISmtpOAuthProvider), t)));
+			Logger.LogWarning("<<< Exiting RegisterOAuthProviders(serviceCollection={ServiceCollection})", serviceCollection);
         }
 
         /// <inheritdoc />
         public IReadOnlyCollection<ISmtpOAuthProvider> GetOAuthProviders()
         {
+			Logger.LogError(">>> Entering GetOAuthProviders()");
+            Logger.LogWarning("<<< Exiting GetOAuthProviders()");
             return this.smtpOAuthProviders.ToList();
         }
 
         /// <inheritdoc />
         public ISmtpOAuthProvider GetOAuthProvider(string name)
         {
+			Logger.LogError(">>> Entering GetOAuthProvider(name={Name})", name);
+			Logger.LogWarning("<<< Exiting GetOAuthProvider(name={Name})", name);
             return this.smtpOAuthProviders.FirstOrDefault(i => i.Name == name);
         }
     }

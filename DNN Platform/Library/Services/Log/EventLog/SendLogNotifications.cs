@@ -9,16 +9,19 @@ namespace DotNetNuke.Services.Log.EventLog
 
     public class SendLogNotifications : SchedulerClient
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SendLogNotifications));
         /// <summary>Initializes a new instance of the <see cref="SendLogNotifications"/> class.</summary>
         /// <param name="objScheduleHistoryItem">The schedule history item.</param>
         public SendLogNotifications(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogError(">>> Entering SendLogNotifications(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             this.ScheduleHistoryItem = objScheduleHistoryItem;
         }
 
         /// <inheritdoc />
         public override void DoWork()
         {
+			Logger.LogError(">>> Entering DoWork()");
             try
             {
                 // notification that the event is progressing
@@ -29,6 +32,7 @@ namespace DotNetNuke.Services.Log.EventLog
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in DoWork(): {Arg0}", exc.Message);
                 this.ScheduleHistoryItem.Succeeded = false; // REQUIRED
                 this.ScheduleHistoryItem.AddLogNote("EXCEPTION: " + exc); // OPTIONAL
                 this.Errored(ref exc); // REQUIRED
@@ -36,6 +40,7 @@ namespace DotNetNuke.Services.Log.EventLog
                 // log the exception
                 Exceptions.Exceptions.LogException(exc); // OPTIONAL
             }
+			Logger.LogWarning("<<< Exiting DoWork()");
         }
     }
 }

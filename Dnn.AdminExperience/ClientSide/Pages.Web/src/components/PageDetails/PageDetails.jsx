@@ -5,10 +5,12 @@ import PageStandard from "./PageStandard/PageStandard";
 import PageUrl from "./PageUrl/PageUrl";
 import PageDetailsFooter from "./PageDetailsFooter/PageDetailsFooter";
 import PageIcons from "./PageIcons/PageIcons";
+const logger = console;
 
 class PageDetail extends Component {
 
     getDetail(pageType) {        
+		logger.error(`>>> Entering getDetail(pageType=${pageType})`, { "event.action": "getDetail", "logrite.pageType": pageType });
         switch (pageType) {
             case "normal": 
                 return PageStandard;
@@ -17,12 +19,15 @@ class PageDetail extends Component {
             case "file":
                 return PageUrl;
             default: 
+		logger.warn(`<<< Exiting getDetail(pageType=${pageType})`, { "event.action": "getDetail", "logrite.pageType": pageType });
                 throw "invalid page type";
         }        
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const DetailComponent = this.getDetail(this.props.page.pageType);
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <DetailComponent onChangeField={this.props.onChangeField} errors={this.props.errors} onSelectParentPageId={this.props.onSelectParentPageId}/>
@@ -42,6 +47,8 @@ PageDetail.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         page: state.pages.selectedPage        
     };

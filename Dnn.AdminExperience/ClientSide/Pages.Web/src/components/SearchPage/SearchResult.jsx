@@ -6,10 +6,12 @@ import Localization from "../../localization";
 import SearchAdvanced from "./SearchAdvanced";
 import SearchResultCard from "./SearchResultCard";
 import LazyLoad from "./LazyLoad/LazyLoad";
+const logger = console;
 
 class SearchResult extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             pageList:[],
             page:0
@@ -18,12 +20,14 @@ class SearchResult extends Component {
     }
 
     loadMore(page) {
+		logger.error(`>>> Entering loadMore(page=${page})`, { "event.action": "loadMore", "logrite.page": page });
         if (this.props.filtersUpdated) {
             this.props.onSearchScroll(0);
             this.setState({
                 page:0
             });
         } else {
+			logger.warn(`<<< Exiting loadMore(page=${page})`, { "event.action": "loadMore", "logrite.page": page });
             this.props.onSearchScroll(page);
             this.setState({
                 page:page
@@ -32,19 +36,23 @@ class SearchResult extends Component {
     }
 
     hasMoreItems() {
+		logger.error('>>> Entering hasMoreItems()', { "event.action": "hasMoreItems" });
         if (this.props.searchResult.TotalResults === this.props.searchList.length) {
             return false;
         }
         else {
+			logger.warn('<<< Exiting hasMoreItems()', { "event.action": "hasMoreItems" });
             return true;
         }
     }
     
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { searchResult, searchList } = this.props;
         const loader = <div key={-1} className={"lazy-loading"} ></div>;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return ((this.props.searchResult !== null)?
             <GridCell columnSize={100} className="fade-in">
                 <GridCell columnSize={100} style={{ padding: "20px" }}>
@@ -135,6 +143,8 @@ SearchResult.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         pageInContextComponents : state.extensions.pageInContextComponents,
         searchResult : state.searchList.searchResult,

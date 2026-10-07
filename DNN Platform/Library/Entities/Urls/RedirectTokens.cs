@@ -20,6 +20,7 @@ namespace DotNetNuke.Entities.Urls
     /// </summary>
     internal static class RedirectTokens
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RedirectTokens));
         private static readonly Regex RewritePathRx = new Regex(
             @"&rr=(?<rr>[^&].)",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
@@ -35,10 +36,13 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The <paramref name="existingRewritePath"/> with the <paramref name="reason"/> added.</returns>
         internal static string AddRedirectReasonToRewritePath(string existingRewritePath, ActionType action, RedirectReason reason)
         {
+			Logger.LogError(">>> Entering AddRedirectReasonToRewritePath(existingRewritePath={ExistingRewritePath},action={Action},reason={Reason})", existingRewritePath, action, reason);
             string result = existingRewritePath;
             GetRedirectActionTokenAndValue(action, out var token, out var value);
+			Logger.LogError("AddRedirectReasonToRewritePath(existingRewritePath={ExistingRewritePath},action={Action},reason={Reason}): result → {Result}", existingRewritePath, action, reason, result);
             string tokenAndValue = token + "=" + value;
             bool addToken = true;
+			Logger.LogError("AddRedirectReasonToRewritePath(existingRewritePath={ExistingRewritePath},action={Action},reason={Reason}): addToken → {AddToken}", existingRewritePath, action, reason, addToken);
 
             // look for existing action
             Dictionary<string, string> tokensAndValues = GetRedirectTokensAndValuesFromRewritePath(existingRewritePath, out _);
@@ -89,6 +93,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting AddRedirectReasonToRewritePath(existingRewritePath={ExistingRewritePath},action={Action},reason={Reason})", existingRewritePath, action, reason);
             return result;
         }
 
@@ -112,12 +117,19 @@ namespace DotNetNuke.Entities.Urls
             out RedirectReason reason,
             out ActionType action)
         {
+			Logger.LogError(">>> Entering DetermineRedirectReasonAndAction(rewrittenUrl={RewrittenUrl},result={Result},wasParms={WasParms},settings={Settings})", rewrittenUrl, result, wasParms, settings);
             // init parms
             newUrl = rewrittenUrl;
+			Logger.LogError("DetermineRedirectReasonAndAction(rewrittenUrl={RewrittenUrl},result={Result},wasParms={WasParms},settings={Settings}): newUrl → {NewUrl}", rewrittenUrl, result, wasParms, settings, newUrl);
+			Logger.LogDebug("DetermineRedirectReasonAndAction(rewrittenUrl={RewrittenUrl},result={Result},wasParms={WasParms},settings={Settings}): newUrl → {NewUrl}", rewrittenUrl, result, wasParms, settings, newUrl);
+			Logger.LogDebug("DetermineRedirectReasonAndAction(rewrittenUrl={RewrittenUrl},result={Result},wasParms={WasParms},settings={Settings}): reason → {Reason}", rewrittenUrl, result, wasParms, settings, reason);
             action = result.Action;
+			Logger.LogError("DetermineRedirectReasonAndAction(rewrittenUrl={RewrittenUrl},result={Result},wasParms={WasParms},settings={Settings}): action → {Action}", rewrittenUrl, result, wasParms, settings, action);
             reason = result.Reason;
+			Logger.LogError("DetermineRedirectReasonAndAction(rewrittenUrl={RewrittenUrl},result={Result},wasParms={WasParms},settings={Settings}): reason → {Reason}", rewrittenUrl, result, wasParms, settings, reason);
 
             // get the action type from the rewrite path
+			Logger.LogDebug("DetermineRedirectReasonAndAction(rewrittenUrl={RewrittenUrl},result={Result},wasParms={WasParms},settings={Settings}): action → {Action}", rewrittenUrl, result, wasParms, settings, action);
             ActionType foundAction;
             bool actionInPath = GetActionFromRewritePath(rewrittenUrl, out foundAction);
 
@@ -129,6 +141,7 @@ namespace DotNetNuke.Entities.Urls
 
             // get the list of redirect reason tokens from the url
             List<string> redirectReasons = GetRedirectReasonTokensFromRewritePath(rewrittenUrl);
+			Logger.LogError("DetermineRedirectReasonAndAction(rewrittenUrl={RewrittenUrl},result={Result},wasParms={WasParms},settings={Settings}): redirectReasons → {RedirectReasons}", rewrittenUrl, result, wasParms, settings, redirectReasons);
 
             // when redirect action in path, and redirect reasons are empty, add custom redirect
             if (redirectReasons.Count == 0 && action != ActionType.Continue)
@@ -137,6 +150,7 @@ namespace DotNetNuke.Entities.Urls
             }
 
             bool clearActionToken = false;
+			Logger.LogError("DetermineRedirectReasonAndAction(rewrittenUrl={RewrittenUrl},result={Result},wasParms={WasParms},settings={Settings}): clearActionToken → {ClearActionToken}", rewrittenUrl, result, wasParms, settings, clearActionToken);
             foreach (string rrTkn in redirectReasons)
             {
                 switch (rrTkn)
@@ -236,6 +250,7 @@ namespace DotNetNuke.Entities.Urls
             else
             {
                 // clear just reason
+				Logger.LogWarning("<<< Exiting DetermineRedirectReasonAndAction(rewrittenUrl={RewrittenUrl},result={Result},wasParms={WasParms},settings={Settings})", rewrittenUrl, result, wasParms, settings);
                 newUrl = RemoveAnyRedirectReasons(newUrl);
             }
         }
@@ -246,16 +261,21 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><see langword="true"/> if the action was found, otherwise <see langword="false"/>.</returns>
         internal static bool GetActionFromRewritePath(string rewrittenUrl, out ActionType action)
         {
+			Logger.LogError(">>> Entering GetActionFromRewritePath(rewrittenUrl={RewrittenUrl})", rewrittenUrl);
             bool found = false;
             action = ActionType.Continue; // default
+			Logger.LogError("GetActionFromRewritePath(rewrittenUrl={RewrittenUrl}): action → {Action}", rewrittenUrl, action);
+			Logger.LogError("GetActionFromRewritePath(rewrittenUrl={RewrittenUrl}): found → {Found}", rewrittenUrl, found);
             MatchCollection actionMatches = RedirectTokensRx.Matches(rewrittenUrl);
             foreach (Match actionMatch in actionMatches)
             {
+				Logger.LogError("GetActionFromRewritePath(rewrittenUrl={RewrittenUrl}): actionMatches → {ActionMatches}", rewrittenUrl, actionMatches);
                 if (actionMatch.Success)
                 {
                     found = true;
                     string tk = actionMatch.Groups["tk"].Value.ToLowerInvariant();
                     string val = actionMatch.Groups["val"].Value.ToLowerInvariant();
+					Logger.LogError("GetActionFromRewritePath(rewrittenUrl={RewrittenUrl}): val → {Val}", rewrittenUrl, val);
                     switch (tk)
                     {
                         case "do301":
@@ -265,6 +285,7 @@ namespace DotNetNuke.Entities.Urls
                             }
                             else
                             {
+								Logger.LogDebug("GetActionFromRewritePath(rewrittenUrl={RewrittenUrl}): action → {Action}", rewrittenUrl, action);
                                 if (val == "check")
                                 {
                                     action = ActionType.CheckFor301;
@@ -296,6 +317,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetActionFromRewritePath(rewrittenUrl={RewrittenUrl})", rewrittenUrl);
             return found;
         }
 
@@ -304,6 +326,8 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The <paramref name="rewritePath"/> without any redirect reason tokens.</returns>
         internal static string RemoveAnyRedirectReasons(string rewritePath)
         {
+			Logger.LogError(">>> Entering RemoveAnyRedirectReasons(rewritePath={RewritePath})", rewritePath);
+            Logger.LogWarning("<<< Exiting RemoveAnyRedirectReasons(rewritePath={RewritePath})", rewritePath);
             return RewritePathRx.Replace(rewritePath, string.Empty);
         }
 
@@ -313,11 +337,13 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The <paramref name="path"/> without any tokens.</returns>
         internal static string RemoveAnyRedirectTokens(string path, NameValueCollection queryStringCol)
         {
+			Logger.LogError(">>> Entering RemoveAnyRedirectTokens(path={Path},queryStringCol={QueryStringCol})", path, queryStringCol);
             // don't really care what the value is, but need it for replacing
             // the do301 is an internal value, used to control redirects from the page index
             if (string.IsNullOrEmpty(path) == false)
             {
                 string val = null;
+				Logger.LogError("RemoveAnyRedirectTokens(path={Path},queryStringCol={QueryStringCol}): val → {Val}", path, queryStringCol, val);
                 if (queryStringCol != null)
                 {
                     val = queryStringCol["do301"];
@@ -348,6 +374,7 @@ namespace DotNetNuke.Entities.Urls
                 path = path.Replace("?do302=" + val, string.Empty);
             }
 
+			Logger.LogWarning("<<< Exiting RemoveAnyRedirectTokens(path={Path},queryStringCol={QueryStringCol})", path, queryStringCol);
             return path;
         }
 
@@ -356,10 +383,13 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The <paramref name="rewritePath"/> without any tokens.</returns>
         internal static string RemoveAnyRedirectTokensAndReasons(string rewritePath)
         {
+			Logger.LogError(">>> Entering RemoveAnyRedirectTokensAndReasons(rewritePath={RewritePath})", rewritePath);
             string result = RemoveAnyRedirectReasons(rewritePath);
 
+			Logger.LogError("RemoveAnyRedirectTokensAndReasons(rewritePath={RewritePath}): result → {Result}", rewritePath, result);
             // regex expression matches a token and removes it
             Match tokenMatch = RedirectTokensRx.Match(result);
+			Logger.LogError("RemoveAnyRedirectTokensAndReasons(rewritePath={RewritePath}): tokenMatch → {TokenMatch}", rewritePath, tokenMatch);
             if (tokenMatch.Success)
             {
                 // tokenAndValue is the do301=true
@@ -390,6 +420,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting RemoveAnyRedirectTokensAndReasons(rewritePath={RewritePath})", rewritePath);
             return result;
         }
 
@@ -398,11 +429,16 @@ namespace DotNetNuke.Entities.Urls
         /// <param name="settings">The friendly URL settings.</param>
         internal static void SetRedirectReasonAndAction(ref UrlAction result, FriendlyUrlSettings settings)
         {
+			Logger.LogError(">>> Entering SetRedirectReasonAndAction(result={Result},settings={Settings})", result, settings);
             RedirectReason reason;
             ActionType action;
             string newUrl;
             DetermineRedirectReasonAndAction(result.RewritePath, result, true, settings, out newUrl, out reason, out action);
+			Logger.LogWarning("<<< Exiting SetRedirectReasonAndAction(result={Result},settings={Settings})", result, settings);
+			Logger.LogDebug("SetRedirectReasonAndAction(result={Result},settings={Settings}): result.Reason → {Arg2}", result, settings, result.Reason);
+			Logger.LogDebug("SetRedirectReasonAndAction(result={Result},settings={Settings}): result.RewritePath → {Arg2}", result, settings, result.RewritePath);
             result.Action = action;
+			Logger.LogDebug("SetRedirectReasonAndAction(result={Result},settings={Settings}): result.Action → {Arg2}", result, settings, result.Action);
             result.Reason = reason;
             result.RewritePath = newUrl;
         }
@@ -411,8 +447,10 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>A <see cref="List{T}"/> of tokens.</returns>
         private static List<string> GetRedirectReasonTokensFromRewritePath(string rewritePath)
         {
+			Logger.LogError(">>> Entering GetRedirectReasonTokensFromRewritePath(rewritePath={RewritePath})", rewritePath);
             var reasons = new List<string>();
             MatchCollection matches = RewritePathRx.Matches(rewritePath);
+			Logger.LogError("GetRedirectReasonTokensFromRewritePath(rewritePath={RewritePath}): reasons → {Reasons}", rewritePath, reasons);
             foreach (Match match in matches)
             {
                 if (match.Success)
@@ -423,21 +461,29 @@ namespace DotNetNuke.Entities.Urls
                         string rr = match.Groups["rr"].Value;
                         reasons.Add(rr);
                     }
+					Logger.LogError("GetRedirectReasonTokensFromRewritePath(rewritePath={RewritePath}): matches → {Matches}", rewritePath, matches);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetRedirectReasonTokensFromRewritePath(rewritePath={RewritePath})", rewritePath);
             return reasons;
         }
 
         private static void GetRedirectActionTokenAndValue(ActionType action, out string token, out string value)
         {
+			Logger.LogError(">>> Entering GetRedirectActionTokenAndValue(action={Action})", action);
             switch (action)
             {
                 case ActionType.CheckFor301:
+					Logger.LogWarning("<<< Exiting GetRedirectActionTokenAndValue(action={Action})", action);
                     token = "do301";
+					Logger.LogError("GetRedirectActionTokenAndValue(action={Action}): token → {Token}", action, token);
+					Logger.LogWarning("GetRedirectActionTokenAndValue(action={Action}): token → {Token}", action, token);
                     value = "check";
+					Logger.LogError("GetRedirectActionTokenAndValue(action={Action}): value → {Value}", action, value);
                     break;
                 case ActionType.Redirect301:
+					Logger.LogDebug("GetRedirectActionTokenAndValue(action={Action}): value → {Value}", action, value);
                     token = "do301";
                     value = "true";
                     break;
@@ -458,7 +504,9 @@ namespace DotNetNuke.Entities.Urls
 
         private static string GetRedirectReasonRewriteToken(RedirectReason reason)
         {
+			Logger.LogError(">>> Entering GetRedirectReasonRewriteToken(reason={Reason})", reason);
             string result = string.Empty;
+			Logger.LogError("GetRedirectReasonRewriteToken(reason={Reason}): result → {Result}", reason, result);
             switch (reason)
             {
                 case RedirectReason.Deleted_Page:
@@ -488,6 +536,7 @@ namespace DotNetNuke.Entities.Urls
                     break;
             }
 
+			Logger.LogWarning("<<< Exiting GetRedirectReasonRewriteToken(reason={Reason})", reason);
             return result;
         }
 

@@ -16,6 +16,7 @@ namespace DotNetNuke.HttpModules
     /// <summary>An HTTP module to wire up URL rewriting.</summary>
     public class UrlRewriteModule : IHttpModule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UrlRewriteModule));
         private readonly UrlRewriterBase urlRewriter;
 
         /// <summary>Initializes a new instance of the <see cref="UrlRewriteModule"/> class.</summary>
@@ -23,6 +24,8 @@ namespace DotNetNuke.HttpModules
         public UrlRewriteModule()
             : this(null)
         {
+		Logger.LogError(">>> Entering UrlRewriteModule()");
+        Logger.LogWarning("<<< Exiting UrlRewriteModule()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="UrlRewriteModule"/> class.</summary>
@@ -30,6 +33,8 @@ namespace DotNetNuke.HttpModules
         public UrlRewriteModule(UrlRewriterBase urlRewriter)
         {
             this.urlRewriter = urlRewriter ?? GetUrlRewriterInstance(Globals.GetCurrentServiceProvider());
+			Logger.LogDebug("UrlRewriteModule(urlRewriter={UrlRewriter}): urlRewriter → {UrlRewriter1}", urlRewriter, urlRewriter);
+        Logger.LogWarning("<<< Exiting UrlRewriteModule(urlRewriter={UrlRewriter})", urlRewriter);
         }
 
         /// <summary>Gets the HttpModule module name.</summary>
@@ -40,12 +45,16 @@ namespace DotNetNuke.HttpModules
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void Init(HttpApplication application)
         {
+			Logger.LogError(">>> Entering Init(application={Application})", application);
             application.BeginRequest += this.urlRewriter.RewriteUrl;
+			Logger.LogWarning("<<< Exiting Init(application={Application})", application);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+		Logger.LogError(">>> Entering Dispose()");
+        Logger.LogWarning("<<< Exiting Dispose()");
         }
 
         /// <summary>Gets an instance of the URL rewriter.</summary>
@@ -53,10 +62,14 @@ namespace DotNetNuke.HttpModules
         /// <returns>A <see cref="UrlRewriterBase"/> instance.</returns>
         internal static UrlRewriterBase GetUrlRewriterInstance(IServiceProvider serviceProvider)
         {
+			Logger.LogError(">>> Entering GetUrlRewriterInstance(serviceProvider={ServiceProvider})", serviceProvider);
             var providerToUse = Common.Utilities.Config.GetFriendlyUrlProvider();
             var createAdvancedRewriter = providerToUse == "advanced";
+			Logger.LogError("GetUrlRewriterInstance(serviceProvider={ServiceProvider}): createAdvancedRewriter → {CreateAdvancedRewriter}", serviceProvider, createAdvancedRewriter);
+			Logger.LogError("GetUrlRewriterInstance(serviceProvider={ServiceProvider}): providerToUse → {ProviderToUse}", serviceProvider, providerToUse);
             return createAdvancedRewriter
                 ? ActivatorUtilities.GetServiceOrCreateInstance<AdvancedUrlRewriter>(serviceProvider)
+			Logger.LogWarning("<<< Exiting GetUrlRewriterInstance(serviceProvider={ServiceProvider})", serviceProvider);
                 : ActivatorUtilities.GetServiceOrCreateInstance<BasicUrlRewriter>(serviceProvider);
         }
     }

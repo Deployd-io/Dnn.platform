@@ -13,6 +13,7 @@ Imports System.Web.UI.WebControls
 Imports DotNetNuke.Abstractions.ClientResources
 Imports DotNetNuke.Web.Client.ResourceManager
 Imports Microsoft.Extensions.DependencyInjection
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.Utilities
 
@@ -30,6 +31,7 @@ Namespace DotNetNuke.UI.Utilities
     ''' </history>
     ''' -----------------------------------------------------------------------------
     Public Class ClientAPI
+	Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
 
 #Region "Public Constants"
 
@@ -126,6 +128,8 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Private Shared Function FindForm(ByVal oCtl As Control) As Control
+			_logger.LogError(">>> Entering FindForm(oCtl={OCtl})", oCtl)
+			_logger.LogWarning("<<< Exiting FindForm(oCtl={OCtl})", oCtl)
             Return oCtl.Page.Form
             'Do While Not TypeOf oCtl Is HtmlControls.HtmlForm
             '    If oCtl Is Nothing OrElse TypeOf oCtl Is Page Then Return Nothing
@@ -145,6 +149,8 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Private Shared Function GetDNNVariableControl(ByVal objParent As Control) As HtmlInputHidden
+			_logger.LogError(">>> Entering GetDNNVariableControl(objParent={ObjParent})", objParent)
+			_logger.LogWarning("<<< Exiting GetDNNVariableControl(objParent={ObjParent})", objParent)
             Return CType(DotNetNuke.UI.Utilities.Globals.FindControlRecursive(objParent.Page, DNNVARIABLE_CONTROLID), System.Web.UI.HtmlControls.HtmlInputHidden)
         End Function
 
@@ -259,6 +265,8 @@ Namespace DotNetNuke.UI.Utilities
         End Property
 
         Public Shared Function EscapeForJavascript(ByVal s As String) As String
+			_logger.LogError(">>> Entering EscapeForJavascript(s={S})", s)
+			_logger.LogWarning("<<< Exiting EscapeForJavascript(s={S})", s)
             Return s.Replace("\", "\\").Replace("'", "\'")
         End Function
 
@@ -267,23 +275,29 @@ Namespace DotNetNuke.UI.Utilities
 #Region "Private Shared Methods"
 
         Private Shared Sub AddAttribute(ByVal objControl As Control, ByVal strName As String, ByVal strValue As String)
+			_logger.LogError(">>> Entering AddAttribute(objControl={ObjControl},strName={StrName},strValue={StrValue})", objControl, strName, strValue)
             If TypeOf objControl Is HtmlControl Then
                 CType(objControl, HtmlControl).Attributes.Add(strName, strValue)
             ElseIf TypeOf objControl Is WebControl Then
                 CType(objControl, WebControl).Attributes.Add(strName, strValue)
             End If
+			_logger.LogWarning("<<< Exiting AddAttribute(objControl={ObjControl},strName={StrName},strValue={StrValue})", objControl, strName, strValue)
         End Sub
 
         Public Shared Function GetClientVariableList(ByVal objPage As Page) As Generic.Dictionary(Of String, String)
+			_logger.LogError(">>> Entering GetClientVariableList(objPage={ObjPage})", objPage)
+			_logger.LogError("GetClientVariableList(objPage={ObjPage}): ctlVar → {CtlVar}", objPage, ctlVar)
             Dim ctlVar As HtmlInputHidden = ClientVariableControl(objPage)
             Dim strValue As String = ""
             If Not ctlVar Is Nothing Then strValue = ctlVar.Value
+			_logger.LogError("GetClientVariableList(objPage={ObjPage}): strValue → {StrValue}", objPage, strValue)
             If Len(strValue) = 0 Then strValue = System.Web.HttpContext.Current.Request(DNNVARIABLE_CONTROLID) 'using request object in case we are loading before controls have values set
             If strValue Is Nothing Then strValue = ""
 
             Dim objDict As Generic.Dictionary(Of String, String) = CType(HttpContext.Current.Items("CAPIVariableList"), Generic.Dictionary(Of String, String))
             If objDict Is Nothing Then
                 'Dim objJSON As Script.Serialization.JavaScriptSerializer = New Script.Serialization.JavaScriptSerializer()
+				_logger.LogError("GetClientVariableList(objPage={ObjPage}): objJSON → {ObjJSON}", objPage, objJSON)
                 If String.IsNullOrEmpty(strValue) = False Then
                     Try
                         'fix serialization issues with invalid json objects
@@ -292,7 +306,9 @@ Namespace DotNetNuke.UI.Utilities
                         End If
 
                         objDict = MSAJAX.Deserialize(Of Generic.Dictionary(Of String, String))(strValue) 'objJSON.Deserialize(Of Generic.Dictionary(Of String, String))(strValue)
+						_logger.LogDebug("GetClientVariableList(objPage={ObjPage}): objDict → {ObjDict}", objPage, objDict)
                     Catch
+						_logger.LogError("Exception in GetClientVariableList(objPage={ObjPage}): {Arg1}", objPage, ex.Message)
                         'ignore error
                     End Try
                 End If
@@ -302,16 +318,20 @@ Namespace DotNetNuke.UI.Utilities
                 HttpContext.Current.Items("CAPIVariableList") = objDict
             End If
 
+			_logger.LogWarning("<<< Exiting GetClientVariableList(objPage={ObjPage})", objPage)
             Return objDict
         End Function
 
         Public Shared Sub SerializeClientVariableDictionary(ByVal objPage As Page, ByVal objDict As Generic.Dictionary(Of String, String))
+			_logger.LogError(">>> Entering SerializeClientVariableDictionary(objPage={ObjPage},objDict={ObjDict})", objPage, objDict)
+			_logger.LogError("SerializeClientVariableDictionary(objPage={ObjPage},objDict={ObjDict}): ctlVar → {CtlVar}", objPage, objDict, ctlVar)
             Dim ctlVar As HtmlInputHidden = ClientVariableControl(objPage)
             ctlVar.Value = MSAJAX.Serialize(objDict)
             'minimize payload by using ` for ", which serializes to &quot;
             If ctlVar.Value.IndexOf("`", StringComparison.Ordinal) = -1 Then
                 'prefix the value with ` to denote that we escaped it (it was safe)
                 ctlVar.Value = "`" & ctlVar.Value.Replace("""", "`")
+				_logger.LogWarning("<<< Exiting SerializeClientVariableDictionary(objPage={ObjPage},objDict={ObjDict})", objPage, objDict)
             End If
 
         End Sub
@@ -330,6 +350,7 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Private Shared Function GetClientVariableNameValuePair(ByVal objPage As Page, ByVal strVar As String) As String
+			_logger.LogError(">>> Entering GetClientVariableNameValuePair(objPage={ObjPage},strVar={StrVar})", objPage, strVar)
             Dim objDict As Generic.Dictionary(Of String, String) = GetClientVariableList(objPage)
 
             Dim value As String = Nothing
@@ -337,6 +358,7 @@ Namespace DotNetNuke.UI.Utilities
             If objDict.TryGetValue(strVar, value) Then
                 Return strVar & COLUMN_DELIMITER & value
             End If
+			_logger.LogWarning("<<< Exiting GetClientVariableNameValuePair(objPage={ObjPage},strVar={StrVar})", objPage, strVar)
             Return ""
         End Function
 
@@ -354,6 +376,8 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Private Shared Function GetKeyDownHandler(ByVal intKeyAscii As Integer, ByVal strJavascript As String) As String
+			_logger.LogError(">>> Entering GetKeyDownHandler(intKeyAscii={IntKeyAscii},strJavascript={StrJavascript})", intKeyAscii, strJavascript)
+			_logger.LogWarning("<<< Exiting GetKeyDownHandler(intKeyAscii={IntKeyAscii},strJavascript={StrJavascript})", intKeyAscii, strJavascript)
             Return "return __dnn_KeyDown('" & intKeyAscii & "', '" & strJavascript.Replace("'", "%27") & "', event);"
         End Function
 
@@ -374,7 +398,9 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Shared Sub AddButtonConfirm(ByVal objButton As WebControl, ByVal strText As String)
+			_logger.LogError(">>> Entering AddButtonConfirm(objButton={ObjButton},strText={StrText})", objButton, strText)
             objButton.Attributes.Add("onClick", "javascript:return confirm('" & GetSafeJSString(strText) & "');")
+			_logger.LogWarning("<<< Exiting AddButtonConfirm(objButton={ObjButton},strText={StrText})", objButton, strText)
         End Sub
 
         ''' -----------------------------------------------------------------------------
@@ -390,12 +416,14 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Shared Function BrowserSupportsFunctionality(ByVal eFunctionality As ClientFunctionality) As Boolean
+			_logger.LogError(">>> Entering BrowserSupportsFunctionality(eFunctionality={EFunctionality})", eFunctionality)
             Try
                 If System.Web.HttpContext.Current Is Nothing Then Return True
                 Dim blnSupports As Boolean = False
 
                 If ClientAPIDisabled() = False Then
                     Dim objCaps As BrowserCaps = BrowserCaps.GetBrowserCaps()
+					_logger.LogError("BrowserSupportsFunctionality(eFunctionality={EFunctionality}): objCaps → {ObjCaps}", eFunctionality, objCaps)
                     If Not objCaps Is Nothing Then
                         Dim objRequest As HttpRequest = System.Web.HttpContext.Current.Request
                         Dim strUserAgent As String = objRequest.UserAgent
@@ -405,11 +433,13 @@ Namespace DotNetNuke.UI.Utilities
                                 Dim strBrowser As String = objRequest.Browser.Browser
                                 'if no version present, Framework dies, hence need for try 
                                 Dim dblVersion As Double = CDbl(objRequest.Browser.MajorVersion + objRequest.Browser.MinorVersion)
+								_logger.LogError("BrowserSupportsFunctionality(eFunctionality={EFunctionality}): dblVersion → {DblVersion}", eFunctionality, dblVersion)
                                 Dim iBitValue As Integer = 0
                                 Dim objFuncInfo As FunctionalityInfo = Nothing
                                 'loop through all functionalities for this UserAgent and determine the bitvalue 
                                 For Each eFunc As ClientFunctionality In System.Enum.GetValues(GetType(ClientFunctionality))
                                     objFuncInfo = objCaps.Functionality(eFunc)
+									_logger.LogDebug("BrowserSupportsFunctionality(eFunctionality={EFunctionality}): objFuncInfo → {ObjFuncInfo}", eFunctionality, objFuncInfo)
                                     If Not objFuncInfo Is Nothing AndAlso objFuncInfo.HasMatch(strUserAgent, strBrowser, dblVersion) Then
                                         iBitValue += eFunc
                                     End If
@@ -417,43 +447,55 @@ Namespace DotNetNuke.UI.Utilities
                                 objCaps.FunctionalityDictionary(strUserAgent) = iBitValue
                             End If
                             blnSupports = (DirectCast(objCaps.FunctionalityDictionary(strUserAgent), Integer) And eFunctionality) <> 0
+							_logger.LogDebug("BrowserSupportsFunctionality(eFunctionality={EFunctionality}): blnSupports → {BlnSupports}", eFunctionality, blnSupports)
                         End If
                     End If
                 End If
                 Return blnSupports
             Catch
+				_logger.LogError("Exception in BrowserSupportsFunctionality(eFunctionality={EFunctionality}): {Arg1}", eFunctionality, ex.Message)
                 'bad user agent (CAP-7321)
             End Try
 
+			_logger.LogWarning("<<< Exiting BrowserSupportsFunctionality(eFunctionality={EFunctionality})", eFunctionality)
             Return False
 
         End Function
 
         Public Shared Function GetCallbackEventReference(ByVal objControl As Control, ByVal strArgument As String, ByVal strClientCallBack As String, ByVal strContext As String, ByVal srtClientErrorCallBack As String) As String
+			_logger.LogError(">>> Entering GetCallbackEventReference(objControl={ObjControl},strArgument={StrArgument},strClientCallBack={StrClientCallBack},strContext={StrContext},srtClientErrorCallBack={SrtClientErrorCallBack})", objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack)
+			_logger.LogError(">>> Entering GetCallbackEventReference(objControl={ObjControl},strArgument={StrArgument},strClientCallBack={StrClientCallBack},strContext={StrContext},srtClientErrorCallBack={SrtClientErrorCallBack},eCallbackType={ECallbackType})", objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, eCallbackType)
             Return GetCallbackEventReference(objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, Nothing, "")
         End Function
 
         Public Shared Function GetCallbackEventReference(ByVal objControl As Control, ByVal strArgument As String, ByVal strClientCallBack As String, ByVal strContext As String, ByVal srtClientErrorCallBack As String, ByVal eCallbackType As ClientAPICallBackResponse.CallBackTypeCode) As String
+			_logger.LogError(">>> Entering GetCallbackEventReference(objControl={ObjControl},strArgument={StrArgument},strClientCallBack={StrClientCallBack},strContext={StrContext},srtClientErrorCallBack={SrtClientErrorCallBack},objPostChildrenOf={ObjPostChildrenOf})", objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, objPostChildrenOf)
             Return GetCallbackEventReference(objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, Nothing, Nothing, eCallbackType)
         End Function
 
         Public Shared Function GetCallbackEventReference(ByVal objControl As Control, ByVal strArgument As String, ByVal strClientCallBack As String, ByVal strContext As String, ByVal srtClientErrorCallBack As String, ByVal objPostChildrenOf As Control) As String
+			_logger.LogError(">>> Entering GetCallbackEventReference(objControl={ObjControl},strArgument={StrArgument},strClientCallBack={StrClientCallBack},strContext={StrContext},srtClientErrorCallBack={SrtClientErrorCallBack},strClientStatusCallBack={StrClientStatusCallBack})", objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, strClientStatusCallBack)
             Return GetCallbackEventReference(objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, Nothing, objPostChildrenOf.ClientID, ClientAPICallBackResponse.CallBackTypeCode.Simple)
         End Function
 
         Public Shared Function GetCallbackEventReference(ByVal objControl As Control, ByVal strArgument As String, ByVal strClientCallBack As String, ByVal strContext As String, ByVal srtClientErrorCallBack As String, ByVal strClientStatusCallBack As String) As String
+			_logger.LogError(">>> Entering GetCallbackEventReference(objControl={ObjControl},strArgument={StrArgument},strClientCallBack={StrClientCallBack},strContext={StrContext},srtClientErrorCallBack={SrtClientErrorCallBack},strClientStatusCallBack={StrClientStatusCallBack},eCallbackType={ECallbackType})", objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, strClientStatusCallBack, eCallbackType)
             Return GetCallbackEventReference(objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, strClientStatusCallBack, Nothing, ClientAPICallBackResponse.CallBackTypeCode.Simple)
         End Function
 
         Public Shared Function GetCallbackEventReference(ByVal objControl As Control, ByVal strArgument As String, ByVal strClientCallBack As String, ByVal strContext As String, ByVal srtClientErrorCallBack As String, ByVal strClientStatusCallBack As String, ByVal eCallbackType As ClientAPICallBackResponse.CallBackTypeCode) As String
+			_logger.LogError(">>> Entering GetCallbackEventReference(objControl={ObjControl},strArgument={StrArgument},strClientCallBack={StrClientCallBack},strContext={StrContext},srtClientErrorCallBack={SrtClientErrorCallBack},strClientStatusCallBack={StrClientStatusCallBack},objPostChildrenOf={ObjPostChildrenOf})", objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, strClientStatusCallBack, objPostChildrenOf)
             Return GetCallbackEventReference(objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, strClientStatusCallBack, Nothing, eCallbackType)
         End Function
 
         Public Shared Function GetCallbackEventReference(ByVal objControl As Control, ByVal strArgument As String, ByVal strClientCallBack As String, ByVal strContext As String, ByVal srtClientErrorCallBack As String, ByVal strClientStatusCallBack As String, ByVal objPostChildrenOf As Control) As String
+			_logger.LogError(">>> Entering GetCallbackEventReference(objControl={ObjControl},strArgument={StrArgument},strClientCallBack={StrClientCallBack},strContext={StrContext},srtClientErrorCallBack={SrtClientErrorCallBack},strClientStatusCallBack={StrClientStatusCallBack},strPostChildrenOfId={StrPostChildrenOfId})", objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, strClientStatusCallBack, strPostChildrenOfId)
             Return GetCallbackEventReference(objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, strClientStatusCallBack, objPostChildrenOf.ClientID, ClientAPICallBackResponse.CallBackTypeCode.Simple)
         End Function
 
         Public Shared Function GetCallbackEventReference(ByVal objControl As Control, ByVal strArgument As String, ByVal strClientCallBack As String, ByVal strContext As String, ByVal srtClientErrorCallBack As String, ByVal strClientStatusCallBack As String, ByVal strPostChildrenOfId As String) As String
+			_logger.LogError(">>> Entering GetCallbackEventReference(objControl={ObjControl},strArgument={StrArgument},strClientCallBack={StrClientCallBack},strContext={StrContext},srtClientErrorCallBack={SrtClientErrorCallBack},strClientStatusCallBack={StrClientStatusCallBack},strPostChildrenOfId={StrPostChildrenOfId},eCallbackType={ECallbackType})", objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, strClientStatusCallBack, strPostChildrenOfId, eCallbackType)
+			_logger.LogError("GetCallbackEventReference(objControl={ObjControl},strArgument={StrArgument},strClientCallBack={StrClientCallBack},strContext={StrContext},srtClientErrorCallBack={SrtClientErrorCallBack},strClientStatusCallBack={StrClientStatusCallBack},strPostChildrenOfId={StrPostChildrenOfId},eCallbackType={ECallbackType}): strCallbackType → {StrCallbackType}", objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, strClientStatusCallBack, strPostChildrenOfId, eCallbackType, strCallbackType)
             Return GetCallbackEventReference(objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack, strClientStatusCallBack, strPostChildrenOfId, ClientAPICallBackResponse.CallBackTypeCode.Simple)
         End Function
         Public Shared Function GetCallbackEventReference(ByVal objControl As Control, ByVal strArgument As String, ByVal strClientCallBack As String, ByVal strContext As String, ByVal srtClientErrorCallBack As String, ByVal strClientStatusCallBack As String, ByVal strPostChildrenOfId As String, ByVal eCallbackType As ClientAPICallBackResponse.CallBackTypeCode) As String
@@ -485,6 +527,7 @@ Namespace DotNetNuke.UI.Utilities
                 Return ""
             End If
 
+		_logger.LogWarning("<<< Exiting GetCallbackEventReference(objControl={ObjControl},strArgument={StrArgument},strClientCallBack={StrClientCallBack},strContext={StrContext},srtClientErrorCallBack={SrtClientErrorCallBack})", objControl, strArgument, strClientCallBack, strContext, srtClientErrorCallBack)
         End Function
 
         ''' -----------------------------------------------------------------------------
@@ -501,12 +544,16 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Shared Function GetClientVariable(ByVal objPage As Page, ByVal strVar As String) As String
+			_logger.LogError(">>> Entering GetClientVariable(objPage={ObjPage},strVar={StrVar})", objPage, strVar)
+			_logger.LogError("GetClientVariable(objPage={ObjPage},strVar={StrVar}): strPair → {StrPair}", objPage, strVar, strPair)
             Dim strPair As String = GetClientVariableNameValuePair(objPage, strVar)
             If strPair.IndexOf(COLUMN_DELIMITER, StringComparison.Ordinal) > -1 Then
                 Return Split(strPair, COLUMN_DELIMITER)(1)
             Else
                 Return ""
             End If
+			_logger.LogError(">>> Entering GetClientVariable(objPage={ObjPage},strVar={StrVar},strDefaultValue={StrDefaultValue})", objPage, strVar, strDefaultValue)
+			_logger.LogError("GetClientVariable(objPage={ObjPage},strVar={StrVar},strDefaultValue={StrDefaultValue}): strPair → {StrPair}", objPage, strVar, strDefaultValue, strPair)
         End Function
 
         ''' -----------------------------------------------------------------------------
@@ -546,26 +593,46 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Shared Function GetSafeJSString(ByVal strString As String) As String
+			_logger.LogError(">>> Entering GetSafeJSString(strString={StrString})", strString)
             If String.IsNullOrEmpty(strString) Then
                 Return String.Empty
             End If
 
+			_logger.LogWarning("<<< Exiting GetSafeJSString(strString={StrString})", strString)
             Return HttpUtility.JavaScriptStringEncode(strString)
         End Function
 
         Public Shared Function IsInCallback(ByVal objPage As Page) As Boolean
+			_logger.LogError(">>> Entering IsInCallback(objPage={ObjPage})", objPage)
+			_logger.LogWarning("<<< Exiting IsInCallback(objPage={ObjPage})", objPage)
             Return Len(objPage.Request(SCRIPT_CALLBACKID)) > 0 AndAlso objPage.Request.HttpMethod.Equals("POST", StringComparison.OrdinalIgnoreCase)
         End Function
 
         Public Shared Sub HandleClientAPICallbackEvent(ByVal objPage As Page)
+			_logger.LogError(">>> Entering HandleClientAPICallbackEvent(objPage={ObjPage})", objPage)
             HandleClientAPICallbackEvent(objPage, GetCallbackType(objPage))
+			_logger.LogWarning("<<< Exiting HandleClientAPICallbackEvent(objPage={ObjPage})", objPage)
+			_logger.LogError(">>> Entering HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType})", objPage, eType)
+			_logger.LogError("HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType}): strClientID → {StrClientID}", objPage, eType, strClientID)
+			_logger.LogDebug("HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType}): strClientID → {StrClientID}", objPage, eType, strClientID)
+			_logger.LogError("HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType}): strParam → {StrParam}", objPage, eType, strParam)
+			_logger.LogError("HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType}): objResponse → {ObjResponse}", objPage, eType, objResponse)
+			_logger.LogDebug("HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType}): objControl → {ObjControl}", objPage, eType, objControl)
+			_logger.LogDebug("HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType}): objResponse.StatusCode → {Arg2}", objPage, eType, objResponse.StatusCode)
+			_logger.LogError("Exception in HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType}): {Arg2}", objPage, eType, ex.Message)
+			_logger.LogDebug("HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType}): objResponse.StatusDesc → {Arg2}", objPage, eType, objResponse.StatusDesc)
+			_logger.LogDebug("HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType}): objInterface → {ObjInterface}", objPage, eType, objInterface)
+			_logger.LogWarning("<<< Exiting HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType})", objPage, eType)
         End Sub
 
         Private Shared Function GetCallbackType(ByVal objPage As Page) As ClientAPICallBackResponse.CallBackTypeCode
+			_logger.LogError(">>> Entering GetCallbackType(objPage={ObjPage})", objPage)
             Dim eType As ClientAPICallBackResponse.CallBackTypeCode = ClientAPICallBackResponse.CallBackTypeCode.Simple
             If Len(objPage.Request(SCRIPT_CALLBACKTYPE)) > 0 Then
                 eType = CType(objPage.Request(SCRIPT_CALLBACKTYPE), ClientAPICallBackResponse.CallBackTypeCode)
+				_logger.LogDebug("GetCallbackType(objPage={ObjPage}): eType → {EType}", objPage, eType)
             End If
+			_logger.LogWarning("<<< Exiting GetCallbackType(objPage={ObjPage})", objPage)
             Return eType
         End Function
 
@@ -588,6 +655,7 @@ Namespace DotNetNuke.UI.Utilities
                         Try
                             objPage.Response.Clear()                      'clear response stream
                             If strControlID = SCRIPT_CALLBACKPAGEID Then
+								_logger.LogError("HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType}): strControlID → {StrControlID}", objPage, eType, strControlID)
                                 objControl = objPage
                             Else
                                 objControl = Globals.FindControlRecursive(objPage, strControlID, strClientID)
@@ -598,6 +666,7 @@ Namespace DotNetNuke.UI.Utilities
                                         objResponse.Response = ExecuteControlMethod(objControl, strParam)
                                         objResponse.StatusCode = ClientAPICallBackResponse.CallBackResponseStatusCode.OK
                                     Catch ex As Exception
+										_logger.LogError("Exception in HandleClientAPICallbackEvent(objPage={ObjPage},eType={EType}): {Arg2}", objPage, eType, ex.Message)
                                         objResponse.StatusCode = ClientAPICallBackResponse.CallBackResponseStatusCode.GenericFailure
                                         objResponse.StatusDesc = ex.Message
                                     End Try
@@ -640,14 +709,18 @@ Namespace DotNetNuke.UI.Utilities
         End Sub
 
         Private Shared Sub CallbackRenderMethod(ByVal output As System.Web.UI.HtmlTextWriter, ByVal container As System.Web.UI.Control)
+			_logger.LogError(">>> Entering CallbackRenderMethod(output={Output},container={Container})", output, container)
+			_logger.LogError("CallbackRenderMethod(output={Output},container={Container}): objPage → {ObjPage}", output, container, objPage)
             Dim objPage As Page = CType(container, Page)
             Dim eType As ClientAPICallBackResponse.CallBackTypeCode = GetCallbackType(objPage)
             If eType = ClientAPICallBackResponse.CallBackTypeCode.ProcessPage Then
                 eType = ClientAPICallBackResponse.CallBackTypeCode.Simple
+				_logger.LogError("CallbackRenderMethod(output={Output},container={Container}): eType → {EType}", output, container, eType)
             Else
                 eType = ClientAPICallBackResponse.CallBackTypeCode.CallbackMethod
             End If
             HandleClientAPICallbackEvent(objPage, eType)
+			_logger.LogWarning("<<< Exiting CallbackRenderMethod(output={Output},container={Container})", output, container)
         End Sub
 
         ''' -----------------------------------------------------------------------------
@@ -661,6 +734,8 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Shared Function NeedsDNNVariable(ByVal objParent As Control) As Boolean
+			_logger.LogError(">>> Entering NeedsDNNVariable(objParent={ObjParent})", objParent)
+			_logger.LogWarning("<<< Exiting NeedsDNNVariable(objParent={ObjParent})", objParent)
             Return GetDNNVariableControl(objParent) Is Nothing
         End Function
 
@@ -677,6 +752,8 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Shared Sub RegisterClientReference(ByVal objPage As Page, ByVal eRef As ClientNamespaceReferences)
+			_logger.LogError(">>> Entering RegisterClientReference(objPage={ObjPage},eRef={ERef})", objPage, eRef)
+			_logger.LogError("RegisterClientReference(objPage={ObjPage},eRef={ERef}): controller → {Controller}", objPage, eRef, controller)
             Dim controller As IClientResourceController = GetClientResourcesController(objPage)
             Select Case eRef
                 Case ClientNamespaceReferences.dnn
@@ -716,6 +793,7 @@ Namespace DotNetNuke.UI.Utilities
                     controller.CreateScript(ScriptPath & "dnn.motion.js").Register()
 
             End Select
+			_logger.LogWarning("<<< Exiting RegisterClientReference(objPage={ObjPage},eRef={ERef})", objPage, eRef)
         End Sub
 
         ''' -----------------------------------------------------------------------------
@@ -733,6 +811,7 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Shared Sub RegisterClientVariable(ByVal objPage As Page, ByVal strVar As String, ByVal strValue As String, ByVal blnOverwrite As Boolean)
+			_logger.LogError(">>> Entering RegisterClientVariable(objPage={ObjPage},strVar={StrVar},strValue={StrValue},blnOverwrite={BlnOverwrite})", objPage, strVar, strValue, blnOverwrite)
             'only add once
             Dim objDict As Generic.Dictionary(Of String, String) = GetClientVariableList(objPage)
             If objDict.ContainsKey(strVar) Then
@@ -756,15 +835,19 @@ Namespace DotNetNuke.UI.Utilities
             'if we are past prerender event then we need to keep serializing
             If Not HttpContext.Current.Items("CAPIPostPreRender") Is Nothing Then
                 SerializeClientVariableDictionary(objPage, objDict)
+				_logger.LogWarning("<<< Exiting RegisterClientVariable(objPage={ObjPage},strVar={StrVar},strValue={StrValue},blnOverwrite={BlnOverwrite})", objPage, strVar, strValue, blnOverwrite)
             End If
 
         End Sub
 
         Private Shared Sub CAPIPreRender(ByVal Sender As Object, ByVal Args As System.EventArgs)
+			_logger.LogError(">>> Entering CAPIPreRender(Sender={Sender},Args={Args})", Sender, Args)
+			_logger.LogError("CAPIPreRender(Sender={Sender},Args={Args}): ctl → {Ctl}", Sender, Args, ctl)
             Dim ctl As Control = CType(Sender, Control)
             Dim objDict As Generic.Dictionary(Of String, String) = GetClientVariableList(ctl.Page)
             SerializeClientVariableDictionary(ctl.Page, objDict)
             HttpContext.Current.Items("CAPIPostPreRender") = True
+			_logger.LogWarning("<<< Exiting CAPIPreRender(Sender={Sender},Args={Args})", Sender, Args)
         End Sub
 
 
@@ -780,22 +863,28 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Shared Function RegisterDNNVariableControl(ByVal objParent As System.Web.UI.Control) As HtmlInputHidden
+			_logger.LogError(">>> Entering RegisterDNNVariableControl(objParent={ObjParent})", objParent)
+			_logger.LogError("RegisterDNNVariableControl(objParent={ObjParent}): variableHiddenInput → {VariableHiddenInput}", objParent, variableHiddenInput)
             Dim variableHiddenInput As HtmlInputHidden = GetDNNVariableControl(objParent)
 
             If variableHiddenInput IsNot Nothing Then
                 Return variableHiddenInput
             Else
                 Dim oForm As Control = FindForm(objParent)
+				_logger.LogError("RegisterDNNVariableControl(objParent={ObjParent}): oForm → {OForm}", objParent, oForm)
                 If Not oForm Is Nothing Then
                     'objParent.Page.ClientScript.RegisterHiddenField(DNNVARIABLE_CONTROLID, "")
                     Dim nonNamingHiddenInput = New NonNamingHiddenInput() 'New System.Web.UI.HtmlControls.HtmlInputHidden
+					_logger.LogError("RegisterDNNVariableControl(objParent={ObjParent}): nonNamingHiddenInput → {NonNamingHiddenInput}", objParent, nonNamingHiddenInput)
                     nonNamingHiddenInput.ID = DNNVARIABLE_CONTROLID
+					_logger.LogDebug("RegisterDNNVariableControl(objParent={ObjParent}): nonNamingHiddenInput.ID → {Arg1}", objParent, nonNamingHiddenInput.ID)
                     'oForm.Controls.AddAt(0, ctlVar)
                     oForm.Controls.Add(nonNamingHiddenInput)
                     Return nonNamingHiddenInput
                 End If
             End If
 
+			_logger.LogWarning("<<< Exiting RegisterDNNVariableControl(objParent={ObjParent})", objParent)
             Return Nothing
         End Function
 
@@ -814,7 +903,11 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Shared Sub RegisterKeyCapture(ByVal objControl As Control, ByVal objPostbackControl As Control, ByVal intKeyAscii As Integer)
+			_logger.LogError(">>> Entering RegisterKeyCapture(objControl={ObjControl},objPostbackControl={ObjPostbackControl},intKeyAscii={IntKeyAscii})", objControl, objPostbackControl, intKeyAscii)
             Globals.SetAttribute(objControl, "onkeydown", GetKeyDownHandler(intKeyAscii, GetPostBackClientHyperlink(objPostbackControl, "")))
+			_logger.LogWarning("<<< Exiting RegisterKeyCapture(objControl={ObjControl},objPostbackControl={ObjPostbackControl},intKeyAscii={IntKeyAscii})", objControl, objPostbackControl, intKeyAscii)
+			_logger.LogError(">>> Entering RegisterKeyCapture(objControl={ObjControl},strJavascript={StrJavascript},intKeyAscii={IntKeyAscii})", objControl, strJavascript, intKeyAscii)
+			_logger.LogWarning("<<< Exiting RegisterKeyCapture(objControl={ObjControl},strJavascript={StrJavascript},intKeyAscii={IntKeyAscii})", objControl, strJavascript, intKeyAscii)
         End Sub
 
         ''' -----------------------------------------------------------------------------
@@ -849,16 +942,22 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Shared Sub RegisterPostBackEventHandler(ByVal objParent As Control, ByVal strEventName As String, ByVal objDelegate As ClientAPIPostBackControl.PostBackEvent, ByVal blnMultipleHandlers As Boolean)
+			_logger.LogError(">>> Entering RegisterPostBackEventHandler(objParent={ObjParent},strEventName={StrEventName},objDelegate={ObjDelegate},blnMultipleHandlers={BlnMultipleHandlers})", objParent, strEventName, objDelegate, blnMultipleHandlers)
+			_logger.LogError("RegisterPostBackEventHandler(objParent={ObjParent},strEventName={StrEventName},objDelegate={ObjDelegate},blnMultipleHandlers={BlnMultipleHandlers}): CLIENTAPI_POSTBACKCTL_ID → {CLIENTAPI_POSTBACKCTL_ID}", objParent, strEventName, objDelegate, blnMultipleHandlers, CLIENTAPI_POSTBACKCTL_ID)
             Const CLIENTAPI_POSTBACKCTL_ID As String = "ClientAPIPostBackCtl"
             Dim objCtl As ClientAPIPostBackControl = CType(Globals.FindControlRecursive(objParent.Page, CLIENTAPI_POSTBACKCTL_ID), ClientAPIPostBackControl)
             If objCtl Is Nothing Then
                 objCtl = New ClientAPIPostBackControl(objParent.Page, strEventName, objDelegate)
+				_logger.LogError("RegisterPostBackEventHandler(objParent={ObjParent},strEventName={StrEventName},objDelegate={ObjDelegate},blnMultipleHandlers={BlnMultipleHandlers}): objCtl → {ObjCtl}", objParent, strEventName, objDelegate, blnMultipleHandlers, objCtl)
+				_logger.LogDebug("RegisterPostBackEventHandler(objParent={ObjParent},strEventName={StrEventName},objDelegate={ObjDelegate},blnMultipleHandlers={BlnMultipleHandlers}): objCtl → {ObjCtl}", objParent, strEventName, objDelegate, blnMultipleHandlers, objCtl)
                 objCtl.ID = CLIENTAPI_POSTBACKCTL_ID
+				_logger.LogDebug("RegisterPostBackEventHandler(objParent={ObjParent},strEventName={StrEventName},objDelegate={ObjDelegate},blnMultipleHandlers={BlnMultipleHandlers}): objCtl.ID → {Arg4}", objParent, strEventName, objDelegate, blnMultipleHandlers, objCtl.ID)
                 objParent.Controls.Add(objCtl)
                 ClientAPI.RegisterClientVariable(objParent.Page, "__dnn_postBack", GetPostBackClientHyperlink(objCtl, "[DATA]"), True)
             ElseIf blnMultipleHandlers Then
                 objCtl.AddEventHandler(strEventName, objDelegate)
             End If
+			_logger.LogWarning("<<< Exiting RegisterPostBackEventHandler(objParent={ObjParent},strEventName={StrEventName},objDelegate={ObjDelegate},blnMultipleHandlers={BlnMultipleHandlers})", objParent, strEventName, objDelegate, blnMultipleHandlers)
         End Sub
 
         ''' -----------------------------------------------------------------------------
@@ -876,10 +975,12 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Shared Sub EnableClientSideReorder(ByVal objButton As Control, ByVal objPage As Page, ByVal blnUp As Boolean, ByVal strKey As String)
+			_logger.LogError(">>> Entering EnableClientSideReorder(objButton={ObjButton},objPage={ObjPage},blnUp={BlnUp},strKey={StrKey})", objButton, objPage, blnUp, strKey)
             If BrowserSupportsFunctionality(ClientFunctionality.DHTML) Then
 
                 RegisterClientReference(objPage, ClientNamespaceReferences.dnn_dom)
                 Dim controller As IClientResourceController = GetClientResourcesController(objPage)
+				_logger.LogError("EnableClientSideReorder(objButton={ObjButton},objPage={ObjPage},blnUp={BlnUp},strKey={StrKey}): controller → {Controller}", objButton, objPage, blnUp, strKey, controller)
                 controller.CreateScript(ScriptPath & "dnn.util.tablereorder.js").Register()
 
                 AddAttribute(objButton, "onclick", "if (dnn.util.tableReorderMove(this," & CInt(blnUp) & ",'" & strKey & "')) return false;")
@@ -889,7 +990,9 @@ Namespace DotNetNuke.UI.Utilities
                         AddAttribute(objParent, "origidx", "-1")                        'mark row as one that we care about, it will be numbered correctly on client
                     End If
                     objParent = objParent.Parent
+					_logger.LogDebug("EnableClientSideReorder(objButton={ObjButton},objPage={ObjPage},blnUp={BlnUp},strKey={StrKey}): objParent → {ObjParent}", objButton, objPage, blnUp, strKey, objParent)
                 End While
+				_logger.LogWarning("<<< Exiting EnableClientSideReorder(objButton={ObjButton},objPage={ObjPage},blnUp={BlnUp},strKey={StrKey})", objButton, objPage, blnUp, strKey)
             End If
 
         End Sub
@@ -907,14 +1010,17 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Shared Function GetClientSideReorder(ByVal strKey As String, ByVal objPage As Page) As String()
+			_logger.LogError(">>> Entering GetClientSideReorder(strKey={StrKey},objPage={ObjPage})", strKey, objPage)
             If Len(ClientAPI.GetClientVariable(objPage, strKey)) > 0 Then
                 Return ClientAPI.GetClientVariable(objPage, strKey).Split(","c)
             Else
                 Return Array.Empty(Of String)
             End If
+			_logger.LogWarning("<<< Exiting GetClientSideReorder(strKey={StrKey},objPage={ObjPage})", strKey, objPage)
         End Function
 
         Public Shared Function ClientAPIDisabled() As Boolean
+			_logger.LogError(">>> Entering ClientAPIDisabled()")
             'jon
             Return False
             If m_ClientAPIDisabled = String.Empty Then
@@ -924,22 +1030,32 @@ Namespace DotNetNuke.UI.Utilities
                     m_ClientAPIDisabled = System.Configuration.ConfigurationManager.AppSettings("ClientAPI")
                 End If
             End If
+			_logger.LogWarning("<<< Exiting ClientAPIDisabled()")
             Return m_ClientAPIDisabled = "0"
         End Function
 
         Public Shared Function GetPostBackClientEvent(ByVal objPage As Page, ByVal objControl As Control, ByVal arg As String) As String
+			_logger.LogError(">>> Entering GetPostBackClientEvent(objPage={ObjPage},objControl={ObjControl},arg={Arg})", objPage, objControl, arg)
+			_logger.LogWarning("<<< Exiting GetPostBackClientEvent(objPage={ObjPage},objControl={ObjControl},arg={Arg})", objPage, objControl, arg)
             Return objPage.ClientScript.GetPostBackEventReference(objControl, arg)
         End Function
         Public Shared Function GetPostBackClientHyperlink(ByVal objControl As Control, ByVal strArgument As String) As String
+			_logger.LogError(">>> Entering GetPostBackClientHyperlink(objControl={ObjControl},strArgument={StrArgument})", objControl, strArgument)
+			_logger.LogWarning("<<< Exiting GetPostBackClientHyperlink(objControl={ObjControl},strArgument={StrArgument})", objControl, strArgument)
             Return "javascript:" & GetPostBackEventReference(objControl, strArgument)
         End Function
         Public Shared Function GetPostBackEventReference(ByVal objControl As Control, ByVal strArgument As String) As String
+			_logger.LogError(">>> Entering GetPostBackEventReference(objControl={ObjControl},strArgument={StrArgument})", objControl, strArgument)
+			_logger.LogWarning("<<< Exiting GetPostBackEventReference(objControl={ObjControl},strArgument={StrArgument})", objControl, strArgument)
             Return objControl.Page.ClientScript.GetPostBackEventReference(objControl, strArgument)
         End Function
         Public Shared Function IsClientScriptBlockRegistered(ByVal objPage As Page, ByVal key As String) As Boolean
+			_logger.LogError(">>> Entering IsClientScriptBlockRegistered(objPage={ObjPage},key={Key})", objPage, key)
+			_logger.LogWarning("<<< Exiting IsClientScriptBlockRegistered(objPage={ObjPage},key={Key})", objPage, key)
             Return objPage.ClientScript.IsClientScriptBlockRegistered(objPage.GetType(), key)
         End Function
         Public Shared Sub RegisterClientScriptBlock(ByVal objPage As Page, ByVal key As String, ByVal strScript As String)
+			_logger.LogError(">>> Entering RegisterClientScriptBlock(objPage={ObjPage},key={Key},strScript={StrScript})", objPage, key, strScript)
             If Globals.IsEmbeddedScript(key) = False Then
                 'JON
                 'ScriptManager.RegisterClientScriptBlock(objPage, objPage.GetType(), key, strScript, False)
@@ -947,10 +1063,15 @@ Namespace DotNetNuke.UI.Utilities
             Else
                 RegisterClientScriptBlock(objPage, key)
             End If
+			_logger.LogWarning("<<< Exiting RegisterClientScriptBlock(objPage={ObjPage},key={Key},strScript={StrScript})", objPage, key, strScript)
+			_logger.LogError(">>> Entering RegisterClientScriptBlock(objPage={ObjPage},key={Key})", objPage, key)
+			_logger.LogWarning("<<< Exiting RegisterClientScriptBlock(objPage={ObjPage},key={Key})", objPage, key)
         End Sub
         Public Shared Sub RegisterStartUpScript(ByVal objPage As Page, ByVal key As String, ByVal script As String)
+			_logger.LogError(">>> Entering RegisterStartUpScript(objPage={ObjPage},key={Key},script={Script})", objPage, key, script)
             MSAJAX.RegisterStartupScript(objPage, key, script)
             'objPage.ClientScript.RegisterStartupScript(objPage.GetType(), key, script)
+			_logger.LogWarning("<<< Exiting RegisterStartUpScript(objPage={ObjPage},key={Key},script={Script})", objPage, key, script)
         End Sub
 
         Public Shared Sub RegisterClientScriptBlock(ByVal objPage As Page, ByVal key As String)
@@ -965,6 +1086,10 @@ Namespace DotNetNuke.UI.Utilities
         End Sub
 
         Public Shared Function RegisterControlMethods(ByVal CallbackControl As Control) As Boolean
+			_logger.LogError(">>> Entering RegisterControlMethods(CallbackControl={CallbackControl})", CallbackControl)
+			_logger.LogError(">>> Entering RegisterControlMethods(CallbackControl={CallbackControl},FriendlyID={FriendlyID})", CallbackControl, FriendlyID)
+			_logger.LogWarning("<<< Exiting RegisterControlMethods(CallbackControl={CallbackControl})", CallbackControl)
+			_logger.LogWarning("<<< Exiting RegisterControlMethods(CallbackControl={CallbackControl},FriendlyID={FriendlyID})", CallbackControl, FriendlyID)
             Return RegisterControlMethods(CallbackControl, String.Empty)
         End Function
 
@@ -1001,14 +1126,19 @@ Namespace DotNetNuke.UI.Utilities
         End Function
 
         Public Shared Function ExecuteControlMethod(ByVal CallbackControl As Control, ByVal callbackArgument As String) As String
+			_logger.LogError(">>> Entering ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument})", CallbackControl, callbackArgument)
             Dim result As Object = Nothing
             Dim controlType As Type = CallbackControl.GetType()
+			_logger.LogError("ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument}): controlType → {ControlType}", CallbackControl, callbackArgument, controlType)
+			_logger.LogError("ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument}): serializer → {Serializer}", CallbackControl, callbackArgument, serializer)
             'Dim serializer As JavaScriptSerializer = New JavaScriptSerializer()
             'Dim callInfo As Dictionary(Of String, Object) = TryCast(serializer.DeserializeObject(callbackArgument), Dictionary(Of String, Object))
             Dim callInfo As Dictionary(Of String, Object) = TryCast(MSAJAX.DeserializeObject(callbackArgument), Dictionary(Of String, Object))
             Dim methodName As String = CStr(callInfo.Item("method"))
+			_logger.LogError("ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument}): methodName → {MethodName}", CallbackControl, callbackArgument, methodName)
             Dim args As Dictionary(Of String, Object) = TryCast(callInfo.Item("args"), Dictionary(Of String, Object))
             Dim mi As MethodInfo = controlType.GetMethod(methodName, (BindingFlags.Public Or (BindingFlags.Static Or BindingFlags.Instance)))
+			_logger.LogError("ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument}): mi → {Mi}", CallbackControl, callbackArgument, mi)
 
             If (mi Is Nothing) Then
                 Throw New InvalidOperationException($"Class: {controlType.FullName} does not have the method: {methodName}")
@@ -1017,20 +1147,26 @@ Namespace DotNetNuke.UI.Utilities
 
             'only allow methods with attribute to be called 
             Dim methAttr As ControlMethodAttribute = DirectCast(Attribute.GetCustomAttribute(mi, GetType(ControlMethodAttribute)), ControlMethodAttribute)
+			_logger.LogError("ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument}): methAttr → {MethAttr}", CallbackControl, callbackArgument, methAttr)
             If methAttr Is Nothing OrElse args.Count <> methodParams.Length Then
                 Throw New InvalidOperationException($"Class: {controlType.FullName} does not have the method: {methodName}")
             End If
 
             Dim targetArgs As Object() = New Object(args.Count - 1) {}
+			_logger.LogError("ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument}): targetArgs → {TargetArgs}", CallbackControl, callbackArgument, targetArgs)
+			_logger.LogError("ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument}): ser → {Ser}", CallbackControl, callbackArgument, ser)
             'Dim ser As System.Web.Script.Serialization.JavaScriptSerializer = New System.Web.Script.Serialization.JavaScriptSerializer(New SimpleTypeResolver())
             Dim paramName As String
             Dim arg As Object
             Dim paramType As Type
             For i As Integer = 0 To methodParams.Length - 1
                 paramName = methodParams(i).Name
+				_logger.LogDebug("ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument}): paramName → {ParamName}", CallbackControl, callbackArgument, paramName)
                 paramType = methodParams(i).ParameterType
+				_logger.LogDebug("ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument}): paramType → {ParamType}", CallbackControl, callbackArgument, paramType)
                 If (args.ContainsKey(paramName)) Then
                     arg = args(paramName)
+					_logger.LogDebug("ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument}): arg → {Arg}", CallbackControl, callbackArgument, arg)
                     If paramType.IsGenericType() Then
                         If Not TryCast(arg, IList) Is Nothing Then
                             Dim genTypes() As Type = paramType.GetGenericArguments()
@@ -1045,34 +1181,44 @@ Namespace DotNetNuke.UI.Utilities
                     End If
                 End If
                 'Dim T As Type = methodParams(i).ParameterType
+				_logger.LogError("ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument}): T → {T}", CallbackControl, callbackArgument, T)
                 'targetArgs(i) = ser.ConvertToType(Of String)(args(i))
                 'targetArgs(i) = Convert.ChangeType(args(i), methodParams(i).ParameterType, CultureInfo.InvariantCulture)
 
                 'End If
             Next
             result = mi.Invoke(CallbackControl, targetArgs)
+			_logger.LogError("ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument}): result → {Result}", CallbackControl, callbackArgument, result)
 
             Dim resultInfo As Dictionary(Of String, Object) = New Dictionary(Of String, Object)
             resultInfo.Item("result") = result
             'Return serializer.Serialize(resultInfo)
+			_logger.LogWarning("<<< Exiting ExecuteControlMethod(CallbackControl={CallbackControl},callbackArgument={CallbackArgument})", CallbackControl, callbackArgument)
             Return MSAJAX.Serialize(resultInfo)
         End Function
 
         Public Shared Function GetListFromType(ByVal TheType As Type, ByVal TheList As IList) As IList
+			_logger.LogError(">>> Entering GetListFromType(TheType={TheType},TheList={TheList})", TheType, TheList)
+			_logger.LogError("GetListFromType(TheType={TheType},TheList={TheList}): listOf → {ListOf}", TheType, TheList, listOf)
+			_logger.LogError("GetListFromType(TheType={TheType},TheList={TheList}): argType → {ArgType}", TheType, TheList, argType)
             Dim listOf As Type = GetType(List(Of ))
             Dim argType As Type = listOf.MakeGenericType(TheType)
 
             Dim instance As IList = CType(Activator.CreateInstance(argType), IList)
+			_logger.LogError("GetListFromType(TheType={TheType},TheList={TheList}): instance → {Instance}", TheType, TheList, instance)
             For Each listitem As Dictionary(Of String, Object) In TheList
                 If Not listitem Is Nothing Then
                     instance.Add(ConvertDictionaryToObject(listitem, TheType))
                 End If
             Next
+			_logger.LogWarning("<<< Exiting GetListFromType(TheType={TheType},TheList={TheList})", TheType, TheList)
             Return instance
 
         End Function
 
         Public Shared Function ConvertDictionaryToObject(ByVal dict As Dictionary(Of String, Object), ByVal TheType As Type) As Object
+			_logger.LogError(">>> Entering ConvertDictionaryToObject(dict={Dict},TheType={TheType})", dict, TheType)
+			_logger.LogError("ConvertDictionaryToObject(dict={Dict},TheType={TheType}): item → {Item}", dict, TheType, item)
             Dim item As Object = Activator.CreateInstance(TheType)
             Dim pi As PropertyInfo
             For Each pair As KeyValuePair(Of String, Object) In dict
@@ -1081,6 +1227,7 @@ Namespace DotNetNuke.UI.Utilities
                     TheType.InvokeMember(pair.Key, BindingFlags.SetProperty, Nothing, item, New Object() {pair.Value}, CultureInfo.InvariantCulture)
                 End If
             Next
+			_logger.LogWarning("<<< Exiting ConvertDictionaryToObject(dict={Dict},TheType={TheType})", dict, TheType)
             Return item
         End Function
 
@@ -1099,22 +1246,31 @@ Namespace DotNetNuke.UI.Utilities
 
 
         Public Shared Sub RegisterEmbeddedResource(ByVal ThePage As Page, ByVal FileName As String, ByVal AssemblyType As Type)
+			_logger.LogError(">>> Entering RegisterEmbeddedResource(ThePage={ThePage},FileName={FileName},AssemblyType={AssemblyType})", ThePage, FileName, AssemblyType)
             RegisterClientVariable(ThePage, FileName & ".resx", ThePage.ClientScript.GetWebResourceUrl(AssemblyType, FileName), True)
+			_logger.LogWarning("<<< Exiting RegisterEmbeddedResource(ThePage={ThePage},FileName={FileName},AssemblyType={AssemblyType})", ThePage, FileName, AssemblyType)
         End Sub
 
 
 #End Region
 
         Friend Shared Function GetClientResourcesController(ByVal page As Page) As IClientResourceController
+			_logger.LogError(">>> Entering GetClientResourcesController(page={Page})", page)
+			_logger.LogError("GetClientResourcesController(page={Page}): serviceProvider → {ServiceProvider}", page, serviceProvider)
             Dim serviceProvider As IServiceProvider = GetCurrentServiceProvider(page.Request.RequestContext.HttpContext)
+			_logger.LogWarning("<<< Exiting GetClientResourcesController(page={Page})", page)
             Return serviceProvider.GetRequiredService(Of IClientResourceController)()
         End Function
 
         Friend Shared Function GetCurrentServiceProvider(ByVal context As HttpContextBase) As IServiceProvider
+			_logger.LogError(">>> Entering GetCurrentServiceProvider(context={Context})", context)
+			_logger.LogWarning("<<< Exiting GetCurrentServiceProvider(context={Context})", context)
             Return GetScope(context.Items).ServiceProvider
         End Function
 
         Friend Shared Function GetScope(ByVal httpContextItems As IDictionary) As IServiceScope
+			_logger.LogError(">>> Entering GetScope(httpContextItems={HttpContextItems})", httpContextItems)
+			_logger.LogWarning("<<< Exiting GetScope(httpContextItems={HttpContextItems})", httpContextItems)
             Return TryCast(httpContextItems(GetType(IServiceScope)), IServiceScope)
         End Function
 

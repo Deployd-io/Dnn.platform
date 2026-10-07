@@ -33,7 +33,11 @@ namespace DotNetNuke.Modules.Groups
         /// <param name="eventLogger">The event logger.</param>
         public View(INavigationManager navigationManager, IApplicationStatusInfo appStatus, IEventLogger eventLogger)
         {
+			eventLogger.LogError(">>> Entering View(navigationManager={NavigationManager},appStatus={AppStatus},eventLogger={EventLogger})", navigationManager, appStatus, eventLogger);
+			eventLogger.LogDebug("View(navigationManager={NavigationManager},appStatus={AppStatus},eventLogger={EventLogger}): appStatus → {AppStatus1}", navigationManager, appStatus, eventLogger, appStatus);
+			eventLogger.LogDebug("View(navigationManager={NavigationManager},appStatus={AppStatus},eventLogger={EventLogger}): eventLogger → {EventLogger1}", navigationManager, appStatus, eventLogger, eventLogger);
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
+			eventLogger.LogWarning("<<< Exiting View(navigationManager={NavigationManager},appStatus={AppStatus},eventLogger={EventLogger})", navigationManager, appStatus, eventLogger);
             this.appStatus = appStatus ?? this.DependencyProvider.GetRequiredService<IApplicationStatusInfo>();
             this.eventLogger = eventLogger ?? this.DependencyProvider.GetRequiredService<IEventLogger>();
         }
@@ -41,18 +45,23 @@ namespace DotNetNuke.Modules.Groups
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnInit(e={E})", e);
             this.InitializeComponent();
             base.OnInit(e);
+			eventLogger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         private void InitializeComponent()
         {
+			eventLogger.LogError(">>> Entering InitializeComponent()");
             this.Load += this.Page_Load;
+			eventLogger.LogWarning("<<< Exiting InitializeComponent()");
         }
 
         /// <summary>Page_Load runs when the control is loaded.</summary>
         private void Page_Load(object sender, EventArgs e)
         {
+			eventLogger.LogError(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
             try
             {
                 JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.PortalSettings, CommonJs.DnnPlugins);
@@ -65,14 +74,18 @@ namespace DotNetNuke.Modules.Groups
                 }
 
                 GroupsModuleBase ctl = (GroupsModuleBase)this.LoadControl(this.ControlPath);
+				eventLogger.LogError("Page_Load(sender={Sender},e={E}): ctl → {Ctl}", sender, e, ctl);
+				eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): ctl.ModuleConfiguration → {Arg2}", sender, e, ctl.ModuleConfiguration);
                 ctl.ModuleConfiguration = this.ModuleConfiguration;
                 this.plhContent.Controls.Clear();
                 this.plhContent.Controls.Add(ctl);
             }
             catch (Exception exc)
             {
+				eventLogger.LogError("Exception in Page_Load(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			eventLogger.LogWarning("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
         }
     }
 }

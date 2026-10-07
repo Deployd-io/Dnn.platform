@@ -21,19 +21,25 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static List<LinkItem> ListAll(string file)
         {
+			eventLogger.LogError(">>> Entering ListAll(file={File})", file);
             var anchorList = new List<LinkItem>();
 
+			eventLogger.LogError("ListAll(file={File}): anchorList → {AnchorList}", file, anchorList);
             MatchCollection m1 = Regex.Matches(file, @"(<a.*?>.*?</a>)", RegexOptions.IgnoreCase);
+			eventLogger.LogError("ListAll(file={File}): m1 → {M1}", file, m1);
 
             foreach (Match m in m1)
             {
                 string value = m.Groups[1].Value;
                 LinkItem item = new LinkItem();
+				eventLogger.LogError("ListAll(file={File}): item → {Item}", file, item);
 
                 Match m2 = Regex.Match(value, @"href=\""(.*?)\""", RegexOptions.Singleline);
 
                 if (m2.Success)
                 {
+					eventLogger.LogError("ListAll(file={File}): m2 → {M2}", file, m2);
+					eventLogger.LogDebug("ListAll(file={File}): item.Href → {Arg1}", file, item.Href);
                     item.Href = m2.Groups[1].Value;
                 }
 
@@ -41,6 +47,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
                 if (m3.Success)
                 {
+					eventLogger.LogError("ListAll(file={File}): m3 → {M3}", file, m3);
+					eventLogger.LogDebug("ListAll(file={File}): item.Anchor → {Arg1}", file, item.Anchor);
                     item.Anchor = m3.Groups[1].Value;
                 }
 
@@ -49,6 +57,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 anchorList.Add(item);
             }
 
+			eventLogger.LogWarning("<<< Exiting ListAll(file={File})", file);
             return anchorList;
         }
     }

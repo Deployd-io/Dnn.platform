@@ -8,6 +8,7 @@ namespace DotNetNuke.UI.WebControls
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class ListAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ListAttribute));
         private readonly string listName;
         private readonly string parentKey;
         private readonly ListBoundField textField;
@@ -20,8 +21,13 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="valueField">Value Field.</param>
         public ListAttribute(string listName, string parentKey, ListBoundField valueField, ListBoundField textField)
         {
+			Logger.LogError(">>> Entering ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField})", listName, parentKey, valueField, textField);
+			Logger.LogDebug("ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField}): textField → {TextField1}", listName, parentKey, valueField, textField, textField);
             this.listName = listName;
             this.parentKey = parentKey;
+			Logger.LogDebug("ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField}): this.listName → {Arg4}", listName, parentKey, valueField, textField, this.listName);
+			Logger.LogDebug("ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField}): this.parentKey → {Arg4}", listName, parentKey, valueField, textField, this.parentKey);
+        Logger.LogWarning("<<< Exiting ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField})", listName, parentKey, valueField, textField);
             this.textField = textField;
             this.valueField = valueField;
         }

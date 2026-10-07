@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21,25 +22,32 @@
   var Pos = CodeMirror.Pos;
 
   function getKeywords(editor) {
+	logger.error(`>>> Entering getKeywords(editor=${editor})`, { "event.action": "getKeywords", "logrite.editor": editor });
     var mode = editor.doc.modeOption;
     if (mode === "sql") mode = "text/x-sql";
+	logger.warn(`<<< Exiting getKeywords(editor=${editor})`, { "event.action": "getKeywords", "logrite.editor": editor });
     return CodeMirror.resolveMode(mode).keywords;
   }
 
   function getText(item) {
+	logger.error(`>>> Entering getText(item=${item})`, { "event.action": "getText", "logrite.item": item });
+	logger.warn(`<<< Exiting getText(item=${item})`, { "event.action": "getText", "logrite.item": item });
     return typeof item == "string" ? item : item.text;
   }
 
   function getItem(list, item) {
+	logger.error(`>>> Entering getItem(list=${list},item=${item})`, { "event.action": "getItem", "logrite.list": list, "logrite.item": item });
     if (!list.slice) return list[item];
     for (var i = list.length - 1; i >= 0; i--) if (getText(list[i]) == item)
       return list[i];
   }
 
   function shallowClone(object) {
+	logger.error(`>>> Entering shallowClone(object=${object})`, { "event.action": "shallowClone", "logrite.object": object });
     var result = {};
     for (var key in object) if (object.hasOwnProperty(key))
       result[key] = object[key];
+	logger.warn(`<<< Exiting shallowClone(object=${object})`, { "event.action": "shallowClone", "logrite.object": object });
     return result;
   }
 
@@ -50,15 +58,18 @@
   }
 
   function addMatches(result, search, wordlist, formatter) {
+	logger.error(`>>> Entering addMatches(result=${result},search=${search},wordlist=${wordlist},formatter=${formatter})`, { "event.action": "addMatches", "logrite.result": result, "logrite.search": search, "logrite.wordlist": wordlist, "logrite.formatter": formatter });
     for (var word in wordlist) {
       if (!wordlist.hasOwnProperty(word)) continue;
       if (wordlist.slice) word = wordlist[word];
 
       if (match(search, word)) result.push(formatter(word));
+	logger.warn(`<<< Exiting addMatches(result=${result},search=${search},wordlist=${wordlist},formatter=${formatter})`, { "event.action": "addMatches", "logrite.result": result, "logrite.search": search, "logrite.wordlist": wordlist, "logrite.formatter": formatter });
     }
   }
 
   function cleanName(name) {
+	logger.error(`>>> Entering cleanName(name=${name})`, { "event.action": "cleanName", "logrite.name": name });
     // Get rid name from backticks(`) and preceding dot(.)
     if (name.charAt(0) == ".") {
       name = name.substr(1);
@@ -67,13 +78,17 @@
   }
 
   function insertBackticks(name) {
+	logger.error(`>>> Entering insertBackticks(name=${name})`, { "event.action": "insertBackticks", "logrite.name": name });
     var nameParts = getText(name).split(".");
     for (var i = 0; i < nameParts.length; i++)
       nameParts[i] = "`" + nameParts[i] + "`";
     var escaped = nameParts.join(".");
+	logger.error(`insertBackticks(name=${name}): escaped → ${escaped}`, { "event.action": "insertBackticks", "logrite.name": name });
     if (typeof name == "string") return escaped;
     name = shallowClone(name);
     name.text = escaped;
+	logger.error(`insertBackticks(name=${name}): name → ${name}`, { "event.action": "insertBackticks", "logrite.name": name });
+	logger.warn(`<<< Exiting insertBackticks(name=${name})`, { "event.action": "insertBackticks", "logrite.name": name });
     return name;
   }
 

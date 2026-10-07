@@ -2,17 +2,24 @@ import React, {Component } from "react";
 import PropTypes from "prop-types";
 import styles from "./style.module.less";
 import resx from "../../../resources";
+const logger = console;
 
 class RightPane extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
     onEnter(key, value) {
+		logger.error(`>>> Entering onEnter(key=${key},value=${value})`, { "event.action": "onEnter", "logrite.key": key, "logrite.value": value });
         const {props} = this;
         props.onEnter(key, value, props.index);
+		logger.warn(`<<< Exiting onEnter(key=${key},value=${value})`, { "event.action": "onEnter", "logrite.key": key, "logrite.value": value });
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.taskStatusItemRightPane}>
                 <div className="taskDetailRight">

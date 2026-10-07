@@ -44,13 +44,18 @@ namespace DotNetNuke.Application
     [AttributeUsage(AttributeTargets.Assembly)]
     public class AssemblyStatusAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AssemblyStatusAttribute));
         private readonly ReleaseMode releaseMode;
 
         /// <summary>Initializes a new instance of the <see cref="AssemblyStatusAttribute" /> class.</summary>
         /// <param name="releaseMode">The release mode.</param>
         public AssemblyStatusAttribute(ReleaseMode releaseMode)
         {
+			Logger.LogError(">>> Entering AssemblyStatusAttribute(releaseMode={ReleaseMode})", releaseMode);
             this.releaseMode = releaseMode;
+			Logger.LogDebug("AssemblyStatusAttribute(releaseMode={ReleaseMode}): releaseMode → {ReleaseMode1}", releaseMode, releaseMode);
+        Logger.LogDebug("AssemblyStatusAttribute(releaseMode={ReleaseMode}): this.releaseMode → {Arg1}", releaseMode, this.releaseMode);
+        Logger.LogWarning("<<< Exiting AssemblyStatusAttribute(releaseMode={ReleaseMode})", releaseMode);
         }
 
         /// <summary>Gets status of current assembly.</summary>

@@ -16,6 +16,7 @@ namespace DotNetNuke.Web.Client.Providers
     [DnnDeprecated(10, 2, 0, "Bundling and minification is no longer supported, there is no replacement within DNN for this functionality.")]
     public partial class DnnCompositeFileProcessingProvider : CompositeFileProcessingProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnCompositeFileProcessingProvider));
         private readonly ClientResourceSettings clientResourceSettings = new ClientResourceSettings();
 
         private bool MinifyCss
@@ -39,19 +40,23 @@ namespace DotNetNuke.Web.Client.Providers
         /// <inheritdoc />
         public override string MinifyFile(Stream fileStream, ClientDependencyType type)
         {
+			Logger.LogError(">>> Entering MinifyFile(fileStream={FileStream},type={Type})", fileStream, type);
             Func<Stream, string> streamToString = stream =>
             {
                 if (!stream.CanRead)
                 {
+					Logger.LogError("Throwing InvalidOperationException from MinifyFile(fileStream={FileStream},type={Type})", fileStream, type);
                     throw new InvalidOperationException("Cannot read input stream");
                 }
 
                 if (stream.CanSeek)
                 {
                     stream.Position = 0;
+					Logger.LogDebug("MinifyFile(fileStream={FileStream},type={Type}): stream.Position → {Arg2}", fileStream, type, stream.Position);
                 }
 
                 var reader = new StreamReader(stream);
+				Logger.LogError("MinifyFile(fileStream={FileStream},type={Type}): reader → {Reader}", fileStream, type, reader);
                 return reader.ReadToEnd();
             };
 
@@ -62,6 +67,8 @@ namespace DotNetNuke.Web.Client.Providers
                 case ClientDependencyType.Javascript:
                     return this.MinifyJs ? JSMin.CompressJS(fileStream) : streamToString(fileStream);
                 default:
+					Logger.LogWarning("<<< Exiting MinifyFile(fileStream={FileStream},type={Type})", fileStream, type);
+			Logger.LogWarning("<<< Exiting MinifyFile(fileContents={FileContents},type={Type})", fileContents, type);
                     return streamToString(fileStream);
             }
         }

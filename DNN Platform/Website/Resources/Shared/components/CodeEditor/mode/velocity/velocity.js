@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -13,8 +14,11 @@
 
 CodeMirror.defineMode("velocity", function() {
     function parseWords(str) {
+		logger.error(`>>> Entering parseWords(str=${str})`, { "event.action": "parseWords", "logrite.str": str });
         var obj = {}, words = str.split(" ");
         for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+		logger.error(`parseWords(str=${str}): obj → ${obj}`, { "event.action": "parseWords", "logrite.str": str });
+		logger.warn(`<<< Exiting parseWords(str=${str})`, { "event.action": "parseWords", "logrite.str": str });
         return obj;
     }
 
@@ -26,16 +30,22 @@ CodeMirror.defineMode("velocity", function() {
     var isOperatorChar = /[+\-*&%=<>!?:\/|]/;
 
     function chain(stream, state, f) {
+		logger.error(`>>> Entering chain(stream=${stream},state=${state},f=${f})`, { "event.action": "chain", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
         state.tokenize = f;
+		logger.warn(`<<< Exiting chain(stream=${stream},state=${state},f=${f})`, { "event.action": "chain", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
         return f(stream, state);
     }
     function tokenBase(stream, state) {
+		logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         var beforeParams = state.beforeParams;
         state.beforeParams = false;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.beforeParams → ${state.beforeParams}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         var ch = stream.next();
+		logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         // start of unparsed string?
         if ((ch == "'") && state.inParams) {
             state.lastTokenWasBuiltin = false;
+			logger.debug(`tokenBase(stream=${stream},state=${state}): state.lastTokenWasBuiltin → ${state.lastTokenWasBuiltin}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
             return chain(stream, state, tokenString(ch));
         }
         // start of parsed string?
@@ -43,6 +53,7 @@ CodeMirror.defineMode("velocity", function() {
             state.lastTokenWasBuiltin = false;
             if (state.inString) {
                 state.inString = false;
+				logger.debug(`tokenBase(stream=${stream},state=${state}): state.inString → ${state.inString}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
                 return "string";
             }
             else if (state.inParams)
@@ -54,6 +65,7 @@ CodeMirror.defineMode("velocity", function() {
                 state.inParams = true;
             else if (ch == ")") {
                 state.inParams = false;
+				logger.debug(`tokenBase(stream=${stream},state=${state}): state.inParams → ${state.inParams}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
                 state.lastTokenWasBuiltin = true;
             }
             return null;
@@ -122,11 +134,13 @@ CodeMirror.defineMode("velocity", function() {
                 return "builtin";
             // default: just a "word"
             state.lastTokenWasBuiltin = false;
+			logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
             return null;
         }
     }
 
     function tokenString(quote) {
+		logger.error(`>>> Entering tokenString(quote=${quote})`, { "event.action": "tokenString", "logrite.quote": quote });
         return function(stream, state) {
             var escaped = false, next, end = false;
             while ((next = stream.next()) != null) {
@@ -147,22 +161,27 @@ CodeMirror.defineMode("velocity", function() {
     }
 
     function tokenComment(stream, state) {
+		logger.error(`>>> Entering tokenComment(stream=${stream},state=${state})`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
         var maybeEnd = false, ch;
         while (ch = stream.next()) {
             if (ch == "#" && maybeEnd) {
                 state.tokenize = tokenBase;
+				logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
                 break;
             }
             maybeEnd = (ch == "*");
         }
+		logger.error(`tokenComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
         return "comment";
     }
 
     function tokenUnparsed(stream, state) {
+		logger.error(`>>> Entering tokenUnparsed(stream=${stream},state=${state})`, { "event.action": "tokenUnparsed", "logrite.stream": stream, "logrite.state": state });
         var maybeEnd = 0, ch;
         while (ch = stream.next()) {
             if (ch == "#" && maybeEnd == 2) {
                 state.tokenize = tokenBase;
+				logger.debug(`tokenUnparsed(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenUnparsed", "logrite.stream": stream, "logrite.state": state });
                 break;
             }
             if (ch == "]")
@@ -170,12 +189,14 @@ CodeMirror.defineMode("velocity", function() {
             else if (ch != " ")
                 maybeEnd = 0;
         }
+		logger.warn(`<<< Exiting tokenUnparsed(stream=${stream},state=${state})`, { "event.action": "tokenUnparsed", "logrite.stream": stream, "logrite.state": state });
         return "meta";
     }
     // Interface
 
     return {
         startState: function() {
+			logger.error('>>> Entering startState()', { "event.action": "startState" });
             return {
                 tokenize: tokenBase,
                 beforeParams: false,
@@ -183,10 +204,13 @@ CodeMirror.defineMode("velocity", function() {
                 inString: false,
                 lastTokenWasBuiltin: false
             };
+			logger.warn('<<< Exiting startState()', { "event.action": "startState" });
         },
 
         token: function(stream, state) {
+			logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
             if (stream.eatSpace()) return null;
+			logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
             return state.tokenize(stream, state);
         },
         blockCommentStart: "#*",

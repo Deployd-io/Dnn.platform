@@ -6,9 +6,11 @@ import JavascriptLibrary from "./JavascriptLibrary";
 import ExtensionLanguagePack from "./ExtensionLanguagePack";
 import CoreLanguagePack from "./CoreLanguagePack";
 import SkinObject from "./SkinObject";
+const logger = console;
 
 class CustomSettings extends Component {
     getExtensionSetting(props) {
+		logger.error(`>>> Entering getExtensionSetting(props=${props})`, { "event.action": "getExtensionSetting", "logrite.props": props });
         switch (props.type) {
             case "Auth_System":
                 return !props.isAddMode && <EditAuthenticationSystem {...props} className={props.isAddMode ? "add-mode": ""} />;
@@ -26,6 +28,7 @@ class CustomSettings extends Component {
             case "Module":
                 return <Module {...props} className={props.isAddMode ? "add-mode": ""} />;
             default:
+				logger.warn(`<<< Exiting getExtensionSetting(props=${props})`, { "event.action": "getExtensionSetting", "logrite.props": props });
                 return <div></div>;
         }
     }

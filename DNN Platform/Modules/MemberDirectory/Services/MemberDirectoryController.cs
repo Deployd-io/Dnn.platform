@@ -42,22 +42,30 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         public MemberDirectoryController()
             : this(null, null)
         {
+		Logger.LogError(">>> Entering MemberDirectoryController()");
+        Logger.LogWarning("<<< Exiting MemberDirectoryController()");
         }
 
         [HttpGet]
         public HttpResponseMessage AdvancedSearch(int userId, int groupId, int pageIndex, int pageSize, string searchTerm1, string searchTerm2, string searchTerm3, string searchTerm4)
         {
+			Logger.LogError(">>> Entering AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4})", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4);
             try
             {
                 if (userId < 0)
                 {
                     userId = this.PortalSettings.UserId;
+					Logger.LogError("AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4}): userId → {UserId1}", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4, userId);
                 }
 
                 var searchField1 = GetSetting(this.ActiveModule.TabModuleSettings, "SearchField1", "DisplayName");
+				Logger.LogError("AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4}): searchField1 → {SearchField1}", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4, searchField1);
                 var searchField2 = GetSetting(this.ActiveModule.TabModuleSettings, "SearchField2", "Email");
+				Logger.LogError("AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4}): searchField2 → {SearchField2}", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4, searchField2);
                 var searchField3 = GetSetting(this.ActiveModule.TabModuleSettings, "SearchField3", "City");
+				Logger.LogError("AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4}): searchField3 → {SearchField3}", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4, searchField3);
                 var searchField4 = GetSetting(this.ActiveModule.TabModuleSettings, "SearchField4", "Country");
+				Logger.LogError("AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4}): searchField4 → {SearchField4}", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4, searchField4);
 
                 var propertyNames = string.Empty;
                 var propertyValues = string.Empty;
@@ -67,11 +75,13 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
                 AddSearchTerm(this.listController, ref propertyNames, ref propertyValues, searchField4, searchTerm4);
 
                 var members = this.GetUsers(userId, groupId, searchTerm1, pageIndex, pageSize, propertyNames, propertyValues);
+				Logger.LogError("AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4}): members → {Members}", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4, members);
                 return this.Request.CreateResponse(HttpStatusCode.OK, this.GetMembers(members));
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4})", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -79,14 +89,17 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [HttpGet]
         public HttpResponseMessage BasicSearch(int groupId, string searchTerm, int pageIndex, int pageSize)
         {
+			Logger.LogError(">>> Entering BasicSearch(groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize})", groupId, searchTerm, pageIndex, pageSize);
             try
             {
                 var users = this.GetUsers(-1, groupId, string.IsNullOrEmpty(searchTerm) ? string.Empty : searchTerm.Trim(), pageIndex, pageSize, string.Empty, string.Empty);
+				Logger.LogError("BasicSearch(groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize}): users → {Users}", groupId, searchTerm, pageIndex, pageSize, users);
                 return this.Request.CreateResponse(HttpStatusCode.OK, this.GetMembers(users));
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting BasicSearch(groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize})", groupId, searchTerm, pageIndex, pageSize);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -94,10 +107,13 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [HttpGet]
         public HttpResponseMessage GetMember(int userId)
         {
+			Logger.LogError(">>> Entering GetMember(userId={UserId})", userId);
             try
             {
                 var users = new List<UserInfo>();
+				Logger.LogError("GetMember(userId={UserId}): users → {Users}", userId, users);
                 var user = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, userId);
+				Logger.LogError("GetMember(userId={UserId}): user → {User}", userId, user);
                 users.Add(user);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, this.GetMembers(users));
@@ -105,6 +121,7 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetMember(userId={UserId})", userId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -112,6 +129,7 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [HttpGet]
         public HttpResponseMessage GetSuggestions(int groupId, string displayName)
         {
+			Logger.LogError(">>> Entering GetSuggestions(groupId={GroupId},displayName={DisplayName})", groupId, displayName);
             try
             {
                 var names = (from UserInfo user in this.GetUsers(-1, groupId, displayName.Trim(), 0, 10, string.Empty, string.Empty)
@@ -123,6 +141,7 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetSuggestions(groupId={GroupId},displayName={DisplayName})", groupId, displayName);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -131,15 +150,18 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage AcceptFriend(FriendDTO postData)
         {
+			Logger.LogError(">>> Entering AcceptFriend(postData={PostData})", postData);
             try
             {
                 var friend = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, postData.FriendId);
+				Logger.LogError("AcceptFriend(postData={PostData}): friend → {Friend}", postData, friend);
                 FriendsController.Instance.AcceptFriend(friend);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting AcceptFriend(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -148,15 +170,18 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage AddFriend(FriendDTO postData)
         {
+			Logger.LogError(">>> Entering AddFriend(postData={PostData})", postData);
             try
             {
                 var friend = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, postData.FriendId);
+				Logger.LogError("AddFriend(postData={PostData}): friend → {Friend}", postData, friend);
                 FriendsController.Instance.AddFriend(friend);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting AddFriend(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -165,15 +190,18 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Follow(FollowDTO postData)
         {
+			Logger.LogError(">>> Entering Follow(postData={PostData})", postData);
             try
             {
                 var follow = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, postData.FollowId);
+				Logger.LogError("Follow(postData={PostData}): follow → {Follow}", postData, follow);
                 FollowersController.Instance.FollowUser(follow);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting Follow(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -182,15 +210,18 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage RemoveFriend(FriendDTO postData)
         {
+			Logger.LogError(">>> Entering RemoveFriend(postData={PostData})", postData);
             try
             {
                 var friend = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, postData.FriendId);
+				Logger.LogError("RemoveFriend(postData={PostData}): friend → {Friend}", postData, friend);
                 FriendsController.Instance.DeleteFriend(friend);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting RemoveFriend(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -199,21 +230,25 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UnFollow(FollowDTO postData)
         {
+			Logger.LogError(">>> Entering UnFollow(postData={PostData})", postData);
             try
             {
                 var follow = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, postData.FollowId);
+				Logger.LogError("UnFollow(postData={PostData}): follow → {Follow}", postData, follow);
                 FollowersController.Instance.UnFollowUser(follow);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting UnFollow(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
 
         private static void AddSearchTerm(ListController listController, ref string propertyNames, ref string propertyValues, string name, string value)
         {
+			Logger.LogError(">>> Entering AddSearchTerm(listController={ListController},propertyNames={PropertyNames},propertyValues={PropertyValues},name={Name},value={Value})", listController, propertyNames, propertyValues, name, value);
             if (!string.IsNullOrEmpty(value))
             {
                 propertyNames += name + ",";
@@ -222,37 +257,46 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
                     name.Equals("Region", StringComparison.InvariantCultureIgnoreCase))
                 {
                     value = GetMatchedListEntryIds(listController, name, value);
+					Logger.LogError("AddSearchTerm(listController={ListController},propertyNames={PropertyNames},propertyValues={PropertyValues},name={Name},value={Value}): value → {Value1}", listController, propertyNames, propertyValues, name, value, value);
                 }
 
                 propertyValues += value + ",";
             }
+			Logger.LogWarning("<<< Exiting AddSearchTerm(listController={ListController},propertyNames={PropertyNames},propertyValues={PropertyValues},name={Name},value={Value})", listController, propertyNames, propertyValues, name, value);
         }
 
         private static string GetMatchedListEntryIds(ListController listController, string name, string value)
         {
+			Logger.LogError(">>> Entering GetMatchedListEntryIds(listController={ListController},name={Name},value={Value})", listController, name, value);
             var listEntries = listController.GetListEntryInfoItems(name)
                 .Where(i => i.Text.StartsWith(value, StringComparison.InvariantCultureIgnoreCase)
                             || i.TextNonLocalized.StartsWith(value, StringComparison.InvariantCultureIgnoreCase)
                             || i.Value.StartsWith(value, StringComparison.InvariantCultureIgnoreCase))
                 .Select(i => i.EntryID);
 
+			Logger.LogWarning("<<< Exiting GetMatchedListEntryIds(listController={ListController},name={Name},value={Value})", listController, name, value);
             return $"${string.Join("$", listEntries)}$";
         }
 
         private static string GetSetting(IDictionary settings, string key, string defaultValue)
         {
+			Logger.LogError(">>> Entering GetSetting(settings={Settings},key={Key},defaultValue={DefaultValue})", settings, key, defaultValue);
             var setting = defaultValue;
+			Logger.LogError("GetSetting(settings={Settings},key={Key},defaultValue={DefaultValue}): setting → {Setting}", settings, key, defaultValue, setting);
             if (settings[key] != null)
             {
                 setting = Convert.ToString(settings[key]);
             }
 
+			Logger.LogWarning("<<< Exiting GetSetting(settings={Settings},key={Key},defaultValue={DefaultValue})", settings, key, defaultValue);
             return setting;
         }
 
         private bool CanViewGroupMembers(int portalId, int groupId)
         {
+			Logger.LogError(">>> Entering CanViewGroupMembers(portalId={PortalId},groupId={GroupId})", portalId, groupId);
             var group = RoleController.Instance.GetRole(portalId, r => r.RoleID == groupId);
+			Logger.LogError("CanViewGroupMembers(portalId={PortalId},groupId={GroupId}): group → {Group}", portalId, groupId, group);
             if (group == null)
             {
                 return false;
@@ -266,23 +310,31 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
             if (!canView)
             {
                 canView = ModulePermissionController.CanViewModule(this.ActiveModule) && group.IsPublic;
+				Logger.LogError("CanViewGroupMembers(portalId={PortalId},groupId={GroupId}): canView → {CanView}", portalId, groupId, canView);
             }
 
+			Logger.LogWarning("<<< Exiting CanViewGroupMembers(portalId={PortalId},groupId={GroupId})", portalId, groupId);
             return canView;
         }
 
         private IList<Member> GetMembers(IEnumerable<UserInfo> users)
         {
+			Logger.LogError(">>> Entering GetMembers(users={Users})", users);
+			Logger.LogWarning("<<< Exiting GetMembers(users={Users})", users);
             return users.Select(user => new Member(user, this.PortalSettings)).ToList();
         }
 
         private IEnumerable<UserInfo> GetUsers(int userId, int groupId, string searchTerm, int pageIndex, int pageSize, string propertyNames, string propertyValues)
         {
+			Logger.LogError(">>> Entering GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues})", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues);
             var portalId = this.PortalSettings.PortalId;
             var isAdmin = this.PortalSettings.UserInfo.IsInRole(this.PortalSettings.AdministratorRoleName);
+			Logger.LogError("GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues}): isAdmin → {IsAdmin}", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues, isAdmin);
 
             var filterBy = GetSetting(this.ActiveModule.ModuleSettings, "FilterBy", string.Empty);
+			Logger.LogError("GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues}): filterBy → {FilterBy}", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues, filterBy);
             var filterValue = GetSetting(this.ActiveModule.ModuleSettings, "FilterValue", string.Empty);
+			Logger.LogError("GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues}): filterValue → {FilterValue}", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues, filterValue);
 
             if (filterBy == "Group" && filterValue == "-1" && groupId > 0)
             {
@@ -290,6 +342,7 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
             }
 
             var sortField = GetSetting(this.ActiveModule.TabModuleSettings, "SortField", "DisplayName");
+			Logger.LogError("GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues}): sortField → {SortField}", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues, sortField);
 
             // QuickFix DNN-6096. See: https://dnntracker.atlassian.net/browse/DNN-6096
             // Instead of changing the available SortFields, we'll use "UserId" as SortField if the TabModuleSetting SortField was CreatedOnDate.
@@ -301,9 +354,12 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
             }
 
             var sortOrder = GetSetting(this.ActiveModule.TabModuleSettings, "SortOrder", "ASC");
+			Logger.LogError("GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues}): sortOrder → {SortOrder}", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues, sortOrder);
 
             var excludeHostUsers = bool.Parse(GetSetting(this.ActiveModule.TabModuleSettings, "ExcludeHostUsers", "false"));
+			Logger.LogError("GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues}): excludeHostUsers → {ExcludeHostUsers}", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues, excludeHostUsers);
             var isBasicSearch = false;
+			Logger.LogError("GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues}): isBasicSearch → {IsBasicSearch}", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues, isBasicSearch);
             if (string.IsNullOrEmpty(propertyNames))
             {
                 isBasicSearch = true;
@@ -315,11 +371,14 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
             {
                 case "User":
                     users = new List<UserInfo> { UserController.GetUserById(this.hostSettings, portalId, userId) };
+					Logger.LogError("GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues}): users → {Users}", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues, users);
+					Logger.LogDebug("GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues}): users → {Users}", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues, users);
                     break;
                 case "Group":
                     if (groupId == -1)
                     {
                         groupId = int.Parse(filterValue);
+						Logger.LogError("GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues}): groupId → {GroupId1}", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues, groupId);
                     }
 
                     if (this.CanViewGroupMembers(portalId, groupId))
@@ -361,6 +420,7 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
                     break;
                 case "ProfileProperty":
                     var propertyValue = GetSetting(this.ActiveModule.ModuleSettings, "FilterPropertyValue", string.Empty);
+					Logger.LogError("GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues}): propertyValue → {PropertyValue}", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues, propertyValue);
                     AddSearchTerm(this.listController, ref propertyNames, ref propertyValues, filterValue, propertyValue);
 
                     users = UserController.Instance.GetUsersAdvancedSearch(
@@ -408,11 +468,14 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
                 return this.FilterExcludedUsers(users);
             }
 
+			Logger.LogWarning("<<< Exiting GetUsers(userId={UserId},groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},propertyNames={PropertyNames},propertyValues={PropertyValues})", userId, groupId, searchTerm, pageIndex, pageSize, propertyNames, propertyValues);
             return users;
         }
 
         private IEnumerable<UserInfo> FilterExcludedUsers(IEnumerable<UserInfo> users)
         {
+			Logger.LogError(">>> Entering FilterExcludedUsers(users={Users})", users);
+			Logger.LogWarning("<<< Exiting FilterExcludedUsers(users={Users})", users);
             return users.Where(u => !u.IsSuperUser).Select(u => u).ToList();
         }
 

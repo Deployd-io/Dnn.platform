@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -42,6 +43,7 @@
      * Tokenizers
      */
     function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       firstWordMatch = stream.string.match(/(^[\w-]+\s*=\s*$)|(^\s*[\w-]+\s*=\s*[\w-])|(^\s*(\.|#|@|\$|\&|\[|\d|\+|::?|\{|\>|~|\/)?\s*[\w-]*([a-z0-9-]|\*|\/\*)(\(|,)?)/);
       state.context.line.firstWord = firstWordMatch ? firstWordMatch[0].replace(/^\s*/, "") : "";
       state.context.line.indent = stream.indentation();
@@ -55,6 +57,7 @@
       // Block comment
       if (stream.match("/*")) {
         state.tokenize = tokenCComment;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         return tokenCComment(stream, state);
       }
       // String
@@ -152,6 +155,7 @@
       }
       // Non-detected items
       stream.next();
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return [null, null];
     }
 
@@ -159,14 +163,17 @@
      * Token comment
      */
     function tokenCComment(stream, state) {
+	logger.error(`>>> Entering tokenCComment(stream=${stream},state=${state})`, { "event.action": "tokenCComment", "logrite.stream": stream, "logrite.state": state });
       var maybeEnd = false, ch;
       while ((ch = stream.next()) != null) {
         if (maybeEnd && ch == "/") {
           state.tokenize = null;
+		logger.debug(`tokenCComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenCComment", "logrite.stream": stream, "logrite.state": state });
           break;
         }
         maybeEnd = (ch == "*");
       }
+	logger.error(`tokenCComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "tokenCComment", "logrite.stream": stream, "logrite.state": state });
       return ["comment", "comment"];
     }
 
@@ -174,6 +181,7 @@
      * Token string
      */
     function tokenString(quote) {
+	logger.error(`>>> Entering tokenString(quote=${quote})`, { "event.action": "tokenString", "logrite.quote": quote });
       return function(stream, state) {
         var escaped = false, ch;
         while ((ch = stream.next()) != null) {
@@ -192,6 +200,7 @@
      * Token parenthesized
      */
     function tokenParenthesized(stream, state) {
+	logger.error(`>>> Entering tokenParenthesized(stream=${stream},state=${state})`, { "event.action": "tokenParenthesized", "logrite.stream": stream, "logrite.state": state });
       stream.next(); // Must be "("
       if (!stream.match(/\s*[\"\')]/, false))
         state.tokenize = tokenString(")");
@@ -204,33 +213,46 @@
      * Context management
      */
     function Context(type, indent, prev, line) {
+	logger.error(`>>> Entering Context(type=${type},indent=${indent},prev=${prev},line=${line})`, { "event.action": "Context", "logrite.type": type, "logrite.indent": indent, "logrite.prev": prev, "logrite.line": line });
       this.type = type;
       this.indent = indent;
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev},line=${line}): type → ${type}`, { "event.action": "Context", "logrite.type": type, "logrite.indent": indent, "logrite.prev": prev, "logrite.line": line });
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev},line=${line}): this.type → ${this.type}`, { "event.action": "Context", "logrite.type": type, "logrite.indent": indent, "logrite.prev": prev, "logrite.line": line });
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev},line=${line}): this.indent → ${this.indent}`, { "event.action": "Context", "logrite.type": type, "logrite.indent": indent, "logrite.prev": prev, "logrite.line": line });
       this.prev = prev;
       this.line = line || {firstWord: "", indent: 0};
     }
 
     function pushContext(state, stream, type, indent) {
+	logger.error(`>>> Entering pushContext(state=${state},stream=${stream},type=${type},indent=${indent})`, { "event.action": "pushContext", "logrite.state": state, "logrite.stream": stream, "logrite.type": type, "logrite.indent": indent });
       indent = indent >= 0 ? indent : indentUnit;
       state.context = new Context(type, stream.indentation() + indent, state.context);
+	logger.warn(`<<< Exiting pushContext(state=${state},stream=${stream},type=${type},indent=${indent})`, { "event.action": "pushContext", "logrite.state": state, "logrite.stream": stream, "logrite.type": type, "logrite.indent": indent });
       return type;
     }
 
     function popContext(state, currentIndent) {
+	logger.error(`>>> Entering popContext(state=${state},currentIndent=${currentIndent})`, { "event.action": "popContext", "logrite.state": state, "logrite.currentIndent": currentIndent });
       var contextIndent = state.context.indent - indentUnit;
       currentIndent = currentIndent || false;
       state.context = state.context.prev;
+	logger.debug(`popContext(state=${state},currentIndent=${currentIndent}): state.context → ${state.context}`, { "event.action": "popContext", "logrite.state": state, "logrite.currentIndent": currentIndent });
       if (currentIndent) state.context.indent = contextIndent;
+	logger.warn(`<<< Exiting popContext(state=${state},currentIndent=${currentIndent})`, { "event.action": "popContext", "logrite.state": state, "logrite.currentIndent": currentIndent });
       return state.context.type;
     }
 
     function pass(type, stream, state) {
+	logger.error(`>>> Entering pass(type=${type},stream=${stream},state=${state})`, { "event.action": "pass", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
+	logger.warn(`<<< Exiting pass(type=${type},stream=${stream},state=${state})`, { "event.action": "pass", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
       return states[state.context.type](type, stream, state);
     }
 
     function popAndPass(type, stream, state, n) {
+	logger.error(`>>> Entering popAndPass(type=${type},stream=${stream},state=${state},n=${n})`, { "event.action": "popAndPass", "logrite.type": type, "logrite.stream": stream, "logrite.state": state, "logrite.n": n });
       for (var i = n || 1; i > 0; i--)
         state.context = state.context.prev;
+	logger.warn(`<<< Exiting popAndPass(type=${type},stream=${stream},state=${state},n=${n})`, { "event.action": "popAndPass", "logrite.type": type, "logrite.stream": stream, "logrite.state": state, "logrite.n": n });
       return pass(type, stream, state);
     }
 
@@ -239,25 +261,35 @@
      * Parser
      */
     function wordIsTag(word) {
+	logger.error(`>>> Entering wordIsTag(word=${word})`, { "event.action": "wordIsTag", "logrite.word": word });
+	logger.warn(`<<< Exiting wordIsTag(word=${word})`, { "event.action": "wordIsTag", "logrite.word": word });
       return word.toLowerCase() in tagKeywords;
     }
 
     function wordIsProperty(word) {
+	logger.error(`>>> Entering wordIsProperty(word=${word})`, { "event.action": "wordIsProperty", "logrite.word": word });
       word = word.toLowerCase();
+	logger.warn(`<<< Exiting wordIsProperty(word=${word})`, { "event.action": "wordIsProperty", "logrite.word": word });
       return word in propertyKeywords || word in fontProperties;
     }
 
     function wordIsBlock(word) {
+	logger.error(`>>> Entering wordIsBlock(word=${word})`, { "event.action": "wordIsBlock", "logrite.word": word });
+	logger.warn(`<<< Exiting wordIsBlock(word=${word})`, { "event.action": "wordIsBlock", "logrite.word": word });
       return word.toLowerCase() in blockKeywords;
     }
 
     function wordIsVendorPrefix(word) {
+	logger.error(`>>> Entering wordIsVendorPrefix(word=${word})`, { "event.action": "wordIsVendorPrefix", "logrite.word": word });
+	logger.warn(`<<< Exiting wordIsVendorPrefix(word=${word})`, { "event.action": "wordIsVendorPrefix", "logrite.word": word });
       return word.toLowerCase().match(vendorPrefixesRegexp);
     }
 
     function wordAsValue(word) {
+	logger.error(`>>> Entering wordAsValue(word=${word})`, { "event.action": "wordAsValue", "logrite.word": word });
       var wordLC = word.toLowerCase();
       var override = "variable-2";
+	logger.error(`wordAsValue(word=${word}): wordLC → ${wordLC}`, { "event.action": "wordAsValue", "logrite.word": word });
       if (wordIsTag(word)) override = "tag";
       else if (wordIsBlock(word)) override = "block-keyword";
       else if (wordIsProperty(word)) override = "property";
@@ -266,32 +298,45 @@
 
       // Font family
       else if (word.match(/^[A-Z]/)) override = "string";
+	logger.error(`wordAsValue(word=${word}): override → ${override}`, { "event.action": "wordAsValue", "logrite.word": word });
       return override;
     }
 
     function typeIsBlock(type, stream) {
+	logger.error(`>>> Entering typeIsBlock(type=${type},stream=${stream})`, { "event.action": "typeIsBlock", "logrite.type": type, "logrite.stream": stream });
+	logger.warn(`<<< Exiting typeIsBlock(type=${type},stream=${stream})`, { "event.action": "typeIsBlock", "logrite.type": type, "logrite.stream": stream });
       return ((endOfLine(stream) && (type == "{" || type == "]" || type == "hash" || type == "qualifier")) || type == "block-mixin");
     }
 
     function typeIsInterpolation(type, stream) {
+	logger.error(`>>> Entering typeIsInterpolation(type=${type},stream=${stream})`, { "event.action": "typeIsInterpolation", "logrite.type": type, "logrite.stream": stream });
+	logger.warn(`<<< Exiting typeIsInterpolation(type=${type},stream=${stream})`, { "event.action": "typeIsInterpolation", "logrite.type": type, "logrite.stream": stream });
       return type == "{" && stream.match(/^\s*\$?[\w-]+/i, false);
     }
 
     function typeIsPseudo(type, stream) {
+	logger.error(`>>> Entering typeIsPseudo(type=${type},stream=${stream})`, { "event.action": "typeIsPseudo", "logrite.type": type, "logrite.stream": stream });
+	logger.warn(`<<< Exiting typeIsPseudo(type=${type},stream=${stream})`, { "event.action": "typeIsPseudo", "logrite.type": type, "logrite.stream": stream });
       return type == ":" && stream.match(/^[a-z-]+/, false);
     }
 
     function startOfLine(stream) {
+	logger.error(`>>> Entering startOfLine(stream=${stream})`, { "event.action": "startOfLine", "logrite.stream": stream });
+	logger.warn(`<<< Exiting startOfLine(stream=${stream})`, { "event.action": "startOfLine", "logrite.stream": stream });
       return stream.sol() || stream.string.match(new RegExp("^\\s*" + escapeRegExp(stream.current())));
     }
 
     function endOfLine(stream) {
+	logger.error(`>>> Entering endOfLine(stream=${stream})`, { "event.action": "endOfLine", "logrite.stream": stream });
+	logger.warn(`<<< Exiting endOfLine(stream=${stream})`, { "event.action": "endOfLine", "logrite.stream": stream });
       return stream.eol() || stream.match(/^\s*$/, false);
     }
 
     function firstWordOfLine(line) {
+	logger.error(`>>> Entering firstWordOfLine(line=${line})`, { "event.action": "firstWordOfLine", "logrite.line": line });
       var re = /^\s*[-_]*[a-z0-9]+[\w-]*/i;
       var result = typeof line == "string" ? line.match(re) : line.string.match(re);
+	logger.error(`firstWordOfLine(line=${line}): result → ${result}`, { "event.action": "firstWordOfLine", "logrite.line": line });
       return result ? result[0].replace(/^\s*/, "") : "";
     }
 
@@ -617,6 +662,7 @@
         override = wordAsValue(stream.current());
         if (override == "tag") override = "atom";
       }
+	logger.warn(`<<< Exiting interpolation(type=${type},stream=${stream},state=${state})`, { "event.action": "interpolation", "logrite.type": type, "logrite.stream": stream, "logrite.state": state });
       return state.context.type;
     };
 
@@ -649,13 +695,16 @@
 
     return {
       startState: function(base) {
+		logger.error(`>>> Entering startState(base=${base})`, { "event.action": "startState", "logrite.base": base });
         return {
           tokenize: null,
           state: "block",
           context: new Context("block", base || 0, null)
         };
+		logger.warn(`<<< Exiting startState(base=${base})`, { "event.action": "startState", "logrite.base": base });
       },
       token: function(stream, state) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if (!state.tokenize && stream.eatSpace()) return null;
         style = (state.tokenize || tokenBase)(stream, state);
         if (style && typeof style == "object") {
@@ -664,9 +713,11 @@
         }
         override = style;
         state.state = states[state.state](type, stream, state);
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return override;
       },
       indent: function(state, textAfter, line) {
+	logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter},line=${line})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter, "logrite.line": line });
 
         var cx = state.context,
             ch = textAfter && textAfter.charAt(0),
@@ -750,17 +801,22 @@
                                       commonAtoms_,commonDef_);
 
   function wordRegexp(words) {
+	logger.error(`>>> Entering wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
     words = words.sort(function(a,b){return b > a;});
     return new RegExp("^((" + words.join(")|(") + "))\\b");
   }
 
   function keySet(array) {
+	logger.error(`>>> Entering keySet(array=${array})`, { "event.action": "keySet", "logrite.array": array });
     var keys = {};
     for (var i = 0; i < array.length; ++i) keys[array[i]] = true;
+	logger.warn(`<<< Exiting keySet(array=${array})`, { "event.action": "keySet", "logrite.array": array });
     return keys;
   }
 
   function escapeRegExp(text) {
+	logger.error(`>>> Entering escapeRegExp(text=${text})`, { "event.action": "escapeRegExp", "logrite.text": text });
+	logger.warn(`<<< Exiting escapeRegExp(text=${text})`, { "event.action": "escapeRegExp", "logrite.text": text });
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
   }
 

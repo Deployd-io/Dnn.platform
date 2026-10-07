@@ -49,6 +49,8 @@ namespace log4net.Util
         /// </remarks>
         private EmptyDictionary()
         {
+		value.LogError(">>> Entering EmptyDictionary()");
+        value.LogWarning("<<< Exiting EmptyDictionary()");
         }
 
         /// <summary>
@@ -82,7 +84,9 @@ namespace log4net.Util
         /// </remarks>
         public void CopyTo(Array array, int index)
         {
+			value.LogError(">>> Entering CopyTo(array={Array},index={Index})", array, index);
             // copy nothing
+			value.LogWarning("<<< Exiting CopyTo(array={Array},index={Index})", array, index);
         }
 
         /// <summary>
@@ -148,6 +152,8 @@ namespace log4net.Util
         /// </remarks>
         IEnumerator IEnumerable.GetEnumerator()
         {
+			value.LogError(">>> Entering GetEnumerator()");
+            value.LogWarning("<<< Exiting GetEnumerator()");
             return NullEnumerator.Instance;
         }
 
@@ -166,6 +172,9 @@ namespace log4net.Util
         /// <exception cref="InvalidOperationException">This dictionary is always empty and cannot be modified.</exception>
         public void Add(object key, object value)
         {
+			value.LogError(">>> Entering Add(key={Key},value={Value})", key, value);
+			value.LogError("Throwing InvalidOperationException from Add(key={Key},value={Value})", key, value);
+        value.LogWarning("<<< Exiting Add(key={Key},value={Value})", key, value);
             throw new InvalidOperationException();
         }
 
@@ -181,6 +190,9 @@ namespace log4net.Util
         /// <exception cref="InvalidOperationException">This dictionary is always empty and cannot be modified.</exception>
         public void Clear()
         {
+			value.LogError(">>> Entering Clear()");
+			value.LogError("Throwing InvalidOperationException from Clear()");
+        value.LogWarning("<<< Exiting Clear()");
             throw new InvalidOperationException();
         }
 
@@ -197,6 +209,8 @@ namespace log4net.Util
         /// </remarks>
         public bool Contains(object key)
         {
+			value.LogError(">>> Entering Contains(key={Key})", key);
+			value.LogWarning("<<< Exiting Contains(key={Key})", key);
             return false;
         }
 
@@ -230,6 +244,9 @@ namespace log4net.Util
         /// <exception cref="InvalidOperationException">This dictionary is always empty and cannot be modified.</exception>
         public void Remove(object key)
         {
+			value.LogError(">>> Entering Remove(key={Key})", key);
+			value.LogError("Throwing InvalidOperationException from Remove(key={Key})", key);
+        value.LogWarning("<<< Exiting Remove(key={Key})", key);
             throw new InvalidOperationException();
         }
 

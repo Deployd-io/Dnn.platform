@@ -22,6 +22,7 @@ namespace DotNetNuke.Services.Syndication
     /// <summary>An HTTP handler for serving an RSS feed.</summary>
     public class RssHandler : SyndicationHandlerBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RssHandler));
         private readonly ISearchController searchController;
 
         /// <summary>Initializes a new instance of the <see cref="RssHandler"/> class.</summary>
@@ -29,18 +30,24 @@ namespace DotNetNuke.Services.Syndication
         public RssHandler()
             : this(null)
         {
+		Logger.LogError(">>> Entering RssHandler()");
+        Logger.LogWarning("<<< Exiting RssHandler()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="RssHandler"/> class.</summary>
         /// <param name="searchController">The search controller.</param>
         public RssHandler(ISearchController searchController)
         {
+			Logger.LogError(">>> Entering RssHandler(searchController={SearchController})", searchController);
             this.searchController = searchController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ISearchController>();
+			Logger.LogDebug("RssHandler(searchController={SearchController}): searchController → {SearchController1}", searchController, searchController);
+        Logger.LogWarning("<<< Exiting RssHandler(searchController={SearchController})", searchController);
         }
 
         /// <inheritdoc />
         protected override void PopulateChannel(string channelName, string userName)
         {
+			Logger.LogError(">>> Entering PopulateChannel(channelName={ChannelName},userName={UserName})", channelName, userName);
             if (this.Request == null || this.Settings?.ActiveTab == null || this.ModuleId == Null.NullInteger)
             {
                 return;
@@ -73,9 +80,11 @@ namespace DotNetNuke.Services.Syndication
             try
             {
                 searchResults = this.searchController.ModuleSearch(query).Results;
+				Logger.LogError("PopulateChannel(channelName={ChannelName},userName={UserName}): searchResults → {SearchResults}", channelName, userName, searchResults);
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in PopulateChannel(channelName={ChannelName},userName={UserName}): {Arg2}", channelName, userName, ex.Message);
                 Exceptions.Exceptions.LogException(ex);
             }
 
@@ -88,6 +97,7 @@ namespace DotNetNuke.Services.Syndication
                         if (this.Settings.ActiveTab.StartDate < DateTime.Now && this.Settings.ActiveTab.EndDate > DateTime.Now)
                         {
                             var objModule = ModuleController.Instance.GetModule(result.ModuleId, query.TabId, false);
+							Logger.LogError("PopulateChannel(channelName={ChannelName},userName={UserName}): objModule → {ObjModule}", channelName, userName, objModule);
                             if (objModule is { DisplaySyndicate: true, IsDeleted: false, })
                             {
                                 if (ModulePermissionController.CanViewModule(objModule))
@@ -103,6 +113,7 @@ namespace DotNetNuke.Services.Syndication
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting PopulateChannel(channelName={ChannelName},userName={UserName})", channelName, userName);
         }
 
         /// <summary>
@@ -112,11 +123,13 @@ namespace DotNetNuke.Services.Syndication
         /// <param name="ea">Event Args.</param>
         protected override void OnPreRender(EventArgs ea)
         {
+			Logger.LogError(">>> Entering OnPreRender(ea={Ea})", ea);
             base.OnPreRender(ea);
 
             this.Context.Response.Cache.SetExpires(DateTime.Now.AddSeconds(60));
             this.Context.Response.Cache.SetCacheability(HttpCacheability.Public);
             this.Context.Response.Cache.VaryByParams["moduleid"] = true;
+			Logger.LogWarning("<<< Exiting OnPreRender(ea={Ea})", ea);
         }
 
         /// <summary>Creates an RSS Item.</summary>
@@ -124,11 +137,14 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>A new <see cref="GenericRssElement"/> instance.</returns>
         private static GenericRssElement GetRssItem(SearchResult searchResult)
         {
+			Logger.LogError(">>> Entering GetRssItem(searchResult={SearchResult})", searchResult);
             var item = new GenericRssElement();
             var url = searchResult.Url;
+			Logger.LogError("GetRssItem(searchResult={SearchResult}): item → {Item}", searchResult, item);
             if (url.Trim() == string.Empty)
             {
                 url = TestableGlobals.Instance.NavigateURL(searchResult.TabId);
+				Logger.LogError("GetRssItem(searchResult={SearchResult}): url → {Url}", searchResult, url);
                 if (url.IndexOf(HttpContext.Current.Request.Url.Host, StringComparison.InvariantCultureIgnoreCase) == -1)
                 {
                     url = TestableGlobals.Instance.AddHTTP(HttpContext.Current.Request.Url.Host) + url;
@@ -141,6 +157,7 @@ namespace DotNetNuke.Services.Syndication
             item["link"] = url;
             item["guid"] = url;
 
+			Logger.LogWarning("<<< Exiting GetRssItem(searchResult={SearchResult})", searchResult);
             return item;
         }
     }

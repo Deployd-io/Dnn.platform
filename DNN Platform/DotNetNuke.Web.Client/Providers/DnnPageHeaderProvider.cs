@@ -19,6 +19,7 @@ namespace DotNetNuke.Web.Client.Providers
     /// <summary>Registers resources at the top of the body on default.aspx.</summary>
     public class DnnPageHeaderProvider : DnnFileRegistrationProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnPageHeaderProvider));
         /// <summary>The default name of the provider.</summary>
         public const string DefaultName = "DnnPageHeaderProvider";
 
@@ -31,24 +32,29 @@ namespace DotNetNuke.Web.Client.Providers
         /// <inheritdoc />
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
+			Logger.LogError(">>> Entering Initialize(name={Name},config={Config})", name, config);
             // Assign the provider a default name if it doesn't have one
             if (string.IsNullOrEmpty(name))
             {
                 name = DefaultName;
+				Logger.LogError("Initialize(name={Name},config={Config}): name → {Name1}", name, config, name);
             }
 
             base.Initialize(name, config);
+			Logger.LogWarning("<<< Exiting Initialize(name={Name},config={Config})", name, config);
         }
 
         /// <inheritdoc />
         protected override string RenderJsDependencies(IEnumerable<IClientDependencyFile> jsDependencies, HttpContextBase http, IDictionary<string, string> htmlAttributes)
         {
+			Logger.LogError(">>> Entering RenderJsDependencies(jsDependencies={JsDependencies},http={Http},htmlAttributes={HtmlAttributes})", jsDependencies, http, htmlAttributes);
             if (!jsDependencies.Any())
             {
                 return string.Empty;
             }
 
             var sb = new StringBuilder();
+			Logger.LogError("RenderJsDependencies(jsDependencies={JsDependencies},http={Http},htmlAttributes={HtmlAttributes}): sb → {Sb}", jsDependencies, http, htmlAttributes, sb);
 
             if (http.IsDebuggingEnabled || !this.EnableCompositeFiles)
             {
@@ -60,30 +66,36 @@ namespace DotNetNuke.Web.Client.Providers
             else
             {
                 var comp = ClientDependencySettings.Instance.DefaultCompositeFileProcessingProvider.ProcessCompositeList(jsDependencies, ClientDependencyType.Javascript, http);
+				Logger.LogError("RenderJsDependencies(jsDependencies={JsDependencies},http={Http},htmlAttributes={HtmlAttributes}): comp → {Comp}", jsDependencies, http, htmlAttributes, comp);
                 foreach (var s in comp)
                 {
                     sb.Append(this.RenderSingleJsFile(s, htmlAttributes));
                 }
             }
 
+			Logger.LogWarning("<<< Exiting RenderJsDependencies(jsDependencies={JsDependencies},http={Http},htmlAttributes={HtmlAttributes})", jsDependencies, http, htmlAttributes);
             return sb.ToString();
         }
 
         /// <inheritdoc />
         protected override string RenderSingleJsFile(string js, IDictionary<string, string> htmlAttributes)
         {
+			Logger.LogError(">>> Entering RenderSingleJsFile(js={Js},htmlAttributes={HtmlAttributes})", js, htmlAttributes);
+            Logger.LogWarning("<<< Exiting RenderSingleJsFile(js={Js},htmlAttributes={HtmlAttributes})", js, htmlAttributes);
             return string.Format(CultureInfo.InvariantCulture, HtmlEmbedContants.ScriptEmbedWithSource, js, htmlAttributes.ToHtmlAttributes());
         }
 
         /// <inheritdoc />
         protected override string RenderCssDependencies(IEnumerable<IClientDependencyFile> cssDependencies, HttpContextBase http, IDictionary<string, string> htmlAttributes)
         {
+			Logger.LogError(">>> Entering RenderCssDependencies(cssDependencies={CssDependencies},http={Http},htmlAttributes={HtmlAttributes})", cssDependencies, http, htmlAttributes);
             if (!cssDependencies.Any())
             {
                 return string.Empty;
             }
 
             var sb = new StringBuilder();
+			Logger.LogError("RenderCssDependencies(cssDependencies={CssDependencies},http={Http},htmlAttributes={HtmlAttributes}): sb → {Sb}", cssDependencies, http, htmlAttributes, sb);
 
             if (http.IsDebuggingEnabled || !this.EnableCompositeFiles)
             {
@@ -95,18 +107,22 @@ namespace DotNetNuke.Web.Client.Providers
             else
             {
                 var comp = ClientDependencySettings.Instance.DefaultCompositeFileProcessingProvider.ProcessCompositeList(cssDependencies, ClientDependencyType.Css, http);
+				Logger.LogError("RenderCssDependencies(cssDependencies={CssDependencies},http={Http},htmlAttributes={HtmlAttributes}): comp → {Comp}", cssDependencies, http, htmlAttributes, comp);
                 foreach (var s in comp)
                 {
                     sb.Append(this.RenderSingleCssFile(s, htmlAttributes));
                 }
             }
 
+			Logger.LogWarning("<<< Exiting RenderCssDependencies(cssDependencies={CssDependencies},http={Http},htmlAttributes={HtmlAttributes})", cssDependencies, http, htmlAttributes);
             return sb.ToString();
         }
 
         /// <inheritdoc />
         protected override string RenderSingleCssFile(string css, IDictionary<string, string> htmlAttributes)
         {
+			Logger.LogError(">>> Entering RenderSingleCssFile(css={Css},htmlAttributes={HtmlAttributes})", css, htmlAttributes);
+            Logger.LogWarning("<<< Exiting RenderSingleCssFile(css={Css},htmlAttributes={HtmlAttributes})", css, htmlAttributes);
             return string.Format(CultureInfo.InvariantCulture, HtmlEmbedContants.CssEmbedWithSource, css, htmlAttributes.ToHtmlAttributes());
         }
 
@@ -121,8 +137,10 @@ namespace DotNetNuke.Web.Client.Providers
         /// </remarks>
         protected override void RegisterDependencies(HttpContextBase http, string js, string css)
         {
+			Logger.LogError(">>> Entering RegisterDependencies(http={Http},js={Js},css={Css})", http, js, css);
             if (http.CurrentHandler is not Page page)
             {
+				Logger.LogError("Throwing InvalidOperationException from RegisterDependencies(http={Http},js={Js},css={Css})", http, js, css);
                 throw new InvalidOperationException("The current HttpHandler in a WebFormsFileRegistrationProvider must be of type Page");
             }
 
@@ -132,17 +150,23 @@ namespace DotNetNuke.Web.Client.Providers
             }
 
             var jsScriptBlock = new LiteralControl(js.Replace("&", "&amp;"));
+			Logger.LogError("RegisterDependencies(http={Http},js={Js},css={Css}): jsScriptBlock → {JsScriptBlock}", http, js, css, jsScriptBlock);
             var cssStyleBlock = new LiteralControl(css.Replace("&", "&amp;"));
+			Logger.LogError("RegisterDependencies(http={Http},js={Js},css={Css}): cssStyleBlock → {CssStyleBlock}", http, js, css, cssStyleBlock);
             page.FindControl(JsPlaceHolderName).Controls.Add(jsScriptBlock);
             page.FindControl(CssPlaceHolderName).Controls.Add(cssStyleBlock);
 
             var scriptManager = ScriptManager.GetCurrent(page);
+			Logger.LogError("RegisterDependencies(http={Http},js={Js},css={Css}): scriptManager → {ScriptManager}", http, js, css, scriptManager);
             if (scriptManager is { IsInAsyncPostBack: true })
             {
                 var jsHolder = page.FindControl(JsPlaceHolderName);
+				Logger.LogError("RegisterDependencies(http={Http},js={Js},css={Css}): jsHolder → {JsHolder}", http, js, css, jsHolder);
                 jsHolder.ID = "$crm_" + jsHolder.ID;
+				Logger.LogDebug("RegisterDependencies(http={Http},js={Js},css={Css}): jsHolder.ID → {Arg3}", http, js, css, jsHolder.ID);
                 scriptManager.RegisterDataItem(jsHolder, $"{jsScriptBlock.Text}{cssStyleBlock.Text}");
             }
+			Logger.LogWarning("<<< Exiting RegisterDependencies(http={Http},js={Js},css={Css})", http, js, css);
         }
     }
 }

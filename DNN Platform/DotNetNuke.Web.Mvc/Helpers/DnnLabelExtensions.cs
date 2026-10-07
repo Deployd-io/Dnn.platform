@@ -12,8 +12,11 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
     public static class DnnLabelExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnLabelExtensions));
         public static MvcHtmlString Label<TModel>(this DnnHelper<TModel> dnnHelper, string expression, string labelText, string helpText)
         {
+			Logger.LogError(">>> Entering Label(dnnHelper={DnnHelper},expression={Expression},labelText={LabelText},helpText={HelpText})", dnnHelper, expression, labelText, helpText);
+			Logger.LogWarning("<<< Exiting Label(dnnHelper={DnnHelper},expression={Expression},labelText={LabelText},helpText={HelpText})", dnnHelper, expression, labelText, helpText);
             return Label(dnnHelper, expression, labelText, helpText, null);
         }
 
@@ -37,6 +40,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
         public static MvcHtmlString LabelFor<TModel, TValue>(this DnnHelper<TModel> dnnHelper, Expression<Func<TModel, TValue>> expression)
         {
+			Logger.LogError(">>> Entering LabelFor(dnnHelper={DnnHelper},expression={Expression})", dnnHelper, expression);
+            Logger.LogWarning("<<< Exiting LabelFor(dnnHelper={DnnHelper},expression={Expression})", dnnHelper, expression);
             return LabelFor(dnnHelper, expression, null, null, null);
         }
 
@@ -90,20 +95,24 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
         public static MvcHtmlString LabelHelper(HtmlHelper html, string htmlFieldName, string labelText, string helpText = null, IDictionary<string, object> htmlAttributes = null)
         {
+			Logger.LogError(">>> Entering LabelHelper(html={Html},htmlFieldName={HtmlFieldName},labelText={LabelText},helpText={HelpText},htmlAttributes={HtmlAttributes})", html, htmlFieldName, labelText, helpText, htmlAttributes);
             if (string.IsNullOrEmpty(labelText))
             {
                 return MvcHtmlString.Empty;
             }
 
             var divTag = new TagBuilder("div");
+			Logger.LogError("LabelHelper(html={Html},htmlFieldName={HtmlFieldName},labelText={LabelText},helpText={HelpText},htmlAttributes={HtmlAttributes}): divTag → {DivTag}", html, htmlFieldName, labelText, helpText, htmlAttributes, divTag);
             divTag.Attributes.Add("class", "dnnLabel");
             divTag.Attributes.Add("style", "position:relative;");
             divTag.MergeAttributes(htmlAttributes, true);
 
             var labelTag = new TagBuilder("label");
+			Logger.LogError("LabelHelper(html={Html},htmlFieldName={HtmlFieldName},labelText={LabelText},helpText={HelpText},htmlAttributes={HtmlAttributes}): labelTag → {LabelTag}", html, htmlFieldName, labelText, helpText, htmlAttributes, labelTag);
             labelTag.Attributes.Add("for", htmlFieldName);
 
             var spanTag = new TagBuilder("span");
+			Logger.LogError("LabelHelper(html={Html},htmlFieldName={HtmlFieldName},labelText={LabelText},helpText={HelpText},htmlAttributes={HtmlAttributes}): spanTag → {SpanTag}", html, htmlFieldName, labelText, helpText, htmlAttributes, spanTag);
             spanTag.SetInnerText(labelText);
 
             labelTag.InnerHtml = spanTag.ToString();
@@ -111,6 +120,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
             divTag.InnerHtml = labelTag.ToString();
 
             var aTag = new TagBuilder("a");
+			Logger.LogError("LabelHelper(html={Html},htmlFieldName={HtmlFieldName},labelText={LabelText},helpText={HelpText},htmlAttributes={HtmlAttributes}): aTag → {ATag}", html, htmlFieldName, labelText, helpText, htmlAttributes, aTag);
             aTag.Attributes.Add("class", "dnnFormHelp");
             aTag.Attributes.Add("href", "#");
             aTag.Attributes.Add("tabIndex", "-1");
@@ -118,9 +128,11 @@ namespace DotNetNuke.Web.Mvc.Helpers
             divTag.InnerHtml += aTag.ToString();
 
             var toolTipTag = new TagBuilder("div");
+			Logger.LogError("LabelHelper(html={Html},htmlFieldName={HtmlFieldName},labelText={LabelText},helpText={HelpText},htmlAttributes={HtmlAttributes}): toolTipTag → {ToolTipTag}", html, htmlFieldName, labelText, helpText, htmlAttributes, toolTipTag);
             toolTipTag.Attributes.Add("class", "dnnTooltip");
 
             var toolTipContentTag = new TagBuilder("div");
+			Logger.LogError("LabelHelper(html={Html},htmlFieldName={HtmlFieldName},labelText={LabelText},helpText={HelpText},htmlAttributes={HtmlAttributes}): toolTipContentTag → {ToolTipContentTag}", html, htmlFieldName, labelText, helpText, htmlAttributes, toolTipContentTag);
             toolTipContentTag.Attributes.Add("class", "dnnFormHelpContent dnnClear");
 
             spanTag = new TagBuilder("span");
@@ -139,6 +151,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
             divTag.InnerHtml += toolTipTag.ToString();
 
+			Logger.LogWarning("<<< Exiting LabelHelper(html={Html},htmlFieldName={HtmlFieldName},labelText={LabelText},helpText={HelpText},htmlAttributes={HtmlAttributes})", html, htmlFieldName, labelText, helpText, htmlAttributes);
             return new MvcHtmlString(divTag.ToString(TagRenderMode.Normal));
         }
 

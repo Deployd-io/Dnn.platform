@@ -21,17 +21,25 @@ namespace Dnn.PersonaBar.Pages.MenuControllers
         /// <summary>Initializes a new instance of the <see cref="PagesMenuController"/> class.</summary>
         public PagesMenuController()
         {
+			eventLogger.LogError(">>> Entering PagesMenuController()");
             this.securityService = SecurityService.Instance;
+			eventLogger.LogDebug("PagesMenuController(): securityService → {SecurityService}", securityService);
+        eventLogger.LogDebug("PagesMenuController(): this.securityService → {Arg0}", this.securityService);
+        eventLogger.LogWarning("<<< Exiting PagesMenuController()");
         }
 
         /// <inheritdoc />
         public void UpdateParameters(MenuItem menuItem)
         {
+		eventLogger.LogError(">>> Entering UpdateParameters(menuItem={MenuItem})", menuItem);
+        eventLogger.LogWarning("<<< Exiting UpdateParameters(menuItem={MenuItem})", menuItem);
         }
 
         /// <inheritdoc />
         public bool Visible(MenuItem menuItem)
         {
+			eventLogger.LogError(">>> Entering Visible(menuItem={MenuItem})", menuItem);
+            eventLogger.LogWarning("<<< Exiting Visible(menuItem={MenuItem})", menuItem);
             return this.securityService.IsVisible(menuItem);
         }
 

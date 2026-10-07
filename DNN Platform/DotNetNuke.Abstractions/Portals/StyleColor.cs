@@ -28,11 +28,16 @@ namespace DotNetNuke.Abstractions.Portals
         /// <param name="hexValue">The hex value to use.</param>
         public StyleColor(string hexValue)
         {
+			_logger.LogError(">>> Entering StyleColor(hexValue={HexValue})", hexValue);
             AssertIsValidCssColor(hexValue);
+			_logger.LogWarning("<<< Exiting StyleColor()");
 
             this.HexValue = hexValue;
+			_logger.LogDebug("StyleColor(hexValue={HexValue}): this.HexValue → {Arg1}", hexValue, this.HexValue);
             this.red = byte.Parse(this.HexValue.Substring(0, 2), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
             this.green = byte.Parse(this.HexValue.Substring(2, 2), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+			_logger.LogDebug("StyleColor(hexValue={HexValue}): red → {Red}", hexValue, red);
+			_logger.LogDebug("StyleColor(hexValue={HexValue}): green → {Green}", hexValue, green);
             this.blue = byte.Parse(this.HexValue.Substring(4, 2), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
         }
 
@@ -89,19 +94,24 @@ namespace DotNetNuke.Abstractions.Portals
 
         private static void AssertIsValidCssColor(string hexValue)
         {
+			_logger.LogError(">>> Entering AssertIsValidCssColor(hexValue={HexValue})", hexValue);
             if (string.IsNullOrWhiteSpace(hexValue))
             {
+				_logger.LogError("Throwing ArgumentNullException from AssertIsValidCssColor(hexValue={HexValue})", hexValue);
                 throw new ArgumentNullException(nameof(hexValue), "You need to provide a CSS color value in the constructor");
             }
 
             if (!HexColorRegex.IsMatch(hexValue))
             {
+				_logger.LogError("Throwing ArgumentOutOfRangeException from AssertIsValidCssColor(hexValue={HexValue})", hexValue);
                 throw new ArgumentOutOfRangeException(nameof(hexValue), hexValue, $"The value {hexValue} that was provided is not valid, it needs to be 3 or 6 character long hexadecimal string without the # sing");
             }
+			_logger.LogWarning("<<< Exiting AssertIsValidCssColor(hexValue={HexValue})", hexValue);
         }
 
         private void SetComponent(Component comp, byte value)
         {
+			_logger.LogError(">>> Entering SetComponent(comp={Comp},value={Value})", comp, value);
             switch (comp)
             {
                 case Component.Red:
@@ -116,6 +126,7 @@ namespace DotNetNuke.Abstractions.Portals
                 default:
                     break;
             }
+			_logger.LogWarning("<<< Exiting SetComponent(comp={Comp},value={Value})", comp, value);
         }
     }
 }

@@ -9,15 +9,20 @@ namespace DotNetNuke.Services.Syndication
     /// <summary>Internal representation of parsed RSS channel.</summary>
     internal sealed class RssChannelDom
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RssChannelDom));
         /// <summary>Initializes a new instance of the <see cref="RssChannelDom"/> class.</summary>
         /// <param name="channel">The channel attributes.</param>
         /// <param name="image">The image attributes.</param>
         /// <param name="items">The items.</param>
         internal RssChannelDom(Dictionary<string, string> channel, Dictionary<string, string> image, List<Dictionary<string, string>> items)
         {
+			Logger.LogError(">>> Entering RssChannelDom(channel={Channel},image={Image},items={Items})", channel, image, items);
             this.Channel = channel;
+			Logger.LogDebug("RssChannelDom(channel={Channel},image={Image},items={Items}): this.Channel → {Arg3}", channel, image, items, this.Channel);
             this.Image = image;
             this.Items = items;
+			Logger.LogDebug("RssChannelDom(channel={Channel},image={Image},items={Items}): this.Image → {Arg3}", channel, image, items, this.Image);
+        Logger.LogWarning("<<< Exiting RssChannelDom(channel={Channel},image={Image},items={Items})", channel, image, items);
             this.UtcExpiry = DateTime.MaxValue;
         }
 
@@ -37,6 +42,7 @@ namespace DotNetNuke.Services.Syndication
         /// <param name="utcExpiry">The expiration on UTC.</param>
         internal void SetExpiry(DateTime utcExpiry)
         {
+			Logger.LogError(">>> Entering SetExpiry(utcExpiry={UtcExpiry})", utcExpiry);
             this.UtcExpiry = utcExpiry;
         }
     }

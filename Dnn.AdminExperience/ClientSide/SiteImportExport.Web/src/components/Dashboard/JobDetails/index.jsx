@@ -7,26 +7,33 @@ import {
 } from "../../../actions";
 import Localization from "localization";
 import itemsToExportService from "../../../services/itemsToExportService";
+const logger = console;
 import { Label, Button, GridCell, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 class JobDetails extends Component {
     constructor(props) {
         super();
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             cancelled: props.cancelled
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const { props } = this;
         if (props.jobId) {
             props.dispatch(ImportExportActions.getJobDetails(props.jobId));
+			logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
         }
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         let {props} = this;
         if (props.cancelled !== prevProps.cancelled) {
+			logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
             this.setState({
                 cancelled: props.cancelled
             });
@@ -35,9 +42,11 @@ class JobDetails extends Component {
 
      
     getSummaryItem(category) {
+		logger.error(`>>> Entering getSummaryItem(category=${category})`, { "event.action": "getSummaryItem", "logrite.category": category });
         const { props, state } = this;
         if (props.jobDetail.Summary) {
             let detail = props.jobDetail.Summary.SummaryItems.find(c => c.Category.toUpperCase() === category.toUpperCase());
+			logger.error(`getSummaryItem(category=${category}): detail → ${detail}`, { "event.action": "getSummaryItem", "logrite.category": category });
             if (detail) {
                 if (detail.Completed || state.cancelled || props.jobDetail.Status !== 1 || detail.TotalItems === 0) {
                     return detail.ProcessedItems > detail.TotalItems ? detail.TotalItemsString : detail.ProcessedItemsString + " / " + detail.TotalItemsString;
@@ -54,16 +63,20 @@ class JobDetails extends Component {
             else return "-";
         }
         else {
+			logger.warn(`<<< Exiting getSummaryItem(category=${category})`, { "event.action": "getSummaryItem", "logrite.category": category });
             return "-";
         }
     }
 
     getUsersSummary() {
+		logger.error('>>> Entering getUsersSummary()', { "event.action": "getUsersSummary" });
         const { props, state } = this;
         if (props.jobDetail.Summary) {
             let users = props.jobDetail.Summary.SummaryItems.find(c => c.Category === "USERS");
+			logger.error(`getUsersSummary(): users → ${users}`, { "event.action": "getUsersSummary" });
             if (users && props.jobDetail.JobType === "Site Import") {
                 let usersData = props.jobDetail.Summary.SummaryItems.find(c => c.Category === "USERS_DATA");
+				logger.error(`getUsersSummary(): usersData → ${usersData}`, { "event.action": "getUsersSummary" });
                 if (users.TotalItems > 0 && !users.Completed && !state.cancelled) {
                     return <GridCell>
                         <Label
@@ -150,6 +163,7 @@ class JobDetails extends Component {
                 }
             }
             else {
+				logger.warn('<<< Exiting getUsersSummary()', { "event.action": "getUsersSummary" });
                 return <GridCell>
                     <Label
                         labelType="inline"
@@ -162,16 +176,22 @@ class JobDetails extends Component {
     }
 
     cancel(jobId) {
+		logger.error(`>>> Entering cancel(jobId=${jobId})`, { "event.action": "cancel", "logrite.jobId": jobId });
         this.props.cancelJob(jobId);
+		logger.warn(`<<< Exiting cancel(jobId=${jobId})`, { "event.action": "cancel", "logrite.jobId": jobId });
     }
 
     delete(jobId) {
+		logger.error(`>>> Entering delete(jobId=${jobId})`, { "event.action": "delete", "logrite.jobId": jobId });
         this.props.deleteJob(jobId);
+		logger.warn(`<<< Exiting delete(jobId=${jobId})`, { "event.action": "delete", "logrite.jobId": jobId });
     }
 
     renderExportSummary() {
+		logger.error('>>> Entering renderExportSummary()', { "event.action": "renderExportSummary" });
         const { props, state } = this;
         const registeredItemsToExport = itemsToExportService.getRegisteredItemsToExport();
+		logger.warn('<<< Exiting renderExportSummary()', { "event.action": "renderExportSummary" });
         return <div style={{ float: "left", width: "100%" }}>
             {props.jobDetail &&
                 <div className="export-summary">
@@ -322,6 +342,7 @@ class JobDetails extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
         if (props.jobDetail !== undefined) {
             return (

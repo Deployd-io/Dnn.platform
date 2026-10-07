@@ -5,12 +5,14 @@ import Scrollbars from "react-custom-scrollbars";
 import {ArrowDownIcon} from "../SvgIcons";
 import scroll from "scroll";
 import "./style.less";
+const logger = console;
 
 const DNN_DROPDOWN_MINHEIGHT = 100;
 
 class Dropdown extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             dropDownOpen: false,
             dropdownText: "",
@@ -18,10 +20,13 @@ class Dropdown extends Component {
             selectedOption: {}
         };
         this.handleClick = this.handleClick.bind(this);
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
         this.uniqueId = Date.now() * Math.random();
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     toggleDropdown() {
+		logger.error('>>> Entering toggleDropdown()', { "event.action": "toggleDropdown" });
         const {props} = this;
         if (props.enabled) {
 
@@ -39,6 +44,7 @@ class Dropdown extends Component {
             });
         }
         else {
+			logger.warn('<<< Exiting toggleDropdown()', { "event.action": "toggleDropdown" });
             this.setState({
                 dropDownOpen: false
             });
@@ -46,26 +52,33 @@ class Dropdown extends Component {
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         const { props } = this;
         if (props.isDropDownOpen !== prevProps.isDropDownOpen) {
             this.setState({dropDownOpen: !props.isDropDownOpen}, () => this.toggleDropdown(true));
+			logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         }
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const {props} = this;
         if (props.closeOnClick) {
             document.addEventListener("mousedown", this.handleClick);
         }
         this._isMounted = true;
+		logger.debug(`componentDidMount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentDidMount" });
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         document.removeEventListener("mousedown", this.handleClick);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentWillUnmount" });
     }
 
     handleClick(event) {
+		logger.error(`>>> Entering handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         const {props} = this;
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
@@ -80,6 +93,7 @@ class Dropdown extends Component {
                 dropdownText: ""
             });
         }
+		logger.warn(`<<< Exiting handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
     }
 
     onSelect(option) {
@@ -107,6 +121,7 @@ class Dropdown extends Component {
      * @returns {string}
      */
     getClassName() {
+		logger.error('>>> Entering getClassName()', { "event.action": "getClassName" });
         const {props, state} = this;
         let className = "dnn-dropdown";
 
@@ -122,10 +137,12 @@ class Dropdown extends Component {
         else {
             className += (state.dropDownOpen ? " open" : "");
         }
+		logger.warn('<<< Exiting getClassName()', { "event.action": "getClassName" });
         return className;
     }
 
     getDropdownLabel() {
+		logger.error('>>> Entering getDropdownLabel()', { "event.action": "getDropdownLabel" });
         const {props} = this;
         let label = props.label;
         if (props.value !== undefined && props.options !== undefined && props.options.length > 0) {
@@ -136,6 +153,7 @@ class Dropdown extends Component {
                 label = selectedValue.label;
             }
         }
+		logger.warn('<<< Exiting getDropdownLabel()', { "event.action": "getDropdownLabel" });
         return (props.prependWith ?
             <span className="dropdown-prepend"><strong>{props.prependWith}</strong> {label}</span> : label);
     }
@@ -286,7 +304,9 @@ class Dropdown extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={this.getClassName()} style={props.style} ref={node => this.node = node}>
                 <div className={"collapsible-label" + this.getIsMultiLineLabel()}

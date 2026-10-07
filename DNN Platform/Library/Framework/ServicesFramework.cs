@@ -15,8 +15,10 @@ namespace DotNetNuke.Framework
     /// <summary>Enables modules to support Services Framework features.</summary>
     public class ServicesFramework : ServiceLocator<IServicesFramework, ServicesFramework>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ServicesFramework));
         public static string GetServiceFrameworkRoot()
         {
+			Logger.LogError(">>> Entering GetServiceFrameworkRoot()");
             var portalSettings = PortalSettings.Current;
             if (portalSettings == null)
             {
@@ -25,6 +27,7 @@ namespace DotNetNuke.Framework
 
             IPortalAliasInfo alias = portalSettings.PortalAlias;
             var path = alias.HttpAlias;
+			Logger.LogError("GetServiceFrameworkRoot(): path → {Path}", path);
             var index = path.IndexOf('/');
             if (index > 0)
             {
@@ -39,12 +42,15 @@ namespace DotNetNuke.Framework
                 path = "/";
             }
 
+			Logger.LogWarning("<<< Exiting GetServiceFrameworkRoot()");
             return path;
         }
 
         /// <inheritdoc />
         protected override Func<IServicesFramework> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return static () => ActivatorUtilities.GetServiceOrCreateInstance<ServicesFrameworkImpl>(Globals.DependencyProvider);
         }
     }

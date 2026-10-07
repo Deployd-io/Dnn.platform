@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 'use strict';
 define(['jquery'], function ($) {
 	return {		
@@ -28,6 +29,7 @@ define(['jquery'], function ($) {
 				var isCustomValidate = $input.hasClass('customValidate');				
 
                 var appendError = function(errorMsg) {
+					logger.error(`>>> Entering appendError(errorMsg=${errorMsg})`, { "event.action": "appendError", "logrite.errorMsg": errorMsg });
                     if (errorSpan.length) {
                         errorSpan.html(errorMsg).show();
                     } else {                       
@@ -39,6 +41,7 @@ define(['jquery'], function ($) {
                             $input.parent().find('span.dnnFormError').hide();
                         });
                     }
+					logger.warn(`<<< Exiting appendError(errorMsg=${errorMsg})`, { "event.action": "appendError", "logrite.errorMsg": errorMsg });
                 };
 
                 var val = $input.val();

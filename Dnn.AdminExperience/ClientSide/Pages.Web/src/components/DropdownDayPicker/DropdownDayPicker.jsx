@@ -4,36 +4,47 @@ import DayPicker from "../DayPicker/DayPicker.jsx";
 import { Button, GridCell } from "@dnnsoftware/dnn-react-common";
 import "./styles.less";
 import Localization from "../../localization";
+const logger = console;
 
 class DropdownDayPicker extends Component  {
 
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         document.addEventListener("click", this.handleClick.bind(this), false);
         this._isMounted = true;
+		logger.debug(`componentDidMount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentDidMount" });
     }
 
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         document.removeEventListener("click", this.handleClick.bind(this), false);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentWillUnmount" });
     }
 
     handleClick(e) {
+		logger.error(`>>> Entering handleClick(e=${e})`, { "event.action": "handleClick", "logrite.e": e });
         const {toggleDropdownCalendar, dropdownIsActive} = this.props;
         if (!this._isMounted) { return; }
         if (!this.node.contains(e.target)) {
             dropdownIsActive ? toggleDropdownCalendar(false) : null;
+			logger.warn(`<<< Exiting handleClick(e=${e})`, { "event.action": "handleClick", "logrite.e": e });
         }
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {dropdownIsActive, onDayClick, applyChanges, clearChanges, startDate, endDate, toggleDropdownCalendar} = this.props;
         const CalendarIcon = this.props.calendarIcon;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="date-picker" ref={node => this.node = node}>
                 <GridCell className="calendar-dropdown-container" columnSize={100} style={{padding: "0px 5px"}}>

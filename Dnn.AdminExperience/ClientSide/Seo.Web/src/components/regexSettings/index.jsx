@@ -8,10 +8,12 @@ import { InputGroup, SingleLineInputWithError, Label, Button, Tooltip } from "@d
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class RegexSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             regexSettings: undefined,
             triedToSubmit: false,
@@ -28,9 +30,11 @@ class RegexSettingsPanelBody extends Component {
                 RegexMatch: false
             }
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
         if (props.regexSettings) {
             this.setState({
@@ -43,18 +47,23 @@ class RegexSettingsPanelBody extends Component {
                 regexSettings: Object.assign({}, data.Settings)
             });
         }));
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         this.setState({
             regexSettings: Object.assign({}, props.regexSettings),
             triedToSubmit: false
         });
+		logger.warn(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {state, props} = this;
         let regexSettings = Object.assign({}, state.regexSettings);
+		logger.error(`onSettingChange(key=${key},event=${event}): regexSettings → ${regexSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
 
         regexSettings[key] = typeof (event) === "object" ? event.target.value : event;
 
@@ -64,9 +73,11 @@ class RegexSettingsPanelBody extends Component {
         });
 
         props.dispatch(SeoActions.regexSettingsClientModified(regexSettings));
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -94,11 +105,13 @@ class RegexSettingsPanelBody extends Component {
             }
             else {
                 util.utilities.notifyError(resx.get("SettingsError"));
+				logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
             }
         }));
     }
 
     handleValidationErrors(errors) {
+		logger.error(`>>> Entering handleValidationErrors(errors=${errors})`, { "event.action": "handleValidationErrors", "logrite.errors": errors });
         let {state} = this;
 
         if (errors.filter(error => { return error.Key === "IgnoreRegex"; }).length > 0) {
@@ -160,6 +173,7 @@ class RegexSettingsPanelBody extends Component {
         }
         else {
             state.error["RegexMatch"] = false;
+			logger.warn(`<<< Exiting handleValidationErrors(errors=${errors})`, { "event.action": "handleValidationErrors", "logrite.errors": errors });
         }
 
         this.setState({
@@ -168,9 +182,11 @@ class RegexSettingsPanelBody extends Component {
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SeoActions.getRegexSettings((data) => {
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
                 this.setState({
                     regexSettings: Object.assign({}, data.Settings)
                 });
@@ -180,6 +196,7 @@ class RegexSettingsPanelBody extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {state} = this;
         if (state.regexSettings) {
             return (
@@ -414,6 +431,8 @@ RegexSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         regexSettings: state.seo.regexSettings,

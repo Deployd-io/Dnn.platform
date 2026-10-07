@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -51,21 +52,29 @@
                     "h5", "h6", "head", "html", "iframe", "layer", "legend", "object", "ol", "p", "select", "table", "ul"];
 
   function autoCloseGT(cm) {
+	logger.error(`>>> Entering autoCloseGT(cm=${cm})`, { "event.action": "autoCloseGT", "logrite.cm": cm });
     if (cm.getOption("disableInput")) return CodeMirror.Pass;
     var ranges = cm.listSelections(), replacements = [];
+	logger.error(`autoCloseGT(cm=${cm}): ranges → ${ranges}`, { "event.action": "autoCloseGT", "logrite.cm": cm });
     for (var i = 0; i < ranges.length; i++) {
       if (!ranges[i].empty()) return CodeMirror.Pass;
       var pos = ranges[i].head, tok = cm.getTokenAt(pos);
+	logger.error(`autoCloseGT(cm=${cm}): pos → ${pos}`, { "event.action": "autoCloseGT", "logrite.cm": cm });
       var inner = CodeMirror.innerMode(cm.getMode(), tok.state), state = inner.state;
+	logger.error(`autoCloseGT(cm=${cm}): inner → ${inner}`, { "event.action": "autoCloseGT", "logrite.cm": cm });
       if (inner.mode.name != "xml" || !state.tagName) return CodeMirror.Pass;
 
       var opt = cm.getOption("autoCloseTags"), html = inner.mode.configuration == "html";
+	logger.error(`autoCloseGT(cm=${cm}): opt → ${opt}`, { "event.action": "autoCloseGT", "logrite.cm": cm });
       var dontCloseTags = (typeof opt == "object" && opt.dontCloseTags) || (html && htmlDontClose);
+	logger.error(`autoCloseGT(cm=${cm}): dontCloseTags → ${dontCloseTags}`, { "event.action": "autoCloseGT", "logrite.cm": cm });
       var indentTags = (typeof opt == "object" && opt.indentTags) || (html && htmlIndent);
+	logger.error(`autoCloseGT(cm=${cm}): indentTags → ${indentTags}`, { "event.action": "autoCloseGT", "logrite.cm": cm });
 
       var tagName = state.tagName;
       if (tok.end > pos.ch) tagName = tagName.slice(0, tagName.length - tok.end + pos.ch);
       var lowerTagName = tagName.toLowerCase();
+	logger.error(`autoCloseGT(cm=${cm}): lowerTagName → ${lowerTagName}`, { "event.action": "autoCloseGT", "logrite.cm": cm });
       // Don't process the '>' at the end of an end-tag or self-closing tag
       if (!tagName ||
           tok.type == "string" && (tok.end != pos.ch || !/[\"\']/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1) ||
@@ -76,6 +85,7 @@
         return CodeMirror.Pass;
 
       var indent = indentTags && indexOf(indentTags, lowerTagName) > -1;
+	logger.error(`autoCloseGT(cm=${cm}): indent → ${indent}`, { "event.action": "autoCloseGT", "logrite.cm": cm });
       replacements[i] = {indent: indent,
                          text: ">" + (indent ? "\n\n" : "") + "</" + tagName + ">",
                          newPos: indent ? CodeMirror.Pos(pos.line + 1, 0) : CodeMirror.Pos(pos.line, pos.ch + 1)};
@@ -85,6 +95,7 @@
       var info = replacements[i];
       cm.replaceRange(info.text, ranges[i].head, ranges[i].anchor, "+insert");
       var sel = cm.listSelections().slice(0);
+	logger.error(`autoCloseGT(cm=${cm}): sel → ${sel}`, { "event.action": "autoCloseGT", "logrite.cm": cm });
       sel[i] = {head: info.newPos, anchor: info.newPos};
       cm.setSelections(sel);
       if (info.indent) {
@@ -133,25 +144,34 @@
   }
 
   function autoCloseSlash(cm) {
+	logger.error(`>>> Entering autoCloseSlash(cm=${cm})`, { "event.action": "autoCloseSlash", "logrite.cm": cm });
     if (cm.getOption("disableInput")) return CodeMirror.Pass;
+	logger.warn(`<<< Exiting autoCloseSlash(cm=${cm})`, { "event.action": "autoCloseSlash", "logrite.cm": cm });
     return autoCloseCurrent(cm, true);
   }
 
   CodeMirror.commands.closeTag = function(cm) { return autoCloseCurrent(cm); };
+logger.error(`>>> Entering closeTag(cm=${cm})`, { "event.action": "closeTag", "logrite.cm": cm });
 
+logger.warn(`<<< Exiting closeTag(cm=${cm})`, { "event.action": "closeTag", "logrite.cm": cm });
   function indexOf(collection, elt) {
+	logger.error(`>>> Entering indexOf(collection=${collection},elt=${elt})`, { "event.action": "indexOf", "logrite.collection": collection, "logrite.elt": elt });
     if (collection.indexOf) return collection.indexOf(elt);
     for (var i = 0, e = collection.length; i < e; ++i)
       if (collection[i] == elt) return i;
+	logger.warn(`<<< Exiting indexOf(collection=${collection},elt=${elt})`, { "event.action": "indexOf", "logrite.collection": collection, "logrite.elt": elt });
     return -1;
   }
 
   // If xml-fold is loaded, we use its functionality to try and verify
   // whether a given tag is actually unclosed.
   function closingTagExists(cm, tagName, pos, state, newTag) {
+	logger.error(`>>> Entering closingTagExists(cm=${cm},tagName=${tagName},pos=${pos},state=${state},newTag=${newTag})`, { "event.action": "closingTagExists", "logrite.cm": cm, "logrite.tagName": tagName, "logrite.pos": pos, "logrite.state": state, "logrite.newTag": newTag });
     if (!CodeMirror.scanForClosingTag) return false;
     var end = Math.min(cm.lastLine() + 1, pos.line + 500);
+	logger.error(`closingTagExists(cm=${cm},tagName=${tagName},pos=${pos},state=${state},newTag=${newTag}): end → ${end}`, { "event.action": "closingTagExists", "logrite.cm": cm, "logrite.tagName": tagName, "logrite.pos": pos, "logrite.state": state, "logrite.newTag": newTag });
     var nextClose = CodeMirror.scanForClosingTag(cm, pos, null, end);
+	logger.error(`closingTagExists(cm=${cm},tagName=${tagName},pos=${pos},state=${state},newTag=${newTag}): nextClose → ${nextClose}`, { "event.action": "closingTagExists", "logrite.cm": cm, "logrite.tagName": tagName, "logrite.pos": pos, "logrite.state": state, "logrite.newTag": newTag });
     if (!nextClose || nextClose.tag != tagName) return false;
     var cx = state.context;
     // If the immediate wrapping context contains onCx instances of
@@ -161,9 +181,11 @@
     pos = nextClose.to;
     for (var i = 1; i < onCx; i++) {
       var next = CodeMirror.scanForClosingTag(cm, pos, null, end);
+	logger.error(`closingTagExists(cm=${cm},tagName=${tagName},pos=${pos},state=${state},newTag=${newTag}): next → ${next}`, { "event.action": "closingTagExists", "logrite.cm": cm, "logrite.tagName": tagName, "logrite.pos": pos, "logrite.state": state, "logrite.newTag": newTag });
       if (!next || next.tag != tagName) return false;
       pos = next.to;
     }
+	logger.warn(`<<< Exiting closingTagExists(cm=${cm},tagName=${tagName},pos=${pos},state=${state},newTag=${newTag})`, { "event.action": "closingTagExists", "logrite.cm": cm, "logrite.tagName": tagName, "logrite.pos": pos, "logrite.state": state, "logrite.newTag": newTag });
     return true;
   }
 });

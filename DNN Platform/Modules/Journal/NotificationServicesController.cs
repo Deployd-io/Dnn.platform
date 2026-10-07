@@ -28,9 +28,11 @@ namespace DotNetNuke.Modules.Journal
         [ValidateAntiForgeryToken]
         public HttpResponseMessage ViewJournal(NotificationDTO postData)
         {
+			Logger.LogError(">>> Entering ViewJournal(postData={PostData})", postData);
             try
             {
                 var notification = NotificationsController.Instance.GetNotification(postData.NotificationId);
+				Logger.LogError("ViewJournal(postData={PostData}): notification → {Notification}", postData, notification);
 
                 if (notification != null && notification.Context != null && notification.Context.Contains("_"))
                 {
@@ -38,9 +40,13 @@ namespace DotNetNuke.Modules.Journal
                     NotificationsController.Instance.DeleteNotificationRecipient(postData.NotificationId, this.UserInfo.UserID);
 
                     var context = notification.Context.Split('_');
+					Logger.LogError("ViewJournal(postData={PostData}): context → {Context}", postData, context);
                     var userId = Convert.ToInt32(context[0]);
+					Logger.LogError("ViewJournal(postData={PostData}): userId → {UserId}", postData, userId);
                     var journalId = Convert.ToInt32(context[1]);
+					Logger.LogError("ViewJournal(postData={PostData}): journalId → {JournalId}", postData, journalId);
                     var ji = JournalController.Instance.GetJournalItem(this.PortalSettings.PortalId, userId, journalId);
+					Logger.LogError("ViewJournal(postData={PostData}): ji → {Ji}", postData, ji);
                     if (ji.ProfileId != Null.NullInteger)
                     {
                         return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", Link = Globals.UserProfileURL(ji.ProfileId) });
@@ -54,6 +60,7 @@ namespace DotNetNuke.Modules.Journal
                 Logger.Error(exc);
             }
 
+			Logger.LogWarning("<<< Exiting ViewJournal(postData={PostData})", postData);
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
         }
 

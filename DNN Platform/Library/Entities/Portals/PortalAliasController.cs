@@ -44,7 +44,10 @@ namespace DotNetNuke.Entities.Portals
         /// <param name="hostSettings">The host settings.</param>
         public PortalAliasController(IEventLogger eventLogger, IHostSettings hostSettings)
         {
+			eventLogger.LogError(">>> Entering PortalAliasController(eventLogger={EventLogger},hostSettings={HostSettings})", eventLogger, hostSettings);
+			eventLogger.LogDebug("PortalAliasController(eventLogger={EventLogger},hostSettings={HostSettings}): hostSettings → {HostSettings1}", eventLogger, hostSettings, hostSettings);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogWarning("<<< Exiting PortalAliasController(eventLogger={EventLogger},hostSettings={HostSettings})", eventLogger, hostSettings);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
         }
 
@@ -260,12 +263,15 @@ namespace DotNetNuke.Entities.Portals
 #pragma warning disable CS0618 // Type or member is obsolete
         protected override Func<IPortalAliasController> GetFactory()
         {
+			eventLogger.LogError(">>> Entering GetFactory()");
+			eventLogger.LogWarning("<<< Exiting GetFactory()");
             return () => new PortalAliasController();
         }
 #pragma warning restore CS0618 // Type or member is obsolete
 
         private static void ClearCache(bool refreshServiceRoutes, int portalId = -1)
         {
+			eventLogger.LogError(">>> Entering ClearCache(refreshServiceRoutes={RefreshServiceRoutes},portalId={PortalId})", refreshServiceRoutes, portalId);
             DataCache.RemoveCache(DataCache.PortalAliasCacheKey);
             CacheController.FlushPageIndexFromCache();
 
@@ -278,6 +284,7 @@ namespace DotNetNuke.Entities.Portals
             {
                 ServicesRoutingManager.ReRegisterServiceRoutesWhileSiteIsRunning();
             }
+			eventLogger.LogWarning("<<< Exiting ClearCache(refreshServiceRoutes={RefreshServiceRoutes},portalId={PortalId})", refreshServiceRoutes, portalId);
         }
 
         private static bool ValidateAlias(string portalAlias, bool ischild, bool isDomain)
@@ -293,30 +300,37 @@ namespace DotNetNuke.Entities.Portals
                 validChars += "_";
             }
 
+			eventLogger.LogWarning("<<< Exiting ValidateAlias(portalAlias={PortalAlias},ischild={Ischild},isDomain={IsDomain})", portalAlias, ischild, isDomain);
             return portalAlias.All(c => validChars.Contains(c.ToString()));
         }
 
         private void LogEvent(IPortalAliasInfo portalAlias, EventLogType logType)
         {
+			eventLogger.LogError(">>> Entering LogEvent(portalAlias={PortalAlias},logType={LogType})", portalAlias, logType);
             this.eventLogger.AddLog(
                 portalAlias,
                 PortalController.Instance.GetCurrentSettings(),
                 UserController.Instance.GetCurrentUserInfo().UserID,
                 string.Empty,
                 logType);
+				eventLogger.LogWarning("<<< Exiting LogEvent(portalAlias={PortalAlias},logType={LogType})", portalAlias, logType);
         }
 
         private PortalAliasInfo GetPortalAliasLookupInternal(string alias)
         {
+			eventLogger.LogError(">>> Entering GetPortalAliasLookupInternal(alias={Alias})", alias);
+			eventLogger.LogWarning("<<< Exiting GetPortalAliasLookupInternal(alias={Alias})", alias);
             return this.GetPortalAliasesInternal().SingleOrDefault(pa => pa.Key == alias).Value;
         }
 
         private IPortalAliasInfo GetPortalAliasInternal(string httpAlias)
         {
+			eventLogger.LogError(">>> Entering GetPortalAliasInternal(httpAlias={HttpAlias})", httpAlias);
             string strPortalAlias;
 
             // try the specified alias first
             IPortalAliasInfo portalAlias = this.GetPortalAliasLookupInternal(httpAlias.ToLowerInvariant());
+			eventLogger.LogError("GetPortalAliasInternal(httpAlias={HttpAlias}): portalAlias → {PortalAlias}", httpAlias, portalAlias);
 
             // domain.com and www.domain.com should be synonymous
             if (portalAlias == null)
@@ -325,9 +339,11 @@ namespace DotNetNuke.Entities.Portals
                 {
                     // try alias without the "www." prefix
                     strPortalAlias = httpAlias.Replace("www.", string.Empty);
+					eventLogger.LogError("GetPortalAliasInternal(httpAlias={HttpAlias}): strPortalAlias → {StrPortalAlias}", httpAlias, strPortalAlias);
                 }
                 else
                 {
+					eventLogger.LogDebug("GetPortalAliasInternal(httpAlias={HttpAlias}): strPortalAlias → {StrPortalAlias}", httpAlias, strPortalAlias);
                     // try the alias with the "www." prefix
                     strPortalAlias = string.Concat("www.", httpAlias);
                 }
@@ -365,6 +381,7 @@ namespace DotNetNuke.Entities.Portals
             {
                 // check if this is a fresh install ( no alias values in collection )
                 var portalAliases = this.GetPortalAliasesInternal();
+				eventLogger.LogError("GetPortalAliasInternal(httpAlias={HttpAlias}): portalAliases → {PortalAliases}", httpAlias, portalAliases);
                 if (portalAliases.Keys.Count == 0 || (portalAliases.Count == 1 && portalAliases.ContainsKey("_default")))
                 {
                     // relate the PortalAlias to the default portal on a fresh database installation
@@ -384,6 +401,7 @@ namespace DotNetNuke.Entities.Portals
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting GetPortalAliasInternal(httpAlias={HttpAlias})", httpAlias);
             return portalAlias;
         }
     }

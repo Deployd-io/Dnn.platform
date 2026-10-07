@@ -41,7 +41,10 @@ namespace Dnn.PersonaBar.UI.Services
         /// <param name="serviceProvider">The DI container.</param>
         public MenuExtensionsController(IServiceProvider serviceProvider)
         {
+			Logger.LogError(">>> Entering MenuExtensionsController(serviceProvider={ServiceProvider})", serviceProvider);
             this.serviceProvider = serviceProvider;
+			Logger.LogDebug("MenuExtensionsController(serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", serviceProvider, serviceProvider);
+        Logger.LogWarning("<<< Exiting MenuExtensionsController(serviceProvider={ServiceProvider})", serviceProvider);
         }
 
         /// <summary>Retrieve a list of extensions for menu.</summary>
@@ -50,9 +53,11 @@ namespace Dnn.PersonaBar.UI.Services
         [HttpGet]
         public HttpResponseMessage GetExtensions(string menu)
         {
+			Logger.LogError(">>> Entering GetExtensions(menu={Menu})", menu);
             try
             {
                 var menuItem = PersonaBarRepository.Instance.GetMenuItem(menu);
+				Logger.LogError("GetExtensions(menu={Menu}): menuItem → {MenuItem}", menu, menuItem);
                 if (menuItem != null)
                 {
                     var extensions = PersonaBarExtensionRepository.Instance.GetExtensions(menuItem.MenuId)
@@ -73,27 +78,37 @@ namespace Dnn.PersonaBar.UI.Services
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetExtensions(menu={Menu}): {Arg1}", menu, ex.Message);
                 Exceptions.LogException(ex);
+				Logger.LogWarning("<<< Exiting GetExtensions(menu={Menu})", menu);
                 return this.Request.CreateErrorResponse(HttpStatusCode.NotFound, ex.Message);
             }
         }
 
         private string GetExtensionPathByController(PersonaBarExtension extension)
         {
+			Logger.LogError(">>> Entering GetExtensionPathByController(extension={Extension})", extension);
             var menuItem = PersonaBarRepository.Instance.GetMenuItem(extension.MenuId);
+			Logger.LogError("GetExtensionPathByController(extension={Extension}): menuItem → {MenuItem}", extension, menuItem);
             if (menuItem == null)
             {
                 return extension.Path;
             }
 
             var extensionController = this.GetExtensionController(extension);
+			Logger.LogError("GetExtensionPathByController(extension={Extension}): extensionController → {ExtensionController}", extension, extensionController);
             var path = extensionController?.GetPath(extension);
+			Logger.LogError("GetExtensionPathByController(extension={Extension}): path → {Path}", extension, path);
+			Logger.LogWarning("<<< Exiting GetExtensionPathByController(extension={Extension})", extension);
             return !string.IsNullOrEmpty(path) ? path : extension.Path;
         }
 
         private bool IsVisible(PersonaBarExtension extension)
         {
+			Logger.LogError(">>> Entering IsVisible(extension={Extension})", extension);
             var extensionController = this.GetExtensionController(extension);
+			Logger.LogError("IsVisible(extension={Extension}): extensionController → {ExtensionController}", extension, extensionController);
+			Logger.LogWarning("<<< Exiting IsVisible(extension={Extension})", extension);
             return extensionController == null || extensionController.Visible(extension);
         }
 
@@ -105,6 +120,7 @@ namespace Dnn.PersonaBar.UI.Services
 
         private IExtensionController GetExtensionController(PersonaBarExtension extension)
         {
+			Logger.LogError(">>> Entering GetExtensionController(extension={Extension})", extension);
             var controllerTypeName = extension.Controller;
             if (string.IsNullOrEmpty(controllerTypeName))
             {
@@ -114,12 +130,15 @@ namespace Dnn.PersonaBar.UI.Services
             try
             {
                 var cacheKey = $"PersonaBarExtensionController_{extension.Identifier}";
+				Logger.LogError("GetExtensionController(extension={Extension}): cacheKey → {CacheKey}", extension, cacheKey);
                 var controllerType = Reflection.CreateType(controllerTypeName, cacheKey, useCache: true);
+				Logger.LogError("GetExtensionController(extension={Extension}): controllerType → {ControllerType}", extension, controllerType);
                 return ActivatorUtilities.GetServiceOrCreateInstance(this.serviceProvider, controllerType) as IExtensionController;
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting GetExtensionController(extension={Extension})", extension);
                 return null;
             }
         }

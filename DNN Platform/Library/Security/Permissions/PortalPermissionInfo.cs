@@ -15,6 +15,7 @@ namespace DotNetNuke.Security.Permissions
     [XmlRoot("permission")]
     public class PortalPermissionInfo : PermissionInfoBase, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalPermissionInfo));
         private int portalID;
 
         // local property declarations
@@ -26,7 +27,11 @@ namespace DotNetNuke.Security.Permissions
         /// </summary>
         public PortalPermissionInfo()
         {
+			Logger.LogError(">>> Entering PortalPermissionInfo()");
             this.portalPermissionID = Null.NullInteger;
+			Logger.LogDebug("PortalPermissionInfo(): this.portalPermissionID → {Arg0}", this.portalPermissionID);
+        Logger.LogDebug("PortalPermissionInfo(permission={Permission}): this.PermissionID → {Arg1}", permission, this.PermissionID);
+        Logger.LogWarning("<<< Exiting PortalPermissionInfo()");
             this.portalID = Null.NullInteger;
         }
 
@@ -39,8 +44,10 @@ namespace DotNetNuke.Security.Permissions
             : this()
         {
             this.ModuleDefID = permission.ModuleDefID;
+			Logger.LogDebug("PortalPermissionInfo(permission={Permission}): this.ModuleDefID → {Arg1}", permission, this.ModuleDefID);
             this.PermissionCode = permission.PermissionCode;
             this.PermissionID = permission.PermissionID;
+			Logger.LogDebug("PortalPermissionInfo(permission={Permission}): this.PermissionCode → {Arg1}", permission, this.PermissionCode);
             this.PermissionKey = permission.PermissionKey;
             this.PermissionName = permission.PermissionName;
         }
@@ -97,8 +104,10 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             // Call the base classes fill method to populate base class properties
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
             this.PortalPermissionID = Null.SetNullInteger(dr["PortalPermissionID"]);
             this.PortalID = Null.SetNullInteger(dr["PortalID"]);
         }

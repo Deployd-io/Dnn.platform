@@ -17,6 +17,7 @@ namespace Dnn.PersonaBar.Library.Repository
     public class PersonaBarExtensionRepository : ServiceLocator<IPersonaBarExtensionRepository, PersonaBarExtensionRepository>,
         IPersonaBarExtensionRepository
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PersonaBarExtensionRepository));
         private const string PersonaBarExtensionsCacheKey = "PersonaBarExtensions";
         private static readonly object ThreadLocker = new object();
         private readonly DataService dataService = new DataService();
@@ -24,6 +25,7 @@ namespace Dnn.PersonaBar.Library.Repository
         /// <inheritdoc />
         public void SaveExtension(PersonaBarExtension extension)
         {
+			Logger.LogError(">>> Entering SaveExtension(extension={Extension})", extension);
             this.dataService.SavePersonaBarExtension(
                 extension.Identifier,
                 extension.MenuId,
@@ -36,26 +38,33 @@ namespace Dnn.PersonaBar.Library.Repository
                 UserController.Instance.GetCurrentUserInfo().UserID);
 
             ClearCache();
+			Logger.LogWarning("<<< Exiting SaveExtension(extension={Extension})", extension);
         }
 
         /// <inheritdoc />
         public void DeleteExtension(PersonaBarExtension extension)
         {
+			Logger.LogError(">>> Entering DeleteExtension(extension={Extension})", extension);
             this.DeleteExtension(extension.Identifier);
+			Logger.LogWarning("<<< Exiting DeleteExtension(extension={Extension})", extension);
         }
 
         /// <inheritdoc />
         public void DeleteExtension(string identifier)
         {
+			Logger.LogError(">>> Entering DeleteExtension(identifier={Identifier})", identifier);
             this.dataService.DeletePersonaBarExtension(identifier);
 
             ClearCache();
+			Logger.LogWarning("<<< Exiting DeleteExtension(identifier={Identifier})", identifier);
         }
 
         /// <inheritdoc />
         public IList<PersonaBarExtension> GetExtensions()
         {
+			Logger.LogError(">>> Entering GetExtensions()");
             var extensions = DataCache.GetCache<IList<PersonaBarExtension>>(PersonaBarExtensionsCacheKey);
+			Logger.LogError("GetExtensions(): extensions → {Extensions}", extensions);
             if (extensions == null)
             {
                 lock (ThreadLocker)
@@ -71,6 +80,8 @@ namespace Dnn.PersonaBar.Library.Repository
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetExtensions()");
+			Logger.LogWarning("<<< Exiting GetExtensions(menuId={MenuId})", menuId);
             return extensions;
         }
 
@@ -83,12 +94,16 @@ namespace Dnn.PersonaBar.Library.Repository
         /// <inheritdoc />
         protected override Func<IPersonaBarExtensionRepository> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new PersonaBarExtensionRepository();
         }
 
         private static void ClearCache()
         {
+			Logger.LogError(">>> Entering ClearCache()");
             DataCache.RemoveCache(PersonaBarExtensionsCacheKey);
+			Logger.LogWarning("<<< Exiting ClearCache()");
         }
     }
 }

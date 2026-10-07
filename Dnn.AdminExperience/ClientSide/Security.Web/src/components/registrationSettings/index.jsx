@@ -15,6 +15,7 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let canEdit = false;
 const reUserNameMinLength = /^[1-9][0-9]?[0-9]?$|^0$/;
@@ -22,6 +23,7 @@ const reUserNameMinLength = /^[1-9][0-9]?[0-9]?$|^0$/;
 class RegistrationSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             registrationSettings: undefined,
             triedToSubmit: false,
@@ -32,9 +34,11 @@ class RegistrationSettingsPanelBody extends Component {
             }
         };
         canEdit = util.settings.isHost || util.settings.isAdmin || util.settings.permissions.REGISTRATION_SETTINGS_EDIT;
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const { props } = this;
         if (props.registrationSettings) {
             this.setState({
@@ -48,19 +52,24 @@ class RegistrationSettingsPanelBody extends Component {
                 registrationSettings
             });
         }));
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         this.setState({
             registrationSettings: Object.assign({}, props.registrationSettings),
             triedToSubmit: false
         });
+		logger.warn(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let { state, props } = this;
 
         let registrationSettings = Object.assign({}, state.registrationSettings);
+		logger.error(`onSettingChange(key=${key},event=${event}): registrationSettings → ${registrationSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
 
         if (key === "UserRegistration" || key === "RegistrationFormType") {
             registrationSettings[key] = parseInt(event);
@@ -87,9 +96,11 @@ class RegistrationSettingsPanelBody extends Component {
         });
 
         props.dispatch(SecurityActions.registrationSettingsClientModified(registrationSettings));
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const { props, state } = this;
         state.error["validationFields"] = "";
@@ -109,17 +120,21 @@ class RegistrationSettingsPanelBody extends Component {
             util.utilities.notifyError(resx.get("RegistrationSettingsError"));
             const errorMessage = JSON.parse(error.responseText);
             state.error["registrationFields"] = errorMessage.Message;
+			logger.error(`onUpdate(event=${event}): errorMessage → ${errorMessage}`, { "event.action": "onUpdate", "logrite.event": event });
             state.error["validationFields"] = errorMessage.ModelState;
             this.setState({
                 error: state.error
             });
         }));
+		logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const { props } = this;
         util.utilities.confirm(resx.get("RegistrationSettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SecurityActions.getRegistrationSettings((data) => {
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
                 let registrationSettings = Object.assign({}, data.Results.Settings);
                 this.setState({
                     registrationSettings
@@ -129,47 +144,58 @@ class RegistrationSettingsPanelBody extends Component {
     }
 
     keyValuePairsToOptions(keyValuePairs) {
+		logger.error(`>>> Entering keyValuePairsToOptions(keyValuePairs=${keyValuePairs})`, { "event.action": "keyValuePairsToOptions", "logrite.keyValuePairs": keyValuePairs });
         let options = [];
         if (keyValuePairs !== undefined) {
             options = keyValuePairs.map((item) => {
                 return { label: item.Key, value: item.Value };
             });
         }
+		logger.warn(`<<< Exiting keyValuePairsToOptions(keyValuePairs=${keyValuePairs})`, { "event.action": "keyValuePairsToOptions", "logrite.keyValuePairs": keyValuePairs });
         return options;
     }
 
     isCustomFormType() {
+		logger.error('>>> Entering isCustomFormType()', { "event.action": "isCustomFormType" });
         const { state } = this;
         if (state.registrationSettings != undefined && state.registrationSettings.RegistrationFormType === 1) {
             return true;
         }
+		logger.warn('<<< Exiting isCustomFormType()', { "event.action": "isCustomFormType" });
         return false;
     }
 
     getRegistrationFields(fields) {
+		logger.error(`>>> Entering getRegistrationFields(fields=${fields})`, { "event.action": "getRegistrationFields", "logrite.fields": fields });
         let fieldList = [];
         if (fields) {
             fieldList = fields.split(",").map((item) => {
                 return { id: item, name: item };
             });
         }
+		logger.warn(`<<< Exiting getRegistrationFields(fields=${fields})`, { "event.action": "getRegistrationFields", "logrite.fields": fields });
         return fieldList;
     }
 
     onUpdateTags(event) {
+		logger.error(`>>> Entering onUpdateTags(event=${event})`, { "event.action": "onUpdateTags", "logrite.event": event });
         let { state, props } = this;
         let registrationSettings = Object.assign({}, state.registrationSettings);
+		logger.error(`onUpdateTags(event=${event}): registrationSettings → ${registrationSettings}`, { "event.action": "onUpdateTags", "logrite.event": event });
         let fields = event.map((field) => { return field.name; }).join(",");
+		logger.error(`onUpdateTags(event=${event}): fields → ${fields}`, { "event.action": "onUpdateTags", "logrite.event": event });
         registrationSettings["RegistrationFields"] = fields;
         this.setState({
             registrationSettings: registrationSettings,
             triedToSubmit: false
         });
         props.dispatch(SecurityActions.registrationSettingsClientModified(registrationSettings));
+		logger.warn(`<<< Exiting onUpdateTags(event=${event})`, { "event.action": "onUpdateTags", "logrite.event": event });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props, state } = this;
         const ToolTipStyle = {
             padding: "5px 0",
@@ -583,6 +609,8 @@ RegistrationSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         registrationSettings: state.security.registrationSettings,

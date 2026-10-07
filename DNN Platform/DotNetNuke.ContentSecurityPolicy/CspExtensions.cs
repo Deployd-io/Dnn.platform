@@ -1,4 +1,5 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+﻿using Microsoft.Extensions.Logging;
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information
 
@@ -9,6 +10,7 @@ namespace DotNetNuke.ContentSecurityPolicy
     /// </summary>
     public static class CspExtensions
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Adds script source directives to the specified <see cref="IContentSecurityPolicy"/> instance
         /// to enable support for WebForms, including 'self', 'unsafe-inline', and 'unsafe-eval'.
@@ -16,6 +18,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="csp">The content security policy to modify.</param>
         public static void AddWebformsSupport(this IContentSecurityPolicy csp)
         {
+			_logger.LogError(">>> Entering AddWebformsSupport(csp={Csp})", csp);
             csp.DefaultSource.AddSelf();
             csp.ScriptSource.AddSelf();
             csp.ScriptSource.AddInline();
@@ -27,6 +30,7 @@ namespace DotNetNuke.ContentSecurityPolicy
             csp.FormAction.AddSelf();
             csp.ConnectSource.AddSelf();
             csp.BaseUriSource.AddSelf();
+			_logger.LogWarning("<<< Exiting AddWebformsSupport(csp={Csp})", csp);
         }
     }
 }

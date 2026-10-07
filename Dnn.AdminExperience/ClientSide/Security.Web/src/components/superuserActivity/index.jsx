@@ -4,21 +4,27 @@ import { connect } from "react-redux";
 import { security as SecurityActions } from "../../actions";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class SuperuserActivityPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
         if (props.activities) {
             return;
         }
         props.dispatch(SecurityActions.getSuperuserActivities());
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     renderHeader() {
+		logger.error('>>> Entering renderHeader()', { "event.action": "renderHeader" });
         const tableFields = [
             { "name": resx.get("Username"), "id": "Username" },
             { "name": resx.get("CreatedDate"), "id": "CreatedDate" },
@@ -32,11 +38,15 @@ class SuperuserActivityPanelBody extends Component {
             </div>;
         });
 
+		logger.error(`renderHeader(): tableHeaders → ${tableHeaders}`, { "event.action": "renderHeader" });
+		logger.warn('<<< Exiting renderHeader()', { "event.action": "renderHeader" });
         return <div className="activityHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderedList() {
+		logger.error('>>> Entering renderedList()', { "event.action": "renderedList" });
         const {props} = this;
+		logger.warn('<<< Exiting renderedList()', { "event.action": "renderedList" });
         return props.activities.map((term, i) => {
             return (
                 <div className="activityItem" key={i}>
@@ -67,6 +77,7 @@ class SuperuserActivityPanelBody extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         if (props.activities) {
             return (
@@ -92,6 +103,8 @@ SuperuserActivityPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         activities: state.security.activities

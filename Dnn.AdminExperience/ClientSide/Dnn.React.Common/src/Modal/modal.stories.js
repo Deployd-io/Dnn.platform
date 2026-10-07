@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Modal from "./index";
+const logger = console;
 
 const storyStyle = {
     overlay: {
@@ -127,7 +128,9 @@ class ControlledModal extends Component {
             onRequestClose,
             ...modalProps
         } = this.props;
+		logger.error('>>> Entering render()', { "event.action": "render" });
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div style={{ minHeight: "120px", padding: "24px" }}>
                 <button onClick={this.onOpen}>{buttonLabel}</button>

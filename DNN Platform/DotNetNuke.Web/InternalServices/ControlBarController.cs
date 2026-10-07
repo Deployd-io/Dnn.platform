@@ -72,6 +72,8 @@ namespace DotNetNuke.Web.InternalServices
         public ControlBarController(IBusinessControllerProvider businessControllerProvider)
             : this(businessControllerProvider, null, null, null, null, null, null, null)
         {
+		Logger.LogError(">>> Entering ControlBarController(businessControllerProvider={BusinessControllerProvider})", businessControllerProvider);
+        Logger.LogWarning("<<< Exiting ControlBarController(businessControllerProvider={BusinessControllerProvider})", businessControllerProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ControlBarController"/> class.</summary>
@@ -111,14 +113,19 @@ namespace DotNetNuke.Web.InternalServices
         [DnnPageEditor]
         public HttpResponseMessage GetPortalDesktopModules(string category, int loadingStartIndex, int loadingPageSize, string searchTerm, string excludeCategories = "", bool sortBookmarks = false, string topModule = "")
         {
+			Logger.LogError(">>> Entering GetPortalDesktopModules(category={Category},loadingStartIndex={LoadingStartIndex},loadingPageSize={LoadingPageSize},searchTerm={SearchTerm},excludeCategories={ExcludeCategories},sortBookmarks={SortBookmarks},topModule={TopModule})", category, loadingStartIndex, loadingPageSize, searchTerm, excludeCategories, sortBookmarks, topModule);
             if (string.IsNullOrEmpty(category))
             {
                 category = "All";
+				Logger.LogError("GetPortalDesktopModules(category={Category},loadingStartIndex={LoadingStartIndex},loadingPageSize={LoadingPageSize},searchTerm={SearchTerm},excludeCategories={ExcludeCategories},sortBookmarks={SortBookmarks},topModule={TopModule}): category → {Category1}", category, loadingStartIndex, loadingPageSize, searchTerm, excludeCategories, sortBookmarks, topModule, category);
             }
 
             var bookmarkCategory = this.controller.GetBookmarkCategory(PortalSettings.Current.PortalId);
+			Logger.LogError("GetPortalDesktopModules(category={Category},loadingStartIndex={LoadingStartIndex},loadingPageSize={LoadingPageSize},searchTerm={SearchTerm},excludeCategories={ExcludeCategories},sortBookmarks={SortBookmarks},topModule={TopModule}): bookmarkCategory → {BookmarkCategory}", category, loadingStartIndex, loadingPageSize, searchTerm, excludeCategories, sortBookmarks, topModule, bookmarkCategory);
             var bookmarkedModules = this.controller.GetBookmarkedDesktopModules(PortalSettings.Current.PortalId, UserController.Instance.GetCurrentUserInfo().UserID, searchTerm);
+			Logger.LogError("GetPortalDesktopModules(category={Category},loadingStartIndex={LoadingStartIndex},loadingPageSize={LoadingPageSize},searchTerm={SearchTerm},excludeCategories={ExcludeCategories},sortBookmarks={SortBookmarks},topModule={TopModule}): bookmarkedModules → {BookmarkedModules}", category, loadingStartIndex, loadingPageSize, searchTerm, excludeCategories, sortBookmarks, topModule, bookmarkedModules);
             var bookmarkCategoryModules = this.controller.GetCategoryDesktopModules(this.PortalSettings.PortalId, bookmarkCategory, searchTerm);
+			Logger.LogError("GetPortalDesktopModules(category={Category},loadingStartIndex={LoadingStartIndex},loadingPageSize={LoadingPageSize},searchTerm={SearchTerm},excludeCategories={ExcludeCategories},sortBookmarks={SortBookmarks},topModule={TopModule}): bookmarkCategoryModules → {BookmarkCategoryModules}", category, loadingStartIndex, loadingPageSize, searchTerm, excludeCategories, sortBookmarks, topModule, bookmarkCategoryModules);
 
             var filteredList = bookmarkCategory == category
                 ? bookmarkCategoryModules.OrderBy(m => m.Key).Union(bookmarkedModules.OrderBy(m => m.Key)).Distinct()
@@ -127,6 +134,7 @@ namespace DotNetNuke.Web.InternalServices
             if (!string.IsNullOrEmpty(excludeCategories))
             {
                 var excludeList = excludeCategories.ToLowerInvariant().Split(',');
+				Logger.LogError("GetPortalDesktopModules(category={Category},loadingStartIndex={LoadingStartIndex},loadingPageSize={LoadingPageSize},searchTerm={SearchTerm},excludeCategories={ExcludeCategories},sortBookmarks={SortBookmarks},topModule={TopModule}): excludeList → {ExcludeList}", category, loadingStartIndex, loadingPageSize, searchTerm, excludeCategories, sortBookmarks, topModule, excludeList);
                 filteredList =
                     filteredList.Where(kvp =>
                         !excludeList.Contains(kvp.Value.DesktopModule.Category.ToLowerInvariant()));
@@ -136,6 +144,7 @@ namespace DotNetNuke.Web.InternalServices
             {
                 // sort bookmarked modules
                 filteredList = bookmarkedModules.OrderBy(m => m.Key).Concat(filteredList.Except(bookmarkedModules));
+				Logger.LogError("GetPortalDesktopModules(category={Category},loadingStartIndex={LoadingStartIndex},loadingPageSize={LoadingPageSize},searchTerm={SearchTerm},excludeCategories={ExcludeCategories},sortBookmarks={SortBookmarks},topModule={TopModule}): filteredList → {FilteredList}", category, loadingStartIndex, loadingPageSize, searchTerm, excludeCategories, sortBookmarks, topModule, filteredList);
 
                 // move Html on top
                 filteredList = filteredList.Where(m => m.Key.Equals(topModule, StringComparison.OrdinalIgnoreCase)).
@@ -154,6 +163,7 @@ namespace DotNetNuke.Web.InternalServices
                 Bookmarked = bookmarkedModules.Any(m => m.Key == kvp.Key),
                 ExistsInBookmarkCategory = bookmarkCategoryModules.Any(m => m.Key == kvp.Key),
             }).ToList();
+			Logger.LogWarning("<<< Exiting GetPortalDesktopModules(category={Category},loadingStartIndex={LoadingStartIndex},loadingPageSize={LoadingPageSize},searchTerm={SearchTerm},excludeCategories={ExcludeCategories},sortBookmarks={SortBookmarks},topModule={TopModule})", category, loadingStartIndex, loadingPageSize, searchTerm, excludeCategories, sortBookmarks, topModule);
             return this.Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
@@ -164,16 +174,21 @@ namespace DotNetNuke.Web.InternalServices
         [DnnPageEditor]
         public HttpResponseMessage GetPageList(string portal)
         {
+			Logger.LogError(">>> Entering GetPageList(portal={Portal})", portal);
             var portalSettings = this.GetPortalSettings(portal);
 
+			Logger.LogError("GetPageList(portal={Portal}): portalSettings → {PortalSettings}", portal, portalSettings);
             List<TabInfo> tabList;
             if (this.PortalSettings.PortalId == portalSettings.PortalId)
             {
                 tabList = TabController.GetPortalTabs(this.hostSettings, this.appStatus, portalSettings.PortalId, this.PortalSettings.ActiveTab.TabID, false, string.Empty, true, false, false, false, true);
+				Logger.LogError("GetPageList(portal={Portal}): tabList → {TabList}", portal, tabList);
             }
             else
             {
+				Logger.LogDebug("GetPageList(portal={Portal}): tabList → {TabList}", portal, tabList);
                 var groups = PortalGroupController.Instance.GetPortalGroups().ToArray();
+				Logger.LogError("GetPageList(portal={Portal}): groups → {Groups}", portal, groups);
 
                 var myGroup = (
                     from @group in groups
@@ -194,6 +209,7 @@ namespace DotNetNuke.Web.InternalServices
             }
 
             List<PageDefDTO> result = new List<PageDefDTO>();
+			Logger.LogError("GetPageList(portal={Portal}): result → {Result}", portal, result);
             foreach (var tab in tabList)
             {
                 if (tab.PortalID == this.PortalSettings.PortalId || (GetModules(tab.TabID).Count > 0 && tab.TabID != portalSettings.AdminTabId && tab.ParentId != portalSettings.AdminTabId))
@@ -202,6 +218,7 @@ namespace DotNetNuke.Web.InternalServices
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetPageList(portal={Portal})", portal);
             return this.Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
@@ -212,12 +229,15 @@ namespace DotNetNuke.Web.InternalServices
         [DnnPageEditor]
         public HttpResponseMessage GetTabModules(string tab)
         {
+			Logger.LogError(">>> Entering GetTabModules(tab={Tab})", tab);
             if (int.TryParse(tab, out var tabId))
             {
                 var result = new List<ModuleDefDTO>();
+				Logger.LogError("GetTabModules(tab={Tab}): result → {Result}", tab, result);
                 if (tabId > 0)
                 {
                     var pageModules = GetModules(tabId);
+					Logger.LogError("GetTabModules(tab={Tab}): pageModules → {PageModules}", tab, pageModules);
 
                     Dictionary<int, string> resultDict = pageModules.ToDictionary(module => module.ModuleID, module => module.ModuleTitle);
                     result.AddRange(from kvp in resultDict
@@ -228,6 +248,7 @@ namespace DotNetNuke.Web.InternalServices
                 return this.Request.CreateResponse(HttpStatusCode.OK, result);
             }
 
+			Logger.LogWarning("<<< Exiting GetTabModules(tab={Tab})", tab);
             return this.Request.CreateResponse(HttpStatusCode.InternalServerError);
         }
 
@@ -238,10 +259,14 @@ namespace DotNetNuke.Web.InternalServices
         [DnnPageEditor]
         public HttpResponseMessage CopyPermissionsToChildren()
         {
+			Logger.LogError(">>> Entering CopyPermissionsToChildren()");
             if (TabPermissionController.CanManagePage() && UserController.Instance.GetCurrentUserInfo().IsInRole("Administrators")
                                                         && this.ActiveTabHasChildren() && !this.PortalSettings.ActiveTab.IsSuperTab)
             {
                 TabController.CopyPermissionsToChildren(this.eventLogger, this.PortalSettings.ActiveTab, this.PortalSettings.ActiveTab.TabPermissions);
+				Logger.LogError(">>> Entering ActiveTabHasChildren()");
+				Logger.LogWarning("<<< Exiting ActiveTabHasChildren()");
+			Logger.LogWarning("<<< Exiting CopyPermissionsToChildren()");
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, });
             }
 
@@ -256,25 +281,30 @@ namespace DotNetNuke.Web.InternalServices
         [DnnPageEditor]
         public HttpResponseMessage AddModule(AddModuleDTO dto)
         {
+			Logger.LogError(">>> Entering AddModule(dto={Dto})", dto);
             if (TabPermissionController.CanAddContentToPage() && this.CanAddModuleToPage())
             {
                 int permissionType;
                 try
                 {
                     permissionType = int.Parse(dto.Visibility, CultureInfo.InvariantCulture);
+					Logger.LogError("AddModule(dto={Dto}): permissionType → {PermissionType}", dto, permissionType);
                 }
                 catch (Exception exc)
                 {
+					Logger.LogDebug("AddModule(dto={Dto}): permissionType → {PermissionType}", dto, permissionType);
                     Logger.Error(exc);
                     permissionType = 0;
                 }
 
                 int positionId = -1;
+				Logger.LogError("AddModule(dto={Dto}): positionId → {PositionId}", dto, positionId);
                 if (!string.IsNullOrEmpty(dto.Sort))
                 {
                     try
                     {
                         var sortId = int.Parse(dto.Sort, CultureInfo.InvariantCulture);
+						Logger.LogError("AddModule(dto={Dto}): sortId → {SortId}", dto, sortId);
                         if (sortId >= 0)
                         {
                             positionId = GetPaneModuleOrder(dto.Pane, sortId);
@@ -305,9 +335,11 @@ namespace DotNetNuke.Web.InternalServices
                 try
                 {
                     moduleLstId = int.Parse(dto.Module, CultureInfo.InvariantCulture);
+					Logger.LogError("AddModule(dto={Dto}): moduleLstId → {ModuleLstId}", dto, moduleLstId);
                 }
                 catch (Exception exc)
                 {
+					Logger.LogDebug("AddModule(dto={Dto}): moduleLstId → {ModuleLstId}", dto, moduleLstId);
                     Logger.Error(exc);
                     moduleLstId = -1;
                 }
@@ -315,6 +347,7 @@ namespace DotNetNuke.Web.InternalServices
                 try
                 {
                     int tabModuleId = -1;
+					Logger.LogError("AddModule(dto={Dto}): tabModuleId → {TabModuleId}", dto, tabModuleId);
                     if (moduleLstId > -1)
                     {
                         if (dto.AddExistingModule == "true")
@@ -323,9 +356,11 @@ namespace DotNetNuke.Web.InternalServices
                             try
                             {
                                 pageId = int.Parse(dto.Page, CultureInfo.InvariantCulture);
+								Logger.LogError("AddModule(dto={Dto}): pageId → {PageId}", dto, pageId);
                             }
                             catch (Exception exc)
                             {
+								Logger.LogDebug("AddModule(dto={Dto}): pageId → {PageId}", dto, pageId);
                                 Logger.Error(exc);
                                 pageId = -1;
                             }
@@ -349,6 +384,7 @@ namespace DotNetNuke.Web.InternalServices
                 }
             }
 
+			Logger.LogWarning("<<< Exiting AddModule(dto={Dto})", dto);
             return this.Request.CreateResponse(HttpStatusCode.InternalServerError);
         }
 
@@ -359,12 +395,14 @@ namespace DotNetNuke.Web.InternalServices
         [RequireHost]
         public HttpResponseMessage ClearHostCache()
         {
+			Logger.LogError(">>> Entering ClearHostCache()");
             if (UserController.Instance.GetCurrentUserInfo().IsSuperUser)
             {
                 DataCache.ClearCache();
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, });
             }
 
+			Logger.LogWarning("<<< Exiting ClearHostCache()");
             return this.Request.CreateResponse(HttpStatusCode.InternalServerError);
         }
 
@@ -375,15 +413,18 @@ namespace DotNetNuke.Web.InternalServices
         [RequireHost]
         public HttpResponseMessage RecycleApplicationPool()
         {
+			Logger.LogError(">>> Entering RecycleApplicationPool()");
             if (UserController.Instance.GetCurrentUserInfo().IsSuperUser)
             {
                 var log = new LogInfo { BypassBuffering = true, LogTypeKey = nameof(EventLogType.HOST_ALERT) };
+				Logger.LogError("RecycleApplicationPool(): log → {Log}", log);
                 log.AddProperty("Message", "UserRestart");
                 LogController.Instance.AddLog(log);
                 Config.Touch(this.appStatus);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, });
             }
 
+			Logger.LogWarning("<<< Exiting RecycleApplicationPool()");
             return this.Request.CreateResponse(HttpStatusCode.InternalServerError);
         }
 
@@ -395,6 +436,7 @@ namespace DotNetNuke.Web.InternalServices
         [RequireHost]
         public HttpResponseMessage SwitchSite(SwitchSiteDTO dto)
         {
+			Logger.LogError(">>> Entering SwitchSite(dto={Dto})", dto);
             if (UserController.Instance.GetCurrentUserInfo().IsSuperUser)
             {
                 try
@@ -402,7 +444,9 @@ namespace DotNetNuke.Web.InternalServices
                     if (!string.IsNullOrEmpty(dto.Site))
                     {
                         int selectedPortalId = int.Parse(dto.Site, CultureInfo.InvariantCulture);
+						Logger.LogError("SwitchSite(dto={Dto}): selectedPortalId → {SelectedPortalId}", dto, selectedPortalId);
                         var portalAliases = this.portalAliasService.GetPortalAliasesByPortalId(selectedPortalId).ToList();
+						Logger.LogError("SwitchSite(dto={Dto}): portalAliases → {PortalAliases}", dto, portalAliases);
 
                         if (portalAliases.Count > 0 && portalAliases[0] != null)
                         {
@@ -412,14 +456,17 @@ namespace DotNetNuke.Web.InternalServices
                 }
                 catch (ThreadAbortException)
                 {
+					Logger.LogError("Exception in SwitchSite(dto={Dto}): {Arg1}", dto, ThreadAbortException.Message);
                     // Do nothing we are not logging ThreadAbortExceptions caused by redirects
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in SwitchSite(dto={Dto}): {Arg1}", dto, ex.Message);
                     Exceptions.LogException(ex);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting SwitchSite(dto={Dto})", dto);
             return this.Request.CreateResponse(HttpStatusCode.InternalServerError);
         }
 
@@ -430,6 +477,7 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage SwitchLanguage(SwitchLanguageDTO dto)
         {
+			Logger.LogError(">>> Entering SwitchLanguage(dto={Dto})", dto);
             try
             {
                 if (this.PortalSettings.AllowUserUICulture && this.PortalSettings.ContentLocalizationEnabled)
@@ -437,8 +485,10 @@ namespace DotNetNuke.Web.InternalServices
                     if (!string.IsNullOrEmpty(dto.Language))
                     {
                         var personalization = this.personalizationController.LoadProfile(this.UserInfo.UserID, this.PortalSettings.PortalId);
+						Logger.LogError("SwitchLanguage(dto={Dto}): personalization → {Personalization}", dto, personalization);
                         personalization.Profile["Usability:UICulture"] = dto.Language;
                         personalization.IsModified = true;
+						Logger.LogDebug("SwitchLanguage(dto={Dto}): personalization.IsModified → {Arg1}", dto, personalization.IsModified);
                         this.personalizationController.SaveProfile(personalization);
                         return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, });
                     }
@@ -446,13 +496,16 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (ThreadAbortException)
             {
+				Logger.LogError("Exception in SwitchLanguage(dto={Dto}): {Arg1}", dto, ThreadAbortException.Message);
                 // Do nothing we are not logging ThreadAbortExceptions caused by redirects
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in SwitchLanguage(dto={Dto}): {Arg1}", dto, ex.Message);
                 Exceptions.LogException(ex);
             }
 
+			Logger.LogWarning("<<< Exiting SwitchLanguage(dto={Dto})", dto);
             return this.Request.CreateResponse(HttpStatusCode.InternalServerError);
         }
 
@@ -464,26 +517,32 @@ namespace DotNetNuke.Web.InternalServices
         [DnnPageEditor]
         public HttpResponseMessage ToggleUserMode(UserModeDTO userMode)
         {
+			Logger.LogError(">>> Entering ToggleUserMode(userMode={UserMode})", userMode);
             if (userMode == null)
             {
                 userMode = new UserModeDTO { UserMode = "VIEW" };
+				Logger.LogError("ToggleUserMode(userMode={UserMode}): userMode → {UserMode1}", userMode, userMode);
             }
 
             this.ToggleUserMode(userMode.UserMode);
             var response = this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, });
+			Logger.LogError("ToggleUserMode(userMode={UserMode}): response → {Response}", userMode, response);
 
             if (userMode.UserMode.Equals("VIEW", StringComparison.OrdinalIgnoreCase))
             {
                 var cookie = this.Request.Headers.GetCookies("StayInEditMode").FirstOrDefault();
+				Logger.LogError("ToggleUserMode(userMode={UserMode}): cookie → {Cookie}", userMode, cookie);
                 if (cookie != null && !string.IsNullOrEmpty(cookie["StayInEditMode"].Value))
                 {
                     var expireCookie = new CookieHeaderValue("StayInEditMode", string.Empty);
+					Logger.LogError("ToggleUserMode(userMode={UserMode}): expireCookie → {ExpireCookie}", userMode, expireCookie);
                     expireCookie.Expires = DateTimeOffset.Now.AddDays(-1);
                     expireCookie.Path = !string.IsNullOrEmpty(Globals.ApplicationPath) ? Globals.ApplicationPath : "/";
                     response.Headers.AddCookies(new List<CookieHeaderValue> { expireCookie });
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ToggleUserMode(userMode={UserMode})", userMode);
             return response;
         }
 
@@ -495,13 +554,16 @@ namespace DotNetNuke.Web.InternalServices
         [DnnPageEditor]
         public HttpResponseMessage SaveBookmark(BookmarkDTO bookmark)
         {
+			Logger.LogError(">>> Entering SaveBookmark(bookmark={Bookmark})", bookmark);
             if (string.IsNullOrEmpty(bookmark.Bookmark))
             {
                 bookmark.Bookmark = string.Empty;
+				Logger.LogDebug("SaveBookmark(bookmark={Bookmark}): bookmark.Bookmark → {Arg1}", bookmark, bookmark.Bookmark);
             }
 
             this.controller.SaveBookMark(this.PortalSettings.PortalId, this.UserInfo.UserID, bookmark.Title, bookmark.Bookmark);
 
+			Logger.LogWarning("<<< Exiting SaveBookmark(bookmark={Bookmark})", bookmark);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, });
         }
 
@@ -513,7 +575,9 @@ namespace DotNetNuke.Web.InternalServices
         [RequireHost]
         public HttpResponseMessage LockInstance(LockingDTO lockingRequest)
         {
+			Logger.LogError(">>> Entering LockInstance(lockingRequest={LockingRequest})", lockingRequest);
             this.hostSettingsService.Update("IsLocked", lockingRequest.Lock.ToString(), true);
+			Logger.LogWarning("<<< Exiting LockInstance(lockingRequest={LockingRequest})", lockingRequest);
             return this.Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -525,7 +589,9 @@ namespace DotNetNuke.Web.InternalServices
         [RequireHost]
         public HttpResponseMessage LockSite(LockingDTO lockingRequest)
         {
+			Logger.LogError(">>> Entering LockSite(lockingRequest={LockingRequest})", lockingRequest);
             PortalController.UpdatePortalSetting(this.portalController, this.PortalSettings.PortalId, "IsLocked", lockingRequest.Lock.ToString(), true);
+			Logger.LogWarning("<<< Exiting LockSite(lockingRequest={LockingRequest})", lockingRequest);
             return this.Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -534,6 +600,8 @@ namespace DotNetNuke.Web.InternalServices
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public bool CanAddModuleToPage()
         {
+			Logger.LogError(">>> Entering CanAddModuleToPage()");
+			Logger.LogWarning("<<< Exiting CanAddModuleToPage()");
             return true;
 
             // If we are not in an edit page
@@ -542,39 +610,50 @@ namespace DotNetNuke.Web.InternalServices
 
         private static void SetCloneModuleContext(bool cloneModuleContext)
         {
+			Logger.LogError(">>> Entering SetCloneModuleContext(cloneModuleContext={CloneModuleContext})", cloneModuleContext);
             Thread.SetData(
                 Thread.GetNamedDataSlot("CloneModuleContext"),
                 cloneModuleContext ? bool.TrueString : bool.FalseString);
+				Logger.LogWarning("<<< Exiting SetCloneModuleContext(cloneModuleContext={CloneModuleContext})", cloneModuleContext);
         }
 
         private static List<ModuleInfo> GetModules(int tabID)
         {
+			Logger.LogError(">>> Entering GetModules(tabID={TabID})", tabID);
             var isRemote = TabController.Instance.GetTab(tabID, Null.NullInteger, false).PortalID != PortalSettings.Current.PortalId;
             var tabModules = ModuleController.Instance.GetTabModules(tabID);
+			Logger.LogError("GetModules(tabID={TabID}): tabModules → {TabModules}", tabID, tabModules);
+			Logger.LogError("GetModules(tabID={TabID}): isRemote → {IsRemote}", tabID, isRemote);
 
             var pageModules = isRemote
                 ? tabModules.Values.Where(m => ModuleSupportsSharing(m) && !m.IsDeleted).ToList()
                 : tabModules.Values.Where(m => ModulePermissionController.HasModuleAccess(SecurityAccessLevel.Edit, "MANAGE", m) && !m.IsDeleted).ToList();
 
+			Logger.LogWarning("<<< Exiting GetModules(tabID={TabID})", tabID);
             return pageModules;
         }
 
         private static bool ModuleSupportsSharing(ModuleInfo moduleInfo)
         {
+			Logger.LogError(">>> Entering ModuleSupportsSharing(moduleInfo={ModuleInfo})", moduleInfo);
             switch (moduleInfo.DesktopModule.Shareable)
             {
                 case ModuleSharing.Supported:
                 case ModuleSharing.Unknown:
                     return moduleInfo.IsShareable;
                 default:
+					Logger.LogWarning("<<< Exiting ModuleSupportsSharing(moduleInfo={ModuleInfo})", moduleInfo);
                     return false;
             }
         }
 
         private static string GetDeskTopModuleImage(IHostSettings hostSettings, int moduleId)
         {
+			Logger.LogError(">>> Entering GetDeskTopModuleImage(hostSettings={HostSettings},moduleId={ModuleId})", hostSettings, moduleId);
             var portalDesktopModules = DesktopModuleController.GetDesktopModules(hostSettings, PortalSettings.Current.PortalId);
             var packages = PackageController.Instance.GetExtensionPackages(PortalSettings.Current.PortalId);
+			Logger.LogError("GetDeskTopModuleImage(hostSettings={HostSettings},moduleId={ModuleId}): packages → {Packages}", hostSettings, moduleId, packages);
+			Logger.LogError("GetDeskTopModuleImage(hostSettings={HostSettings},moduleId={ModuleId}): portalDesktopModules → {PortalDesktopModules}", hostSettings, moduleId, portalDesktopModules);
 
             string imageUrl =
                 (from package in packages
@@ -583,15 +662,22 @@ namespace DotNetNuke.Web.InternalServices
                     select package.IconFile).FirstOrDefault();
 
             imageUrl = string.IsNullOrEmpty(imageUrl) ? Globals.ImagePath + DefaultExtensionImage : imageUrl;
+			Logger.LogError("GetDeskTopModuleImage(hostSettings={HostSettings},moduleId={ModuleId}): imageUrl → {ImageUrl}", hostSettings, moduleId, imageUrl);
+			Logger.LogWarning("<<< Exiting GetDeskTopModuleImage(hostSettings={HostSettings},moduleId={ModuleId})", hostSettings, moduleId);
             return System.Web.VirtualPathUtility.ToAbsolute(imageUrl);
         }
 
         private static string GetTabModuleImage(IHostSettings hostSettings, int tabId, int moduleId)
         {
+			Logger.LogError(">>> Entering GetTabModuleImage(hostSettings={HostSettings},tabId={TabId},moduleId={ModuleId})", hostSettings, tabId, moduleId);
             var tabModules = ModuleController.Instance.GetTabModules(tabId);
             var portalDesktopModules = DesktopModuleController.GetDesktopModules(hostSettings, PortalSettings.Current.PortalId);
+			Logger.LogError("GetTabModuleImage(hostSettings={HostSettings},tabId={TabId},moduleId={ModuleId}): portalDesktopModules → {PortalDesktopModules}", hostSettings, tabId, moduleId, portalDesktopModules);
             var moduleDefinitions = ModuleDefinitionController.GetModuleDefinitions(hostSettings);
+			Logger.LogError("GetTabModuleImage(hostSettings={HostSettings},tabId={TabId},moduleId={ModuleId}): moduleDefinitions → {ModuleDefinitions}", hostSettings, tabId, moduleId, moduleDefinitions);
             var packages = PackageController.Instance.GetExtensionPackages(PortalSettings.Current.PortalId);
+			Logger.LogError("GetTabModuleImage(hostSettings={HostSettings},tabId={TabId},moduleId={ModuleId}): packages → {Packages}", hostSettings, tabId, moduleId, packages);
+			Logger.LogError("GetTabModuleImage(hostSettings={HostSettings},tabId={TabId},moduleId={ModuleId}): tabModules → {TabModules}", hostSettings, tabId, moduleId, tabModules);
 
             string imageUrl = (from package in packages
                 join portMods in portalDesktopModules on package.PackageID equals portMods.Value.PackageID
@@ -601,11 +687,14 @@ namespace DotNetNuke.Web.InternalServices
                 select package.IconFile).FirstOrDefault();
 
             imageUrl = string.IsNullOrEmpty(imageUrl) ? Globals.ImagePath + DefaultExtensionImage : imageUrl;
+			Logger.LogError("GetTabModuleImage(hostSettings={HostSettings},tabId={TabId},moduleId={ModuleId}): imageUrl → {ImageUrl}", hostSettings, tabId, moduleId, imageUrl);
+			Logger.LogWarning("<<< Exiting GetTabModuleImage(hostSettings={HostSettings},tabId={TabId},moduleId={ModuleId})", hostSettings, tabId, moduleId);
             return System.Web.VirtualPathUtility.ToAbsolute(imageUrl);
         }
 
         private static void AddModulePermission(ModuleInfo objModule, IPermissionDefinitionInfo permission, int roleId, int userId, bool allowAccess)
         {
+			Logger.LogError(">>> Entering AddModulePermission(objModule={ObjModule},permission={Permission},roleId={RoleId},userId={UserId},allowAccess={AllowAccess})", objModule, permission, roleId, userId, allowAccess);
             IPermissionInfo objModulePermission = new ModulePermissionInfo
             {
                 ModuleID = objModule.ModuleID,
@@ -613,7 +702,10 @@ namespace DotNetNuke.Web.InternalServices
                 AllowAccess = allowAccess,
             };
             objModulePermission.PermissionId = permission.PermissionId;
+			Logger.LogDebug("AddModulePermission(objModule={ObjModule},permission={Permission},roleId={RoleId},userId={UserId},allowAccess={AllowAccess}): objModulePermission.PermissionId → {Arg5}", objModule, permission, roleId, userId, allowAccess, objModulePermission.PermissionId);
+			Logger.LogDebug("AddModulePermission(objModule={ObjModule},permission={Permission},roleId={RoleId},userId={UserId},allowAccess={AllowAccess}): objModulePermission.UserId → {Arg5}", objModule, permission, roleId, userId, allowAccess, objModulePermission.UserId);
             objModulePermission.RoleId = roleId;
+			Logger.LogDebug("AddModulePermission(objModule={ObjModule},permission={Permission},roleId={RoleId},userId={UserId},allowAccess={AllowAccess}): objModulePermission.RoleId → {Arg5}", objModule, permission, roleId, userId, allowAccess, objModulePermission.RoleId);
             objModulePermission.UserId = userId;
 
             // add the permission to the collection
@@ -621,12 +713,15 @@ namespace DotNetNuke.Web.InternalServices
             {
                 objModule.ModulePermissions.Add((ModulePermissionInfo)objModulePermission);
             }
+			Logger.LogWarning("<<< Exiting AddModulePermission(objModule={ObjModule},permission={Permission},roleId={RoleId},userId={UserId},allowAccess={AllowAccess})", objModule, permission, roleId, userId, allowAccess);
         }
 
         private static int GetPaneModuleOrder(string pane, int sort)
         {
+			Logger.LogError(">>> Entering GetPaneModuleOrder(pane={Pane},sort={Sort})", pane, sort);
             var items = new List<int>();
 
+			Logger.LogError("GetPaneModuleOrder(pane={Pane},sort={Sort}): items → {Items}", pane, sort, items);
             foreach (ModuleInfo m in PortalSettings.Current.ActiveTab.Modules)
             {
                 // if user is allowed to view module and module is not deleted
@@ -662,42 +757,55 @@ namespace DotNetNuke.Web.InternalServices
                 return items.Last() + 1;
             }
 
+			Logger.LogWarning("<<< Exiting GetPaneModuleOrder(pane={Pane},sort={Sort})", pane, sort);
             return 0;
         }
 
         private static int DoAddNewModule(IHostSettings hostSettings, string title, int desktopModuleId, string paneName, int position, int permissionType, string align)
         {
+			Logger.LogError(">>> Entering DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align})", hostSettings, title, desktopModuleId, paneName, position, permissionType, align);
             try
             {
                 if (!DesktopModuleController.GetDesktopModules(hostSettings, PortalSettings.Current.PortalId).TryGetValue(desktopModuleId, out _))
                 {
+					Logger.LogError("Throwing ArgumentException from DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align})", hostSettings, title, desktopModuleId, paneName, position, permissionType, align);
                     throw new ArgumentException($"Could not find desktop module with given ID: {desktopModuleId}", nameof(desktopModuleId));
                 }
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): {Arg7}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, ex.Message);
                 Exceptions.LogException(ex);
             }
 
             var tabModuleId = Null.NullInteger;
+			Logger.LogError("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): tabModuleId → {TabModuleId}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, tabModuleId);
             foreach (ModuleDefinitionInfo objModuleDefinition in
                      ModuleDefinitionController.GetModuleDefinitionsByDesktopModuleID(desktopModuleId).Values)
             {
                 var objModule = new ModuleInfo();
+				Logger.LogError("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule → {ObjModule}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, objModule);
                 objModule.Initialize(PortalSettings.Current.ActiveTab.PortalID);
 
                 objModule.PortalID = PortalSettings.Current.ActiveTab.PortalID;
+				Logger.LogDebug("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.PortalID → {Arg7}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, objModule.PortalID);
+				Logger.LogDebug("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.ModuleOrder → {Arg7}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, objModule.ModuleOrder);
                 objModule.TabID = PortalSettings.Current.ActiveTab.TabID;
+				Logger.LogDebug("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.TabID → {Arg7}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, objModule.TabID);
                 objModule.ModuleOrder = position;
                 objModule.ModuleTitle = string.IsNullOrEmpty(title) ? objModuleDefinition.FriendlyName : title;
                 objModule.PaneName = paneName;
+				Logger.LogDebug("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.PaneName → {Arg7}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, objModule.PaneName);
                 objModule.ModuleDefID = objModuleDefinition.ModuleDefID;
+				Logger.LogDebug("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.ModuleDefID → {Arg7}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, objModule.ModuleDefID);
                 if (objModuleDefinition.DefaultCacheTime > 0)
                 {
                     objModule.CacheTime = objModuleDefinition.DefaultCacheTime;
+					Logger.LogDebug("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.CacheTime → {Arg7}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, objModule.CacheTime);
                     if (PortalSettings.Current.DefaultModuleId > Null.NullInteger && PortalSettings.Current.DefaultTabId > Null.NullInteger)
                     {
                         ModuleInfo defaultModule = ModuleController.Instance.GetModule(PortalSettings.Current.DefaultModuleId, PortalSettings.Current.DefaultTabId, true);
+						Logger.LogError("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): defaultModule → {DefaultModule}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, defaultModule);
                         if (defaultModule != null)
                         {
                             objModule.CacheTime = defaultModule.CacheTime;
@@ -710,18 +818,23 @@ namespace DotNetNuke.Web.InternalServices
                 if (PortalSettings.Current.ContentLocalizationEnabled)
                 {
                     Locale defaultLocale = LocaleController.Instance.GetDefaultLocale(PortalSettings.Current.PortalId);
+					Logger.LogError("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): defaultLocale → {DefaultLocale}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, defaultLocale);
 
                     // set the culture of the module to that of the tab
                     var tabInfo = TabController.Instance.GetTab(objModule.TabID, PortalSettings.Current.PortalId, false);
+					Logger.LogError("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): tabInfo → {TabInfo}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, tabInfo);
                     objModule.CultureCode = tabInfo != null ? tabInfo.CultureCode : defaultLocale.Code;
                 }
                 else
                 {
                     objModule.CultureCode = Null.NullString;
+					Logger.LogDebug("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.CultureCode → {Arg7}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, objModule.CultureCode);
                 }
 
                 objModule.AllTabs = false;
+				Logger.LogDebug("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.AllTabs → {Arg7}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, objModule.AllTabs);
                 objModule.Alignment = align;
+				Logger.LogDebug("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): objModule.Alignment → {Arg7}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, objModule.Alignment);
 
                 ModuleController.Instance.AddModule(objModule);
 
@@ -732,8 +845,10 @@ namespace DotNetNuke.Web.InternalServices
 
                 // update the position to let later modules with add after previous one.
                 position = ModuleController.Instance.GetTabModule(objModule.TabModuleID).ModuleOrder + 1;
+				Logger.LogError("DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align}): position → {Position1}", hostSettings, title, desktopModuleId, paneName, position, permissionType, align, position);
             }
 
+			Logger.LogWarning("<<< Exiting DoAddNewModule(hostSettings={HostSettings},title={Title},desktopModuleId={DesktopModuleId},paneName={PaneName},position={Position},permissionType={PermissionType},align={Align})", hostSettings, title, desktopModuleId, paneName, position, permissionType, align);
             return tabModuleId;
         }
 
@@ -747,13 +862,16 @@ namespace DotNetNuke.Web.InternalServices
 
         private PortalSettings GetPortalSettings(string portal)
         {
+			Logger.LogError(">>> Entering GetPortalSettings(portal={Portal})", portal);
             var portalSettings = PortalSettings.Current;
 
+			Logger.LogError("GetPortalSettings(portal={Portal}): portalSettings → {PortalSettings}", portal, portalSettings);
             try
             {
                 if (!string.IsNullOrEmpty(portal))
                 {
                     var selectedPortalId = int.Parse(portal, CultureInfo.InvariantCulture);
+					Logger.LogError("GetPortalSettings(portal={Portal}): selectedPortalId → {SelectedPortalId}", portal, selectedPortalId);
                     if (this.PortalSettings.PortalId != selectedPortalId)
                     {
                         portalSettings = new PortalSettings(selectedPortalId);
@@ -762,9 +880,11 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in GetPortalSettings(portal={Portal}): {Arg1}", portal, Exception.Message);
                 portalSettings = PortalSettings.Current;
             }
 
+			Logger.LogWarning("<<< Exiting GetPortalSettings(portal={Portal})", portal);
             return portalSettings;
         }
 
@@ -782,11 +902,15 @@ namespace DotNetNuke.Web.InternalServices
 
         private int DoAddExistingModule(int moduleId, int tabId, string paneName, int position, string align, bool cloneModule)
         {
+			Logger.LogError(">>> Entering DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule})", moduleId, tabId, paneName, position, align, cloneModule);
             ModuleInfo moduleInfo = ModuleController.Instance.GetModule(moduleId, tabId, false);
 
+			Logger.LogError("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): moduleInfo → {ModuleInfo}", moduleId, tabId, paneName, position, align, cloneModule, moduleInfo);
             int userID = -1;
+			Logger.LogError("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): userID → {UserID}", moduleId, tabId, paneName, position, align, cloneModule, userID);
 
             UserInfo user = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogError("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): user → {User}", moduleId, tabId, paneName, position, align, cloneModule, user);
             if (user != null)
             {
                 userID = user.UserID;
@@ -802,6 +926,7 @@ namespace DotNetNuke.Web.InternalServices
                     {
                         case ModuleSharing.Unsupported:
                             // Should never happen since the module should not be listed in the first place.
+							Logger.LogError("Throwing SharingUnsupportedException from DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule})", moduleId, tabId, paneName, position, align, cloneModule);
                             throw new SharingUnsupportedException($"Module '{moduleInfo.DesktopModule.FriendlyName}' does not support Shareable and should not be listed in Add Existing Module from a different source site");
                         case ModuleSharing.Supported:
                         case ModuleSharing.Unknown:
@@ -811,15 +936,23 @@ namespace DotNetNuke.Web.InternalServices
 
                 if (!ModulePermissionController.HasModuleAccess(SecurityAccessLevel.Edit, "MANAGE", moduleInfo))
                 {
+					Logger.LogError("Throwing SecurityException from DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule})", moduleId, tabId, paneName, position, align, cloneModule);
                     throw new SecurityException($"Module '{moduleInfo.ModuleID}' is not available in current context.");
                 }
 
                 // clone the module object ( to avoid creating an object reference to the data cache )
                 ModuleInfo newModule = moduleInfo.Clone();
+				Logger.LogError("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): newModule → {NewModule}", moduleId, tabId, paneName, position, align, cloneModule, newModule);
 
                 newModule.UniqueId = Guid.NewGuid(); // Cloned Module requires a different uniqueID
                 newModule.TabModuleID = Null.NullInteger;
+				Logger.LogDebug("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): newModule.TabModuleID → {Arg6}", moduleId, tabId, paneName, position, align, cloneModule, newModule.TabModuleID);
+				Logger.LogDebug("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): newModule.TabID → {Arg6}", moduleId, tabId, paneName, position, align, cloneModule, newModule.TabID);
+				Logger.LogDebug("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): newModule.ModuleOrder → {Arg6}", moduleId, tabId, paneName, position, align, cloneModule, newModule.ModuleOrder);
+				Logger.LogDebug("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): newModule.PaneName → {Arg6}", moduleId, tabId, paneName, position, align, cloneModule, newModule.PaneName);
+				Logger.LogDebug("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): newModule.Alignment → {Arg6}", moduleId, tabId, paneName, position, align, cloneModule, newModule.Alignment);
                 newModule.PortalID = PortalSettings.Current.PortalId;
+				Logger.LogDebug("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): newModule.PortalID → {Arg6}", moduleId, tabId, paneName, position, align, cloneModule, newModule.PortalID);
                 newModule.TabID = PortalSettings.Current.ActiveTab.TabID;
                 newModule.ModuleOrder = position;
                 newModule.PaneName = paneName;
@@ -828,6 +961,7 @@ namespace DotNetNuke.Web.InternalServices
                 if (cloneModule)
                 {
                     newModule.ModuleID = Null.NullInteger;
+					Logger.LogDebug("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): newModule.ModuleID → {Arg6}", moduleId, tabId, paneName, position, align, cloneModule, newModule.ModuleID);
 
                     // copy module settings and tab module settings
                     newModule.ModuleSettings.Clear();
@@ -848,12 +982,14 @@ namespace DotNetNuke.Web.InternalServices
                     if (!string.IsNullOrEmpty(newModule.DesktopModule.BusinessControllerClass))
                     {
                         var portable = this.businessControllerProvider.GetInstance<IPortable>(newModule);
+						Logger.LogError("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): portable → {Portable}", moduleId, tabId, paneName, position, align, cloneModule, portable);
                         if (portable is not null)
                         {
                             try
                             {
                                 SetCloneModuleContext(true);
                                 var content = portable.ExportModule(moduleId);
+								Logger.LogError("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): content → {Content}", moduleId, tabId, paneName, position, align, cloneModule, content);
                                 if (!string.IsNullOrEmpty(content))
                                 {
                                     portable.ImportModule(
@@ -885,6 +1021,7 @@ namespace DotNetNuke.Web.InternalServices
                 // if the tab of original module has custom stylesheet defined, then also copy the stylesheet
                 // to the destination tab if its custom stylesheet is empty.
                 var originalTab = TabController.Instance.GetTab(moduleInfo.TabID, moduleInfo.PortalID);
+				Logger.LogError("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): originalTab → {OriginalTab}", moduleId, tabId, paneName, position, align, cloneModule, originalTab);
                 var targetTab = PortalSettings.Current.ActiveTab;
                 if (originalTab != null
                     && originalTab.TabSettings.ContainsKey("CustomStylesheet")
@@ -899,6 +1036,7 @@ namespace DotNetNuke.Web.InternalServices
                 {
                     // Ensure the Portal Admin has View rights
                     var arrSystemModuleViewPermissions = this.permissionDefinitionService.GetDefinitionsByCodeAndKey("SYSTEM_MODULE_DEFINITION", "VIEW");
+					Logger.LogError("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): arrSystemModuleViewPermissions → {ArrSystemModuleViewPermissions}", moduleId, tabId, paneName, position, align, cloneModule, arrSystemModuleViewPermissions);
                     AddModulePermission(
                         newModule,
                         arrSystemModuleViewPermissions.First(),
@@ -908,6 +1046,7 @@ namespace DotNetNuke.Web.InternalServices
 
                     // Set PortalID correctly
                     newModule.OwnerPortalID = newModule.PortalID;
+					Logger.LogDebug("DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule}): newModule.OwnerPortalID → {Arg6}", moduleId, tabId, paneName, position, align, cloneModule, newModule.OwnerPortalID);
                     newModule.PortalID = PortalSettings.Current.PortalId;
                     ModulePermissionController.SaveModulePermissions(newModule);
                 }
@@ -918,6 +1057,7 @@ namespace DotNetNuke.Web.InternalServices
                 return newModule.ModuleID;
             }
 
+			Logger.LogWarning("<<< Exiting DoAddExistingModule(moduleId={ModuleId},tabId={TabId},paneName={PaneName},position={Position},align={Align},cloneModule={CloneModule})", moduleId, tabId, paneName, position, align, cloneModule);
             return -1;
         }
 

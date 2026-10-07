@@ -10,6 +10,7 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens.Models
     [SuppressMessage("Microsoft.Design", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "Breaking change")]
     public class ApiTokenAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ApiTokenAttribute));
         /// <summary>Initializes a new instance of the <see cref="ApiTokenAttribute"/> class.</summary>
         /// <param name="scope">The scope of the API token attribute.</param>
         /// <param name="key">The API key string.</param>
@@ -17,9 +18,13 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens.Models
         /// <param name="description">The localized description of this part of the API.</param>
         public ApiTokenAttribute(int scope, string key, string name, string description)
         {
+			Logger.LogError(">>> Entering ApiTokenAttribute(scope={Scope},key={Key},name={Name},description={Description})", scope, key, name, description);
             this.Scope = scope;
+			Logger.LogDebug("ApiTokenAttribute(scope={Scope},key={Key},name={Name},description={Description}): this.Scope → {Arg4}", scope, key, name, description, this.Scope);
             this.Key = key;
             this.Name = name;
+			Logger.LogDebug("ApiTokenAttribute(scope={Scope},key={Key},name={Name},description={Description}): this.Key → {Arg4}", scope, key, name, description, this.Key);
+        Logger.LogWarning("<<< Exiting ApiTokenAttribute(scope={Scope},key={Key},name={Name},description={Description})", scope, key, name, description);
             this.Description = description;
         }
 

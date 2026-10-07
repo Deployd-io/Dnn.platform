@@ -20,11 +20,13 @@ namespace Dnn.EditBar.UI.Services
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void RegisterRoutes(IMapRoute routeManager)
         {
+			eventLogger.LogError(">>> Entering RegisterRoutes(routeManager={RouteManager})", routeManager);
             routeManager.MapHttpRoute(
                 "editBar/Common",
                 "default",
                 "{controller}/{action}",
                 Namespaces);
+				eventLogger.LogWarning("<<< Exiting RegisterRoutes(routeManager={RouteManager})", routeManager);
         }
     }
 }

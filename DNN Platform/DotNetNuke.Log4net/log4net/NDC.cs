@@ -73,6 +73,8 @@ namespace log4net
         /// </remarks>
         private NDC()
         {
+		value.LogError(">>> Entering NDC()");
+        value.LogWarning("<<< Exiting NDC()");
         }
 
         /// <summary>Gets the current context depth.</summary>
@@ -114,7 +116,9 @@ namespace log4net
         /*[Obsolete("NDC has been replaced by ThreadContext.Stacks")]*/
         public static void Clear() 
         {
+			value.LogError(">>> Entering Clear()");
             ThreadContext.Stacks["NDC"].Clear();
+			value.LogWarning("<<< Exiting Clear()");
         }
 
         /// <summary>Creates a clone of the stack of context information.</summary>
@@ -135,6 +139,8 @@ namespace log4net
         /*[Obsolete("NDC has been replaced by ThreadContext.Stacks")]*/
         public static Stack CloneStack() 
         {
+			value.LogError(">>> Entering CloneStack()");
+            value.LogWarning("<<< Exiting CloneStack()");
             return ThreadContext.Stacks["NDC"].InternalStack;
         }
 
@@ -160,7 +166,9 @@ namespace log4net
         /*[Obsolete("NDC has been replaced by ThreadContext.Stacks", true)]*/
         public static void Inherit(Stack stack) 
         {
+			value.LogError(">>> Entering Inherit(stack={Stack})", stack);
             ThreadContext.Stacks["NDC"].InternalStack = stack;
+			value.LogWarning("<<< Exiting Inherit(stack={Stack})", stack);
         }
 
         /// <summary>Removes the top context from the stack.</summary>
@@ -184,6 +192,8 @@ namespace log4net
         /*[Obsolete("NDC has been replaced by ThreadContext.Stacks")]*/
         public static string Pop() 
         {
+			value.LogError(">>> Entering Pop()");
+            value.LogWarning("<<< Exiting Pop()");
             return ThreadContext.Stacks["NDC"].Pop();
         }
 
@@ -218,6 +228,8 @@ namespace log4net
         /*[Obsolete("NDC has been replaced by ThreadContext.Stacks")]*/
         public static IDisposable Push(string message) 
         {
+			value.LogError(">>> Entering Push(message={Message})", message);
+            value.LogWarning("<<< Exiting Push(message={Message})", message);
             return ThreadContext.Stacks["NDC"].Push(message);
         }
 
@@ -254,6 +266,8 @@ namespace log4net
         /*[Obsolete("NDC has been replaced by ThreadContext.Stacks")]*/
         public static IDisposable PushFormat(string messageFormat, params object[] args)
         {
+			value.LogError(">>> Entering PushFormat(messageFormat={MessageFormat},args={Args})", messageFormat, args);
+            value.LogWarning("<<< Exiting PushFormat(messageFormat={MessageFormat},args={Args})", messageFormat, args);
             return Push(string.Format(messageFormat, args));
         }
 
@@ -275,6 +289,8 @@ namespace log4net
         /*[Obsolete("NDC has been replaced by ThreadContext.Stacks")]*/
         public static void Remove() 
         {
+		value.LogError(">>> Entering Remove()");
+        value.LogWarning("<<< Exiting Remove()");
         }
 
         /// <summary>Forces the stack depth to be at most <paramref name="maxDepth"/>.</summary>
@@ -297,9 +313,11 @@ namespace log4net
         /*[Obsolete("NDC has been replaced by ThreadContext.Stacks")]*/
         public static void SetMaxDepth(int maxDepth) 
         {
+			value.LogError(">>> Entering SetMaxDepth(maxDepth={MaxDepth})", maxDepth);
             if (maxDepth >= 0)
             {
                 Util.ThreadContextStack stack = ThreadContext.Stacks["NDC"];
+				value.LogError("SetMaxDepth(maxDepth={MaxDepth}): stack → {Stack}", maxDepth, stack);
 
                 if (maxDepth == 0)
                 {
@@ -313,6 +331,7 @@ namespace log4net
                     }
                 }
             }
+			value.LogWarning("<<< Exiting SetMaxDepth(maxDepth={MaxDepth})", maxDepth);
         }
     }
 }

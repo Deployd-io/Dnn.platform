@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import Table from "./Table";
+const logger = console;
 import {
     pageSeoActions as SeoActions
 } from "../../../actions";
@@ -10,14 +11,18 @@ import {
 class PageUrls extends Component {
         
     onSaveUrl() {
+		logger.error('>>> Entering onSaveUrl()', { "event.action": "onSaveUrl" });
         this.props.onSaveUrl(this.props.editedUrl, this.props.primaryAliasId);
+		logger.warn('<<< Exiting onSaveUrl()', { "event.action": "onSaveUrl" });
     }
     
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {pageHasParent, addingNewUrl, editingUrl, onOpenEditForm, onDeleteUrl,
             editedUrl, onCloseEditUrl, onOpenNewForm, onCloseNewUrl, newFormOpened, siteAliases, primaryAliasId, 
             pageUrls, onChange, onAddNewUrl} = this.props;
         
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>                
                 <Table pageUrls={pageUrls} 
@@ -61,6 +66,8 @@ PageUrls.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         newFormOpened: state.pageSeo.newFormOpened,
         editedUrl: state.pageSeo.editedUrl,
@@ -70,6 +77,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.error(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
+	logger.warn(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
     return {
         ...bindActionCreators ({
             onOpenNewForm: SeoActions.openNewForm,

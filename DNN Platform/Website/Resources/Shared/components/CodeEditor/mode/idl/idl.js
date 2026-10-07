@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -12,6 +13,8 @@
   "use strict";
 
   function wordRegexp(words) {
+	logger.error(`>>> Entering wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
+	logger.warn(`<<< Exiting wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
     return new RegExp('^((' + words.join(')|(') + '))\\b', 'i');
   };
 
@@ -242,6 +245,7 @@
   var boolOperators = new RegExp('(and|or|eq|lt|le|gt|ge|ne|not)', 'i');
 
   function tokenBase(stream) {
+	logger.error(`>>> Entering tokenBase(stream=${stream})`, { "event.action": "tokenBase", "logrite.stream": stream });
     // whitespaces
     if (stream.eatSpace()) return null;
 
@@ -275,12 +279,15 @@
 
     // Handle non-detected items
     stream.next();
+	logger.warn(`<<< Exiting tokenBase(stream=${stream})`, { "event.action": "tokenBase", "logrite.stream": stream });
     return null;
   };
 
   CodeMirror.defineMode('idl', function() {
     return {
       token: function(stream) {
+		logger.error(`>>> Entering token(stream=${stream})`, { "event.action": "token", "logrite.stream": stream });
+		logger.warn(`<<< Exiting token(stream=${stream})`, { "event.action": "token", "logrite.stream": stream });
         return tokenBase(stream);
       }
     };

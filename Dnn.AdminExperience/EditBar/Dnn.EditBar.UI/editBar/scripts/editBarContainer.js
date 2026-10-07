@@ -1,6 +1,8 @@
-﻿(function ($) {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+(function ($) {
     $(document.body).ready(function () {
         var loadEditBar = function () {
+			logger.error('>>> Entering loadEditBar()', { "event.action": "loadEditBar" });
             var w = window,
                 d = document,
                 e = d.documentElement,
@@ -15,6 +17,7 @@
 
             var debugMode = settings.debugMode === true;
             var src = appPath + '/DesktopModules/admin/Dnn.EditBar/index.html';
+			logger.error(`loadEditBar(): src → ${src}`, { "event.action": "loadEditBar" });
             src += '?cdv=' + settings.buildNumber + (debugMode ? '&t=' + Math.random() : '');
             var $container = $('<div class="editBarFrameContainer"></div>');
             if ($('#personaBar-iframe').length) {
@@ -29,6 +32,7 @@
                 }).mouseleave(function () {
                     $iframe.removeClass("small middle");
                 });
+				logger.warn('<<< Exiting loadEditBar()', { "event.action": "loadEditBar" });
         }
 
         loadEditBar();

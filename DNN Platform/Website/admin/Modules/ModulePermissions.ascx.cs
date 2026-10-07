@@ -26,6 +26,7 @@ namespace DotNetNuke.Modules.Admin.Modules
     /// </summary>
     public partial class ModulePermissions : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModulePermissions.ascx));
         private readonly INavigationManager navigationManager;
 
         private int moduleId = -1;
@@ -34,7 +35,10 @@ namespace DotNetNuke.Modules.Admin.Modules
         /// <summary>Initializes a new instance of the <see cref="ModulePermissions"/> class.</summary>
         public ModulePermissions()
         {
+			Logger.LogError(">>> Entering ModulePermissions()");
             this.navigationManager = this.DependencyProvider.GetRequiredService<INavigationManager>();
+			Logger.LogDebug("ModulePermissions(): navigationManager → {NavigationManager}", navigationManager);
+        Logger.LogWarning("<<< Exiting ModulePermissions()");
         }
 
         private ModuleInfo Module
@@ -53,12 +57,14 @@ namespace DotNetNuke.Modules.Admin.Modules
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             // get ModuleId
             if (this.Request.QueryString["ModuleId"] != null)
             {
                 this.moduleId = int.Parse(this.Request.QueryString["ModuleId"]);
+				Logger.LogDebug("OnInit(e={E}): moduleId → {ModuleId}", e, moduleId);
             }
 
             // Verify that the current user has access to edit this module
@@ -66,11 +72,13 @@ namespace DotNetNuke.Modules.Admin.Modules
             {
                 this.Response.Redirect(Globals.AccessDeniedURL(), true);
             }
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdUpdate.Click += this.OnUpdateClick;
@@ -93,12 +101,15 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         protected void OnUpdateClick(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnUpdateClick(sender={Sender},e={E})", sender, e);
             try
             {
                 if (this.Page.IsValid)
@@ -114,8 +125,10 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnUpdateClick(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnUpdateClick(sender={Sender},e={E})", sender, e);
         }
     }
 }

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -152,40 +153,49 @@
   }
 
   CodeMirror.findModeByMIME = function(mime) {
+	logger.error(`>>> Entering findModeByMIME(mime=${mime})`, { "event.action": "findModeByMIME", "logrite.mime": mime });
     mime = mime.toLowerCase();
     for (var i = 0; i < CodeMirror.modeInfo.length; i++) {
       var info = CodeMirror.modeInfo[i];
       if (info.mime == mime) return info;
       if (info.mimes) for (var j = 0; j < info.mimes.length; j++)
         if (info.mimes[j] == mime) return info;
+		logger.warn(`<<< Exiting findModeByMIME(mime=${mime})`, { "event.action": "findModeByMIME", "logrite.mime": mime });
     }
   };
 
   CodeMirror.findModeByExtension = function(ext) {
+	logger.error(`>>> Entering findModeByExtension(ext=${ext})`, { "event.action": "findModeByExtension", "logrite.ext": ext });
     for (var i = 0; i < CodeMirror.modeInfo.length; i++) {
       var info = CodeMirror.modeInfo[i];
       if (info.ext) for (var j = 0; j < info.ext.length; j++)
         if (info.ext[j] == ext) return info;
+		logger.warn(`<<< Exiting findModeByExtension(ext=${ext})`, { "event.action": "findModeByExtension", "logrite.ext": ext });
     }
   };
 
   CodeMirror.findModeByFileName = function(filename) {
+	logger.error(`>>> Entering findModeByFileName(filename=${filename})`, { "event.action": "findModeByFileName", "logrite.filename": filename });
     for (var i = 0; i < CodeMirror.modeInfo.length; i++) {
       var info = CodeMirror.modeInfo[i];
       if (info.file && info.file.test(filename)) return info;
     }
     var dot = filename.lastIndexOf(".");
+	logger.error(`findModeByFileName(filename=${filename}): dot → ${dot}`, { "event.action": "findModeByFileName", "logrite.filename": filename });
     var ext = dot > -1 && filename.substring(dot + 1, filename.length);
     if (ext) return CodeMirror.findModeByExtension(ext);
+	logger.error(`findModeByFileName(filename=${filename}): ext → ${ext}`, { "event.action": "findModeByFileName", "logrite.filename": filename });
   };
 
   CodeMirror.findModeByName = function(name) {
+	logger.error(`>>> Entering findModeByName(name=${name})`, { "event.action": "findModeByName", "logrite.name": name });
     name = name.toLowerCase();
     for (var i = 0; i < CodeMirror.modeInfo.length; i++) {
       var info = CodeMirror.modeInfo[i];
       if (info.name.toLowerCase() == name) return info;
       if (info.alias) for (var j = 0; j < info.alias.length; j++)
         if (info.alias[j].toLowerCase() == name) return info;
+		logger.warn(`<<< Exiting findModeByName(name=${name})`, { "event.action": "findModeByName", "logrite.name": name });
     }
   };
 });

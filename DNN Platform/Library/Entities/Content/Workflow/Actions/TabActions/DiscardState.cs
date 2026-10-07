@@ -15,10 +15,13 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
     /// </summary>
     internal class DiscardState : TabActionBase, IWorkflowAction
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DiscardState));
         /// <inheritdoc />
         public void DoActionOnStateChanging(StateTransaction stateTransaction)
         {
+			Logger.LogError(">>> Entering DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
             // nothing
+			Logger.LogWarning("<<< Exiting DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <inheritdoc />

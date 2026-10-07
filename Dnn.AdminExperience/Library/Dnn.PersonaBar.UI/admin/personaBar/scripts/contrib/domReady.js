@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 /**
  * @license RequireJS domReady 2.0.1 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
@@ -19,13 +20,16 @@ define(function () {
         readyCalls = [];
 
     function runCallbacks(callbacks) {
+		logger.error(`>>> Entering runCallbacks(callbacks=${callbacks})`, { "event.action": "runCallbacks", "logrite.callbacks": callbacks });
         var i;
         for (i = 0; i < callbacks.length; i += 1) {
             callbacks[i](doc);
+			logger.warn(`<<< Exiting runCallbacks(callbacks=${callbacks})`, { "event.action": "runCallbacks", "logrite.callbacks": callbacks });
         }
     }
 
     function callReady() {
+		logger.error('>>> Entering callReady()', { "event.action": "callReady" });
         var callbacks = readyCalls;
 
         if (isPageLoaded) {
@@ -33,6 +37,7 @@ define(function () {
             if (callbacks.length) {
                 readyCalls = [];
                 runCallbacks(callbacks);
+				logger.warn('<<< Exiting callReady()', { "event.action": "callReady" });
             }
         }
     }
@@ -41,6 +46,7 @@ define(function () {
      * Sets the page as loaded.
      */
     function pageLoaded() {
+		logger.error('>>> Entering pageLoaded()', { "event.action": "pageLoaded" });
         if (!isPageLoaded) {
             isPageLoaded = true;
             if (scrollIntervalId) {
@@ -48,6 +54,7 @@ define(function () {
             }
 
             callReady();
+			logger.warn('<<< Exiting pageLoaded()', { "event.action": "pageLoaded" });
         }
     }
 
@@ -102,11 +109,13 @@ define(function () {
      * @param {Function} callback
      */
     function domReady(callback) {
+		logger.error(`>>> Entering domReady(callback=${callback})`, { "event.action": "domReady", "logrite.callback": callback });
         if (isPageLoaded) {
             callback(doc);
         } else {
             readyCalls.push(callback);
         }
+		logger.warn(`<<< Exiting domReady(callback=${callback})`, { "event.action": "domReady", "logrite.callback": callback });
         return domReady;
     }
 
@@ -116,10 +125,12 @@ define(function () {
      * Loader Plugin API method
      */
     domReady.load = function (name, req, onLoad, config) {
+		logger.error(`>>> Entering load(name=${name},req=${req},onLoad=${onLoad},config=${config})`, { "event.action": "load", "logrite.name": name, "logrite.req": req, "logrite.onLoad": onLoad, "logrite.config": config });
         if (config.isBuild) {
             onLoad(null);
         } else {
             domReady(onLoad);
+			logger.warn(`<<< Exiting load(name=${name},req=${req},onLoad=${onLoad},config=${config})`, { "event.action": "load", "logrite.name": name, "logrite.req": req, "logrite.onLoad": onLoad, "logrite.config": config });
         }
     };
 

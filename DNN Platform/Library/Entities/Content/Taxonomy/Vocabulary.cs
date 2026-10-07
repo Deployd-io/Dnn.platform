@@ -18,6 +18,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
     [Serializable]
     public class Vocabulary : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Vocabulary));
         private static readonly PortalSecurity Security = PortalSecurity.Instance;
 
         private string description;
@@ -43,6 +44,8 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         public Vocabulary(string name)
             : this(name, Null.NullString, VocabularyType.Simple)
         {
+		Logger.LogError(">>> Entering Vocabulary(name={Name})", name);
+        Logger.LogWarning("<<< Exiting Vocabulary(name={Name})", name);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Vocabulary"/> class.</summary>
@@ -51,6 +54,8 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         public Vocabulary(string name, string description)
             : this(name, description, VocabularyType.Simple)
         {
+		Logger.LogError(">>> Entering Vocabulary(name={Name},description={Description})", name, description);
+        Logger.LogWarning("<<< Exiting Vocabulary(name={Name},description={Description})", name, description);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Vocabulary"/> class.</summary>
@@ -67,12 +72,16 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         public Vocabulary(string name, string description, VocabularyType type)
         {
             this.Description = description;
+			Logger.LogDebug("Vocabulary(name={Name},description={Description},type={Type}): this.Description → {Arg3}", name, description, type, this.Description);
             this.Name = name;
             this.Type = type;
+			Logger.LogDebug("Vocabulary(name={Name},description={Description},type={Type}): this.Name → {Arg3}", name, description, type, this.Name);
+			Logger.LogDebug("Vocabulary(name={Name},description={Description},type={Type}): this.Type → {Arg3}", name, description, type, this.Type);
 
             this.ScopeId = Null.NullInteger;
             this.ScopeTypeId = Null.NullInteger;
             this.VocabularyId = Null.NullInteger;
+			Logger.LogDebug("Vocabulary(name={Name},description={Description},type={Type}): this.ScopeId → {Arg3}", name, description, type, this.ScopeId);
             this.Weight = 0;
         }
 
@@ -240,11 +249,13 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <inheritdoc />
         public virtual void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.VocabularyId = Null.SetNullInteger(dr["VocabularyID"]);
             switch (Convert.ToInt16(dr["VocabularyTypeID"], CultureInfo.InvariantCulture))
             {
                 case 1:
                     this.Type = VocabularyType.Simple;
+					Logger.LogDebug("Fill(dr={Dr}): this.Type → {Arg1}", dr, this.Type);
                     break;
                 case 2:
                     this.Type = VocabularyType.Hierarchy;
@@ -260,6 +271,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
             // Fill base class properties
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

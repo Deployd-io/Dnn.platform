@@ -16,9 +16,12 @@ namespace DotNetNuke.Services.Authentication
     /// </summary>
     public abstract class AuthenticationLogoffBase : UserModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AuthenticationLogoffBase));
         /// <summary>Initializes a new instance of the <see cref="AuthenticationLogoffBase"/> class.</summary>
         public AuthenticationLogoffBase()
         {
+		Logger.LogError(">>> Entering AuthenticationLogoffBase()");
+        Logger.LogWarning("<<< Exiting AuthenticationLogoffBase()");
         }
 
         /// <summary>Fires when a LogOff occurs.</summary>
@@ -44,20 +47,24 @@ namespace DotNetNuke.Services.Authentication
         /// <param name="a">The event arguments.</param>
         protected virtual void OnLogOff(EventArgs a)
         {
+			Logger.LogError(">>> Entering OnLogOff(a={A})", a);
             if (this.LogOff != null)
             {
                 this.LogOff(null, a);
             }
+			Logger.LogWarning("<<< Exiting OnLogOff(a={A})", a);
         }
 
         /// <summary>Handles the <see cref="Redirect"/> event.</summary>
         /// <param name="a">The event arguments.</param>
         protected virtual void OnRedirect(EventArgs a)
         {
+			Logger.LogError(">>> Entering OnRedirect(a={A})", a);
             if (this.Redirect != null)
             {
                 this.Redirect(null, a);
             }
+			Logger.LogWarning("<<< Exiting OnRedirect(a={A})", a);
         }
     }
 }

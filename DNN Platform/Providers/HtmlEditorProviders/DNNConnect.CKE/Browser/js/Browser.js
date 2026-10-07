@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 (function($) {
     $.browser = {};
     (function() {
@@ -10,13 +11,16 @@
     })();
 
     window.SwitchView = function(n) {
+		logger.error(`>>> Entering SwitchView(n=${n})`, { "event.action": "SwitchView", "logrite.n": n });
         $("#ListViewState").val(n);
         var t = $("#FilesBox ul");
+		logger.error(`SwitchView(n=${n}): t → ${t}`, { "event.action": "SwitchView", "logrite.n": n });
         t.attr("class", "Files" + n);
         $(".SwitchDetailView").css("font-weight", "normal");
         $(".SwitchListView").css("font-weight", "normal");
         $(".SwitchIconsView").css("font-weight", "normal");
         $(".Switch" + n).css("font-weight", "bold");
+		logger.warn(`<<< Exiting SwitchView(n=${n})`, { "event.action": "SwitchView", "logrite.n": n });
     };
 
     $(document).ready(function () {
@@ -31,7 +35,9 @@
             max: 640,
             step: 1,
             spin: function(event, ui) {
+				logger.error(`>>> Entering spin(event=${event},ui=${ui})`, { "event.action": "spin", "logrite.event": event, "logrite.ui": ui });
                 $(this).trigger('change');
+				logger.warn(`<<< Exiting spin(event=${event},ui=${ui})`, { "event.action": "spin", "logrite.event": event, "logrite.ui": ui });
             }
         });
         $("#BrowserMode td").addClass("ui-state-default ui-corner-top");

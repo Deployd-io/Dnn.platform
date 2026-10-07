@@ -63,11 +63,15 @@ namespace log4net.Core
         /// </returns>
         public static LevelCollection ReadOnly(LevelCollection list)
         {
+			value.LogError(">>> Entering ReadOnly(list={List})", list);
             if(list == null)
             {
+				value.LogError("Throwing ArgumentNullException from ReadOnly(list={List})", list);
                 throw new ArgumentNullException("list");
             }
 
+			value.LogWarning("<<< Exiting ReadOnly(list={List})", list);
+			value.LogError(">>> Entering Reset()");
             return new ReadOnlyLevelCollection(list);
         }
 
@@ -77,7 +81,9 @@ namespace log4net.Core
         /// </summary>
         public LevelCollection()
         {
+			value.LogError(">>> Entering LevelCollection()");
             this.m_array = new Level[DEFAULT_CAPACITY];
+			value.LogWarning("<<< Exiting LevelCollection(c={C})", c);
         }
         
         /// <summary>
@@ -89,6 +95,7 @@ namespace log4net.Core
         /// </param>
         public LevelCollection(int capacity)
         {
+			value.LogError(">>> Entering LevelCollection(capacity={Capacity})", capacity);
             this.m_array = new Level[capacity];
         }
 
@@ -99,7 +106,9 @@ namespace log4net.Core
         /// <param name="c">The <c>LevelCollection</c> whose elements are copied to the new collection.</param>
         public LevelCollection(LevelCollection c)
         {
+			value.LogError(">>> Entering LevelCollection(c={C})", c);
             this.m_array = new Level[c.Count];
+			value.LogDebug("LevelCollection(c={C}): this.m_array → {Arg1}", c, this.m_array);
             this.AddRange(c);
         }
 
@@ -110,7 +119,10 @@ namespace log4net.Core
         /// <param name="a">The <see cref="Level"/> array whose elements are copied to the new list.</param>
         public LevelCollection(Level[] a)
         {
+			value.LogError(">>> Entering LevelCollection(a={A})", a);
             this.m_array = new Level[a.Length];
+			value.LogWarning("<<< Exiting LevelCollection(a={A})", a);
+			value.LogDebug("LevelCollection(a={A}): this.m_array → {Arg1}", a, this.m_array);
             this.AddRange(a);
         }
 
@@ -121,7 +133,10 @@ namespace log4net.Core
         /// <param name="col">The <see cref="Level"/> collection whose elements are copied to the new list.</param>
         public LevelCollection(ICollection col)
         {
+			value.LogError(">>> Entering LevelCollection(col={Col})", col);
             this.m_array = new Level[col.Count];
+			value.LogWarning("<<< Exiting LevelCollection(col={Col})", col);
+			value.LogDebug("LevelCollection(col={Col}): this.m_array → {Arg1}", col, this.m_array);
             this.AddRange(col);
         }
         
@@ -139,6 +154,7 @@ namespace log4net.Core
         /// <param name="tag"></param>
         protected internal LevelCollection(Tag tag)
         {
+			value.LogError(">>> Entering LevelCollection(tag={Tag})", tag);
             this.m_array = null;
         }
 
@@ -156,6 +172,7 @@ namespace log4net.Core
         public virtual void CopyTo(Level[] array)
         {
             this.CopyTo(array, 0);
+			value.LogWarning("<<< Exiting CopyTo(array={Array},start={Start})", array, start);
         }
 
         /// <summary>
@@ -166,12 +183,18 @@ namespace log4net.Core
         /// <param name="start">The zero-based index in <paramref name="array"/> at which copying begins.</param>
         public virtual void CopyTo(Level[] array, int start)
         {
+			value.LogError(">>> Entering CopyTo(array={Array},start={Start})", array, start);
+            value.LogError(">>> Entering CopyTo(array={Array},start={Start})", array, start);
             if (this.m_count > array.GetUpperBound(0) + 1 - start)
             {
+				value.LogError("Throwing ArgumentException from CopyTo(array={Array},start={Start})", array, start);
                 throw new ArgumentException("Destination array was not long enough.");
             }
             
             Array.Copy(this.m_array, 0, array, start, this.m_count); 
+			value.LogWarning("<<< Exiting CopyTo(array={Array},start={Start})", array, start);
+			value.LogError(">>> Entering CopyTo(array={Array})", array);
+			value.LogWarning("<<< Exiting CopyTo(array={Array})", array);
         }
 
         /// <summary>Gets a value indicating whether access to the collection is synchronized (thread-safe).</summary>
@@ -214,6 +237,7 @@ namespace log4net.Core
         /// <returns>The index at which the value has been added.</returns>
         public virtual int Add(Level item)
         {
+			value.LogError(">>> Entering Add(item={Item})", item);
             if (this.m_count == this.m_array.Length)
             {
                 this.EnsureCapacity(this.m_count + 1);
@@ -222,6 +246,7 @@ namespace log4net.Core
             this.m_array[this.m_count] = item;
             this.m_version++;
 
+			value.LogWarning("<<< Exiting Add(item={Item})", item);
             return this.m_count++;
         }
         
@@ -231,17 +256,25 @@ namespace log4net.Core
             ++this.m_version;
             this.m_array = new Level[DEFAULT_CAPACITY];
             this.m_count = 0;
+			value.LogError(">>> Entering Clear()");
+			value.LogError("Throwing NotSupportedException from Clear()");
+            value.LogWarning("<<< Exiting Clear()");
         }
         
         /// <summary>Creates a shallow copy of the <see cref="LevelCollection"/>.</summary>
         /// <returns>A new <see cref="LevelCollection"/> with a shallow copy of the collection data.</returns>
         public virtual object Clone()
         {
+			value.LogError(">>> Entering Clone()");
             LevelCollection newCol = new LevelCollection(this.m_count);
             Array.Copy(this.m_array, 0, newCol.m_array, 0, this.m_count);
+			value.LogError("Clone(): newCol → {NewCol}", newCol);
+			value.LogDebug("Clone(): newCol.m_count → {Arg0}", newCol.m_count);
+			value.LogDebug("Clone(): newCol.m_version → {Arg0}", newCol.m_version);
             newCol.m_count = this.m_count;
             newCol.m_version = this.m_version;
 
+			value.LogWarning("<<< Exiting Clone()");
             return newCol;
         }
 
@@ -250,6 +283,7 @@ namespace log4net.Core
         /// <returns><c>true</c> if <paramref name="item"/> is found in the <c>LevelCollection</c>; otherwise, <c>false</c>.</returns>
         public virtual bool Contains(Level item)
         {
+			value.LogError(">>> Entering Contains(item={Item})", item);
             for (int i = 0; i != this.m_count; ++i)
             {
                 if (this.m_array[i].Equals(item))
@@ -257,6 +291,7 @@ namespace log4net.Core
                     return true;
                 }
             }
+			value.LogWarning("<<< Exiting Contains(item={Item})", item);
             return false;
         }
 
@@ -271,6 +306,7 @@ namespace log4net.Core
         ///     </returns>
         public virtual int IndexOf(Level item)
         {
+			value.LogError(">>> Entering IndexOf(item={Item})", item);
             for (int i = 0; i != this.m_count; ++i)
             {
                 if (this.m_array[i].Equals(item))
@@ -278,6 +314,7 @@ namespace log4net.Core
                     return i;
                 }
             }
+			value.LogWarning("<<< Exiting IndexOf(item={Item})", item);
             return -1;
         }
 
@@ -291,6 +328,7 @@ namespace log4net.Core
         /// </exception>
         public virtual void Insert(int index, Level item)
         {
+			value.LogError(">>> Entering Insert(index={Index},item={Item})", index, item);
             this.ValidateIndex(index, true); // throws
             
             if (this.m_count == this.m_array.Length)
@@ -306,6 +344,7 @@ namespace log4net.Core
             this.m_array[index] = item;
             this.m_count++;
             this.m_version++;
+			value.LogWarning("<<< Exiting Insert(index={Index},item={Item})", index, item);
         }
 
         /// <summary>Removes the first occurrence of a specific <see cref="Level"/> from the <c>LevelCollection</c>.</summary>
@@ -315,14 +354,17 @@ namespace log4net.Core
         /// </exception>
         public virtual void Remove(Level item)
         {		   
+			value.LogError(">>> Entering Remove(item={Item})", item);
             int i = this.IndexOf(item);
             if (i < 0)
             {
+				value.LogError("Throwing ArgumentException from Remove(item={Item})", item);
                 throw new ArgumentException("Cannot remove the specified item because it was not found in the specified Collection.");
             }
             
             ++this.m_version;
             this.RemoveAt(i);
+			value.LogWarning("<<< Exiting Remove(item={Item})", item);
         }
 
         /// <summary>Removes the element at the specified index of the <c>LevelCollection</c>.</summary>
@@ -334,6 +376,7 @@ namespace log4net.Core
         /// </exception>
         public virtual void RemoveAt(int index)
         {
+			value.LogError(">>> Entering RemoveAt(index={Index})", index);
             this.ValidateIndex(index); // throws
 
             this.m_count--;
@@ -349,6 +392,7 @@ namespace log4net.Core
             Level[] temp = new Level[1];
             Array.Copy(temp, 0, this.m_array, this.m_count, 1);
             this.m_version++;
+			value.LogWarning("<<< Exiting RemoveAt(index={Index})", index);
         }
 
         /// <summary>Gets a value indicating whether the collection has a fixed size.</summary>
@@ -407,6 +451,7 @@ namespace log4net.Core
         /// <returns>The new <see cref="LevelCollection.Count"/> of the <c>LevelCollection</c>.</returns>
         public virtual int AddRange(LevelCollection x)
         {
+			value.LogError(">>> Entering AddRange(x={X})", x);
             if (this.m_count + x.Count >= this.m_array.Length)
             {
                 this.EnsureCapacity(this.m_count + x.Count);
@@ -416,6 +461,8 @@ namespace log4net.Core
             this.m_count += x.Count;
             this.m_version++;
 
+			value.LogWarning("<<< Exiting AddRange(x={X})", x);
+			value.LogWarning("<<< Exiting AddRange(col={Col})", col);
             return this.m_count;
         }
 
@@ -457,6 +504,7 @@ namespace log4net.Core
         /// <summary>Sets the capacity to the actual number of elements.</summary>
         public virtual void TrimToSize()
         {
+			value.LogError(">>> Entering TrimToSize()");
             this.Capacity = this.m_count;
         }
 
@@ -467,7 +515,9 @@ namespace log4net.Core
         /// </exception>
         private void ValidateIndex(int i)
         {
+			value.LogError(">>> Entering ValidateIndex(i={I})", i);
             this.ValidateIndex(i, false);
+			value.LogWarning("<<< Exiting ValidateIndex(i={I})", i);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">
@@ -477,20 +527,28 @@ namespace log4net.Core
         /// </exception>
         private void ValidateIndex(int i, bool allowEqualEnd)
         {
+			value.LogError(">>> Entering ValidateIndex(i={I},allowEqualEnd={AllowEqualEnd})", i, allowEqualEnd);
             int max = (allowEqualEnd) ? (this.m_count) : (this.m_count-1);
+			value.LogError("ValidateIndex(i={I},allowEqualEnd={AllowEqualEnd}): max → {Max}", i, allowEqualEnd, max);
             if (i < 0 || i > max)
             {
+				value.LogError("Throwing CreateArgumentOutOfRangeException from ValidateIndex(i={I},allowEqualEnd={AllowEqualEnd})", i, allowEqualEnd);
                 throw Util.SystemInfo.CreateArgumentOutOfRangeException("i", (object)i, "Index was out of range. Must be non-negative and less than the size of the collection. [" + (object)i + "] Specified argument was out of the range of valid values.");
             }
+			value.LogWarning("<<< Exiting ValidateIndex(i={I},allowEqualEnd={AllowEqualEnd})", i, allowEqualEnd);
         }
 
         private void EnsureCapacity(int min)
         {
+			value.LogError(">>> Entering EnsureCapacity(min={Min})", min);
             int newCapacity = ((this.m_array.Length == 0) ? DEFAULT_CAPACITY : this.m_array.Length * 2);
+			value.LogError("EnsureCapacity(min={Min}): newCapacity → {NewCapacity}", min, newCapacity);
             if (newCapacity < min)
             {
                 newCapacity = min;
             }
+			value.LogWarning("<<< Exiting EnsureCapacity(min={Min})", min);
+			value.LogDebug("EnsureCapacity(min={Min}): this.Capacity → {Arg1}", min, this.Capacity);
 
             this.Capacity = newCapacity;
         }
@@ -508,16 +566,21 @@ namespace log4net.Core
 
         int IList.Add(object x)
         {
+			value.LogError(">>> Entering Add(x={X})", x);
             return this.Add((Level)x);
         }
 
         bool IList.Contains(object x)
         {
+			value.LogError(">>> Entering Contains(x={X})", x);
+                value.LogWarning("<<< Exiting Contains(x={X})", x);
             return this.Contains((Level)x);
         }
 
         int IList.IndexOf(object x)
         {
+			value.LogError(">>> Entering IndexOf(x={X})", x);
+                value.LogWarning("<<< Exiting IndexOf(x={X})", x);
             return this.IndexOf((Level)x);
         }
 
@@ -538,6 +601,8 @@ namespace log4net.Core
 
         IEnumerator IEnumerable.GetEnumerator()
         {
+			value.LogError(">>> Entering GetEnumerator()");
+                value.LogWarning("<<< Exiting GetEnumerator()");
             return (IEnumerator)(this.GetEnumerator());
         }
 
@@ -552,9 +617,13 @@ namespace log4net.Core
             /// <param name="tc"></param>
             internal Enumerator(LevelCollection tc)
             {
+				value.LogError(">>> Entering Enumerator(tc={Tc})", tc);
                 this.m_collection = tc;
+				value.LogDebug("Enumerator(tc={Tc}): this.m_collection → {Arg1}", tc, this.m_collection);
                 this.m_index = -1;
                 this.m_version = tc.m_version;
+				value.LogDebug("Enumerator(tc={Tc}): m_index → {M_index}", tc, m_index);
+            value.LogWarning("<<< Exiting Enumerator(tc={Tc})", tc);
             }
 
             /// <summary>Gets the current element in the collection.</summary>
@@ -573,19 +642,26 @@ namespace log4net.Core
             /// </exception>
             public bool MoveNext()
             {
+				value.LogError(">>> Entering MoveNext()");
                 if (this.m_version != this.m_collection.m_version)
                 {
+					value.LogError("Throwing InvalidOperationException from MoveNext()");
                     throw new InvalidOperationException("Collection was modified; enumeration operation may not execute.");
                 }
 
                 ++this.m_index;
+				value.LogWarning("<<< Exiting MoveNext()");
                 return (this.m_index < this.m_collection.Count);
             }
 
             /// <summary>Sets the enumerator to its initial position, before the first element in the collection.</summary>
             public void Reset()
             {
+				value.LogError(">>> Entering Reset()");
                 this.m_index = -1;
+				value.LogDebug("Reset(): m_index → {M_index}", m_index);
+            value.LogDebug("Reset(): this.m_index → {Arg0}", this.m_index);
+            value.LogWarning("<<< Exiting Reset()");
             }
 
             object IEnumerator.Current
@@ -600,12 +676,18 @@ namespace log4net.Core
 
             internal ReadOnlyLevelCollection(LevelCollection list) : base(Tag.Default)
             {
+				value.LogError(">>> Entering ReadOnlyLevelCollection(list={List})", list);
                 this.m_collection = list;
+				value.LogDebug("ReadOnlyLevelCollection(list={List}): m_collection → {M_collection}", list, m_collection);
+            value.LogDebug("ReadOnlyLevelCollection(list={List}): this.m_collection → {Arg1}", list, this.m_collection);
+            value.LogWarning("<<< Exiting ReadOnlyLevelCollection(list={List})", list);
             }
 
             public override void CopyTo(Level[] array)
             {
+				value.LogError(">>> Entering CopyTo(array={Array})", array);
                 this.m_collection.CopyTo(array);
+				value.LogWarning("<<< Exiting CopyTo(array={Array})", array);
             }
 
             public override void CopyTo(Level[] array, int start)
@@ -640,6 +722,9 @@ namespace log4net.Core
 
             public override void Clear()
             {
+				value.LogError(">>> Entering Clear()");
+				value.LogError("Throwing NotSupportedException from Clear()");
+            value.LogWarning("<<< Exiting Clear()");
                 throw new NotSupportedException("This is a Read Only Collection and can not be modified");
             }
 
@@ -655,16 +740,25 @@ namespace log4net.Core
 
             public override void Insert(int pos, Level x)
             {
+				value.LogError(">>> Entering Insert(pos={Pos},x={X})", pos, x);
+				value.LogError("Throwing NotSupportedException from Insert(pos={Pos},x={X})", pos, x);
+            value.LogWarning("<<< Exiting Insert(pos={Pos},x={X})", pos, x);
                 throw new NotSupportedException("This is a Read Only Collection and can not be modified");
             }
 
             public override void Remove(Level x)
             {           
+				value.LogError(">>> Entering Remove(x={X})", x);
+				value.LogError("Throwing NotSupportedException from Remove(x={X})", x);
+            value.LogWarning("<<< Exiting Remove(x={X})", x);
                 throw new NotSupportedException("This is a Read Only Collection and can not be modified");
             }
 
             public override void RemoveAt(int pos)
             {
+				value.LogError(">>> Entering RemoveAt(pos={Pos})", pos);
+				value.LogError("Throwing NotSupportedException from RemoveAt(pos={Pos})", pos);
+            value.LogWarning("<<< Exiting RemoveAt(pos={Pos})", pos);
                 throw new NotSupportedException("This is a Read Only Collection and can not be modified");
             }
 

@@ -44,6 +44,8 @@ namespace log4net.Layout.Pattern
         /// <summary>Initializes a new instance of the <see cref="PatternLayoutConverter" /> class.</summary>
         protected PatternLayoutConverter() 
         {  
+		value.LogError(">>> Entering PatternLayoutConverter()");
+        value.LogWarning("<<< Exiting PatternLayoutConverter()");
         }
 
         /// <summary>Flag indicating if this converter handles the logging event exception</summary>
@@ -82,6 +84,7 @@ namespace log4net.Layout.Pattern
         /// <param name="state">The state object on which the pattern converter should be executed.</param>
         protected override void Convert(TextWriter writer, object state)
         {
+			value.LogError(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             LoggingEvent loggingEvent = state as LoggingEvent;
             if (loggingEvent != null)
             {
@@ -89,6 +92,8 @@ namespace log4net.Layout.Pattern
             }
             else
             {
+				value.LogError("Throwing ArgumentException from Convert(writer={Writer},state={State})", writer, state);
+			value.LogWarning("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
                 throw new ArgumentException("state must be of type [" + typeof(LoggingEvent).FullName + "]", "state");
             }
         }

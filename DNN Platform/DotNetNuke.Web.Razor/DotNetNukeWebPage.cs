@@ -7,11 +7,13 @@ namespace DotNetNuke.Web.Razor
 
     using DotNetNuke.Internal.SourceGenerators;
     using DotNetNuke.Web.Razor.Helpers;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>A razor web page model.</summary>
     [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
     public abstract partial class DotNetNukeWebPage : WebPageBase
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private dynamic model;
 
         public dynamic Model
@@ -29,8 +31,10 @@ namespace DotNetNuke.Web.Razor
         /// <inheritdoc />
         protected override void ConfigurePage(WebPageBase parentPage)
         {
+			_logger.LogError(">>> Entering ConfigurePage(parentPage={ParentPage})", parentPage);
             base.ConfigurePage(parentPage);
 
+			_logger.LogWarning("<<< Exiting ConfigurePage(parentPage={ParentPage})", parentPage);
             // Child pages need to get their context from the Parent
             this.Context = parentPage.Context;
         }

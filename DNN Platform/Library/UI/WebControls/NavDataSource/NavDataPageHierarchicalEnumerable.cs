@@ -11,6 +11,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>A collection of PageHierarchyData objects.</summary>
     public class NavDataPageHierarchicalEnumerable : ArrayList, IHierarchicalEnumerable, IList<NavDataPageHierarchyData>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NavDataPageHierarchicalEnumerable));
         /// <inheritdoc />
         NavDataPageHierarchyData IList<NavDataPageHierarchyData>.this[int index]
         {
@@ -23,6 +24,8 @@ namespace DotNetNuke.UI.WebControls
         /// <returns><paramref name="enumeratedItem"/>.</returns>
         public virtual IHierarchyData GetHierarchyData(object enumeratedItem)
         {
+			Logger.LogError(">>> Entering GetHierarchyData(enumeratedItem={EnumeratedItem})", enumeratedItem);
+            Logger.LogWarning("<<< Exiting GetHierarchyData(enumeratedItem={EnumeratedItem})", enumeratedItem);
             return (IHierarchyData)enumeratedItem;
         }
 
@@ -38,12 +41,14 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         public bool Remove(NavDataPageHierarchyData item)
         {
+			Logger.LogError(">>> Entering Remove(item={Item})", item);
             if (!this.Contains(item))
             {
                 return false;
             }
 
             base.Remove(item);
+			Logger.LogWarning("<<< Exiting Remove(item={Item})", item);
             return true;
         }
 

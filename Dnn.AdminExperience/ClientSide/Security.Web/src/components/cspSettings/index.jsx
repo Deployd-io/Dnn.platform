@@ -18,10 +18,12 @@ import "./style.less";
 import util from "../../utils";
 import resx from "../../resources";
 import "./style.less";
+const logger = console;
 
 class CspSettingsPanelBody extends Component {
   constructor() {
     super();
+	logger.error('>>> Entering constructor()', { "event.action": "constructor" });
     this.state = {
       cspSettings: undefined,
       error: {
@@ -32,9 +34,11 @@ class CspSettingsPanelBody extends Component {
       },
       cspLockConfirm: false,
     };
+	logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
   }
 
   UNSAFE_componentWillMount() {
+	logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     const { props } = this;
     if (props.cspSettings) {
       this.setState({
@@ -50,9 +54,11 @@ class CspSettingsPanelBody extends Component {
       return;
     }
     this.getSettings();
+	logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
   }
 
   getCspHeaderModeOptions() {
+	logger.error('>>> Entering getCspHeaderModeOptions()', { "event.action": "getCspHeaderModeOptions" });
     let cspHeaderModeOptions = [];
     cspHeaderModeOptions.push({
       value: 0,
@@ -64,22 +70,30 @@ class CspSettingsPanelBody extends Component {
     });
     cspHeaderModeOptions.push({ value: 2, label: resx.get("CspHeaderModeOn") });
 
+	logger.warn('<<< Exiting getCspHeaderModeOptions()', { "event.action": "getCspHeaderModeOptions" });
     return cspHeaderModeOptions;
   }
 
   onCspHeaderValueChange(key, event) {
+	logger.error(`>>> Entering onCspHeaderValueChange(key=${key},event=${event})`, { "event.action": "onCspHeaderValueChange", "logrite.key": key, "logrite.event": event });
     this.onSettingChange(key, event);
+	logger.warn(`<<< Exiting onCspHeaderValueChange(key=${key},event=${event})`, { "event.action": "onCspHeaderValueChange", "logrite.key": key, "logrite.event": event });
   }
 
   onCspReportingHeaderValueChange(key, event) {
+	logger.error(`>>> Entering onCspReportingHeaderValueChange(key=${key},event=${event})`, { "event.action": "onCspReportingHeaderValueChange", "logrite.key": key, "logrite.event": event });
     this.onSettingChange(key, event);
+	logger.warn(`<<< Exiting onCspReportingHeaderValueChange(key=${key},event=${event})`, { "event.action": "onCspReportingHeaderValueChange", "logrite.key": key, "logrite.event": event });
   }
 
   onSettingChange(key, event) {
+	logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     const { state, props } = this;
     let cspSettings = Object.assign({}, state.cspSettings);
+	logger.error(`onSettingChange(key=${key},event=${event}): cspSettings → ${cspSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     cspSettings[key] = typeof event === "object" ? event.target.value : event;
     let error = Object.assign({}, state.error);
+	logger.error(`onSettingChange(key=${key},event=${event}): error → ${error}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     error[key] = false;
     error[key + "Errors"] = [];
     this.setState(
@@ -90,9 +104,11 @@ class CspSettingsPanelBody extends Component {
       () => {}
     );
     props.dispatch(SecurityActions.cspSettingsClientModified(cspSettings));
+	logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
   }
 
   onUpdate(event) {
+	logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
     event.preventDefault();
     const { props, state } = this;
 
@@ -113,23 +129,27 @@ class CspSettingsPanelBody extends Component {
         },
         () => {
           util.utilities.notifyError(resx.get("CspSettingsError"));
+		logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         }
       )
     );
   }
 
   onCancel() {
+	logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
     util.utilities.confirm(
       resx.get("CspSettingsRestoreWarning"),
       resx.get("Yes"),
       resx.get("No"),
       () => {
         this.getSettings();
+		logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
       }
     );
   }
 
   getSettings() {
+	logger.error('>>> Entering getSettings()', { "event.action": "getSettings" });
     const { props } = this;
     props.dispatch(
       SecurityActions.getCspSettings((data) => {
@@ -145,9 +165,11 @@ class CspSettingsPanelBody extends Component {
         });
       })
     );
+	logger.warn('<<< Exiting getSettings()', { "event.action": "getSettings" });
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
     const { state } = this;
 
     if (state.cspSettings) {
@@ -263,6 +285,8 @@ CspSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
   return {
     tabIndex: state.pagination.tabIndex,
     cspSettings: state.security.cspSettings,

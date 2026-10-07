@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
     /// <summary>Represents a control that excludes JavaScript client resources from being loaded.</summary>
     public class DnnJsExclude : ClientResourceExclude
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnJsExclude));
         /// <summary>Initializes a new instance of the <see cref="DnnJsExclude"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.1. Use overload with IClientResourceController. Scheduled removal in v12.0.0.")]
         public DnnJsExclude()
@@ -25,6 +26,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         public DnnJsExclude(IClientResourceController clientResourceController)
             : base(clientResourceController)
         {
+			Logger.LogError(">>> Entering DnnJsExclude(clientResourceController={ClientResourceController})", clientResourceController);
             this.DependencyType = ClientDependencyType.Javascript;
         }
     }

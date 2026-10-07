@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -34,6 +35,8 @@ CodeMirror.defineMode("tiddlywiki", function () {
 
   var keywords = function () {
     function kw(type) {
+	logger.error(`>>> Entering kw(type=${type})`, { "event.action": "kw", "logrite.type": type });
+	logger.warn(`<<< Exiting kw(type=${type})`, { "event.action": "kw", "logrite.type": type });
       return { type: type, style: "macro"};
     }
     return {
@@ -67,14 +70,19 @@ CodeMirror.defineMode("tiddlywiki", function () {
   reUntilCodeStop = /.*?\}\}\}/;
 
   function chain(stream, state, f) {
+	logger.error(`>>> Entering chain(stream=${stream},state=${state},f=${f})`, { "event.action": "chain", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
     state.tokenize = f;
+	logger.warn(`<<< Exiting chain(stream=${stream},state=${state},f=${f})`, { "event.action": "chain", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
     return f(stream, state);
   }
 
   function jsTokenBase(stream, state) {
+	logger.error(`>>> Entering jsTokenBase(stream=${stream},state=${state})`, { "event.action": "jsTokenBase", "logrite.stream": stream, "logrite.state": state });
     var sol = stream.sol(), ch;
 
+	logger.error(`jsTokenBase(stream=${stream},state=${state}): sol → ${sol}`, { "event.action": "jsTokenBase", "logrite.stream": stream, "logrite.state": state });
     state.block = false;        // indicates the start of a code block.
+	logger.debug(`jsTokenBase(stream=${stream},state=${state}): state.block → ${state.block}`, { "event.action": "jsTokenBase", "logrite.stream": stream, "logrite.state": state });
 
     ch = stream.peek();         // don't eat, to make matching simpler
 
@@ -202,40 +210,49 @@ CodeMirror.defineMode("tiddlywiki", function () {
     stream.eatWhile(/[\w\$_]/);
     var word = stream.current(),
     known = textwords.propertyIsEnumerable(word) && textwords[word];
+	logger.error(`jsTokenBase(stream=${stream},state=${state}): word → ${word}`, { "event.action": "jsTokenBase", "logrite.stream": stream, "logrite.state": state });
 
+	logger.warn(`<<< Exiting jsTokenBase(stream=${stream},state=${state})`, { "event.action": "jsTokenBase", "logrite.stream": stream, "logrite.state": state });
     return known ? known.style : null;
   } // jsTokenBase()
 
   // tw invisible comment
   function twTokenComment(stream, state) {
+	logger.error(`>>> Entering twTokenComment(stream=${stream},state=${state})`, { "event.action": "twTokenComment", "logrite.stream": stream, "logrite.state": state });
     var maybeEnd = false,
     ch;
     while (ch = stream.next()) {
       if (ch == "/" && maybeEnd) {
         state.tokenize = jsTokenBase;
+		logger.debug(`twTokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "twTokenComment", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       maybeEnd = (ch == "%");
     }
+	logger.error(`twTokenComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "twTokenComment", "logrite.stream": stream, "logrite.state": state });
     return "comment";
   }
 
   // tw strong / bold
   function twTokenStrong(stream, state) {
+	logger.error(`>>> Entering twTokenStrong(stream=${stream},state=${state})`, { "event.action": "twTokenStrong", "logrite.stream": stream, "logrite.state": state });
     var maybeEnd = false,
     ch;
     while (ch = stream.next()) {
       if (ch == "'" && maybeEnd) {
         state.tokenize = jsTokenBase;
+		logger.debug(`twTokenStrong(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "twTokenStrong", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       maybeEnd = (ch == "'");
     }
+	logger.error(`twTokenStrong(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "twTokenStrong", "logrite.stream": stream, "logrite.state": state });
     return "strong";
   }
 
   // tw code
   function twTokenCode(stream, state) {
+	logger.error(`>>> Entering twTokenCode(stream=${stream},state=${state})`, { "event.action": "twTokenCode", "logrite.stream": stream, "logrite.state": state });
     var sb = state.block;
 
     if (sb && stream.current()) {
@@ -244,6 +261,7 @@ CodeMirror.defineMode("tiddlywiki", function () {
 
     if (!sb && stream.match(reUntilCodeStop)) {
       state.tokenize = jsTokenBase;
+	logger.debug(`twTokenCode(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "twTokenCode", "logrite.stream": stream, "logrite.state": state });
       return "comment";
     }
 
@@ -253,54 +271,65 @@ CodeMirror.defineMode("tiddlywiki", function () {
     }
 
     stream.next();
+	logger.warn(`<<< Exiting twTokenCode(stream=${stream},state=${state})`, { "event.action": "twTokenCode", "logrite.stream": stream, "logrite.state": state });
     return "comment";
   }
 
   // tw em / italic
   function twTokenEm(stream, state) {
+	logger.error(`>>> Entering twTokenEm(stream=${stream},state=${state})`, { "event.action": "twTokenEm", "logrite.stream": stream, "logrite.state": state });
     var maybeEnd = false,
     ch;
     while (ch = stream.next()) {
       if (ch == "/" && maybeEnd) {
         state.tokenize = jsTokenBase;
+		logger.debug(`twTokenEm(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "twTokenEm", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       maybeEnd = (ch == "/");
     }
+	logger.error(`twTokenEm(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "twTokenEm", "logrite.stream": stream, "logrite.state": state });
     return "em";
   }
 
   // tw underlined text
   function twTokenUnderline(stream, state) {
+	logger.error(`>>> Entering twTokenUnderline(stream=${stream},state=${state})`, { "event.action": "twTokenUnderline", "logrite.stream": stream, "logrite.state": state });
     var maybeEnd = false,
     ch;
     while (ch = stream.next()) {
       if (ch == "_" && maybeEnd) {
         state.tokenize = jsTokenBase;
+		logger.debug(`twTokenUnderline(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "twTokenUnderline", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       maybeEnd = (ch == "_");
     }
+	logger.error(`twTokenUnderline(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "twTokenUnderline", "logrite.stream": stream, "logrite.state": state });
     return "underlined";
   }
 
   // tw strike through text looks ugly
   // change CSS if needed
   function twTokenStrike(stream, state) {
+	logger.error(`>>> Entering twTokenStrike(stream=${stream},state=${state})`, { "event.action": "twTokenStrike", "logrite.stream": stream, "logrite.state": state });
     var maybeEnd = false, ch;
 
     while (ch = stream.next()) {
       if (ch == "-" && maybeEnd) {
         state.tokenize = jsTokenBase;
+		logger.debug(`twTokenStrike(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "twTokenStrike", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       maybeEnd = (ch == "-");
     }
+	logger.error(`twTokenStrike(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "twTokenStrike", "logrite.stream": stream, "logrite.state": state });
     return "strikethrough";
   }
 
   // macro
   function twTokenMacro(stream, state) {
+	logger.error(`>>> Entering twTokenMacro(stream=${stream},state=${state})`, { "event.action": "twTokenMacro", "logrite.stream": stream, "logrite.state": state });
     var ch, word, known;
 
     if (stream.current() == '<<') {
@@ -308,8 +337,10 @@ CodeMirror.defineMode("tiddlywiki", function () {
     }
 
     ch = stream.next();
+	logger.error(`twTokenMacro(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "twTokenMacro", "logrite.stream": stream, "logrite.state": state });
     if (!ch) {
       state.tokenize = jsTokenBase;
+	logger.debug(`twTokenMacro(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "twTokenMacro", "logrite.stream": stream, "logrite.state": state });
       return null;
     }
     if (ch == ">") {
@@ -328,6 +359,7 @@ CodeMirror.defineMode("tiddlywiki", function () {
       return known.style, word;
     }
     else {
+	logger.warn(`<<< Exiting twTokenMacro(stream=${stream},state=${state})`, { "event.action": "twTokenMacro", "logrite.stream": stream, "logrite.state": state });
       return null, word;
     }
   }
@@ -335,16 +367,21 @@ CodeMirror.defineMode("tiddlywiki", function () {
   // Interface
   return {
     startState: function () {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         tokenize: jsTokenBase,
         indented: 0,
         level: 0
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
 
     token: function (stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.eatSpace()) return null;
       var style = state.tokenize(stream, state);
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+	logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return style;
     },
 

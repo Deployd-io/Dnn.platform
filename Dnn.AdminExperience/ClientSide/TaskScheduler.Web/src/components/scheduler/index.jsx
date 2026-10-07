@@ -10,12 +10,14 @@ import SchedulerEditor from "./schedulerEditor";
 import "./style.less";
 import util from "../../utils";
 import resx from "../../resources";
+const logger = console;
 
 let tableFields = [];
 
 class SchedulerPanel extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             currentServerId: "*",
             schedulerItemList: [],
@@ -23,9 +25,11 @@ class SchedulerPanel extends Component {
             serverList: [],
             historyPanelOpen: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const { props } = this;
         props.dispatch(TaskActions.getSchedulerItemList());
         if (props.serverList === null || props.serverList === undefined || props.serverList.length === 0) {
@@ -38,25 +42,30 @@ class SchedulerPanel extends Component {
         tableFields.push({ "name": resx.get("RetryTimeLapse.Header"), "id": "RetryTimeLapse" });
         tableFields.push({ "name": resx.get("NextStart.Header"), "id": "NextStart" });
         tableFields.push({ "name": resx.get("Enabled.Header"), "id": "Enabled" });
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     createServerOptions(serverList) {
+		logger.error(`>>> Entering createServerOptions(serverList=${serverList})`, { "event.action": "createServerOptions", "logrite.serverList": serverList });
         let serverOptions = [];
         if (serverList !== undefined) {
             serverOptions = serverList.map((item) => {
                 return { label: item.ServerName, value: item.ServerID };
             });
         }
+		logger.warn(`<<< Exiting createServerOptions(serverList=${serverList})`, { "event.action": "createServerOptions", "logrite.serverList": serverList });
         return serverOptions;
     }
 
     renderHeader() {
+		logger.error('>>> Entering renderHeader()', { "event.action": "renderHeader" });
         let tableHeaders = tableFields.map((field) => {
             let className = "header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.warn('<<< Exiting renderHeader()', { "event.action": "renderHeader" });
         return <div className="header-row">{tableHeaders}</div>;
     }
     uncollapse(id, index) {
@@ -135,8 +144,10 @@ class SchedulerPanel extends Component {
 
      
     renderedScedulerItemList() {
+		logger.error('>>> Entering renderedScedulerItemList()', { "event.action": "renderedScedulerItemList" });
         let i = 0;
         if (this.props.schedulerItemList) {
+			logger.warn('<<< Exiting renderedScedulerItemList()', { "event.action": "renderedScedulerItemList" });
             return this.props.schedulerItemList.map((item, index) => {
                 let id = "row-" + i++;
                 return (
@@ -172,8 +183,11 @@ class SchedulerPanel extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let opened = (this.state.openId === "add");
         let serverOptions = this.createServerOptions(this.props.serverList);
+		logger.error(`render(): opened → ${opened}`, { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <div className="schedule-items">
@@ -235,6 +249,8 @@ SchedulerPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         schedulerItemList: state.task.schedulerItemList,
         serverList: state.task.serverList,

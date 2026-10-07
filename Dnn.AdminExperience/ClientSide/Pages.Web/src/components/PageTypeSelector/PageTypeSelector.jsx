@@ -5,6 +5,7 @@ import styles from "./style.module.less";
 import Localization from "../../localization";
 import { RadioButtons } from "@dnnsoftware/dnn-react-common";
 import utils from "../../utils";
+const logger = console;
 
 
 const MAX_PAGE_PARENT_SIZE_TOOGLE = 180;
@@ -13,10 +14,13 @@ class PageTypeSelector extends Component {
 
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.pageParentLarge = false;
+		logger.debug(`constructor(props=${props}): this.pageParentLarge → ${this.pageParentLarge}`, { "event.action": "constructor", "logrite.props": props });
     }
 
     getComponents() {
+		logger.error('>>> Entering getComponents()', { "event.action": "getComponents" });
         const {props} = this;
         if (props.components && props.components.length > 0) {
             return this.props.components.map((component, index) => {
@@ -24,46 +28,60 @@ class PageTypeSelector extends Component {
                 return <Component key={index} page={props.page} />;
             });
         }
+		logger.warn('<<< Exiting getComponents()', { "event.action": "getComponents" });
         return false;
     }
     _getHierarchyLabel() {
+		logger.error('>>> Entering _getHierarchyLabel()', { "event.action": "_getHierarchyLabel" });
         const page = this.props.page;
         if (page.hierarchy === null || page.hierarchy === "" || page.hierarchy === Localization.get("NoneSpecified")) {
             return Localization.get("TopPage");
         } else {
+			logger.warn('<<< Exiting _getHierarchyLabel()', { "event.action": "_getHierarchyLabel" });
             return page.hierarchy;
         }
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const pageSelectorDOM = this.node;
         if (pageSelectorDOM.querySelector("#parentPageValue").offsetWidth > MAX_PAGE_PARENT_SIZE_TOOGLE) {
             pageSelectorDOM.querySelector("#pageParent").className = "page-info-item page-parent-info-style-large";
             pageSelectorDOM.querySelector("#pageParentLabel").className = "page-info-item-label parent-page-style-label-large";
             pageSelectorDOM.querySelector("#pageParentContent").className = "page-info-item-value parent-page-name parent-page-style-content-large";
+			logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
         }
     }
 
     _calculateParentPageSize(parentPageRef) {
+		logger.error(`>>> Entering _calculateParentPageSize(parentPageRef=${parentPageRef})`, { "event.action": "_calculateParentPageSize", "logrite.parentPageRef": parentPageRef });
         if (parentPageRef !== null) {
             this.pageParentLarge = (parentPageRef.offsetWidth > MAX_PAGE_PARENT_SIZE_TOOGLE);
+			logger.warn(`<<< Exiting _calculateParentPageSize(parentPageRef=${parentPageRef})`, { "event.action": "_calculateParentPageSize", "logrite.parentPageRef": parentPageRef });
         }
     }
 
     _defineVisibleOrHidden(includeInMenu) {
+		logger.error(`>>> Entering _defineVisibleOrHidden(includeInMenu=${includeInMenu})`, { "event.action": "_defineVisibleOrHidden", "logrite.includeInMenu": includeInMenu });
+		logger.warn(`<<< Exiting _defineVisibleOrHidden(includeInMenu=${includeInMenu})`, { "event.action": "_defineVisibleOrHidden", "logrite.includeInMenu": includeInMenu });
         return includeInMenu ? Localization.get("Status_Visible") : Localization.get("Status_Hidden");
     }
 
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { page, onChangePageType } = this.props;
         const createdDate = Localization.get("CreatedValue")
             .replace("[CREATEDDATE]", utils.formatDateNoTime(page.createdOnDate))
             .replace("[CREATEDUSER]", page.created || "System");
         
+		logger.error(`render(): createdDate → ${createdDate}`, { "event.action": "render" });
         const hierarchy = this._getHierarchyLabel();        
+		logger.error(`render(): hierarchy → ${hierarchy}`, { "event.action": "render" });
         const components = this.getComponents();
+				logger.error(`render(): components → ${components}`, { "event.action": "render" });
                 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.pageTypeSelector} ref={node => this.node = node}>
                 <div>
@@ -162,6 +180,8 @@ PageTypeSelector.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         page : state.pages.selectedPage
     };

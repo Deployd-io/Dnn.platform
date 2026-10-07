@@ -8,12 +8,14 @@ namespace DotNetNuke.UI.WebControls
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class FormatAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FormatAttribute));
         private readonly string format;
 
         /// <summary>Initializes a new instance of the <see cref="FormatAttribute"/> class.</summary>
         /// <param name="format">The format string to use to format the corresponding date/time.</param>
         public FormatAttribute(string format)
         {
+			Logger.LogError(">>> Entering FormatAttribute(format={Format})", format);
             this.format = format;
         }
 

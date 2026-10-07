@@ -10,10 +10,12 @@ import {
     roleUsers as RoleUsersActions
 } from "../../../actions";
 import util from "../../../utils";
+const logger = console;
 
 class UsersInRole extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
 
         this.state = {
             userSelectState: { userId: -1, keyword: "" },
@@ -30,12 +32,14 @@ class UsersInRole extends Component {
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.getUsers();
         if (this.comboBoxRef.childNodes && this.comboBoxRef.childNodes[1])
             this.comboBoxRef.childNodes[1].setAttribute("aria-label", "Suggestion");
     }
 
     getUsers() {
+	logger.error('>>> Entering getUsers()', { "event.action": "getUsers" });
 
         const {props, state} = this;
         this.setState({loading: true});
@@ -47,19 +51,25 @@ class UsersInRole extends Component {
         };
         props.dispatch(RoleUsersActions.getRoleUsers(parameter, () => {
             this.setState({loading: false});
+			logger.warn('<<< Exiting getUsers()', { "event.action": "getUsers" });
         }));
     }
 
     getSuggestUsers() {
+		logger.error('>>> Entering getSuggestUsers()', { "event.action": "getSuggestUsers" });
         const {props, state} = this;
         let keyword = state.userSelectState.userId > 0 ? "" : state.userSelectState.keyword;
         props.dispatch(RoleUsersActions.getSuggestUsers({ keyword: keyword, roleId: -1, count: 10 }));
+		logger.error(`getSuggestUsers(): keyword → ${keyword}`, { "event.action": "getSuggestUsers" });
     }
     debounceGetSuggestUsers() {
+		logger.error('>>> Entering debounceGetSuggestUsers()', { "event.action": "debounceGetSuggestUsers" });
         this.getSuggestUsers();
+		logger.warn('<<< Exiting debounceGetSuggestUsers()', { "event.action": "debounceGetSuggestUsers" });
     }
 
     onUserSelectorChanged(item) {
+		logger.error(`>>> Entering onUserSelectorChanged(item=${item})`, { "event.action": "onUserSelectorChanged", "logrite.item": item });
         if (this.state.loading) {
             return;
         }
@@ -68,28 +78,35 @@ class UsersInRole extends Component {
         }
         this.setState({ userSelectState: { userId: -1, keyword: item } });
         this.debounceGetSuggestUsers();
+		logger.warn(`<<< Exiting onUserSelectorChanged(item=${item})`, { "event.action": "onUserSelectorChanged", "logrite.item": item });
     }
 
     onUserSelectorSelected(item) {
+		logger.error(`>>> Entering onUserSelectorSelected(item=${item})`, { "event.action": "onUserSelectorSelected", "logrite.item": item });
         if (!item.userId || !item.displayName) {
             return;
         }
         this.setState({ userSelectState: { userId: item.userId, keyword: item.displayName } }, function () {
             this.getSuggestUsers();
         });
+		logger.warn(`<<< Exiting onUserSelectorSelected(item=${item})`, { "event.action": "onUserSelectorSelected", "logrite.item": item });
     }
 
     onUserSelectorToggle() {
+	logger.error('>>> Entering onUserSelectorToggle()', { "event.action": "onUserSelectorToggle" });
     }
 
     onAddUser() {
+		logger.error('>>> Entering onAddUser()', { "event.action": "onAddUser" });
         const {state} = this;
         let userId = state.userSelectState.userId;
+		logger.error(`onAddUser(): userId → ${userId}`, { "event.action": "onAddUser" });
         if (userId === -1) {
             return;
         }
         this.saveUser(true, userId);
         this.setState({ userSelectState: { userId: -1, keyword: "" } });
+		logger.warn('<<< Exiting onAddUser()', { "event.action": "onAddUser" });
     }
     saveUser(isAdd, userId, startTime, expiresTime) {
         const {props} = this;
@@ -97,28 +114,36 @@ class UsersInRole extends Component {
         let parameter = { userId: userId, roleId: props.roleDetails.id, startTime: startTime, expiresTime: expiresTime, isAdd: isAdd };
         props.dispatch(RoleUsersActions.addUserToRole(parameter, this.state.sendEmail, this.state.isOwner));
         this.setState({ sendEmail: true, isOwner: false });
+		logger.warn(`<<< Exiting saveUser(isAdd=${isAdd},userId=${userId},startTime=${startTime},expiresTime=${expiresTime})`, { "event.action": "saveUser", "logrite.isAdd": isAdd, "user.name": String(userId), "logrite.startTime": startTime, "logrite.expiresTime": expiresTime });
     }
 
     onUsersKeywordChanged(keyword) {
+		logger.error(`>>> Entering onUsersKeywordChanged(keyword=${keyword})`, { "event.action": "onUsersKeywordChanged", "logrite.keyword": keyword });
         let newState = { usersKeyword: keyword, currentPage: 0 };
 
         this.setState(newState, () => {
             this.getUsers();
         });
+		logger.warn(`<<< Exiting onUsersKeywordChanged(keyword=${keyword})`, { "event.action": "onUsersKeywordChanged", "logrite.keyword": keyword });
     }
 
     onPageChanged(currentPage, pageSize) {
+		logger.error(`>>> Entering onPageChanged(currentPage=${currentPage},pageSize=${pageSize})`, { "event.action": "onPageChanged", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
         let {state} = this;
         if (pageSize !== undefined && state.pageSize !== pageSize) {
+			logger.debug(`onPageChanged(currentPage=${currentPage},pageSize=${pageSize}): state.currentPage → ${state.currentPage}`, { "event.action": "onPageChanged", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
             state.pageSize = pageSize;
+			logger.debug(`onPageChanged(currentPage=${currentPage},pageSize=${pageSize}): state.pageSize → ${state.pageSize}`, { "event.action": "onPageChanged", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
         }
         state.currentPage = currentPage;
         this.setState({
             state
         });
         this.getUsers();
+		logger.warn(`<<< Exiting onPageChanged(currentPage=${currentPage},pageSize=${pageSize})`, { "event.action": "onPageChanged", "logrite.currentPage": currentPage, "logrite.pageSize": pageSize });
     }
     getUserRows() {
+		logger.error('>>> Entering getUserRows()', { "event.action": "getUserRows" });
         let roleUsers = this.props.roleUsers;
         let userRows = roleUsers.map((user, index) => {
             return <UserRow
@@ -129,6 +154,7 @@ class UsersInRole extends Component {
             >
             </UserRow>;
         });
+		logger.warn('<<< Exiting getUserRows()', { "event.action": "getUserRows" });
         return <div className="role-user-body">{(roleUsers.length > 0) ?
             userRows :
             <div className="no-roles-row">{resx.get("NoUsers") }</div> }
@@ -180,8 +206,10 @@ class UsersInRole extends Component {
             />;
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {state} = this;
         const className = "roleusers-form" + (state.loading ? " isloading" : "");
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <div className={className}>
             <div className="header">
                 <div className="header-title">{resx.get("PermissionsByRole") }</div>
@@ -241,6 +269,8 @@ UserRow.defaultProps = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         matchedUsers: state.roleUsers.matchedUsers,
         roleUsers: state.roleUsers.roleUsers,

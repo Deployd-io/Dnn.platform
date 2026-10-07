@@ -22,6 +22,7 @@ namespace DotNetNuke.UI.WebControls
         /// </summary>
         public IntegerEditControl()
         {
+			Logger.LogError(">>> Entering IntegerEditControl()");
             this.SystemType = "System.Int32";
         }
 
@@ -96,8 +97,14 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments.</param>
         protected override void OnDataChanged(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnDataChanged(e={E})", e);
             var args = new PropertyEditorEventArgs(this.Name);
+			Logger.LogWarning("<<< Exiting OnDataChanged(e={E})", e);
+			Logger.LogDebug("OnDataChanged(e={E}): args.OldValue → {Arg1}", e, args.OldValue);
+			Logger.LogDebug("OnDataChanged(e={E}): args.StringValue → {Arg1}", e, args.StringValue);
+			Logger.LogError("OnDataChanged(e={E}): args → {Args}", e, args);
             args.Value = this.IntegerValue;
+			Logger.LogDebug("OnDataChanged(e={E}): args.Value → {Arg1}", e, args.Value);
             args.OldValue = this.OldIntegerValue;
             args.StringValue = this.StringValue;
             this.OnValueChanged(args);
@@ -107,6 +114,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderEditMode(writer={Writer})", writer);
             this.ControlStyle.AddAttributesToRender(writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Type, "text");
             writer.AddAttribute(HtmlTextWriterAttribute.Size, "5");
@@ -115,6 +123,7 @@ namespace DotNetNuke.UI.WebControls
             writer.AddAttribute(HtmlTextWriterAttribute.Id, this.ClientID);
             writer.RenderBeginTag(HtmlTextWriterTag.Input);
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
     }
 }

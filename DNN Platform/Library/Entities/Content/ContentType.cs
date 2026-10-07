@@ -19,6 +19,7 @@ namespace DotNetNuke.Entities.Content
     [Serializable]
     public class ContentType : ContentTypeMemberNameFixer, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ContentType));
         private const string DesktopModuleContentTypeName = "DesktopModule";
         private const string ModuleContentTypeName = "Module";
         private const string TabContentTypeName = "Tab";
@@ -37,7 +38,10 @@ namespace DotNetNuke.Entities.Content
         /// <param name="contentType">The name of the content type.</param>
         public ContentType(string contentType)
         {
+			Logger.LogError(">>> Entering ContentType(contentType={ContentType})", contentType);
             this.ContentTypeId = Null.NullInteger;
+			Logger.LogWarning("<<< Exiting ContentType(contentType={ContentType})", contentType);
+			Logger.LogDebug("ContentType(contentType={ContentType}): this.ContentTypeId → {Arg1}", contentType, this.ContentTypeId);
             this.ContentType = contentType;
         }
 
@@ -93,6 +97,7 @@ namespace DotNetNuke.Entities.Content
         /// <seealso cref="IHydratable.Fill"/>
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.ContentTypeId = Null.SetNullInteger(dr["ContentTypeID"]);
             this.ContentType = Null.SetNullString(dr["ContentType"]);
         }
@@ -103,6 +108,8 @@ namespace DotNetNuke.Entities.Content
         /// </returns>
         public override string ToString()
         {
+			Logger.LogError(">>> Entering ToString()");
+            Logger.LogWarning("<<< Exiting ToString()");
             return this.ContentType;
         }
     }

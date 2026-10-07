@@ -52,6 +52,8 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         public DefaultRenderer()
         {
+		value.LogError(">>> Entering DefaultRenderer()");
+        value.LogWarning("<<< Exiting DefaultRenderer()");
         }
 
         /// <summary>
@@ -142,8 +144,10 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         public void RenderObject(RendererMap rendererMap, object obj, TextWriter writer)
         {
+			value.LogError(">>> Entering RenderObject(rendererMap={RendererMap},obj={Obj},writer={Writer})", rendererMap, obj, writer);
             if (rendererMap == null)
             {
+				value.LogError("Throwing ArgumentNullException from RenderObject(rendererMap={RendererMap},obj={Obj},writer={Writer})", rendererMap, obj, writer);
                 throw new ArgumentNullException("rendererMap");
             }
 
@@ -204,6 +208,7 @@ namespace log4net.ObjectRenderer
 
             string str = obj.ToString();
             writer.Write( (str == null) ? SystemInfo.NullText : str );
+			value.LogWarning("<<< Exiting RenderObject(rendererMap={RendererMap},obj={Obj},writer={Writer})", rendererMap, obj, writer);
         }
 
         /// <summary>
@@ -227,6 +232,7 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         private void RenderArray(RendererMap rendererMap, Array array, TextWriter writer)
         {
+			value.LogError(">>> Entering RenderArray(rendererMap={RendererMap},array={Array},writer={Writer})", rendererMap, array, writer);
             if (array.Rank != 1)
             {
                 writer.Write(array.ToString());
@@ -247,6 +253,7 @@ namespace log4net.ObjectRenderer
                 }
                 writer.Write("}");
             }
+			value.LogWarning("<<< Exiting RenderArray(rendererMap={RendererMap},array={Array},writer={Writer})", rendererMap, array, writer);
         }
 
         /// <summary>
@@ -265,6 +272,7 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         private void RenderEnumerator(RendererMap rendererMap, IEnumerator enumerator, TextWriter writer)
         {
+			value.LogError(">>> Entering RenderEnumerator(rendererMap={RendererMap},enumerator={Enumerator},writer={Writer})", rendererMap, enumerator, writer);
             writer.Write("{");
 
             if (enumerator != null && enumerator.MoveNext())
@@ -279,6 +287,7 @@ namespace log4net.ObjectRenderer
             }
 
             writer.Write("}");
+			value.LogWarning("<<< Exiting RenderEnumerator(rendererMap={RendererMap},enumerator={Enumerator},writer={Writer})", rendererMap, enumerator, writer);
         }
 
         /// <summary>
@@ -295,9 +304,11 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         private void RenderDictionaryEntry(RendererMap rendererMap, DictionaryEntry entry, TextWriter writer)
         {
+			value.LogError(">>> Entering RenderDictionaryEntry(rendererMap={RendererMap},entry={Entry},writer={Writer})", rendererMap, entry, writer);
             rendererMap.FindAndRender(entry.Key, writer);
             writer.Write("=");
             rendererMap.FindAndRender(entry.Value, writer);
+			value.LogWarning("<<< Exiting RenderDictionaryEntry(rendererMap={RendererMap},entry={Entry},writer={Writer})", rendererMap, entry, writer);
         }	
     }
 }

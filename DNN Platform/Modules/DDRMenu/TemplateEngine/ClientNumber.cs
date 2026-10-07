@@ -12,7 +12,10 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
         public ClientNumber(string name, string value)
         {
+			eventLogger.LogError(">>> Entering ClientNumber(name={Name},value={Value})", name, value);
             this.Name = name;
+			eventLogger.LogWarning("<<< Exiting ClientNumber(name={Name},value={Value})", name, value);
+			eventLogger.LogDebug("ClientNumber(name={Name},value={Value}): this.Name → {Arg2}", name, value, this.Name);
             this.Value = value;
         }
     }

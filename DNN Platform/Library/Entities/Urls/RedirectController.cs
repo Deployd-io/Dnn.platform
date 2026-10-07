@@ -17,6 +17,7 @@ namespace DotNetNuke.Entities.Urls
 
     internal class RedirectController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RedirectController));
         /// <summary>Cancels a redirect.</summary>
         /// <param name="result">The URL action to update.</param>
         /// <param name="context">The HTTP context.</param>
@@ -24,12 +25,17 @@ namespace DotNetNuke.Entities.Urls
         /// <param name="message">The message to add to <see cref="UrlAction.DebugMessages"/>.</param>
         internal static void CancelRedirect(ref UrlAction result, HttpContext context, FriendlyUrlSettings settings, string message)
         {
+			Logger.LogError(">>> Entering CancelRedirect(result={Result},context={Context},settings={Settings},message={Message})", result, context, settings, message);
             result.Action = ActionType.Continue;
             result.Reason = RedirectReason.Not_Redirected;
+			Logger.LogDebug("CancelRedirect(result={Result},context={Context},settings={Settings},message={Message}): result.Reason → {Arg4}", result, context, settings, message, result.Reason);
+			Logger.LogDebug("CancelRedirect(result={Result},context={Context},settings={Settings},message={Message}): result.Action → {Arg4}", result, context, settings, message, result.Action);
             result.FinalUrl = null;
+			Logger.LogDebug("CancelRedirect(result={Result},context={Context},settings={Settings},message={Message}): result.FinalUrl → {Arg4}", result, context, settings, message, result.FinalUrl);
 
             // clean the path for the rewrite
             NameValueCollection queryString = null;
+			Logger.LogError("CancelRedirect(result={Result},context={Context},settings={Settings},message={Message}): queryString → {QueryString}", result, context, settings, message, queryString);
             if (context != null)
             {
                 queryString = context.Request.QueryString;
@@ -46,6 +52,7 @@ namespace DotNetNuke.Entities.Urls
             }
 
             result.DebugMessages.Add(message);
+			Logger.LogWarning("<<< Exiting CancelRedirect(result={Result},context={Context},settings={Settings},message={Message})", result, context, settings, message);
         }
 
         /// <summary>Checks for a redirect based on a module friendly url provider rule.</summary>
@@ -62,8 +69,10 @@ namespace DotNetNuke.Entities.Urls
             FriendlyUrlSettings settings,
             Guid parentTraceId)
         {
+			Logger.LogError(">>> Entering CheckForModuleProviderRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},parentTraceId={ParentTraceId})", requestUri, result, queryStringCol, settings, parentTraceId);
             var messages = new List<string>();
             string location;
+			Logger.LogError("CheckForModuleProviderRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},parentTraceId={ParentTraceId}): messages → {Messages}", requestUri, result, queryStringCol, settings, parentTraceId, messages);
             bool redirected = ExtensionUrlProviderController.CheckForRedirect(
                 requestUri,
                 result,
@@ -80,10 +89,14 @@ namespace DotNetNuke.Entities.Urls
             if (redirected)
             {
                 result.FinalUrl = location;
+				Logger.LogDebug("CheckForModuleProviderRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},parentTraceId={ParentTraceId}): result.FinalUrl → {Arg5}", requestUri, result, queryStringCol, settings, parentTraceId, result.FinalUrl);
+				Logger.LogDebug("CheckForModuleProviderRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},parentTraceId={ParentTraceId}): result.Reason → {Arg5}", requestUri, result, queryStringCol, settings, parentTraceId, result.Reason);
                 result.Action = ActionType.Redirect301;
+				Logger.LogDebug("CheckForModuleProviderRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},parentTraceId={ParentTraceId}): result.Action → {Arg5}", requestUri, result, queryStringCol, settings, parentTraceId, result.Action);
                 result.Reason = RedirectReason.Custom_Redirect;
             }
 
+			Logger.LogWarning("<<< Exiting CheckForModuleProviderRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},parentTraceId={ParentTraceId})", requestUri, result, queryStringCol, settings, parentTraceId);
             return redirected;
         }
 
@@ -93,13 +106,16 @@ namespace DotNetNuke.Entities.Urls
             NameValueCollection queryStringCol,
             FriendlyUrlSettings settings)
         {
+			Logger.LogError(">>> Entering CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings})", requestUri, result, queryStringCol, settings);
             // check for parameter replaced works by inspecting the parameters on a rewritten request, comparing
             // them agains the list of regex expressions on the friendlyurls.config file, and redirecting to the same page
             // but with new parameters, if there was a match
             bool redirect = false;
+			Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): redirect → {Redirect}", requestUri, result, queryStringCol, settings, redirect);
 
             // get the redirect actions for this portal
             var messages = new List<string>();
+			Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): messages → {Messages}", requestUri, result, queryStringCol, settings, messages);
             Dictionary<int, List<ParameterRedirectAction>> redirectActions = CacheController.GetParameterRedirects(settings, result.PortalId, ref messages);
             if (redirectActions != null && redirectActions.Count > 0)
             {
@@ -111,12 +127,14 @@ namespace DotNetNuke.Entities.Urls
 
                     // find the matching redirects for the tabid
                     int tabId = result.TabId;
+					Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): tabId → {TabId}", requestUri, result, queryStringCol, settings, tabId);
                     if (tabId > -1)
                     {
                         if (redirectActions.TryGetValue(tabId, out var parameterRedirectActions))
                         {
                             // find the right set of replaced actions for this tab
                             parmRedirects = parameterRedirectActions;
+							Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): parmRedirects → {ParmRedirects}", requestUri, result, queryStringCol, settings, parmRedirects);
                         }
                     }
 
@@ -162,12 +180,16 @@ namespace DotNetNuke.Entities.Urls
                             // regex test each replaced to see if there is a match between the parameter string
                             // and the parmRedirect
                             string compareWith = rewrittenUrl;
+							Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): compareWith → {CompareWith}", requestUri, result, queryStringCol, settings, compareWith);
                             var redirectRegex = RegexUtils.GetCachedRegex(
                                 parmRedirect.LookFor,
                                 RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                             Match regexMatch = redirectRegex.Match(compareWith);
+							Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): regexMatch → {RegexMatch}", requestUri, result, queryStringCol, settings, regexMatch);
                             bool success = regexMatch.Success;
+							Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): success → {Success}", requestUri, result, queryStringCol, settings, success);
                             bool siteRootTried = false;
+							Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): siteRootTried → {SiteRootTried}", requestUri, result, queryStringCol, settings, siteRootTried);
 
                             // if no match, but there is a site root redirect to try
                             if (!success && parmRedirect.TabId == -3)
@@ -192,6 +214,7 @@ namespace DotNetNuke.Entities.Urls
                             {
                                 // success! there was a match in the parameters
                                 string parms = redirectRegex.Replace(compareWith, parmRedirect.RedirectTo);
+								Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): parms → {Parms}", requestUri, result, queryStringCol, settings, parms);
                                 if (siteRootTried)
                                 {
                                     result.DebugMessages.Add(parmRedirect.Name + " redirect matched [site root] with (" +
@@ -204,6 +227,7 @@ namespace DotNetNuke.Entities.Urls
                                 }
 
                                 string finalUrl = string.Empty;
+								Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): finalUrl → {FinalUrl}", requestUri, result, queryStringCol, settings, finalUrl);
 
                                 // now we need to generate the friendly Url
 
@@ -214,6 +238,7 @@ namespace DotNetNuke.Entities.Urls
                                     // redirect the page as well as redirecting the parameter values
                                     string[] parmParts = parms.Split('/');
                                     bool tabIdNext = false;
+									Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): tabIdNext → {TabIdNext}", requestUri, result, queryStringCol, settings, tabIdNext);
                                     foreach (string parmPart in parmParts)
                                     {
                                         if (tabIdNext)
@@ -239,6 +264,7 @@ namespace DotNetNuke.Entities.Urls
                                     // find the home tabid for this portal
                                     // 735 : switch to custom method for getting portal
                                     PortalInfo portal = CacheController.GetPortal(result.PortalId, true);
+									Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): portal → {Portal}", requestUri, result, queryStringCol, settings, portal);
                                     tabId = portal.HomeTabId;
                                 }
 
@@ -254,6 +280,7 @@ namespace DotNetNuke.Entities.Urls
                                     if (tabId > -1)
                                     {
                                         TabInfo tab = TabController.Instance.GetTab(tabId, result.PortalId, false);
+										Logger.LogError("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): tab → {Tab}", requestUri, result, queryStringCol, settings, tab);
                                         if (tab != null)
                                         {
                                             string path = Globals.glbDefaultPage + TabIndexController.CreateRewritePath(tab.TabID, string.Empty);
@@ -343,11 +370,14 @@ namespace DotNetNuke.Entities.Urls
 
                                 // set the final url
                                 result.FinalUrl = finalUrl;
+								Logger.LogDebug("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): result.FinalUrl → {Arg4}", requestUri, result, queryStringCol, settings, result.FinalUrl);
                                 result.Reason = RedirectReason.Custom_Redirect;
+								Logger.LogDebug("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): result.Reason → {Arg4}", requestUri, result, queryStringCol, settings, result.Reason);
                                 switch (parmRedirect.Action)
                                 {
                                     case "301":
                                         result.Action = ActionType.Redirect301;
+										Logger.LogDebug("CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): result.Action → {Arg4}", requestUri, result, queryStringCol, settings, result.Action);
                                         break;
                                     case "302":
                                         result.Action = ActionType.Redirect302;
@@ -365,6 +395,7 @@ namespace DotNetNuke.Entities.Urls
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings}): {Arg4}", requestUri, result, queryStringCol, settings, ex.Message);
                     Services.Exceptions.Exceptions.LogException(ex);
                     messages.Add("Exception: " + ex.Message + "\n" + ex.StackTrace);
                 }
@@ -377,6 +408,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting CheckForParameterRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings})", requestUri, result, queryStringCol, settings);
             return redirect;
         }
 
@@ -439,6 +471,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetTabRedirectUrl(tab={Tab},settings={Settings},cleanPath={CleanPath},result={Result},parentTraceId={ParentTraceId})", tab, settings, cleanPath, result, parentTraceId);
             return bestFriendlyUrl;
         }
     }

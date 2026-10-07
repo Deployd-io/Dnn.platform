@@ -23,11 +23,14 @@ namespace DotNetNuke.UI.Containers
     /// </summary>
     public partial class PrintModule : ActionBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PrintModule.ascx));
         /// <summary>Initializes a new instance of the <see cref="PrintModule"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IEventLogger. Scheduled removal in v12.0.0.")]
         public PrintModule()
             : this(null)
         {
+		Logger.LogError(">>> Entering PrintModule()");
+        Logger.LogWarning("<<< Exiting PrintModule()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PrintModule"/> class.</summary>
@@ -42,6 +45,7 @@ namespace DotNetNuke.UI.Containers
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -58,16 +62,20 @@ namespace DotNetNuke.UI.Containers
                 else
                 {
                     this.Visible = false;
+					Logger.LogDebug("OnLoad(e={E}): this.Visible → {Arg1}", e, this.Visible);
                 }
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         private void DisplayAction(ModuleAction action)
         {
+			Logger.LogError(">>> Entering DisplayAction(action={Action})", action);
             if (action.CommandName == ModuleActionType.PrintModule)
             {
                 if (action.Visible)
@@ -77,6 +85,7 @@ namespace DotNetNuke.UI.Containers
                         if (this.ModuleContext.Configuration.DisplayPrint)
                         {
                             var moduleActionIcon = new ImageButton();
+							Logger.LogError("DisplayAction(action={Action}): moduleActionIcon → {ModuleActionIcon}", action, moduleActionIcon);
                             if (!string.IsNullOrEmpty(this.PrintIcon))
                             {
                                 moduleActionIcon.ImageUrl = this.ModuleContext.Configuration.ContainerPath.Substring(0, this.ModuleContext.Configuration.ContainerPath.LastIndexOf("/", StringComparison.Ordinal) + 1) + this.PrintIcon;
@@ -84,10 +93,14 @@ namespace DotNetNuke.UI.Containers
                             else
                             {
                                 moduleActionIcon.ImageUrl = "~/images/" + action.Icon;
+								Logger.LogDebug("DisplayAction(action={Action}): moduleActionIcon.ImageUrl → {Arg1}", action, moduleActionIcon.ImageUrl);
                             }
 
                             moduleActionIcon.ToolTip = action.Title;
+							Logger.LogDebug("DisplayAction(action={Action}): moduleActionIcon.ToolTip → {Arg1}", action, moduleActionIcon.ToolTip);
+							Logger.LogDebug("DisplayAction(action={Action}): moduleActionIcon.CausesValidation → {Arg1}", action, moduleActionIcon.CausesValidation);
                             moduleActionIcon.ID = "ico" + action.ID;
+							Logger.LogDebug("DisplayAction(action={Action}): moduleActionIcon.ID → {Arg1}", action, moduleActionIcon.ID);
                             moduleActionIcon.CausesValidation = false;
 
                             moduleActionIcon.Click += this.IconAction_Click;
@@ -102,18 +115,22 @@ namespace DotNetNuke.UI.Containers
             {
                 this.DisplayAction(subAction);
             }
+			Logger.LogWarning("<<< Exiting DisplayAction(action={Action})", action);
         }
 
         private void IconAction_Click(object sender, ImageClickEventArgs e)
         {
+			Logger.LogError(">>> Entering IconAction_Click(sender={Sender},e={E})", sender, e);
             try
             {
                 this.ProcessAction(((ImageButton)sender).ID.Substring(3));
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in IconAction_Click(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting IconAction_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

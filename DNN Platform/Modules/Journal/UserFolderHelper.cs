@@ -11,8 +11,10 @@ namespace DotNetNuke.Modules.Journal
 
     public class UserFolderHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserFolderHelper));
         public UserFolderHelper(PortalSettings portalSettings)
         {
+			Logger.LogError(">>> Entering UserFolderHelper(portalSettings={PortalSettings})", portalSettings);
             this.UserFolder = FolderManager.Instance.GetUserFolder(portalSettings.UserInfo);
         }
 

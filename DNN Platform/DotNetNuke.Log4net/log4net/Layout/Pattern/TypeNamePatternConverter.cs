@@ -45,6 +45,7 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override string GetFullyQualifiedName(LoggingEvent loggingEvent) 
         {
+			value.LogError(">>> Entering GetFullyQualifiedName(loggingEvent={LoggingEvent})", loggingEvent);
             if (loggingEvent == null)
             {
                 return string.Empty;
@@ -55,6 +56,7 @@ namespace log4net.Layout.Pattern
                 return string.Empty;
             }
             
+			value.LogWarning("<<< Exiting GetFullyQualifiedName(loggingEvent={LoggingEvent})", loggingEvent);
             return loggingEvent.LocationInformation.ClassName;
         }
     }

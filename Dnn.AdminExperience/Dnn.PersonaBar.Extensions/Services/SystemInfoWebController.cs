@@ -22,9 +22,11 @@ namespace Dnn.PersonaBar.Servers.Services
         [HttpGet]
         public HttpResponseMessage GetWebServerInfo()
         {
+			Logger.LogError(">>> Entering GetWebServerInfo()");
             try
             {
                 var serverInfo = new ServerInfo();
+				Logger.LogError("GetWebServerInfo(): serverInfo → {ServerInfo}", serverInfo);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
                 {
                     osVersion = serverInfo.OSVersion,
@@ -42,6 +44,7 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetWebServerInfo()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

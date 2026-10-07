@@ -3,18 +3,22 @@ import PropTypes from "prop-types";
 import { GridSystem as Grid, Label, InputGroup, Button, Switch, Dropdown } from "@dnnsoftware/dnn-react-common";
 import resx from "../../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let priorityOptions = [];
 
 class ProviderEditor extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             settings: {}
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
 
         priorityOptions = [];
@@ -29,6 +33,7 @@ class ProviderEditor extends Component {
         priorityOptions.push({ "value": 0.3, "label": "0.3" });
         priorityOptions.push({ "value": 0.2, "label": "0.2" });
         priorityOptions.push({ "value": 0.1, "label": "0.1" });
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         priorityOptions.push({ "value": 0, "label": "0" });
 
         this.setState({
@@ -37,6 +42,7 @@ class ProviderEditor extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {settings} = this.state;
 
         if (key === "Priority") {
@@ -50,6 +56,7 @@ class ProviderEditor extends Component {
         }
         else {
             settings[key] = typeof (event) === "object" ? event.target.value : event;
+			logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         }
 
         this.setState({
@@ -58,13 +65,16 @@ class ProviderEditor extends Component {
     }
 
     onUpdateItem(event) {
+		logger.error(`>>> Entering onUpdateItem(event=${event})`, { "event.action": "onUpdateItem", "logrite.event": event });
         event.preventDefault();
         const {state} = this;
         this.props.onUpdate(state.settings);
+		logger.warn(`<<< Exiting onUpdateItem(event=${event})`, { "event.action": "onUpdateItem", "logrite.event": event });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {state} = this;
         if (state.settings) {
             const columnOne = <div className="left-column">

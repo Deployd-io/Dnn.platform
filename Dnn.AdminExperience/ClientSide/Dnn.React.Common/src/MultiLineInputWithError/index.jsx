@@ -4,13 +4,16 @@ import Tooltip from "../Tooltip";
 import TextArea from "../MultiLineInput";
 import Label from "../Label";
 import "./style.less";
+const logger = console;
 
 class MultiLineInputWithError extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             isFocused: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     onBlur(e) {
@@ -30,18 +33,24 @@ class MultiLineInputWithError extends Component {
     }
 
     getClass() {
+		logger.error('>>> Entering getClass()', { "event.action": "getClass" });
         const {props} = this;
         const errorClass = props.error ? " " + props.errorSeverity : "";
+		logger.error(`getClass(): errorClass → ${errorClass}`, { "event.action": "getClass" });
         const enabledClass = props.enabled ? "" : " disabled";
+		logger.error(`getClass(): enabledClass → ${enabledClass}`, { "event.action": "getClass" });
         const customClass = " " + props.className;
+		logger.error(`getClass(): customClass → ${customClass}`, { "event.action": "getClass" });
         return "dnn-multi-line-input-with-error" + errorClass + customClass + enabledClass;
     }
 
     getCounter(counter) {
+		logger.error(`>>> Entering getCounter(counter=${counter})`, { "event.action": "getCounter", "logrite.counter": counter });
         if (!this.shouldRenderCounter(counter)) {
             return null;
         }
 
+		logger.warn(`<<< Exiting getCounter(counter=${counter})`, { "event.action": "getCounter", "logrite.counter": counter });
         return (
             <div className="dnn-inline-counter">
                 {counter}
@@ -50,11 +59,14 @@ class MultiLineInputWithError extends Component {
     }
 
     shouldRenderCounter(counter) {
+		logger.error(`>>> Entering shouldRenderCounter(counter=${counter})`, { "event.action": "shouldRenderCounter", "logrite.counter": counter });
         const counterIsDefined = !!counter || counter === 0;
+		logger.warn(`<<< Exiting shouldRenderCounter(counter=${counter})`, { "event.action": "shouldRenderCounter", "logrite.counter": counter });
         return this.state.isFocused && counterIsDefined;
     }
 
     getInputRightPadding(counter, error) {
+		logger.error(`>>> Entering getInputRightPadding(counter=${counter},error=${error})`, { "event.action": "getInputRightPadding", "logrite.counter": counter, "logrite.error": error });
         
         let padding = 0;
         if (counter || counter === 0) {
@@ -64,12 +76,15 @@ class MultiLineInputWithError extends Component {
             padding += 22;
         }
 
+		logger.warn(`<<< Exiting getInputRightPadding(counter=${counter},error=${error})`, { "event.action": "getInputRightPadding", "logrite.counter": counter, "logrite.error": error });
         return padding;
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         const errorMessages = props.errorMessage instanceof Array ? props.errorMessage : [props.errorMessage];
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={this.getClass()} style={props.style}>
                 {props.label &&

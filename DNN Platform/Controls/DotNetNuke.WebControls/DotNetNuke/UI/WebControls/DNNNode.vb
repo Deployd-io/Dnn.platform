@@ -8,23 +8,37 @@ Imports System
 Imports System.Collections
 Imports System.Text
 Imports System.Xml
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     Public Class DNNNode
+	Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
 
         ' Methods
         Public Sub New()
+			_logger.LogError(">>> Entering New()")
             Me.New(New XmlDocument().CreateNode(XmlNodeType.Element, "n", ""))
+			_logger.LogWarning("<<< Exiting New()")
+			_logger.LogError(">>> Entering New(strText={StrText})", strText)
+			_logger.LogDebug("New(strText={StrText}): Me.Text → {Arg1}", strText, Me.Text)
+        _logger.LogWarning("<<< Exiting New(strText={StrText})", strText)
         End Sub
 
         Public Sub New(ByVal strText As String)
             Me.New()
             Me.Text = strText
+			_logger.LogError(">>> Entering New(objXmlNode={ObjXmlNode})", objXmlNode)
+			_logger.LogDebug("New(objXmlNode={ObjXmlNode}): Me.m_objXMLNode → {Arg1}", objXmlNode, Me.m_objXMLNode)
+			_logger.LogDebug("New(objXmlNode={ObjXmlNode}): Me.m_objXMLDoc → {Arg1}", objXmlNode, Me.m_objXMLDoc)
+        _logger.LogWarning("<<< Exiting New(objXmlNode={ObjXmlNode})", objXmlNode)
         End Sub
 
         Public Sub New(ByVal objXmlNode As XmlNode)
             Me.m_objXMLNode = objXmlNode
             Me.m_objXMLDoc = objXmlNode.OwnerDocument
+			_logger.LogError(">>> Entering New(NodeText={NodeText},navigateUrl={NavigateUrl})", NodeText, navigateUrl)
+			_logger.LogDebug("New(NodeText={NodeText},navigateUrl={NavigateUrl}): Me.Text → {Arg2}", NodeText, navigateUrl, Me.Text)
+			_logger.LogWarning("<<< Exiting New(NodeText={NodeText},navigateUrl={NavigateUrl})", NodeText, navigateUrl)
         End Sub
 
         Public Sub New(ByVal NodeText As String, ByVal navigateUrl As String)
@@ -39,11 +53,19 @@ Namespace DotNetNuke.UI.WebControls
         End Sub
 
         Friend Sub AssociateXmlNode(ByVal objXmlNode As XmlNode)
+			_logger.LogError(">>> Entering AssociateXmlNode(objXmlNode={ObjXmlNode})", objXmlNode)
+			_logger.LogDebug("AssociateXmlNode(objXmlNode={ObjXmlNode}): Me.m_objXMLDoc → {Arg1}", objXmlNode, Me.m_objXMLDoc)
+        _logger.LogWarning("<<< Exiting AssociateXmlNode(objXmlNode={ObjXmlNode})", objXmlNode)
             Me.m_objXMLNode = objXmlNode
+			_logger.LogDebug("AssociateXmlNode(objXmlNode={ObjXmlNode}): Me.m_objXMLNode → {Arg1}", objXmlNode, Me.m_objXMLNode)
             Me.m_objXMLDoc = objXmlNode.OwnerDocument
         End Sub
 
         Public Function Clone() As DNNNode
+			_logger.LogError(">>> Entering Clone()")
+			_logger.LogError(">>> Entering Clone(blnDeep={BlnDeep})", blnDeep)
+			_logger.LogWarning("<<< Exiting Clone()")
+			_logger.LogWarning("<<< Exiting Clone(blnDeep={BlnDeep})", blnDeep)
             Return Me.Clone(True)
         End Function
 
@@ -52,6 +74,10 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Function ToJSON() As String
+			_logger.LogError(">>> Entering ToJSON()")
+			_logger.LogError(">>> Entering ToJSON(blnDeep={BlnDeep})", blnDeep)
+			_logger.LogWarning("<<< Exiting ToJSON()")
+			_logger.LogWarning("<<< Exiting ToJSON(blnDeep={BlnDeep})", blnDeep)
             Return Me.ToJSON(True)
         End Function
 
@@ -101,6 +127,8 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Function ToXML() As String
+			_logger.LogError(">>> Entering ToXML()")
+			_logger.LogWarning("<<< Exiting ToXML()")
             Return Me.XmlNode.OuterXml
         End Function
 

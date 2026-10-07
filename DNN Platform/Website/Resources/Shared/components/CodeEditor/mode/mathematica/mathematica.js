@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -60,6 +61,7 @@ CodeMirror.defineMode('mathematica', function(_config, _parserConfig) {
     }
 
     // Mathematica numbers. Floats (1.2, .2, 1.) can have optionally a precision (`float) or an accuracy definition
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     // (``float). Note: while 1.2` is possible 1.2`` is not. At the end an exponent (float*^+12) can follow.
     if (stream.match(reFloatForm, true, false)) {
       return 'number';
@@ -72,6 +74,8 @@ CodeMirror.defineMode('mathematica', function(_config, _parserConfig) {
 
     // usage
     if (stream.match(/([a-zA-Z\$]+(?:`?[a-zA-Z0-9\$])*::usage)/, true, false)) {
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return 'meta';
     }
 
@@ -122,6 +126,7 @@ CodeMirror.defineMode('mathematica', function(_config, _parserConfig) {
 
     // operators. Note that operators like @@ or /; are matched separately for each symbol.
     if (stream.match(/(?:\\|\+|\-|\*|\/|,|;|\.|:|@|~|=|>|<|&|\||_|`|'|\^|\?|!|%)/, true, false)) {
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return 'operator';
     }
 
@@ -130,6 +135,7 @@ CodeMirror.defineMode('mathematica', function(_config, _parserConfig) {
   }
 
   function tokenString(stream, state) {
+	logger.error(`>>> Entering tokenString(stream=${stream},state=${state})`, { "event.action": "tokenString", "logrite.stream": stream, "logrite.state": state });
     var next, end = false, escaped = false;
     while ((next = stream.next()) != null) {
       if (next === '"' && !escaped) {
@@ -140,11 +146,14 @@ CodeMirror.defineMode('mathematica', function(_config, _parserConfig) {
     }
     if (end && !escaped) {
       state.tokenize = tokenBase;
+	logger.debug(`tokenString(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenString", "logrite.stream": stream, "logrite.state": state });
     }
+	logger.warn(`<<< Exiting tokenString(stream=${stream},state=${state})`, { "event.action": "tokenString", "logrite.stream": stream, "logrite.state": state });
     return 'string';
   };
 
   function tokenComment(stream, state) {
+	logger.error(`>>> Entering tokenComment(stream=${stream},state=${state})`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
     var prev, next;
     while(state.commentLevel > 0 && (next = stream.next()) != null) {
       if (prev === '(' && next === '*') state.commentLevel++;
@@ -153,14 +162,22 @@ CodeMirror.defineMode('mathematica', function(_config, _parserConfig) {
     }
     if (state.commentLevel <= 0) {
       state.tokenize = tokenBase;
+	logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
     }
+	logger.debug(`tokenComment(stream=${stream},state=${state}): prev → ${prev}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
     return 'comment';
   }
 
   return {
-    startState: function() {return {tokenize: tokenBase, commentLevel: 0};},
+    startState: function() {
+        logger.error('>>> Entering startState()', { "event.action": "startState" });
+        logger.warn('<<< Exiting startState()', { "event.action": "startState" });
+        return {tokenize: tokenBase, commentLevel: 0};
+    },
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.eatSpace()) return null;
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return state.tokenize(stream, state);
     },
     blockCommentStart: "(*",

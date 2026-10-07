@@ -29,9 +29,11 @@ namespace DotNetNuke.Modules.Journal
     /// <summary>The Settings class manages Module Settings.</summary>
     public partial class Settings : JournalSettingsBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Settings.ascx));
         /// <summary>LoadSettings loads the settings from the Database and displays them.</summary>
         public override void LoadSettings()
         {
+			Logger.LogError(">>> Entering LoadSettings()");
             try
             {
                 if (this.Page.IsPostBack == false)
@@ -104,6 +106,7 @@ namespace DotNetNuke.Modules.Journal
                     foreach (ListItem li in this.chkJournalFilters.Items)
                     {
                         li.Selected = true;
+						Logger.LogDebug("LoadSettings(): li.Selected → {Arg0}", li.Selected);
                     }
 
                     if (this.Settings.ContainsKey(Constants.JournalFilters))
@@ -138,13 +141,16 @@ namespace DotNetNuke.Modules.Journal
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in LoadSettings(): {Arg0}", exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting LoadSettings()");
         }
 
         /// <summary>UpdateSettings saves the modified settings to the Database.</summary>
         public override void UpdateSettings()
         {
+			Logger.LogError(">>> Entering UpdateSettings()");
             try
             {
                 ModuleController.Instance.UpdateModuleSetting(this.ModuleId, Constants.DefaultPageSize, this.drpDefaultPageSize.SelectedItem.Value);
@@ -155,6 +161,7 @@ namespace DotNetNuke.Modules.Journal
                 ModuleController.Instance.UpdateModuleSetting(this.ModuleId, Constants.MaxCharacters, this.drpMaxMessageLength.SelectedItem.Value);
                 string journalTypes = string.Empty;
                 bool allTypes = true;
+				Logger.LogError("UpdateSettings(): allTypes → {AllTypes}", allTypes);
                 foreach (ListItem li in this.chkJournalFilters.Items)
                 {
                     if (!li.Selected)
@@ -182,16 +189,20 @@ namespace DotNetNuke.Modules.Journal
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in UpdateSettings(): {Arg0}", exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting UpdateSettings()");
         }
 
         private void BindJournalTypes()
         {
+			Logger.LogError(">>> Entering BindJournalTypes()");
             foreach (JournalTypeInfo journalTypeInfo in JournalController.Instance.GetJournalTypes(this.PortalId))
             {
                 this.chkJournalFilters.Items.Add(new ListItem(Localization.GetString(journalTypeInfo.JournalType, "~/desktopmodules/journal/app_localresources/sharedresources.resx"), journalTypeInfo.JournalTypeId.ToString()));
             }
+			Logger.LogWarning("<<< Exiting BindJournalTypes()");
         }
     }
 }

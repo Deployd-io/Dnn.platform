@@ -10,6 +10,7 @@ namespace DotNetNuke.Common.Utilities
 
     public static class EscapedString
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EscapedString));
         private const char EscapeSequence = '\\';
         private const string DoubleEscapeSequence = @"\\";
         private const char DefaultSeparator = ',';
@@ -21,6 +22,9 @@ namespace DotNetNuke.Common.Utilities
         /// <remarks>The separator char is <c>','</c>.</remarks>
         public static string Combine(IEnumerable enumerable)
         {
+			Logger.LogError(">>> Entering Combine(enumerable={Enumerable})", enumerable);
+			Logger.LogWarning("<<< Exiting Combine(enumerable={Enumerable})", enumerable);
+			Logger.LogWarning("<<< Exiting Combine(enumerable={Enumerable},seperator={Seperator})", enumerable, seperator);
             return Combine(enumerable, DefaultSeparator);
         }
 
@@ -50,6 +54,9 @@ namespace DotNetNuke.Common.Utilities
         /// <remarks>The escape character is <c>'\'</c>, the separator char is <c>','</c>.</remarks>
         public static IEnumerable<string> Seperate(string combinedString)
         {
+			Logger.LogError(">>> Entering Seperate(combinedString={CombinedString})", combinedString);
+            Logger.LogWarning("<<< Exiting Seperate(combinedString={CombinedString})", combinedString);
+			Logger.LogWarning("<<< Exiting Seperate(combinedString={CombinedString},seperator={Seperator},trimWhitespaces={TrimWhitespaces})", combinedString, seperator, trimWhitespaces);
             return Seperate(combinedString, DefaultSeparator);
         }
 
@@ -115,6 +122,7 @@ namespace DotNetNuke.Common.Utilities
 
         private static bool EndsInEscapeMode(string s)
         {
+			Logger.LogError(">>> Entering EndsInEscapeMode(s={S})", s);
             int escapeCount = 0;
 
             // count the number of escape chars on end of string
@@ -130,6 +138,7 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogWarning("<<< Exiting EndsInEscapeMode(s={S})", s);
             return escapeCount % 2 == 1; // odd count means escape mode is active
         }
     }

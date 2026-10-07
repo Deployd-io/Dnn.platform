@@ -1,4 +1,5 @@
 import ActionTypes from "../constants/actionTypes/pageSeoTypes";
+const logger = console;
 
 const statusCodes = [
     {
@@ -18,10 +19,13 @@ export default function  pageSeoReducer(state = {
     editedUrl: null
 }, action) {
     const changeField = function changeField(key, value) {
+		logger.error(`>>> Entering changeField(key=${key},value=${value})`, { "event.action": "changeField", "logrite.key": key, "logrite.value": value });
         const newEditedUrl = {
             ...state.editedUrl
         };  
         
+		logger.debug(`changeField(key=${key},value=${value}): newEditedUrl.statusCode → ${newEditedUrl.statusCode}`, { "event.action": "changeField", "logrite.key": key, "logrite.value": value });
+		logger.debug(`changeField(key=${key},value=${value}): newEditedUrl.siteAlias → ${newEditedUrl.siteAlias}`, { "event.action": "changeField", "logrite.key": key, "logrite.value": value });
         if (key === "statusCode") {
             newEditedUrl.statusCode = {
                 ...state.editedUrl.statusCode
@@ -42,9 +46,11 @@ export default function  pageSeoReducer(state = {
                 value = "?" + value;
             }
             
+			logger.error(`changeField(key=${key},value=${value}): value → ${value}`, { "event.action": "changeField", "logrite.key": key, "logrite.value": value });
             newEditedUrl[key] = value;
         }
         
+		logger.warn(`<<< Exiting changeField(key=${key},value=${value})`, { "event.action": "changeField", "logrite.key": key, "logrite.value": value });
         return newEditedUrl;
     };
     switch (action.type) {

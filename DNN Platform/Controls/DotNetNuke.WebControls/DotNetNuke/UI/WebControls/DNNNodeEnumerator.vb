@@ -4,24 +4,35 @@
 Imports System
 Imports System.Collections
 Imports System.Xml
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     Friend NotInheritable Class DNNNodeEnumerator
         Implements IEnumerator
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Public Sub New(ByVal objRoot As XmlNode)
+			_logger.LogError(">>> Entering New(objRoot={ObjRoot})", objRoot)
+			_logger.LogDebug("New(objRoot={ObjRoot}): Me.m_intCursor → {Arg1}", objRoot, Me.m_intCursor)
+        _logger.LogWarning("<<< Exiting New(objRoot={ObjRoot})", objRoot)
             Me.m_objXMLNode = objRoot
+			_logger.LogDebug("New(objRoot={ObjRoot}): Me.m_objXMLNode → {Arg1}", objRoot, Me.m_objXMLNode)
             Me.m_intCursor = -1
         End Sub
 
         Public Function MoveNext() As Boolean Implements IEnumerator.MoveNext
+			_logger.LogError(">>> Entering MoveNext()")
             If (Me.m_intCursor < Me.m_objXMLNode.ChildNodes.Count) Then
                 Me.m_intCursor += 1
             End If
+			_logger.LogWarning("<<< Exiting MoveNext()")
             Return (Me.m_intCursor <> Me.m_objXMLNode.ChildNodes.Count)
         End Function
 
         Public Sub Reset() Implements IEnumerator.Reset
+			_logger.LogError(">>> Entering Reset()")
+			_logger.LogDebug("Reset(): Me.m_intCursor → {Arg0}", Me.m_intCursor)
+        _logger.LogWarning("<<< Exiting Reset()")
             Me.m_intCursor = -1
         End Sub
 

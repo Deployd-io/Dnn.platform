@@ -18,9 +18,11 @@ namespace Dnn.PersonaBar.Pages.Components
     {
         public static DateTime GetTabLastPublishedOn(TabInfo tab)
         {
+			eventLogger.LogError(">>> Entering GetTabLastPublishedOn(tab={Tab})", tab);
             if (tab.HasBeenPublished)
             {
                 var versions = TabVersionController.Instance.GetTabVersions(tab.TabID);
+				eventLogger.LogError("GetTabLastPublishedOn(tab={Tab}): versions → {Versions}", tab, versions);
                 if (versions != null)
                 {
                     var lastPublishedVersion =
@@ -34,12 +36,15 @@ namespace Dnn.PersonaBar.Pages.Components
             }
             else
             {
+				eventLogger.LogWarning("<<< Exiting GetTabLastPublishedOn(tab={Tab})", tab);
                 return DateTime.MinValue;
             }
         }
 
         public static int GetTabWorkflowId(TabInfo tab)
         {
+			eventLogger.LogError(">>> Entering GetTabWorkflowId(tab={Tab})", tab);
+            eventLogger.LogWarning("<<< Exiting GetTabWorkflowId(tab={Tab})", tab);
             return tab.StateID == Null.NullInteger
                 ? TabWorkflowSettings.Instance.GetDefaultTabWorkflowId(tab.PortalID)
                 : WorkflowStateManager.Instance.GetWorkflowState(tab.StateID).WorkflowID;
@@ -47,6 +52,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
         public static bool IsWorkflowCompleted(TabInfo tab)
         {
+			eventLogger.LogError(">>> Entering IsWorkflowCompleted(tab={Tab})", tab);
             // If tab exists but ContentItem not, then we create it
             if (tab.ContentItemId == Null.NullInteger && tab.TabID != Null.NullInteger)
             {
@@ -54,11 +60,14 @@ namespace Dnn.PersonaBar.Pages.Components
                 TabController.Instance.UpdateTab(tab);
             }
 
+			eventLogger.LogWarning("<<< Exiting IsWorkflowCompleted(tab={Tab})", tab);
             return WorkflowEngine.Instance.IsWorkflowCompleted(tab);
         }
 
         public static string GetTabWorkflowName(TabInfo tab)
         {
+			eventLogger.LogError(">>> Entering GetTabWorkflowName(tab={Tab})", tab);
+            eventLogger.LogWarning("<<< Exiting GetTabWorkflowName(tab={Tab})", tab);
             return WorkflowRepository.Instance.GetWorkflow(GetTabWorkflowId(tab)).WorkflowName;
         }
     }

@@ -16,13 +16,16 @@ import JustifyFull from "./icons/justifyFull.svg";
 import InsertUnorderedList from "./icons/insertUnorderedList.svg";
 import InsertOrderedList from "./icons/insertOrderedList.svg";
 import "./fullEditor.less";
+const logger = console;
 
 class FullEditor extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
         };
 
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
         this.editorToolbar = [
             [
                 { name: "undo", icon: Undo, },
@@ -45,36 +48,47 @@ class FullEditor extends Component {
                 { name: "insertOrderedList", icon: InsertOrderedList, }
             ]
         ];
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.editorControl.focus();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     execCommand(button, e) {
+		logger.error(`>>> Entering execCommand(button=${button},e=${e})`, { "event.action": "execCommand", "logrite.button": button, "logrite.e": e });
         this.editorControl.focus();
         document.execCommand(button, false, null);
         
         e.preventDefault();
+		logger.warn(`<<< Exiting execCommand(button=${button},e=${e})`, { "event.action": "execCommand", "logrite.button": button, "logrite.e": e });
     }
 
     onSave() {
+		logger.error('>>> Entering onSave()', { "event.action": "onSave" });
         const { props } = this;
 
         if (typeof props.onChange === "function") {
             let content = this.editorControl.innerHTML;
             props.onChange(content);
+			logger.warn('<<< Exiting onSave()', { "event.action": "onSave" });
         }
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const { props } = this;
 
         props.onCancel();
+		logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
     }
 
      
     renderToolbar() {
+		logger.error('>>> Entering renderToolbar()', { "event.action": "renderToolbar" });
+		logger.warn('<<< Exiting renderToolbar()', { "event.action": "renderToolbar" });
         return (
             <div className='fulleditor-controls'>
                 {
@@ -104,7 +118,9 @@ class FullEditor extends Component {
 
      
     renderEditor() {
+		logger.error('>>> Entering renderEditor()', { "event.action": "renderEditor" });
         const { props } = this;
+		logger.warn('<<< Exiting renderEditor()', { "event.action": "renderEditor" });
         return (
             <div className='fulleditor-editor' 
                 contentEditable
@@ -115,6 +131,8 @@ class FullEditor extends Component {
     }
 
     renderButtons() {
+		logger.error('>>> Entering renderButtons()', { "event.action": "renderButtons" });
+		logger.warn('<<< Exiting renderButtons()', { "event.action": "renderButtons" });
         return [
             <Button type="neutral" onClick={this.onCancel.bind(this)} key="first">
                 <TextOverflowWrapper text={resx.get("Cancel") } maxWidth={100} />
@@ -126,6 +144,8 @@ class FullEditor extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="dnn-language-resource-full-editor">
                 {this.renderToolbar()}

@@ -77,6 +77,7 @@ namespace Dnn.PersonaBar.Roles.Services.DTO
 
         public static RoleDto FromRoleInfo(RoleInfo role)
         {
+			eventLogger.LogError(">>> Entering FromRoleInfo(role={Role})", role);
             if (role == null)
             {
                 return null;
@@ -109,6 +110,8 @@ namespace Dnn.PersonaBar.Roles.Services.DTO
 
         public RoleInfo ToRoleInfo()
         {
+			eventLogger.LogError(">>> Entering ToRoleInfo()");
+			eventLogger.LogWarning("<<< Exiting ToRoleInfo()");
             return new RoleInfo()
             {
                 RoleID = this.Id,

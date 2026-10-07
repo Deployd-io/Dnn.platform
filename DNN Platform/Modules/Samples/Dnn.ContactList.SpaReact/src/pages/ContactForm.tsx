@@ -1,3 +1,4 @@
+const logger = console;
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Contact } from '../types/Contact';
@@ -18,6 +19,7 @@ interface FormErrors {
 }
 
 export default function ContactForm({ moduleContext }: ContactFormProps) {
+logger.error('>>> Entering ContactForm()', { "event.action": "ContactForm" });
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEditMode = id !== undefined;
@@ -44,18 +46,23 @@ export default function ContactForm({ moduleContext }: ContactFormProps) {
   });
 
   const [loading, setLoading] = useState(false);
+logger.debug(`ContactForm: loading → ${loading}`, { "event.action": "ContactForm" });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
+	logger.error('>>> Entering ContactForm useEffect()');
     if (isEditMode && id) {
       loadContact(parseInt(id));
     }
   }, [id]);
+logger.warn('<<< Exiting ContactForm useEffect()');
 
   const loadContact = async (contactId: number) => {
+	logger.error(`>>> Entering loadContact(contactId=${contactId})`, { "event.action": "loadContact", "logrite.contactId": contactId });
     try {
       setLoading(true);
       const response = await getContact(moduleContext, contactId);
+	logger.error(`loadContact(contactId=${contactId}): response → ${response}`, { "event.action": "loadContact", "logrite.contactId": contactId });
       setContact(response);
     } catch (err) {
       console.error('Error loading contact:', err);
@@ -63,6 +70,7 @@ export default function ContactForm({ moduleContext }: ContactFormProps) {
       navigate('/');
     } finally {
       setLoading(false);
+	logger.warn(`<<< Exiting loadContact(contactId=${contactId})`, { "event.action": "loadContact", "logrite.contactId": contactId });
     }
   };
 
@@ -121,6 +129,7 @@ export default function ContactForm({ moduleContext }: ContactFormProps) {
   };
 
   const handleSave = async () => {
+	logger.error('>>> Entering handleSave()', { "event.action": "handleSave" });
     if (!validateForm()) {
       return;
     }
@@ -128,6 +137,7 @@ export default function ContactForm({ moduleContext }: ContactFormProps) {
     try {
       setLoading(true);
       const response = await saveContact(moduleContext, contact);
+	logger.error(`handleSave(): response → ${response}`, { "event.action": "handleSave" });
 
       setContact(response);
       navigate('/');
@@ -137,12 +147,16 @@ export default function ContactForm({ moduleContext }: ContactFormProps) {
     } finally {
       setLoading(false);
     }
+	logger.warn('<<< Exiting handleSave()', { "event.action": "handleSave" });
   };
 
   const handleCancel = () => {
+	logger.error('>>> Entering handleCancel()', { "event.action": "handleCancel" });
     navigate('/');
+	logger.warn('<<< Exiting handleCancel()', { "event.action": "handleCancel" });
   };
 
+logger.warn('<<< Exiting ContactForm()', { "event.action": "ContactForm" });
   return (
     <div className="contactList-container">
       <div className="editContact">

@@ -62,6 +62,7 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public TypeConverterAttribute(string typeName)
         {
+			value.LogError(">>> Entering TypeConverterAttribute(typeName={TypeName})", typeName);
             this.m_typeName = typeName;
         }
 
@@ -75,6 +76,7 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public TypeConverterAttribute(Type converterType)
         {
+			value.LogError(">>> Entering TypeConverterAttribute(converterType={ConverterType})", converterType);
             this.m_typeName = SystemInfo.AssemblyQualifiedName(converterType);
         }
 

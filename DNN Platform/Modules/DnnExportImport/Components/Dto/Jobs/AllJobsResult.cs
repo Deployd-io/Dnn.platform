@@ -15,6 +15,7 @@ namespace Dnn.ExportImport.Components.Dto.Jobs
     [JsonObject]
     public class AllJobsResult : IDateTimeConverter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AllJobsResult));
         /// <summary>Gets the total job count as a string.</summary>
         public string TotalJobsString => Util.FormatNumber(this.TotalJobs);
 
@@ -45,6 +46,7 @@ namespace Dnn.ExportImport.Components.Dto.Jobs
         /// <inheritdoc />
         public void ConvertToLocal(UserInfo userInfo)
         {
+			Logger.LogError(">>> Entering ConvertToLocal(userInfo={UserInfo})", userInfo);
             this.LastExportTime = Util.ToLocalDateTime(this.LastExportTime, userInfo);
             this.LastImportTime = Util.ToLocalDateTime(this.LastImportTime, userInfo);
 
@@ -59,6 +61,7 @@ namespace Dnn.ExportImport.Components.Dto.Jobs
             }
 
             var tempJobs = new List<JobItem>();
+			Logger.LogError("ConvertToLocal(userInfo={UserInfo}): tempJobs → {TempJobs}", userInfo, tempJobs);
 
             foreach (var job in this.Jobs)
             {
@@ -67,6 +70,8 @@ namespace Dnn.ExportImport.Components.Dto.Jobs
             }
 
             this.Jobs = tempJobs;
+			Logger.LogDebug("ConvertToLocal(userInfo={UserInfo}): this.Jobs → {Arg1}", userInfo, this.Jobs);
+			Logger.LogWarning("<<< Exiting ConvertToLocal(userInfo={UserInfo})", userInfo);
         }
     }
 }

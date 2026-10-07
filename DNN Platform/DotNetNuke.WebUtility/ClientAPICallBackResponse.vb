@@ -5,10 +5,12 @@ Imports System.Diagnostics.CodeAnalysis
 Imports System.Globalization
 Imports System.Web
 Imports System.Web.UI
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.Utilities
 
     Public Class ClientAPICallBackResponse
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         Public Enum CallBackResponseStatusCode
             OK = 200
             GenericFailure = 400
@@ -50,14 +52,20 @@ Namespace DotNetNuke.UI.Utilities
         End Property
 
         Public Sub New(ByVal objPage As Page, ByVal eCallBackType As CallBackTypeCode)
+			_logger.LogError(">>> Entering New(objPage={ObjPage},eCallBackType={ECallBackType})", objPage, eCallBackType)
+			_logger.LogDebug("New(objPage={ObjPage},eCallBackType={ECallBackType}): CallBackType → {CallBackType}", objPage, eCallBackType, CallBackType)
+        _logger.LogWarning("<<< Exiting New(objPage={ObjPage},eCallBackType={ECallBackType})", objPage, eCallBackType)
             m_objPage = objPage
+			_logger.LogDebug("New(objPage={ObjPage},eCallBackType={ECallBackType}): m_objPage → {M_objPage}", objPage, eCallBackType, m_objPage)
             CallBackType = eCallBackType
         End Sub
 
         Public Sub Write()
+			_logger.LogError(">>> Entering Write()")
             Select Case Me.TransportType
                 Case TransportTypeCode.IFRAMEPost
                     Dim strContextID As String = m_objPage.Request.Form("ctx")                    'if context passed in then we are using IFRAME Implementation
+					_logger.LogError("Write(): strContextID → {StrContextID}", strContextID)
                     If IsNumeric(strContextID) Then
                         m_objPage.Response.Write("<html><head></head><body onload=""window.parent.dnn.xmlhttp.requests['" & strContextID & "'].complete(window.parent.dnn.dom.getById('txt', document).value);""><form>")
                         m_objPage.Response.Write("<input type=""hidden"" id=""" & ClientAPI.SCRIPT_CALLBACKSTATUSID & """ value=""" & CInt(Me.StatusCode).ToString(CultureInfo.InvariantCulture) & """>")
@@ -71,6 +79,7 @@ Namespace DotNetNuke.UI.Utilities
                     m_objPage.Response.AppendHeader(ClientAPI.SCRIPT_CALLBACKSTATUSDESCID, Me.StatusDesc)
 
                     m_objPage.Response.Write(MSAJAX.Serialize(New With {.d = Response}))    '//don't serialize straight html
+					_logger.LogWarning("<<< Exiting Write()")
             End Select
 
         End Sub

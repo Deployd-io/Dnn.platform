@@ -28,13 +28,16 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.UserId = this.GetFlagValue(FlagId, "User Id", -1, true, true, true);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             var userInfo = UserController.Instance.GetUser(this.PortalId, this.UserId);
+			eventLogger.LogError("Run(): userInfo → {UserInfo}", userInfo);
             if (userInfo == null)
             {
                 return new ConsoleErrorResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("UserNotFound"), this.UserId));
@@ -46,6 +49,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
             }
 
             RecyclebinController.Instance.DeleteUsers(new List<UserInfo> { userInfo });
+			eventLogger.LogWarning("<<< Exiting Run()");
             return new ConsoleResultModel(this.LocalizeString("Prompt_UserPurged")) { Records = 1, };
         }
     }

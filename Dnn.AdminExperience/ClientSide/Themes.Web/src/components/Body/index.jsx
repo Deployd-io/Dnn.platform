@@ -11,6 +11,7 @@ import MiddleActions from "./MiddleActions";
 import ThemeList from "./ThemeList";
 import "./style.less";
 import utils from "utils";
+const logger = console;
 
 class Body extends Component {
     constructor() {
@@ -19,9 +20,11 @@ class Body extends Component {
             searchText: "",
             level: 7
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     getThemesData(reload) {
+		logger.error(`>>> Entering getThemesData(reload=${reload})`, { "event.action": "getThemesData", "logrite.reload": reload });
         const { props, state } = this;
 
         if (reload || props.themes.layouts.length === 0) {
@@ -30,6 +33,7 @@ class Body extends Component {
 
         let searchText = state.searchText;
         let level = state.level;
+		logger.warn(`<<< Exiting getThemesData(reload=${reload})`, { "event.action": "getThemesData", "logrite.reload": reload });
         return props.themes.layouts.filter(l => {
             return !searchText || l.packageName.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
         }).filter(l => {
@@ -38,21 +42,27 @@ class Body extends Component {
     }
 
     onSearch(value) {
+		logger.error(`>>> Entering onSearch(value=${value})`, { "event.action": "onSearch", "logrite.value": value });
         this.setState({ searchText: value });
+		logger.warn(`<<< Exiting onSearch(value=${value})`, { "event.action": "onSearch", "logrite.value": value });
     }
 
     onFilterChanged(value) {
+		logger.error(`>>> Entering onFilterChanged(value=${value})`, { "event.action": "onFilterChanged", "logrite.value": value });
         this.setState({ level: value });
+		logger.warn(`<<< Exiting onFilterChanged(value=${value})`, { "event.action": "onFilterChanged", "logrite.value": value });
     }
 
     backToThemes() {
         utils.utilities.loadPanel("Dnn.Themes", {});
         this.getThemesData(true);
+		logger.warn('<<< Exiting backToThemes()', { "event.action": "backToThemes" });
     }
 
     installTheme() {
         let event = document.createEvent("Event");
 
+		logger.error(`installTheme(): event → ${event}`, { "event.action": "installTheme" });
         event.initEvent("installPortalTheme", true, true);
 
         let settings = {
@@ -70,6 +80,7 @@ class Body extends Component {
         });
 
         document.dispatchEvent(event);
+		logger.warn('<<< Exiting installTheme()', { "event.action": "installTheme" });
     }
 
     render() {
@@ -98,6 +109,8 @@ Body.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         themes: state.theme.themes
     };

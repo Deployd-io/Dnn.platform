@@ -18,6 +18,7 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider
     /// <summary>AspNet.BrowserDetector implementation of <see cref="DotNetNuke.Services.ClientCapability.IClientCapabilityProvider"/>.</summary>
     public class AspNetClientCapabilityProvider : ClientCapabilityProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AspNetClientCapabilityProvider));
         private static readonly object AllCapabilitiesLock = new object();
         private static readonly object AllClientCapabilityValuesLock = new object();
         private static IQueryable<IClientCapability> allCapabilities;
@@ -134,24 +135,32 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider
         /// <returns>An <see cref="HttpBrowserCapabilities"/> instance.</returns>
         public static HttpBrowserCapabilities GetHttpBrowserCapabilities(NameValueCollection headers, string userAgent)
         {
+			Logger.LogError(">>> Entering GetHttpBrowserCapabilities(headers={Headers},userAgent={UserAgent})", headers, userAgent);
             var factory = new BrowserCapabilitiesFactory();
             var browserCaps = new HttpBrowserCapabilities();
+			Logger.LogError("GetHttpBrowserCapabilities(headers={Headers},userAgent={UserAgent}): browserCaps → {BrowserCaps}", headers, userAgent, browserCaps);
+			Logger.LogDebug("GetHttpBrowserCapabilities(headers={Headers},userAgent={UserAgent}): browserCaps.Capabilities → {Arg2}", headers, userAgent, browserCaps.Capabilities);
             var hashtable = new Hashtable(180, StringComparer.OrdinalIgnoreCase);
+			Logger.LogError("GetHttpBrowserCapabilities(headers={Headers},userAgent={UserAgent}): hashtable → {Hashtable}", headers, userAgent, hashtable);
+			Logger.LogError("GetHttpBrowserCapabilities(headers={Headers},userAgent={UserAgent}): factory → {Factory}", headers, userAgent, factory);
             hashtable[string.Empty] = userAgent;
             browserCaps.Capabilities = hashtable;
             factory.ConfigureBrowserCapabilities(headers, browserCaps);
             factory.ConfigureCustomCapabilities(headers, browserCaps);
+			Logger.LogWarning("<<< Exiting GetHttpBrowserCapabilities(headers={Headers},userAgent={UserAgent})", headers, userAgent);
             return browserCaps;
         }
 
         /// <inheritdoc />
         public override IClientCapability GetClientCapability(string userAgent)
         {
+			Logger.LogError(">>> Entering GetClientCapability(userAgent={UserAgent})", userAgent);
             if (string.IsNullOrEmpty(userAgent))
             {
                 return new AspNetClientCapability(SampleProperties);
             }
 
+			Logger.LogWarning("<<< Exiting GetClientCapability(userAgent={UserAgent})", userAgent);
             return new AspNetClientCapability(userAgent, GetHttpBrowserCapabilities(new NameValueCollection(), userAgent));
         }
 
@@ -159,8 +168,11 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public override IClientCapability GetClientCapabilityById(string deviceId)
         {
+			Logger.LogError(">>> Entering GetClientCapabilityById(deviceId={DeviceId})", deviceId);
             Requires.NotNullOrEmpty("deviceId", deviceId);
 
+			Logger.LogWarning("<<< Exiting GetClientCapabilityById(deviceId={DeviceId})", deviceId);
+			Logger.LogError("Throwing NotImplementedException from GetClientCapabilityById(deviceId={DeviceId})", deviceId);
             throw new NotImplementedException($"Can't get device capability for the id '{deviceId}'");
         }
 
@@ -173,6 +185,8 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider
         /// <inheritdoc />
         public override IQueryable<IClientCapability> GetAllClientCapabilities()
         {
+			Logger.LogError(">>> Entering GetAllClientCapabilities()");
+            Logger.LogWarning("<<< Exiting GetAllClientCapabilities()");
             return AllCapabilities;
         }
     }

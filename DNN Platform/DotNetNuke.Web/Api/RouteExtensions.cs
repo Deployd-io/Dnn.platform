@@ -10,6 +10,7 @@ namespace DotNetNuke.Web.Api
     /// <summary>Extension methods for <see cref="Route"/> and <see cref="IHttpRoute"/>.</summary>
     public static class RouteExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RouteExtensions));
         private const string NamespaceKey = "namespaces";
         private const string NameKey = "name";
 
@@ -35,6 +36,8 @@ namespace DotNetNuke.Web.Api
         internal static void SetNameSpaces(this Route route, string[] namespaces)
         {
             route.DataTokens[NamespaceKey] = namespaces;
+			Logger.LogError(">>> Entering SetNameSpaces(route={Route},namespaces={Namespaces})", route, namespaces);
+			Logger.LogWarning("<<< Exiting SetNameSpaces(route={Route},namespaces={Namespaces})", route, namespaces);
         }
 
         /// <summary>Set the namespaces for the route.</summary>
@@ -67,6 +70,8 @@ namespace DotNetNuke.Web.Api
         internal static void SetName(this Route route, string name)
         {
             route.DataTokens[NameKey] = name;
+			Logger.LogError(">>> Entering SetName(route={Route},name={Name})", route, name);
+			Logger.LogWarning("<<< Exiting SetName(route={Route},name={Name})", route, name);
         }
 
         /// <summary>Set the name for the route.</summary>

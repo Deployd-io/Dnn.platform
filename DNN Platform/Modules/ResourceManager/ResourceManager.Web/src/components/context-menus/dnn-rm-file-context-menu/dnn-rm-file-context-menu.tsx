@@ -1,6 +1,7 @@
 import { Component, Host, h, Prop } from '@stencil/core';
 import { Item } from '../../../services/ItemsClient';
 import state from '../../../store/store';
+const logger = console;
 
 @Component({
   tag: 'dnn-rm-file-context-menu',
@@ -13,6 +14,8 @@ export class DnnRmFileContextMenu {
   @Prop() item!: Item;
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         {state.currentItems?.hasAddFilesPermission && state.currentItems.hasDeletePermission &&

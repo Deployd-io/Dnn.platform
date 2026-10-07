@@ -4,42 +4,55 @@ import Localization from "../../localization";
 import { GridCell, Tags, Dropdown, Button, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import DropdownDayPicker from "../DropdownDayPicker/DropdownDayPicker";
 import utils from "../../utils";
+const logger = console;
 
 class SearchAdvancedDetails extends Component {
 
     constructor(props) {
         super(props); 
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             DropdownCalendarIsActive : false,
             tags : props.tags?props.tags.split(","):[]
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         if (this.props.tags !== prevProps.tags) {
             this.setState({
                 tags: this.props.tags.split(",")
             });
+			logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         }
     }
 
     getDateLabel() {
+		logger.error('>>> Entering getDateLabel()', { "event.action": "getDateLabel" });
         const { startDate, endDate, startAndEndDateDirty } = this.props;
         let label = Localization.get("FilterByPublishDateText");
         if (startAndEndDateDirty) {
             const fullStartDate = utils.formatDate(startDate);
+			logger.error(`getDateLabel(): fullStartDate → ${fullStartDate}`, { "event.action": "getDateLabel" });
             const fullEndDate = utils.formatDate(endDate);
+			logger.error(`getDateLabel(): fullEndDate → ${fullEndDate}`, { "event.action": "getDateLabel" });
             label = fullStartDate !== fullEndDate ? `${fullStartDate} - ${fullEndDate}` : `${fullStartDate}`;
         }
+		logger.warn('<<< Exiting getDateLabel()', { "event.action": "getDateLabel" });
         return label;
     }
     
     toggleDropdownCalendar() {
+		logger.error('>>> Entering toggleDropdownCalendar()', { "event.action": "toggleDropdownCalendar" });
         this.setState({
             DropdownCalendarIsActive : !this.state.DropdownCalendarIsActive
         });
+		logger.warn('<<< Exiting toggleDropdownCalendar()', { "event.action": "toggleDropdownCalendar" });
     }
     getPageStatusLabel() {
+		logger.error('>>> Entering getPageStatusLabel()', { "event.action": "getPageStatusLabel" });
+		logger.warn('<<< Exiting getPageStatusLabel()', { "event.action": "getPageStatusLabel" });
         return (
             this.props.filterByPublishStatus ? 
                 this.props.getFilterByPageStatusOptions().find(
@@ -49,34 +62,46 @@ class SearchAdvancedDetails extends Component {
     }
 
     onClear() {
+		logger.error('>>> Entering onClear()', { "event.action": "onClear" });
         this.setState({
             DropdownCalendarIsActive : false,
             tags:[]
         });
         this.props.clearAdvancedSearch();
+		logger.warn('<<< Exiting onClear()', { "event.action": "onClear" });
     }
 
     onChangeTags(evnt) {
+		logger.error(`>>> Entering onChangeTags(evnt=${evnt})`, { "event.action": "onChangeTags", "logrite.evnt": evnt });
         this.setState({
             tags: evnt
         },()=>this.props.updateSearchAdvancedTags(this.state.tags.join(",")));        
+		logger.warn(`<<< Exiting onChangeTags(evnt=${evnt})`, { "event.action": "onChangeTags", "logrite.evnt": evnt });
     }
 
     onTagClick() {
+		logger.error('>>> Entering onTagClick()', { "event.action": "onTagClick" });
         this.node.getElementsByClassName("input-container")[0].childNodes[0].focus();
+		logger.warn('<<< Exiting onTagClick()', { "event.action": "onTagClick" });
     }
 
     applyDateFilter() {
+		logger.error('>>> Entering applyDateFilter()', { "event.action": "applyDateFilter" });
         this.toggleDropdownCalendar(); 
         this.props.onApplyChangesDropdownDayPicker();
+		logger.warn('<<< Exiting applyDateFilter()', { "event.action": "applyDateFilter" });
     }
 
     clearDateFilter() {
+		logger.error('>>> Entering clearDateFilter()', { "event.action": "clearDateFilter" });
         this.toggleDropdownCalendar();
         this.props.clearAdvancedSearchDateInterval();
+		logger.warn('<<< Exiting clearDateFilter()', { "event.action": "clearDateFilter" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="search-more-flyout" ref={node => this.node = node}>
                 <GridCell columnSize={70} style={{ padding: "5px 5px 5px 10px" }}>

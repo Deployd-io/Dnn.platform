@@ -33,13 +33,18 @@ namespace Dnn.PersonaBar.ConfigConsole.Services
         public ConfigConsoleController()
             : this(null)
         {
+		Logger.LogError(">>> Entering ConfigConsoleController()");
+        Logger.LogWarning("<<< Exiting ConfigConsoleController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ConfigConsoleController"/> class.</summary>
         /// <param name="controller">The controller.</param>
         public ConfigConsoleController(Components.ConfigConsoleController controller)
         {
+			Logger.LogError(">>> Entering ConfigConsoleController(controller={Controller})", controller);
             this.controller = controller ?? Globals.GetCurrentServiceProvider().GetRequiredService<Components.ConfigConsoleController>();
+			Logger.LogDebug("ConfigConsoleController(controller={Controller}): controller → {Controller1}", controller, controller);
+        Logger.LogWarning("<<< Exiting ConfigConsoleController(controller={Controller})", controller);
         }
 
         /// GET: api/ConfigConsole/GetConfigFilesList
@@ -48,9 +53,11 @@ namespace Dnn.PersonaBar.ConfigConsole.Services
         [HttpGet]
         public async Task<HttpResponseMessage> GetConfigFilesList()
         {
+			Logger.LogError(">>> Entering GetConfigFilesList()");
             try
             {
                 var configFileList = (await this.controller.GetConfigFilesListAsync()).ToList();
+				Logger.LogError("GetConfigFilesList(): configFileList → {ConfigFileList}", configFileList);
 
                 var response = new
                 {
@@ -64,6 +71,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetConfigFilesList()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -75,6 +83,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Services
         [HttpGet]
         public async Task<HttpResponseMessage> GetConfigFile(string fileName)
         {
+			Logger.LogError(">>> Entering GetConfigFile(fileName={FileName})", fileName);
             try
             {
                 var response = new
@@ -92,6 +101,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetConfigFile(fileName={FileName})", fileName);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -104,6 +114,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Services
         [ValidateAntiForgeryToken]
         public async Task<HttpResponseMessage> ValidateConfigFile(ConfigFileDto configFileDto)
         {
+			Logger.LogError(">>> Entering ValidateConfigFile(configFileDto={ConfigFileDto})", configFileDto);
             try
             {
                 var response = new
@@ -119,6 +130,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting ValidateConfigFile(configFileDto={ConfigFileDto})", configFileDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -131,6 +143,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Services
         [ValidateAntiForgeryToken]
         public async Task<HttpResponseMessage> UpdateConfigFile(ConfigFileDto configFileDto)
         {
+			Logger.LogError(">>> Entering UpdateConfigFile(configFileDto={ConfigFileDto})", configFileDto);
             try
             {
                 await this.controller.UpdateConfigFileAsync(configFileDto.FileName, configFileDto.FileContent);
@@ -143,6 +156,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting UpdateConfigFile(configFileDto={ConfigFileDto})", configFileDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -155,6 +169,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage MergeConfigFile(ConfigFileDto configFileDto)
         {
+			Logger.LogError(">>> Entering MergeConfigFile(configFileDto={ConfigFileDto})", configFileDto);
             try
             {
                 this.controller.MergeConfigFile(configFileDto.FileContent);
@@ -163,6 +178,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting MergeConfigFile(configFileDto={ConfigFileDto})", configFileDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

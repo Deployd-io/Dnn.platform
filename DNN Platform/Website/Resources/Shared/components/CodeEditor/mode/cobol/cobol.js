@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -20,8 +21,11 @@ CodeMirror.defineMode("cobol", function () {
       ATOM = "atom", NUMBER = "number", KEYWORD = "keyword", MODTAG = "header",
       COBOLLINENUM = "def", PERIOD = "link";
   function makeKeywords(str) {
+	logger.error(`>>> Entering makeKeywords(str=${str})`, { "event.action": "makeKeywords", "logrite.str": str });
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.error(`makeKeywords(str=${str}): obj → ${obj}`, { "event.action": "makeKeywords", "logrite.str": str });
+	logger.warn(`<<< Exiting makeKeywords(str=${str})`, { "event.action": "makeKeywords", "logrite.str": str });
     return obj;
   }
   var atoms = makeKeywords("TRUE FALSE ZEROES ZEROS ZERO SPACES SPACE LOW-VALUE LOW-VALUES ");
@@ -148,6 +152,7 @@ CodeMirror.defineMode("cobol", function () {
     symbol: /[\w*+\-]/
   };
   function isNumber(ch, stream){
+	logger.error(`>>> Entering isNumber(ch=${ch},stream=${stream})`, { "event.action": "isNumber", "logrite.ch": ch, "logrite.stream": stream });
     // hex
     if ( ch === '0' && stream.eat(/x/i) ) {
       stream.eatWhile(tests.hex);
@@ -171,17 +176,21 @@ CodeMirror.defineMode("cobol", function () {
       }
       return true;
     }
+	logger.warn(`<<< Exiting isNumber(ch=${ch},stream=${stream})`, { "event.action": "isNumber", "logrite.ch": ch, "logrite.stream": stream });
     return false;
   }
   return {
     startState: function () {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         indentStack: null,
         indentation: 0,
         mode: false
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     token: function (stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (state.indentStack == null && stream.sol()) {
         // update indentation, but only if indentStack is empty
         state.indentation = 6 ; //stream.indentation();
@@ -197,6 +206,7 @@ CodeMirror.defineMode("cobol", function () {
         while ((next = stream.next()) != null) {
           if (next == "\"" || next == "\'") {
             state.mode = false;
+			logger.debug(`token(stream=${stream},state=${state}): state.mode → ${state.mode}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
             break;
           }
         }
@@ -204,7 +214,9 @@ CodeMirror.defineMode("cobol", function () {
         break;
       default: // default parsing mode
         var ch = stream.next();
+		logger.error(`token(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         var col = stream.column();
+		logger.error(`token(stream=${stream},state=${state}): col → ${col}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if (col >= 0 && col <= 5) {
           returnType = COBOLLINENUM;
         } else if (col >= 72 && col <= 79) {
@@ -239,12 +251,15 @@ CodeMirror.defineMode("cobol", function () {
           } else if (atoms && atoms.propertyIsEnumerable(stream.current().toUpperCase())) {
             returnType = ATOM;
           } else returnType = null;
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         }
       }
       return returnType;
     },
     indent: function (state) {
+	logger.error(`>>> Entering indent(state=${state})`, { "event.action": "indent", "logrite.state": state });
       if (state.indentStack == null) return state.indentation;
+	logger.warn(`<<< Exiting indent(state=${state})`, { "event.action": "indent", "logrite.state": state });
       return state.indentStack.indent;
     }
   };

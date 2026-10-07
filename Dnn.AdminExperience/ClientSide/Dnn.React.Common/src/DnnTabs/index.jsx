@@ -2,11 +2,13 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "./style.less";
+const logger = console;
 
 class DnnTabs extends Component {
 
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.uniqueId = Date.now() * Math.random();
         this.state = {
             selectedIndex: 0
@@ -26,7 +28,9 @@ class DnnTabs extends Component {
     }
 
     getTabHeaders() {
+		logger.error('>>> Entering getTabHeaders()', { "event.action": "getTabHeaders" });
         const {props} = this;
+		logger.warn('<<< Exiting getTabHeaders()', { "event.action": "getTabHeaders" });
         return props.tabHeaders.map((tabHeader, index) => {
             return <Tab key={this.uniqueId + "-" + index}>{tabHeader}</Tab>;
         });
@@ -45,8 +49,10 @@ class DnnTabs extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         const className = (props.className ? " " + props.className : "");
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <Tabs className={"dnn-tabs react-tabs" + className + (" " + props.type) } onSelect={this.onSelect.bind(this) }
                 selectedIndex={typeof props.selectedIndex !== "undefined" ? props.selectedIndex : state.selectedIndex}>

@@ -17,6 +17,7 @@ namespace DotNetNuke.Web.Common
     /// </summary>
     internal class WebFormsServiceProvider : IServiceProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WebFormsServiceProvider));
         private const BindingFlags ActivatorFlags =
             BindingFlags.Instance |
             BindingFlags.NonPublic |
@@ -26,9 +27,12 @@ namespace DotNetNuke.Web.Common
         /// <inheritdoc />
         public object GetService(Type serviceType)
         {
+			Logger.LogError(">>> Entering GetService(serviceType={ServiceType})", serviceType);
             var provider = HttpContextSource.Current?.GetScope()?.ServiceProvider;
 
+			Logger.LogError("GetService(serviceType={ServiceType}): provider → {Provider}", serviceType, provider);
             var service = provider?.GetService(serviceType);
+			Logger.LogError("GetService(serviceType={ServiceType}): service → {Service}", serviceType, service);
 
             if (service != null)
             {
@@ -42,6 +46,7 @@ namespace DotNetNuke.Web.Common
                 return ActivatorUtilities.CreateInstance(provider, serviceType);
             }
 
+			Logger.LogWarning("<<< Exiting GetService(serviceType={ServiceType})", serviceType);
             return Activator.CreateInstance(serviceType, ActivatorFlags, null, null, null);
         }
     }

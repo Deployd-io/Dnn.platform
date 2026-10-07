@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import "./style.less";
 import utilities from "utils";
 import Localization from "localization";
+const logger = console;
 import { CommonUsersActions } from "../../../../actions";
 import {formatDate,formatString} from "../../../../helpers";
 import { GridCell, DatePicker, SvgIcons } from "@dnnsoftware/dnn-react-common";
@@ -11,27 +12,37 @@ import { GridCell, DatePicker, SvgIcons } from "@dnnsoftware/dnn-react-common";
 class RoleRow extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             editIndex: -1,
             editCommand: "",
             isCalendarVisible: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
     onStartTimeClick(userRole, index) {
+		logger.error(`>>> Entering onStartTimeClick(userRole=${userRole},index=${index})`, { "event.action": "onStartTimeClick", "logrite.userRole": userRole, "logrite.index": index });
         this.setState({ editIndex: index, editCommand: "startTime", isCalendarVisible: true });
+		logger.warn(`<<< Exiting onStartTimeClick(userRole=${userRole},index=${index})`, { "event.action": "onStartTimeClick", "logrite.userRole": userRole, "logrite.index": index });
     }
 
     onExpiresTimeClick(userRole, index) {
+		logger.error(`>>> Entering onExpiresTimeClick(userRole=${userRole},index=${index})`, { "event.action": "onExpiresTimeClick", "logrite.userRole": userRole, "logrite.index": index });
         this.setState({ editIndex: index, editCommand: "expiresTime", isCalendarVisible: true });
+		logger.warn(`<<< Exiting onExpiresTimeClick(userRole=${userRole},index=${index})`, { "event.action": "onExpiresTimeClick", "logrite.userRole": userRole, "logrite.index": index });
     }
 
     onDeleteClick(userRole) {
+		logger.error(`>>> Entering onDeleteClick(userRole=${userRole})`, { "event.action": "onDeleteClick", "logrite.userRole": userRole });
         const {props} = this;
         utilities.confirm(formatString(Localization.get("DeleteRole.Confirm"), userRole.roleName, userRole.displayName), Localization.get("Delete"), Localization.get("Cancel"), () => {
             props.dispatch(CommonUsersActions.removeUserRole(userRole));
         });
+		logger.warn(`<<< Exiting onDeleteClick(userRole=${userRole})`, { "event.action": "onDeleteClick", "logrite.userRole": userRole });
     }
     isEmptyDate(date) {
+		logger.error(`>>> Entering isEmptyDate(date=${date})`, { "event.action": "isEmptyDate", "logrite.date": date });
+		logger.warn(`<<< Exiting isEmptyDate(date=${date})`, { "event.action": "isEmptyDate", "logrite.date": date });
         return !date || new Date(date).getFullYear() < 1970;
     }
 
@@ -46,8 +57,10 @@ class RoleRow extends Component {
         this.setState({ isCalendarVisible: false });
     }
     getBoundDate(userRole, command) {
+		logger.error(`>>> Entering getBoundDate(userRole=${userRole},command=${command})`, { "event.action": "getBoundDate", "logrite.userRole": userRole, "logrite.command": command });
         if (command === "startTime") {
             let maxValue = new Date(2049, 11, 31);
+			logger.error(`getBoundDate(userRole=${userRole},command=${command}): maxValue → ${maxValue}`, { "event.action": "getBoundDate", "logrite.userRole": userRole, "logrite.command": command });
             if (!this.isEmptyDate(userRole.expiresTime)) {
                 maxValue = new Date(new Date().setTime(new Date(userRole.expiresTime).getTime() - 1 * 86400000));
             }
@@ -57,10 +70,12 @@ class RoleRow extends Component {
             if (!this.isEmptyDate(userRole.startTime)) {
                 minValue = new Date(new Date().setTime(new Date(userRole.startTime).getTime() + 1 * 86400000));
             }
+			logger.error(`getBoundDate(userRole=${userRole},command=${command}): minValue → ${minValue}`, { "event.action": "getBoundDate", "logrite.userRole": userRole, "logrite.command": command });
             return minValue;
         }
     }
     getDate(roleDetails, command) {
+		logger.error(`>>> Entering getDate(roleDetails=${roleDetails},command=${command})`, { "event.action": "getDate", "logrite.roleDetails": roleDetails, "logrite.command": command });
         let dateValue = new Date();
         if (command === "startTime") {
             if (!this.isEmptyDate(roleDetails.startTime)) {
@@ -72,10 +87,12 @@ class RoleRow extends Component {
                 dateValue = new Date(roleDetails.expiresTime);
             }
         }
+		logger.error(`getDate(roleDetails=${roleDetails},command=${command}): dateValue → ${dateValue}`, { "event.action": "getDate", "logrite.roleDetails": roleDetails, "logrite.command": command });
         return dateValue;
     }
     /* eslint-disable react/no-danger */
     createRoleActions() {
+		logger.error('>>> Entering createRoleActions()', { "event.action": "createRoleActions" });
         const {props, state} = this;
 
         let startTimeAction = props.roleDetails.allowExpired ? <span>
@@ -93,6 +110,7 @@ class RoleRow extends Component {
         let deleteAction = props.roleDetails.allowDelete ?
             <a className={"extension-action"} onClick={this.onDeleteClick.bind(this, props.roleDetails, props.index) }><SvgIcons.XIcon /></a>
             : null;
+		logger.warn('<<< Exiting createRoleActions()', { "event.action": "createRoleActions" });
         return <div className={state.editIndex === props.index ? "edit-row" : null}>
             {startTimeAction}
             {expiresTimeAction}
@@ -100,7 +118,9 @@ class RoleRow extends Component {
         </div>;
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="user-role-row">
                 <GridCell title={props.roleDetails.roleName} columnSize={25} >
@@ -126,6 +146,8 @@ RoleRow.propTypes = {
     deleteRole: PropTypes.func.isRequired
 };
 function mapStateToProps() {
+	logger.error('>>> Entering mapStateToProps()', { "event.action": "mapStateToProps" });
+	logger.warn('<<< Exiting mapStateToProps()', { "event.action": "mapStateToProps" });
     return {};
 }
 

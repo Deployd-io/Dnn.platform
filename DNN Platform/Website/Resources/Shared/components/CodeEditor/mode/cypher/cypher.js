@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -14,13 +15,17 @@
 })(function(CodeMirror) {
   "use strict";
   var wordRegexp = function(words) {
+	logger.error(`>>> Entering wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
+	logger.warn(`<<< Exiting wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
     return new RegExp("^(?:" + words.join("|") + ")$", "i");
   };
 
   CodeMirror.defineMode("cypher", function(config) {
     var tokenBase = function(stream/*, state*/) {
+	logger.error(`>>> Entering tokenBase(stream=${stream})`, { "event.action": "tokenBase", "logrite.stream": stream });
       var ch = stream.next();
       if (ch === "\"" || ch === "'") {
+		logger.error(`tokenBase(stream=${stream}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream });
         stream.match(/.+?["']/);
         return "string";
       }
@@ -40,13 +45,17 @@
           return "atom";
         }
         var word = stream.current();
+		logger.error(`tokenBase(stream=${stream}): word → ${word}`, { "event.action": "tokenBase", "logrite.stream": stream });
         if (funcs.test(word)) return "builtin";
         if (preds.test(word)) return "def";
         if (keywords.test(word)) return "keyword";
+		logger.warn(`<<< Exiting tokenBase(stream=${stream})`, { "event.action": "tokenBase", "logrite.stream": stream });
         return "variable";
       }
     };
     var pushContext = function(state, type, col) {
+	logger.error(`>>> Entering pushContext(state=${state},type=${type},col=${col})`, { "event.action": "pushContext", "logrite.state": state, "logrite.type": type, "logrite.col": col });
+	logger.warn(`<<< Exiting pushContext(state=${state},type=${type},col=${col})`, { "event.action": "pushContext", "logrite.state": state, "logrite.type": type, "logrite.col": col });
       return state.context = {
         prev: state.context,
         indent: state.indent,
@@ -55,7 +64,9 @@
       };
     };
     var popContext = function(state) {
+	logger.error(`>>> Entering popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
       state.indent = state.context.indent;
+	logger.warn(`<<< Exiting popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
       return state.context = state.context.prev;
     };
     var indentUnit = config.indentUnit;
@@ -67,14 +78,17 @@
 
     return {
       startState: function(/*base*/) {
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
         return {
           tokenize: tokenBase,
           context: null,
           indent: 0,
           col: 0
         };
+		logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       },
       token: function(stream, state) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if (stream.sol()) {
           if (state.context && (state.context.align == null)) {
             state.context.align = false;
@@ -85,6 +99,7 @@
           return null;
         }
         var style = state.tokenize(stream, state);
+		logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if (style !== "comment" && state.context && (state.context.align == null) && state.context.type !== "pattern") {
           state.context.align = true;
         }
@@ -109,16 +124,20 @@
           } else if (state.context.type === "pattern" && !state.context.align) {
             state.context.align = true;
             state.context.col = stream.column();
+			logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           }
         }
         return style;
       },
       indent: function(state, textAfter) {
+		logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
         var firstChar = textAfter && textAfter.charAt(0);
         var context = state.context;
+		logger.error(`indent(state=${state},textAfter=${textAfter}): firstChar → ${firstChar}`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
         if (/[\]\}]/.test(firstChar)) {
           while (context && context.type === "pattern") {
             context = context.prev;
+			logger.warn(`<<< Exiting indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
           }
         }
         var closing = context && firstChar === context.type;
@@ -132,11 +151,14 @@
 
   CodeMirror.modeExtensions["cypher"] = {
     autoFormatLineBreaks: function(text) {
+	logger.error(`>>> Entering autoFormatLineBreaks(text=${text})`, { "event.action": "autoFormatLineBreaks", "logrite.text": text });
       var i, lines, reProcessedPortion;
       var lines = text.split("\n");
+	logger.error(`autoFormatLineBreaks(text=${text}): lines → ${lines}`, { "event.action": "autoFormatLineBreaks", "logrite.text": text });
       var reProcessedPortion = /\s+\b(return|where|order by|match|with|skip|limit|create|delete|set)\b\s/g;
       for (var i = 0; i < lines.length; i++)
         lines[i] = lines[i].replace(reProcessedPortion, " \n$1 ").trim();
+		logger.warn(`<<< Exiting autoFormatLineBreaks(text=${text})`, { "event.action": "autoFormatLineBreaks", "logrite.text": text });
       return lines.join("\n");
     }
   };

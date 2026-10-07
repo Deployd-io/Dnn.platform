@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -61,35 +62,43 @@ CodeMirror.defineMode("commonlisp", function (config) {
   }
 
   function inString(stream, state) {
+	logger.error(`>>> Entering inString(stream=${stream},state=${state})`, { "event.action": "inString", "logrite.stream": stream, "logrite.state": state });
     var escaped = false, next;
     while (next = stream.next()) {
       if (next == '"' && !escaped) { state.tokenize = base; break; }
       escaped = !escaped && next == "\\";
     }
+	logger.error(`inString(stream=${stream},state=${state}): escaped → ${escaped}`, { "event.action": "inString", "logrite.stream": stream, "logrite.state": state });
     return "string";
   }
 
   function inComment(stream, state) {
+	logger.error(`>>> Entering inComment(stream=${stream},state=${state})`, { "event.action": "inComment", "logrite.stream": stream, "logrite.state": state });
     var next, last;
     while (next = stream.next()) {
       if (next == "#" && last == "|") { state.tokenize = base; break; }
       last = next;
     }
     type = "ws";
+	logger.warn(`<<< Exiting inComment(stream=${stream},state=${state})`, { "event.action": "inComment", "logrite.stream": stream, "logrite.state": state });
     return "comment";
   }
 
   return {
     startState: function () {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       return {ctx: {prev: null, start: 0, indentTo: 0}, lastType: null, tokenize: base};
     },
 
     token: function (stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.sol() && typeof state.ctx.indentTo != "number")
         state.ctx.indentTo = state.ctx.start + 1;
 
       type = null;
       var style = state.tokenize(stream, state);
+	logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (type != "ws") {
         if (state.ctx.indentTo == null) {
           if (type == "symbol" && assumeBody.test(stream.current()))
@@ -100,14 +109,18 @@ CodeMirror.defineMode("commonlisp", function (config) {
           state.ctx.indentTo = stream.column();
         }
         state.lastType = type;
+		logger.debug(`token(stream=${stream},state=${state}): state.lastType → ${state.lastType}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       }
       if (type == "open") state.ctx = {prev: state.ctx, start: stream.column(), indentTo: null};
       else if (type == "close") state.ctx = state.ctx.prev || state.ctx;
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return style;
     },
 
     indent: function (state, _textAfter) {
+	logger.error(`>>> Entering indent(state=${state},_textAfter=${_textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite._textAfter": _textAfter });
       var i = state.ctx.indentTo;
+	logger.warn(`<<< Exiting indent(state=${state},_textAfter=${_textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite._textAfter": _textAfter });
       return typeof i == "number" ? i : state.ctx.start + 1;
     },
 

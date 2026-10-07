@@ -24,6 +24,7 @@ namespace DotNetNuke.HttpModules.OutputCaching
     /// <summary>Manages the output cache for a request.</summary>
     public class OutputCacheModule : IHttpModule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(OutputCacheModule));
         private const string ContextKeyResponseFilter = "OutputCache:ResponseFilter";
         private const string ContextKeyTabId = "OutputCache:TabId";
         private const string ContextKeyTabOutputCacheProvider = "OutputCache:TabOutputCacheProvider";
@@ -39,25 +40,35 @@ namespace DotNetNuke.HttpModules.OutputCaching
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void Init(HttpApplication httpApp)
         {
+			Logger.LogError(">>> Entering Init(httpApp={HttpApp})", httpApp);
             this.app = httpApp;
 
+			Logger.LogDebug("Init(httpApp={HttpApp}): this.app → {Arg1}", httpApp, this.app);
+			Logger.LogDebug("Init(httpApp={HttpApp}): app → {App}", httpApp, app);
             httpApp.ResolveRequestCache += this.OnResolveRequestCache;
             httpApp.UpdateRequestCache += this.OnUpdateRequestCache;
+			Logger.LogWarning("<<< Exiting Init(httpApp={HttpApp})", httpApp);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+		Logger.LogError(">>> Entering Dispose()");
+        Logger.LogWarning("<<< Exiting Dispose()");
         }
 
         private static bool IsInstallInProgress()
         {
+			Logger.LogError(">>> Entering IsInstallInProgress()");
+            Logger.LogWarning("<<< Exiting IsInstallInProgress()");
             return InstallBlocker.Instance.IsInstallInProgress();
         }
 
         private void OnResolveRequestCache(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnResolveRequestCache(sender={Sender},e={E})", sender, e);
             bool cached = false;
+			Logger.LogError("OnResolveRequestCache(sender={Sender},e={E}): cached → {Cached}", sender, e, cached);
             if (this.app?.Context == null || !this.app.Response.ContentType.Equals("text/html", StringComparison.OrdinalIgnoreCase) || this.app.Context.Request.IsAuthenticated || this.app.Context.Request.Browser.Crawler)
             {
                 return;
@@ -74,6 +85,7 @@ namespace DotNetNuke.HttpModules.OutputCaching
             }
 
             var portalSettings = (PortalSettings)HttpContextSource.Current.Items["PortalSettings"];
+			Logger.LogError("OnResolveRequestCache(sender={Sender},e={E}): portalSettings → {PortalSettings}", sender, e, portalSettings);
             var tabId = portalSettings?.ActiveTab?.TabID;
             if (tabId == null)
             {
@@ -81,6 +93,7 @@ namespace DotNetNuke.HttpModules.OutputCaching
             }
 
             Hashtable tabSettings = TabController.Instance.GetTabSettings(tabId.Value);
+			Logger.LogError("OnResolveRequestCache(sender={Sender},e={E}): tabSettings → {TabSettings}", sender, e, tabSettings);
 
             if (tabSettings["CacheProvider"] == null || string.IsNullOrEmpty(tabSettings["CacheProvider"].ToString()))
             {
@@ -91,6 +104,7 @@ namespace DotNetNuke.HttpModules.OutputCaching
             string locale = Localization.GetPageLocale((IPortalSettings)portalSettings).Name;
 
             IncludeExcludeType includeExclude = IncludeExcludeType.ExcludeByDefault;
+			Logger.LogError("OnResolveRequestCache(sender={Sender},e={E}): includeExclude → {IncludeExclude}", sender, e, includeExclude);
             if (tabSettings["CacheIncludeExclude"] != null && !string.IsNullOrEmpty(tabSettings["CacheIncludeExclude"].ToString()))
             {
                 if (tabSettings["CacheIncludeExclude"].ToString() == "0")
@@ -106,6 +120,7 @@ namespace DotNetNuke.HttpModules.OutputCaching
             string tabOutputCacheProvider = tabSettings["CacheProvider"].ToString();
             this.app.Context.Items[ContextKeyTabOutputCacheProvider] = tabOutputCacheProvider;
             int maxCachedVariationsForTab = 250; // by default, prevent DOS attacks
+			Logger.LogError("OnResolveRequestCache(sender={Sender},e={E}): maxCachedVariationsForTab → {MaxCachedVariationsForTab}", sender, e, maxCachedVariationsForTab);
             if (tabSettings["MaxVaryByCount"] != null && !string.IsNullOrEmpty(tabSettings["MaxVaryByCount"].ToString()))
             {
                 maxCachedVariationsForTab = Convert.ToInt32(tabSettings["MaxVaryByCount"].ToString(), CultureInfo.InvariantCulture);
@@ -125,6 +140,7 @@ namespace DotNetNuke.HttpModules.OutputCaching
             if (includeExclude == IncludeExcludeType.ExcludeByDefault)
             {
                 string includeVaryByKeysSettings = string.Empty;
+				Logger.LogError("OnResolveRequestCache(sender={Sender},e={E}): includeVaryByKeysSettings → {IncludeVaryByKeysSettings}", sender, e, includeVaryByKeysSettings);
                 if (tabSettings["IncludeVaryBy"] != null)
                 {
                     includeVaryByKeysSettings = tabSettings["IncludeVaryBy"].ToString();
@@ -148,9 +164,11 @@ namespace DotNetNuke.HttpModules.OutputCaching
             }
 
             var excludeVaryByKeys = new StringCollection();
+			Logger.LogError("OnResolveRequestCache(sender={Sender},e={E}): excludeVaryByKeys → {ExcludeVaryByKeys}", sender, e, excludeVaryByKeys);
             if (includeExclude == IncludeExcludeType.IncludeByDefault)
             {
                 string excludeVaryByKeysSettings = string.Empty;
+				Logger.LogError("OnResolveRequestCache(sender={Sender},e={E}): excludeVaryByKeysSettings → {ExcludeVaryByKeysSettings}", sender, e, excludeVaryByKeysSettings);
                 if (tabSettings["ExcludeVaryBy"] != null)
                 {
                     excludeVaryByKeysSettings = tabSettings["ExcludeVaryBy"].ToString();
@@ -174,12 +192,14 @@ namespace DotNetNuke.HttpModules.OutputCaching
             }
 
             var varyBy = new SortedDictionary<string, string>();
+			Logger.LogError("OnResolveRequestCache(sender={Sender},e={E}): varyBy → {VaryBy}", sender, e, varyBy);
 
             foreach (string key in this.app.Context.Request.QueryString)
             {
                 if (key != null && this.app.Context.Request.QueryString[key] != null)
                 {
                     var varyKey = key.ToLowerInvariant();
+					Logger.LogError("OnResolveRequestCache(sender={Sender},e={E}): varyKey → {VaryKey}", sender, e, varyKey);
                     varyBy.Add(varyKey, this.app.Context.Request.QueryString[key]);
 
                     if (includeExclude == IncludeExcludeType.IncludeByDefault && !includeVaryByKeys.Contains(varyKey))
@@ -239,7 +259,9 @@ namespace DotNetNuke.HttpModules.OutputCaching
                 if (tabSettings["CacheDuration"] != null && !string.IsNullOrEmpty(tabSettings["CacheDuration"].ToString()) && Convert.ToInt32(tabSettings["CacheDuration"].ToString(), CultureInfo.InvariantCulture) > 0)
                 {
                     var seconds = Convert.ToInt32(tabSettings["CacheDuration"].ToString(), CultureInfo.InvariantCulture);
+					Logger.LogError("OnResolveRequestCache(sender={Sender},e={E}): seconds → {Seconds}", sender, e, seconds);
                     var duration = new TimeSpan(0, 0, seconds);
+					Logger.LogError("OnResolveRequestCache(sender={Sender},e={E}): duration → {Duration}", sender, e, duration);
 
                     var responseFilter = OutputCachingProvider.Instance(this.app.Context.Items[ContextKeyTabOutputCacheProvider].ToString()).GetResponseFilter(
                         Convert.ToInt32(this.app.Context.Items[ContextKeyTabId], CultureInfo.InvariantCulture),
@@ -251,13 +273,17 @@ namespace DotNetNuke.HttpModules.OutputCaching
                     this.app.Context.Response.Filter = responseFilter;
                 }
             }
+			Logger.LogWarning("<<< Exiting OnResolveRequestCache(sender={Sender},e={E})", sender, e);
         }
 
         private void OnUpdateRequestCache(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnUpdateRequestCache(sender={Sender},e={E})", sender, e);
             var request = HttpContext.Current.Request;
             var response = HttpContext.Current.Response;
+			Logger.LogError("OnUpdateRequestCache(sender={Sender},e={E}): response → {Response}", sender, e, response);
             var isRedirect = response.StatusCode == (int)HttpStatusCode.Redirect;
+			Logger.LogError("OnUpdateRequestCache(sender={Sender},e={E}): isRedirect → {IsRedirect}", sender, e, isRedirect);
             if (!request.Browser.Crawler && !isRedirect)
             {
                 if (this.app.Context.Items[ContextKeyResponseFilter] is OutputCacheResponseFilter responseFilter)
@@ -265,6 +291,7 @@ namespace DotNetNuke.HttpModules.OutputCaching
                     responseFilter.StopFiltering(Convert.ToInt32(this.app.Context.Items[ContextKeyTabId], CultureInfo.InvariantCulture), false);
                 }
             }
+			Logger.LogWarning("<<< Exiting OnUpdateRequestCache(sender={Sender},e={E})", sender, e);
         }
     }
 }

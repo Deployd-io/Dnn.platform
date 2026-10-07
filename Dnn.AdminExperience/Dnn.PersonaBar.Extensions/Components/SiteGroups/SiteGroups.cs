@@ -11,6 +11,8 @@ namespace Dnn.PersonaBar.SiteGroups
         /// <inheritdoc />
         protected override System.Func<IManagePortalGroups> GetFactory()
         {
+			eventLogger.LogError(">>> Entering GetFactory()");
+			eventLogger.LogWarning("<<< Exiting GetFactory()");
             return () => new PortalGroupAdapter();
         }
     }

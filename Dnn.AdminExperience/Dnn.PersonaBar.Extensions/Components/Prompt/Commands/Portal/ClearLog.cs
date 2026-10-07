@@ -27,13 +27,18 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Portal
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IEventLogService. Scheduled removal in v12.0.0.")]
         public ClearLog()
         {
+		Logger.LogError(">>> Entering ClearLog()");
+        Logger.LogWarning("<<< Exiting ClearLog()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ClearLog"/> class.</summary>
         /// <param name="eventLogService">The event logger.</param>
         public ClearLog(IEventLogService eventLogService)
         {
+			Logger.LogError(">>> Entering ClearLog(eventLogService={EventLogService})", eventLogService);
             this.eventLogService = eventLogService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogService>();
+			Logger.LogDebug("ClearLog(eventLogService={EventLogService}): eventLogService → {EventLogService1}", eventLogService, eventLogService);
+        Logger.LogWarning("<<< Exiting ClearLog(eventLogService={EventLogService})", eventLogService);
         }
 
         /// <inheritdoc />
@@ -42,6 +47,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Portal
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogError(">>> Entering Run()");
             try
             {
                 this.eventLogService.ClearLog();
@@ -49,6 +55,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Portal
             catch (Exception ex)
             {
                 Logger.Error(ex);
+			Logger.LogWarning("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(this.LocalizeString("Prompt_ClearLog_Error"));
             }
 

@@ -12,6 +12,7 @@ namespace DotNetNuke.Entities.Urls
     /// <summary>The Xml Helpers class is used to read in parameter rewrite/replace/redirect rules from the friendlyUrlParms.config file.</summary>
     internal static class XmlHelpers
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(XmlHelpers));
         /// <summary>Converts <paramref name="tabIdsRaw"/> and <paramref name="tabNames"/> into a list of tab IDs.</summary>
         /// <param name="tabIdsRaw">A semicolon-delimited list of tab IDs.</param>
         /// <param name="tabNames">Either <c>"All"</c> or a semicolon-delimited list of tab names.</param>
@@ -20,12 +21,15 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>A <see cref="List{T}"/> of tab IDs (<c>-1</c> indicates "all", <c>-2</c> indicates "default.aspx", and <c>-3</c> indicates site root).</returns>
         internal static List<int> TabIdsFromAttributes(string tabIdsRaw, string tabNames, int portalId, ref List<string> messages)
         {
+			Logger.LogError(">>> Entering TabIdsFromAttributes(tabIdsRaw={TabIdsRaw},tabNames={TabNames},portalId={PortalId},messages={Messages})", tabIdsRaw, tabNames, portalId, messages);
             if (messages == null)
             {
                 messages = new List<string>();
+				Logger.LogError("TabIdsFromAttributes(tabIdsRaw={TabIdsRaw},tabNames={TabNames},portalId={PortalId},messages={Messages}): messages → {Messages1}", tabIdsRaw, tabNames, portalId, messages, messages);
             }
 
             var tabIds = new List<int>();
+			Logger.LogError("TabIdsFromAttributes(tabIdsRaw={TabIdsRaw},tabNames={TabNames},portalId={PortalId},messages={Messages}): tabIds → {TabIds}", tabIdsRaw, tabNames, portalId, messages, tabIds);
             if (!string.IsNullOrEmpty(tabIdsRaw))
             {
                 string[] rawTabids = tabIdsRaw.Split(';');
@@ -68,6 +72,7 @@ namespace DotNetNuke.Entities.Urls
                             {
                                 // portal id specified : specific portal
                                 TabInfo tab = TabController.Instance.GetTabByName(tabName, portalId);
+								Logger.LogError("TabIdsFromAttributes(tabIdsRaw={TabIdsRaw},tabNames={TabNames},portalId={PortalId},messages={Messages}): tab → {Tab}", tabIdsRaw, tabNames, portalId, messages, tab);
                                 if (tab != null)
                                 {
                                     tabIds.Add(tab.TabID);
@@ -82,6 +87,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting TabIdsFromAttributes(tabIdsRaw={TabIdsRaw},tabNames={TabNames},portalId={PortalId},messages={Messages})", tabIdsRaw, tabNames, portalId, messages);
             return tabIds;
         }
     }

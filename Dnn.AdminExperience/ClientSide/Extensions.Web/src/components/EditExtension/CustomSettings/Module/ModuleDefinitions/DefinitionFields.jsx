@@ -3,14 +3,19 @@ import PropTypes from "prop-types";
 import { SingleLineInputWithError, GridSystem } from "@dnnsoftware/dnn-react-common";
 import Localization from "localization";
 import "./style.less";
+const logger = console;
 class DefinitionFields extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridSystem>
                 <div>

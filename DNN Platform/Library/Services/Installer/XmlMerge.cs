@@ -22,6 +22,7 @@ namespace DotNetNuke.Services.Installer
     /// <summary>The XmlMerge class is a utility class for XmlSplicing config files.</summary>
     public class XmlMerge
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(XmlMerge));
         private IDictionary<string, XmlDocument> pendingDocuments;
 
         /// <summary>Initializes a new instance of the <see cref="XmlMerge"/> class.</summary>
@@ -30,10 +31,19 @@ namespace DotNetNuke.Services.Installer
         /// <param name="sender">The name of the component responsible for the merge.</param>
         public XmlMerge(string sourceFileName, string version, string sender)
         {
+			Logger.LogError(">>> Entering XmlMerge(sourceFileName={SourceFileName},version={Version},sender={Sender})", sourceFileName, version, sender);
             this.Version = version;
+			Logger.LogDebug("XmlMerge(sourceFileName={SourceFileName},version={Version},sender={Sender}): this.Version → {Arg3}", sourceFileName, version, sender, this.Version);
             this.Sender = sender;
             this.SourceConfig = new XmlDocument { XmlResolver = null };
+			Logger.LogDebug("XmlMerge(sourceFileName={SourceFileName},version={Version},sender={Sender}): this.Sender → {Arg3}", sourceFileName, version, sender, this.Sender);
+        Logger.LogDebug("XmlMerge(sourceStream={SourceStream},version={Version},sender={Sender}): SourceConfig → {SourceConfig}", sourceStream, version, sender, SourceConfig);
+        Logger.LogDebug("XmlMerge(sourceReader={SourceReader},version={Version},sender={Sender}): SourceConfig → {SourceConfig}", sourceReader, version, sender, SourceConfig);
+        Logger.LogDebug("XmlMerge(sourceDoc={SourceDoc},version={Version},sender={Sender}): this.Sender → {Arg3}", sourceDoc, version, sender, this.Sender);
+        Logger.LogWarning("<<< Exiting XmlMerge(sourceFileName={SourceFileName},version={Version},sender={Sender})", sourceFileName, version, sender);
+        Logger.LogWarning("<<< Exiting XmlMerge(sourceStream={SourceStream},version={Version},sender={Sender})", sourceStream, version, sender);
             using var configReader = XmlReader.Create(sourceFileName, new XmlReaderSettings { XmlResolver = null, });
+			Logger.LogError("XmlMerge(sourceFileName={SourceFileName},version={Version},sender={Sender}): configReader → {ConfigReader}", sourceFileName, version, sender, configReader);
             this.SourceConfig.Load(configReader);
         }
 
@@ -43,8 +53,12 @@ namespace DotNetNuke.Services.Installer
         /// <param name="sender">The name of the component responsible for the merge.</param>
         public XmlMerge(Stream sourceStream, string version, string sender)
         {
+			Logger.LogError(">>> Entering XmlMerge(sourceStream={SourceStream},version={Version},sender={Sender})", sourceStream, version, sender);
+			Logger.LogDebug("XmlMerge(sourceStream={SourceStream},version={Version},sender={Sender}): this.Sender → {Arg3}", sourceStream, version, sender, this.Sender);
+			Logger.LogError("XmlMerge(sourceStream={SourceStream},version={Version},sender={Sender}): configReader → {ConfigReader}", sourceStream, version, sender, configReader);
             this.Version = version;
             this.Sender = sender;
+			Logger.LogDebug("XmlMerge(sourceStream={SourceStream},version={Version},sender={Sender}): this.Version → {Arg3}", sourceStream, version, sender, this.Version);
             this.SourceConfig = new XmlDocument { XmlResolver = null };
             using var configReader = XmlReader.Create(sourceStream, new XmlReaderSettings { XmlResolver = null, });
             this.SourceConfig.Load(configReader);
@@ -56,7 +70,12 @@ namespace DotNetNuke.Services.Installer
         /// <param name="sender">The name of the component responsible for the merge.</param>
         public XmlMerge(TextReader sourceReader, string version, string sender)
         {
+			Logger.LogError(">>> Entering XmlMerge(sourceReader={SourceReader},version={Version},sender={Sender})", sourceReader, version, sender);
+			Logger.LogError("XmlMerge(sourceReader={SourceReader},version={Version},sender={Sender}): configReader → {ConfigReader}", sourceReader, version, sender, configReader);
+			Logger.LogDebug("XmlMerge(sourceReader={SourceReader},version={Version},sender={Sender}): this.Sender → {Arg3}", sourceReader, version, sender, this.Sender);
             this.Version = version;
+			Logger.LogWarning("<<< Exiting XmlMerge(sourceReader={SourceReader},version={Version},sender={Sender})", sourceReader, version, sender);
+			Logger.LogDebug("XmlMerge(sourceReader={SourceReader},version={Version},sender={Sender}): this.Version → {Arg3}", sourceReader, version, sender, this.Version);
             this.Sender = sender;
             this.SourceConfig = new XmlDocument { XmlResolver = null };
             using var configReader = XmlReader.Create(sourceReader, new XmlReaderSettings { XmlResolver = null, });
@@ -69,7 +88,10 @@ namespace DotNetNuke.Services.Installer
         /// <param name="sender">The name of the component responsible for the merge.</param>
         public XmlMerge(XmlDocument sourceDoc, string version, string sender)
         {
+			Logger.LogError(">>> Entering XmlMerge(sourceDoc={SourceDoc},version={Version},sender={Sender})", sourceDoc, version, sender);
             this.Version = version;
+			Logger.LogWarning("<<< Exiting XmlMerge(sourceDoc={SourceDoc},version={Version},sender={Sender})", sourceDoc, version, sender);
+			Logger.LogDebug("XmlMerge(sourceDoc={SourceDoc},version={Version},sender={Sender}): this.Version → {Arg3}", sourceDoc, version, sender, this.Version);
             this.Sender = sender;
             this.SourceConfig = sourceDoc;
         }
@@ -118,14 +140,19 @@ namespace DotNetNuke.Services.Installer
         /// <param name="target">An Xml Document represent the Target Xml File.</param>
         public void UpdateConfig(XmlDocument target)
         {
+			Logger.LogError(">>> Entering UpdateConfig(target={Target})", target);
             var changedAnyNodes = false;
             this.TargetConfig = target;
             if (this.TargetConfig != null)
             {
+				Logger.LogDebug("UpdateConfig(target={Target}): this.TargetConfig → {Arg1}", target, this.TargetConfig);
                 changedAnyNodes = this.ProcessNodes(this.SourceConfig.SelectNodes("/configuration/nodes/node"), false);
+				Logger.LogError("UpdateConfig(target={Target}): changedAnyNodes → {ChangedAnyNodes}", target, changedAnyNodes);
             }
 
             this.ConfigUpdateChangedNodes = changedAnyNodes;
+			Logger.LogWarning("<<< Exiting UpdateConfig(target={Target})", target);
+        Logger.LogWarning("<<< Exiting UpdateConfig(target={Target},fileName={FileName})", target, fileName);
         }
 
         /// <summary>
@@ -136,13 +163,17 @@ namespace DotNetNuke.Services.Installer
         /// <param name="fileName">The fileName for the Target Xml File - relative to the webroot.</param>
         public void UpdateConfig(XmlDocument target, string fileName)
         {
+			Logger.LogError(">>> Entering UpdateConfig(target={Target},fileName={FileName})", target, fileName);
             var changedAnyNodes = false;
             this.TargetFileName = fileName;
+			Logger.LogDebug("UpdateConfig(target={Target},fileName={FileName}): this.TargetFileName → {Arg2}", target, fileName, this.TargetFileName);
             this.TargetConfig = target;
             if (this.TargetConfig != null)
             {
+				Logger.LogDebug("UpdateConfig(target={Target},fileName={FileName}): this.TargetConfig → {Arg2}", target, fileName, this.TargetConfig);
                 changedAnyNodes = this.ProcessNodes(this.SourceConfig.SelectNodes("/configuration/nodes/node"), true);
             }
+			Logger.LogError("UpdateConfig(target={Target},fileName={FileName}): changedAnyNodes → {ChangedAnyNodes}", target, fileName, changedAnyNodes);
 
             this.ConfigUpdateChangedNodes = changedAnyNodes;
         }
@@ -153,25 +184,32 @@ namespace DotNetNuke.Services.Installer
         /// </summary>
         public void UpdateConfigs()
         {
+			Logger.LogError(">>> Entering UpdateConfigs()");
+			Logger.LogDebug("UpdateConfigs(autoSave={AutoSave}): this.ConfigUpdateChangedNodes → {Arg1}", autoSave, this.ConfigUpdateChangedNodes);
             this.UpdateConfigs(true);
+			Logger.LogWarning("<<< Exiting UpdateConfigs()");
         }
 
         public void UpdateConfigs(bool autoSave)
         {
             var changedAnyNodes = false;
             var nodes = this.SourceConfig.SelectNodes("/configuration/nodes");
+			Logger.LogError("UpdateConfigs(autoSave={AutoSave}): changedAnyNodes → {ChangedAnyNodes}", autoSave, changedAnyNodes);
             if (nodes != null)
             {
+				Logger.LogError("UpdateConfigs(autoSave={AutoSave}): nodes → {Nodes}", autoSave, nodes);
                 foreach (XmlNode configNode in nodes)
                 {
                     Debug.Assert(configNode.Attributes != null, "configNode.Attributes != null");
 
                     // Attempt to load TargetFile property from configFile Atribute
                     this.TargetFileName = configNode.Attributes["configfile"].Value;
+					Logger.LogDebug("UpdateConfigs(autoSave={AutoSave}): this.TargetFileName → {Arg1}", autoSave, this.TargetFileName);
                     string targetProductName = string.Empty;
                     if (configNode.Attributes["productName"] != null)
                     {
                         targetProductName = configNode.Attributes["productName"].Value;
+						Logger.LogError("UpdateConfigs(autoSave={AutoSave}): targetProductName → {TargetProductName}", autoSave, targetProductName);
                     }
 
                     bool isAppliedToProduct;
@@ -186,16 +224,19 @@ namespace DotNetNuke.Services.Installer
                     if (string.IsNullOrEmpty(targetProductName) || targetProductName == "All")
                     {
                         isAppliedToProduct = true;
+						Logger.LogError("UpdateConfigs(autoSave={AutoSave}): isAppliedToProduct → {IsAppliedToProduct}", autoSave, isAppliedToProduct);
                     }
                     else
                     {
                         isAppliedToProduct = DotNetNukeContext.Current.Application.ApplyToProduct(targetProductName);
+						Logger.LogDebug("UpdateConfigs(autoSave={AutoSave}): isAppliedToProduct → {IsAppliedToProduct}", autoSave, isAppliedToProduct);
                     }
 
                     // The nodes definition is not correct so skip changes
                     if (this.TargetConfig != null && isAppliedToProduct)
                     {
                         var changedNodes = this.ProcessNodes(configNode.SelectNodes("node"), autoSave);
+						Logger.LogError("UpdateConfigs(autoSave={AutoSave}): changedNodes → {ChangedNodes}", autoSave, changedNodes);
                         changedAnyNodes = changedAnyNodes || changedNodes;
                         if (!autoSave && changedNodes)
                         {
@@ -210,26 +251,34 @@ namespace DotNetNuke.Services.Installer
 
         public void SavePendingConfigs()
         {
+			Logger.LogError(">>> Entering SavePendingConfigs()");
             foreach (var key in this.PendingDocuments.Keys)
             {
                 Config.Save(this.PendingDocuments[key], key);
             }
+			Logger.LogWarning("<<< Exiting SavePendingConfigs()");
         }
 
         private static XmlNode FindNode(XmlNode root, string rootNodePath, XmlNamespaceManager nsmgr)
         {
+			Logger.LogError(">>> Entering FindNode(root={Root},rootNodePath={RootNodePath},nsmgr={Nsmgr})", root, rootNodePath, nsmgr);
             rootNodePath = AdjustRootNodePathRelativeToLocationElements(root, rootNodePath);
+			Logger.LogError("FindNode(root={Root},rootNodePath={RootNodePath},nsmgr={Nsmgr}): rootNodePath → {RootNodePath1}", root, rootNodePath, nsmgr, rootNodePath);
+			Logger.LogWarning("<<< Exiting FindNode(root={Root},rootNodePath={RootNodePath},nsmgr={Nsmgr})", root, rootNodePath, nsmgr);
+			Logger.LogWarning("<<< Exiting FindNode(root={Root},rootNodePath={RootNodePath})", root, rootNodePath);
             return root.SelectSingleNode(rootNodePath, nsmgr);
         }
 
         private static XmlNode FindNode(XmlNode root, string rootNodePath)
         {
             rootNodePath = AdjustRootNodePathRelativeToLocationElements(root, rootNodePath);
+			Logger.LogError("FindNode(root={Root},rootNodePath={RootNodePath}): rootNodePath → {RootNodePath1}", root, rootNodePath, rootNodePath);
             return root.SelectSingleNode(rootNodePath);
         }
 
         private static string AdjustRootNodePathRelativeToLocationElements(XmlNode root, string rootNodePath)
         {
+			Logger.LogError(">>> Entering AdjustRootNodePathRelativeToLocationElements(root={Root},rootNodePath={RootNodePath})", root, rootNodePath);
             if (root.Name != "location")
             {
                 return rootNodePath;
@@ -238,20 +287,24 @@ namespace DotNetNuke.Services.Installer
             var index = rootNodePath.IndexOf("configuration", StringComparison.OrdinalIgnoreCase);
             var adjustedPath = rootNodePath.Substring(index + "configuration".Length);
             adjustedPath = adjustedPath.TrimStart('/');
+			Logger.LogError("AdjustRootNodePathRelativeToLocationElements(root={Root},rootNodePath={RootNodePath}): adjustedPath → {AdjustedPath}", root, rootNodePath, adjustedPath);
             if (string.IsNullOrEmpty(adjustedPath))
             {
                 adjustedPath = ".";
             }
 
+			Logger.LogWarning("<<< Exiting AdjustRootNodePathRelativeToLocationElements(root={Root},rootNodePath={RootNodePath})", root, rootNodePath);
             return adjustedPath;
         }
 
         private static bool RemoveAttribute(XmlNode rootNode, XmlNode actionNode)
         {
+			Logger.LogError(">>> Entering RemoveAttribute(rootNode={RootNode},actionNode={ActionNode})", rootNode, actionNode);
             Debug.Assert(actionNode.Attributes != null, "actionNode.Attributes != null");
             Debug.Assert(rootNode.Attributes != null, "rootNode.Attributes != null");
 
             var changedNode = false;
+			Logger.LogError("RemoveAttribute(rootNode={RootNode},actionNode={ActionNode}): changedNode → {ChangedNode}", rootNode, actionNode, changedNode);
             if (actionNode.Attributes["name"] != null)
             {
                 string attributeName = actionNode.Attributes["name"].Value;
@@ -266,12 +319,15 @@ namespace DotNetNuke.Services.Installer
                 }
             }
 
+			Logger.LogWarning("<<< Exiting RemoveAttribute(rootNode={RootNode},actionNode={ActionNode})", rootNode, actionNode);
             return changedNode;
         }
 
         private static bool RemoveNode(XmlNode node)
         {
+			Logger.LogError(">>> Entering RemoveNode(node={Node})", node);
             var changedNode = false;
+			Logger.LogError("RemoveNode(node={Node}): changedNode → {ChangedNode}", node, changedNode);
             if (node != null)
             {
                 // Get Parent
@@ -286,20 +342,26 @@ namespace DotNetNuke.Services.Installer
                 }
             }
 
+			Logger.LogWarning("<<< Exiting RemoveNode(node={Node})", node);
             return changedNode;
         }
 
         private static string GetNodeContentWithoutComment(XmlNode node)
         {
+			Logger.LogError(">>> Entering GetNodeContentWithoutComment(node={Node})", node);
             var cloneNode = node.Clone();
             RemoveCommentNodes(cloneNode);
+			Logger.LogError("GetNodeContentWithoutComment(node={Node}): cloneNode → {CloneNode}", node, cloneNode);
 
+			Logger.LogWarning("<<< Exiting GetNodeContentWithoutComment(node={Node})", node);
             return cloneNode.OuterXml;
         }
 
         private static void RemoveCommentNodes(XmlNode node)
         {
+			Logger.LogError(">>> Entering RemoveCommentNodes(node={Node})", node);
             var commentNodes = new List<XmlNode>();
+			Logger.LogError("RemoveCommentNodes(node={Node}): commentNodes → {CommentNodes}", node, commentNodes);
             foreach (XmlNode childNode in node.ChildNodes)
             {
                 if (childNode.NodeType == XmlNodeType.Comment)
@@ -316,11 +378,14 @@ namespace DotNetNuke.Services.Installer
             {
                 commentNodes.ForEach(n => { node.RemoveChild(n); });
             }
+			Logger.LogWarning("<<< Exiting RemoveCommentNodes(node={Node})", node);
         }
 
         private bool AddNode(XmlNode rootNode, XmlNode actionNode)
         {
+			Logger.LogError(">>> Entering AddNode(rootNode={RootNode},actionNode={ActionNode})", rootNode, actionNode);
             var changedNode = false;
+			Logger.LogError("AddNode(rootNode={RootNode},actionNode={ActionNode}): changedNode → {ChangedNode}", rootNode, actionNode, changedNode);
             foreach (XmlNode child in actionNode.ChildNodes)
             {
                 if (child.NodeType == XmlNodeType.Element || child.NodeType == XmlNodeType.Comment)
@@ -331,12 +396,15 @@ namespace DotNetNuke.Services.Installer
                 }
             }
 
+			Logger.LogWarning("<<< Exiting AddNode(rootNode={RootNode},actionNode={ActionNode})", rootNode, actionNode);
             return changedNode;
         }
 
         private bool PrependNode(XmlNode rootNode, XmlNode actionNode)
         {
+			Logger.LogError(">>> Entering PrependNode(rootNode={RootNode},actionNode={ActionNode})", rootNode, actionNode);
             var changedNode = false;
+			Logger.LogError("PrependNode(rootNode={RootNode},actionNode={ActionNode}): changedNode → {ChangedNode}", rootNode, actionNode, changedNode);
             foreach (XmlNode child in actionNode.ChildNodes)
             {
                 if (child.NodeType == XmlNodeType.Element || child.NodeType == XmlNodeType.Comment)
@@ -347,15 +415,18 @@ namespace DotNetNuke.Services.Installer
                 }
             }
 
+			Logger.LogWarning("<<< Exiting PrependNode(rootNode={RootNode},actionNode={ActionNode})", rootNode, actionNode);
             return changedNode;
         }
 
         private bool InsertNode(XmlNode childRootNode, XmlNode actionNode, NodeInsertType mode)
         {
+			Logger.LogError(">>> Entering InsertNode(childRootNode={ChildRootNode},actionNode={ActionNode},mode={Mode})", childRootNode, actionNode, mode);
             XmlNode rootNode = childRootNode.ParentNode;
             Debug.Assert(rootNode != null, "Root Node was null");
 
             var changedNode = false;
+			Logger.LogError("InsertNode(childRootNode={ChildRootNode},actionNode={ActionNode},mode={Mode}): changedNode → {ChangedNode}", childRootNode, actionNode, mode, changedNode);
             foreach (XmlNode child in actionNode.ChildNodes)
             {
                 if (child.NodeType == XmlNodeType.Element || child.NodeType == XmlNodeType.Comment)
@@ -375,14 +446,17 @@ namespace DotNetNuke.Services.Installer
                 }
             }
 
+			Logger.LogWarning("<<< Exiting InsertNode(childRootNode={ChildRootNode},actionNode={ActionNode},mode={Mode})", childRootNode, actionNode, mode);
             return changedNode;
         }
 
         private bool ProcessNode(XmlNode node, XmlNode targetRoot)
         {
+			Logger.LogError(">>> Entering ProcessNode(node={Node},targetRoot={TargetRoot})", node, targetRoot);
             Debug.Assert(node.Attributes != null, "node.Attributes != null");
 
             XmlNode rootNode = this.FindMatchingNode(targetRoot, node, "path");
+			Logger.LogError("ProcessNode(node={Node},targetRoot={TargetRoot}): rootNode → {RootNode}", node, targetRoot, rootNode);
 
             string nodeAction = node.Attributes["action"].Value.ToLowerInvariant();
 
@@ -410,14 +484,17 @@ namespace DotNetNuke.Services.Installer
                 case "updateattribute":
                     return this.UpdateAttribute(rootNode, node);
                 default:
+					Logger.LogWarning("<<< Exiting ProcessNode(node={Node},targetRoot={TargetRoot})", node, targetRoot);
                     return false;
             }
         }
 
         private bool ProcessNodes(XmlNodeList nodes, bool saveConfig)
         {
+			Logger.LogError(">>> Entering ProcessNodes(nodes={Nodes},saveConfig={SaveConfig})", nodes, saveConfig);
             var changedNodes = false;
 
+			Logger.LogError("ProcessNodes(nodes={Nodes},saveConfig={SaveConfig}): changedNodes → {ChangedNodes}", nodes, saveConfig, changedNodes);
             // The nodes definition is not correct so skip changes
             if (this.TargetConfig != null)
             {
@@ -425,6 +502,7 @@ namespace DotNetNuke.Services.Installer
                 // otherwise be in the root <configuration> node, therefore some files can have multiple roots
                 // making it tricky to decide where to apply the xml merge operations
                 var targetRoots = this.GetTargetRoots().ToList();
+				Logger.LogError("ProcessNodes(nodes={Nodes},saveConfig={SaveConfig}): targetRoots → {TargetRoots}", nodes, saveConfig, targetRoots);
 
                 if (targetRoots.Count == 1)
                 {
@@ -439,6 +517,7 @@ namespace DotNetNuke.Services.Installer
                     foreach (XmlNode node in nodes)
                     {
                         var hits = this.FindMatchingNodes(node, targetRoots, "path").ToList();
+						Logger.LogError("ProcessNodes(nodes={Nodes},saveConfig={SaveConfig}): hits → {Hits}", nodes, saveConfig, hits);
 
                         if (hits.Count == 0)
                         {
@@ -457,6 +536,7 @@ namespace DotNetNuke.Services.Installer
                         {
                             // hit on all roots
                             XmlNode hit = this.FindMatchingNodes(node, hits, "targetpath").FirstOrDefault();
+							Logger.LogError("ProcessNodes(nodes={Nodes},saveConfig={SaveConfig}): hit → {Hit}", nodes, saveConfig, hit);
                             if (hit != null)
                             {
                                 changedNodes = this.ProcessNode(node, hit) || changedNodes;
@@ -476,27 +556,33 @@ namespace DotNetNuke.Services.Installer
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ProcessNodes(nodes={Nodes},saveConfig={SaveConfig})", nodes, saveConfig);
             return changedNodes;
         }
 
         private IEnumerable<XmlNode> FindMatchingNodes(XmlNode mergeNode, IEnumerable<XmlNode> rootNodes, string pathAttributeName)
         {
+			Logger.LogError(">>> Entering FindMatchingNodes(mergeNode={MergeNode},rootNodes={RootNodes},pathAttributeName={PathAttributeName})", mergeNode, rootNodes, pathAttributeName);
             foreach (var targetRoot in rootNodes)
             {
                 var rootNode = this.FindMatchingNode(targetRoot, mergeNode, pathAttributeName);
+				Logger.LogError("FindMatchingNodes(mergeNode={MergeNode},rootNodes={RootNodes},pathAttributeName={PathAttributeName}): rootNode → {RootNode}", mergeNode, rootNodes, pathAttributeName, rootNode);
 
                 if (rootNode != null)
                 {
                     yield return targetRoot;
                 }
             }
+			Logger.LogWarning("<<< Exiting FindMatchingNodes(mergeNode={MergeNode},rootNodes={RootNodes},pathAttributeName={PathAttributeName})", mergeNode, rootNodes, pathAttributeName);
         }
 
         private XmlNode FindMatchingNode(XmlNode rootNode, XmlNode mergeNode, string pathAttributeName)
         {
+			Logger.LogError(">>> Entering FindMatchingNode(rootNode={RootNode},mergeNode={MergeNode},pathAttributeName={PathAttributeName})", rootNode, mergeNode, pathAttributeName);
             Debug.Assert(mergeNode.Attributes != null, "Attributes collection was null");
 
             XmlNode matchingNode = null;
+			Logger.LogError("FindMatchingNode(rootNode={RootNode},mergeNode={MergeNode},pathAttributeName={PathAttributeName}): matchingNode → {MatchingNode}", rootNode, mergeNode, pathAttributeName, matchingNode);
             if (mergeNode.Attributes[pathAttributeName] != null)
             {
                 string rootNodePath = mergeNode.Attributes[pathAttributeName].Value;
@@ -510,19 +596,23 @@ namespace DotNetNuke.Services.Installer
                     string xmlNameSpace = mergeNode.Attributes["nameSpace"].Value;
                     string xmlNameSpacePrefix = mergeNode.Attributes["nameSpacePrefix"].Value;
                     var nsmgr = new XmlNamespaceManager(this.TargetConfig.NameTable);
+					Logger.LogError("FindMatchingNode(rootNode={RootNode},mergeNode={MergeNode},pathAttributeName={PathAttributeName}): nsmgr → {Nsmgr}", rootNode, mergeNode, pathAttributeName, nsmgr);
                     nsmgr.AddNamespace(xmlNameSpacePrefix, xmlNameSpace);
                     matchingNode = FindNode(rootNode, rootNodePath, nsmgr);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting FindMatchingNode(rootNode={RootNode},mergeNode={MergeNode},pathAttributeName={PathAttributeName})", rootNode, mergeNode, pathAttributeName);
             return matchingNode;
         }
 
         private IEnumerable<XmlNode> GetTargetRoots()
         {
+			Logger.LogError(">>> Entering GetTargetRoots()");
             yield return this.TargetConfig.DocumentElement;
 
             var locations = this.TargetConfig.SelectNodes("/configuration/location");
+			Logger.LogError("GetTargetRoots(): locations → {Locations}", locations);
             if (locations != null)
             {
                 foreach (XmlNode node in locations)
@@ -530,14 +620,17 @@ namespace DotNetNuke.Services.Installer
                     yield return node;
                 }
             }
+			Logger.LogWarning("<<< Exiting GetTargetRoots()");
         }
 
         private bool UpdateAttribute(XmlNode rootNode, XmlNode actionNode)
         {
+			Logger.LogError(">>> Entering UpdateAttribute(rootNode={RootNode},actionNode={ActionNode})", rootNode, actionNode);
             Debug.Assert(actionNode.Attributes != null, "actionNode.Attributes != null");
             Debug.Assert(rootNode.Attributes != null, "rootNode.Attributes != null");
 
             var changedNode = false;
+			Logger.LogError("UpdateAttribute(rootNode={RootNode},actionNode={ActionNode}): changedNode → {ChangedNode}", rootNode, actionNode, changedNode);
             if (actionNode.Attributes["name"] != null && actionNode.Attributes["value"] != null)
             {
                 string attributeName = actionNode.Attributes["name"].Value;
@@ -560,15 +653,19 @@ namespace DotNetNuke.Services.Installer
                 }
             }
 
+			Logger.LogWarning("<<< Exiting UpdateAttribute(rootNode={RootNode},actionNode={ActionNode})", rootNode, actionNode);
             return changedNode;
         }
 
         private bool UpdateNode(XmlNode rootNode, XmlNode actionNode)
         {
+			Logger.LogError(">>> Entering UpdateNode(rootNode={RootNode},actionNode={ActionNode})", rootNode, actionNode);
             Debug.Assert(actionNode.Attributes != null, "actionNode.Attributes != null");
 
             var changedNode = false;
+			Logger.LogError("UpdateNode(rootNode={RootNode},actionNode={ActionNode}): changedNode → {ChangedNode}", rootNode, actionNode, changedNode);
             string keyAttribute = string.Empty;
+			Logger.LogError("UpdateNode(rootNode={RootNode},actionNode={ActionNode}): keyAttribute → {KeyAttribute}", rootNode, actionNode, keyAttribute);
             if (actionNode.Attributes["key"] != null)
             {
                 keyAttribute = actionNode.Attributes["key"].Value;
@@ -582,11 +679,13 @@ namespace DotNetNuke.Services.Installer
                 if (child.NodeType == XmlNodeType.Element)
                 {
                     XmlNode targetNode = null;
+					Logger.LogError("UpdateNode(rootNode={RootNode},actionNode={ActionNode}): targetNode → {TargetNode}", rootNode, actionNode, targetNode);
                     if (!string.IsNullOrEmpty(keyAttribute))
                     {
                         if (child.Attributes[keyAttribute] != null)
                         {
                             var matchingChildren = rootNode.SelectNodes(child.LocalName);
+							Logger.LogError("UpdateNode(rootNode={RootNode},actionNode={ActionNode}): matchingChildren → {MatchingChildren}", rootNode, actionNode, matchingChildren);
                             if (matchingChildren is not null)
                             {
                                 var keyValue = child.Attributes[keyAttribute].Value;
@@ -626,8 +725,11 @@ namespace DotNetNuke.Services.Installer
                             break;
                         case "save":
                             var newChild = this.TargetConfig.ImportNode(child, true);
+							Logger.LogError("UpdateNode(rootNode={RootNode},actionNode={ActionNode}): newChild → {NewChild}", rootNode, actionNode, newChild);
                             var targetXElement = XElement.Load(targetNode.CreateNavigator().ReadSubtree());
+							Logger.LogError("UpdateNode(rootNode={RootNode},actionNode={ActionNode}): targetXElement → {TargetXElement}", rootNode, actionNode, targetXElement);
                             var newXElement = XElement.Load(newChild.CreateNavigator().ReadSubtree());
+							Logger.LogError("UpdateNode(rootNode={RootNode},actionNode={ActionNode}): newXElement → {NewXElement}", rootNode, actionNode, newXElement);
 
                             if (XElement.DeepEquals(targetXElement, newXElement))
                             {
@@ -642,8 +744,11 @@ namespace DotNetNuke.Services.Installer
                                 this.Version,
                                 DateTime.Now);
                             XmlComment commentHeader = this.TargetConfig.CreateComment(commentHeaderText);
+							Logger.LogError("UpdateNode(rootNode={RootNode},actionNode={ActionNode}): commentHeader → {CommentHeader}", rootNode, actionNode, commentHeader);
                             var targetNodeContent = GetNodeContentWithoutComment(targetNode);
+							Logger.LogError("UpdateNode(rootNode={RootNode},actionNode={ActionNode}): targetNodeContent → {TargetNodeContent}", rootNode, actionNode, targetNodeContent);
                             XmlComment commentNode = this.TargetConfig.CreateComment(targetNodeContent);
+							Logger.LogError("UpdateNode(rootNode={RootNode},actionNode={ActionNode}): commentNode → {CommentNode}", rootNode, actionNode, commentNode);
                             rootNode.ReplaceChild(newChild, targetNode);
                             rootNode.InsertBefore(commentHeader, newChild);
                             rootNode.InsertBefore(commentNode, newChild);
@@ -655,6 +760,7 @@ namespace DotNetNuke.Services.Installer
                 }
             }
 
+			Logger.LogWarning("<<< Exiting UpdateNode(rootNode={RootNode},actionNode={ActionNode})", rootNode, actionNode);
             return changedNode;
         }
     }

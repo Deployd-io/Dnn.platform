@@ -12,6 +12,7 @@ namespace DotNetNuke.HttpModules.RequestFilter
     [Serializable]
     public class RequestFilterRule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RequestFilterRule));
         /// <summary>Initializes a new instance of the <see cref="RequestFilterRule"/> class.</summary>
         /// <param name="serverVariable">The server variable name.</param>
         /// <param name="values">The values to filter.</param>
@@ -20,9 +21,12 @@ namespace DotNetNuke.HttpModules.RequestFilter
         /// <param name="location">The redirect location.</param>
         public RequestFilterRule(string serverVariable, string values, RequestFilterOperatorType op, RequestFilterRuleType action, string location)
         {
+			Logger.LogError(">>> Entering RequestFilterRule(serverVariable={ServerVariable},values={Values},op={Op},action={Action},location={Location})", serverVariable, values, op, action, location);
             this.ServerVariable = serverVariable;
+			Logger.LogDebug("RequestFilterRule(serverVariable={ServerVariable},values={Values},op={Op},action={Action},location={Location}): this.ServerVariable → {Arg5}", serverVariable, values, op, action, location, this.ServerVariable);
             this.SetValues(values, op);
             this.Operator = op;
+			Logger.LogDebug("RequestFilterRule(serverVariable={ServerVariable},values={Values},op={Op},action={Action},location={Location}): this.Operator → {Arg5}", serverVariable, values, op, action, location, this.Operator);
             this.Action = action;
             this.Location = location;
         }
@@ -55,10 +59,12 @@ namespace DotNetNuke.HttpModules.RequestFilter
         /// <param name="op">The operator.</param>
         public void SetValues(string values, RequestFilterOperatorType op)
         {
+			Logger.LogError(">>> Entering SetValues(values={Values},op={Op})", values, op);
             this.Values.Clear();
             if (op != RequestFilterOperatorType.Regex)
             {
                 var vals = values.Split([' '], StringSplitOptions.RemoveEmptyEntries);
+				Logger.LogError("SetValues(values={Values},op={Op}): vals → {Vals}", values, op, vals);
                 foreach (var value in vals)
                 {
                     this.Values.Add(value.ToUpperInvariant());
@@ -68,6 +74,7 @@ namespace DotNetNuke.HttpModules.RequestFilter
             {
                 this.Values.Add(values);
             }
+			Logger.LogWarning("<<< Exiting SetValues(values={Values},op={Op})", values, op);
         }
 
         /// <summary>Determines whether the <paramref name="serverVariableValue"/> matches this rule.</summary>
@@ -75,6 +82,8 @@ namespace DotNetNuke.HttpModules.RequestFilter
         /// <returns><see langword="true"/> if the values matches the rule, otherwise <see langword="false"/>.</returns>
         public bool Matches(string serverVariableValue)
         {
+			Logger.LogError(">>> Entering Matches(serverVariableValue={ServerVariableValue})", serverVariableValue);
+			Logger.LogWarning("<<< Exiting Matches(serverVariableValue={ServerVariableValue})", serverVariableValue);
             return this.Operator switch
             {
                 RequestFilterOperatorType.Equal => this.Values.Contains(serverVariableValue.ToUpperInvariant()),
@@ -87,7 +96,9 @@ namespace DotNetNuke.HttpModules.RequestFilter
         /// <summary>Executes the rule action on the current response.</summary>
         public void Execute()
         {
+			Logger.LogError(">>> Entering Execute()");
             HttpResponse response = HttpContext.Current.Response;
+			Logger.LogError("Execute(): response → {Response}", response);
             switch (this.Action)
             {
                 case RequestFilterRuleType.Redirect:
@@ -95,16 +106,21 @@ namespace DotNetNuke.HttpModules.RequestFilter
                     break;
                 case RequestFilterRuleType.PermanentRedirect:
                     response.StatusCode = 301;
+					Logger.LogDebug("Execute(): response.StatusCode → {Arg0}", response.StatusCode);
+					Logger.LogDebug("Execute(): response.RedirectLocation → {Arg0}", response.RedirectLocation);
                     response.Status = "301 Moved Permanently";
+					Logger.LogDebug("Execute(): response.Status → {Arg0}", response.Status);
                     response.RedirectLocation = this.Location;
                     response.End();
                     break;
                 case RequestFilterRuleType.NotFound:
                     response.StatusCode = 404;
                     response.SuppressContent = true;
+					Logger.LogDebug("Execute(): response.SuppressContent → {Arg0}", response.SuppressContent);
                     response.End();
                     break;
             }
+			Logger.LogWarning("<<< Exiting Execute()");
         }
     }
 }

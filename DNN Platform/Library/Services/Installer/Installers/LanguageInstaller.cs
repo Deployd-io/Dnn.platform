@@ -14,6 +14,7 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The LanguageInstaller installs Language Packs to a DotNetNuke site.</summary>
     public class LanguageInstaller : FileInstaller
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LanguageInstaller));
         private readonly LanguagePackType languagePackType;
         private LanguagePackInfo installedLanguagePack;
         private Locale language;
@@ -24,7 +25,11 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <param name="type">The language pack type.</param>
         public LanguageInstaller(LanguagePackType type)
         {
+			Logger.LogError(">>> Entering LanguageInstaller(type={Type})", type);
             this.languagePackType = type;
+			Logger.LogDebug("LanguageInstaller(type={Type}): languagePackType → {LanguagePackType}", type, languagePackType);
+        Logger.LogDebug("LanguageInstaller(type={Type}): this.languagePackType → {Arg1}", type, this.languagePackType);
+        Logger.LogWarning("<<< Exiting LanguageInstaller(type={Type})", type);
         }
 
         /// <summary>Gets a list of allowable file extensions (in addition to the Host's List).</summary>
@@ -58,13 +63,16 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <remarks>In the case of Modules this is not neccessary.</remarks>
         public override void Commit()
         {
+			Logger.LogError(">>> Entering Commit()");
             if (this.languagePackType == LanguagePackType.Core || this.languagePack.DependentPackageID > 0)
             {
                 base.Commit();
+				Logger.LogWarning("<<< Exiting Commit()");
             }
             else
             {
                 this.Completed = true;
+				Logger.LogDebug("Commit(): this.Completed → {Arg0}", this.Completed);
                 this.Skipped = true;
             }
         }
@@ -72,12 +80,14 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <summary>The Install method installs the language component.</summary>
         public override void Install()
         {
+			Logger.LogError(">>> Entering Install()");
             if (this.languagePackType == LanguagePackType.Core || this.languagePack.DependentPackageID > 0)
             {
                 try
                 {
                     // Attempt to get the LanguagePack
                     this.installedLanguagePack = LanguagePackController.GetLanguagePackByPackage(this.Package.PackageID);
+					Logger.LogDebug("Install(): installedLanguagePack → {InstalledLanguagePack}", installedLanguagePack);
                     if (this.installedLanguagePack != null)
                     {
                         this.languagePack.LanguagePackID = this.installedLanguagePack.LanguagePackID;
@@ -85,6 +95,7 @@ namespace DotNetNuke.Services.Installer.Installers
 
                     // Attempt to get the Locale
                     this.tempLanguage = LocaleController.Instance.GetLocale(this.language.Code);
+					Logger.LogDebug("Install(): tempLanguage → {TempLanguage}", tempLanguage);
                     if (this.tempLanguage != null)
                     {
                         this.language.LanguageId = this.tempLanguage.LanguageId;
@@ -112,10 +123,13 @@ namespace DotNetNuke.Services.Installer.Installers
                 {
                     this.Log.AddFailure(ex);
                 }
+				Logger.LogWarning("<<< Exiting Install()");
             }
             else
             {
+				Logger.LogDebug("Install(): this.Skipped → {Arg0}", this.Skipped);
                 this.Completed = true;
+				Logger.LogDebug("Install(): this.Completed → {Arg0}", this.Completed);
                 this.Skipped = true;
             }
         }
@@ -126,6 +140,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// </summary>
         public override void Rollback()
         {
+			Logger.LogError(">>> Entering Rollback()");
             // If Temp Language exists then we need to update the DataStore with this
             if (this.tempLanguage == null)
             {
@@ -140,23 +155,29 @@ namespace DotNetNuke.Services.Installer.Installers
 
             // Call base class to prcoess files
             base.Rollback();
+			Logger.LogWarning("<<< Exiting Rollback()");
         }
 
         /// <summary>The UnInstall method uninstalls the language component.</summary>
         public override void UnInstall()
         {
+			Logger.LogError(">>> Entering UnInstall()");
             this.DeleteLanguage();
 
             // Call base class to process files
             base.UnInstall();
+			Logger.LogWarning("<<< Exiting UnInstall()");
         }
 
         /// <summary>The ReadCustomManifest method reads the custom manifest items.</summary>
         /// <param name="nav">The XPathNavigator representing the node.</param>
         protected override void ReadCustomManifest(XPathNavigator nav)
         {
+			Logger.LogError(">>> Entering ReadCustomManifest(nav={Nav})", nav);
             this.language = new Locale();
             this.languagePack = new LanguagePackInfo();
+			Logger.LogDebug("ReadCustomManifest(nav={Nav}): languagePack → {LanguagePack}", nav, languagePack);
+			Logger.LogDebug("ReadCustomManifest(nav={Nav}): language → {Language}", nav, language);
 
             // Get the Skin name
             this.language.Code = Util.ReadElement(nav, "code");
@@ -171,6 +192,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 string packageName = Util.ReadElement(nav, "package");
                 PackageInfo package = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.Name.Equals(packageName, StringComparison.OrdinalIgnoreCase));
+				Logger.LogError("ReadCustomManifest(nav={Nav}): package → {Package}", nav, package);
                 if (package != null)
                 {
                     this.languagePack.DependentPackageID = package.PackageID;
@@ -179,6 +201,7 @@ namespace DotNetNuke.Services.Installer.Installers
 
             // Call base class
             base.ReadCustomManifest(nav);
+			Logger.LogWarning("<<< Exiting ReadCustomManifest(nav={Nav})", nav);
         }
 
         /// <summary>
@@ -187,13 +210,16 @@ namespace DotNetNuke.Services.Installer.Installers
         /// </summary>
         private void DeleteLanguage()
         {
+			Logger.LogError(">>> Entering DeleteLanguage()");
             try
             {
                 // Attempt to get the LanguagePack
                 LanguagePackInfo tempLanguagePack = LanguagePackController.GetLanguagePackByPackage(this.Package.PackageID);
+				Logger.LogError("DeleteLanguage(): tempLanguagePack → {TempLanguagePack}", tempLanguagePack);
 
                 // Attempt to get the Locale
                 Locale language = LocaleController.Instance.GetLocale(tempLanguagePack.LanguageID);
+				Logger.LogError("DeleteLanguage(): language → {Language}", language);
                 if (tempLanguagePack != null)
                 {
                     LanguagePackController.DeleteLanguagePack(tempLanguagePack);
@@ -211,6 +237,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 this.Log.AddFailure(ex);
             }
+			Logger.LogWarning("<<< Exiting DeleteLanguage()");
         }
     }
 }

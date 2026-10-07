@@ -30,6 +30,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
     /// <inheritdoc />
     public class AzureFolderProvider : BaseRemoteStorageProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AzureFolderProvider));
         internal const string ProviderName = "AzureFolderProvider";
         internal const string ProviderType = "folder";
 
@@ -42,6 +43,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         public AzureFolderProvider()
             : this(null, null)
         {
+		Logger.LogError(">>> Entering AzureFolderProvider()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="AzureFolderProvider"/> class.</summary>
@@ -52,12 +54,18 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         {
             this.cryptographyProvider = cryptographyProvider ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<ICryptographyProvider>();
 
+			Logger.LogDebug("AzureFolderProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): cryptographyProvider → {CryptographyProvider1}", hostSettings, cryptographyProvider, cryptographyProvider);
+			Logger.LogDebug("AzureFolderProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): ServicePointManager.UseNagleAlgorithm → {Arg2}", hostSettings, cryptographyProvider, ServicePointManager.UseNagleAlgorithm);
+			Logger.LogDebug("AzureFolderProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): ServicePointManager.Expect100Continue → {Arg2}", hostSettings, cryptographyProvider, ServicePointManager.Expect100Continue);
             ServicePointManager.DefaultConnectionLimit = 100;
+			Logger.LogDebug("AzureFolderProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): ServicePointManager.DefaultConnectionLimit → {Arg2}", hostSettings, cryptographyProvider, ServicePointManager.DefaultConnectionLimit);
             ServicePointManager.UseNagleAlgorithm = false;
             ServicePointManager.Expect100Continue = false;
 
+			Logger.LogWarning("<<< Exiting AzureFolderProvider()");
             // Read the configuration specific information for this provider
             var objProvider = (Provider)this.providerConfiguration.Providers[ProviderName];
+			Logger.LogError("AzureFolderProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): objProvider → {ObjProvider}", hostSettings, cryptographyProvider, objProvider);
 
             if (!string.IsNullOrEmpty(objProvider.Attributes["cacheControl"]))
             {
@@ -81,29 +89,38 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         /// <inheritdoc />
         public override void AddFolder(string folderPath, FolderMappingInfo folderMapping, string mappedPath)
         {
+			Logger.LogError(">>> Entering AddFolder(folderPath={FolderPath},folderMapping=<redacted>,mappedPath={MappedPath})", folderPath, mappedPath);
             Requires.NotNull("folderPath", folderPath);
             Requires.NotNull("folderMapping", folderMapping);
 
             this.UpdateFileInternal(new MemoryStream(), folderMapping, mappedPath + Constants.PlaceHolderFileName);
+			Logger.LogWarning("<<< Exiting AddFolder(folderPath={FolderPath},folderMapping=<redacted>,mappedPath={MappedPath})", folderPath, mappedPath);
         }
 
         /// <inheritdoc />
         public override string GetFileUrl(IFileInfo file)
         {
+			Logger.LogError(">>> Entering GetFileUrl(file={File})", file);
             Requires.NotNull("file", file);
 
             var folderMapping = FolderMappingController.Instance.GetFolderMapping(file.PortalId, file.FolderMappingID);
+			Logger.LogError("GetFileUrl(file={File}): folderMapping → {FolderMapping}", file, folderMapping);
             var directLink = string.IsNullOrEmpty(GetSetting(folderMapping, Constants.DirectLink)) || GetSetting(folderMapping, Constants.DirectLink).ToLowerInvariant() == "true";
+			Logger.LogError("GetFileUrl(file={File}): directLink → {DirectLink}", file, directLink);
 
             if (directLink)
             {
                 var folder = FolderManager.Instance.GetFolder(file.FolderId);
+				Logger.LogError("GetFileUrl(file={File}): folder → {Folder}", file, folder);
                 var uri = folder.MappedPath + file.FileName;
 
                 var container = this.GetContainer(folderMapping);
+				Logger.LogError("GetFileUrl(file={File}): container → {Container}", file, container);
                 var blob = container.GetBlobReference(uri);
+				Logger.LogError("GetFileUrl(file={File}): blob → {Blob}", file, blob);
                 var absuri = blob.Uri.AbsoluteUri;
                 var customDomain = GetEncryptedSetting(this.cryptographyProvider, this.HostSettings, folderMapping.FolderMappingSettings, Constants.CustomDomain);
+				Logger.LogError("GetFileUrl(file={File}): customDomain → {CustomDomain}", file, customDomain);
 
                 if (!string.IsNullOrEmpty(customDomain))
                 {
@@ -164,20 +181,30 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         /// <inheritdoc />
         public override string GetFolderProviderIconPath()
         {
+			Logger.LogError(">>> Entering GetFolderProviderIconPath()");
+            Logger.LogWarning("<<< Exiting GetFolderProviderIconPath()");
             return Globals.ResolveUrl("~/Providers/FolderProviders/AzureFolderProvider/images/FolderAzure_32x32_Standard.png");
         }
 
         public List<string> GetAllContainers(FolderMappingInfo folderMapping)
         {
+			Logger.LogError(">>> Entering GetAllContainers(folderMapping=<redacted>)");
             List<string> containers = [];
             var accountName = GetEncryptedSetting(this.cryptographyProvider, this.HostSettings, folderMapping.FolderMappingSettings, Constants.AccountName);
+			Logger.LogError("GetAllContainers(folderMapping=<redacted>): accountName → {AccountName}", accountName);
             var accountKey = GetEncryptedSetting(this.cryptographyProvider, this.HostSettings, folderMapping.FolderMappingSettings, Constants.AccountKey);
+			Logger.LogError("GetAllContainers(folderMapping=<redacted>): accountKey → {AccountKey}", accountKey);
             var useHttps = GetBooleanSetting(folderMapping, Constants.UseHttps);
+			Logger.LogError("GetAllContainers(folderMapping=<redacted>): useHttps → {UseHttps}", useHttps);
 
             var sc = new StorageCredentials(accountName, accountKey);
+			Logger.LogError("GetAllContainers(folderMapping=<redacted>): sc → {Sc}", sc);
             var csa = new CloudStorageAccount(sc, useHttps);
+			Logger.LogError("GetAllContainers(folderMapping=<redacted>): csa → {Csa}", csa);
             var blobClient = csa.CreateCloudBlobClient();
+			Logger.LogError("GetAllContainers(folderMapping=<redacted>): blobClient → {BlobClient}", blobClient);
             blobClient.ListContainers().ToList().ForEach(x => containers.Add(x.Name));
+			Logger.LogWarning("<<< Exiting GetAllContainers(folderMapping=<redacted>)");
             return containers;
         }
 
@@ -190,65 +217,87 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         /// <inheritdoc />
         public override void UpdateFile(IFolderInfo folder, string fileName, Stream content)
         {
+			Logger.LogError(">>> Entering UpdateFile(folder={Folder},fileName={FileName},content={Content})", folder, fileName, content);
             IFileInfo originalFile = FileManager.Instance.GetFile(folder, fileName);
 
+			Logger.LogError("UpdateFile(folder={Folder},fileName={FileName},content={Content}): originalFile → {OriginalFile}", folder, fileName, content, originalFile);
             base.UpdateFile(folder, fileName, content);
 
             if (originalFile != null && originalFile.FileName != fileName)
             {
                 FolderMappingInfo folderMapping = FolderMappingController.Instance.GetFolderMapping(folder.FolderMappingID);
+				Logger.LogError("UpdateFile(folder={Folder},fileName={FileName},content={Content}): folderMapping → {FolderMapping}", folder, fileName, content, folderMapping);
                 this.DeleteFileInternal(folderMapping, folder.MappedPath + originalFile.FileName);
             }
+			Logger.LogWarning("<<< Exiting UpdateFile(folder={Folder},fileName={FileName},content={Content})", folder, fileName, content);
         }
 
         /// <inheritdoc />
         protected override void CopyFileInternal(FolderMappingInfo folderMapping, string sourceUri, string newUri)
         {
+			Logger.LogError(">>> Entering CopyFileInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri})", sourceUri, newUri);
             var container = this.GetContainer(folderMapping);
 
+			Logger.LogError("CopyFileInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri}): container → {Container}", sourceUri, newUri, container);
             var sourceBlob = container.GetBlobReference(sourceUri);
+			Logger.LogError("CopyFileInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri}): sourceBlob → {SourceBlob}", sourceUri, newUri, sourceBlob);
             var newBlob = container.GetBlobReference(newUri);
+			Logger.LogError("CopyFileInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri}): newBlob → {NewBlob}", sourceUri, newUri, newBlob);
 
             newBlob.StartCopy(sourceBlob.Uri);
 
             this.ClearCache(folderMapping.FolderMappingID);
+			Logger.LogWarning("<<< Exiting CopyFileInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri})", sourceUri, newUri);
         }
 
         /// <inheritdoc />
         protected override void DeleteFileInternal(FolderMappingInfo folderMapping, string uri)
         {
+			Logger.LogError(">>> Entering DeleteFileInternal(folderMapping=<redacted>,uri={Uri})", uri);
             var container = this.GetContainer(folderMapping);
             var blob = container.GetBlobReference(uri);
+			Logger.LogError("DeleteFileInternal(folderMapping=<redacted>,uri={Uri}): blob → {Blob}", uri, blob);
+			Logger.LogError("DeleteFileInternal(folderMapping=<redacted>,uri={Uri}): container → {Container}", uri, container);
 
             blob.DeleteIfExists();
 
             this.ClearCache(folderMapping.FolderMappingID);
+			Logger.LogWarning("<<< Exiting DeleteFileInternal(folderMapping=<redacted>,uri={Uri})", uri);
         }
 
         /// <inheritdoc />
         protected override void DeleteFolderInternal(FolderMappingInfo folderMapping, IFolderInfo folder)
         {
+			Logger.LogError(">>> Entering DeleteFolderInternal(folderMapping=<redacted>,folder={Folder})", folder);
             this.DeleteFileInternal(folderMapping, folder.MappedPath + Constants.PlaceHolderFileName);
+			Logger.LogWarning("<<< Exiting DeleteFolderInternal(folderMapping=<redacted>,folder={Folder})", folder);
         }
 
         /// <inheritdoc />
         protected override Stream GetFileStreamInternal(FolderMappingInfo folderMapping, string uri)
         {
+			Logger.LogError(">>> Entering GetFileStreamInternal(folderMapping=<redacted>,uri={Uri})", uri);
             var container = this.GetContainer(folderMapping);
             var blob = container.GetBlockBlobReference(uri);
+			Logger.LogError("GetFileStreamInternal(folderMapping=<redacted>,uri={Uri}): blob → {Blob}", uri, blob);
+			Logger.LogError("GetFileStreamInternal(folderMapping=<redacted>,uri={Uri}): container → {Container}", uri, container);
 
             var memoryStream = new MemoryStream();
+			Logger.LogError("GetFileStreamInternal(folderMapping=<redacted>,uri={Uri}): memoryStream → {MemoryStream}", uri, memoryStream);
             blob.DownloadToStream(memoryStream);
             memoryStream.Seek(0, SeekOrigin.Begin);
 
+			Logger.LogWarning("<<< Exiting GetFileStreamInternal(folderMapping=<redacted>,uri={Uri})", uri);
             return memoryStream;
         }
 
         /// <inheritdoc />
         protected override IList<IRemoteStorageItem> GetObjectList(FolderMappingInfo folderMapping)
         {
+			Logger.LogError(">>> Entering GetObjectList(folderMapping=<redacted>)");
             var cacheKey = string.Format(this.ListObjectsCacheKey, folderMapping.FolderMappingID);
 
+			Logger.LogError("GetObjectList(folderMapping=<redacted>): cacheKey → {CacheKey}", cacheKey);
             return CBO.GetCachedObject<IList<IRemoteStorageItem>>(
                 this.HostSettings,
                 new CacheItemArgs(
@@ -289,6 +338,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
                     }
                     while (continuationToken != null);
 
+				Logger.LogWarning("<<< Exiting GetObjectList(folderMapping=<redacted>)");
                     return list;
                 });
         }
@@ -296,40 +346,55 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         /// <inheritdoc />
         protected override void MoveFileInternal(FolderMappingInfo folderMapping, string sourceUri, string newUri)
         {
+			Logger.LogError(">>> Entering MoveFileInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri})", sourceUri, newUri);
             var container = this.GetContainer(folderMapping);
 
+			Logger.LogError("MoveFileInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri}): container → {Container}", sourceUri, newUri, container);
             var sourceBlob = container.GetBlobReference(sourceUri);
+			Logger.LogError("MoveFileInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri}): sourceBlob → {SourceBlob}", sourceUri, newUri, sourceBlob);
             var newBlob = container.GetBlobReference(newUri);
+			Logger.LogError("MoveFileInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri}): newBlob → {NewBlob}", sourceUri, newUri, newBlob);
 
             newBlob.StartCopy(sourceBlob.Uri);
             sourceBlob.Delete();
 
             this.ClearCache(folderMapping.FolderMappingID);
+			Logger.LogWarning("<<< Exiting MoveFileInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri})", sourceUri, newUri);
         }
 
         /// <inheritdoc />
         protected override void MoveFolderInternal(FolderMappingInfo folderMapping, string sourceUri, string newUri)
         {
+			Logger.LogError(">>> Entering MoveFolderInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri})", sourceUri, newUri);
             var container = this.GetContainer(folderMapping);
             var directory = container.GetDirectoryReference(sourceUri);
+			Logger.LogError("MoveFolderInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri}): directory → {Directory}", sourceUri, newUri, directory);
             var blobs = directory.ListBlobs(true);
+			Logger.LogError("MoveFolderInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri}): blobs → {Blobs}", sourceUri, newUri, blobs);
+			Logger.LogError("MoveFolderInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri}): container → {Container}", sourceUri, newUri, container);
 
             foreach (var blobItem in blobs)
             {
                 var blob = (CloudBlob)blobItem;
+				Logger.LogError("MoveFolderInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri}): blob → {Blob}", sourceUri, newUri, blob);
                 var newBlob = container.GetBlobReference(newUri + blobItem.Uri.LocalPath.Substring(directory.Uri.LocalPath.Length));
+				Logger.LogError("MoveFolderInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri}): newBlob → {NewBlob}", sourceUri, newUri, newBlob);
                 newBlob.StartCopy(blob.Uri);
                 blob.Delete();
             }
 
             this.ClearCache(folderMapping.FolderMappingID);
+			Logger.LogWarning("<<< Exiting MoveFolderInternal(folderMapping=<redacted>,sourceUri={SourceUri},newUri={NewUri})", sourceUri, newUri);
         }
 
         /// <inheritdoc />
         protected override void UpdateFileInternal(Stream stream, FolderMappingInfo folderMapping, string uri)
         {
+			Logger.LogError(">>> Entering UpdateFileInternal(stream={Stream},folderMapping=<redacted>,uri={Uri})", stream, uri);
             var container = this.GetContainer(folderMapping);
             var blob = container.GetBlockBlobReference(uri);
+			Logger.LogError("UpdateFileInternal(stream={Stream},folderMapping=<redacted>,uri={Uri}): blob → {Blob}", stream, uri, blob);
+			Logger.LogError("UpdateFileInternal(stream={Stream},folderMapping=<redacted>,uri={Uri}): container → {Container}", stream, uri, container);
 
             stream.Seek(0, SeekOrigin.Begin);
             blob.UploadFromStream(stream);
@@ -346,10 +411,12 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
             blob.SetProperties();
 
             this.ClearCache(folderMapping.FolderMappingID);
+			Logger.LogWarning("<<< Exiting UpdateFileInternal(stream={Stream},folderMapping=<redacted>,uri={Uri})", stream, uri);
         }
 
         private static void CheckSettings(FolderMappingInfo folderMapping)
         {
+			Logger.LogError(">>> Entering CheckSettings(folderMapping=<redacted>)");
             var settings = folderMapping.FolderMappingSettings;
 
             if (string.IsNullOrEmpty((string)settings[Constants.AccountName]) ||
@@ -357,22 +424,33 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
                 string.IsNullOrEmpty((string)settings[Constants.Container]) ||
                 string.IsNullOrEmpty((string)settings[Constants.UseHttps]))
             {
+				Logger.LogError("Throwing Exception from CheckSettings(folderMapping=<redacted>)");
+			Logger.LogWarning("<<< Exiting CheckSettings(folderMapping=<redacted>)");
                 throw new Exception("Settings cannot be found.");
             }
         }
 
         private CloudBlobContainer GetContainer(FolderMappingInfo folderMapping)
         {
+			Logger.LogError(">>> Entering GetContainer(folderMapping=<redacted>)");
             CheckSettings(folderMapping);
 
             var accountName = GetEncryptedSetting(this.cryptographyProvider, this.HostSettings, folderMapping.FolderMappingSettings, Constants.AccountName);
+			Logger.LogError("GetContainer(folderMapping=<redacted>): accountName → {AccountName}", accountName);
             var accountKey = GetEncryptedSetting(this.cryptographyProvider, this.HostSettings, folderMapping.FolderMappingSettings, Constants.AccountKey);
+			Logger.LogError("GetContainer(folderMapping=<redacted>): accountKey → {AccountKey}", accountKey);
             var container = GetSetting(folderMapping, Constants.Container);
+			Logger.LogError("GetContainer(folderMapping=<redacted>): container → {Container}", container);
             var useHttps = GetBooleanSetting(folderMapping, Constants.UseHttps);
+			Logger.LogError("GetContainer(folderMapping=<redacted>): useHttps → {UseHttps}", useHttps);
 
             var sc = new StorageCredentials(accountName, accountKey);
+			Logger.LogError("GetContainer(folderMapping=<redacted>): sc → {Sc}", sc);
             var csa = new CloudStorageAccount(sc, useHttps);
+			Logger.LogError("GetContainer(folderMapping=<redacted>): csa → {Csa}", csa);
             var blobClient = csa.CreateCloudBlobClient();
+			Logger.LogError("GetContainer(folderMapping=<redacted>): blobClient → {BlobClient}", blobClient);
+			Logger.LogWarning("<<< Exiting GetContainer(folderMapping=<redacted>)");
             return blobClient.GetContainerReference(container);
         }
     }

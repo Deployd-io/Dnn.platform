@@ -8,17 +8,21 @@ import { Dropdown, InputGroup, GridSystem as Grid, Label, RadioButtons, Switch, 
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class GeneralSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             generalSettings: undefined,
             triedToSubmit: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
         if (props.generalSettings) {
             this.setState({
@@ -31,18 +35,23 @@ class GeneralSettingsPanelBody extends Component {
                 generalSettings: Object.assign({}, data.Settings)
             });
         }));
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         this.setState({
             generalSettings: Object.assign({}, props.generalSettings),
             triedToSubmit: false
         });
+		logger.warn(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {state, props} = this;
         let generalSettings = Object.assign({}, state.generalSettings);
+		logger.error(`onSettingChange(key=${key},event=${event}): generalSettings → ${generalSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
 
         if (key === "ReplaceSpaceWith") {
             generalSettings[key] = event.value;
@@ -57,19 +66,23 @@ class GeneralSettingsPanelBody extends Component {
         });
 
         props.dispatch(SeoActions.generalSettingsClientModified(generalSettings));
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     }
 
     keyValuePairsToOptions(keyValuePairs) {
+		logger.error(`>>> Entering keyValuePairsToOptions(keyValuePairs=${keyValuePairs})`, { "event.action": "keyValuePairsToOptions", "logrite.keyValuePairs": keyValuePairs });
         let options = [];
         if (keyValuePairs !== undefined) {
             options = keyValuePairs.map((item) => {
                 return { label: item.Key, value: item.Value };
             });
         }
+		logger.warn(`<<< Exiting keyValuePairsToOptions(keyValuePairs=${keyValuePairs})`, { "event.action": "keyValuePairsToOptions", "logrite.keyValuePairs": keyValuePairs });
         return options;
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -80,13 +93,16 @@ class GeneralSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         }));
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SeoActions.getGeneralSettings((data) => {
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
                 this.setState({
                     generalSettings: Object.assign({}, data.Settings)
                 });
@@ -96,6 +112,7 @@ class GeneralSettingsPanelBody extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         if (state.generalSettings) {
             const columnOne = <div className="left-column" key="columnOne">
@@ -238,6 +255,8 @@ GeneralSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         generalSettings: state.seo.generalSettings,

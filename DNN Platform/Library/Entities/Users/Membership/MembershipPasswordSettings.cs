@@ -14,26 +14,37 @@ namespace DotNetNuke.Entities.Users.Membership
 
     public class MembershipPasswordSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MembershipPasswordSettings));
         /// <summary>Initializes a new instance of the <see cref="MembershipPasswordSettings"/> class.</summary>
         /// <param name="portalId">The portal ID.</param>
         public MembershipPasswordSettings(int portalId)
         {
+			Logger.LogError(">>> Entering MembershipPasswordSettings(portalId={PortalId})", portalId);
             // portalId not used currently - left in place for potential site specific settings
             this.PortalId = portalId;
+			Logger.LogDebug("MembershipPasswordSettings(portalId={PortalId}): this.PortalId → {Arg1}", portalId, this.PortalId);
 
             if (HttpContext.Current != null && !IsInstallRequest(HttpContext.Current.Request))
             {
                 this.EnableBannedList = Host.Host.EnableBannedList;
+				Logger.LogDebug("MembershipPasswordSettings(portalId={PortalId}): this.EnableBannedList → {Arg1}", portalId, this.EnableBannedList);
                 this.EnableStrengthMeter = Host.Host.EnableStrengthMeter;
                 this.EnableIPChecking = Host.Host.EnableIPChecking;
                 this.EnablePasswordHistory = Host.Host.EnablePasswordHistory;
 
+				Logger.LogDebug("MembershipPasswordSettings(portalId={PortalId}): this.EnableIPChecking → {Arg1}", portalId, this.EnableIPChecking);
+				Logger.LogDebug("MembershipPasswordSettings(portalId={PortalId}): this.EnablePasswordHistory → {Arg1}", portalId, this.EnablePasswordHistory);
                 this.ResetLinkValidity = Host.Host.MembershipResetLinkValidity;
                 this.NumberOfPasswordsStored = Host.Host.MembershipNumberPasswords;
                 this.NumberOfDaysBeforePasswordReuse = Host.Host.MembershipDaysBeforePasswordReuse;
             }
             else
             {
+				Logger.LogDebug("MembershipPasswordSettings(portalId={PortalId}): this.ResetLinkValidity → {Arg1}", portalId, this.ResetLinkValidity);
+				Logger.LogDebug("MembershipPasswordSettings(portalId={PortalId}): this.NumberOfPasswordsStored → {Arg1}", portalId, this.NumberOfPasswordsStored);
+				Logger.LogDebug("MembershipPasswordSettings(portalId={PortalId}): this.NumberOfDaysBeforePasswordReuse → {Arg1}", portalId, this.NumberOfDaysBeforePasswordReuse);
+        Logger.LogDebug("MembershipPasswordSettings(portalId={PortalId}): EnableBannedList → {EnableBannedList}", portalId, EnableBannedList);
+        Logger.LogWarning("<<< Exiting MembershipPasswordSettings(portalId={PortalId})", portalId);
                 // setup default values during install process.
                 this.EnableStrengthMeter = true;
                 this.EnableBannedList = true;
@@ -89,8 +100,10 @@ namespace DotNetNuke.Entities.Users.Membership
 
         private static bool IsInstallRequest(HttpRequest request)
         {
+			Logger.LogError(">>> Entering IsInstallRequest(request={Request})", request);
             var url = request.Url.LocalPath;
 
+			Logger.LogWarning("<<< Exiting IsInstallRequest(request={Request})", request);
             return url.EndsWith("/install.aspx", StringComparison.OrdinalIgnoreCase)
                    || url.Contains("/installwizard.aspx", StringComparison.OrdinalIgnoreCase);
         }

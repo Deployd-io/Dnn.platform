@@ -57,6 +57,7 @@ namespace log4net.Util.PatternStringConverters
         /// <seealso cref="DatePatternConverter"/>
         protected override void Convert(TextWriter writer, object state)
         {
+			value.LogError(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             try 
             {
                 this.m_dateFormatter.FormatDate(DateTime.UtcNow, writer);
@@ -65,6 +66,7 @@ namespace log4net.Util.PatternStringConverters
             {
                 LogLog.Error(declaringType, "Error occurred while converting date.", ex);
             }
+			value.LogWarning("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
 
         /// <summary>The fully qualified type of the UtcDatePatternConverter class.</summary>

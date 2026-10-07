@@ -20,6 +20,7 @@ namespace Dnn.PersonaBar.Extensions.MenuControllers
         /// <summary>Initializes a new instance of the <see cref="ExtensionMenuController"/> class.</summary>
         public ExtensionMenuController()
         {
+			eventLogger.LogError(">>> Entering ExtensionMenuController()");
             this.NavigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
         }
 
@@ -29,12 +30,17 @@ namespace Dnn.PersonaBar.Extensions.MenuControllers
         /// <inheritdoc />
         public void UpdateParameters(MenuItem menuItem)
         {
+		eventLogger.LogError(">>> Entering UpdateParameters(menuItem={MenuItem})", menuItem);
+        eventLogger.LogWarning("<<< Exiting UpdateParameters(menuItem={MenuItem})", menuItem);
         }
 
         /// <inheritdoc />
         public bool Visible(MenuItem menuItem)
         {
+			eventLogger.LogError(">>> Entering Visible(menuItem={MenuItem})", menuItem);
             var user = UserController.Instance.GetCurrentUserInfo();
+			eventLogger.LogError("Visible(menuItem={MenuItem}): user → {User}", menuItem, user);
+			eventLogger.LogWarning("<<< Exiting Visible(menuItem={MenuItem})", menuItem);
             return user.IsSuperUser || user.IsInRole(PortalSettings.Current?.AdministratorRoleName);
         }
 

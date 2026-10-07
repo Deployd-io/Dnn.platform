@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -12,14 +13,20 @@
 "use strict";
 
 CodeMirror.runMode = function(string, modespec, callback, options) {
+logger.error(`>>> Entering runMode(string=${string},modespec=${modespec},callback=${callback},options=${options})`, { "event.action": "runMode", "logrite.string": string, "logrite.modespec": modespec, "logrite.callback": callback, "logrite.options": options });
   var mode = CodeMirror.getMode(CodeMirror.defaults, modespec);
   var ie = /MSIE \d/.test(navigator.userAgent);
+logger.error(`runMode(string=${string},modespec=${modespec},callback=${callback},options=${options}): mode → ${mode}`, { "event.action": "runMode", "logrite.string": string, "logrite.modespec": modespec, "logrite.callback": callback, "logrite.options": options });
+logger.error(`runMode(string=${string},modespec=${modespec},callback=${callback},options=${options}): ie → ${ie}`, { "event.action": "runMode", "logrite.string": string, "logrite.modespec": modespec, "logrite.callback": callback, "logrite.options": options });
   var ie_lt9 = ie && (document.documentMode == null || document.documentMode < 9);
 
+logger.error(`runMode(string=${string},modespec=${modespec},callback=${callback},options=${options}): ie_lt9 → ${ie_lt9}`, { "event.action": "runMode", "logrite.string": string, "logrite.modespec": modespec, "logrite.callback": callback, "logrite.options": options });
   if (callback.nodeType == 1) {
     var tabSize = (options && options.tabSize) || CodeMirror.defaults.tabSize;
+	logger.error(`runMode(string=${string},modespec=${modespec},callback=${callback},options=${options}): tabSize → ${tabSize}`, { "event.action": "runMode", "logrite.string": string, "logrite.modespec": modespec, "logrite.callback": callback, "logrite.options": options });
     var node = callback, col = 0;
     node.innerHTML = "";
+	logger.debug(`runMode(string=${string},modespec=${modespec},callback=${callback},options=${options}): node.innerHTML → ${node.innerHTML}`, { "event.action": "runMode", "logrite.string": string, "logrite.modespec": modespec, "logrite.callback": callback, "logrite.options": options });
     callback = function(text, style) {
       if (text == "\n") {
         // Emitting LF or CRLF on IE8 or earlier results in an incorrect display.
@@ -53,18 +60,23 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
       } else {
         node.appendChild(document.createTextNode(content));
       }
+	logger.warn(`<<< Exiting callback(text=${text},style=${style})`, { "event.action": "callback", "logrite.text": text, "logrite.style": style });
     };
   }
 
   var lines = CodeMirror.splitLines(string), state = (options && options.state) || CodeMirror.startState(mode);
+logger.error(`runMode(string=${string},modespec=${modespec},callback=${callback},options=${options}): lines → ${lines}`, { "event.action": "runMode", "logrite.string": string, "logrite.modespec": modespec, "logrite.callback": callback, "logrite.options": options });
   for (var i = 0, e = lines.length; i < e; ++i) {
     if (i) callback("\n");
     var stream = new CodeMirror.StringStream(lines[i]);
+	logger.error(`runMode(string=${string},modespec=${modespec},callback=${callback},options=${options}): stream → ${stream}`, { "event.action": "runMode", "logrite.string": string, "logrite.modespec": modespec, "logrite.callback": callback, "logrite.options": options });
     if (!stream.string && mode.blankLine) mode.blankLine(state);
     while (!stream.eol()) {
       var style = mode.token(stream, state);
+	logger.error(`runMode(string=${string},modespec=${modespec},callback=${callback},options=${options}): style → ${style}`, { "event.action": "runMode", "logrite.string": string, "logrite.modespec": modespec, "logrite.callback": callback, "logrite.options": options });
       callback(stream.current(), style, i, stream.start, state);
       stream.start = stream.pos;
+	logger.debug(`runMode(string=${string},modespec=${modespec},callback=${callback},options=${options}): stream.start → ${stream.start}`, { "event.action": "runMode", "logrite.string": string, "logrite.modespec": modespec, "logrite.callback": callback, "logrite.options": options });
     }
   }
 };

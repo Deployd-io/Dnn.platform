@@ -18,6 +18,7 @@ namespace DotNetNuke.Application
     /// <summary>Defines the context for the environment of the DotNetNuke application.</summary>
     public class DotNetNukeContext : IDnnContext
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DotNetNukeContext));
         private static IDnnContext current;
         private readonly IApplicationInfo applicationInfo;
 
@@ -28,9 +29,13 @@ namespace DotNetNuke.Application
         /// </remarks>
         public DotNetNukeContext(IApplicationInfo applicationInfo)
         {
+			Logger.LogError(">>> Entering DotNetNukeContext(applicationInfo={ApplicationInfo})", applicationInfo);
             this.applicationInfo = applicationInfo;
+			Logger.LogDebug("DotNetNukeContext(applicationInfo={ApplicationInfo}): this.applicationInfo → {Arg1}", applicationInfo, this.applicationInfo);
             this.ContainerEventListeners = new NaiveLockingList<ContainerEventListener>();
             this.SkinEventListeners = new NaiveLockingList<SkinEventListener>();
+			Logger.LogError(">>> Entering DotNetNukeContext()");
+        Logger.LogWarning("<<< Exiting DotNetNukeContext()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DotNetNukeContext"/> class.</summary>

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -64,10 +65,13 @@ CodeMirror.defineMode("asterisk", function() {
                  ];
 
   function basicToken(stream,state){
+	logger.error(`>>> Entering basicToken(stream=${stream},state=${state})`, { "event.action": "basicToken", "logrite.stream": stream, "logrite.state": state });
     var cur = '';
     var ch = stream.next();
+	logger.error(`basicToken(stream=${stream},state=${state}): cur → ${cur}`, { "event.action": "basicToken", "logrite.stream": stream, "logrite.state": state });
     // comment
     if(ch == ";") {
+	logger.error(`basicToken(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "basicToken", "logrite.stream": stream, "logrite.state": state });
       stream.skipToEnd();
       return "comment";
     }
@@ -98,9 +102,12 @@ CodeMirror.defineMode("asterisk", function() {
     // application args
     if(ch == '$'){
       var ch1 = stream.peek();
+	logger.error(`basicToken(stream=${stream},state=${state}): ch1 → ${ch1}`, { "event.action": "basicToken", "logrite.stream": stream, "logrite.state": state });
       if(ch1 == '{'){
         stream.skipTo('}');
         stream.eat('}');
+		logger.debug(`basicToken(stream=${stream},state=${state}): state.extenStart → ${state.extenStart}`, { "event.action": "basicToken", "logrite.stream": stream, "logrite.state": state });
+		logger.warn(`<<< Exiting basicToken(stream=${stream},state=${state})`, { "event.action": "basicToken", "logrite.stream": stream, "logrite.state": state });
         return "variable-3";
       }
     }
@@ -123,6 +130,7 @@ CodeMirror.defineMode("asterisk", function() {
 
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         extenStart: false,
         extenSame:  false,
@@ -131,18 +139,23 @@ CodeMirror.defineMode("asterisk", function() {
         extenPriority: false,
         extenApplication: false
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
 
       var cur = '';
       if(stream.eatSpace()) return null;
+	logger.error(`token(stream=${stream},state=${state}): cur → ${cur}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       // extension started
       if(state.extenStart){
         stream.eatWhile(/[^\s]/);
         cur = stream.current();
         if(/^=>?$/.test(cur)){
           state.extenExten = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.extenExten → ${state.extenExten}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           state.extenStart = false;
+		logger.debug(`token(stream=${stream},state=${state}): state.extenStart → ${state.extenStart}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           return "strong";
         } else {
           state.extenStart = false;
@@ -153,16 +166,20 @@ CodeMirror.defineMode("asterisk", function() {
         // set exten and priority
         state.extenExten = false;
         state.extenPriority = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.extenPriority → ${state.extenPriority}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         stream.eatWhile(/[^,]/);
         if(state.extenInclude) {
           stream.skipToEnd();
           state.extenPriority = false;
           state.extenInclude = false;
+		logger.debug(`token(stream=${stream},state=${state}): state.extenInclude → ${state.extenInclude}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         }
         if(state.extenSame) {
           state.extenPriority = false;
           state.extenSame = false;
+		logger.debug(`token(stream=${stream},state=${state}): state.extenSame → ${state.extenSame}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           state.extenApplication = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.extenApplication → ${state.extenApplication}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         }
         return "tag";
       } else if(state.extenPriority) {
@@ -183,6 +200,7 @@ CodeMirror.defineMode("asterisk", function() {
           return "def strong";
         }
       } else{
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return basicToken(stream,state);
       }
 

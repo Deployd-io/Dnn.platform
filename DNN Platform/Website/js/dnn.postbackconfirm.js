@@ -1,4 +1,5 @@
-﻿window.postBackConfirm = function(text, mozEvent, oWidth, oHeight, callerObj, oTitle) 
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+window.postBackConfirm = function(text, mozEvent, oWidth, oHeight, callerObj, oTitle) 
 {
 	try
 	{
@@ -18,6 +19,7 @@
 			//Show the confirm, then when it is closing, if returned value was true, automatically call the caller's click method again. 
 			var callBackFn = function (arg) 
 			{ 
+				logger.error(`>>> Entering callBackFn(arg=${arg})`, { "event.action": "callBackFn", "logrite.arg": arg });
 				if (arg) 
 				{ 
 					callerObj["onclick"] = ""; 
@@ -29,8 +31,10 @@
 							eval(callerObj.href) 
 						} 
 						catch(e){} 
+						logger.warn(`<<< Exiting callBackFn(arg=${arg})`, { "event.action": "callBackFn", "logrite.arg": arg });
 					} 
 				} 
+				logger.error(`Exception in callBackFn(arg=${arg}): ${e.message}`, e, { "event.action": "callBackFn", "event.category": "process", "logrite.arg": arg });
 			} 
 			
 			if (oWidth == null || oWidth == "")

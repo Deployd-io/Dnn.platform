@@ -10,8 +10,11 @@ namespace DotNetNuke.Services.Syndication
     /// <summary>Helper class (for <see cref="RssHttpHandlerBase{TRssChannelType,TRssItemType,TRssImageType}"/>) to pack and unpack user name and channel to from/to query string.</summary>
     public class RssHttpHandlerHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RssHttpHandlerHelper));
         private RssHttpHandlerHelper()
         {
+		Logger.LogError(">>> Entering RssHttpHandlerHelper()");
+        Logger.LogWarning("<<< Exiting RssHttpHandlerHelper()");
         }
 
         /// <summary>Generate the link (to the .ashx) containing the channel name and (encoded) userName.</summary>
@@ -21,6 +24,7 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>A URL to the channel.</returns>
         public static string GenerateChannelLink(string handlerPath, string channelName, string userName)
         {
+			Logger.LogError(">>> Entering GenerateChannelLink(handlerPath={HandlerPath},channelName={ChannelName},userName={UserName})", handlerPath, channelName, userName);
             string link = VirtualPathUtility.ToAbsolute(handlerPath);
 
             if (string.IsNullOrEmpty(userName))
@@ -38,13 +42,17 @@ namespace DotNetNuke.Services.Syndication
                 }
 
                 userName = "." + userName; // not to confuse the encrypted string with real auth ticket for real user
+				Logger.LogError("GenerateChannelLink(handlerPath={HandlerPath},channelName={ChannelName},userName={UserName}): userName → {UserName1}", handlerPath, channelName, userName, userName);
                 DateTime ticketDate = DateTime.Now.AddDays(-100); // already expired
+				Logger.LogError("GenerateChannelLink(handlerPath={HandlerPath},channelName={ChannelName},userName={UserName}): ticketDate → {TicketDate}", handlerPath, channelName, userName, ticketDate);
 
                 var t = new FormsAuthenticationTicket(2, userName, ticketDate, ticketDate.AddDays(2), false, channelName, "/");
+				Logger.LogError("GenerateChannelLink(handlerPath={HandlerPath},channelName={ChannelName},userName={UserName}): t → {T}", handlerPath, channelName, userName, t);
 
                 link += "?t=" + FormsAuthentication.Encrypt(t);
             }
 
+			Logger.LogWarning("<<< Exiting GenerateChannelLink(handlerPath={HandlerPath},channelName={ChannelName},userName={UserName})", handlerPath, channelName, userName);
             return link;
         }
 
@@ -54,19 +62,26 @@ namespace DotNetNuke.Services.Syndication
         /// <param name="userName">The user name or <see cref="string.Empty"/>.</param>
         internal static void ParseChannelQueryString(HttpRequest request, out string channelName, out string userName)
         {
+			Logger.LogError(">>> Entering ParseChannelQueryString(request={Request})", request);
             string ticket = request.QueryString["t"];
 
             if (string.IsNullOrEmpty(ticket))
             {
                 userName = string.Empty;
+				Logger.LogError("ParseChannelQueryString(request={Request}): userName → {UserName}", request, userName);
+				Logger.LogDebug("ParseChannelQueryString(request={Request}): userName → {UserName}", request, userName);
 
                 // optional unencrypted channel name
                 channelName = request.QueryString["c"];
+				Logger.LogError("ParseChannelQueryString(request={Request}): channelName → {ChannelName}", request, channelName);
             }
             else
             {
+				Logger.LogDebug("ParseChannelQueryString(request={Request}): channelName → {ChannelName}", request, channelName);
                 // encrypted user name and channel name
+				Logger.LogWarning("<<< Exiting ParseChannelQueryString(request={Request})", request);
                 FormsAuthenticationTicket t = FormsAuthentication.Decrypt(ticket);
+				Logger.LogError("ParseChannelQueryString(request={Request}): t → {T}", request, t);
                 userName = t.Name.Substring(1); // remove extra prepended '.'
                 channelName = t.UserData;
             }

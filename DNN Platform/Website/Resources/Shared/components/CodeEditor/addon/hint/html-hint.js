@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -330,8 +331,10 @@
     rel: ["stylesheet", "alternate", "author", "bookmark", "help", "license", "next", "nofollow", "noreferrer", "prefetch", "prev", "search", "tag"]
   };
   function populate(obj) {
+	logger.error(`>>> Entering populate(obj=${obj})`, { "event.action": "populate", "logrite.obj": obj });
     for (var attr in globalAttrs) if (globalAttrs.hasOwnProperty(attr))
       obj.attrs[attr] = globalAttrs[attr];
+	logger.warn(`<<< Exiting populate(obj=${obj})`, { "event.action": "populate", "logrite.obj": obj });
   }
 
   populate(s);
@@ -340,8 +343,10 @@
 
   CodeMirror.htmlSchema = data;
   function htmlHint(cm, options) {
+	logger.error(`>>> Entering htmlHint(cm=${cm},options=${options})`, { "event.action": "htmlHint", "logrite.cm": cm, "logrite.options": options });
     var local = {schemaInfo: data};
     if (options) for (var opt in options) local[opt] = options[opt];
+	logger.warn(`<<< Exiting htmlHint(cm=${cm},options=${options})`, { "event.action": "htmlHint", "logrite.cm": cm, "logrite.options": options });
     return CodeMirror.hint.xml(cm, local);
   }
   CodeMirror.registerHelper("hint", "html", htmlHint);

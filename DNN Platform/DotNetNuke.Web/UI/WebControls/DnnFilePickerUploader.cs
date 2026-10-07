@@ -78,7 +78,11 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <param name="servicesFramework">The web API service framework.</param>
         public DnnFilePickerUploader(IApplicationStatusInfo appStatus, IEventLogger eventLogger, IServicesFramework servicesFramework)
         {
+			eventLogger.LogError(">>> Entering DnnFilePickerUploader(appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework})", appStatus, eventLogger, servicesFramework);
+			eventLogger.LogDebug("DnnFilePickerUploader(appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): eventLogger → {EventLogger1}", appStatus, eventLogger, servicesFramework, eventLogger);
+			eventLogger.LogDebug("DnnFilePickerUploader(appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", appStatus, eventLogger, servicesFramework, servicesFramework);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			eventLogger.LogWarning("<<< Exiting DnnFilePickerUploader(appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework})", appStatus, eventLogger, servicesFramework);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
         }
@@ -222,6 +226,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.FoldersComboBox.SelectItemDefaultText = (this.SupportHost && PortalSettings.Current.ActiveTab.IsSuperTab) ? DynamicSharedConstants.HostRootFolder : DynamicSharedConstants.RootFolder;
@@ -243,14 +248,17 @@ namespace DotNetNuke.Web.UI.WebControls
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, PortalSettings.Current, CommonJs.jQueryFileUpload);
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, PortalSettings.Current, CommonJs.DnnPlugins);
             this.servicesFramework.RequestAjaxAntiForgerySupport();
+			eventLogger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnPreRender(e={E})", e);
             if (this.FoldersComboBox.SelectedFolder != null && this.FoldersComboBox.SelectedFolder.FolderPath.StartsWith("Users/", StringComparison.InvariantCultureIgnoreCase))
             {
                 var userFolder = FolderManager.Instance.GetUserFolder(this.User ?? UserController.Instance.GetCurrentUserInfo());
+				eventLogger.LogError("OnPreRender(e={E}): userFolder → {UserFolder}", e, userFolder);
                 if (this.FoldersComboBox.SelectedFolder.FolderID == userFolder.FolderID)
                 {
                     this.FoldersComboBox.SelectedItem = new ListItem
@@ -288,14 +296,18 @@ namespace DotNetNuke.Web.UI.WebControls
             }
 
             base.OnPreRender(e);
+			eventLogger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private void LoadFolders()
         {
+			eventLogger.LogError(">>> Entering LoadFolders()");
             if (this.UsePersonalFolder)
             {
                 var user = this.User ?? UserController.Instance.GetCurrentUserInfo();
+				eventLogger.LogError("LoadFolders(): user → {User}", user);
                 var userFolder = FolderManager.Instance.GetUserFolder(user);
+				eventLogger.LogError("LoadFolders(): userFolder → {UserFolder}", userFolder);
                 this.FoldersComboBox.SelectedFolder = userFolder;
             }
             else
@@ -306,11 +318,15 @@ namespace DotNetNuke.Web.UI.WebControls
                 if (!string.IsNullOrEmpty(this.FilePath))
                 {
                     fileName = this.FilePath.Substring(this.FilePath.LastIndexOf("/", StringComparison.Ordinal) + 1);
+					eventLogger.LogError("LoadFolders(): fileName → {FileName}", fileName);
                     folderPath = string.IsNullOrEmpty(fileName) ? this.FilePath : this.FilePath.Replace(fileName, string.Empty);
+					eventLogger.LogDebug("LoadFolders(): folderPath → {FolderPath}", folderPath);
                 }
                 else
                 {
+					eventLogger.LogError("LoadFolders(): folderPath → {FolderPath}", folderPath);
                     fileName = this.FilePath;
+					eventLogger.LogDebug("LoadFolders(): fileName → {FileName}", fileName);
                     folderPath = this.FolderPath;
                 }
 
@@ -324,6 +340,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
             this.FoldersComboBox.Enabled = !this.UsePersonalFolder;
             this.FoldersLabel.Visible = this.UsePersonalFolder;
+			eventLogger.LogWarning("<<< Exiting LoadFolders()");
         }
     }
 }

@@ -14,13 +14,17 @@ namespace DotNetNuke.Modules.Admin.Security
     /// <summary>A control which displays an access denied message.</summary>
     public partial class AccessDeniedPage : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AccessDenied.ascx));
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             string message = null;
+			Logger.LogError("OnLoad(e={E}): message → {Message}", e, message);
             Guid messageGuid;
             var guidText = this.Request.QueryString["message"];
+			Logger.LogError("OnLoad(e={E}): guidText → {GuidText}", e, guidText);
             if (!string.IsNullOrEmpty(guidText) && Guid.TryParse(guidText, out messageGuid))
             {
                 message = HttpUtility.HtmlEncode(DataProvider.Instance().GetRedirectMessage(messageGuid));
@@ -30,6 +34,7 @@ namespace DotNetNuke.Modules.Admin.Security
                 this,
                 !string.IsNullOrEmpty(message) ? message : Localization.GetString("AccessDenied", this.LocalResourceFile),
                 ModuleMessage.ModuleMessageType.YellowWarning);
+				Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

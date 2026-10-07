@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -19,10 +20,13 @@ CodeMirror.defineMode("solr", function() {
   var isOperatorString = /^(OR|AND|NOT|TO)$/i;
 
   function isNumber(word) {
+	logger.error(`>>> Entering isNumber(word=${word})`, { "event.action": "isNumber", "logrite.word": word });
+	logger.warn(`<<< Exiting isNumber(word=${word})`, { "event.action": "isNumber", "logrite.word": word });
     return parseFloat(word, 10).toString() === word;
   }
 
   function tokenString(quote) {
+	logger.error(`>>> Entering tokenString(quote=${quote})`, { "event.action": "tokenString", "logrite.quote": quote });
     return function(stream, state) {
       var escaped = false, next;
       while ((next = stream.next()) != null) {
@@ -36,6 +40,7 @@ CodeMirror.defineMode("solr", function() {
   }
 
   function tokenOperator(operator) {
+	logger.error(`>>> Entering tokenOperator(operator=${operator})`, { "event.action": "tokenOperator", "user.name": String(operator) });
     return function(stream, state) {
       var style = "operator";
       if (operator == "+")
@@ -55,6 +60,7 @@ CodeMirror.defineMode("solr", function() {
   }
 
   function tokenWord(ch) {
+	logger.error(`>>> Entering tokenWord(ch=${ch})`, { "event.action": "tokenWord", "logrite.ch": ch });
     return function(stream, state) {
       var word = ch;
       while ((ch = stream.peek()) && ch.match(isStringChar) != null) {
@@ -74,6 +80,7 @@ CodeMirror.defineMode("solr", function() {
   }
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.next();
     if (ch == '"')
       state.tokenize = tokenString(ch);
@@ -82,18 +89,23 @@ CodeMirror.defineMode("solr", function() {
     else if (isStringChar.test(ch))
       state.tokenize = tokenWord(ch);
 
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     return (state.tokenize != tokenBase) ? state.tokenize(stream, state) : null;
   }
 
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         tokenize: tokenBase
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.eatSpace()) return null;
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return state.tokenize(stream, state);
     }
   };

@@ -36,8 +36,12 @@ namespace Dnn.PersonaBar.Extensions.Services
         /// <param name="localUpgradeService">The local upgrade service.</param>
         public UpgradesController(IApplicationStatusInfo applicationStatusInfo, ILocalUpgradeService localUpgradeService)
         {
+			Logger.LogError(">>> Entering UpgradesController(applicationStatusInfo={ApplicationStatusInfo},localUpgradeService={LocalUpgradeService})", applicationStatusInfo, localUpgradeService);
+			Logger.LogDebug("UpgradesController(applicationStatusInfo={ApplicationStatusInfo},localUpgradeService={LocalUpgradeService}): localUpgradeService → {LocalUpgradeService1}", applicationStatusInfo, localUpgradeService, localUpgradeService);
             this.applicationStatusInfo = applicationStatusInfo;
             this.localUpgradeService = localUpgradeService;
+			Logger.LogDebug("UpgradesController(applicationStatusInfo={ApplicationStatusInfo},localUpgradeService={LocalUpgradeService}): this.applicationStatusInfo → {Arg2}", applicationStatusInfo, localUpgradeService, this.applicationStatusInfo);
+        Logger.LogWarning("<<< Exiting UpgradesController(applicationStatusInfo={ApplicationStatusInfo},localUpgradeService={LocalUpgradeService})", applicationStatusInfo, localUpgradeService);
         }
 
         /// <summary>Retrieves upgrade settings.</summary>
@@ -47,11 +51,13 @@ namespace Dnn.PersonaBar.Extensions.Services
         [HttpGet]
         public HttpResponseMessage GetSettings()
         {
+			Logger.LogError(">>> Entering GetSettings()");
             try
             {
                 if (!bool.TryParse(DotNetNuke.Common.Utilities.Config.GetSetting("AllowDnnUpgradeUpload"), out var allowDnnUpgradeUpload))
                 {
                     allowDnnUpgradeUpload = false;
+					Logger.LogDebug("GetSettings(): allowDnnUpgradeUpload → {AllowDnnUpgradeUpload}", allowDnnUpgradeUpload);
                 }
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
@@ -61,6 +67,8 @@ namespace Dnn.PersonaBar.Extensions.Services
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetSettings(): {Arg0}", ex.Message);
+				Logger.LogWarning("<<< Exiting GetSettings()");
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, new { ex.Message, });
             }
         }
@@ -73,14 +81,18 @@ namespace Dnn.PersonaBar.Extensions.Services
         [HttpGet]
         public async Task<HttpResponseMessage> List(CancellationToken cancellationToken)
         {
+			Logger.LogError(">>> Entering List(cancellationToken=<redacted>)");
             try
             {
                 var upgrades = await this.localUpgradeService.GetLocalUpgrades(cancellationToken);
+				Logger.LogError("List(cancellationToken=<redacted>): upgrades → {Upgrades}", upgrades);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, upgrades);
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in List(cancellationToken=<redacted>): {Arg1}", ex.Message);
+				Logger.LogWarning("<<< Exiting List(cancellationToken=<redacted>)");
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, new { Message = ex.Message });
             }
         }
@@ -92,13 +104,16 @@ namespace Dnn.PersonaBar.Extensions.Services
         [HttpPost]
         public async Task<HttpResponseMessage> StartUpgrade(UpgradePackageRequestDto data, CancellationToken cancellationToken)
         {
+			Logger.LogError(">>> Entering StartUpgrade(data={Data},cancellationToken=<redacted>)", data);
             var upgrades = await this.localUpgradeService.GetLocalUpgrades(cancellationToken);
+			Logger.LogError("StartUpgrade(data={Data},cancellationToken=<redacted>): upgrades → {Upgrades}", data, upgrades);
             if (!upgrades.Any(u => u.IsValid && !u.IsOutdated))
             {
                 return this.Request.CreateResponse(HttpStatusCode.BadRequest, new { message = LocalizeString("Upgrade_NoUpgrade"), });
             }
 
             var upgrade = upgrades.FirstOrDefault(u => u.PackageName.Equals(data.PackageName, StringComparison.OrdinalIgnoreCase));
+			Logger.LogError("StartUpgrade(data={Data},cancellationToken=<redacted>): upgrade → {Upgrade}", data, upgrade);
             if (upgrade is not { CanInstall: true, })
             {
                 return this.Request.CreateResponse(HttpStatusCode.BadRequest, new { message = LocalizeString($"Upgrade_NoValidUpgrade", data.PackageName), });
@@ -108,6 +123,7 @@ namespace Dnn.PersonaBar.Extensions.Services
 
             await this.localUpgradeService.DeleteLocalUpgrade(data.PackageName, cancellationToken);
 
+			Logger.LogWarning("<<< Exiting StartUpgrade(data={Data},cancellationToken=<redacted>)", data);
             return this.Request.CreateResponse(HttpStatusCode.NoContent);
         }
 
@@ -117,7 +133,9 @@ namespace Dnn.PersonaBar.Extensions.Services
         [HttpPost]
         public async Task<HttpResponseMessage> StartFirstUpgrade(CancellationToken cancellationToken)
         {
+			Logger.LogError(">>> Entering StartFirstUpgrade(cancellationToken=<redacted>)");
             var upgrades = await this.localUpgradeService.GetLocalUpgrades(cancellationToken);
+			Logger.LogError("StartFirstUpgrade(cancellationToken=<redacted>): upgrades → {Upgrades}", upgrades);
             if (!upgrades.Any(u => u.IsValid && !u.IsOutdated))
             {
                 return this.Request.CreateResponse(HttpStatusCode.BadRequest, new { message = LocalizeString("Upgrade_NoUpgrade"), });
@@ -125,6 +143,7 @@ namespace Dnn.PersonaBar.Extensions.Services
 
             await this.localUpgradeService.StartLocalUpgrade(upgrades, cancellationToken);
 
+			Logger.LogWarning("<<< Exiting StartFirstUpgrade(cancellationToken=<redacted>)");
             return this.Request.CreateResponse(HttpStatusCode.NoContent);
         }
 
@@ -135,6 +154,7 @@ namespace Dnn.PersonaBar.Extensions.Services
         [HttpPost]
         public async Task<HttpResponseMessage> Delete(UpgradePackageRequestDto data, CancellationToken cancellationToken)
         {
+			Logger.LogError(">>> Entering Delete(data={Data},cancellationToken=<redacted>)", data);
             try
             {
                 await this.localUpgradeService.DeleteLocalUpgrade(data.PackageName, cancellationToken);
@@ -142,6 +162,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+			Logger.LogWarning("<<< Exiting Delete(data={Data},cancellationToken=<redacted>)", data);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, new { message = ex.Message, });
             }
 
@@ -155,11 +176,13 @@ namespace Dnn.PersonaBar.Extensions.Services
         [IFrameSupportedValidateAntiForgeryToken]
         public Task<HttpResponseMessage> Upload(CancellationToken cancellationToken)
         {
+			Logger.LogError(">>> Entering Upload(cancellationToken=<redacted>)");
             try
             {
                 if (!bool.TryParse(DotNetNuke.Common.Utilities.Config.GetSetting("AllowDnnUpgradeUpload"), out var allowDnnUpgradeUpload))
                 {
                     allowDnnUpgradeUpload = false;
+					Logger.LogDebug("Upload(cancellationToken=<redacted>): allowDnnUpgradeUpload → {AllowDnnUpgradeUpload}", allowDnnUpgradeUpload);
                 }
 
                 if (!allowDnnUpgradeUpload)
@@ -172,6 +195,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting Upload(cancellationToken=<redacted>)");
                 return Task.FromResult(this.Request.CreateResponse(HttpStatusCode.InternalServerError, new { message = ex.Message, }));
             }
         }
@@ -186,18 +210,23 @@ namespace Dnn.PersonaBar.Extensions.Services
         [IFrameSupportedValidateAntiForgeryToken]
         public async Task<HttpResponseMessage> UploadComplete(UpgradeUploadCompleteDto data, CancellationToken cancellationToken)
         {
+			Logger.LogError(">>> Entering UploadComplete(data={Data},cancellationToken=<redacted>)", data);
             var fileName = Path.GetFileName(data.FileName);
             var fileId = Path.GetFileName(data.FileId);
+			Logger.LogError("UploadComplete(data={Data},cancellationToken=<redacted>): fileId → {FileId}", data, fileId);
+			Logger.LogError("UploadComplete(data={Data},cancellationToken=<redacted>): fileName → {FileName}", data, fileName);
 
             if (!string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(fileId))
             {
                 var writtenFile = Path.Combine(this.applicationStatusInfo.ApplicationMapPath, "App_Data", "Upgrade", fileId + ".resources");
+				Logger.LogError("UploadComplete(data={Data},cancellationToken=<redacted>): writtenFile → {WrittenFile}", data, writtenFile);
                 if (!File.Exists(writtenFile))
                 {
                     return this.Request.CreateResponse(HttpStatusCode.BadRequest, new { message = LocalizeString($"Upgrade_InvalidPackage", fileName), });
                 }
 
                 var info = await this.localUpgradeService.GetLocalUpgradeInfo(writtenFile, cancellationToken);
+				Logger.LogError("UploadComplete(data={Data},cancellationToken=<redacted>): info → {Info}", data, info);
                 if (!info.IsValid)
                 {
                     return this.Request.CreateResponse(HttpStatusCode.BadRequest, new { message = LocalizeString($"Upgrade_InvalidPackage", fileName), });
@@ -209,24 +238,30 @@ namespace Dnn.PersonaBar.Extensions.Services
                 else
                 {
                     var upgradePath = Path.Combine(this.applicationStatusInfo.ApplicationMapPath, "App_Data", "Upgrade", Path.GetFileNameWithoutExtension(fileName) + ".zip");
+					Logger.LogError("UploadComplete(data={Data},cancellationToken=<redacted>): upgradePath → {UpgradePath}", data, upgradePath);
                     File.Move(writtenFile, upgradePath);
                     return this.Request.CreateResponse(HttpStatusCode.OK, fileName);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting UploadComplete(data={Data},cancellationToken=<redacted>)", data);
             return this.Request.CreateResponse(HttpStatusCode.BadRequest, new { message = LocalizeString($"Upgrade_InvalidPackage", fileName), });
         }
 
         private static string LocalizeString(string key, params object[] args)
         {
+			Logger.LogError(">>> Entering LocalizeString(key={Key},args={Args})", key, args);
+            Logger.LogWarning("<<< Exiting LocalizeString(key={Key},args={Args})", key, args);
             return string.Format(CultureInfo.CurrentCulture, Localization.GetString(key, ResourceFile), args);
         }
 
         private async Task<HttpResponseMessage> UploadFileAction(CancellationToken cancellationToken)
         {
+			Logger.LogError(">>> Entering UploadFileAction(cancellationToken=<redacted>)");
             var request = this.Request;
             if (!request.Content.IsMimeMultipartContent())
             {
+				Logger.LogError("Throwing HttpResponseException from UploadFileAction(cancellationToken=<redacted>)");
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
@@ -236,19 +271,25 @@ namespace Dnn.PersonaBar.Extensions.Services
             await request.Content.LoadIntoBufferAsync().ConfigureAwait(false);
 
             var provider = new MultipartMemoryStreamProvider();
+			Logger.LogError("UploadFileAction(cancellationToken=<redacted>): provider → {Provider}", provider);
 
             // read multipart parts
             await request.Content.ReadAsMultipartAsync(provider, cancellationToken).ConfigureAwait(false);
 
             long startPosition = 0;
+			Logger.LogError("UploadFileAction(cancellationToken=<redacted>): startPosition → {StartPosition}", startPosition);
             long totalSize = 0;
+			Logger.LogError("UploadFileAction(cancellationToken=<redacted>): totalSize → {TotalSize}", totalSize);
             string fileId = string.Empty;
+			Logger.LogError("UploadFileAction(cancellationToken=<redacted>): fileId → {FileId}", fileId);
             Stream stream = null;
+			Logger.LogError("UploadFileAction(cancellationToken=<redacted>): stream → {Stream}", stream);
 
             foreach (var item in provider.Contents)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var name = item.Headers.ContentDisposition.Name;
+				Logger.LogError("UploadFileAction(cancellationToken=<redacted>): name → {Name}", name);
                 switch (name.ToUpperInvariant())
                 {
                     case "\"CHUNK\"":
@@ -277,13 +318,17 @@ namespace Dnn.PersonaBar.Extensions.Services
             if (stream != null && totalSize != 0 && !string.IsNullOrEmpty(fileId))
             {
                 var fileToWriteTo = Path.Combine(this.applicationStatusInfo.ApplicationMapPath, "App_Data", "Upgrade", fileId + ".resources");
+				Logger.LogError("UploadFileAction(cancellationToken=<redacted>): fileToWriteTo → {FileToWriteTo}", fileToWriteTo);
 
                 // use the file stream and start position to write the chunk to the file
                 using var fileStream = new FileStream(fileToWriteTo, FileMode.OpenOrCreate, FileAccess.Write);
+				Logger.LogError("UploadFileAction(cancellationToken=<redacted>): fileStream → {FileStream}", fileStream);
                 fileStream.Position = startPosition;
+				Logger.LogDebug("UploadFileAction(cancellationToken=<redacted>): fileStream.Position → {Arg1}", fileStream.Position);
                 await stream.CopyToAsync(fileStream).ConfigureAwait(false);
             }
 
+			Logger.LogWarning("<<< Exiting UploadFileAction(cancellationToken=<redacted>)");
             return request.CreateResponse(HttpStatusCode.OK);
         }
     }

@@ -13,8 +13,10 @@ namespace DotNetNuke.ExtensionPoints
     [ToolboxData("<{0}:UserControlExtensionControl runat=server></{0}:UserControlExtensionControl>")]
     public class UserControlExtensionControl : DefaultExtensionControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserControlExtensionControl));
         public void BindAction(int portalId, int tabId, int moduleId)
         {
+			Logger.LogError(">>> Entering BindAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
             foreach (var control in this.Controls)
             {
                 var actionsControl = control as IUserControlActions;
@@ -23,10 +25,12 @@ namespace DotNetNuke.ExtensionPoints
                     actionsControl.BindAction(portalId, tabId, moduleId);
                 }
             }
+			Logger.LogWarning("<<< Exiting BindAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
         }
 
         public void SaveAction(int portalId, int tabId, int moduleId)
         {
+			Logger.LogError(">>> Entering SaveAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
             foreach (var control in this.Controls)
             {
                 var actionsControl = control as IUserControlActions;
@@ -35,10 +39,12 @@ namespace DotNetNuke.ExtensionPoints
                     actionsControl.SaveAction(portalId, tabId, moduleId);
                 }
             }
+			Logger.LogWarning("<<< Exiting SaveAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
         }
 
         public void CancelAction(int portalId, int tabId, int moduleId)
         {
+			Logger.LogError(">>> Entering CancelAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
             foreach (var control in this.Controls)
             {
                 var actionsControl = control as IUserControlActions;
@@ -47,17 +53,21 @@ namespace DotNetNuke.ExtensionPoints
                     actionsControl.CancelAction(portalId, tabId, moduleId);
                 }
             }
+			Logger.LogWarning("<<< Exiting CancelAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             var extensionPointManager = new ExtensionPointManager();
+			Logger.LogError("OnInit(e={E}): extensionPointManager → {ExtensionPointManager}", e, extensionPointManager);
 
             if (!string.IsNullOrEmpty(this.Name))
             {
                 var extension = extensionPointManager.GetUserControlExtensionPointFirstByPriority(this.Module, this.Name);
+				Logger.LogError("OnInit(e={E}): extension → {Extension}", e, extension);
                 this.LoadControl(extension);
             }
             else
@@ -67,13 +77,17 @@ namespace DotNetNuke.ExtensionPoints
                     this.LoadControl(extension);
                 }
             }
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         private void LoadControl(IUserControlExtensionPoint extension)
         {
+			Logger.LogError(">>> Entering LoadControl(extension={Extension})", extension);
             var control = this.Page.LoadControl(extension.UserControlSrc);
             control.ID = Path.GetFileNameWithoutExtension(extension.UserControlSrc);
+			Logger.LogError("LoadControl(extension={Extension}): control → {Control}", extension, control);
             this.Controls.Add(control);
+			Logger.LogWarning("<<< Exiting LoadControl(extension={Extension})", extension);
         }
     }
 }

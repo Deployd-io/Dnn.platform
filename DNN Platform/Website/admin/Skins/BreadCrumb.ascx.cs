@@ -24,6 +24,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// </remarks>
     public partial class BreadCrumb : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(BreadCrumb.ascx));
         private const string MyFileName = "BreadCrumb.ascx";
         private const string HomeTabName = "Root";
         private const string UrlRegex = """(href|src)=(\"|'|)(.[^\"']*)(\"|'|)""";
@@ -45,7 +46,10 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <param name="tabController">The tab controller.</param>
         public BreadCrumb(INavigationManager navigationManager, ITabController tabController)
         {
+			Logger.LogError(">>> Entering BreadCrumb(navigationManager={NavigationManager},tabController={TabController})", navigationManager, tabController);
+			Logger.LogDebug("BreadCrumb(navigationManager={NavigationManager},tabController={TabController}): tabController → {TabController1}", navigationManager, tabController, tabController);
             this.navigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
+			Logger.LogWarning("<<< Exiting BreadCrumb(navigationManager={NavigationManager},tabController={TabController})", navigationManager, tabController);
             this.tabController = tabController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITabController>();
         }
 
@@ -128,6 +132,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.ResolveSeparatorPaths();
@@ -142,10 +147,12 @@ namespace DotNetNuke.UI.Skins.Controls
             this.lblBreadCrumb.Text = this.RenderingVersion >= 2
                 ? this.BuildListMarkup(crumbCount)
                 : this.BuildLegacyMarkup(crumbCount);
+				Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         private string BuildLegacyMarkup(int crumbCount)
         {
+			Logger.LogError(">>> Entering BuildLegacyMarkup(crumbCount={CrumbCount})", crumbCount);
             var position = 1;
 
             // IMPORTANT:
@@ -181,11 +188,15 @@ namespace DotNetNuke.UI.Skins.Controls
                 }
 
                 var tab = (TabInfo)this.PortalSettings.ActiveTab.BreadCrumbs[i];
+				Logger.LogError("BuildLegacyMarkup(crumbCount={CrumbCount}): tab → {Tab}", crumbCount, tab);
 
                 var tabName = this.GetTabDisplayName(tab);
+				Logger.LogError("BuildLegacyMarkup(crumbCount={CrumbCount}): tabName → {TabName}", crumbCount, tabName);
                 var tabNameEncoded = HttpUtility.HtmlEncode(tabName ?? string.Empty);
+				Logger.LogError("BuildLegacyMarkup(crumbCount={CrumbCount}): tabNameEncoded → {TabNameEncoded}", crumbCount, tabNameEncoded);
 
                 var tabUrl = this.GetTabUrl(tab);
+				Logger.LogError("BuildLegacyMarkup(crumbCount={CrumbCount}): tabUrl → {TabUrl}", crumbCount, tabUrl);
 
                 if (tab.DisableLink)
                 {
@@ -220,13 +231,16 @@ namespace DotNetNuke.UI.Skins.Controls
 
             // close both wrappers
             breadcrumb.Append("</span></span>");
+			Logger.LogWarning("<<< Exiting BuildLegacyMarkup(crumbCount={CrumbCount})", crumbCount);
             return breadcrumb.ToString();
         }
 
         private string BuildListMarkup(int crumbCount)
         {
+			Logger.LogError(">>> Entering BuildListMarkup(crumbCount={CrumbCount})", crumbCount);
             var position = 1;
             var breadcrumb = new StringBuilder();
+			Logger.LogError("BuildListMarkup(crumbCount={CrumbCount}): breadcrumb → {Breadcrumb}", crumbCount, breadcrumb);
 
             // IMPORTANT:
             // List markup must start with <nav> (no legacy wrapper).
@@ -252,14 +266,20 @@ namespace DotNetNuke.UI.Skins.Controls
             for (var i = this.rootLevel; i < crumbCount; ++i)
             {
                 var tab = (TabInfo)this.PortalSettings.ActiveTab.BreadCrumbs[i];
+				Logger.LogError("BuildListMarkup(crumbCount={CrumbCount}): tab → {Tab}", crumbCount, tab);
 
                 var tabName = this.GetTabDisplayName(tab);
+				Logger.LogError("BuildListMarkup(crumbCount={CrumbCount}): tabName → {TabName}", crumbCount, tabName);
                 var tabNameEncoded = HttpUtility.HtmlEncode(tabName ?? string.Empty);
+				Logger.LogError("BuildListMarkup(crumbCount={CrumbCount}): tabNameEncoded → {TabNameEncoded}", crumbCount, tabNameEncoded);
 
                 var tabUrl = this.GetTabUrl(tab);
+				Logger.LogError("BuildListMarkup(crumbCount={CrumbCount}): tabUrl → {TabUrl}", crumbCount, tabUrl);
 
                 var isLastCrumb = i == (crumbCount - 1);
+				Logger.LogError("BuildListMarkup(crumbCount={CrumbCount}): isLastCrumb → {IsLastCrumb}", crumbCount, isLastCrumb);
                 var liAriaCurrent = isLastCrumb ? " aria-current=\"page\"" : string.Empty;
+				Logger.LogError("BuildListMarkup(crumbCount={CrumbCount}): liAriaCurrent → {LiAriaCurrent}", crumbCount, liAriaCurrent);
 
                 breadcrumb.AppendFormat(
                     CultureInfo.InvariantCulture,
@@ -295,6 +315,7 @@ namespace DotNetNuke.UI.Skins.Controls
                 }
 
                 breadcrumb.Append("</li>");
+				Logger.LogWarning("<<< Exiting BuildListMarkup(crumbCount={CrumbCount})", crumbCount);
             }
 
             breadcrumb.Append("</ol></nav>");
@@ -303,14 +324,19 @@ namespace DotNetNuke.UI.Skins.Controls
 
         private void ResolveHome(out string homeUrl, out string homeNameEncoded)
         {
+			Logger.LogError(">>> Entering ResolveHome()");
             homeUrl = Globals.AddHTTP(this.CurrentPortalAlias.HttpAlias);
             var homeName = HomeTabName;
+			Logger.LogError("ResolveHome(): homeName → {HomeName}", homeName);
+			Logger.LogDebug("ResolveHome(): homeUrl → {HomeUrl}", homeUrl);
 
             if (this.PortalSettings.HomeTabId != -1)
             {
                 homeUrl = this.navigationManager.NavigateURL(this.PortalSettings.HomeTabId);
+				Logger.LogError("ResolveHome(): homeUrl → {HomeUrl}", homeUrl);
 
                 var homeTab = this.tabController.GetTab(this.PortalSettings.HomeTabId, this.PortalSettings.PortalId, false);
+				Logger.LogError("ResolveHome(): homeTab → {HomeTab}", homeTab);
                 homeName = homeTab?.LocalizedTabName ?? homeName;
 
                 if (this.UseTitle && homeTab != null && !string.IsNullOrEmpty(homeTab.Title))
@@ -318,23 +344,29 @@ namespace DotNetNuke.UI.Skins.Controls
                     homeName = homeTab.Title;
                 }
             }
+			Logger.LogWarning("<<< Exiting ResolveHome()");
 
             homeNameEncoded = HttpUtility.HtmlEncode(homeName ?? string.Empty);
+			Logger.LogError("ResolveHome(): homeNameEncoded → {HomeNameEncoded}", homeNameEncoded);
         }
 
         private string GetTabDisplayName(TabInfo tab)
         {
+			Logger.LogError(">>> Entering GetTabDisplayName(tab={Tab})", tab);
             var tabName = tab.LocalizedTabName;
+			Logger.LogError("GetTabDisplayName(tab={Tab}): tabName → {TabName}", tab, tabName);
             if (this.UseTitle && !string.IsNullOrEmpty(tab.Title))
             {
                 tabName = tab.Title;
             }
 
+			Logger.LogWarning("<<< Exiting GetTabDisplayName(tab={Tab})", tab);
             return tabName;
         }
 
         private string GetTabUrl(TabInfo tab)
         {
+			Logger.LogError(">>> Entering GetTabUrl(tab={Tab})", tab);
             var tabUrl = tab.FullUrl;
 
             if (this.ProfileUserId > -1)
@@ -353,25 +385,31 @@ namespace DotNetNuke.UI.Skins.Controls
                     "GroupId=" + this.GroupId.ToString(CultureInfo.InvariantCulture));
             }
 
+			Logger.LogWarning("<<< Exiting GetTabUrl(tab={Tab})", tab);
             return tabUrl;
         }
 
         private string GetAriaLabel()
         {
+			Logger.LogError(">>> Entering GetAriaLabel()");
             // resource key (example):
             ////BreadCrumbAriaLabel.Text = Breadcrumb
             var localized = Localization.GetString("BreadCrumbAriaLabel.Text", Localization.GetResourceFile(this, MyFileName));
+			Logger.LogError("GetAriaLabel(): localized → {Localized}", localized);
+			Logger.LogWarning("<<< Exiting GetAriaLabel()");
             return string.IsNullOrWhiteSpace(localized) ? "Breadcrumb" : localized;
         }
 
         private void ResolveSeparatorPaths()
         {
+			Logger.LogError(">>> Entering ResolveSeparatorPaths()");
             if (string.IsNullOrEmpty(this.Separator))
             {
                 return;
             }
 
             var urlMatches = Regex.Matches(this.Separator, UrlRegex, RegexOptions.IgnoreCase);
+			Logger.LogError("ResolveSeparatorPaths(): urlMatches → {UrlMatches}", urlMatches);
             if (urlMatches.Count > 0)
             {
                 foreach (Match match in urlMatches)
@@ -390,7 +428,9 @@ namespace DotNetNuke.UI.Skins.Controls
                     else if (url.StartsWith("~/", StringComparison.Ordinal))
                     {
                         url = Globals.ResolveUrl(url);
+						Logger.LogError("ResolveSeparatorPaths(): url → {Url}", url);
                         changed = true;
+						Logger.LogError("ResolveSeparatorPaths(): changed → {Changed}", changed);
                     }
                     else
                     {
@@ -412,6 +452,7 @@ namespace DotNetNuke.UI.Skins.Controls
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting ResolveSeparatorPaths()");
         }
     }
 }

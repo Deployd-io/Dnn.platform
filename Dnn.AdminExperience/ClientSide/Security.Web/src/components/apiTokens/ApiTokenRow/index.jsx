@@ -5,35 +5,45 @@ import { Collapsible as Collapse, IconButton, Button } from "@dnnsoftware/dnn-re
 import "./style.less";
 import resx from "../../../resources";
 import utils from "../../../utils";
+const logger = console;
 import { security as SecurityActions } from "../../../actions";
 
 class ApiTokenRow extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             collapsed: true,
             collapsedClass: true,
             repainting: false
         };
         this.timeout = 10;
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         // this.handleClick = this.handleClick.bind(this);
     }
 
     UNSAFE_componentWillReceiveProps() {
+		logger.error('>>> Entering UNSAFE_componentWillReceiveProps()', { "event.action": "UNSAFE_componentWillReceiveProps" });
         this.setState({});
+		logger.warn('<<< Exiting UNSAFE_componentWillReceiveProps()', { "event.action": "UNSAFE_componentWillReceiveProps" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         document.addEventListener("click", this.handleClick);
         this._isMounted = true;
+		logger.debug(`componentDidMount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentDidMount" });
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         document.removeEventListener("click", this.handleClick);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentWillUnmount" });
     }
 
     handleClick(event) {
+		logger.error(`>>> Entering handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
         // the "findDOMNode was called on an unmounted component." error we need to check if the component is mounted before execute this code
@@ -46,35 +56,44 @@ class ApiTokenRow extends Component {
         } else {
 
             this.timeout = 0;
+			logger.warn(`<<< Exiting handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         }
     }
 
     uncollapse() {
+		logger.error('>>> Entering uncollapse()', { "event.action": "uncollapse" });
         setTimeout(() => {
             this.setState({
                 collapsed: false
             });
         }, this.timeout);
+		logger.warn('<<< Exiting uncollapse()', { "event.action": "uncollapse" });
     }
 
     collapse() {
+		logger.error('>>> Entering collapse()', { "event.action": "collapse" });
         this.setState({
             collapsed: true
         });
+		logger.warn('<<< Exiting collapse()', { "event.action": "collapse" });
     }
 
     toggle() {
+		logger.error('>>> Entering toggle()', { "event.action": "toggle" });
         if (this.state.collapsed) {
             this.uncollapse();
         } else {
             this.collapse();
+			logger.warn('<<< Exiting toggle()', { "event.action": "toggle" });
         }
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props, state } = this;
         let status;
         let statusClass = "inactive";
+		logger.error(`render(): statusClass → ${statusClass}`, { "event.action": "render" });
         if (utils.dateInPast(new Date(props.apiToken.ExpiresOn), new Date())) {
             status = resx.get("Expired");
         } else {
@@ -86,6 +105,7 @@ class ApiTokenRow extends Component {
             }
         }
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div ref={node => this.node = node} className={"collapsible-logitemdetail " + state.collapsed + (props.className ? (" " + props.className) : "")}>
                 <div className={"collapsible-logitemdetail-header " + state.collapsed}>
@@ -179,6 +199,8 @@ ApiTokenRow.propTypes = {
 };
 
 function mapStateToProps() {
+	logger.error('>>> Entering mapStateToProps()', { "event.action": "mapStateToProps" });
+	logger.warn('<<< Exiting mapStateToProps()', { "event.action": "mapStateToProps" });
     return {};
 }
 

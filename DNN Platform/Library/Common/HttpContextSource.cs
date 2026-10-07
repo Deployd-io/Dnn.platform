@@ -9,6 +9,7 @@ namespace DotNetNuke.Common
     /// <summary>A unit testable alternative to HttpContext.Current.</summary>
     public class HttpContextSource
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HttpContextSource));
         private static HttpContextBase fakeContext;
 
         /// <summary>Gets the current HttpContext.</summary>
@@ -34,7 +35,10 @@ namespace DotNetNuke.Common
         /// <param name="instance">The fake context to inject.</param>
         public static void RegisterInstance(HttpContextBase instance)
         {
+			Logger.LogError(">>> Entering RegisterInstance(instance={Instance})", instance);
             fakeContext = instance;
+			Logger.LogDebug("RegisterInstance(instance={Instance}): fakeContext → {FakeContext}", instance, fakeContext);
+        Logger.LogWarning("<<< Exiting RegisterInstance(instance={Instance})", instance);
         }
     }
 }

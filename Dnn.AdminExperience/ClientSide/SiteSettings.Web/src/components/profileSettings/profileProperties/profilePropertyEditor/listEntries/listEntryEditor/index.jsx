@@ -3,10 +3,12 @@ import PropTypes from "prop-types";
 import "./style.less";
 import { SingleLineInputWithError, GridSystem, Switch, Label, Button, InputGroup } from "@dnnsoftware/dnn-react-common";
 import resx from "resources";
+const logger = console;
 
 class ListEntryEditor extends Component {
     constructor(props) {
         super();
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
 
         this.state = {
             entryDetail: {
@@ -26,10 +28,14 @@ class ListEntryEditor extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let { state } = this;
         let entryDetail = Object.assign({}, state.entryDetail);
+		logger.error(`onSettingChange(key=${key},event=${event}): entryDetail → ${entryDetail}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let value = typeof (event) === "object" ? event.target.value : event;
+		logger.error(`onSettingChange(key=${key},event=${event}): value → ${value}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         state.error[key] = value === "" ? true : false;
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         entryDetail[key] = value;
 
         this.setState({
@@ -40,6 +46,7 @@ class ListEntryEditor extends Component {
     }
 
     onSave() {
+		logger.error('>>> Entering onSave()', { "event.action": "onSave" });
         const { props, state } = this;
         this.setState({
             triedToSubmit: true
@@ -49,15 +56,19 @@ class ListEntryEditor extends Component {
         }
 
         props.onUpdate(state.entryDetail);
+		logger.warn('<<< Exiting onSave()', { "event.action": "onSave" });
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const { props } = this;
         props.Collapse();
+		logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         if (this.state.entryDetail !== undefined || this.props.id === "add") {
             const columnOne = <div className="left-column">
                 <InputGroup>

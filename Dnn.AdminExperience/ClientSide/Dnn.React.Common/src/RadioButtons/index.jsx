@@ -2,21 +2,26 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Tooltip from "../Tooltip";
 import "./style.less";
+const logger = console;
 
 class RadioButtons extends Component {
     
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             value: props.value
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }    
 
     componentDidUpdate(prevProp) {
+		logger.error(`>>> Entering componentDidUpdate(prevProp=${prevProp})`, { "event.action": "componentDidUpdate", "logrite.prevProp": prevProp });
         if (this.props.value !== prevProp.value) {
             this.setState({
                 value: this.props.value
             });
+			logger.warn(`<<< Exiting componentDidUpdate(prevProp=${prevProp})`, { "event.action": "componentDidUpdate", "logrite.prevProp": prevProp });
         }
     }
 
@@ -27,11 +32,14 @@ class RadioButtons extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         const tooltipMessages = props.tooltipMessage instanceof Array ? props.tooltipMessage : [props.tooltipMessage];
         const buttons = props.options.map((button) => {
             const uniqueKey = "radio-button-" + (props.id ? props.id + "-" : "") + button.label + "-" + button.value;
+			logger.error(`render(): uniqueKey → ${uniqueKey}`, { "event.action": "render" });
             const checked = (button.value && button.value.toString()) === (state.value && state.value.toString());
+			logger.error(`render(): checked → ${checked}`, { "event.action": "render" });
             const radioButtonClass = (props.disabled ? "disabled" : "") + (checked ? " checked" : "");
             return (
                 <li key={uniqueKey} className={radioButtonClass} style={{ width: props.buttonWidth }}>
@@ -40,6 +48,7 @@ class RadioButtons extends Component {
                     <label htmlFor={uniqueKey} disabled={props.disabled}>{button.label}</label>
                 </li>);
         });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={"dnn-radio-buttons " + props.float}>
                 {!!props.label && <label>{props.label}</label>}

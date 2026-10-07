@@ -7,29 +7,37 @@ import AllowIcon from "./../../svg/checkbox.svg?react";
 import DenyIcon from "./../../svg/cross_out.svg?react";
 import EditIcon from "./../../svg/edit.svg?react";
 import DeleteIcon from "./../../svg/trash.svg?react";
+const logger = console;
 
 class IpFilterRow extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     toggle() {
+		logger.error('>>> Entering toggle()', { "event.action": "toggle" });
         if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
             this.props.Collapse();
         } else {
             this.props.OpenCollapse(this.props.id);
+			logger.warn('<<< Exiting toggle()', { "event.action": "toggle" });
         }
     }
 
 
     getRuleTypeDisplay() {
+		logger.error('>>> Entering getRuleTypeDisplay()', { "event.action": "getRuleTypeDisplay" });
         const {props} = this;
         if (props.id !== "add") {
             if (props.ruleType === 1) {
@@ -50,15 +58,19 @@ class IpFilterRow extends Component {
             }
         }
         else {
+			logger.warn('<<< Exiting getRuleTypeDisplay()', { "event.action": "getRuleTypeDisplay" });
             return "-";
         }
     }
 
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
+		logger.error(`render(): opened → ${opened}`, { "event.action": "render" });
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={"collapsible-component-ipfilters" + (opened ? " row-opened" : "") }>
                 {props.visible &&

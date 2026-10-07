@@ -5,26 +5,35 @@ import { GridSystem, GridCell, InputGroup, SingleLineInputWithError, MultiLineIn
 import Localization from "../../../localization";
 import styles from "./style.module.less";
 import Utils from "../../../utils";
+const logger = console;
 
 class PageDetails extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {};
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
     }
 
     onChangeField(key, event) {
+		logger.error(`>>> Entering onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
         const { onChangeField } = this.props;
         onChangeField(key, event.target.value);
+		logger.warn(`<<< Exiting onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
     }
 
     onChangeTags(tags) {
+		logger.error(`>>> Entering onChangeTags(tags=${tags})`, { "event.action": "onChangeTags", "logrite.tags": tags });
         const { onChangeField } = this.props;
         onChangeField("tags", tags.join(","));
+		logger.warn(`<<< Exiting onChangeTags(tags=${tags})`, { "event.action": "onChangeTags", "logrite.tags": tags });
     }
 
     onChangeParentId(value) {
+		logger.error(`>>> Entering onChangeParentId(value=${value})`, { "event.action": "onChangeParentId", "logrite.value": value });
         const { onChangeField } = this.props;
         onChangeField("parentId", value);
+		logger.warn(`<<< Exiting onChangeParentId(value=${value})`, { "event.action": "onChangeParentId", "logrite.value": value });
     }
 
     onSelect(parentPageId, parentPageName) {
@@ -37,9 +46,11 @@ class PageDetails extends Component {
 
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { page, errors } = this.props;
 
         const tags = page.tags ? page.tags.split(",") : [];
+		logger.error(`render(): tags → ${tags}`, { "event.action": "render" });
         const TabParameters = {
             portalId: -2,
             cultureCode: "",
@@ -55,9 +66,13 @@ class PageDetails extends Component {
             includeDeletedChildren: false
         });
         const sf = Utils.getServiceFramework();
+		logger.error(`render(): TabParameters_1 → ${TabParameters_1}`, { "event.action": "render" });
+		logger.error(`render(): sf → ${sf}`, { "event.action": "render" });
 
         const defaultLabel = page.hierarchy || Localization.get("NoneSpecified");
+		logger.error(`render(): defaultLabel → ${defaultLabel}`, { "event.action": "render" });
         const selectedTabId = page.parentId || -1;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.pageStandard}>
                 <GridSystem>
@@ -145,6 +160,8 @@ PageDetails.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         page : state.pages.selectedPage
     };

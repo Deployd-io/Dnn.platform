@@ -63,6 +63,8 @@ namespace DotNetNuke.Modules.Groups
         public ModerationServiceController(INavigationManager navigationManager)
             : this(navigationManager, null, null, null, null, null, null, null)
         {
+		Logger.LogError(">>> Entering ModerationServiceController(navigationManager={NavigationManager})", navigationManager);
+        Logger.LogWarning("<<< Exiting ModerationServiceController(navigationManager={NavigationManager})", navigationManager);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModerationServiceController"/> class.</summary>
@@ -86,15 +88,18 @@ namespace DotNetNuke.Modules.Groups
         [ValidateAntiForgeryToken]
         public HttpResponseMessage ApproveGroup(NotificationDTO postData)
         {
+			Logger.LogError(">>> Entering ApproveGroup(postData={PostData})", postData);
             try
             {
                 var recipient = InternalMessagingController.Instance.GetMessageRecipient(postData.NotificationId, this.UserInfo.UserID);
+				Logger.LogError("ApproveGroup(postData={PostData}): recipient → {Recipient}", postData, recipient);
                 if (recipient == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Unable to locate recipient");
                 }
 
                 var notification = NotificationsController.Instance.GetNotification(postData.NotificationId);
+				Logger.LogError("ApproveGroup(postData={PostData}): notification → {Notification}", postData, notification);
                 this.ParseKey(notification.Context);
                 if (this.roleInfo == null)
                 {
@@ -109,13 +114,16 @@ namespace DotNetNuke.Modules.Groups
                 this.roleInfo.Status = RoleStatus.Approved;
                 RoleController.Instance.UpdateRole(this.roleInfo);
                 var roleCreator = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, this.roleInfo.CreatedByUserID);
+				Logger.LogError("ApproveGroup(postData={PostData}): roleCreator → {RoleCreator}", postData, roleCreator);
 
                 // Update the original creator's role
                 RoleController.Instance.UpdateUserRole(this.PortalSettings.PortalId, roleCreator.UserID, this.roleInfo.RoleID, RoleStatus.Approved, true, false);
                 GroupUtilities.CreateJournalEntry(this.roleInfo, roleCreator);
 
                 var notifications = new Notifications(this.hostSettings);
+				Logger.LogError("ApproveGroup(postData={PostData}): notifications → {Notifications}", postData, notifications);
                 var siteAdmin = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, this.PortalSettings.AdministratorId);
+				Logger.LogError("ApproveGroup(postData={PostData}): siteAdmin → {SiteAdmin}", postData, siteAdmin);
                 notifications.AddGroupNotification(Constants.GroupApprovedNotification, this.tabId, this.moduleId, this.roleInfo, siteAdmin, new List<RoleInfo> { this.roleInfo });
                 NotificationsController.Instance.DeleteAllNotificationRecipients(postData.NotificationId);
 
@@ -124,6 +132,7 @@ namespace DotNetNuke.Modules.Groups
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting ApproveGroup(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -132,15 +141,18 @@ namespace DotNetNuke.Modules.Groups
         [ValidateAntiForgeryToken]
         public HttpResponseMessage RejectGroup(NotificationDTO postData)
         {
+			Logger.LogError(">>> Entering RejectGroup(postData={PostData})", postData);
             try
             {
                 var recipient = InternalMessagingController.Instance.GetMessageRecipient(postData.NotificationId, this.UserInfo.UserID);
+				Logger.LogError("RejectGroup(postData={PostData}): recipient → {Recipient}", postData, recipient);
                 if (recipient == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Unable to locate recipient");
                 }
 
                 var notification = NotificationsController.Instance.GetNotification(postData.NotificationId);
+				Logger.LogError("RejectGroup(postData={PostData}): notification → {Notification}", postData, notification);
                 this.ParseKey(notification.Context);
                 if (this.roleInfo == null)
                 {
@@ -153,11 +165,15 @@ namespace DotNetNuke.Modules.Groups
                 }
 
                 var notifications = new Notifications(this.hostSettings);
+				Logger.LogError("RejectGroup(postData={PostData}): notifications → {Notifications}", postData, notifications);
                 var roleCreator = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, this.roleInfo.CreatedByUserID);
+				Logger.LogError("RejectGroup(postData={PostData}): roleCreator → {RoleCreator}", postData, roleCreator);
                 var siteAdmin = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, this.PortalSettings.AdministratorId);
+				Logger.LogError("RejectGroup(postData={PostData}): siteAdmin → {SiteAdmin}", postData, siteAdmin);
                 notifications.AddGroupNotification(Constants.GroupRejectedNotification, this.tabId, this.moduleId, this.roleInfo, siteAdmin, new List<RoleInfo> { this.roleInfo }, roleCreator);
 
                 var role = RoleController.Instance.GetRole(this.PortalSettings.PortalId, r => r.RoleID == this.roleId);
+				Logger.LogError("RejectGroup(postData={PostData}): role → {Role}", postData, role);
                 RoleController.Instance.DeleteRole(role);
                 NotificationsController.Instance.DeleteAllNotificationRecipients(postData.NotificationId);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
@@ -165,6 +181,7 @@ namespace DotNetNuke.Modules.Groups
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting RejectGroup(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -175,14 +192,17 @@ namespace DotNetNuke.Modules.Groups
         [SupportedModules("Social Groups")]
         public HttpResponseMessage JoinGroup(RoleDTO postData)
         {
+			Logger.LogError(">>> Entering JoinGroup(postData={PostData})", postData);
             try
             {
                 if (this.UserInfo.UserID >= 0 && postData.RoleId > -1)
                 {
                     this.roleInfo = RoleController.Instance.GetRoleById(this.PortalSettings.PortalId, postData.RoleId);
+					Logger.LogDebug("JoinGroup(postData={PostData}): roleInfo → {RoleInfo}", postData, roleInfo);
                     if (this.roleInfo != null)
                     {
                         var requireApproval = false;
+						Logger.LogError("JoinGroup(postData={PostData}): requireApproval → {RequireApproval}", postData, requireApproval);
 
                         if (this.roleInfo.Settings.ContainsKey("ReviewMembers"))
                         {
@@ -195,6 +215,7 @@ namespace DotNetNuke.Modules.Groups
                             RoleController.Instance.UpdateRole(this.roleInfo);
 
                             var url = this.NavigationManager.NavigateURL(postData.GroupViewTabId, string.Empty, new[] { "groupid=" + this.roleInfo.RoleID });
+							Logger.LogError("JoinGroup(postData={PostData}): url → {Url}", postData, url);
                             return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", URL = url });
                         }
 
@@ -202,6 +223,7 @@ namespace DotNetNuke.Modules.Groups
                         {
                             RoleController.Instance.AddUserRole(this.PortalSettings.PortalId, this.UserInfo.UserID, this.roleInfo.RoleID, RoleStatus.Pending, false, Null.NullDate, Null.NullDate);
                             var notifications = new Notifications(this.hostSettings);
+							Logger.LogError("JoinGroup(postData={PostData}): notifications → {Notifications}", postData, notifications);
                             notifications.AddGroupOwnerNotification(Constants.MemberPendingNotification, this.tabId, this.moduleId, this.roleInfo, this.UserInfo);
                             return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", URL = string.Empty });
                         }
@@ -211,6 +233,7 @@ namespace DotNetNuke.Modules.Groups
             catch (Exception exc)
             {
                 Logger.Error(exc);
+			Logger.LogWarning("<<< Exiting JoinGroup(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
 
@@ -223,13 +246,16 @@ namespace DotNetNuke.Modules.Groups
         [SupportedModules("Social Groups")]
         public HttpResponseMessage LeaveGroup(RoleDTO postData)
         {
+			Logger.LogError(">>> Entering LeaveGroup(postData={PostData})", postData);
             var success = false;
 
+			Logger.LogError("LeaveGroup(postData={PostData}): success → {Success}", postData, success);
             try
             {
                 if (this.UserInfo.UserID >= 0 && postData.RoleId > 0)
                 {
                     this.roleInfo = RoleController.Instance.GetRoleById(this.PortalSettings.PortalId, postData.RoleId);
+					Logger.LogDebug("LeaveGroup(postData={PostData}): roleInfo → {RoleInfo}", postData, roleInfo);
 
                     if (this.roleInfo != null)
                     {
@@ -253,6 +279,7 @@ namespace DotNetNuke.Modules.Groups
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success" });
             }
 
+			Logger.LogWarning("<<< Exiting LeaveGroup(postData={PostData})", postData);
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Unknown Error");
         }
 
@@ -260,15 +287,18 @@ namespace DotNetNuke.Modules.Groups
         [ValidateAntiForgeryToken]
         public HttpResponseMessage ApproveMember(NotificationDTO postData)
         {
+			Logger.LogError(">>> Entering ApproveMember(postData={PostData})", postData);
             try
             {
                 var recipient = InternalMessagingController.Instance.GetMessageRecipient(postData.NotificationId, this.UserInfo.UserID);
+				Logger.LogError("ApproveMember(postData={PostData}): recipient → {Recipient}", postData, recipient);
                 if (recipient == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Unable to locate recipient");
                 }
 
                 var notification = NotificationsController.Instance.GetNotification(postData.NotificationId);
+				Logger.LogError("ApproveMember(postData={PostData}): notification → {Notification}", postData, notification);
                 this.ParseKey(notification.Context);
                 if (this.memberId <= 0)
                 {
@@ -281,15 +311,20 @@ namespace DotNetNuke.Modules.Groups
                 }
 
                 var member = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, this.memberId);
+				Logger.LogError("ApproveMember(postData={PostData}): member → {Member}", postData, member);
 
                 if (member != null)
                 {
                     var memberRoleInfo = RoleController.Instance.GetUserRole(this.PortalSettings.PortalId, this.memberId, this.roleInfo.RoleID);
+					Logger.LogError("ApproveMember(postData={PostData}): memberRoleInfo → {MemberRoleInfo}", postData, memberRoleInfo);
                     memberRoleInfo.Status = RoleStatus.Approved;
+					Logger.LogDebug("ApproveMember(postData={PostData}): memberRoleInfo.Status → {Arg1}", postData, memberRoleInfo.Status);
                     RoleController.Instance.UpdateUserRole(this.PortalSettings.PortalId, this.memberId, this.roleInfo.RoleID, RoleStatus.Approved, false, false);
 
                     var notifications = new Notifications(this.hostSettings);
+					Logger.LogError("ApproveMember(postData={PostData}): notifications → {Notifications}", postData, notifications);
                     var groupOwner = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, this.roleInfo.CreatedByUserID);
+					Logger.LogError("ApproveMember(postData={PostData}): groupOwner → {GroupOwner}", postData, groupOwner);
                     notifications.AddMemberNotification(Constants.MemberApprovedNotification, this.tabId, this.moduleId, this.roleInfo, groupOwner, member);
                     NotificationsController.Instance.DeleteAllNotificationRecipients(postData.NotificationId);
 
@@ -299,6 +334,7 @@ namespace DotNetNuke.Modules.Groups
             catch (Exception exc)
             {
                 Logger.Error(exc);
+			Logger.LogWarning("<<< Exiting ApproveMember(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
 
@@ -309,15 +345,18 @@ namespace DotNetNuke.Modules.Groups
         [ValidateAntiForgeryToken]
         public HttpResponseMessage RejectMember(NotificationDTO postData)
         {
+			Logger.LogError(">>> Entering RejectMember(postData={PostData})", postData);
             try
             {
                 var recipient = InternalMessagingController.Instance.GetMessageRecipient(postData.NotificationId, this.UserInfo.UserID);
+				Logger.LogError("RejectMember(postData={PostData}): recipient → {Recipient}", postData, recipient);
                 if (recipient == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "Unable to locate recipient");
                 }
 
                 var notification = NotificationsController.Instance.GetNotification(postData.NotificationId);
+				Logger.LogError("RejectMember(postData={PostData}): notification → {Notification}", postData, notification);
                 this.ParseKey(notification.Context);
                 if (this.memberId <= 0)
                 {
@@ -330,12 +369,15 @@ namespace DotNetNuke.Modules.Groups
                 }
 
                 var member = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, this.memberId);
+				Logger.LogError("RejectMember(postData={PostData}): member → {Member}", postData, member);
 
                 if (member != null)
                 {
                     RoleController.DeleteUserRole(this.roleProvider, this.roleController, this.eventManager, this.portalController, this.userController, this.eventLogger, member, this.roleInfo, this.PortalSettings, false);
                     var notifications = new Notifications(this.hostSettings);
+					Logger.LogError("RejectMember(postData={PostData}): notifications → {Notifications}", postData, notifications);
                     var groupOwner = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, this.roleInfo.CreatedByUserID);
+					Logger.LogError("RejectMember(postData={PostData}): groupOwner → {GroupOwner}", postData, groupOwner);
                     notifications.AddMemberNotification(Constants.MemberRejectedNotification, this.tabId, this.moduleId, this.roleInfo, groupOwner, member);
                     NotificationsController.Instance.DeleteAllNotificationRecipients(postData.NotificationId);
 
@@ -345,6 +387,7 @@ namespace DotNetNuke.Modules.Groups
             catch (Exception exc)
             {
                 Logger.Error(exc);
+			Logger.LogWarning("<<< Exiting RejectMember(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
 
@@ -353,19 +396,30 @@ namespace DotNetNuke.Modules.Groups
 
         private void ParseKey(string key)
         {
+			Logger.LogError(">>> Entering ParseKey(key={Key})", key);
             this.tabId = -1;
             this.moduleId = -1;
+			Logger.LogDebug("ParseKey(key={Key}): this.tabId → {Arg1}", key, this.tabId);
+			Logger.LogDebug("ParseKey(key={Key}): moduleId → {ModuleId}", key, moduleId);
+			Logger.LogDebug("ParseKey(key={Key}): this.moduleId → {Arg1}", key, this.moduleId);
             this.roleId = -1;
             this.memberId = -1;
             this.roleInfo = null;
+			Logger.LogDebug("ParseKey(key={Key}): roleId → {RoleId}", key, roleId);
             if (!string.IsNullOrEmpty(key))
             {
+				Logger.LogDebug("ParseKey(key={Key}): this.roleId → {Arg1}", key, this.roleId);
+				Logger.LogDebug("ParseKey(key={Key}): memberId → {MemberId}", key, memberId);
+				Logger.LogDebug("ParseKey(key={Key}): this.memberId → {Arg1}", key, this.memberId);
+				Logger.LogDebug("ParseKey(key={Key}): roleInfo → {RoleInfo}", key, roleInfo);
+				Logger.LogDebug("ParseKey(key={Key}): this.roleInfo → {Arg1}", key, this.roleInfo);
                 string[] keys = key.Split(':');
                 this.tabId = Convert.ToInt32(keys[0]);
                 this.moduleId = Convert.ToInt32(keys[1]);
                 this.roleId = Convert.ToInt32(keys[2]);
                 if (keys.Length > 3)
                 {
+					Logger.LogDebug("ParseKey(key={Key}): tabId → {TabId}", key, tabId);
                     this.memberId = Convert.ToInt32(keys[3]);
                 }
             }
@@ -374,11 +428,15 @@ namespace DotNetNuke.Modules.Groups
             {
                 this.roleInfo = RoleController.Instance.GetRoleById(this.PortalSettings.PortalId, this.roleId);
             }
+			Logger.LogWarning("<<< Exiting ParseKey(key={Key})", key);
         }
 
         private bool IsMod()
         {
+			Logger.LogError(">>> Entering IsMod()");
             var objModulePermissions = new ModulePermissionCollection(CBO.FillCollection(DataProvider.Instance().GetModulePermissionsByModuleID(this.moduleId, -1), typeof(ModulePermissionInfo)));
+			Logger.LogError("IsMod(): objModulePermissions → {ObjModulePermissions}", objModulePermissions);
+			Logger.LogWarning("<<< Exiting IsMod()");
             return ModulePermissionController.HasModulePermission(objModulePermissions, "MODGROUP");
         }
 

@@ -16,12 +16,15 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let canEdit = false;
 class BasicSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this._mounted = false;
+		logger.debug(`constructor(): this._mounted → ${this._mounted}`, { "event.action": "constructor" });
         this.state = {
             basicSettings: undefined,
             error: {
@@ -30,12 +33,15 @@ class BasicSettingsPanelBody extends Component {
             triedToSubmit: false
         };
         canEdit = util.settings.isHost || util.settings.isAdmin || util.settings.permissions.SITE_INFO_EDIT;
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
     }
 
     getPortalSettings() {
+		logger.error('>>> Entering getPortalSettings()', { "event.action": "getPortalSettings" });
         const {props} = this;
         props.dispatch(SiteInfoActions.getPortalSettings(props.portalId, props.cultureCode, (data) => {
             if (this._mounted) {
+				logger.warn('<<< Exiting getPortalSettings()', { "event.action": "getPortalSettings" });
                 this.setState({
                     basicSettings: Object.assign({}, data.Settings)
                 });
@@ -44,11 +50,14 @@ class BasicSettingsPanelBody extends Component {
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this._mounted = true;
         this.getPortalSettings();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentDidUpdate() {
+		logger.error('>>> Entering componentDidUpdate()', { "event.action": "componentDidUpdate" });
         let { props} = this;
         if (props.basicSettings) {
             let portalIdChanged = props.portalId !== undefined && props.basicSettings.PortalId !== props.portalId;
@@ -56,20 +65,26 @@ class BasicSettingsPanelBody extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.getPortalSettings();
+				logger.warn('<<< Exiting componentDidUpdate()', { "event.action": "componentDidUpdate" });
             }
         }
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         this._mounted = false;
+		logger.warn('<<< Exiting componentWillUnmount()', { "event.action": "componentWillUnmount" });
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {state, props} = this;
         let basicSettings = Object.assign({}, state.basicSettings);
+		logger.error(`onSettingChange(key=${key},event=${event}): basicSettings → ${basicSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
 
         if (key === "LogoFile" || key === "FavIcon") {
             basicSettings[key] = event;
+			logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         }
         else if (key === "TimeZone" || key === "IconSets") {
             basicSettings[key] = event.value;
@@ -95,26 +110,31 @@ class BasicSettingsPanelBody extends Component {
     }
 
     getTimeZoneOptions() {
+		logger.error('>>> Entering getTimeZoneOptions()', { "event.action": "getTimeZoneOptions" });
         let options = [];
         if (this.props.timeZones !== undefined) {
             options = this.props.timeZones.map((item) => {
                 return { label: item.DisplayName, value: item.Id };
             });
         }
+		logger.warn('<<< Exiting getTimeZoneOptions()', { "event.action": "getTimeZoneOptions" });
         return options;
     }
 
     getIconSetOptions() {
+		logger.error('>>> Entering getIconSetOptions()', { "event.action": "getIconSetOptions" });
         let options = [];
         if (this.props.iconSets !== undefined) {
             options = this.props.iconSets.map((item) => {
                 return { label: item, value: item };
             });
         }
+		logger.warn('<<< Exiting getIconSetOptions()', { "event.action": "getIconSetOptions" });
         return options;
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -130,12 +150,15 @@ class BasicSettingsPanelBody extends Component {
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
         }));
+		logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {            
             props.dispatch(SiteInfoActions.getPortalSettings(props.portalId, props.cultureCode, (data) => {
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
                 let basicSettings = Object.assign({}, data.Settings);
                 this.setState({
                     basicSettings
@@ -146,6 +169,7 @@ class BasicSettingsPanelBody extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         if (state.basicSettings) {
             const columnOne = <div key="column-one" className="left-column">
@@ -360,6 +384,7 @@ class BasicSettingsPanelBody extends Component {
             );
         }
         else {
+			logger.warn('<<< Exiting render()', { "event.action": "render" });
             return <div />;
         }
     }
@@ -377,6 +402,8 @@ BasicSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         basicSettings: state.siteInfo.settings,

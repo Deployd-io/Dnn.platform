@@ -61,6 +61,7 @@ namespace DotNetNuke.Entities.Content
     [Serializable]
     public class ContentItem : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ContentItem));
         private NameValueCollection metadata;
 
         private List<Term> terms;
@@ -72,9 +73,12 @@ namespace DotNetNuke.Entities.Content
         /// <summary>Initializes a new instance of the <see cref="ContentItem"/> class.</summary>
         public ContentItem()
         {
+			Logger.LogError(">>> Entering ContentItem()");
             this.TabID = Null.NullInteger;
+			Logger.LogDebug("ContentItem(): this.TabID → {Arg0}", this.TabID);
             this.ModuleID = Null.NullInteger;
             this.ContentTypeId = Null.NullInteger;
+			Logger.LogDebug("ContentItem(): this.ModuleID → {Arg0}", this.ModuleID);
             this.ContentItemId = Null.NullInteger;
             this.StateID = Null.NullInteger;
         }
@@ -238,7 +242,9 @@ namespace DotNetNuke.Entities.Content
         /// <seealso cref="IHydratable.Fill"/>
         public virtual void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <summary>Fills the internal.</summary>
@@ -248,6 +254,7 @@ namespace DotNetNuke.Entities.Content
         /// </remarks>
         protected override void FillInternal(IDataReader dr)
         {
+			Logger.LogError(">>> Entering FillInternal(dr={Dr})", dr);
             base.FillInternal(dr);
 
             this.ContentItemId = Null.SetNullInteger(dr["ContentItemID"]);
@@ -259,6 +266,7 @@ namespace DotNetNuke.Entities.Content
             this.Indexed = Null.SetNullBoolean(dr["Indexed"]);
 
             var schema = dr.GetSchemaTable();
+			Logger.LogError("FillInternal(dr={Dr}): schema → {Schema}", dr, schema);
             if (schema != null)
             {
                 if (schema.Select("ColumnName = 'StateID'").Length > 0)
@@ -266,13 +274,24 @@ namespace DotNetNuke.Entities.Content
                     this.StateID = Null.SetNullInteger(dr["StateID"]);
                 }
             }
+			Logger.LogWarning("<<< Exiting FillInternal(dr={Dr})", dr);
         }
 
         protected void Clone(ContentItem cloneItem, ContentItem originalItem)
         {
+			Logger.LogError(">>> Entering Clone(cloneItem={CloneItem},originalItem={OriginalItem})", cloneItem, originalItem);
             this.CloneBaseProperties(cloneItem, originalItem);
 
+			Logger.LogWarning("<<< Exiting Clone(cloneItem={CloneItem},originalItem={OriginalItem})", cloneItem, originalItem);
+			Logger.LogDebug("Clone(cloneItem={CloneItem},originalItem={OriginalItem}): cloneItem.Content → {Arg2}", cloneItem, originalItem, cloneItem.Content);
+			Logger.LogDebug("Clone(cloneItem={CloneItem},originalItem={OriginalItem}): cloneItem.ContentTypeId → {Arg2}", cloneItem, originalItem, cloneItem.ContentTypeId);
+			Logger.LogDebug("Clone(cloneItem={CloneItem},originalItem={OriginalItem}): cloneItem.TabID → {Arg2}", cloneItem, originalItem, cloneItem.TabID);
+			Logger.LogDebug("Clone(cloneItem={CloneItem},originalItem={OriginalItem}): cloneItem.ModuleID → {Arg2}", cloneItem, originalItem, cloneItem.ModuleID);
+			Logger.LogDebug("Clone(cloneItem={CloneItem},originalItem={OriginalItem}): cloneItem.ContentKey → {Arg2}", cloneItem, originalItem, cloneItem.ContentKey);
+			Logger.LogDebug("Clone(cloneItem={CloneItem},originalItem={OriginalItem}): cloneItem.Indexed → {Arg2}", cloneItem, originalItem, cloneItem.Indexed);
+			Logger.LogDebug("Clone(cloneItem={CloneItem},originalItem={OriginalItem}): cloneItem.StateID → {Arg2}", cloneItem, originalItem, cloneItem.StateID);
             cloneItem.ContentItemId = originalItem.ContentItemId;
+			Logger.LogDebug("Clone(cloneItem={CloneItem},originalItem={OriginalItem}): cloneItem.ContentItemId → {Arg2}", cloneItem, originalItem, cloneItem.ContentItemId);
             cloneItem.Content = originalItem.Content;
             cloneItem.ContentTypeId = originalItem.ContentTypeId;
             cloneItem.TabID = originalItem.TabID;

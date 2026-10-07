@@ -2,22 +2,28 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "./style.less";
 import Tooltip from "../Tooltip";
+const logger = console;
 
 class TextOverflowWrapper extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.uniqueId = "overflowTooltip-" + (Date.now() * Math.random());
         this.state = {
             itemWidth: 0
         };
         this.overflowTooltipRef = React.createRef();
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
     getStyle() {
+		logger.error('>>> Entering getStyle()', { "event.action": "getStyle" });
         const {props} = this;
+		logger.warn('<<< Exiting getStyle()', { "event.action": "getStyle" });
         return Object.assign({ maxWidth: props.maxWidth }, props.style);
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         //Set time out to ensure calculation happens after render
         this.timerId = setTimeout(() => {
             let input = this.overflowTooltipRef;
@@ -27,19 +33,25 @@ class TextOverflowWrapper extends Component {
                     itemWidth: inputRect.width
                 });
             } else {
+				logger.error(`componentDidMount(): inputRect → ${inputRect}`, { "event.action": "componentDidMount" });
                 this.setState({
                     itemWidth: this.props.maxWidth
                 });
             }
         }, 500);
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         clearTimeout(this.timerId);
+		logger.warn('<<< Exiting componentWillUnmount()', { "event.action": "componentWillUnmount" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div
                 className={"dnn-text-overflow-wrapper" + (props.className ? " " + props.className : "")}

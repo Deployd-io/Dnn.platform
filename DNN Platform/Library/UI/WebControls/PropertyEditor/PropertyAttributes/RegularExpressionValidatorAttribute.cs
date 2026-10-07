@@ -8,12 +8,14 @@ namespace DotNetNuke.UI.WebControls
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class RegularExpressionValidatorAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RegularExpressionValidatorAttribute));
         private readonly string expression;
 
         /// <summary>Initializes a new instance of the <see cref="RegularExpressionValidatorAttribute"/> class.</summary>
         /// <param name="expression">The regular expression pattern.</param>
         public RegularExpressionValidatorAttribute(string expression)
         {
+			Logger.LogError(">>> Entering RegularExpressionValidatorAttribute(expression={Expression})", expression);
             this.expression = expression;
         }
 

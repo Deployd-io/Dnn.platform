@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import "./style.less";
+const logger = console;
 
 const SvgIcons = {
     EmptyThumbnail: <svg version="1.1" x="0px" y="0px" viewBox="0 0 2048 2048">
@@ -49,13 +50,17 @@ const SvgIcons = {
 class SvgIcon extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {};
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
     }
 
     
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             SvgIcons[props.name]
         );
@@ -67,6 +72,8 @@ SvgIcon.propTypes = {
 };
 
 function mapStateToProps() {
+	logger.error('>>> Entering mapStateToProps()', { "event.action": "mapStateToProps" });
+	logger.warn('<<< Exiting mapStateToProps()', { "event.action": "mapStateToProps" });
     return {};
 }
 

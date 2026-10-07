@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using DotNetNuke.Common;
 using DotNetNuke.Entities.Users;
 using DotNetNuke.Services.Tokens;
+using Microsoft.Extensions.Logging;
 
 namespace Dnn.ContactList.Spa.Components
 {
@@ -17,6 +18,7 @@ namespace Dnn.ContactList.Spa.Components
     /// </summary>
     public class SettingsPropertyAccess : IPropertyAccess
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private readonly ISettingsService _service;
         private readonly int _moduleId;
         private readonly int _tabId;
@@ -26,7 +28,9 @@ namespace Dnn.ContactList.Spa.Components
         /// </summary>
         public SettingsPropertyAccess(int moduleId, int tabId) : this(moduleId, tabId, SettingsService.Instance)
         {
+		_logger.LogError(">>> Entering SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
 
+		_logger.LogWarning("<<< Exiting SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
         }
 
         /// <summary>
@@ -34,11 +38,16 @@ namespace Dnn.ContactList.Spa.Components
         /// </summary>
         public SettingsPropertyAccess(int moduleId, int tabId, ISettingsService service)
         {
+			_logger.LogError(">>> Entering SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId},service={Service})", moduleId, tabId, service);
             Requires.NotNull(service);
+			_logger.LogWarning("<<< Exiting SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
 
             _service = service;
+			_logger.LogDebug("SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId},service={Service}): _service → {_service}", moduleId, tabId, service, _service);
             _tabId = tabId;
+			_logger.LogDebug("SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId},service={Service}): _tabId → {_tabId}", moduleId, tabId, service, _tabId);
             _moduleId = moduleId;
+			_logger.LogDebug("SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId},service={Service}): _moduleId → {_moduleId}", moduleId, tabId, service, _moduleId);
         }
 
         /// <summary>
@@ -61,8 +70,10 @@ namespace Dnn.ContactList.Spa.Components
         /// <returns></returns>
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			_logger.LogError(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             string propertyValue = "";
 
+			_logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): propertyValue → {PropertyValue}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, propertyValue);
             switch (propertyName)
             {
                 case "IsFormEnabled":
@@ -76,6 +87,7 @@ namespace Dnn.ContactList.Spa.Components
                     break;
             }
 
+			_logger.LogWarning("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return propertyValue;
         }
     }

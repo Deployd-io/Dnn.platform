@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 var isMac = /Mac/.test(navigator.platform);
 
 var shortcuts = {
@@ -19,11 +20,13 @@ var shortcuts = {
  * Fix shortcut. Mac use Command, others use Ctrl.
  */
 function fixShortcut(name) {
+	logger.error(`>>> Entering fixShortcut(name=${name})`, { "event.action": "fixShortcut", "logrite.name": name });
 	if(isMac) {
 		name = name.replace('Ctrl', 'Cmd');
 	} else {
 		name = name.replace('Cmd', 'Ctrl');
 	}
+	logger.warn(`<<< Exiting fixShortcut(name=${name})`, { "event.action": "fixShortcut", "logrite.name": name });
 	return name;
 }
 
@@ -32,9 +35,14 @@ function fixShortcut(name) {
  * Create icon element for toolbar.
  */
 function createIcon(options, enableTooltips) {
+	logger.error(`>>> Entering createIcon(options=${options},enableTooltips=${enableTooltips})`, { "event.action": "createIcon", "logrite.options": options, "logrite.enableTooltips": enableTooltips });
 	options = options || {};
 	var el = document.createElement('a');
+	logger.error(`createIcon(options=${options},enableTooltips=${enableTooltips}): el → ${el}`, { "event.action": "createIcon", "logrite.options": options, "logrite.enableTooltips": enableTooltips });
+	logger.debug(`createIcon(options=${options},enableTooltips=${enableTooltips}): el.title → ${el.title}`, { "event.action": "createIcon", "logrite.options": options, "logrite.enableTooltips": enableTooltips });
+	logger.debug(`createIcon(options=${options},enableTooltips=${enableTooltips}): el.className → ${el.className}`, { "event.action": "createIcon", "logrite.options": options, "logrite.enableTooltips": enableTooltips });
 	enableTooltips = (enableTooltips == undefined) ? true : enableTooltips;
+	logger.error(`createIcon(options=${options},enableTooltips=${enableTooltips}): enableTooltips → ${enableTooltips}`, { "event.action": "createIcon", "logrite.options": options, "logrite.enableTooltips": enableTooltips });
 
 	if(options.title && enableTooltips) {
 		el.title = options.title;
@@ -46,13 +54,16 @@ function createIcon(options, enableTooltips) {
 	}
 
 	el.className = options.className;
+	logger.warn(`<<< Exiting createIcon(options=${options},enableTooltips=${enableTooltips})`, { "event.action": "createIcon", "logrite.options": options, "logrite.enableTooltips": enableTooltips });
 	return el;
 }
 
 function createSep() {
+	logger.error('>>> Entering createSep()', { "event.action": "createSep" });
 	el = document.createElement('i');
 	el.className = 'separator';
 	el.innerHTML = '|';
+	logger.warn('<<< Exiting createSep()', { "event.action": "createSep" });
 	return el;
 }
 
@@ -61,14 +72,23 @@ function createSep() {
  * The state of CodeMirror at the given position.
  */
 function getState(cm, pos) {
+	logger.error(`>>> Entering getState(cm=${cm},pos=${pos})`, { "event.action": "getState", "logrite.cm": cm, "logrite.pos": pos });
 	pos = pos || cm.getCursor('start');
 	var stat = cm.getTokenAt(pos);
+	logger.error(`getState(cm=${cm},pos=${pos}): pos → ${pos}`, { "event.action": "getState", "logrite.cm": cm, "logrite.pos": pos });
+	logger.error(`getState(cm=${cm},pos=${pos}): stat → ${stat}`, { "event.action": "getState", "logrite.cm": cm, "logrite.pos": pos });
 	if(!stat.type) return {};
 
 	var types = stat.type.split(' ');
+	logger.error(`getState(cm=${cm},pos=${pos}): types → ${types}`, { "event.action": "getState", "logrite.cm": cm, "logrite.pos": pos });
 
 	var ret = {},
 		data, text;
+		logger.debug(`getState(cm=${cm},pos=${pos}): ret.quote → ${ret.quote}`, { "event.action": "getState", "logrite.cm": cm, "logrite.pos": pos });
+		logger.debug(`getState(cm=${cm},pos=${pos}): ret.bold → ${ret.bold}`, { "event.action": "getState", "logrite.cm": cm, "logrite.pos": pos });
+		logger.debug(`getState(cm=${cm},pos=${pos}): ret.italic → ${ret.italic}`, { "event.action": "getState", "logrite.cm": cm, "logrite.pos": pos });
+		logger.debug(`getState(cm=${cm},pos=${pos}): ret.strikethrough → ${ret.strikethrough}`, { "event.action": "getState", "logrite.cm": cm, "logrite.pos": pos });
+		logger.debug(`getState(cm=${cm},pos=${pos}): ret.code → ${ret.code}`, { "event.action": "getState", "logrite.cm": cm, "logrite.pos": pos });
 	for(var i = 0; i < types.length; i++) {
 		data = types[i];
 		if(data === 'strong') {
@@ -92,6 +112,7 @@ function getState(cm, pos) {
 			ret.code = true;
 		}
 	}
+	logger.warn(`<<< Exiting getState(cm=${cm},pos=${pos})`, { "event.action": "getState", "logrite.cm": cm, "logrite.pos": pos });
 	return ret;
 }
 
@@ -103,8 +124,10 @@ var saved_overflow = "";
  * Toggle full screen of the editor.
  */
 function toggleFullScreen(editor) {
+	logger.error(`>>> Entering toggleFullScreen(editor=${editor})`, { "event.action": "toggleFullScreen" });
 	// Set fullscreen
 	var cm = editor.codemirror;
+	logger.error(`toggleFullScreen(editor=${editor}): cm → ${cm}`, { "event.action": "toggleFullScreen" });
 	cm.setOption("fullScreen", !cm.getOption("fullScreen"));
 
 
@@ -119,6 +142,7 @@ function toggleFullScreen(editor) {
 
 	// Update toolbar class
 	var wrap = cm.getWrapperElement();
+	logger.error(`toggleFullScreen(editor=${editor}): wrap → ${wrap}`, { "event.action": "toggleFullScreen" });
 
 	if(!/fullscreen/.test(wrap.previousSibling.className)) {
 		wrap.previousSibling.className += " fullscreen";
@@ -141,6 +165,9 @@ function toggleFullScreen(editor) {
 	var sidebyside = cm.getWrapperElement().nextSibling;
 	if(/editor-preview-active-side/.test(sidebyside.className))
 		toggleSideBySide(editor);
+		logger.warn(`<<< Exiting toggleFullScreen(editor=${editor})`, { "event.action": "toggleFullScreen" });
+		logger.error('>>> Entering toggleFullScreen()', { "event.action": "toggleFullScreen" });
+		logger.warn('<<< Exiting toggleFullScreen()', { "event.action": "toggleFullScreen" });
 }
 
 
@@ -148,7 +175,11 @@ function toggleFullScreen(editor) {
  * Action for toggling bold.
  */
 function toggleBold(editor) {
+	logger.error(`>>> Entering toggleBold(editor=${editor})`, { "event.action": "toggleBold" });
 	_toggleBlock(editor, 'bold', '**');
+	logger.warn(`<<< Exiting toggleBold(editor=${editor})`, { "event.action": "toggleBold" });
+	logger.error('>>> Entering toggleBold()', { "event.action": "toggleBold" });
+	logger.warn('<<< Exiting toggleBold()', { "event.action": "toggleBold" });
 }
 
 
@@ -156,7 +187,11 @@ function toggleBold(editor) {
  * Action for toggling italic.
  */
 function toggleItalic(editor) {
+	logger.error(`>>> Entering toggleItalic(editor=${editor})`, { "event.action": "toggleItalic" });
 	_toggleBlock(editor, 'italic', '*');
+	logger.warn(`<<< Exiting toggleItalic(editor=${editor})`, { "event.action": "toggleItalic" });
+	logger.error('>>> Entering toggleItalic()', { "event.action": "toggleItalic" });
+	logger.warn('<<< Exiting toggleItalic()', { "event.action": "toggleItalic" });
 }
 
 
@@ -164,62 +199,94 @@ function toggleItalic(editor) {
  * Action for toggling strikethrough.
  */
 function toggleStrikethrough(editor) {
+	logger.error(`>>> Entering toggleStrikethrough(editor=${editor})`, { "event.action": "toggleStrikethrough" });
 	_toggleBlock(editor, 'strikethrough', '~~');
+	logger.warn(`<<< Exiting toggleStrikethrough(editor=${editor})`, { "event.action": "toggleStrikethrough" });
+	logger.error('>>> Entering toggleStrikethrough()', { "event.action": "toggleStrikethrough" });
+	logger.warn('<<< Exiting toggleStrikethrough()', { "event.action": "toggleStrikethrough" });
 }
 
 /**
  * Action for toggling code block.
  */
 function toggleCodeBlock(editor) {
+	logger.error(`>>> Entering toggleCodeBlock(editor=${editor})`, { "event.action": "toggleCodeBlock" });
 	_toggleBlock(editor, 'code', '```\r\n', '\r\n```');
+	logger.warn(`<<< Exiting toggleCodeBlock(editor=${editor})`, { "event.action": "toggleCodeBlock" });
+	logger.error('>>> Entering toggleCodeBlock()', { "event.action": "toggleCodeBlock" });
+	logger.warn('<<< Exiting toggleCodeBlock()', { "event.action": "toggleCodeBlock" });
 }
 
 /**
  * Action for toggling blockquote.
  */
 function toggleBlockquote(editor) {
+	logger.error(`>>> Entering toggleBlockquote(editor=${editor})`, { "event.action": "toggleBlockquote" });
 	var cm = editor.codemirror;
 	_toggleLine(cm, 'quote');
+	logger.warn(`<<< Exiting toggleBlockquote(editor=${editor})`, { "event.action": "toggleBlockquote" });
+	logger.error('>>> Entering toggleBlockquote()', { "event.action": "toggleBlockquote" });
+	logger.warn('<<< Exiting toggleBlockquote()', { "event.action": "toggleBlockquote" });
 }
 
 /**
  * Action for toggling heading size: normal -> h1 -> h2 -> h3 -> h4 -> h5 -> h6 -> normal
  */
 function toggleHeadingSmaller(editor) {
+	logger.error(`>>> Entering toggleHeadingSmaller(editor=${editor})`, { "event.action": "toggleHeadingSmaller" });
 	var cm = editor.codemirror;
 	_toggleHeading(cm, 'smaller');
+	logger.warn(`<<< Exiting toggleHeadingSmaller(editor=${editor})`, { "event.action": "toggleHeadingSmaller" });
+	logger.error('>>> Entering toggleHeadingSmaller()', { "event.action": "toggleHeadingSmaller" });
+	logger.warn('<<< Exiting toggleHeadingSmaller()', { "event.action": "toggleHeadingSmaller" });
 }
 
 /**
  * Action for toggling heading size: normal -> h6 -> h5 -> h4 -> h3 -> h2 -> h1 -> normal
  */
 function toggleHeadingBigger(editor) {
+	logger.error(`>>> Entering toggleHeadingBigger(editor=${editor})`, { "event.action": "toggleHeadingBigger" });
 	var cm = editor.codemirror;
 	_toggleHeading(cm, 'bigger');
+	logger.warn(`<<< Exiting toggleHeadingBigger(editor=${editor})`, { "event.action": "toggleHeadingBigger" });
+	logger.error('>>> Entering toggleHeadingBigger()', { "event.action": "toggleHeadingBigger" });
+	logger.warn('<<< Exiting toggleHeadingBigger()', { "event.action": "toggleHeadingBigger" });
 }
 
 /**
  * Action for toggling heading size 1
  */
 function toggleHeading1(editor) {
+	logger.error(`>>> Entering toggleHeading1(editor=${editor})`, { "event.action": "toggleHeading1" });
 	var cm = editor.codemirror;
 	_toggleHeading(cm, undefined, 1);
+	logger.warn(`<<< Exiting toggleHeading1(editor=${editor})`, { "event.action": "toggleHeading1" });
+	logger.error('>>> Entering toggleHeading1()', { "event.action": "toggleHeading1" });
+	logger.warn('<<< Exiting toggleHeading1()', { "event.action": "toggleHeading1" });
 }
 
 /**
  * Action for toggling heading size 2
  */
 function toggleHeading2(editor) {
+	logger.error(`>>> Entering toggleHeading2(editor=${editor})`, { "event.action": "toggleHeading2" });
 	var cm = editor.codemirror;
 	_toggleHeading(cm, undefined, 2);
+	logger.warn(`<<< Exiting toggleHeading2(editor=${editor})`, { "event.action": "toggleHeading2" });
+	logger.error('>>> Entering toggleHeading2()', { "event.action": "toggleHeading2" });
+	logger.warn('<<< Exiting toggleHeading2()', { "event.action": "toggleHeading2" });
 }
 
 /**
  * Action for toggling heading size 3
  */
 function toggleHeading3(editor) {
+	logger.error(`>>> Entering toggleHeading3(editor=${editor})`, { "event.action": "toggleHeading3" });
 	var cm = editor.codemirror;
 	_toggleHeading(cm, undefined, 3);
+	logger.warn(`<<< Exiting toggleHeading3(editor=${editor})`, { "event.action": "toggleHeading3" });
+	logger.error('>>> Entering toggleHeading3()', { "event.action": "toggleHeading3" });
+	logger.warn('<<< Exiting toggleHeading3()', { "event.action": "toggleHeading3" });
 }
 
 
@@ -227,8 +294,12 @@ function toggleHeading3(editor) {
  * Action for toggling ul.
  */
 function toggleUnorderedList(editor) {
+	logger.error(`>>> Entering toggleUnorderedList(editor=${editor})`, { "event.action": "toggleUnorderedList" });
 	var cm = editor.codemirror;
 	_toggleLine(cm, 'unordered-list');
+	logger.warn(`<<< Exiting toggleUnorderedList(editor=${editor})`, { "event.action": "toggleUnorderedList" });
+	logger.error('>>> Entering toggleUnorderedList()', { "event.action": "toggleUnorderedList" });
+	logger.warn('<<< Exiting toggleUnorderedList()', { "event.action": "toggleUnorderedList" });
 }
 
 
@@ -236,8 +307,12 @@ function toggleUnorderedList(editor) {
  * Action for toggling ol.
  */
 function toggleOrderedList(editor) {
+	logger.error(`>>> Entering toggleOrderedList(editor=${editor})`, { "event.action": "toggleOrderedList" });
 	var cm = editor.codemirror;
 	_toggleLine(cm, 'ordered-list');
+	logger.warn(`<<< Exiting toggleOrderedList(editor=${editor})`, { "event.action": "toggleOrderedList" });
+	logger.error('>>> Entering toggleOrderedList()', { "event.action": "toggleOrderedList" });
+	logger.warn('<<< Exiting toggleOrderedList()', { "event.action": "toggleOrderedList" });
 }
 
 
@@ -245,9 +320,13 @@ function toggleOrderedList(editor) {
  * Action for drawing a link.
  */
 function drawLink(editor) {
+	logger.error(`>>> Entering drawLink(editor=${editor})`, { "event.action": "drawLink" });
 	var cm = editor.codemirror;
 	var stat = getState(cm);
 	_replaceSelection(cm, stat.link, '[', '](http://)');
+	logger.error(`drawLink(editor=${editor}): stat → ${stat}`, { "event.action": "drawLink" });
+	logger.error('>>> Entering drawLink()', { "event.action": "drawLink" });
+	logger.warn('<<< Exiting drawLink()', { "event.action": "drawLink" });
 }
 
 
@@ -255,9 +334,13 @@ function drawLink(editor) {
  * Action for drawing an img.
  */
 function drawImage(editor) {
+	logger.error(`>>> Entering drawImage(editor=${editor})`, { "event.action": "drawImage" });
 	var cm = editor.codemirror;
 	var stat = getState(cm);
 	_replaceSelection(cm, stat.image, '![](http://', ')');
+	logger.error(`drawImage(editor=${editor}): stat → ${stat}`, { "event.action": "drawImage" });
+	logger.error('>>> Entering drawImage()', { "event.action": "drawImage" });
+	logger.warn('<<< Exiting drawImage()', { "event.action": "drawImage" });
 }
 
 
@@ -265,9 +348,13 @@ function drawImage(editor) {
  * Action for drawing a horizontal rule.
  */
 function drawHorizontalRule(editor) {
+	logger.error(`>>> Entering drawHorizontalRule(editor=${editor})`, { "event.action": "drawHorizontalRule" });
 	var cm = editor.codemirror;
 	var stat = getState(cm);
 	_replaceSelection(cm, stat.image, '', '\n\n-----\n\n');
+	logger.error(`drawHorizontalRule(editor=${editor}): stat → ${stat}`, { "event.action": "drawHorizontalRule" });
+	logger.error('>>> Entering drawHorizontalRule()', { "event.action": "drawHorizontalRule" });
+	logger.warn('<<< Exiting drawHorizontalRule()', { "event.action": "drawHorizontalRule" });
 }
 
 
@@ -275,9 +362,13 @@ function drawHorizontalRule(editor) {
  * Undo action.
  */
 function undo(editor) {
+	logger.error(`>>> Entering undo(editor=${editor})`, { "event.action": "undo" });
 	var cm = editor.codemirror;
 	cm.undo();
 	cm.focus();
+	logger.warn(`<<< Exiting undo(editor=${editor})`, { "event.action": "undo" });
+	logger.error('>>> Entering undo()', { "event.action": "undo" });
+	logger.warn('<<< Exiting undo()', { "event.action": "undo" });
 }
 
 
@@ -285,9 +376,13 @@ function undo(editor) {
  * Redo action.
  */
 function redo(editor) {
+	logger.error(`>>> Entering redo(editor=${editor})`, { "event.action": "redo" });
 	var cm = editor.codemirror;
 	cm.redo();
 	cm.focus();
+	logger.warn(`<<< Exiting redo(editor=${editor})`, { "event.action": "redo" });
+	logger.error('>>> Entering redo()', { "event.action": "redo" });
+	logger.warn('<<< Exiting redo()', { "event.action": "redo" });
 }
 
 
@@ -295,11 +390,14 @@ function redo(editor) {
  * Toggle side by side preview
  */
 function toggleSideBySide(editor) {
+	logger.error(`>>> Entering toggleSideBySide(editor=${editor})`, { "event.action": "toggleSideBySide" });
 	var cm = editor.codemirror;
 	var wrapper = cm.getWrapperElement();
+	logger.error(`toggleSideBySide(editor=${editor}): wrapper → ${wrapper}`, { "event.action": "toggleSideBySide" });
 	var code = wrapper.firstChild;
 	var preview = wrapper.nextSibling;
 	var toolbarButton = editor.toolbarElements["side-by-side"];
+	logger.error(`toggleSideBySide(editor=${editor}): toolbarButton → ${toolbarButton}`, { "event.action": "toggleSideBySide" });
 
 	if(/editor-preview-active-side/.test(preview.className)) {
 		preview.className = preview.className.replace(
@@ -308,6 +406,7 @@ function toggleSideBySide(editor) {
 		toolbarButton.className = toolbarButton.className.replace(/\s*active\s*/g, '');
 		wrapper.className = wrapper.className.replace(/\s*CodeMirror-sided\s*/g, ' ');
 	} else {
+		logger.warn(`<<< Exiting toggleSideBySide(editor=${editor})`, { "event.action": "toggleSideBySide" });
 		/* When the preview button is clicked for the first time,
 		 * give some time for the transition from editor.css to fire and the view to slide from right to left,
 		 * instead of just appearing.
@@ -339,6 +438,8 @@ function toggleSideBySide(editor) {
 	cm.on('update', function() {
 		preview.innerHTML = editor.options.previewRender(editor.value(), preview);
 	});
+	logger.error('>>> Entering toggleSideBySide()', { "event.action": "toggleSideBySide" });
+	logger.warn('<<< Exiting toggleSideBySide()', { "event.action": "toggleSideBySide" });
 }
 
 
@@ -346,11 +447,15 @@ function toggleSideBySide(editor) {
  * Preview action.
  */
 function togglePreview(editor) {
+	logger.error(`>>> Entering togglePreview(editor=${editor})`, { "event.action": "togglePreview" });
 	var cm = editor.codemirror;
 	var wrapper = cm.getWrapperElement();
+	logger.error(`togglePreview(editor=${editor}): wrapper → ${wrapper}`, { "event.action": "togglePreview" });
 	var toolbar_div = wrapper.previousSibling;
 	var toolbar = editor.toolbarElements.preview;
 	var preview = wrapper.lastChild;
+	logger.error(`togglePreview(editor=${editor}): preview → ${preview}`, { "event.action": "togglePreview" });
+	logger.debug(`togglePreview(editor=${editor}): preview.className → ${preview.className}`, { "event.action": "togglePreview" });
 	if(!preview || !/editor-preview/.test(preview.className)) {
 		preview = document.createElement('div');
 		preview.className = 'editor-preview';
@@ -363,6 +468,7 @@ function togglePreview(editor) {
 		toolbar.className = toolbar.className.replace(/\s*active\s*/g, '');
 		toolbar_div.className = toolbar_div.className.replace(/\s*disabled-for-preview*/g, '');
 	} else {
+		logger.warn(`<<< Exiting togglePreview(editor=${editor})`, { "event.action": "togglePreview" });
 		/* When the preview button is clicked for the first time,
 		 * give some time for the transition from editor.css to fire and the view to slide from right to left,
 		 * instead of just appearing.
@@ -379,15 +485,20 @@ function togglePreview(editor) {
 	var sidebyside = cm.getWrapperElement().nextSibling;
 	if(/editor-preview-active-side/.test(sidebyside.className))
 		toggleSideBySide(editor);
+		logger.error('>>> Entering togglePreview()', { "event.action": "togglePreview" });
+		logger.warn('<<< Exiting togglePreview()', { "event.action": "togglePreview" });
 }
 
 function _replaceSelection(cm, active, start, end) {
+	logger.error(`>>> Entering _replaceSelection(cm=${cm},active=${active},start=${start},end=${end})`, { "event.action": "_replaceSelection", "logrite.cm": cm, "logrite.active": active, "logrite.start": start, "logrite.end": end });
 	if(/editor-preview-active/.test(cm.getWrapperElement().lastChild.className))
 		return;
 
 	var text;
 	var startPoint = cm.getCursor('start');
+	logger.error(`_replaceSelection(cm=${cm},active=${active},start=${start},end=${end}): startPoint → ${startPoint}`, { "event.action": "_replaceSelection", "logrite.cm": cm, "logrite.active": active, "logrite.start": start, "logrite.end": end });
 	var endPoint = cm.getCursor('end');
+	logger.error(`_replaceSelection(cm=${cm},active=${active},start=${start},end=${end}): endPoint → ${endPoint}`, { "event.action": "_replaceSelection", "logrite.cm": cm, "logrite.active": active, "logrite.start": start, "logrite.end": end });
 	if(active) {
 		text = cm.getLine(startPoint.line);
 		start = text.slice(0, startPoint.ch);
@@ -397,8 +508,11 @@ function _replaceSelection(cm, active, start, end) {
 			ch: 0
 		});
 	} else {
+		logger.error(`_replaceSelection(cm=${cm},active=${active},start=${start},end=${end}): end → ${end}`, { "event.action": "_replaceSelection", "logrite.cm": cm, "logrite.active": active, "logrite.start": start, "logrite.end": end });
 		text = cm.getSelection();
 		cm.replaceSelection(start + text + end);
+		logger.error(`_replaceSelection(cm=${cm},active=${active},start=${start},end=${end}): text → ${text}`, { "event.action": "_replaceSelection", "logrite.cm": cm, "logrite.active": active, "logrite.start": start, "logrite.end": end });
+		logger.debug(`_replaceSelection(cm=${cm},active=${active},start=${start},end=${end}): text → ${text}`, { "event.action": "_replaceSelection", "logrite.cm": cm, "logrite.active": active, "logrite.start": start, "logrite.end": end });
 
 		startPoint.ch += start.length;
 		if(startPoint !== endPoint) {
@@ -407,14 +521,17 @@ function _replaceSelection(cm, active, start, end) {
 	}
 	cm.setSelection(startPoint, endPoint);
 	cm.focus();
+	logger.warn(`<<< Exiting _replaceSelection(cm=${cm},active=${active},start=${start},end=${end})`, { "event.action": "_replaceSelection", "logrite.cm": cm, "logrite.active": active, "logrite.start": start, "logrite.end": end });
 }
 
 
 function _toggleHeading(cm, direction, size) {
+	logger.error(`>>> Entering _toggleHeading(cm=${cm},direction=${direction},size=${size})`, { "event.action": "_toggleHeading", "logrite.cm": cm, "logrite.direction": direction, "logrite.size": size });
 	if(/editor-preview-active/.test(cm.getWrapperElement().lastChild.className))
 		return;
 
 	var startPoint = cm.getCursor('start');
+	logger.error(`_toggleHeading(cm=${cm},direction=${direction},size=${size}): startPoint → ${startPoint}`, { "event.action": "_toggleHeading", "logrite.cm": cm, "logrite.direction": direction, "logrite.size": size });
 	var endPoint = cm.getCursor('end');
 	for(var i = startPoint.line; i <= endPoint.line; i++) {
 		(function(i) {
@@ -477,15 +594,19 @@ function _toggleHeading(cm, direction, size) {
 		})(i);
 	}
 	cm.focus();
+	logger.error(`_toggleHeading(cm=${cm},direction=${direction},size=${size}): endPoint → ${endPoint}`, { "event.action": "_toggleHeading", "logrite.cm": cm, "logrite.direction": direction, "logrite.size": size });
 }
 
 
 function _toggleLine(cm, name) {
+	logger.error(`>>> Entering _toggleLine(cm=${cm},name=${name})`, { "event.action": "_toggleLine", "logrite.cm": cm, "logrite.name": name });
 	if(/editor-preview-active/.test(cm.getWrapperElement().lastChild.className))
 		return;
 
 	var stat = getState(cm);
+	logger.error(`_toggleLine(cm=${cm},name=${name}): stat → ${stat}`, { "event.action": "_toggleLine", "logrite.cm": cm, "logrite.name": name });
 	var startPoint = cm.getCursor('start');
+	logger.error(`_toggleLine(cm=${cm},name=${name}): startPoint → ${startPoint}`, { "event.action": "_toggleLine", "logrite.cm": cm, "logrite.name": name });
 	var endPoint = cm.getCursor('end');
 	var repl = {
 		'quote': /^(\s*)\>\s+/,
@@ -515,22 +636,31 @@ function _toggleLine(cm, name) {
 		})(i);
 	}
 	cm.focus();
+	logger.error(`_toggleLine(cm=${cm},name=${name}): endPoint → ${endPoint}`, { "event.action": "_toggleLine", "logrite.cm": cm, "logrite.name": name });
 }
 
 function _toggleBlock(editor, type, start_chars, end_chars) {
+	logger.error(`>>> Entering _toggleBlock(editor=${editor},type=${type},start_chars=${start_chars},end_chars=${end_chars})`, { "event.action": "_toggleBlock", "logrite.editor": editor, "logrite.type": type, "logrite.start_chars": start_chars, "logrite.end_chars": end_chars });
 	if(/editor-preview-active/.test(editor.codemirror.getWrapperElement().lastChild.className))
 		return;
 
 	end_chars = (typeof end_chars === 'undefined') ? start_chars : end_chars;
 	var cm = editor.codemirror;
+	logger.error(`_toggleBlock(editor=${editor},type=${type},start_chars=${start_chars},end_chars=${end_chars}): end_chars → ${end_chars}`, { "event.action": "_toggleBlock", "logrite.editor": editor, "logrite.type": type, "logrite.start_chars": start_chars, "logrite.end_chars": end_chars });
+	logger.error(`_toggleBlock(editor=${editor},type=${type},start_chars=${start_chars},end_chars=${end_chars}): cm → ${cm}`, { "event.action": "_toggleBlock", "logrite.editor": editor, "logrite.type": type, "logrite.start_chars": start_chars, "logrite.end_chars": end_chars });
 	var stat = getState(cm);
 
+	logger.error(`_toggleBlock(editor=${editor},type=${type},start_chars=${start_chars},end_chars=${end_chars}): stat → ${stat}`, { "event.action": "_toggleBlock", "logrite.editor": editor, "logrite.type": type, "logrite.start_chars": start_chars, "logrite.end_chars": end_chars });
 	var text;
 	var start = start_chars;
 	var end = end_chars;
+	logger.error(`_toggleBlock(editor=${editor},type=${type},start_chars=${start_chars},end_chars=${end_chars}): end → ${end}`, { "event.action": "_toggleBlock", "logrite.editor": editor, "logrite.type": type, "logrite.start_chars": start_chars, "logrite.end_chars": end_chars });
 
 	var startPoint = cm.getCursor('start');
+	logger.error(`_toggleBlock(editor=${editor},type=${type},start_chars=${start_chars},end_chars=${end_chars}): startPoint → ${startPoint}`, { "event.action": "_toggleBlock", "logrite.editor": editor, "logrite.type": type, "logrite.start_chars": start_chars, "logrite.end_chars": end_chars });
 	var endPoint = cm.getCursor('end');
+	logger.error(`_toggleBlock(editor=${editor},type=${type},start_chars=${start_chars},end_chars=${end_chars}): endPoint → ${endPoint}`, { "event.action": "_toggleBlock", "logrite.editor": editor, "logrite.type": type, "logrite.start_chars": start_chars, "logrite.end_chars": end_chars });
+	logger.debug(`_toggleBlock(editor=${editor},type=${type},start_chars=${start_chars},end_chars=${end_chars}): endPoint.ch → ${endPoint.ch}`, { "event.action": "_toggleBlock", "logrite.editor": editor, "logrite.type": type, "logrite.start_chars": start_chars, "logrite.end_chars": end_chars });
 
 	if(stat[type]) {
 		text = cm.getLine(startPoint.line);
@@ -577,6 +707,8 @@ function _toggleBlock(editor, type, start_chars, end_chars) {
 			text = text.split("~~").join("");
 		}
 		cm.replaceSelection(start + text + end);
+		logger.error(`_toggleBlock(editor=${editor},type=${type},start_chars=${start_chars},end_chars=${end_chars}): text → ${text}`, { "event.action": "_toggleBlock", "logrite.editor": editor, "logrite.type": type, "logrite.start_chars": start_chars, "logrite.end_chars": end_chars });
+		logger.debug(`_toggleBlock(editor=${editor},type=${type},start_chars=${start_chars},end_chars=${end_chars}): text → ${text}`, { "event.action": "_toggleBlock", "logrite.editor": editor, "logrite.type": type, "logrite.start_chars": start_chars, "logrite.end_chars": end_chars });
 
 		startPoint.ch += start_chars.length;
 		endPoint.ch = startPoint.ch + text.length;
@@ -584,14 +716,17 @@ function _toggleBlock(editor, type, start_chars, end_chars) {
 
 	cm.setSelection(startPoint, endPoint);
 	cm.focus();
+	logger.warn(`<<< Exiting _toggleBlock(editor=${editor},type=${type},start_chars=${start_chars},end_chars=${end_chars})`, { "event.action": "_toggleBlock", "logrite.editor": editor, "logrite.type": type, "logrite.start_chars": start_chars, "logrite.end_chars": end_chars });
 }
 
 
 /* The right word count in respect for CJK. */
 function wordCount(data) {
+	logger.error(`>>> Entering wordCount(data=${data})`, { "event.action": "wordCount", "logrite.data": data });
 	var pattern = /[a-zA-Z0-9_\u0392-\u03c9]+|[\u4E00-\u9FFF\u3400-\u4dbf\uf900-\ufaff\u3040-\u309f\uac00-\ud7af]+/g;
 	var m = data.match(pattern);
 	var count = 0;
+	logger.error(`wordCount(data=${data}): count → ${count}`, { "event.action": "wordCount", "logrite.data": data });
 	if(m === null) return count;
 	for(var i = 0; i < m.length; i++) {
 		if(m[i].charCodeAt(0) >= 0x4E00) {
@@ -600,6 +735,7 @@ function wordCount(data) {
 			count += 1;
 		}
 	}
+	logger.error(`wordCount(data=${data}): m → ${m}`, { "event.action": "wordCount", "logrite.data": data });
 	return count;
 }
 
@@ -733,15 +869,18 @@ var toolbar = ["bold", "italic", "heading", "|", "quote", "unordered-list", "ord
  * Interface of SimpleMDE.
  */
 function SimpleMDE(options) {
+	logger.error(`>>> Entering SimpleMDE(options=${options})`, { "event.action": "SimpleMDE", "logrite.options": options });
 	options = options || {};
 
 	// Used later to refer to it's parent
 	options.parent = this;
+	logger.debug(`SimpleMDE(options=${options}): options.parent → ${options.parent}`, { "event.action": "SimpleMDE", "logrite.options": options });
 
 	// Find the textarea to use
 	if(options.element) {
 		this.element = options.element;
 	} else if(options.element === null) {
+		logger.debug(`SimpleMDE(options=${options}): this.element → ${this.element}`, { "event.action": "SimpleMDE", "logrite.options": options });
 		// This means that the element option was specified, but no element was found
 		console.log("SimpleMDE: Error. No element was found.");
 		return;
@@ -751,26 +890,33 @@ function SimpleMDE(options) {
 	if(options.toolbar !== false)
 		options.toolbar = options.toolbar || SimpleMDE.toolbar;
 
+	logger.debug(`SimpleMDE(options=${options}): options.toolbar → ${options.toolbar}`, { "event.action": "SimpleMDE", "logrite.options": options });
 	if(!options.hasOwnProperty('status')) {
 		options.status = ['autosave', 'lines', 'words', 'cursor'];
+		logger.debug(`SimpleMDE(options=${options}): options.status → ${options.status}`, { "event.action": "SimpleMDE", "logrite.options": options });
 	}
 
 	// Add default preview rendering function
 	if(!options.previewRender) {
 		options.previewRender = function(plainText) {
+			logger.error(`>>> Entering previewRender(plainText=${plainText})`, { "event.action": "previewRender", "logrite.plainText": plainText });
 			// Note: 'this' refers to the options object
+			logger.warn(`<<< Exiting previewRender(plainText=${plainText})`, { "event.action": "previewRender", "logrite.plainText": plainText });
 			return this.parent.markdown(plainText);
 		}
 	}
 
 	// Set default options for parsing config
 	options.parsingConfig = options.parsingConfig || {};
+	logger.debug(`SimpleMDE(options=${options}): options.parsingConfig → ${options.parsingConfig}`, { "event.action": "SimpleMDE", "logrite.options": options });
 
 	// Update this options
 	this.options = options;
 
+	logger.debug(`SimpleMDE(options=${options}): options → ${options}`, { "event.action": "SimpleMDE", "logrite.options": options });
 	// Auto render
 	this.render();
+	logger.debug(`SimpleMDE(options=${options}): this.options → ${this.options}`, { "event.action": "SimpleMDE", "logrite.options": options });
 
 	// The codemirror component is only available after rendering
 	// so, the setter for the initialValue can only run after
@@ -778,6 +924,7 @@ function SimpleMDE(options) {
 	if(options.initialValue) {
 		this.value(options.initialValue);
 	}
+	logger.warn(`<<< Exiting SimpleMDE(options=${options})`, { "event.action": "SimpleMDE", "logrite.options": options });
 }
 
 /**
@@ -882,8 +1029,10 @@ SimpleMDE.prototype.render = function(el) {
 };
 
 SimpleMDE.prototype.autosave = function() {
+	logger.error('>>> Entering autosave()', { "event.action": "autosave" });
 	var content = this.value();
 	var simplemde = this;
+	logger.error(`autosave(): content → ${content}`, { "event.action": "autosave" });
 
 	if(this.options.autosave.unique_id == undefined || this.options.autosave.unique_id == "") {
 		console.log("SimpleMDE: You must set a unique_id to use the autosave feature");
@@ -908,11 +1057,17 @@ SimpleMDE.prototype.autosave = function() {
 	}
 
 	var el = document.getElementById("autosaved");
+	logger.error(`autosave(): el → ${el}`, { "event.action": "autosave" });
+	logger.debug(`autosave(): el.innerHTML → ${el.innerHTML}`, { "event.action": "autosave" });
 	if(el != null && el != undefined && el != "") {
 		var d = new Date();
+		logger.error(`autosave(): d → ${d}`, { "event.action": "autosave" });
 		var hh = d.getHours();
+		logger.error(`autosave(): hh → ${hh}`, { "event.action": "autosave" });
 		var m = d.getMinutes();
+		logger.error(`autosave(): m → ${m}`, { "event.action": "autosave" });
 		var dd = "am";
+		logger.error(`autosave(): dd → ${dd}`, { "event.action": "autosave" });
 		var h = hh;
 		if(h >= 12) {
 			h = hh - 12;
@@ -929,12 +1084,18 @@ SimpleMDE.prototype.autosave = function() {
 	setTimeout(function() {
 		simplemde.autosave();
 	}, this.options.autosave.delay || 10000);
+	logger.warn('<<< Exiting autosave()', { "event.action": "autosave" });
 };
 
 SimpleMDE.prototype.createSideBySide = function() {
+	logger.error('>>> Entering createSideBySide()', { "event.action": "createSideBySide" });
 	var cm = this.codemirror;
 	var wrapper = cm.getWrapperElement();
+	logger.error(`createSideBySide(): wrapper → ${wrapper}`, { "event.action": "createSideBySide" });
 	var preview = wrapper.nextSibling;
+	logger.error(`createSideBySide(): preview → ${preview}`, { "event.action": "createSideBySide" });
+	logger.debug(`createSideBySide(): preview.className → ${preview.className}`, { "event.action": "createSideBySide" });
+	logger.debug(`createSideBySide(): preview.scrollTop → ${preview.scrollTop}`, { "event.action": "createSideBySide" });
 
 	if(!preview || !/editor-preview-side/.test(preview.className)) {
 		preview = document.createElement('div');
@@ -959,6 +1120,7 @@ SimpleMDE.prototype.createSideBySide = function() {
 
 	// Syncs scroll  preview -> editor
 	preview.onscroll = function(v) {
+		logger.error(`>>> Entering onscroll(v=${v})`, { "event.action": "onscroll", "logrite.v": v });
 		if(pScroll) {
 			pScroll = false;
 			return;
@@ -968,11 +1130,14 @@ SimpleMDE.prototype.createSideBySide = function() {
 		ratio = parseFloat(preview.scrollTop) / height;
 		move = (cm.getScrollInfo().height - cm.getScrollInfo().clientHeight) * ratio;
 		cm.scrollTo(0, move);
+		logger.warn(`<<< Exiting onscroll(v=${v})`, { "event.action": "onscroll", "logrite.v": v });
 	};
+	logger.warn('<<< Exiting createSideBySide()', { "event.action": "createSideBySide" });
 	return true;
 }
 
 SimpleMDE.prototype.createToolbar = function(items) {
+	logger.error(`>>> Entering createToolbar(items=${items})`, { "event.action": "createToolbar", "logrite.items": items });
 	items = items || this.options.toolbar;
 
 	if(!items || items.length === 0) {
@@ -986,14 +1151,18 @@ SimpleMDE.prototype.createToolbar = function(items) {
 	}
 
 	var bar = document.createElement('div');
+	logger.error(`createToolbar(items=${items}): bar → ${bar}`, { "event.action": "createToolbar", "logrite.items": items });
 	bar.className = 'editor-toolbar';
+	logger.debug(`createToolbar(items=${items}): bar.className → ${bar.className}`, { "event.action": "createToolbar", "logrite.items": items });
 
 	var self = this;
 
 	var el;
 	var toolbar_data = {};
+	logger.error(`createToolbar(items=${items}): toolbar_data → ${toolbar_data}`, { "event.action": "createToolbar", "logrite.items": items });
 	self.toolbar = items;
 
+	logger.debug(`createToolbar(items=${items}): self.toolbar → ${self.toolbar}`, { "event.action": "createToolbar", "logrite.items": items });
 	for(var i = 0; i < items.length; i++) {
 		if(items[i].name == "guide" && self.options.toolbarGuideIcon === false)
 			continue;
@@ -1010,7 +1179,9 @@ SimpleMDE.prototype.createToolbar = function(items) {
 			if(item.action) {
 				if(typeof item.action === 'function') {
 					el.onclick = function(e) {
+						logger.error(`>>> Entering onclick(e=${e})`, { "event.action": "onclick", "logrite.e": e });
 						item.action(self);
+						logger.warn(`<<< Exiting onclick(e=${e})`, { "event.action": "onclick", "logrite.e": e });
 					};
 				} else if(typeof item.action === 'string') {
 					el.href = item.action;
@@ -1023,6 +1194,7 @@ SimpleMDE.prototype.createToolbar = function(items) {
 	}
 
 	self.toolbarElements = toolbar_data;
+	logger.debug(`createToolbar(items=${items}): self.toolbarElements → ${self.toolbarElements}`, { "event.action": "createToolbar", "logrite.items": items });
 
 	var cm = this.codemirror;
 	cm.on('cursorActivity', function() {
@@ -1032,6 +1204,8 @@ SimpleMDE.prototype.createToolbar = function(items) {
 			(function(key) {
 				var el = toolbar_data[key];
 				if(stat[key]) {
+					logger.debug(`createToolbar(items=${items}): el.href → ${el.href}`, { "event.action": "createToolbar", "logrite.items": items });
+					logger.debug(`createToolbar(items=${items}): el.target → ${el.target}`, { "event.action": "createToolbar", "logrite.items": items });
 					el.className += ' active';
 				} else if(key != "fullscreen" && key != "side-by-side") {
 					el.className = el.className.replace(/\s*active\s*/g, '');
@@ -1041,24 +1215,31 @@ SimpleMDE.prototype.createToolbar = function(items) {
 	});
 
 	var cmWrapper = cm.getWrapperElement();
+	logger.error(`createToolbar(items=${items}): cmWrapper → ${cmWrapper}`, { "event.action": "createToolbar", "logrite.items": items });
 	cmWrapper.parentNode.insertBefore(bar, cmWrapper);
 	return bar;
 };
 
 SimpleMDE.prototype.createStatusbar = function(status) {
+	logger.error(`>>> Entering createStatusbar(status=${status})`, { "event.action": "createStatusbar", "logrite.status": status });
 	status = status || this.options.status;
 	options = this.options;
+	logger.error(`createStatusbar(status=${status}): status → ${status}`, { "event.action": "createStatusbar", "logrite.status": status });
 
 	if(!status || status.length === 0) return;
 
 	var bar = document.createElement('div');
+	logger.error(`createStatusbar(status=${status}): bar → ${bar}`, { "event.action": "createStatusbar", "logrite.status": status });
 	bar.className = 'editor-statusbar';
+	logger.debug(`createStatusbar(status=${status}): bar.className → ${bar.className}`, { "event.action": "createStatusbar", "logrite.status": status });
 
 	var pos, cm = this.codemirror;
 	for(var i = 0; i < status.length; i++) {
 		(function(name) {
 			var el = document.createElement('span');
+			logger.debug(`createStatusbar(status=${status}): el.innerHTML → ${el.innerHTML}`, { "event.action": "createStatusbar", "logrite.status": status });
 			el.className = name;
+			logger.debug(`createStatusbar(status=${status}): el.className → ${el.className}`, { "event.action": "createStatusbar", "logrite.status": status });
 			if(name === 'words') {
 				el.innerHTML = '0';
 				cm.on('update', function() {
@@ -1073,6 +1254,7 @@ SimpleMDE.prototype.createStatusbar = function(status) {
 				el.innerHTML = '0:0';
 				cm.on('cursorActivity', function() {
 					pos = cm.getCursor();
+					logger.debug(`createStatusbar(status=${status}): pos → ${pos}`, { "event.action": "createStatusbar", "logrite.status": status });
 					el.innerHTML = pos.line + ':' + pos.ch;
 				});
 			} else if(name === 'autosave') {
@@ -1085,6 +1267,7 @@ SimpleMDE.prototype.createStatusbar = function(status) {
 	}
 
 	var cmWrapper = this.codemirror.getWrapperElement();
+	logger.error(`createStatusbar(status=${status}): cmWrapper → ${cmWrapper}`, { "event.action": "createStatusbar", "logrite.status": status });
 	cmWrapper.parentNode.insertBefore(bar, cmWrapper.nextSibling);
 	return bar;
 };
@@ -1093,10 +1276,12 @@ SimpleMDE.prototype.createStatusbar = function(status) {
  * Get or set the text content.
  */
 SimpleMDE.prototype.value = function(val) {
+	logger.error(`>>> Entering value(val=${val})`, { "event.action": "value", "logrite.val": val });
 	if(val === undefined) {
 		return this.codemirror.getValue();
 	} else {
 		this.codemirror.getDoc().setValue(val);
+		logger.warn(`<<< Exiting value(val=${val})`, { "event.action": "value", "logrite.val": val });
 		return this;
 	}
 };

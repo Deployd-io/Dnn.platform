@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The ConfigInstaller installs Config changes.</summary>
     public class ConfigInstaller : ComponentInstallerBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConfigInstaller));
         private string fileName = Null.NullString;
         private string installConfig = Null.NullString;
         private XmlDocument targetConfig;
@@ -64,6 +65,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <summary>The Commit method finalises the Install and commits any pending changes.</summary>
         public override void Commit()
         {
+			Logger.LogError(">>> Entering Commit()");
             try
             {
                 if (string.IsNullOrEmpty(this.fileName) && this.xmlMerge.ConfigUpdateChangedNodes)
@@ -85,11 +87,13 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 this.Log.AddFailure(ex);
             }
+			Logger.LogWarning("<<< Exiting Commit()");
         }
 
         /// <summary>The Install method installs the config component.</summary>
         public override void Install()
         {
+			Logger.LogError(">>> Entering Install()");
             try
             {
                 if (string.IsNullOrEmpty(this.fileName))
@@ -99,17 +103,21 @@ namespace DotNetNuke.Services.Installer.Installers
 
                     // Create an XmlDocument for the config file
                     this.targetConfig = new XmlDocument { XmlResolver = null };
+					Logger.LogDebug("Install(): targetConfig → {TargetConfig}", targetConfig);
                     using (var targetConfigReader = XmlReader.Create(Path.Combine(this.PhysicalSitePath, this.TargetFile.FullName), new XmlReaderSettings { XmlResolver = null, }))
                     {
+						Logger.LogDebug("Install(): this.targetConfig → {Arg0}", this.targetConfig);
                         this.TargetConfig.Load(targetConfigReader);
                     }
 
                     // Create XmlMerge instance from InstallConfig source
                     this.xmlMerge = new XmlMerge(new StringReader(this.InstallConfig), this.Package.Version.ToString(), this.Package.Name);
+					Logger.LogDebug("Install(): xmlMerge → {XmlMerge}", xmlMerge);
 
                     // Update the Config file - Note that this method does not save the file - we will save it in Commit
                     this.xmlMerge.UpdateConfig(this.TargetConfig);
                     this.Completed = true;
+					Logger.LogDebug("Install(): this.Completed → {Arg0}", this.Completed);
                     this.Log.AddInfo(Util.CONFIG_Updated + " - " + this.TargetFile.Name);
                 }
                 else
@@ -136,12 +144,14 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 this.Log.AddFailure(Util.EXCEPTION + " - " + ex.Message);
             }
+			Logger.LogWarning("<<< Exiting Install()");
         }
 
         /// <summary>The ReadManifest method reads the manifest file for the config component.</summary>
         /// <param name="manifestNav">The XPath navigator for the Config section of the manifest.</param>
         public override void ReadManifest(XPathNavigator manifestNav)
         {
+			Logger.LogError(">>> Entering ReadManifest(manifestNav={ManifestNav})", manifestNav);
             this.fileName = Util.ReadAttribute(manifestNav, "fileName");
             this.uninstallFileName = Util.ReadAttribute(manifestNav, "unInstallFileName");
 
@@ -151,6 +161,7 @@ namespace DotNetNuke.Services.Installer.Installers
             }
 
             XPathNavigator nav = manifestNav.SelectSingleNode("config");
+			Logger.LogError("ReadManifest(manifestNav={ManifestNav}): nav → {Nav}", manifestNav, nav);
             if (nav is null)
             {
                 this.Log.AddFailure("config element was missing");
@@ -159,6 +170,7 @@ namespace DotNetNuke.Services.Installer.Installers
 
             // Get the name of the target config file to update
             XPathNavigator nodeNav = nav.SelectSingleNode("configFile");
+			Logger.LogError("ReadManifest(manifestNav={ManifestNav}): nodeNav → {NodeNav}", manifestNav, nodeNav);
             if (nodeNav is null)
             {
                 this.Log.AddFailure("configFile element was missing");
@@ -169,6 +181,7 @@ namespace DotNetNuke.Services.Installer.Installers
             if (!string.IsNullOrEmpty(targetFileName))
             {
                 this.targetFile = new InstallFile(targetFileName, string.Empty, this.Package.InstallerInfo);
+				Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): targetFile → {TargetFile}", manifestNav, targetFile);
             }
 
             // Get the Install config changes
@@ -179,6 +192,7 @@ namespace DotNetNuke.Services.Installer.Installers
             }
 
             this.installConfig = nodeNav?.InnerXml ?? Null.NullString;
+			Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): this.installConfig → {Arg1}", manifestNav, this.installConfig);
 
             // Get the UnInstall config changes
             nodeNav = nav.SelectSingleNode("uninstall");
@@ -188,6 +202,7 @@ namespace DotNetNuke.Services.Installer.Installers
             }
 
             this.unInstallConfig = nodeNav?.InnerXml ?? Null.NullString;
+			Logger.LogWarning("<<< Exiting ReadManifest(manifestNav={ManifestNav})", manifestNav);
         }
 
         /// <summary>
@@ -196,26 +211,32 @@ namespace DotNetNuke.Services.Installer.Installers
         /// </summary>
         public override void Rollback()
         {
+			Logger.LogError(">>> Entering Rollback()");
             // Do nothing as the changes are all in memory
             this.Log.AddInfo(Util.CONFIG_RolledBack + " - " + this.TargetFile.Name);
+			Logger.LogWarning("<<< Exiting Rollback()");
         }
 
         /// <summary>The UnInstall method uninstalls the config component.</summary>
         public override void UnInstall()
         {
+			Logger.LogError(">>> Entering UnInstall()");
             if (string.IsNullOrEmpty(this.uninstallFileName))
             {
                 if (!string.IsNullOrEmpty(this.UnInstallConfig))
                 {
                     // Create an XmlDocument for the config file
                     this.targetConfig = new XmlDocument { XmlResolver = null };
+					Logger.LogDebug("UnInstall(): targetConfig → {TargetConfig}", targetConfig);
                     using (var targetConfigReader = XmlReader.Create(Path.Combine(this.PhysicalSitePath, this.TargetFile.FullName), new XmlReaderSettings { XmlResolver = null, }))
                     {
+						Logger.LogDebug("UnInstall(): this.targetConfig → {Arg0}", this.targetConfig);
                         this.TargetConfig.Load(targetConfigReader);
                     }
 
                     // Create XmlMerge instance from UnInstallConfig source
                     var merge = new XmlMerge(new StringReader(this.UnInstallConfig), this.Package.Version.ToString(), this.Package.Name);
+					Logger.LogError("UnInstall(): merge → {Merge}", merge);
 
                     // Update the Config file - Note that this method does save the file
                     merge.UpdateConfig(this.TargetConfig, this.TargetFile.FullName);
@@ -229,6 +250,7 @@ namespace DotNetNuke.Services.Installer.Installers
                 {
                     // Create XmlMerge instance from config file source
                     StreamReader stream = File.OpenText(strConfigFile);
+					Logger.LogError("UnInstall(): stream → {Stream}", stream);
                     var merge = new XmlMerge(stream, this.Package.Version.ToString(3), this.Package.Name + " UnInstall");
 
                     // Process merge
@@ -238,6 +260,7 @@ namespace DotNetNuke.Services.Installer.Installers
                     stream.Close();
                 }
             }
+			Logger.LogWarning("<<< Exiting UnInstall()");
         }
     }
 }

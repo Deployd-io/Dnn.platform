@@ -10,10 +10,13 @@ namespace DotNetNuke.Services.Authentication.OAuth
 
     internal static class AuthExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AuthExtensions));
         public static string ToAuthorizationString(this IList<QueryParameter> parameters)
         {
+			Logger.LogError(">>> Entering ToAuthorizationString(parameters={Parameters})", parameters);
             var sb = new StringBuilder();
             sb.Append("OAuth ");
+			Logger.LogError("ToAuthorizationString(parameters={Parameters}): sb → {Sb}", parameters, sb);
 
             for (var i = 0; i < parameters.Count; i++)
             {
@@ -28,12 +31,15 @@ namespace DotNetNuke.Services.Authentication.OAuth
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ToAuthorizationString(parameters={Parameters})", parameters);
             return sb.ToString();
         }
 
         public static string ToNormalizedString(this IList<QueryParameter> parameters)
         {
+			Logger.LogError(">>> Entering ToNormalizedString(parameters={Parameters})", parameters);
             var sb = new StringBuilder();
+			Logger.LogError("ToNormalizedString(parameters={Parameters}): sb → {Sb}", parameters, sb);
             for (var i = 0; i < parameters.Count; i++)
             {
                 var p = parameters[i];
@@ -45,6 +51,7 @@ namespace DotNetNuke.Services.Authentication.OAuth
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ToNormalizedString(parameters={Parameters})", parameters);
             return sb.ToString();
         }
     }

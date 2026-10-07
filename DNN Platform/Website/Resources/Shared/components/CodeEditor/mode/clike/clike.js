@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -31,9 +32,12 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
   var curPunc, isDefKeyword;
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.next();
     if (hooks[ch]) {
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       var result = hooks[ch](stream, state);
+	logger.error(`tokenBase(stream=${stream},state=${state}): result → ${result}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       if (result !== false) return result;
     }
     if (ch == '"' || ch == "'") {
@@ -51,6 +55,7 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
     if (ch == "/") {
       if (stream.eat("*")) {
         state.tokenize = tokenComment;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         return tokenComment(stream, state);
       }
       if (stream.eat("/")) {
@@ -67,6 +72,7 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
       stream.eatWhile(/[\w\$_\xa1-\uffff]/);
 
     var cur = stream.current();
+	logger.error(`tokenBase(stream=${stream},state=${state}): cur → ${cur}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     if (keywords.propertyIsEnumerable(cur)) {
       if (blockKeywords.propertyIsEnumerable(cur)) curPunc = "newstatement";
       if (defKeywords.propertyIsEnumerable(cur)) isDefKeyword = true;
@@ -78,10 +84,12 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
       return "builtin";
     }
     if (atoms.propertyIsEnumerable(cur)) return "atom";
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     return "variable";
   }
 
   function tokenString(quote) {
+	logger.error(`>>> Entering tokenString(quote=${quote})`, { "event.action": "tokenString", "logrite.quote": quote });
     return function(stream, state) {
       var escaped = false, next, end = false;
       while ((next = stream.next()) != null) {
@@ -95,49 +103,67 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
   }
 
   function tokenComment(stream, state) {
+	logger.error(`>>> Entering tokenComment(stream=${stream},state=${state})`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
     var maybeEnd = false, ch;
     while (ch = stream.next()) {
       if (ch == "/" && maybeEnd) {
         state.tokenize = null;
+		logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       maybeEnd = (ch == "*");
     }
+	logger.error(`tokenComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
     return "comment";
   }
 
   function Context(indented, column, type, align, prev) {
+	logger.error(`>>> Entering Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev})`, { "event.action": "Context", "logrite.indented": indented, "logrite.column": column, "logrite.type": type, "logrite.align": align, "logrite.prev": prev });
     this.indented = indented;
     this.column = column;
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): indented → ${indented}`, { "event.action": "Context", "logrite.indented": indented, "logrite.column": column, "logrite.type": type, "logrite.align": align, "logrite.prev": prev });
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): this.indented → ${this.indented}`, { "event.action": "Context", "logrite.indented": indented, "logrite.column": column, "logrite.type": type, "logrite.align": align, "logrite.prev": prev });
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): column → ${column}`, { "event.action": "Context", "logrite.indented": indented, "logrite.column": column, "logrite.type": type, "logrite.align": align, "logrite.prev": prev });
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): this.prev → ${this.prev}`, { "event.action": "Context", "logrite.indented": indented, "logrite.column": column, "logrite.type": type, "logrite.align": align, "logrite.prev": prev });
     this.type = type;
     this.align = align;
     this.prev = prev;
   }
   function isStatement(type) {
+	logger.error(`>>> Entering isStatement(type=${type})`, { "event.action": "isStatement", "logrite.type": type });
+	logger.warn(`<<< Exiting isStatement(type=${type})`, { "event.action": "isStatement", "logrite.type": type });
     return type == "statement" || type == "switchstatement" || type == "namespace";
   }
   function pushContext(state, col, type) {
+	logger.error(`>>> Entering pushContext(state=${state},col=${col},type=${type})`, { "event.action": "pushContext", "logrite.state": state, "logrite.col": col, "logrite.type": type });
     var indent = state.indented;
     if (state.context && isStatement(state.context.type) && !isStatement(type))
       indent = state.context.indented;
+	logger.warn(`<<< Exiting pushContext(state=${state},col=${col},type=${type})`, { "event.action": "pushContext", "logrite.state": state, "logrite.col": col, "logrite.type": type });
     return state.context = new Context(indent, col, type, null, state.context);
   }
   function popContext(state) {
+	logger.error(`>>> Entering popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
     var t = state.context.type;
     if (t == ")" || t == "]" || t == "}")
       state.indented = state.context.indented;
+	logger.warn(`<<< Exiting popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
     return state.context = state.context.prev;
   }
 
   function typeBefore(stream, state) {
+	logger.error(`>>> Entering typeBefore(stream=${stream},state=${state})`, { "event.action": "typeBefore", "logrite.stream": stream, "logrite.state": state });
     if (state.prevToken == "variable" || state.prevToken == "variable-3") return true;
     if (/\S(?:[^- ]>|[*\]])\s*$|\*$/.test(stream.string.slice(0, stream.start))) return true;
+	logger.warn(`<<< Exiting typeBefore(stream=${stream},state=${state})`, { "event.action": "typeBefore", "logrite.stream": stream, "logrite.state": state });
   }
 
   function isTopScope(context) {
+	logger.error(`>>> Entering isTopScope(context=${context})`, { "event.action": "isTopScope", "logrite.context": context });
     for (;;) {
       if (!context || context.type == "top") return true;
       if (context.type == "}" && context.prev.type != "namespace") return false;
+	logger.warn(`<<< Exiting isTopScope(context=${context})`, { "event.action": "isTopScope", "logrite.context": context });
       context = context.prev;
     }
   }
@@ -146,6 +172,7 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
 
   return {
     startState: function(basecolumn) {
+	logger.error(`>>> Entering startState(basecolumn=${basecolumn})`, { "event.action": "startState", "logrite.basecolumn": basecolumn });
       return {
         tokenize: null,
         context: new Context((basecolumn || 0) - indentUnit, 0, "top", false),
@@ -153,18 +180,22 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
         startOfLine: true,
         prevToken: null
       };
+	logger.warn(`<<< Exiting startState(basecolumn=${basecolumn})`, { "event.action": "startState", "logrite.basecolumn": basecolumn });
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state, "logrite.style": style });
       var ctx = state.context;
       if (stream.sol()) {
         if (ctx.align == null) ctx.align = false;
         state.indented = stream.indentation();
         state.startOfLine = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.startOfLine → ${state.startOfLine}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state, "logrite.style": style });
       }
       if (stream.eatSpace()) return null;
       curPunc = isDefKeyword = null;
       var style = (state.tokenize || tokenBase)(stream, state);
+	logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state, "logrite.style": style });
       if (style == "comment" || style == "meta") return style;
       if (ctx.align == null) ctx.align = true;
 
@@ -209,11 +240,14 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
     },
 
     indent: function(state, textAfter) {
+	logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       if (state.tokenize != tokenBase && state.tokenize != null) return CodeMirror.Pass;
       var ctx = state.context, firstChar = textAfter && textAfter.charAt(0);
+	logger.error(`indent(state=${state},textAfter=${textAfter}): ctx → ${ctx}`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       if (isStatement(ctx.type) && firstChar == "}") ctx = ctx.prev;
       var closing = firstChar == ctx.type;
       var switchBlock = ctx.prev && ctx.prev.type == "switchstatement";
+	logger.error(`indent(state=${state},textAfter=${textAfter}): switchBlock → ${switchBlock}`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       if (isStatement(ctx.type))
         return ctx.indented + (firstChar == "{" ? 0 : statementIndentUnit);
       if (ctx.align && (!dontAlignCalls || ctx.type != ")"))
@@ -223,6 +257,7 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
 
       return ctx.indented + (closing ? 0 : indentUnit) +
         (!closing && switchBlock && !/^(?:case|default)\b/.test(textAfter) ? indentUnit : 0);
+		logger.warn(`<<< Exiting indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
     },
 
     electricInput: indentSwitch ? /^\s*(?:case .*?:|default:|\{\}?|\})$/ : /^\s*[{}]$/,
@@ -234,8 +269,10 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
 });
 
   function words(str) {
+	logger.error(`>>> Entering words(str=${str})`, { "event.action": "words", "logrite.str": str });
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.error(`words(str=${str}): obj → ${obj}`, { "event.action": "words", "logrite.str": str });
     return obj;
   }
   var cKeywords = "auto if break case register continue return default do sizeof " +
@@ -244,12 +281,14 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
   var cTypes = "int long char short double float unsigned signed void size_t ptrdiff_t";
 
   function cppHook(stream, state) {
+	logger.error(`>>> Entering cppHook(stream=${stream},state=${state})`, { "event.action": "cppHook", "logrite.stream": stream, "logrite.state": state });
     if (!state.startOfLine) return false;
     for (;;) {
       if (stream.skipTo("\\")) {
         stream.next();
         if (stream.eol()) {
           state.tokenize = cppHook;
+		logger.debug(`cppHook(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "cppHook", "logrite.stream": stream, "logrite.state": state });
           break;
         }
       } else {
@@ -258,15 +297,19 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
         break;
       }
     }
+	logger.warn(`<<< Exiting cppHook(stream=${stream},state=${state})`, { "event.action": "cppHook", "logrite.stream": stream, "logrite.state": state });
     return "meta";
   }
 
   function pointerHook(_stream, state) {
+	logger.error(`>>> Entering pointerHook(_stream=${_stream},state=${state})`, { "event.action": "pointerHook", "logrite._stream": _stream, "logrite.state": state });
     if (state.prevToken == "variable-3") return "variable-3";
+	logger.warn(`<<< Exiting pointerHook(_stream=${_stream},state=${state})`, { "event.action": "pointerHook", "logrite._stream": _stream, "logrite.state": state });
     return false;
   }
 
   function cpp11StringHook(stream, state) {
+	logger.error(`>>> Entering cpp11StringHook(stream=${stream},state=${state})`, { "event.action": "cpp11StringHook", "logrite.stream": stream, "logrite.state": state });
     stream.backUp(1);
     // Raw strings.
     if (stream.match(/(R|u8R|uR|UR|LR)/)) {
@@ -280,6 +323,7 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
     }
     // Unicode strings/chars.
     if (stream.match(/(u8|u|U|L)/)) {
+	logger.error(`cpp11StringHook(stream=${stream},state=${state}): match → ${match}`, { "event.action": "cpp11StringHook", "logrite.stream": stream, "logrite.state": state });
       if (stream.match(/["']/, /* eat */ false)) {
         return "string";
       }
@@ -287,45 +331,58 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
     }
     // Ignore this hook.
     stream.next();
+	logger.warn(`<<< Exiting cpp11StringHook(stream=${stream},state=${state})`, { "event.action": "cpp11StringHook", "logrite.stream": stream, "logrite.state": state });
     return false;
   }
 
   function cppLooksLikeConstructor(word) {
+	logger.error(`>>> Entering cppLooksLikeConstructor(word=${word})`, { "event.action": "cppLooksLikeConstructor", "logrite.word": word });
     var lastTwo = /(\w+)::(\w+)$/.exec(word);
+	logger.error(`cppLooksLikeConstructor(word=${word}): lastTwo → ${lastTwo}`, { "event.action": "cppLooksLikeConstructor", "logrite.word": word });
     return lastTwo && lastTwo[1] == lastTwo[2];
   }
 
   // C#-style strings where "" escapes a quote.
   function tokenAtString(stream, state) {
+	logger.error(`>>> Entering tokenAtString(stream=${stream},state=${state})`, { "event.action": "tokenAtString", "logrite.stream": stream, "logrite.state": state });
     var next;
     while ((next = stream.next()) != null) {
       if (next == '"' && !stream.eat('"')) {
         state.tokenize = null;
+		logger.debug(`tokenAtString(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenAtString", "logrite.stream": stream, "logrite.state": state });
         break;
       }
     }
+	logger.warn(`<<< Exiting tokenAtString(stream=${stream},state=${state})`, { "event.action": "tokenAtString", "logrite.stream": stream, "logrite.state": state });
     return "string";
   }
 
   // C++11 raw string literal is <prefix>"<delim>( anything )<delim>", where
   // <delim> can be a string up to 16 characters long.
   function tokenRawString(stream, state) {
+	logger.error(`>>> Entering tokenRawString(stream=${stream},state=${state})`, { "event.action": "tokenRawString", "logrite.stream": stream, "logrite.state": state });
     // Escape characters that have special regex meanings.
     var delim = state.cpp11RawStringDelim.replace(/[^\w\s]/g, '\\$&');
+	logger.error(`tokenRawString(stream=${stream},state=${state}): delim → ${delim}`, { "event.action": "tokenRawString", "logrite.stream": stream, "logrite.state": state });
     var match = stream.match(new RegExp(".*?\\)" + delim + '"'));
+	logger.error(`tokenRawString(stream=${stream},state=${state}): match → ${match}`, { "event.action": "tokenRawString", "logrite.stream": stream, "logrite.state": state });
     if (match)
       state.tokenize = null;
     else
       stream.skipToEnd();
+	logger.warn(`<<< Exiting tokenRawString(stream=${stream},state=${state})`, { "event.action": "tokenRawString", "logrite.stream": stream, "logrite.state": state });
     return "string";
   }
 
   function def(mimes, mode) {
+	logger.error(`>>> Entering def(mimes=${mimes},mode=${mode})`, { "event.action": "def", "logrite.mimes": mimes, "logrite.mode": mode });
     if (typeof mimes == "string") mimes = [mimes];
     var words = [];
     function add(obj) {
+	logger.error(`>>> Entering add(obj=${obj})`, { "event.action": "add", "logrite.obj": obj });
       if (obj) for (var prop in obj) if (obj.hasOwnProperty(prop))
         words.push(prop);
+		logger.warn(`<<< Exiting add(obj=${obj})`, { "event.action": "add", "logrite.obj": obj });
     }
     add(mode.keywords);
     add(mode.types);
@@ -333,6 +390,7 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
     add(mode.atoms);
     if (words.length) {
       mode.helperType = mimes[0];
+	logger.debug(`def(mimes=${mimes},mode=${mode}): mode.helperType → ${mode.helperType}`, { "event.action": "def", "logrite.mimes": mimes, "logrite.mode": mode });
       CodeMirror.registerHelper("hintWords", mimes[0], words);
     }
 
@@ -374,6 +432,7 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
       "L": cpp11StringHook,
       "R": cpp11StringHook,
       token: function(stream, state, style) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state},style=${style})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state, "logrite.style": style });
         if (style == "variable" && stream.peek() == "(" &&
             (state.prevToken == ";" || state.prevToken == null ||
              state.prevToken == "}") &&
@@ -437,14 +496,17 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
   });
 
   function tokenTripleString(stream, state) {
+	logger.error(`>>> Entering tokenTripleString(stream=${stream},state=${state})`, { "event.action": "tokenTripleString", "logrite.stream": stream, "logrite.state": state });
     var escaped = false;
     while (!stream.eol()) {
       if (!escaped && stream.match('"""')) {
         state.tokenize = null;
+		logger.debug(`tokenTripleString(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenTripleString", "logrite.stream": stream, "logrite.state": state });
         break;
       }
       escaped = stream.next() == "\\" && !escaped;
     }
+	logger.error(`tokenTripleString(stream=${stream},state=${state}): escaped → ${escaped}`, { "event.action": "tokenTripleString", "logrite.stream": stream, "logrite.state": state });
     return "string";
   }
 

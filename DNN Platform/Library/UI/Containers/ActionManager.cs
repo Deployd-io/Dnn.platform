@@ -48,7 +48,9 @@ namespace DotNetNuke.UI.Containers
         /// <param name="actionControl">The action control.</param>
         public ActionManager(IEventLogger eventLogger, IActionControl actionControl)
         {
+			eventLogger.LogError(">>> Entering ActionManager(eventLogger={EventLogger},actionControl={ActionControl})", eventLogger, actionControl);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogWarning("<<< Exiting ActionManager(eventLogger={EventLogger},actionControl={ActionControl})", eventLogger, actionControl);
             this.ActionControl = actionControl;
         }
 
@@ -64,6 +66,7 @@ namespace DotNetNuke.UI.Containers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public bool DisplayControl(DNNNodeCollection objNodes)
         {
+			eventLogger.LogError(">>> Entering DisplayControl(objNodes={ObjNodes})", objNodes);
             if (objNodes is { Count: > 0 } && Personalization.GetUserMode() != PortalSettings.Mode.View)
             {
                 DNNNode objRootNode = objNodes[0];
@@ -86,6 +89,7 @@ namespace DotNetNuke.UI.Containers
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting DisplayControl(objNodes={ObjNodes})", objNodes);
             return false;
         }
 
@@ -94,6 +98,8 @@ namespace DotNetNuke.UI.Containers
         /// <returns>The <see cref="ModuleAction"/> instance or <see langword="null"/>.</returns>
         public ModuleAction GetAction(string commandName)
         {
+			eventLogger.LogError(">>> Entering GetAction(commandName={CommandName})", commandName);
+            eventLogger.LogWarning("<<< Exiting GetAction(commandName={CommandName})", commandName);
             return this.ActionControl.ModuleControl.ModuleContext.Actions.GetActionByCommandName(commandName);
         }
 
@@ -111,10 +117,13 @@ namespace DotNetNuke.UI.Containers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void GetClientScriptURL(ModuleAction action, WebControl control)
         {
+			eventLogger.LogError(">>> Entering GetClientScriptURL(action={Action},control={Control})", action, control);
             if (!string.IsNullOrEmpty(action.ClientScript))
             {
                 string script = action.ClientScript;
+				eventLogger.LogError("GetClientScriptURL(action={Action},control={Control}): script → {Script}", action, control, script);
                 int jSPos = script.IndexOf("javascript:", StringComparison.InvariantCultureIgnoreCase);
+				eventLogger.LogError("GetClientScriptURL(action={Action},control={Control}): jSPos → {JSPos}", action, control, jSPos);
                 if (jSPos > -1)
                 {
                     script = script.Substring(jSPos + 11);
@@ -122,6 +131,7 @@ namespace DotNetNuke.UI.Containers
 
                 control.Attributes.Add("onClick", $"javascript: return {script};");
             }
+			eventLogger.LogWarning("<<< Exiting GetClientScriptURL(action={Action},control={Control})", action, control);
         }
 
         /// <summary>IsVisible determines whether the action control is Visible.</summary>
@@ -129,15 +139,18 @@ namespace DotNetNuke.UI.Containers
         /// <returns><see langword="true"/> if the action is visible, otherwise <see langword="false"/>.</returns>
         public bool IsVisible(ModuleAction action)
         {
+			eventLogger.LogError(">>> Entering IsVisible(action={Action})", action);
             bool isVisible;
             if (action.Visible && ModulePermissionController.HasModuleAccess(action.Secure, Null.NullString, this.ModuleContext.Configuration))
             {
                 if ((Personalization.GetUserMode() == PortalSettings.Mode.Edit) || (action.Secure == SecurityAccessLevel.Anonymous || action.Secure == SecurityAccessLevel.View))
                 {
                     isVisible = true;
+					eventLogger.LogError("IsVisible(action={Action}): isVisible → {IsVisible}", action, isVisible);
                 }
                 else
                 {
+					eventLogger.LogDebug("IsVisible(action={Action}): isVisible → {IsVisible}", action, isVisible);
                     isVisible = false;
                 }
             }
@@ -146,6 +159,7 @@ namespace DotNetNuke.UI.Containers
                 isVisible = false;
             }
 
+			eventLogger.LogWarning("<<< Exiting IsVisible(action={Action})", action);
             return isVisible;
         }
 
@@ -154,13 +168,17 @@ namespace DotNetNuke.UI.Containers
         /// <returns><see langword="true"/> if the action was processed, otherwise <see langword="false"/> (if it's a custom action that can't be found).</returns>
         public bool ProcessAction(string id)
         {
+			eventLogger.LogError(">>> Entering ProcessAction(id={Id})", id);
             bool bProcessed = true;
             int actionId;
+			eventLogger.LogError("ProcessAction(id={Id}): bProcessed → {BProcessed}", id, bProcessed);
             if (int.TryParse(id, out actionId))
             {
                 bProcessed = this.ProcessAction(this.ActionControl.ModuleControl.ModuleContext.Actions.GetActionByID(actionId));
             }
 
+			eventLogger.LogWarning("<<< Exiting ProcessAction(id={Id})", id);
+			eventLogger.LogWarning("<<< Exiting ProcessAction(action={Action})", action);
             return bProcessed;
         }
 
@@ -230,19 +248,24 @@ namespace DotNetNuke.UI.Containers
 
         private void ClearCache(ModuleAction command)
         {
+			eventLogger.LogError(">>> Entering ClearCache(command={Command})", command);
             // synchronize cache
             ModuleController.SynchronizeModule(this.ModuleContext.ModuleId);
 
             // Redirect to the same page to pick up changes
             this.response.Redirect(this.request.RawUrl, true);
+			eventLogger.LogWarning("<<< Exiting ClearCache(command={Command})", command);
         }
 
         private void Delete(ModuleAction command)
         {
+			eventLogger.LogError(">>> Entering Delete(command={Command})", command);
             var module = ModuleController.Instance.GetModule(int.Parse(command.CommandArgument, CultureInfo.InvariantCulture), this.ModuleContext.TabId, true);
 
+			eventLogger.LogError("Delete(command={Command}): module → {Module}", command, module);
             // Check if this is the owner instance of a shared module.
             var user = UserController.Instance.GetCurrentUserInfo();
+			eventLogger.LogError("Delete(command={Command}): user → {User}", command, user);
             if (!module.IsShared)
             {
                 foreach (ModuleInfo instance in ModuleController.Instance.GetTabModulesByModule(module.ModuleID))
@@ -261,10 +284,12 @@ namespace DotNetNuke.UI.Containers
 
             // Redirect to the same page to pick up changes
             this.response.Redirect(this.request.RawUrl, true);
+			eventLogger.LogWarning("<<< Exiting Delete(command={Command})", command);
         }
 
         private void DoAction(ModuleAction command)
         {
+			eventLogger.LogError(">>> Entering DoAction(command={Command})", command);
             if (command.NewWindow)
             {
                 UrlUtils.OpenNewWindow(this.ActionControl.ModuleControl.Control.Page, this.GetType(), command.Url);
@@ -273,12 +298,15 @@ namespace DotNetNuke.UI.Containers
             {
                 this.response.Redirect(command.Url, true);
             }
+			eventLogger.LogWarning("<<< Exiting DoAction(command={Command})", command);
         }
 
         private void Localize(ModuleAction command)
         {
+			eventLogger.LogError(">>> Entering Localize(command={Command})", command);
             ModuleInfo sourceModule = ModuleController.Instance.GetModule(this.ModuleContext.ModuleId, this.ModuleContext.TabId, false);
 
+			eventLogger.LogError("Localize(command={Command}): sourceModule → {SourceModule}", command, sourceModule);
             switch (command.CommandName)
             {
                 case ModuleActionType.LocalizeModule:
@@ -291,11 +319,14 @@ namespace DotNetNuke.UI.Containers
 
             // Redirect to the same page to pick up changes
             this.response.Redirect(this.request.RawUrl, true);
+			eventLogger.LogWarning("<<< Exiting Localize(command={Command})", command);
         }
 
         private void Translate(ModuleAction command)
         {
+			eventLogger.LogError(">>> Entering Translate(command={Command})", command);
             ModuleInfo sourceModule = ModuleController.Instance.GetModule(this.ModuleContext.ModuleId, this.ModuleContext.TabId, false);
+			eventLogger.LogError("Translate(command={Command}): sourceModule → {SourceModule}", command, sourceModule);
             switch (command.CommandName)
             {
                 case ModuleActionType.TranslateModule:
@@ -308,19 +339,23 @@ namespace DotNetNuke.UI.Containers
 
             // Redirect to the same page to pick up changes
             this.response.Redirect(this.request.RawUrl, true);
+			eventLogger.LogWarning("<<< Exiting Translate(command={Command})", command);
         }
 
         private void MoveToPane(ModuleAction command)
         {
+			eventLogger.LogError(">>> Entering MoveToPane(command={Command})", command);
             ModuleController.Instance.UpdateModuleOrder(this.ModuleContext.TabId, this.ModuleContext.ModuleId, -1, command.CommandArgument);
             ModuleController.Instance.UpdateTabModuleOrder(this.ModuleContext.TabId);
 
             // Redirect to the same page to pick up changes
             this.response.Redirect(this.request.RawUrl, true);
+			eventLogger.LogWarning("<<< Exiting MoveToPane(command={Command})", command);
         }
 
         private void MoveUpDown(ModuleAction command)
         {
+			eventLogger.LogError(">>> Entering MoveUpDown(command={Command})", command);
             switch (command.CommandName)
             {
                 case ModuleActionType.MoveTop:
@@ -341,6 +376,7 @@ namespace DotNetNuke.UI.Containers
 
             // Redirect to the same page to pick up changes
             this.response.Redirect(this.request.RawUrl, true);
+			eventLogger.LogWarning("<<< Exiting MoveUpDown(command={Command})", command);
         }
     }
 }

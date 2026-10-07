@@ -9,10 +9,12 @@ import resx from "../../../resources";
 import util from "../../../utils";
 import TranslationProgressBars from "../TranslationProgressBars";
 import "./style.less";
+const logger = console;
 
 class LocalizedContent extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             triedToSubmit: false,
             allPagesTranslatable: false,
@@ -20,28 +22,36 @@ class LocalizedContent extends Component {
             showProgressBars: false
         };
         this.counter = 0;
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
         this.getProgressData = this.getProgressData.bind(this);
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     onEnable() {
+		logger.error('>>> Entering onEnable()', { "event.action": "onEnable" });
         const {props, state} = this;
         props.dispatch(LanguagesActions.enableLocalizedContent({ portalId: props.portalId, translatePages: state.allPagesTranslatable }, (data) => {
             this.setState(data);
             const newState = Object.assign(data, { showProgressBars: true });
+			logger.error(`onEnable(): newState → ${newState}`, { "event.action": "onEnable" });
             this.setState(newState);
             this.getProgressData();
         }, (error) => {
             const errorMessage = JSON.parse(error.responseText);
             util.utilities.notifyError(errorMessage.Message);
+			logger.error(`onEnable(): errorMessage → ${errorMessage}`, { "event.action": "onEnable" });
         }));
     }
 
     onUpdateSettings() {
+		logger.error('>>> Entering onUpdateSettings()', { "event.action": "onUpdateSettings" });
         const {props} = this;
         props.dispatch(LanguagesActions.getLanguageSettings(props.languageSettings.PortalId, props.languageSettings.CultureCode));
+		logger.warn('<<< Exiting onUpdateSettings()', { "event.action": "onUpdateSettings" });
     }
 
     getProgressData() {
+		logger.error('>>> Entering getProgressData()', { "event.action": "getProgressData" });
         const {props} = this;
         props.dispatch(LanguagesActions.getLocalizationProgress((data) => {
             this.setState(data);
@@ -52,22 +62,27 @@ class LocalizedContent extends Component {
                 return;
             }
             this.doneProgress();
+			logger.warn('<<< Exiting getProgressData()', { "event.action": "getProgressData" });
         }));
     }
 
     doneProgress() {
+		logger.error('>>> Entering doneProgress()', { "event.action": "doneProgress" });
         if (this.props.isOpen) {
             this.props.closePersonaBarPage();
             this.onUpdateSettings();
         }
         this.setState({ showProgressBars: false });
+		logger.warn('<<< Exiting doneProgress()', { "event.action": "doneProgress" });
     }
 
     getDefaultLanguage() {
+		logger.error('>>> Entering getDefaultLanguage()', { "event.action": "getDefaultLanguage" });
         const {languages, languageSettings} = this.props;
         if (!languages || !languageSettings) {
             return;
         }
+		logger.warn('<<< Exiting getDefaultLanguage()', { "event.action": "getDefaultLanguage" });
         return languages.find(l => l.Code === languageSettings.SiteDefaultLanguage);
     }
 
@@ -78,9 +93,12 @@ class LocalizedContent extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         
         const defaultLanguage = this.getDefaultLanguage() || {};
+		logger.error(`render(): defaultLanguage → ${defaultLanguage}`, { "event.action": "render" });
         const {props, state} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <PersonaBarPageBody
                 className="create-language-pack-panel enable-localized-content-panel"
@@ -161,7 +179,9 @@ LocalizedContent.propTypes = {
 };
 
 function mapStateToProps(state) {
+logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
 
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         languages: state.languages.languageList,
         languageSettings: state.languages.languageSettings

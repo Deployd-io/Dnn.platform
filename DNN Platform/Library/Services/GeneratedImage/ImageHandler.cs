@@ -19,6 +19,7 @@ namespace DotNetNuke.Services.GeneratedImage
     /// <summary>Image Handler abstract class.</summary>
     public abstract class ImageHandler : IHttpHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImageHandler));
         /// <summary>Initializes a new instance of the <see cref="ImageHandler"/> class.</summary>
         /// <param name="eventLogger">The event logger.</param>
         /// <param name="imageStore">The image store.</param>
@@ -33,6 +34,10 @@ namespace DotNetNuke.Services.GeneratedImage
         protected ImageHandler()
             : this(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>())
         {
+		Logger.LogError(">>> Entering ImageHandler()");
+        Logger.LogWarning("<<< Exiting ImageHandler()");
+		Logger.LogError(">>> Entering ImageHandler(eventLogger={EventLogger})", eventLogger);
+        Logger.LogWarning("<<< Exiting ImageHandler(eventLogger={EventLogger})", eventLogger);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ImageHandler"/> class.</summary>
@@ -138,13 +143,17 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <inheritdoc />
         public void ProcessRequest(HttpContext context)
         {
+			Logger.LogError(">>> Entering ProcessRequest(context={Context})", context);
             if (context == null)
             {
+				Logger.LogError("Throwing ArgumentNullException from ProcessRequest(context={Context})", context);
                 throw new ArgumentNullException(nameof(context));
             }
 
             HttpContextBase contextWrapper = new HttpContextWrapper(context);
+			Logger.LogError("ProcessRequest(context={Context}): contextWrapper → {ContextWrapper}", context, contextWrapper);
             this.ProcessRequest(contextWrapper);
+			Logger.LogWarning("<<< Exiting ProcessRequest(context={Context})", context);
         }
 
         internal void ProcessRequest(HttpContextBase context)

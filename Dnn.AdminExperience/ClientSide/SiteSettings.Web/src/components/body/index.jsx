@@ -19,6 +19,7 @@ import MoreSettings from "../moreSettings";
 import "./style.less";
 import util from "../../utils";
 import resx from "../../resources";
+const logger = console;
 
 let isHost = false;
 let isAdmin = false;
@@ -26,10 +27,12 @@ let canViewSiteInfo = false;
 export class Body extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.handleSelect = this.handleSelect.bind(this);
         isHost = util.settings.isHost;
         isAdmin = util.settings.isHost || util.settings.isAdmin;
         canViewSiteInfo = isAdmin || util.settings.permissions.SITE_INFO_VIEW;
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     handleSelect(index) {
@@ -38,11 +41,14 @@ export class Body extends Component {
     }
 
     shouldComponentUpdate(nextProps) {
+		logger.error(`>>> Entering shouldComponentUpdate(nextProps=${nextProps})`, { "event.action": "shouldComponentUpdate", "logrite.nextProps": nextProps });
         // Only render if is to show the component.Avoid calling backend when not needed. 
+		logger.warn(`<<< Exiting shouldComponentUpdate(nextProps=${nextProps})`, { "event.action": "shouldComponentUpdate", "logrite.nextProps": nextProps });
         return nextProps.showing;
     }
 
     renderSiteBehaviorTab() {
+		logger.error('>>> Entering renderSiteBehaviorTab()', { "event.action": "renderSiteBehaviorTab" });
         const {props} = this;
         if (isHost) {
             return <DnnTabs onSelect={this.handleSelect.bind(this) }
@@ -62,6 +68,7 @@ export class Body extends Component {
             </DnnTabs>;
         }
         else {
+			logger.warn('<<< Exiting renderSiteBehaviorTab()', { "event.action": "renderSiteBehaviorTab" });
             return <DnnTabs onSelect={this.handleSelect.bind(this) }
                 tabHeaders={[resx.get("TabDefaultPages"),
                     resx.get("TabMessaging"),
@@ -79,9 +86,11 @@ export class Body extends Component {
     }
 
     getSearchSecondaryTabs() {
+		logger.error('>>> Entering getSearchSecondaryTabs()', { "event.action": "getSearchSecondaryTabs" });
         const SearchExtras = window.dnn.SiteSettings && window.dnn.SiteSettings.SearchExtras;
 
         let searchTabHeaders = [resx.get("TabBasicSettings"), resx.get("TabSynonyms"), resx.get("TabIgnoreWords")];
+		logger.error(`getSearchSecondaryTabs(): searchTabHeaders → ${searchTabHeaders}`, { "event.action": "getSearchSecondaryTabs" });
         let searchTabContent = [
             <BasicSearchSettings portalId={this.props.portalId} cultureCode={this.props.cultureCode} key="first" />,
             <SynonymsGroups portalId={this.props.portalId} cultureCode={this.props.cultureCode} key="second" />,
@@ -99,6 +108,7 @@ export class Body extends Component {
             });
         }
 
+		logger.warn('<<< Exiting getSearchSecondaryTabs()', { "event.action": "getSearchSecondaryTabs" });
         return <DnnTabs onSelect={this.handleSelect.bind(this) }
             tabHeaders={searchTabHeaders}
             type="secondary">
@@ -112,6 +122,7 @@ export class Body extends Component {
 
     /*eslint no-mixed-spaces-and-tabs: "error"*/
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let tabHeaders = [];
         if (canViewSiteInfo)
             tabHeaders.push([resx.get("TabSiteInfo")]);
@@ -121,6 +132,7 @@ export class Body extends Component {
             tabHeaders.push(resx.get("TabSearch"));
         }
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <PersonaBarPageBody backToLinkProps={{
                 text: this.props.referrer && this.props.referrerText,
@@ -161,6 +173,8 @@ Body.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.index
     };

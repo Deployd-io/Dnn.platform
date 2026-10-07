@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -13,8 +14,10 @@
 
 CodeMirror.defineMode("eiffel", function() {
   function wordObj(words) {
+	logger.error(`>>> Entering wordObj(words=${words})`, { "event.action": "wordObj", "logrite.words": words });
     var o = {};
     for (var i = 0, e = words.length; i < e; ++i) o[words[i]] = true;
+	logger.warn(`<<< Exiting wordObj(words=${words})`, { "event.action": "wordObj", "logrite.words": words });
     return o;
   }
   var keywords = wordObj([
@@ -86,13 +89,17 @@ CodeMirror.defineMode("eiffel", function() {
   var operators = wordObj([":=", "and then","and", "or","<<",">>"]);
 
   function chain(newtok, stream, state) {
+	logger.error(`>>> Entering chain(newtok=${newtok},stream=${stream},state=${state})`, { "event.action": "chain", "logrite.newtok": newtok, "logrite.stream": stream, "logrite.state": state });
     state.tokenize.push(newtok);
+	logger.warn(`<<< Exiting chain(newtok=${newtok},stream=${stream},state=${state})`, { "event.action": "chain", "logrite.newtok": newtok, "logrite.stream": stream, "logrite.state": state });
     return newtok(stream, state);
   }
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     if (stream.eatSpace()) return null;
     var ch = stream.next();
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     if (ch == '"'||ch == "'") {
       return chain(readQuoted(ch, "string"), stream, state);
     } else if (ch == "-"&&stream.eat("-")) {
@@ -112,11 +119,13 @@ CodeMirror.defineMode("eiffel", function() {
       stream.eatWhile(/[=+\-\/*^%<>~]/);
       return "operator";
     } else {
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return null;
     }
   }
 
   function readQuoted(quote, style,  unescaped) {
+	logger.error(`>>> Entering readQuoted(quote=${quote},style=${style},unescaped=${unescaped})`, { "event.action": "readQuoted", "logrite.quote": quote, "logrite.style": style, "logrite.unescaped": unescaped });
     return function(stream, state) {
       var escaped = false, ch;
       while ((ch = stream.next()) != null) {
@@ -132,13 +141,18 @@ CodeMirror.defineMode("eiffel", function() {
 
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       return {tokenize: [tokenBase]};
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       var style = state.tokenize[state.tokenize.length-1](stream, state);
       if (style == "ident") {
+		logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         var word = stream.current();
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         style = keywords.propertyIsEnumerable(stream.current()) ? "keyword"
           : operators.propertyIsEnumerable(stream.current()) ? "operator"
           : /^[A-Z][A-Z_0-9]*$/g.test(word) ? "tag"
@@ -149,6 +163,7 @@ CodeMirror.defineMode("eiffel", function() {
           : /^[0-9]+$/g.test(word) ? "number"
           : "variable";
       }
+	logger.error(`token(stream=${stream},state=${state}): word → ${word}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return style;
     },
     lineComment: "--"

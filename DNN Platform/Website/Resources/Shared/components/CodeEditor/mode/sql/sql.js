@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -24,11 +25,14 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
       dateSQL        = parserConfig.dateSQL || {"date" : true, "time" : true, "timestamp" : true};
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.next();
 
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     // call hooks from the mime type
     if (hooks[ch]) {
       var result = hooks[ch](stream, state);
+	logger.error(`tokenBase(stream=${stream},state=${state}): result → ${result}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       if (result !== false) return result;
     }
 
@@ -81,6 +85,7 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
       // multi-line comments
       // ref: https://kb.askmonty.org/en/comment-syntax/
       state.tokenize = tokenComment;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return state.tokenize(stream, state);
     } else if (ch == ".") {
       // .1 for 0.1
@@ -118,6 +123,7 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
 
   // 'string', with char specified in quote escaped by '\'
   function tokenLiteral(quote) {
+	logger.error(`>>> Entering tokenLiteral(quote=${quote})`, { "event.action": "tokenLiteral", "logrite.quote": quote });
     return function(stream, state) {
       var escaped = false, ch;
       while ((ch = stream.next()) != null) {
@@ -131,11 +137,13 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
     };
   }
   function tokenComment(stream, state) {
+	logger.error(`>>> Entering tokenComment(stream=${stream},state=${state})`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
     while (true) {
       if (stream.skipTo("*")) {
         stream.next();
         if (stream.eat("/")) {
           state.tokenize = tokenBase;
+		logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
           break;
         }
       } else {
@@ -143,29 +151,37 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
         break;
       }
     }
+	logger.warn(`<<< Exiting tokenComment(stream=${stream},state=${state})`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
     return "comment";
   }
 
   function pushContext(stream, state, type) {
+	logger.error(`>>> Entering pushContext(stream=${stream},state=${state},type=${type})`, { "event.action": "pushContext", "logrite.stream": stream, "logrite.state": state, "logrite.type": type });
     state.context = {
       prev: state.context,
       indent: stream.indentation(),
       col: stream.column(),
       type: type
     };
+	logger.warn(`<<< Exiting pushContext(stream=${stream},state=${state},type=${type})`, { "event.action": "pushContext", "logrite.stream": stream, "logrite.state": state, "logrite.type": type });
   }
 
   function popContext(state) {
+	logger.error(`>>> Entering popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
     state.indent = state.context.indent;
     state.context = state.context.prev;
+	logger.warn(`<<< Exiting popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
   }
 
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       return {tokenize: tokenBase, context: null};
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.sol()) {
         if (state.context && state.context.align == null)
           state.context.align = false;
@@ -173,12 +189,14 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
       if (stream.eatSpace()) return null;
 
       var style = state.tokenize(stream, state);
+	logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (style == "comment") return style;
 
       if (state.context && state.context.align == null)
         state.context.align = true;
 
       var tok = stream.current();
+	logger.error(`token(stream=${stream},state=${state}): tok → ${tok}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (tok == "(")
         pushContext(stream, state, ")");
       else if (tok == "[")
@@ -189,9 +207,11 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
     },
 
     indent: function(state, textAfter) {
+	logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       var cx = state.context;
       if (!cx) return CodeMirror.Pass;
       var closing = textAfter.charAt(0) == cx.type;
+	logger.error(`indent(state=${state},textAfter=${textAfter}): closing → ${closing}`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
       if (cx.align) return cx.col + (closing ? 0 : 1);
       else return cx.indent + (closing ? 0 : config.indentUnit);
     },
@@ -207,6 +227,7 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
 
   // `identifier`
   function hookIdentifier(stream) {
+	logger.error(`>>> Entering hookIdentifier(stream=${stream})`, { "event.action": "hookIdentifier", "logrite.stream": stream });
     // MySQL/MariaDB identifiers
     // ref: http://dev.mysql.com/doc/refman/5.6/en/identifier-qualifiers.html
     var ch;
@@ -214,11 +235,13 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
       if (ch == "`" && !stream.eat("`")) return "variable-2";
     }
     stream.backUp(stream.current().length - 1);
+	logger.warn(`<<< Exiting hookIdentifier(stream=${stream})`, { "event.action": "hookIdentifier", "logrite.stream": stream });
     return stream.eatWhile(/\w/) ? "variable-2" : null;
   }
 
   // variable token
   function hookVar(stream) {
+	logger.error(`>>> Entering hookVar(stream=${stream})`, { "event.action": "hookVar", "logrite.stream": stream });
     // variables
     // @@prefix.varName @varName
     // varName can be quoted with ` or ' or "

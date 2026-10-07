@@ -1,9 +1,12 @@
 import { serversTab as ActionTypes } from "../constants/actionTypes";
 import serversTabService from "../services/serversTabService";
 import localization from "../localization";
+const logger = console;
 
 const serversTabActions = {
     loadServers() {
+		logger.error('>>> Entering loadServers()', { "event.action": "loadServers" });
+		logger.warn('<<< Exiting loadServers()', { "event.action": "loadServers" });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.LOAD_SERVERS,
@@ -28,9 +31,12 @@ const serversTabActions = {
                     });
                 });
         };
+		logger.error('Exception in loadServers()', { "event.action": "loadServers", "event.category": "process" });
     },
 
     deleteServer(serverId) {
+		logger.error(`>>> Entering deleteServer(serverId=${serverId})`, { "event.action": "deleteServer", "logrite.serverId": serverId });
+		logger.warn(`<<< Exiting deleteServer(serverId=${serverId})`, { "event.action": "deleteServer", "logrite.serverId": serverId });
         return (dispatch) => {
             serversTabService
                 .deleteServer(serverId)
@@ -51,6 +57,8 @@ const serversTabActions = {
     },
 
     deleteNonActiveServers() {
+		logger.error('>>> Entering deleteNonActiveServers()', { "event.action": "deleteNonActiveServers" });
+		logger.warn('<<< Exiting deleteNonActiveServers()', { "event.action": "deleteNonActiveServers" });
         return (dispatch) => {
             serversTabService
                 .deleteNonActiveServers()

@@ -18,6 +18,7 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
 
     public class Member
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Member));
         private UserInfo user;
         private UserInfo viewer;
         private PortalSettings settings;
@@ -27,7 +28,11 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         /// <param name="settings">The portal settings.</param>
         public Member(UserInfo user, PortalSettings settings)
         {
+			Logger.LogError(">>> Entering Member(user={User},settings={Settings})", user, settings);
+			Logger.LogDebug("Member(user={User},settings={Settings}): settings → {Settings1}", user, settings, settings);
+        Logger.LogWarning("<<< Exiting Member(user={User},settings={Settings})", user, settings);
             this.user = user;
+			Logger.LogDebug("Member(user={User},settings={Settings}): this.user → {Arg2}", user, settings, this.user);
             this.settings = settings;
             this.viewer = settings.UserInfo;
         }
@@ -146,9 +151,11 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         /// <returns>property value.</returns>
         private string GetProfileProperty(string propertyName)
         {
+			Logger.LogError(">>> Entering GetProfileProperty(propertyName={PropertyName})", propertyName);
             var profileProperties = this.ProfileProperties;
             string value;
 
+			Logger.LogWarning("<<< Exiting GetProfileProperty(propertyName={PropertyName})", propertyName);
             return profileProperties.TryGetValue(propertyName, out value) ? value : string.Empty;
         }
     }

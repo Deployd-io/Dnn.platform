@@ -36,7 +36,10 @@ namespace Dnn.PersonaBar.Styles.MenuControllers
         /// <param name="userController">Provides information about users.</param>
         public StylesMenuController(IPortalController portalController, IUserController userController)
         {
+			eventLogger.LogError(">>> Entering StylesMenuController(portalController={PortalController},userController={UserController})", portalController, userController);
             this.portalController = portalController;
+			eventLogger.LogWarning("<<< Exiting StylesMenuController(portalController={PortalController},userController={UserController})", portalController, userController);
+			eventLogger.LogDebug("StylesMenuController(portalController={PortalController},userController={UserController}): this.portalController → {Arg2}", portalController, userController, this.portalController);
             this.userController = userController;
         }
 
@@ -49,17 +52,22 @@ namespace Dnn.PersonaBar.Styles.MenuControllers
         /// <inheritdoc />
         public void UpdateParameters(MenuItem menuItem)
         {
+			eventLogger.LogError(">>> Entering UpdateParameters(menuItem={MenuItem})", menuItem);
+			eventLogger.LogDebug("UpdateParameters(menuItem={MenuItem}): menuItem.AllowHost → {Arg1}", menuItem, menuItem.AllowHost);
+        eventLogger.LogWarning("<<< Exiting UpdateParameters(menuItem={MenuItem})", menuItem);
             menuItem.AllowHost = true;
         }
 
         /// <inheritdoc />
         public bool Visible(MenuItem menuItem)
         {
+			eventLogger.LogError(">>> Entering Visible(menuItem={MenuItem})", menuItem);
             var allowAdminEdits = this.portalController
                 .GetCurrentSettings()
                 .GetStyles()
                 .AllowAdminEdits;
             var user = this.userController.GetCurrentUserInfo();
+			eventLogger.LogError("Visible(menuItem={MenuItem}): user → {User}", menuItem, user);
 
             if (user.IsSuperUser)
             {
@@ -71,6 +79,7 @@ namespace Dnn.PersonaBar.Styles.MenuControllers
                 return true;
             }
 
+			eventLogger.LogWarning("<<< Exiting Visible(menuItem={MenuItem})", menuItem);
             return false;
         }
     }

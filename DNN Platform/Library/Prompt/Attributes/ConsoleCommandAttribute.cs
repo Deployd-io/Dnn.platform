@@ -9,13 +9,16 @@ namespace DotNetNuke.Prompt
     [AttributeUsage(AttributeTargets.Class)]
     public class ConsoleCommandAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConsoleCommandAttribute));
         /// <summary>Initializes a new instance of the <see cref="ConsoleCommandAttribute"/> class.</summary>
         /// <param name="name">The command name.</param>
         /// <param name="categoryKey">The resource key for the command category.</param>
         /// <param name="descriptionKey">The resource key for the command description.</param>
         public ConsoleCommandAttribute(string name, string categoryKey, string descriptionKey)
         {
+			Logger.LogError(">>> Entering ConsoleCommandAttribute(name={Name},categoryKey={CategoryKey},descriptionKey={DescriptionKey})", name, categoryKey, descriptionKey);
             this.Name = name;
+			Logger.LogDebug("ConsoleCommandAttribute(name={Name},categoryKey={CategoryKey},descriptionKey={DescriptionKey}): this.Name → {Arg3}", name, categoryKey, descriptionKey, this.Name);
             this.CategoryKey = categoryKey;
             this.DescriptionKey = descriptionKey;
         }

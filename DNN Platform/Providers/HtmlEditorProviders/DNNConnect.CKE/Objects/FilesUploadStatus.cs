@@ -17,13 +17,17 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <summary>Initializes a new instance of the <see cref="FilesUploadStatus"/> class.</summary>
         public FilesUploadStatus()
         {
+		eventLogger.LogError(">>> Entering FilesUploadStatus()");
+        eventLogger.LogWarning("<<< Exiting FilesUploadStatus()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FilesUploadStatus"/> class.</summary>
         /// <param name="fileInfo">The file information.</param>
         public FilesUploadStatus(FileInfo fileInfo)
         {
+			eventLogger.LogError(">>> Entering FilesUploadStatus(fileInfo={FileInfo})", fileInfo);
             this.SetValues(fileInfo.Name, (int)fileInfo.Length);
+			eventLogger.LogWarning("<<< Exiting FilesUploadStatus(fileInfo={FileInfo})", fileInfo);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FilesUploadStatus"/> class.</summary>
@@ -31,7 +35,9 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <param name="fileLength">Length of the file.</param>
         public FilesUploadStatus(string fileName, int fileLength)
         {
+			eventLogger.LogError(">>> Entering FilesUploadStatus(fileName={FileName},fileLength={FileLength})", fileName, fileLength);
             this.SetValues(fileName, fileLength);
+			eventLogger.LogWarning("<<< Exiting FilesUploadStatus(fileName={FileName},fileLength={FileLength})", fileName, fileLength);
         }
 
         /// <summary>Gets or sets the group.</summary>
@@ -99,9 +105,12 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <param name="fileLength">Length of the file.</param>
         private void SetValues(string fileName, int fileLength)
         {
+			eventLogger.LogError(">>> Entering SetValues(fileName={FileName},fileLength={FileLength})", fileName, fileLength);
             this.name = fileName;
+			eventLogger.LogDebug("SetValues(fileName={FileName},fileLength={FileLength}): this.name → {Arg2}", fileName, fileLength, this.name);
             this.type = "image/png";
             this.size = fileLength;
+			eventLogger.LogDebug("SetValues(fileName={FileName},fileLength={FileLength}): this.type → {Arg2}", fileName, fileLength, this.type);
             this.progress = "1.0";
             this.url = string.Format("{0}FileTransferHandler.ashx?f={1}", HandlerPath, fileName);
         }

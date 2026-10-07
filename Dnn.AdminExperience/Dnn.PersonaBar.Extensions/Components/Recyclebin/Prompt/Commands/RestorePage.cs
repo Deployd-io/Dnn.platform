@@ -43,7 +43,11 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <param name="contentVerifier">The content verifier.</param>
         public RestorePage(ITabController tabController, IRecyclebinController recyclebinController, IContentVerifier contentVerifier)
         {
+			eventLogger.LogError(">>> Entering RestorePage(tabController={TabController},recyclebinController={RecyclebinController},contentVerifier={ContentVerifier})", tabController, recyclebinController, contentVerifier);
+			eventLogger.LogDebug("RestorePage(tabController={TabController},recyclebinController={RecyclebinController},contentVerifier={ContentVerifier}): recyclebinController → {RecyclebinController1}", tabController, recyclebinController, contentVerifier, recyclebinController);
             this.tabController = tabController;
+			eventLogger.LogWarning("<<< Exiting RestorePage(tabController={TabController},recyclebinController={RecyclebinController},contentVerifier={ContentVerifier})", tabController, recyclebinController, contentVerifier);
+			eventLogger.LogDebug("RestorePage(tabController={TabController},recyclebinController={RecyclebinController},contentVerifier={ContentVerifier}): this.tabController → {Arg3}", tabController, recyclebinController, contentVerifier, this.tabController);
             this.recyclebinController = recyclebinController;
             this.contentVerifier = contentVerifier;
         }
@@ -60,6 +64,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.PageId = this.GetFlagValue(FlagId, "Page Id", -1, false, true);
             this.ParentId = this.GetFlagValue(FlagParentId, "Parent Id", -1);
             this.PageName = this.GetFlagValue(FlagName, "Page Name", string.Empty);
@@ -67,19 +72,24 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
             {
                 this.AddMessage(this.LocalizeString("Prompt_RestorePageNoParams"));
             }
+			eventLogger.LogWarning("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             TabInfo tab;
             string message = string.Format(CultureInfo.CurrentCulture, this.LocalizeString("PageNotFound"), this.PageId);
+			eventLogger.LogError("Run(): message → {Message}", message);
 
             if (this.PageId > 0)
             {
                 tab = this.tabController.GetTab(this.PageId, this.PortalId);
+				eventLogger.LogDebug("Run(): tab → {Tab}", tab);
                 if (tab == null)
                 {
+					eventLogger.LogError("Run(): tab → {Tab}", tab);
                     return new ConsoleErrorResultModel(message);
                 }
             }
@@ -118,6 +128,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
             }
             else
             {
+				eventLogger.LogWarning("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(message);
             }
         }

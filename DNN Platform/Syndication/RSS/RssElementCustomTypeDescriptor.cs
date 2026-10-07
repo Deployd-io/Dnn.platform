@@ -10,12 +10,14 @@ namespace DotNetNuke.Services.Syndication
     /// <summary>  Helper class to enable the data binding logic generate column names at runtime.</summary>
     internal sealed class RssElementCustomTypeDescriptor : ICustomTypeDescriptor
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RssElementCustomTypeDescriptor));
         private readonly Dictionary<string, string> attributes;
 
         /// <summary>Initializes a new instance of the <see cref="RssElementCustomTypeDescriptor"/> class.</summary>
         /// <param name="attributes">The attributes.</param>
         public RssElementCustomTypeDescriptor(Dictionary<string, string> attributes)
         {
+			Logger.LogError(">>> Entering RssElementCustomTypeDescriptor(attributes={Attributes})", attributes);
             this.attributes = attributes;
         }
 
@@ -93,6 +95,7 @@ namespace DotNetNuke.Services.Syndication
 
         private PropertyDescriptorCollection GetPropertyDescriptors()
         {
+			Logger.LogError(">>> Entering GetPropertyDescriptors()");
             var propertyDescriptors = new PropertyDescriptor[this.attributes.Count];
             int i = 0;
 
@@ -101,6 +104,7 @@ namespace DotNetNuke.Services.Syndication
                 propertyDescriptors[i++] = new RssElementCustomPropertyDescriptor(a.Key);
             }
 
+			Logger.LogWarning("<<< Exiting GetPropertyDescriptors()");
             return new PropertyDescriptorCollection(propertyDescriptors);
         }
 
@@ -109,6 +113,8 @@ namespace DotNetNuke.Services.Syndication
             public RssElementCustomPropertyDescriptor(string propertyName)
                 : base(propertyName, null)
             {
+			Logger.LogError(">>> Entering RssElementCustomPropertyDescriptor(propertyName={PropertyName})", propertyName);
+            Logger.LogWarning("<<< Exiting RssElementCustomPropertyDescriptor(propertyName={PropertyName})", propertyName);
             }
 
             public override Type ComponentType
@@ -137,6 +143,10 @@ namespace DotNetNuke.Services.Syndication
 
             public override bool CanResetValue(object o)
             {
+				Logger.LogError(">>> Entering CanResetValue(o={O})", o);
+				Logger.LogError(">>> Entering ResetValue(o={O})", o);
+            Logger.LogWarning("<<< Exiting ResetValue(o={O})", o);
+				Logger.LogWarning("<<< Exiting CanResetValue(o={O})", o);
                 return false;
             }
 
@@ -146,15 +156,20 @@ namespace DotNetNuke.Services.Syndication
 
             public override void SetValue(object o, object value)
             {
+			Logger.LogError(">>> Entering SetValue(o={O},value={Value})", o, value);
+            Logger.LogWarning("<<< Exiting SetValue(o={O},value={Value})", o, value);
             }
 
             public override bool ShouldSerializeValue(object o)
             {
+				Logger.LogError(">>> Entering ShouldSerializeValue(o={O})", o);
+				Logger.LogWarning("<<< Exiting ShouldSerializeValue(o={O})", o);
                 return true;
             }
 
             public override object GetValue(object o)
             {
+				Logger.LogError(">>> Entering GetValue(o={O})", o);
                 if (o is RssElementCustomTypeDescriptor element)
                 {
                     if (element.attributes.TryGetValue(this.Name, out var propertyValue))
@@ -163,6 +178,7 @@ namespace DotNetNuke.Services.Syndication
                     }
                 }
 
+				Logger.LogWarning("<<< Exiting GetValue(o={O})", o);
                 return string.Empty;
             }
         }

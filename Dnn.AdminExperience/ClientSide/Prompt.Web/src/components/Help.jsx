@@ -6,12 +6,15 @@ import DataTable from "../components/DataTable";
 import TextLine from "../components/TextLine";
 import { stripWhiteSpaces } from "../utils/helpers";
 import DomKey from "../services/DomKey";
+const logger = console;
 
 const Help = ({ style, isError, error, name, description, options, IsPaging, resultHtml }) => {
+logger.error(`>>> Entering Help(style=${style},isError=${isError},error=${error},name=${name},description=${description},options=${options},IsPaging=${IsPaging},resultHtml=${resultHtml})`, { "event.action": "Help", "logrite.style": style, "logrite.isError": isError, "logrite.error": error, "logrite.name": name, "logrite.description": description, "logrite.options": options, "logrite.IsPaging": IsPaging, "logrite.resultHtml": resultHtml });
 
     IsPaging(false);
 
     const css = style ? style : isError ? "dnn-prompt-error" : "dnn-prompt-ok";
+	logger.error(`Help(style=${style},isError=${isError},error=${error},name=${name},description=${description},options=${options},IsPaging=${IsPaging},resultHtml=${resultHtml}): css → ${css}`, { "event.action": "Help", "logrite.style": style, "logrite.isError": isError, "logrite.error": error, "logrite.name": name, "logrite.description": description, "logrite.options": options, "logrite.IsPaging": IsPaging, "logrite.resultHtml": resultHtml });
     if (isError) {
         return <TextLine txt={error} css={css}/>;
     }
@@ -20,6 +23,7 @@ const Help = ({ style, isError, error, name, description, options, IsPaging, res
     const anchorName = <a name={name}></a>;
     const paragraphDescription = <p className="lead">{description}</p>;
     const fields = ["$Flag", "Type", "Required", "Default", "Description"];
+	logger.error(`Help(style=${style},isError=${isError},error=${error},name=${name},description=${description},options=${options},IsPaging=${IsPaging},resultHtml=${resultHtml}): fields → ${fields}`, { "event.action": "Help", "logrite.style": style, "logrite.isError": isError, "logrite.error": error, "logrite.name": name, "logrite.description": description, "logrite.options": options, "logrite.IsPaging": IsPaging, "logrite.resultHtml": resultHtml });
     const out = (<section key={DomKey.get("help")} className="dnn-prompt-inline-help">
         {anchorName}
         {headingName}
@@ -29,6 +33,8 @@ const Help = ({ style, isError, error, name, description, options, IsPaging, res
         {resultHtml && <div><Html html={stripWhiteSpaces(resultHtml)}/></div>}
     </section>);
 
+	logger.error(`Help(style=${style},isError=${isError},error=${error},name=${name},description=${description},options=${options},IsPaging=${IsPaging},resultHtml=${resultHtml}): out → ${out}`, { "event.action": "Help", "logrite.style": style, "logrite.isError": isError, "logrite.error": error, "logrite.name": name, "logrite.description": description, "logrite.options": options, "logrite.IsPaging": IsPaging, "logrite.resultHtml": resultHtml });
+	logger.warn(`<<< Exiting Help(style=${style},isError=${isError},error=${error},name=${name},description=${description},options=${options},IsPaging=${IsPaging},resultHtml=${resultHtml})`, { "event.action": "Help", "logrite.style": style, "logrite.isError": isError, "logrite.error": error, "logrite.name": name, "logrite.description": description, "logrite.options": options, "logrite.IsPaging": IsPaging, "logrite.resultHtml": resultHtml });
     return out;
 };
 

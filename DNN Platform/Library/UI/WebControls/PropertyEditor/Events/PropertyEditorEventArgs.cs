@@ -11,6 +11,7 @@ namespace DotNetNuke.UI.WebControls
     /// </summary>
     public class PropertyEditorEventArgs : EventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PropertyEditorEventArgs));
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyEditorEventArgs"/> class.
         /// Constructs a new PropertyEditorEventArgs.
@@ -30,7 +31,10 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="oldValue">The old value of the property.</param>
         public PropertyEditorEventArgs(string name, object newValue, object oldValue)
         {
+			Logger.LogError(">>> Entering PropertyEditorEventArgs(name={Name},newValue={NewValue},oldValue={OldValue})", name, newValue, oldValue);
             this.Name = name;
+			Logger.LogWarning("<<< Exiting PropertyEditorEventArgs(name={Name},newValue={NewValue},oldValue={OldValue})", name, newValue, oldValue);
+			Logger.LogDebug("PropertyEditorEventArgs(name={Name},newValue={NewValue},oldValue={OldValue}): this.Name → {Arg3}", name, newValue, oldValue, this.Name);
             this.Value = newValue;
             this.OldValue = oldValue;
         }

@@ -41,6 +41,8 @@ namespace DotNetNuke.Services.Search
         public ModuleIndexer()
             : this(false, null)
         {
+		Logger.LogError(">>> Entering ModuleIndexer()");
+        Logger.LogWarning("<<< Exiting ModuleIndexer()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleIndexer"/> class.</summary>
@@ -49,6 +51,8 @@ namespace DotNetNuke.Services.Search
         public ModuleIndexer(bool needSearchModules)
             : this(needSearchModules, null)
         {
+		Logger.LogError(">>> Entering ModuleIndexer(needSearchModules={NeedSearchModules})", needSearchModules);
+        Logger.LogWarning("<<< Exiting ModuleIndexer(needSearchModules={NeedSearchModules})", needSearchModules);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleIndexer"/> class.</summary>
@@ -58,10 +62,13 @@ namespace DotNetNuke.Services.Search
         {
             this.businessControllerProvider = businessControllerProvider ?? Globals.DependencyProvider.GetRequiredService<IBusinessControllerProvider>();
             this.searchModules = new Dictionary<int, IEnumerable<ModuleIndexInfo>>();
+			Logger.LogDebug("ModuleIndexer(needSearchModules={NeedSearchModules},businessControllerProvider={BusinessControllerProvider}): searchModules → {SearchModules}", needSearchModules, businessControllerProvider, searchModules);
+			Logger.LogDebug("ModuleIndexer(needSearchModules={NeedSearchModules},businessControllerProvider={BusinessControllerProvider}): businessControllerProvider → {BusinessControllerProvider1}", needSearchModules, businessControllerProvider, businessControllerProvider);
 
             if (needSearchModules)
             {
                 var portals = PortalController.Instance.GetPortals();
+				Logger.LogError("ModuleIndexer(needSearchModules={NeedSearchModules},businessControllerProvider={BusinessControllerProvider}): portals → {Portals}", needSearchModules, businessControllerProvider, portals);
                 foreach (var portal in portals.Cast<IPortalInfo>())
                 {
                     this.searchModules.Add(portal.PortalId, GetModulesForIndex(portal.PortalId));
@@ -74,11 +81,14 @@ namespace DotNetNuke.Services.Search
         /// <inheritdoc />
         public override int IndexSearchDocuments(int portalId, ScheduleHistoryItem schedule, DateTime startDateLocal, Action<IEnumerable<SearchDocument>> indexer)
         {
+			Logger.LogError(">>> Entering IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer})", portalId, schedule, startDateLocal, indexer);
             Requires.NotNull("indexer", indexer);
             const int saveThreshold = 1024 * 2;
             var totalIndexed = 0;
             startDateLocal = this.GetLocalTimeOfLastIndexedItem(portalId, schedule.ScheduleID, startDateLocal);
+			Logger.LogError("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): startDateLocal → {StartDateLocal1}", portalId, schedule, startDateLocal, indexer, startDateLocal);
             var searchDocuments = new List<SearchDocument>();
+			Logger.LogError("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): searchDocuments → {SearchDocuments}", portalId, schedule, startDateLocal, indexer, searchDocuments);
             var searchModuleCollection = this.searchModules.TryGetValue(portalId, out var indexes)
                 ? indexes.Where(m => m.SupportSearch).Select(m => m.ModuleInfo)
                 : this.GetSearchModules(portalId);
@@ -97,8 +107,10 @@ namespace DotNetNuke.Services.Search
                     try
                     {
                         var controller = this.businessControllerProvider.GetInstance<ModuleSearchBase>(module);
+						Logger.LogError("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): controller → {Controller}", portalId, schedule, startDateLocal, indexer, controller);
                         var contentInfo = new SearchContentModuleInfo { ModSearchBaseControllerType = controller, ModInfo = module };
                         var searchItems = contentInfo.ModSearchBaseControllerType.GetModifiedSearchDocuments(module, startDateLocal.ToUniversalTime());
+						Logger.LogError("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): searchItems → {SearchItems}", portalId, schedule, startDateLocal, indexer, searchItems);
 
                         if (searchItems is { Count: > 0, })
                         {
@@ -124,6 +136,7 @@ namespace DotNetNuke.Services.Search
                     }
                     catch (Exception ex)
                     {
+						Logger.LogError("Exception in IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): {Arg4}", portalId, schedule, startDateLocal, indexer, ex.Message);
                         Exceptions.Exceptions.LogException(ex);
                     }
                 }
@@ -134,6 +147,7 @@ namespace DotNetNuke.Services.Search
                 }
             }
 
+			Logger.LogWarning("<<< Exiting IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer})", portalId, schedule, startDateLocal, indexer);
             return totalIndexed;
         }
 
@@ -143,10 +157,12 @@ namespace DotNetNuke.Services.Search
         /// <returns>A <see cref="List{T}"/> of <see cref="SearchDocument"/> instances.</returns>
         public List<SearchDocument> GetModuleMetaData(int portalId, DateTime startDate)
         {
+			Logger.LogError(">>> Entering GetModuleMetaData(portalId={PortalId},startDate={StartDate})", portalId, startDate);
             var searchDocuments = new List<SearchDocument>();
             var searchModuleCollection = this.searchModules.TryGetValue(portalId, out var indexes)
                 ? indexes.Select(m => m.ModuleInfo)
                 : this.GetSearchModules(portalId, true);
+				Logger.LogError("GetModuleMetaData(portalId={PortalId},startDate={StartDate}): searchDocuments → {SearchDocuments}", portalId, startDate, searchDocuments);
             foreach (ModuleInfo module in searchModuleCollection)
             {
                 try
@@ -178,10 +194,12 @@ namespace DotNetNuke.Services.Search
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in GetModuleMetaData(portalId={PortalId},startDate={StartDate}): {Arg2}", portalId, startDate, ex.Message);
                     Exceptions.Exceptions.LogException(ex);
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetModuleMetaData(portalId={PortalId},startDate={StartDate})", portalId, startDate);
             return searchDocuments;
         }
 
@@ -190,6 +208,8 @@ namespace DotNetNuke.Services.Search
         /// <returns>A sequence of <see cref="ModuleInfo"/> instances.</returns>
         protected IEnumerable<ModuleInfo> GetSearchModules(int portalId)
         {
+			Logger.LogError(">>> Entering GetSearchModules(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting GetSearchModules(portalId={PortalId})", portalId);
             return this.GetSearchModules(portalId, false);
         }
 
@@ -203,6 +223,7 @@ namespace DotNetNuke.Services.Search
 
         private static void ThrowLogError(ModuleInfo module, Exception ex)
         {
+			Logger.LogError(">>> Entering ThrowLogError(module={Module},ex={Ex})", module, ex);
             try
             {
                 var message = string.Format(
@@ -215,23 +236,30 @@ namespace DotNetNuke.Services.Search
                     module.ModuleID,
                     module.TabID,
                     module.PortalID);
+					Logger.LogError("Throwing BusinessControllerClassException from ThrowLogError(module={Module},ex={Ex})", module, ex);
                 throw new BusinessControllerClassException(message, ex);
             }
             catch (Exception ex1)
             {
+				Logger.LogError("Exception in ThrowLogError(module={Module},ex={Ex}): {Arg2}", module, ex, ex1.Message);
                 Exceptions.Exceptions.LogException(ex1);
             }
+			Logger.LogWarning("<<< Exiting ThrowLogError(module={Module},ex={Ex})", module, ex);
         }
 
         private static void AddModuleMetaData(IEnumerable<SearchDocument> searchItems, ModuleInfo module)
         {
+			Logger.LogError(">>> Entering AddModuleMetaData(searchItems={SearchItems},module={Module})", searchItems, module);
             foreach (var searchItem in searchItems)
             {
                 searchItem.ModuleDefId = module.ModuleDefID;
+				Logger.LogDebug("AddModuleMetaData(searchItems={SearchItems},module={Module}): searchItem.ModuleDefId → {Arg2}", searchItems, module, searchItem.ModuleDefId);
                 searchItem.ModuleId = module.ModuleID;
+				Logger.LogDebug("AddModuleMetaData(searchItems={SearchItems},module={Module}): searchItem.ModuleId → {Arg2}", searchItems, module, searchItem.ModuleId);
                 if (string.IsNullOrEmpty(searchItem.CultureCode))
                 {
                     searchItem.CultureCode = module.CultureCode;
+					Logger.LogDebug("AddModuleMetaData(searchItems={SearchItems},module={Module}): searchItem.CultureCode → {Arg2}", searchItems, module, searchItem.CultureCode);
                 }
 
                 if (Null.IsNull(searchItem.ModifiedTimeUtc))
@@ -239,22 +267,29 @@ namespace DotNetNuke.Services.Search
                     searchItem.ModifiedTimeUtc = module.LastContentModifiedOnDate.ToUniversalTime();
                 }
             }
+			Logger.LogWarning("<<< Exiting AddModuleMetaData(searchItems={SearchItems},module={Module})", searchItems, module);
         }
 
         private static List<ModuleIndexInfo> GetModulesForIndex(int portalId)
         {
+			Logger.LogError(">>> Entering GetModulesForIndex(portalId={PortalId})", portalId);
             var businessControllers = new Dictionary<string, bool>();
             var searchModuleIds = new HashSet<int>();
+			Logger.LogError("GetModulesForIndex(portalId={PortalId}): searchModuleIds → {SearchModuleIds}", portalId, searchModuleIds);
             var searchModules = new List<ModuleIndexInfo>();
+			Logger.LogError("GetModulesForIndex(portalId={PortalId}): searchModules → {SearchModules}", portalId, searchModules);
+			Logger.LogError("GetModulesForIndex(portalId={PortalId}): businessControllers → {BusinessControllers}", portalId, businessControllers);
 
             // Only get modules that are set to be Indexed.
             var modules = ModuleController.Instance.GetSearchModules(portalId).Cast<ModuleInfo>().Where(m => m.TabModuleSettings["AllowIndex"] == null || bool.Parse(m.TabModuleSettings["AllowIndex"].ToString()));
+			Logger.LogError("GetModulesForIndex(portalId={PortalId}): modules → {Modules}", portalId, modules);
 
             foreach (var module in modules.Where(module => !searchModuleIds.Contains(module.ModuleID)))
             {
                 try
                 {
                     var tab = TabController.Instance.GetTab(module.TabID, portalId, false);
+					Logger.LogError("GetModulesForIndex(portalId={PortalId}): tab → {Tab}", portalId, tab);
 
                     // Only index modules on tabs that are set to be Indexed.
                     if (tab.TabSettings["AllowIndex"] == null || (tab.TabSettings["AllowIndex"] != null && bool.Parse(tab.TabSettings["AllowIndex"].ToString())))
@@ -263,7 +298,10 @@ namespace DotNetNuke.Services.Search
                         if (!businessControllers.TryGetValue(module.DesktopModule.BusinessControllerClass, out var supportsSearch))
                         {
                             var controllerType = Reflection.CreateType(module.DesktopModule.BusinessControllerClass);
+							Logger.LogError("GetModulesForIndex(portalId={PortalId}): controllerType → {ControllerType}", portalId, controllerType);
                             supportsSearch = typeof(ModuleSearchBase).IsAssignableFrom(controllerType);
+							Logger.LogError("GetModulesForIndex(portalId={PortalId}): supportsSearch → {SupportsSearch}", portalId, supportsSearch);
+							Logger.LogDebug("GetModulesForIndex(portalId={PortalId}): supportsSearch → {SupportsSearch}", portalId, supportsSearch);
                             businessControllers.Add(module.DesktopModule.BusinessControllerClass, supportsSearch);
                         }
 
@@ -281,15 +319,19 @@ namespace DotNetNuke.Services.Search
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetModulesForIndex(portalId={PortalId})", portalId);
             return searchModules;
         }
 
         private int IndexCollectedDocs(
             Action<IEnumerable<SearchDocument>> indexer, List<SearchDocument> searchDocuments, int portalId, ScheduleHistoryItem schedule)
         {
+			Logger.LogError(">>> Entering IndexCollectedDocs(indexer={Indexer},searchDocuments={SearchDocuments},portalId={PortalId},schedule={Schedule})", indexer, searchDocuments, portalId, schedule);
             indexer.Invoke(searchDocuments);
             var total = searchDocuments.Count;
+			Logger.LogError("IndexCollectedDocs(indexer={Indexer},searchDocuments={SearchDocuments},portalId={PortalId},schedule={Schedule}): total → {Total}", indexer, searchDocuments, portalId, schedule, total);
             this.SetLocalTimeOfLastIndexedItem(portalId, schedule.ScheduleID, schedule.StartDate);
+			Logger.LogWarning("<<< Exiting IndexCollectedDocs(indexer={Indexer},searchDocuments={SearchDocuments},portalId={PortalId},schedule={Schedule})", indexer, searchDocuments, portalId, schedule);
             return total;
         }
 #pragma warning restore 0618

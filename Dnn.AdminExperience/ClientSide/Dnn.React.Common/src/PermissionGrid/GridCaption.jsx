@@ -4,11 +4,13 @@ import GridCell from "../GridCell";
 import Label from "../Label";
 import RoleGroupFilter from "./RoleGroupFilter";
 import Suggestion from "./Suggestion";
+const logger = console;
 
 class GridCaption extends Component {
 
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
 
         this.state = {
             roleGroupId: -1
@@ -16,20 +18,25 @@ class GridCaption extends Component {
     }
 
     onRoleGroupChange(value) {
+		logger.error(`>>> Entering onRoleGroupChange(value=${value})`, { "event.action": "onRoleGroupChange", "logrite.value": value });
         const { props, state } = this;
 
         this.setState({ roleGroupId: value.id });
+		logger.warn(`<<< Exiting onRoleGroupChange(value=${value})`, { "event.action": "onRoleGroupChange", "logrite.value": value });
     }
 
     onSuggestionSelected(value) {
+		logger.error(`>>> Entering onSuggestionSelected(value=${value})`, { "event.action": "onSuggestionSelected", "logrite.value": value });
         const { props, state } = this;
 
         if (typeof props.onSuggestion === "function") {
             props.onSuggestion(value);
+			logger.warn(`<<< Exiting onSuggestionSelected(value=${value})`, { "event.action": "onSuggestionSelected", "logrite.value": value });
         }
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props, state } = this;
 
         let suggestionOptions = props.type === "role" ? {
@@ -41,6 +48,8 @@ class GridCaption extends Component {
             count: 10
         };
 
+		logger.error(`render(): suggestionOptions → ${suggestionOptions}`, { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <GridCell className="grid-caption">
             <Label className="title" label={props.type === "role" ? props.localization.permissionsByRole : props.localization.permissionsByUser}></Label>
             {props.type === "role" && <GridCell columnSize="40" className="left">

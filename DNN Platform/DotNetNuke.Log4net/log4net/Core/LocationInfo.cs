@@ -73,25 +73,33 @@ namespace log4net.Core
         /// </remarks>
         public LocationInfo(Type callerStackBoundaryDeclaringType) 
         {
+			value.LogError(">>> Entering LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType})", callerStackBoundaryDeclaringType);
             // Initialize all fields
             this.m_className = NA;
+			value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): this.m_className → {Arg1}", callerStackBoundaryDeclaringType, this.m_className);
             this.m_fileName = NA;
             this.m_lineNumber = NA;
+			value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): this.m_fileName → {Arg1}", callerStackBoundaryDeclaringType, this.m_fileName);
             this.m_methodName = NA;
             this.m_fullInfo = NA;
 
 #if !NETCF && !NETSTANDARD1_3 // StackTrace isn't fully implemented for NETSTANDARD1_3 https://github.com/dotnet/corefx/issues/1797
+			value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): this.m_lineNumber → {Arg1}", callerStackBoundaryDeclaringType, this.m_lineNumber);
             if (callerStackBoundaryDeclaringType != null)
             {
                 try
                 {
+					value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): this.m_methodName → {Arg1}", callerStackBoundaryDeclaringType, this.m_methodName);
+					value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): this.m_fullInfo → {Arg1}", callerStackBoundaryDeclaringType, this.m_fullInfo);
                     StackTrace st = new StackTrace(true);
                     int frameIndex = 0;
                                                                                 
+																				value.LogError("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): st → {St}", callerStackBoundaryDeclaringType, st);
                     // skip frames not from fqnOfCallingClass
                     while (frameIndex < st.FrameCount)
                     {
                         StackFrame frame = st.GetFrame(frameIndex);
+						value.LogError("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): frame → {Frame}", callerStackBoundaryDeclaringType, frame);
                         if (frame != null && frame.GetMethod().DeclaringType == callerStackBoundaryDeclaringType)
                         {
                             break;
@@ -115,9 +123,11 @@ namespace log4net.Core
                         // take into account the frames we skip above
                         int adjustedFrameCount = st.FrameCount - frameIndex;
                         ArrayList stackFramesList = new ArrayList(adjustedFrameCount);
+						value.LogError("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): stackFramesList → {StackFramesList}", callerStackBoundaryDeclaringType, stackFramesList);
                         this.m_stackFrames = new StackFrameItem[adjustedFrameCount];
                         for (int i = frameIndex; i < st.FrameCount; i++) 
                         {
+							value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): this.m_stackFrames → {Arg1}", callerStackBoundaryDeclaringType, this.m_stackFrames);
                             stackFramesList.Add(new StackFrameItem(st.GetFrame(i)));
                         }
                                                 
@@ -125,10 +135,12 @@ namespace log4net.Core
                         
                         // now frameIndex is the first 'user' caller frame
                         StackFrame locationFrame = st.GetFrame(frameIndex);
+						value.LogError("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): locationFrame → {LocationFrame}", callerStackBoundaryDeclaringType, locationFrame);
 
                         if (locationFrame != null)
                         {
                             System.Reflection.MethodBase method = locationFrame.GetMethod();
+							value.LogError("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): method → {Method}", callerStackBoundaryDeclaringType, method);
 
                             if (method != null)
                             {
@@ -154,6 +166,7 @@ namespace log4net.Core
                     LogLog.Debug(declaringType, "Security exception while trying to get caller stack frame. Error Ignored. Location Information Not Available.");
                 }
             }
+			value.LogWarning("<<< Exiting LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType})", callerStackBoundaryDeclaringType);
 #endif
         }
 
@@ -170,8 +183,12 @@ namespace log4net.Core
         /// </remarks>
         public LocationInfo(string className, string methodName, string fileName, string lineNumber)
         {
+			value.LogError(">>> Entering LocationInfo(className=<redacted>,methodName={MethodName},fileName={FileName},lineNumber={LineNumber})", methodName, fileName, lineNumber);
+			value.LogDebug("LocationInfo(className=<redacted>,methodName={MethodName},fileName={FileName},lineNumber={LineNumber}): this.m_lineNumber → {Arg4}", methodName, fileName, lineNumber, this.m_lineNumber);
+			value.LogDebug("LocationInfo(className=<redacted>,methodName={MethodName},fileName={FileName},lineNumber={LineNumber}): this.m_fileName → {Arg4}", methodName, fileName, lineNumber, this.m_fileName);
             this.m_className = className;
             this.m_fileName = fileName;
+			value.LogDebug("LocationInfo(className=<redacted>,methodName={MethodName},fileName={FileName},lineNumber={LineNumber}): this.m_className → {Arg4}", methodName, fileName, lineNumber, this.m_className);
             this.m_lineNumber = lineNumber;
             this.m_methodName = methodName;
             this.m_fullInfo = this.m_className + '.' + this.m_methodName + '(' + this.m_fileName + 

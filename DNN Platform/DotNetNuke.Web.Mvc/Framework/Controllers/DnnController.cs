@@ -24,9 +24,11 @@ namespace DotNetNuke.Web.Mvc.Framework.Controllers
 
     public abstract class DnnController : Controller, IDnnController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnController));
         /// <summary>Initializes a new instance of the <see cref="DnnController"/> class.</summary>
         protected DnnController()
         {
+			Logger.LogError(">>> Entering DnnController()");
             this.ActionInvoker = new ResultCapturingActionInvoker();
         }
 
@@ -81,34 +83,43 @@ namespace DotNetNuke.Web.Mvc.Framework.Controllers
         /// <inheritdoc />
         public string LocalizeString(string key)
         {
+			Logger.LogError(">>> Entering LocalizeString(key={Key})", key);
+            Logger.LogWarning("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, this.LocalResourceFile);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected internal RedirectToRouteResult RedirectToDefaultRoute()
         {
+			Logger.LogError(">>> Entering RedirectToDefaultRoute()");
+            Logger.LogWarning("<<< Exiting RedirectToDefaultRoute()");
             return new DnnRedirecttoRouteResult(string.Empty, string.Empty, string.Empty, null, false);
         }
 
         /// <inheritdoc />
         protected override RedirectToRouteResult RedirectToAction(string actionName, string controllerName, RouteValueDictionary routeValues)
         {
+			Logger.LogError(">>> Entering RedirectToAction(actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues})", actionName, controllerName, routeValues);
+            Logger.LogWarning("<<< Exiting RedirectToAction(actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues})", actionName, controllerName, routeValues);
             return new DnnRedirecttoRouteResult(actionName, controllerName, string.Empty, routeValues, false, this.Url);
         }
 
         /// <inheritdoc />
         protected override ViewResult View(IView view, object model)
         {
+			Logger.LogError(">>> Entering View(view={View},model={Model})", view, model);
             if (model != null)
             {
                 this.ViewData.Model = model;
             }
 
+			Logger.LogWarning("<<< Exiting View(view={View},model={Model})", view, model);
             return new DnnViewResult
             {
                 View = view,
                 ViewData = this.ViewData,
                 TempData = this.TempData,
+			Logger.LogWarning("<<< Exiting View(viewName={ViewName},masterName={MasterName},model={Model})", viewName, masterName, model);
             };
         }
 
@@ -133,11 +144,13 @@ namespace DotNetNuke.Web.Mvc.Framework.Controllers
         /// <inheritdoc />
         protected override PartialViewResult PartialView(string viewName, object model)
         {
+			Logger.LogError(">>> Entering PartialView(viewName={ViewName},model={Model})", viewName, model);
             if (model != null)
             {
                 this.ViewData.Model = model;
             }
 
+			Logger.LogWarning("<<< Exiting PartialView(viewName={ViewName},model={Model})", viewName, model);
             return new DnnPartialViewResult
             {
                 ViewName = viewName,
@@ -150,7 +163,9 @@ namespace DotNetNuke.Web.Mvc.Framework.Controllers
         /// <inheritdoc />
         protected override void Initialize(RequestContext requestContext)
         {
+			Logger.LogError(">>> Entering Initialize(requestContext={RequestContext})", requestContext);
             base.Initialize(requestContext);
+			Logger.LogWarning("<<< Exiting Initialize(requestContext={RequestContext})", requestContext);
             this.Url = new DnnUrlHelper(requestContext, this);
         }
     }

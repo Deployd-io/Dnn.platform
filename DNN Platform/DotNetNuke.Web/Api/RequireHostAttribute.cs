@@ -11,11 +11,13 @@ namespace DotNetNuke.Web.Api
     /// <summary>A web API authorization filter which requires the user to be a super-user.</summary>
     public class RequireHostAttribute : AuthorizeAttributeBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RequireHostAttribute));
         /// <summary>Tests if the request passes the authorization requirements.</summary>
         /// <param name="context">The auth filter context.</param>
         /// <returns>True when authorization is successful.</returns>
         public override bool IsAuthorized(AuthFilterContext context)
         {
+			Logger.LogError(">>> Entering IsAuthorized(context={Context})", context);
             var principal = Thread.CurrentPrincipal;
             if (!principal.Identity.IsAuthenticated)
             {
@@ -23,6 +25,8 @@ namespace DotNetNuke.Web.Api
             }
 
             var currentUser = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogError("IsAuthorized(context={Context}): currentUser → {CurrentUser}", context, currentUser);
+			Logger.LogWarning("<<< Exiting IsAuthorized(context={Context})", context);
             return currentUser.IsSuperUser;
         }
     }

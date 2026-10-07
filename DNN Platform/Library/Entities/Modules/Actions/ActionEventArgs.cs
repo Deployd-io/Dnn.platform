@@ -8,6 +8,7 @@ namespace DotNetNuke.Entities.Modules.Actions
     /// <summary>ActionEventArgs provides a custom EventARgs class for Action Events.</summary>
     public class ActionEventArgs : EventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ActionEventArgs));
         private readonly ModuleAction action;
         private readonly ModuleInfo moduleConfiguration;
 
@@ -16,8 +17,12 @@ namespace DotNetNuke.Entities.Modules.Actions
         /// <param name="moduleConfiguration">The module info.</param>
         public ActionEventArgs(ModuleAction action, ModuleInfo moduleConfiguration)
         {
+			Logger.LogError(">>> Entering ActionEventArgs(action={Action},moduleConfiguration={ModuleConfiguration})", action, moduleConfiguration);
+			Logger.LogDebug("ActionEventArgs(action={Action},moduleConfiguration={ModuleConfiguration}): moduleConfiguration → {ModuleConfiguration1}", action, moduleConfiguration, moduleConfiguration);
             this.action = action;
             this.moduleConfiguration = moduleConfiguration;
+			Logger.LogDebug("ActionEventArgs(action={Action},moduleConfiguration={ModuleConfiguration}): this.action → {Arg2}", action, moduleConfiguration, this.action);
+        Logger.LogWarning("<<< Exiting ActionEventArgs(action={Action},moduleConfiguration={ModuleConfiguration})", action, moduleConfiguration);
         }
 
         public ModuleAction Action

@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Search.Internals
 
     internal class SearchSecurityTrimmer : Collector
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchSecurityTrimmer));
         private readonly SecurityCheckerDelegate securityChecker;
         private readonly IndexSearcher searcher;
         private readonly LuceneQuery luceneQuery;
@@ -31,9 +32,15 @@ namespace DotNetNuke.Services.Search.Internals
         /// <param name="searchContext">The search context.</param>
         public SearchSecurityTrimmer(SearchSecurityTrimmerContext searchContext)
         {
+			Logger.LogError(">>> Entering SearchSecurityTrimmer(searchContext={SearchContext})", searchContext);
             this.securityChecker = searchContext.SecurityChecker;
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): this.securityChecker → {Arg1}", searchContext, this.securityChecker);
             this.searcher = searchContext.Searcher;
             this.luceneQuery = searchContext.LuceneQuery;
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): searcher → {Searcher}", searchContext, searcher);
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): this.searcher → {Arg1}", searchContext, this.searcher);
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): luceneQuery → {LuceneQuery}", searchContext, luceneQuery);
+        Logger.LogWarning("<<< Exiting SearchSecurityTrimmer(searchContext={SearchContext})", searchContext);
             this.searchQuery = searchContext.SearchQuery;
             this.hitDocs = new List<ScoreDoc>(16);
         }
@@ -73,30 +80,44 @@ namespace DotNetNuke.Services.Search.Internals
         /// <inheritdoc />
         public override void SetNextReader(IndexReader reader, int docBase)
         {
+			Logger.LogError(">>> Entering SetNextReader(reader={Reader},docBase={DocBase})", reader, docBase);
             this.docBase = docBase;
+			Logger.LogDebug("SetNextReader(reader={Reader},docBase={DocBase}): docBase → {DocBase1}", reader, docBase, docBase);
+        Logger.LogDebug("SetNextReader(reader={Reader},docBase={DocBase}): this.docBase → {Arg2}", reader, docBase, this.docBase);
+        Logger.LogWarning("<<< Exiting SetNextReader(reader={Reader},docBase={DocBase})", reader, docBase);
         }
 
         /// <inheritdoc />
         public override void SetScorer(Scorer scorer)
         {
+			Logger.LogError(">>> Entering SetScorer(scorer={Scorer})", scorer);
             this.scorer = scorer;
+			Logger.LogDebug("SetScorer(scorer={Scorer}): scorer → {Scorer1}", scorer, scorer);
+        Logger.LogDebug("SetScorer(scorer={Scorer}): this.scorer → {Arg1}", scorer, this.scorer);
+        Logger.LogWarning("<<< Exiting SetScorer(scorer={Scorer})", scorer);
         }
 
         /// <inheritdoc />
         public override void Collect(int doc)
         {
+			Logger.LogError(">>> Entering Collect(doc={Doc})", doc);
             this.hitDocs.Add(new ScoreDoc(doc + this.docBase, this.scorer.Score()));
+			Logger.LogWarning("<<< Exiting Collect(doc={Doc})", doc);
         }
 
         private static string GetStringFromField(Document doc, SortField sortField)
         {
+			Logger.LogError(">>> Entering GetStringFromField(doc={Doc},sortField={SortField})", doc, sortField);
             var field = doc.GetField(sortField.Field);
+			Logger.LogWarning("<<< Exiting GetStringFromField(doc={Doc},sortField={SortField})", doc, sortField);
             return field == null ? string.Empty : field.StringValue;
         }
 
         private static long GetLongFromField(Document doc, SortField sortField)
         {
+			Logger.LogError(">>> Entering GetLongFromField(doc={Doc},sortField={SortField})", doc, sortField);
             var field = doc.GetField(sortField.Field);
+			Logger.LogError("GetLongFromField(doc={Doc},sortField={SortField}): field → {Field}", doc, sortField, field);
             if (field == null)
             {
                 return 0;
@@ -108,20 +129,26 @@ namespace DotNetNuke.Services.Search.Internals
                 return data;
             }
 
+			Logger.LogWarning("<<< Exiting GetLongFromField(doc={Doc},sortField={SortField})", doc, sortField);
             return 0;
         }
 
         private void PrepareScoreDocs()
         {
+			Logger.LogError(">>> Entering PrepareScoreDocs()");
             int skippedSoFar;
             var collectedSoFar = skippedSoFar = 0;
             var pageSize = this.luceneQuery.PageSize;
             var toSkip = this.luceneQuery.PageIndex <= 1 ? 0 : ((this.luceneQuery.PageIndex - 1) * pageSize);
+			Logger.LogError("PrepareScoreDocs(): toSkip → {ToSkip}", toSkip);
             IEnumerable<ScoreDoc> tempDocs = new List<ScoreDoc>();
 
             this.totalHits = this.hitDocs.Count;
+			Logger.LogDebug("PrepareScoreDocs(): totalHits → {TotalHits}", totalHits);
+			Logger.LogDebug("PrepareScoreDocs(): this.totalHits → {Arg0}", this.totalHits);
 
             var useRelevance = false;
+			Logger.LogError("PrepareScoreDocs(): useRelevance → {UseRelevance}", useRelevance);
             if (ReferenceEquals(Sort.RELEVANCE, this.luceneQuery.Sort))
             {
                 useRelevance = true;
@@ -129,6 +156,7 @@ namespace DotNetNuke.Services.Search.Internals
             else
             {
                 var fields = this.luceneQuery.Sort.GetSort();
+				Logger.LogError("PrepareScoreDocs(): fields → {Fields}", fields);
                 if (fields is not { Length: 1 })
                 {
                     useRelevance = true;
@@ -176,10 +204,13 @@ namespace DotNetNuke.Services.Search.Internals
             if (useRelevance)
             {
                 tempDocs = this.hitDocs.OrderByDescending(d => d.Score).ThenBy(d => d.Doc);
+				Logger.LogError("PrepareScoreDocs(): tempDocs → {TempDocs}", tempDocs);
             }
 
             var scoreDocSize = Math.Min(tempDocs.Count(), pageSize);
+			Logger.LogError("PrepareScoreDocs(): scoreDocSize → {ScoreDocSize}", scoreDocSize);
             this.scoreDocs = new List<ScoreDoc>(scoreDocSize);
+			Logger.LogDebug("PrepareScoreDocs(): scoreDocs → {ScoreDocs}", scoreDocs);
 
             foreach (var scoreDoc in tempDocs)
             {
@@ -204,6 +235,7 @@ namespace DotNetNuke.Services.Search.Internals
                     this.totalHits--;
                 }
             }
+			Logger.LogWarning("<<< Exiting PrepareScoreDocs()");
         }
     }
 }

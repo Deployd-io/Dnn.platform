@@ -26,10 +26,13 @@ namespace DotNetNuke.Entities.Portals
     [Serializable]
     public partial class PortalSettings : BaseEntityInfo, IPropertyAccess, IPortalSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalSettings));
         /// <summary>Initializes a new instance of the <see cref="PortalSettings"/> class.</summary>
         public PortalSettings()
         {
+			Logger.LogError(">>> Entering PortalSettings()");
             this.Registration = new RegistrationSettings();
+			Logger.LogWarning("<<< Exiting PortalSettings(tabId={TabId},portalId={PortalId})", tabId, portalId);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PortalSettings"/> class.</summary>
@@ -37,6 +40,8 @@ namespace DotNetNuke.Entities.Portals
         public PortalSettings(int portalId)
             : this(Null.NullInteger, portalId)
         {
+		Logger.LogError(">>> Entering PortalSettings(portalId={PortalId})", portalId);
+        Logger.LogWarning("<<< Exiting PortalSettings(portalId={PortalId})", portalId);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PortalSettings"/> class.</summary>
@@ -44,8 +49,11 @@ namespace DotNetNuke.Entities.Portals
         /// <param name="portalId">The portal ID.</param>
         public PortalSettings(int tabId, int portalId)
         {
+			Logger.LogError(">>> Entering PortalSettings(tabId={TabId},portalId={PortalId})", tabId, portalId);
             this.PortalId = portalId;
+			Logger.LogDebug("PortalSettings(tabId={TabId},portalId={PortalId}): this.PortalId → {Arg2}", tabId, portalId, this.PortalId);
             var portal = PortalController.Instance.GetPortal(portalId);
+			Logger.LogError("PortalSettings(tabId={TabId},portalId={PortalId}): portal → {Portal}", tabId, portalId, portal);
             this.BuildPortalSettings(tabId, portal);
         }
 
@@ -59,11 +67,15 @@ namespace DotNetNuke.Entities.Portals
         /// <param name="portalAliasInfo">The current portal.</param>
         public PortalSettings(int tabId, PortalAliasInfo portalAliasInfo)
         {
+			Logger.LogError(">>> Entering PortalSettings(tabId={TabId},portalAliasInfo={PortalAliasInfo})", tabId, portalAliasInfo);
             this.PortalId = portalAliasInfo.PortalID;
+			Logger.LogWarning("<<< Exiting PortalSettings(tabId={TabId},portalAliasInfo={PortalAliasInfo})", tabId, portalAliasInfo);
+			Logger.LogDebug("PortalSettings(tabId={TabId},portalAliasInfo={PortalAliasInfo}): this.PortalId → {Arg2}", tabId, portalAliasInfo, this.PortalId);
             this.PortalAlias = portalAliasInfo;
             var portal = string.IsNullOrEmpty(portalAliasInfo.CultureCode) ?
                             PortalController.Instance.GetPortal(portalAliasInfo.PortalID)
                             : PortalController.Instance.GetPortal(portalAliasInfo.PortalID, portalAliasInfo.CultureCode);
+							Logger.LogDebug("PortalSettings(tabId={TabId},portalAliasInfo={PortalAliasInfo}): this.PortalAlias → {Arg2}", tabId, portalAliasInfo, this.PortalAlias);
 
             this.BuildPortalSettings(tabId, portal);
         }
@@ -81,6 +93,8 @@ namespace DotNetNuke.Entities.Portals
         public PortalSettings(int tabId, PortalInfo portal)
         {
             this.PortalId = portal?.PortalID ?? Null.NullInteger;
+			Logger.LogWarning("<<< Exiting PortalSettings(tabId={TabId},portal={Portal})", tabId, portal);
+			Logger.LogDebug("PortalSettings(tabId={TabId},portal={Portal}): this.PortalId → {Arg2}", tabId, portal, this.PortalId);
             this.BuildPortalSettings(tabId, portal);
         }
 
@@ -597,6 +611,7 @@ namespace DotNetNuke.Entities.Portals
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogError(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             var outputFormat = string.Empty;
             if (format == string.Empty)
             {
@@ -808,16 +823,20 @@ namespace DotNetNuke.Entities.Portals
                 result = PropertyAccess.ContentLocked;
             }
 
+			Logger.LogWarning("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return result;
         }
 
         public PortalSettings Clone()
         {
+			Logger.LogError(">>> Entering Clone()");
+            Logger.LogWarning("<<< Exiting Clone()");
             return (PortalSettings)this.MemberwiseClone();
         }
 
         private void BuildPortalSettings(int tabId, PortalInfo portal)
         {
+			Logger.LogError(">>> Entering BuildPortalSettings(tabId={TabId},portal={Portal})", tabId, portal);
             PortalSettingsController.Instance().LoadPortalSettings(this);
 
             if (portal == null)
@@ -841,6 +860,7 @@ namespace DotNetNuke.Entities.Portals
                     items[key] = this.ActiveTab;
                 }
             }
+			Logger.LogWarning("<<< Exiting BuildPortalSettings(tabId={TabId},portal={Portal})", tabId, portal);
         }
     }
 }

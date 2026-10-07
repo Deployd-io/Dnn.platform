@@ -48,6 +48,8 @@ namespace Dnn.EditBar.UI.Services
         public ContentEditorController()
             : this(null)
         {
+		Logger.LogError(">>> Entering ContentEditorController()");
+        Logger.LogWarning("<<< Exiting ContentEditorController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ContentEditorController"/> class.</summary>
@@ -64,7 +66,9 @@ namespace Dnn.EditBar.UI.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DeleteModule([FromUri] int moduleId)
         {
+			Logger.LogError(">>> Entering DeleteModule(moduleId={ModuleId})", moduleId);
             var module = ModuleController.Instance.GetModule(moduleId, this.PortalSettings.ActiveTab.TabID, false);
+			Logger.LogError("DeleteModule(moduleId={ModuleId}): module → {Module}", moduleId, module);
             if (module == null)
             {
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 1, Message = LocalizeString("Service_ModuleNotExist") });
@@ -81,15 +85,18 @@ namespace Dnn.EditBar.UI.Services
                     ModuleController.Instance.DeleteTabModule(tabId, m.ModuleID, false);
                 });
 
+			Logger.LogWarning("<<< Exiting DeleteModule(moduleId={ModuleId})", moduleId);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 0 });
         }
 
         [HttpGet]
         public HttpResponseMessage GetRecommendedModules()
         {
+			Logger.LogError(">>> Entering GetRecommendedModules()");
             var recommendedModuleNames = new List<string>();
             var filteredList = DesktopModuleController.GetPortalDesktopModules(this.hostSettings, this.PortalSettings.PortalId)
                                         .Where(kvp => kvp.Value.DesktopModule.Category == "Recommended");
+										Logger.LogError("GetRecommendedModules(): recommendedModuleNames → {RecommendedModuleNames}", recommendedModuleNames);
 
             var result = filteredList.Select(kvp => new ControlBarController.ModuleDefDTO
             {
@@ -115,26 +122,33 @@ namespace Dnn.EditBar.UI.Services
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetRecommendedModules()");
             return this.Request.CreateResponse(HttpStatusCode.OK, result.OrderBy(m => recommendedModuleNames.IndexOf(m.ModuleName)));
         }
 
         [HttpGet]
         public HttpResponseMessage LoadModuleScript(int desktopModuleId)
         {
+			Logger.LogError(">>> Entering LoadModuleScript(desktopModuleId={DesktopModuleId})", desktopModuleId);
             var desktopModule = DesktopModuleController.GetDesktopModule(this.hostSettings, desktopModuleId, Null.NullInteger);
+			Logger.LogError("LoadModuleScript(desktopModuleId={DesktopModuleId}): desktopModule → {DesktopModule}", desktopModuleId, desktopModule);
             if (desktopModule == null)
             {
+				Logger.LogError("Throwing ArgumentException from LoadModuleScript(desktopModuleId={DesktopModuleId})", desktopModuleId);
                 throw new ArgumentException("Can't find the desktop module");
             }
 
             var moduleScriptPath = $"{this.appSettings.ApplicationMapPath}/DesktopModules/{desktopModule.FolderName}/ClientScripts/ModuleEditor.js";
+			Logger.LogError("LoadModuleScript(desktopModuleId={DesktopModuleId}): moduleScriptPath → {ModuleScriptPath}", desktopModuleId, moduleScriptPath);
             var moduleScriptContent = string.Empty;
+			Logger.LogError("LoadModuleScript(desktopModuleId={DesktopModuleId}): moduleScriptContent → {ModuleScriptContent}", desktopModuleId, moduleScriptContent);
             if (File.Exists(moduleScriptPath))
             {
                 moduleScriptContent = File.ReadAllText(moduleScriptPath);
             }
 
             var moduleStylePath = $"/DesktopModules/{desktopModule.FolderName}/Css/ModuleEditor.css";
+			Logger.LogError("LoadModuleScript(desktopModuleId={DesktopModuleId}): moduleStylePath → {ModuleStylePath}", desktopModuleId, moduleStylePath);
             if (File.Exists(this.appSettings.ApplicationMapPath + moduleStylePath))
             {
                 moduleStylePath = Globals.ApplicationPath + moduleStylePath;
@@ -144,6 +158,7 @@ namespace Dnn.EditBar.UI.Services
                 moduleStylePath = string.Empty;
             }
 
+			Logger.LogWarning("<<< Exiting LoadModuleScript(desktopModuleId={DesktopModuleId})", desktopModuleId);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Script = moduleScriptContent, StyleFile = moduleStylePath, });
         }
 
@@ -151,8 +166,11 @@ namespace Dnn.EditBar.UI.Services
 
         private string GetDeskTopModuleImage(int moduleId)
         {
+			Logger.LogError(">>> Entering GetDeskTopModuleImage(moduleId={ModuleId})", moduleId);
             var portalDesktopModules = DesktopModuleController.GetDesktopModules(this.hostSettings, this.PortalSettings.PortalId);
             var packages = PackageController.Instance.GetExtensionPackages(this.PortalSettings.PortalId);
+			Logger.LogError("GetDeskTopModuleImage(moduleId={ModuleId}): packages → {Packages}", moduleId, packages);
+			Logger.LogError("GetDeskTopModuleImage(moduleId={ModuleId}): portalDesktopModules → {PortalDesktopModules}", moduleId, portalDesktopModules);
 
             string imageUrl =
                     (from pkgs in packages
@@ -161,6 +179,8 @@ namespace Dnn.EditBar.UI.Services
                      select pkgs.IconFile).FirstOrDefault();
 
             imageUrl = string.IsNullOrEmpty(imageUrl) ? Globals.ImagePath + DefaultExtensionImage : imageUrl;
+			Logger.LogError("GetDeskTopModuleImage(moduleId={ModuleId}): imageUrl → {ImageUrl}", moduleId, imageUrl);
+			Logger.LogWarning("<<< Exiting GetDeskTopModuleImage(moduleId={ModuleId})", moduleId);
             return System.Web.VirtualPathUtility.ToAbsolute(imageUrl);
         }
     }

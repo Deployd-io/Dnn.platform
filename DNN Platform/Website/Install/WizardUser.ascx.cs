@@ -14,6 +14,7 @@ namespace DotNetNuke.Services.Install
     /// <summary>A control which collects information about the initial user of a site during installation.</summary>
     public partial class WizardUser : UserControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WizardUser.ascx));
         public string FirstName
         {
             get
@@ -172,7 +173,9 @@ namespace DotNetNuke.Services.Install
 
         public string Validate()
         {
+			Logger.LogError(">>> Entering Validate()");
             string strErrorMessage = Null.NullString;
+			Logger.LogError("Validate(): strErrorMessage → {StrErrorMessage}", strErrorMessage);
             if (this.txtUserName.Text.Length < 4)
             {
                 strErrorMessage = "MinUserNamelength";
@@ -198,12 +201,14 @@ namespace DotNetNuke.Services.Install
                 strErrorMessage = "InValidEmail";
             }
 
+			Logger.LogWarning("<<< Exiting Validate()");
             return strErrorMessage;
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             if (this.IsPostBack)
@@ -226,16 +231,19 @@ namespace DotNetNuke.Services.Install
                     this.txtConfirm.Text = this.ViewState["Confirm"].ToString();
                 }
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             // Make sure that the password is not cleared on postback
             this.txtConfirm.Attributes["value"] = this.txtConfirm.Text;
             this.txtPassword.Attributes["value"] = this.txtPassword.Text;
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

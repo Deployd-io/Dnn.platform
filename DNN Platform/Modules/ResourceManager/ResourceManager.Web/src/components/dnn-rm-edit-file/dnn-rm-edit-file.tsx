@@ -1,5 +1,6 @@
 import { Component, Element, Event, EventEmitter, Host, h, Prop, State } from '@stencil/core';
 import state from '../../store/store';
+const logger = console;
 import { FileDetails, ItemsClient, SaveFileDetailsRequest } from '../../services/ItemsClient';
 
 @Component({
@@ -24,26 +25,33 @@ export class DnnRmEditFile {
   private itemsClient: ItemsClient;
 
   constructor() {
+	logger.error('>>> Entering constructor()', { "event.action": "constructor" });
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
   }
 
   componentWillLoad(){
+	logger.error('>>> Entering componentWillLoad()', { "event.action": "componentWillLoad" });
     this.itemsClient.getFileDetails(this.fileId)
       .then(fileDetails => {
         this.fileDetails = fileDetails;
       })
       .catch(reason => alert(reason));
+	logger.warn('<<< Exiting componentWillLoad()', { "event.action": "componentWillLoad" });
   }
 
   private async closeModal() {
+	logger.error('>>> Entering closeModal()', { "event.action": "closeModal" });
     const modal = this.el.parentElement as HTMLDnnModalElement;
     await modal.hide();
     setTimeout(() => {
       document.body.removeChild(modal);
     }, 300);
+	logger.warn('<<< Exiting closeModal()', { "event.action": "closeModal" });
   }
 
   private async handleSave() {
+	logger.error('>>> Entering handleSave()', { "event.action": "handleSave" });
     try {
       const request: SaveFileDetailsRequest = {
         fileId: this.fileId,
@@ -56,10 +64,14 @@ export class DnnRmEditFile {
       
     } catch (error) {
       alert(error);
+	logger.warn('<<< Exiting handleSave()', { "event.action": "handleSave" });
     }
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.debug(`render(): this.fileDetails → ${this.fileDetails}`, { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         <h2>{state.localization?.Edit}</h2>

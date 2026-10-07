@@ -9,6 +9,7 @@ import { InputGroup, Dropdown, Flag, Label } from "@dnnsoftware/dnn-react-common
 import resx from "../../resources";
 import styles from "./style.module.less";
 import util from "../../utils";
+const logger = console;
 
 let isHost = false;
 
@@ -20,6 +21,7 @@ class SiteLanguageSelector extends Component {
             portalId: undefined
         };
         isHost = util.settings.isHost;
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
@@ -41,9 +43,11 @@ class SiteLanguageSelector extends Component {
         document.addEventListener("reloadPortalList", (event) => {
             props.dispatch(SiteInfoActions.getPortalSettings(event.portalId, event.cultureCode));
         }, false);
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         const { props, state } = this;
         if (props.portals !== undefined) {
             props.portals.map((item) => {
@@ -59,10 +63,12 @@ class SiteLanguageSelector extends Component {
         }
         if (props.cultureCode !== state.cultureCode) {
             this.onLanguageChange({ value: props.cultureCode });
+			logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         }
     }
 
     onSiteChange(event) {
+		logger.error(`>>> Entering onSiteChange(event=${event})`, { "event.action": "onSiteChange", "logrite.event": event });
         let {state, props} = this;
 
         if (event.value === state.portalId) {
@@ -98,9 +104,11 @@ class SiteLanguageSelector extends Component {
                     });
             }
         }));
+		logger.warn(`<<< Exiting onSiteChange(event=${event})`, { "event.action": "onSiteChange", "logrite.event": event });
     }
 
     onLanguageChange(event) {
+		logger.error(`>>> Entering onLanguageChange(event=${event})`, { "event.action": "onLanguageChange", "logrite.event": event });
         let {props} = this;
         this.setState({
             cultureCode: event.value
@@ -112,6 +120,7 @@ class SiteLanguageSelector extends Component {
                 referrerText: props.referrerText,
                 backToReferrerFunc: props.backToReferrerFunc
             });
+			logger.warn(`<<< Exiting onLanguageChange(event=${event})`, { "event.action": "onLanguageChange", "logrite.event": event });
     }
 
     getSiteOptions() {
@@ -162,10 +171,12 @@ class SiteLanguageSelector extends Component {
     }
 
     triggerEvent(name, parameter) {
+		logger.error(`>>> Entering triggerEvent(name=${name},parameter=${parameter})`, { "event.action": "triggerEvent", "logrite.name": name, "logrite.parameter": parameter });
         let event = document.createEvent("Event");
         event.initEvent(name, true, true);
         event = Object.assign(event, parameter);
         document.dispatchEvent(event);
+		logger.error(`triggerEvent(name=${name},parameter=${parameter}): event → ${event}`, { "event.action": "triggerEvent", "logrite.name": name, "logrite.parameter": parameter });
     }
 
     renderSitesList() {
@@ -221,6 +232,8 @@ SiteLanguageSelector.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         portals: state.siteInfo.portals,
         languages: state.search.cultures

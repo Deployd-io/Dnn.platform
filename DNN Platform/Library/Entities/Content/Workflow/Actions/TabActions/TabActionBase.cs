@@ -21,19 +21,23 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
     /// </summary>
     internal abstract class TabActionBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabActionBase));
         /// <summary>
         /// Removes the cache for the tab.
         /// </summary>
         /// <param name="stateTransaction">The state transaction.</param>
         internal static void RemoveCache(StateTransaction stateTransaction)
         {
+			Logger.LogError(">>> Entering RemoveCache(stateTransaction={StateTransaction})", stateTransaction);
             var tab = GetTab(stateTransaction.ContentItemId);
+			Logger.LogError("RemoveCache(stateTransaction={StateTransaction}): tab → {Tab}", stateTransaction, tab);
             if (tab == null)
             {
                 return;
             }
 
             DataCache.RemoveCache($"Tab_Tabs{tab.PortalID}");
+			Logger.LogWarning("<<< Exiting RemoveCache(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <summary>
@@ -51,6 +55,7 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
         /// <returns>The tab information.</returns>
         internal static TabInfo GetTab(int contentItemId)
         {
+			Logger.LogError(">>> Entering GetTab(contentItemId={ContentItemId})", contentItemId);
             const string Sql = "SELECT * FROM dbo.vw_Tabs WHERE ContentItemId = @ContentItemId";
 
             IDataParameter[] parameters =
@@ -69,7 +74,10 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
         /// <returns>The localized string value.</returns>
         internal static string GetString(string key, string defaultValue)
         {
+			Logger.LogError(">>> Entering GetString(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             var content = Localization.GetString(key, Localization.GlobalResourceFile);
+			Logger.LogError("GetString(key={Key},defaultValue={DefaultValue}): content → {Content}", key, defaultValue, content);
+			Logger.LogWarning("<<< Exiting GetString(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return string.IsNullOrEmpty(content) ? defaultValue : content;
         }
 

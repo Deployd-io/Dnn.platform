@@ -49,6 +49,8 @@ namespace log4net.Util
         /// </remarks>
         public PropertiesDictionary()
         {
+		value.LogError(">>> Entering PropertiesDictionary()");
+        value.LogWarning("<<< Exiting PropertiesDictionary()");
         }
 
         /// <summary>Constructor</summary>
@@ -60,6 +62,8 @@ namespace log4net.Util
         /// </remarks>
         public PropertiesDictionary(ReadOnlyPropertiesDictionary propertiesDictionary) : base(propertiesDictionary)
         {
+		value.LogError(">>> Entering PropertiesDictionary(propertiesDictionary={PropertiesDictionary})", propertiesDictionary);
+        value.LogWarning("<<< Exiting PropertiesDictionary(propertiesDictionary={PropertiesDictionary})", propertiesDictionary);
         }
 
 #if !NETCF
@@ -76,6 +80,8 @@ namespace log4net.Util
         /// </remarks>
         private PropertiesDictionary(SerializationInfo info, StreamingContext context) : base(info, context)
         {
+		value.LogError(">>> Entering PropertiesDictionary(info={Info},context={Context})", info, context);
+        value.LogWarning("<<< Exiting PropertiesDictionary(info={Info},context={Context})", info, context);
         }
 #endif
 
@@ -106,7 +112,9 @@ namespace log4net.Util
         /// </remarks>
         public void Remove(string key)
         {
+			value.LogError(">>> Entering Remove(key={Key})", key);
             this.InnerHashtable.Remove(key);
+			value.LogWarning("<<< Exiting Remove(key={Key})", key);
         }
 
         /// <summary>See <see cref="IDictionary.GetEnumerator"/></summary>
@@ -154,7 +162,9 @@ namespace log4net.Util
         /// </remarks>
         public override void Clear()
         {
+			value.LogError(">>> Entering Clear()");
             this.InnerHashtable.Clear();
+			value.LogWarning("<<< Exiting Clear()");
         }
 
         /// <summary>See <see cref="IDictionary.Add"/></summary>

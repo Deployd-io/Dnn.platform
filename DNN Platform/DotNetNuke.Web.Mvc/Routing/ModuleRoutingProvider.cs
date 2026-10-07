@@ -13,16 +13,20 @@ namespace DotNetNuke.Web.Mvc.Routing
 
     public abstract class ModuleRoutingProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleRoutingProvider));
         public static ModuleRoutingProvider Instance()
         {
+			Logger.LogError(">>> Entering Instance()");
             var component = ComponentFactory.GetComponent<ModuleRoutingProvider>();
 
+			Logger.LogError("Instance(): component → {Component}", component);
             if (component == null)
             {
                 component = new StandardModuleRoutingProvider();
                 ComponentFactory.RegisterComponentInstance<ModuleRoutingProvider>(component);
             }
 
+			Logger.LogWarning("<<< Exiting Instance()");
             return component;
         }
 

@@ -10,6 +10,7 @@ import {
     pagination as PaginationActions
 } from "../actions";
 import util from "../utils";
+const logger = console;
 
 let isHost = false;
 let isAdmin = false;
@@ -19,10 +20,12 @@ let canViewLogSettings = false;
 class App extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         isHost = util.settings.isHost;
         isAdmin = isHost || util.settings.isAdmin;
         canViewAdminLogs = isAdmin || util.settings.permissions.ADMIN_LOGS_VIEW;
         canViewLogSettings = isHost || util.settings.permissions.LOG_SETTINGS_VIEW;
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     handleSelect(index) {
@@ -31,11 +34,14 @@ class App extends Component {
     }
 
     navigateMap(page, index, event) {
+		logger.error(`>>> Entering navigateMap(page=${page},index=${index},event=${event})`, { "event.action": "navigateMap", "logrite.page": page, "logrite.index": index, "logrite.event": event });
         event.preventDefault();
         const {props} = this;
         props.dispatch(VisiblePanelActions.selectPanel(page, index));
+		logger.warn(`<<< Exiting navigateMap(page=${page},index=${index},event=${event})`, { "event.action": "navigateMap", "logrite.page": page, "logrite.index": index, "logrite.event": event });
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let renderTabs = [];
         let tabHeaders = [];
         if (canViewAdminLogs) {
@@ -47,6 +53,7 @@ class App extends Component {
             renderTabs.push(<LogSettings key="log-settings-tab" />);
         }
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell>
                 <PersonaBarPageHeader title={("Admin Logs") }>
@@ -69,6 +76,8 @@ App.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         selectedPage: state.visiblePanel.selectedPage,
         selectedPageVisibleIndex: state.visiblePanel.selectedPageVisibleIndex

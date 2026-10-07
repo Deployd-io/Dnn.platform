@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 /// <reference name="MicrosoftAjax.js" />
 /// <reference name="dnn.controls.js" assembly="DotNetNuke.WebControls" />
 /// <reference name="dnn.js" assembly="DotNetNuke.WebUtility" />
@@ -9,10 +10,13 @@ Type.registerNamespace('dnn.controls');
 dnn.extend(dnn.controls, {
     initTextSuggest: function (ctl) 
     {    	
+		logger.error(`>>> Entering initTextSuggest(ctl=${ctl})`, { "event.action": "initTextSuggest", "logrite.ctl": ctl });
 	    if (ctl)
 	    {
 		    var ts = new dnn.controls.DNNTextSuggest(ctl);
 		    ts.initialize();
+			logger.error(`initTextSuggest(ctl=${ctl}): ts → ${ts}`, { "event.action": "initTextSuggest", "logrite.ctl": ctl });
+			logger.warn(`<<< Exiting initTextSuggest(ctl=${ctl})`, { "event.action": "initTextSuggest", "logrite.ctl": ctl });
 		    return ts;
 	    }
     }
@@ -84,10 +88,12 @@ dnn.controls.DNNTextSuggest.prototype =
 //--- Event Handlers ---//
 keyPress: function (e) 
 {
+	logger.error(`>>> Entering keyPress(e=${e})`, { "event.action": "keyPress", "logrite.e": e });
 	if(e.charCode == KEY_RETURN)	//stop from posting
 	{
 	    e.stopPropagation();
 	    e.preventDefault();
+		logger.warn(`<<< Exiting keyPress(e=${e})`, { "event.action": "keyPress", "logrite.e": e });
 		return false;
 	}
 },
@@ -104,11 +110,14 @@ onfocus: function (e)
 
 blurHide: function(e)
 {
+	logger.error(`>>> Entering blurHide(e=${e})`, { "event.action": "blurHide", "logrite.e": e });
 	this.clearResults(true);
+	logger.warn(`<<< Exiting blurHide(e=${e})`, { "event.action": "blurHide", "logrite.e": e });
 },
 
 keyUp: function (e) 
 {
+	logger.error(`>>> Entering keyUp(e=${e})`, { "event.action": "keyUp", "logrite.e": e });
 	this.prevText = this.container.value;
 	if (e.keyCode == KEY_UP_ARROW)
 		this.setNodeIndex(this.selIndex - 1);
@@ -130,49 +139,67 @@ keyUp: function (e)
 		dnn.doDelay(this.ns + 'kd', this.lookupDelay, this._doLookupDelegate);	
 	}
 		
+		logger.warn(`<<< Exiting keyUp(e=${e})`, { "event.action": "keyUp", "logrite.e": e });
 },
 
 nodeMOver: function(evt)
 {
+	logger.error(`>>> Entering nodeMOver(evt=${evt})`, { "event.action": "nodeMOver", "logrite.evt": evt });
 	var node = this._findEventNode(evt);
+	logger.error(`nodeMOver(evt=${evt}): node → ${node}`, { "event.action": "nodeMOver", "logrite.evt": evt });
 	if (node != null)
 	{
 		var tsNode = new dnn.controls.DNNTextSuggestNode(node);
+		logger.error(`nodeMOver(evt=${evt}): tsNode → ${tsNode}`, { "event.action": "nodeMOver", "logrite.evt": evt });
 		tsNode.hover = true;
+		logger.debug(`nodeMOver(evt=${evt}): tsNode.hover → ${tsNode.hover}`, { "event.action": "nodeMOver", "logrite.evt": evt });
 		this.assignCss(tsNode);
+		logger.warn(`<<< Exiting nodeMOver(evt=${evt})`, { "event.action": "nodeMOver", "logrite.evt": evt });
 	}
 },
 
 nodeMOut: function(evt)
 {
+	logger.error(`>>> Entering nodeMOut(evt=${evt})`, { "event.action": "nodeMOut", "logrite.evt": evt });
 	var node = this._findEventNode(evt);
+	logger.error(`nodeMOut(evt=${evt}): node → ${node}`, { "event.action": "nodeMOut", "logrite.evt": evt });
 	if (node != null)
 	{
 		var tsNode = new dnn.controls.DNNTextSuggestNode(node);
+		logger.error(`nodeMOut(evt=${evt}): tsNode → ${tsNode}`, { "event.action": "nodeMOut", "logrite.evt": evt });
 		tsNode.hover = false;
+		logger.debug(`nodeMOut(evt=${evt}): tsNode.hover → ${tsNode.hover}`, { "event.action": "nodeMOut", "logrite.evt": evt });
 		this.assignCss(tsNode);
+		logger.warn(`<<< Exiting nodeMOut(evt=${evt})`, { "event.action": "nodeMOut", "logrite.evt": evt });
 	}
 },
 
 nodeClick: function(evt)
 {
+	logger.error(`>>> Entering nodeClick(evt=${evt})`, { "event.action": "nodeClick", "logrite.evt": evt });
 	var node = this._findEventNode(evt);
+	logger.error(`nodeClick(evt=${evt}): node → ${node}`, { "event.action": "nodeClick", "logrite.evt": evt });
 	if (node != null)
 	{
 		var tsNode = new dnn.controls.DNNTextSuggestNode(node);
+		logger.error(`nodeClick(evt=${evt}): tsNode → ${tsNode}`, { "event.action": "nodeClick", "logrite.evt": evt });
 		this.selectNode(tsNode);
 		this.clearResults(true);
+		logger.warn(`<<< Exiting nodeClick(evt=${evt})`, { "event.action": "nodeClick", "logrite.evt": evt });
 	}
 },
 
 // Methods
 getTextOffset: function () 
 {
+	logger.error('>>> Entering getTextOffset()', { "event.action": "getTextOffset" });
 	var offset = 0;
 	if (this.delimiter.length > 0)
 	{
 		var ary = this.container.value.split(this.delimiter);
+		logger.error(`getTextOffset(): ary → ${ary}`, { "event.action": "getTextOffset" });
 		var pos = dnn.dom.cursorPos(this.container);
+		logger.error(`getTextOffset(): pos → ${pos}`, { "event.action": "getTextOffset" });
 		var len = 0;
 		for (offset=0; offset<ary.length-1; offset++)
 		{
@@ -186,12 +213,14 @@ getTextOffset: function ()
 
 setText: function (s, id) 
 {
+	logger.error(`>>> Entering setText(s=${s},id=${id})`, { "event.action": "setText", "logrite.s": s, "logrite.id": id });
 	if (this.idtoken.length > 0)
 		s += ' ' + this.idtoken.replace('~', id);
 		
 	if (this.delimiter.length > 0)
 	{
 		var ary = this.container.value.split(this.delimiter);
+		logger.error(`setText(s=${s},id=${id}): ary → ${ary}`, { "event.action": "setText", "logrite.s": s, "logrite.id": id });
 		ary[this.getTextOffset()] = s;
 
 		this.container.value = ary.join(this.delimiter);
@@ -203,13 +232,17 @@ setText: function (s, id)
 		this.container.value = s;
 
 	this.prevText = this.container.value;
+	logger.debug(`setText(s=${s},id=${id}): this.prevText → ${this.prevText}`, { "event.action": "setText", "logrite.s": s, "logrite.id": id });
 },
 
 getText: function () 
 {
+	logger.error('>>> Entering getText()', { "event.action": "getText" });
 	if (this.delimiter.length > 0 && this.container.value.indexOf(this.delimiter) > -1)
 	{
 		var ary = this.container.value.split(this.delimiter);
+		logger.warn('<<< Exiting getText()', { "event.action": "getText" });
+		logger.error(`getText(): ary → ${ary}`, { "event.action": "getText" });
 		return ary[this.getTextOffset()];
 	}
 	else
@@ -218,6 +251,7 @@ getText: function ()
 
 formatText: function (s) 
 {
+	logger.error(`>>> Entering formatText(s=${s})`, { "event.action": "formatText", "logrite.s": s });
 	if (this.caseSensitive)
 		return s;
 	else
@@ -226,16 +260,21 @@ formatText: function (s)
 
 highlightNode: function(index, bHighlight)
 {
+	logger.error(`>>> Entering highlightNode(index=${index},bHighlight=${bHighlight})`, { "event.action": "highlightNode", "logrite.index": index, "logrite.bHighlight": bHighlight });
 	if (index > -1)
 	{
 		var tsNode = this.getNodeByIndex(index);
+		logger.error(`highlightNode(index=${index},bHighlight=${bHighlight}): tsNode → ${tsNode}`, { "event.action": "highlightNode", "logrite.index": index, "logrite.bHighlight": bHighlight });
 		tsNode.hover = bHighlight;
+		logger.debug(`highlightNode(index=${index},bHighlight=${bHighlight}): tsNode.hover → ${tsNode.hover}`, { "event.action": "highlightNode", "logrite.index": index, "logrite.bHighlight": bHighlight });
 		this.assignCss(tsNode);				
+		logger.warn(`<<< Exiting highlightNode(index=${index},bHighlight=${bHighlight})`, { "event.action": "highlightNode", "logrite.index": index, "logrite.bHighlight": bHighlight });
 	}
 },
 
 getNodeByIndex: function(index)
 {
+	logger.error(`>>> Entering getNodeByIndex(index=${index})`, { "event.action": "getNodeByIndex", "logrite.index": index });
 	var element = this.resultCtr.childNodes[index];
 	if (element)
 	{
@@ -247,18 +286,23 @@ getNodeByIndex: function(index)
 
 setNodeIndex: function(index)
 {
+	logger.error(`>>> Entering setNodeIndex(index=${index})`, { "event.action": "setNodeIndex", "logrite.index": index });
 	if (index > -1 && index < this.resultCtr.childNodes.length)
 	{
 		this.highlightNode(this.selIndex, false);
 		this.selIndex = index;
 		this.highlightNode(this.selIndex, true);
+		logger.warn(`<<< Exiting setNodeIndex(index=${index})`, { "event.action": "setNodeIndex", "logrite.index": index });
+		logger.debug(`setNodeIndex(index=${index}): this.selIndex → ${this.selIndex}`, { "event.action": "setNodeIndex", "logrite.index": index });
 	}
 },
 
 selectNode: function (tsNode) 
 {		
+	logger.error(`>>> Entering selectNode(tsNode=${tsNode})`, { "event.action": "selectNode", "logrite.tsNode": tsNode });
     var arg = new dnn.controls.DNNNodeEventArgs(tsNode);
     this.invoke_handler('click', arg);
+	logger.error(`selectNode(tsNode=${tsNode}): arg → ${arg}`, { "event.action": "selectNode", "logrite.tsNode": tsNode });
     if (arg.get_cancel())
         return;
 
@@ -271,6 +315,7 @@ selectNode: function (tsNode)
 	if (tsNode.selected)
 	{
 		tsNode.selected = null;
+		logger.debug(`selectNode(tsNode=${tsNode}): tsNode.selected → ${tsNode.selected}`, { "event.action": "selectNode", "logrite.tsNode": tsNode });
 		this.assignCss(tsNode);
 	}
 	else
@@ -281,6 +326,7 @@ selectNode: function (tsNode)
 	
 	this.selNode = tsNode;
 
+	logger.debug(`selectNode(tsNode=${tsNode}): this.selNode → ${this.selNode}`, { "event.action": "selectNode", "logrite.tsNode": tsNode });
 	if (tsNode.selected)
 	{
 		this.setText(tsNode.text, tsNode.id);
@@ -306,43 +352,55 @@ selectNode: function (tsNode)
 
 positionMenu: function ()
 {
+	logger.error('>>> Entering positionMenu()', { "event.action": "positionMenu" });
 	var dims = new dnn.dom.positioning.dims(this.container);
 	this.resultCtr.style.left = dims.l - dnn.dom.positioning.bodyScrollLeft();			
+	logger.error(`positionMenu(): dims → ${dims}`, { "event.action": "positionMenu" });
 	this.resultCtr.style.top = dims.t + dims.h;
 	
+	logger.warn('<<< Exiting positionMenu()', { "event.action": "positionMenu" });
 },
 
 showResults: function()
 {
+	logger.error('>>> Entering showResults()', { "event.action": "showResults" });
 	if (this.resultCtr)
 		this.resultCtr.style.display = '';
 },
 
 hideResults: function()
 {
+	logger.error('>>> Entering hideResults()', { "event.action": "hideResults" });
 	if (this.resultCtr)
 		this.resultCtr.style.display = 'none';
     dnn.dom.positioning.placeOnTop(this.resultCtr, false, this.sysImgPath + 'spacer.gif');  
+	logger.warn('<<< Exiting hideResults()', { "event.action": "hideResults" });
 },
 
 clearResults: function (hide) 
 {
+	logger.error(`>>> Entering clearResults(hide=${hide})`, { "event.action": "clearResults", "logrite.hide": hide });
 	if (this.resultCtr != null)
 		this.resultCtr.innerHTML = '';
 	this.selIndex = -1;
 	this.selNode = null;
+	logger.debug(`clearResults(hide=${hide}): this.selIndex → ${this.selIndex}`, { "event.action": "clearResults", "logrite.hide": hide });
+	logger.debug(`clearResults(hide=${hide}): this.selNode → ${this.selNode}`, { "event.action": "clearResults", "logrite.hide": hide });
 	if (hide)
 		this.hideResults();
 },
 
 clear: function () 
 {
+	logger.error('>>> Entering clear()', { "event.action": "clear" });
 	this.clearResults();
 	this.setText('', '');
+	logger.warn('<<< Exiting clear()', { "event.action": "clear" });
 },
 
 doLookup: function () 
 {
+	logger.error('>>> Entering doLookup()', { "event.action": "doLookup" });
 	if (this.getText().length >= this.minChar)
 	{
 		if (this.needsLookup())
@@ -350,6 +408,7 @@ doLookup: function ()
 			this.prevLookupOffset = this.getTextOffset();
 			this.prevLookupText = this.formatText(this.getText());
 			eval(this.callBack.replace('[TEXT]', this.prevLookupText));
+			logger.warn('<<< Exiting doLookup()', { "event.action": "doLookup" });
 		}
 		else
 			this.renderResults(null);
@@ -360,6 +419,7 @@ doLookup: function ()
 
 needsLookup: function () 
 {
+	logger.error('>>> Entering needsLookup()', { "event.action": "needsLookup" });
 	if (this.rootNode == null)
 		return true;
 
@@ -374,9 +434,11 @@ needsLookup: function ()
 		var node;
 		var oneMatch = false;
 		var text = this.getText();
+		logger.error(`needsLookup(): text → ${text}`, { "event.action": "needsLookup" });
 		for (var i=0; i<this.maxRows; i++)
 		{
 			node = new dnn.controls.DNNTextSuggestNode(this.rootNode.childNodes(i));
+			logger.error(`needsLookup(): node → ${node}`, { "event.action": "needsLookup" });
 			if (this.formatText(node.text).indexOf(text) == 0)	
 			{
 				if (i==0)	//if first shown node hasn't changed
@@ -387,6 +449,7 @@ needsLookup: function ()
 			else if (oneMatch)	//if found match and a row following has no match then we dont need lookup
 				return false;
 		}		
+	logger.warn('<<< Exiting needsLookup()', { "event.action": "needsLookup" });
 	}
 
 	return true;
@@ -395,14 +458,18 @@ needsLookup: function ()
 
 renderResults: function (result) 
 {
+	logger.error(`>>> Entering renderResults(result=${result})`, { "event.action": "renderResults", "logrite.result": result });
 	if (result != null)
 	{
 	    var json = dnn.evalJSON("{" + result + "}");
+		logger.error(`renderResults(result=${result}): json → ${json}`, { "event.action": "renderResults", "logrite.result": result });
         this.nodes = json.nodes;
         this.rootNode = {};
         this.rootNode.nodes = this.nodes;
+		logger.debug(`renderResults(result=${result}): this.nodes → ${this.nodes}`, { "event.action": "renderResults", "logrite.result": result });
         this.rootNode.id = this.ns;
         this.rootNode = new dnn.controls.JSONNode(this.rootNode, 'root', 0);
+		logger.debug(`renderResults(result=${result}): this.rootNode → ${this.rootNode}`, { "event.action": "renderResults", "logrite.result": result });
 		
 	}
 	if (this.rootNode != null)
@@ -415,18 +482,21 @@ renderResults: function (result)
 			this.renderNode(this.rootNode.childNodes(i), this.resultCtr);
 		this.showResults();
 	}
+	logger.warn(`<<< Exiting renderResults(result=${result})`, { "event.action": "renderResults", "logrite.result": result });
     dnn.dom.positioning.placeOnTop(this.resultCtr, true, this.sysImgPath + 'spacer.gif');  
 
 },
 
 renderContainer: function () 
 {
+	logger.error('>>> Entering renderContainer()', { "event.action": "renderContainer" });
 	this.resultCtr = document.createElement('DIV');
 	this.container.parentNode.appendChild(this.resultCtr);
 
 	this.resultCtr.className = this.tscss;
 	this.resultCtr.style.position = 'absolute';
 	this.positionMenu();
+	logger.warn('<<< Exiting renderContainer()', { "event.action": "renderContainer" });
 },
 
 renderNode: function (node, ctr) 
@@ -452,21 +522,28 @@ renderNode: function (node, ctr)
 		ctr.appendChild(newCtr);
 		this.assignCss(tsNode);
 	}
+	logger.warn(`<<< Exiting renderNode(node=${node},ctr=${ctr})`, { "event.action": "renderNode", "logrite.node": node, "logrite.ctr": ctr });
 },
 
 renderText: function (tsNode) 
 {
+	logger.error(`>>> Entering renderText(tsNode=${tsNode})`, { "event.action": "renderText", "logrite.tsNode": tsNode });
 	var span = this.createChildControl('SPAN', tsNode.id, 't'); //document.createElement('SPAN');
 	span.innerHTML = tsNode.text;	
+	logger.error(`renderText(tsNode=${tsNode}): span → ${span}`, { "event.action": "renderText", "logrite.tsNode": tsNode });
+	logger.debug(`renderText(tsNode=${tsNode}): span.innerHTML → ${span.innerHTML}`, { "event.action": "renderText", "logrite.tsNode": tsNode });
 	span.style.cursor = 'pointer';
 	
+	logger.warn(`<<< Exiting renderText(tsNode=${tsNode})`, { "event.action": "renderText", "logrite.tsNode": tsNode });
 	return span;
 },
 
 assignCss: function (tsNode)
 {
+	logger.error(`>>> Entering assignCss(tsNode=${tsNode})`, { "event.action": "assignCss", "logrite.tsNode": tsNode });
 	var oCtr = this.getChildControl(tsNode.id, 'ctr'); //dnn.dom.getById(__dm_getControlID(this.ns, tsNode.id, 'ctr'));//, this.container);
 	var nodeCss = this.css;
+	logger.error(`assignCss(tsNode=${tsNode}): oCtr → ${oCtr}`, { "event.action": "assignCss", "logrite.tsNode": tsNode });
 
 	if (tsNode.css.length > 0)
 		nodeCss = tsNode.css;
@@ -477,39 +554,51 @@ assignCss: function (tsNode)
 		nodeCss += ' ' + (tsNode.cssSel.length > 0 ? tsNode.cssSel : this.cssSel);
 	
 	oCtr.className = nodeCss;
+	logger.debug(`assignCss(tsNode=${tsNode}): oCtr.className → ${oCtr.className}`, { "event.action": "assignCss", "logrite.tsNode": tsNode });
 },
 
 callBackStatus: function (result, ctx, req) 
 {
+	logger.error(`>>> Entering callBackStatus(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackStatus", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 	var ts = ctx;
 	ts.invoke_compatHandler('callBackStatus', result, ctx, req);	
+	logger.warn(`<<< Exiting callBackStatus(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackStatus", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 },
 
 callBackSuccess: function (result, ctx, req) 
 {
+	logger.error(`>>> Entering callBackSuccess(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 	var ts = ctx;
 	ts.invoke_compatHandler('callBackStatus', result, ctx, req);	
 	ts.invoke_handler('callBackSuccess', new dnn.controls.DNNCallbackEventArgs(result, ctx, req));	
+	logger.warn(`<<< Exiting callBackSuccess(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 	ts.renderResults(result);
 
 },
 
 callBackFail: function (result, ctx, req) 
 {
+	logger.error(`>>> Entering callBackFail(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackFail", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 	var ts = ctx;
 	ts.invoke_handler('callBackFail', new dnn.controls.DNNCallbackEventArgs(result, ctx, req));	
+	logger.warn(`<<< Exiting callBackFail(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackFail", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 	//alert(result);
 },
 
 _findEventNode: function(evt)
 {
+	logger.error(`>>> Entering _findEventNode(evt=${evt})`, { "event.action": "_findEventNode", "logrite.evt": evt });
+	logger.warn(`<<< Exiting _findEventNode(evt=${evt})`, { "event.action": "_findEventNode", "logrite.evt": evt });
     return this.rootNode.findNode(this.getChildControlBaseId(evt.target));
 },
 
 dispose: function()
 {
+	logger.error('>>> Entering dispose()', { "event.action": "dispose" });
     this._blurHideDelegate = null;
     this._doLookupDelegate = null;
+	logger.debug(`dispose(): this._blurHideDelegate → ${this._blurHideDelegate}`, { "event.action": "dispose" });
+	logger.debug(`dispose(): this._doLookupDelegate → ${this._doLookupDelegate}`, { "event.action": "dispose" });
     dnn.controls.DNNTextSuggest.callBaseMethod(this, 'dispose');
 }
 
@@ -534,6 +623,7 @@ dnn.controls.DNNTextSuggestNode.prototype =
 {
 childNodes: function (index)
 {
+	logger.error(`>>> Entering childNodes(index=${index})`, { "event.action": "childNodes", "logrite.index": index });
 	if (this.node.childNodes[index] != null)
 		return new dnn.controls.DNNTextSuggestNode(this.node.childNodes[index]);
 }

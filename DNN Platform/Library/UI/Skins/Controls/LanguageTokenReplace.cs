@@ -11,13 +11,16 @@ namespace DotNetNuke.UI.Skins.Controls
 
     public class LanguageTokenReplace : TokenReplace
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LanguageTokenReplace));
         // see http://support.dotnetnuke.com/issue/ViewIssue.aspx?id=6505
 
         /// <summary>Initializes a new instance of the <see cref="LanguageTokenReplace"/> class.</summary>
         public LanguageTokenReplace()
             : base(Scope.NoSettings)
         {
+			Logger.LogError(">>> Entering LanguageTokenReplace()");
             this.UseObjectLessExpression = true;
+			Logger.LogDebug("LanguageTokenReplace(): this.UseObjectLessExpression → {Arg0}", this.UseObjectLessExpression);
             this.AddPropertySource(ObjectLessToken, new LanguagePropertyAccess(this, Globals.GetPortalSettings()));
         }
 

@@ -11,6 +11,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The DNNMultiStateBoxColumn control provides a DNNMultiState Box column for a Data Grid.</summary>
     public class DNNMultiStateBoxColumn : TemplateColumn
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DNNMultiStateBoxColumn));
         private DNNMultiStateCollection mStates;
 
         /// <summary>
@@ -30,6 +31,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="autoPostBack">Optional set the control to postback.</param>
         public DNNMultiStateBoxColumn(bool autoPostBack)
         {
+			Logger.LogError(">>> Entering DNNMultiStateBoxColumn(autoPostBack={AutoPostBack})", autoPostBack);
             this.AutoPostBack = autoPostBack;
         }
 
@@ -88,6 +90,7 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>Initialises the Column.</summary>
         public override void Initialize()
         {
+			Logger.LogError(">>> Entering Initialize()");
             this.ItemTemplate = this.CreateTemplate(ListItemType.Item);
             this.EditItemTemplate = this.CreateTemplate(ListItemType.EditItem);
             this.HeaderTemplate = this.CreateTemplate(ListItemType.Header);
@@ -100,26 +103,35 @@ namespace DotNetNuke.UI.WebControls
 
             this.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
             this.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+			Logger.LogWarning("<<< Exiting Initialize()");
         }
 
         /// <summary>Creates a DNNMultiStateBoxColumnTemplate.</summary>
         /// <returns>A DNNMultiStateBoxColumnTemplate.</returns>
         private DNNMultiStateBoxColumnTemplate CreateTemplate(ListItemType type)
         {
+			Logger.LogError(">>> Entering CreateTemplate(type={Type})", type);
             bool isDesignMode = false;
+			Logger.LogError("CreateTemplate(type={Type}): isDesignMode → {IsDesignMode}", type, isDesignMode);
             if (HttpContext.Current == null)
             {
                 isDesignMode = true;
             }
 
             var template = new DNNMultiStateBoxColumnTemplate(type);
+			Logger.LogError("CreateTemplate(type={Type}): template → {Template}", type, template);
             if (type != ListItemType.Header)
             {
                 template.AutoPostBack = this.AutoPostBack;
+				Logger.LogDebug("CreateTemplate(type={Type}): template.AutoPostBack → {Arg1}", type, template.AutoPostBack);
             }
 
             template.DataField = this.DataField;
+			Logger.LogDebug("CreateTemplate(type={Type}): template.DataField → {Arg1}", type, template.DataField);
+			Logger.LogDebug("CreateTemplate(type={Type}): template.EnabledField → {Arg1}", type, template.EnabledField);
+			Logger.LogDebug("CreateTemplate(type={Type}): template.ImagePath → {Arg1}", type, template.ImagePath);
             template.Enabled = this.Enabled;
+			Logger.LogDebug("CreateTemplate(type={Type}): template.Enabled → {Arg1}", type, template.Enabled);
             template.EnabledField = this.EnabledField;
             template.ImagePath = this.ImagePath;
             foreach (DNNMultiState objState in this.States)
@@ -128,13 +140,17 @@ namespace DotNetNuke.UI.WebControls
             }
 
             template.SelectedStateKey = this.SelectedStateKey;
+			Logger.LogDebug("CreateTemplate(type={Type}): template.SelectedStateKey → {Arg1}", type, template.SelectedStateKey);
             if (type == ListItemType.Header)
             {
                 template.Text = this.HeaderText;
+				Logger.LogDebug("CreateTemplate(type={Type}): template.Text → {Arg1}", type, template.Text);
                 template.AutoPostBack = true;
             }
 
             template.DesignMode = isDesignMode;
+			Logger.LogDebug("CreateTemplate(type={Type}): template.DesignMode → {Arg1}", type, template.DesignMode);
+			Logger.LogWarning("<<< Exiting CreateTemplate(type={Type})", type);
             return template;
         }
     }

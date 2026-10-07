@@ -12,10 +12,13 @@ namespace DotNetNuke.Entities.Host
 
     public class ServerWebRequestAdapter : IServerWebRequestAdapter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ServerWebRequestAdapter));
         /// <inheritdoc />
         public virtual string GetServerUrl()
         {
+			Logger.LogError(">>> Entering GetServerUrl()");
             var domainName = string.Empty;
+			Logger.LogError("GetServerUrl(): domainName → {DomainName}", domainName);
             if (HttpContext.Current != null)
             {
                 domainName = Globals.GetDomainName(HttpContext.Current.Request);
@@ -31,23 +34,30 @@ namespace DotNetNuke.Entities.Host
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetServerUrl()");
             return domainName;
         }
 
         /// <inheritdoc />
         public virtual string GetServerUniqueId()
         {
+			Logger.LogError(">>> Entering GetServerUniqueId()");
+            Logger.LogWarning("<<< Exiting GetServerUniqueId()");
             return string.Empty;
         }
 
         /// <inheritdoc />
         public virtual void ProcessRequest(HttpWebRequest request, ServerInfo server)
         {
+		Logger.LogError(">>> Entering ProcessRequest(request={Request},server={Server})", request, server);
+        Logger.LogWarning("<<< Exiting ProcessRequest(request={Request},server={Server})", request, server);
         }
 
         /// <inheritdoc />
         public virtual void CheckResponse(HttpWebResponse response, ServerInfo server, ref HttpStatusCode statusCode)
         {
+		Logger.LogError(">>> Entering CheckResponse(response={Response},server={Server},statusCode={StatusCode})", response, server, statusCode);
+        Logger.LogWarning("<<< Exiting CheckResponse(response={Response},server={Server},statusCode={StatusCode})", response, server, statusCode);
         }
     }
 }

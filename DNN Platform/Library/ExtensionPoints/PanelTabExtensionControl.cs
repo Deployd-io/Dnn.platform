@@ -9,27 +9,34 @@ namespace DotNetNuke.ExtensionPoints
 
     public class PanelTabExtensionControl : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PanelTabExtensionControl));
         public string PanelId { get; set; }
 
         /// <inheritdoc />
         public override void RenderBeginTag(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderBeginTag(writer={Writer})", writer);
             writer.Write(string.Empty);
+			Logger.LogWarning("<<< Exiting RenderBeginTag(writer={Writer})", writer);
         }
 
         /// <inheritdoc />
         public override void RenderEndTag(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderEndTag(writer={Writer})", writer);
             writer.Write(string.Empty);
+			Logger.LogWarning("<<< Exiting RenderEndTag(writer={Writer})", writer);
         }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         protected override void RenderContents(HtmlTextWriter op)
         {
+			Logger.LogError(">>> Entering RenderContents(op={Op})", op);
             op.Write($"<div class=\"ehccContent dnnClear\" id=\"{this.PanelId}\">");
             base.RenderContents(op);
             op.Write("</div>");
+			Logger.LogWarning("<<< Exiting RenderContents(op={Op})", op);
         }
     }
 }

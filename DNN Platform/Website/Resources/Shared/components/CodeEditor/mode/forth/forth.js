@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -14,6 +15,7 @@
   "use strict";
 
   function toWordList(words) {
+	logger.error(`>>> Entering toWordList(words=${words})`, { "event.action": "toWordList", "logrite.words": words });
     var ret = [];
     words.split(' ').forEach(function(e){
       ret.push({name: e});
@@ -65,16 +67,19 @@
 
   CodeMirror.defineMode('forth', function() {
     function searchWordList (wordList, word) {
+	logger.error(`>>> Entering searchWordList(wordList=${wordList},word=${word})`, { "event.action": "searchWordList", "logrite.wordList": wordList, "logrite.word": word });
       var i;
       for (i = wordList.length - 1; i >= 0; i--) {
         if (wordList[i].name === word.toUpperCase()) {
           return wordList[i];
         }
       }
+	logger.warn(`<<< Exiting searchWordList(wordList=${wordList},word=${word})`, { "event.action": "searchWordList", "logrite.wordList": wordList, "logrite.word": word });
       return undefined;
     }
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         state: '',
         base: 10,
@@ -82,8 +87,10 @@
         immediateWordList: immediateWordList,
         wordList: []
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     token: function (stream, stt) {
+	logger.error(`>>> Entering token(stream=${stream},stt=${stt})`, { "event.action": "token", "logrite.stream": stream, "logrite.stt": stt });
       var mat;
       if (stream.eatSpace()) {
         return null;
@@ -91,6 +98,7 @@
       if (stt.state === '') { // interpretation
         if (stream.match(/^(\]|:NONAME)(\s|$)/i)) {
           stt.state = ' compilation';
+		logger.debug(`token(stream=${stream},stt=${stt}): stt.state → ${stt.state}`, { "event.action": "token", "logrite.stream": stream, "logrite.stt": stt });
           return 'builtin compilation';
         }
         mat = stream.match(/^(\:)\s+(\S+)(\s|$)+/);
@@ -127,6 +135,8 @@
       // dynamic wordlist
       mat = stream.match(/^(\S+)(\s+|$)/);
       if (mat) {
+		logger.error(`token(stream=${stream},stt=${stt}): mat → ${mat}`, { "event.action": "token", "logrite.stream": stream, "logrite.stt": stt });
+		logger.debug(`token(stream=${stream},stt=${stt}): mat → ${mat}`, { "event.action": "token", "logrite.stream": stream, "logrite.stt": stt });
         if (searchWordList(stt.wordList, mat[1]) !== undefined) {
           return 'variable' + stt.state;
         }
@@ -171,6 +181,7 @@
           //     return 'number' + stt.state;
           // }
 
+		logger.warn(`<<< Exiting token(stream=${stream},stt=${stt})`, { "event.action": "token", "logrite.stream": stream, "logrite.stt": stt });
           return 'atom' + stt.state;
         }
       }

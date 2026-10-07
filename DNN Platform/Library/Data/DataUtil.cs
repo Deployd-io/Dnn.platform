@@ -15,14 +15,19 @@ namespace DotNetNuke.Data
 
     internal static class DataUtil
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DataUtil));
         internal static string GenerateExecuteStoredProcedureSql(string procedureName, params object[] args)
         {
+			Logger.LogError(">>> Entering GenerateExecuteStoredProcedureSql(procedureName={ProcedureName},args={Args})", procedureName, args);
             var sb = new StringBuilder(";Exec ");
             sb.Append(procedureName);
+			Logger.LogError("GenerateExecuteStoredProcedureSql(procedureName={ProcedureName},args={Args}): sb → {Sb}", procedureName, args, sb);
             for (int i = 0; i < args.Length; i++)
             {
                 var parameterFormat = " @{0}";
+				Logger.LogError("GenerateExecuteStoredProcedureSql(procedureName={ProcedureName},args={Args}): parameterFormat → {ParameterFormat}", procedureName, args, parameterFormat);
                 string parameterName = null;
+				Logger.LogError("GenerateExecuteStoredProcedureSql(procedureName={ProcedureName},args={Args}): parameterName → {ParameterName}", procedureName, args, parameterName);
                 if (args[i] is IDataParameter param)
                 {
                     // intentionally adding an extra @ before parameter name, so PetaPoco won't try to match it to a passed-in arg
@@ -42,37 +47,48 @@ namespace DotNetNuke.Data
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GenerateExecuteStoredProcedureSql(procedureName={ProcedureName},args={Args})", procedureName, args);
             return sb.ToString();
         }
 
         internal static TAttribute GetAttribute<TAttribute>(Type type)
         {
+			Logger.LogError(">>> Entering GetAttribute(type={Type})", type);
             TAttribute attribute = default(TAttribute);
 
+			Logger.LogError("GetAttribute(type={Type}): attribute → {Attribute}", type, attribute);
             object[] tableNameAttributes = type.GetCustomAttributes(typeof(TAttribute), true);
             if (tableNameAttributes.Length > 0)
             {
                 attribute = (TAttribute)tableNameAttributes[0];
             }
 
+			Logger.LogWarning("<<< Exiting GetAttribute(type={Type})", type);
             return attribute;
         }
 
         internal static bool GetAutoIncrement(Type type, bool defaultValue)
         {
+			Logger.LogError(">>> Entering GetAutoIncrement(type={Type},defaultValue={DefaultValue})", type, defaultValue);
             var autoIncrement = defaultValue;
 
+			Logger.LogError("GetAutoIncrement(type={Type},defaultValue={DefaultValue}): autoIncrement → {AutoIncrement}", type, defaultValue, autoIncrement);
             var primaryKeyAttribute = GetAttribute<PrimaryKeyAttribute>(type);
+			Logger.LogError("GetAutoIncrement(type={Type},defaultValue={DefaultValue}): primaryKeyAttribute → {PrimaryKeyAttribute}", type, defaultValue, primaryKeyAttribute);
             if (primaryKeyAttribute != null)
             {
                 autoIncrement = primaryKeyAttribute.AutoIncrement;
             }
 
+			Logger.LogWarning("<<< Exiting GetAutoIncrement(type={Type},defaultValue={DefaultValue})", type, defaultValue);
             return autoIncrement;
         }
 
         internal static string GetColumnName(Type type, string propertyName)
         {
+			Logger.LogError(">>> Entering GetColumnName(type={Type},propertyName={PropertyName})", type, propertyName);
+			Logger.LogWarning("<<< Exiting GetColumnName(type={Type},propertyName={PropertyName})", type, propertyName);
+			Logger.LogWarning("<<< Exiting GetColumnName(propertyInfo={PropertyInfo},defaultName={DefaultName})", propertyInfo, defaultName);
             return GetColumnName(type.GetProperty(propertyName), propertyName);
         }
 
@@ -92,55 +108,76 @@ namespace DotNetNuke.Data
 
         internal static bool GetIsCacheable(Type type)
         {
+			Logger.LogError(">>> Entering GetIsCacheable(type={Type})", type);
+            Logger.LogWarning("<<< Exiting GetIsCacheable(type={Type})", type);
             return GetAttribute<CacheableAttribute>(type) != null;
         }
 
         internal static TProperty GetPrimaryKey<TEntity, TProperty>(TEntity item)
         {
+			Logger.LogError(">>> Entering GetPrimaryKey(item={Item})", item);
             Type modelType = typeof(TEntity);
 
+			Logger.LogError("GetPrimaryKey(item={Item}): modelType → {ModelType}", item, modelType);
             // Get the primary key
             var primaryKeyName = GetPrimaryKeyProperty(modelType, string.Empty);
+			Logger.LogError("GetPrimaryKey(item={Item}): primaryKeyName → {PrimaryKeyName}", item, primaryKeyName);
 
+			Logger.LogWarning("<<< Exiting GetPrimaryKey(item={Item})", item);
             return GetPropertyValue<TEntity, TProperty>(item, primaryKeyName);
         }
 
         internal static string GetPrimaryKeyColumn(Type type, string defaultName)
         {
+			Logger.LogError(">>> Entering GetPrimaryKeyColumn(type={Type},defaultName={DefaultName})", type, defaultName);
             var primaryKeyName = defaultName;
 
+			Logger.LogError("GetPrimaryKeyColumn(type={Type},defaultName={DefaultName}): primaryKeyName → {PrimaryKeyName}", type, defaultName, primaryKeyName);
             var primaryKeyAttribute = GetAttribute<PrimaryKeyAttribute>(type);
+			Logger.LogError("GetPrimaryKeyColumn(type={Type},defaultName={DefaultName}): primaryKeyAttribute → {PrimaryKeyAttribute}", type, defaultName, primaryKeyAttribute);
             if (primaryKeyAttribute != null)
             {
                 primaryKeyName = primaryKeyAttribute.ColumnName;
             }
 
+			Logger.LogWarning("<<< Exiting GetPrimaryKeyColumn(type={Type},defaultName={DefaultName})", type, defaultName);
             return primaryKeyName;
         }
 
         internal static string GetPrimaryKeyProperty(Type type, string defaultName)
         {
+			Logger.LogError(">>> Entering GetPrimaryKeyProperty(type={Type},defaultName={DefaultName})", type, defaultName);
             var primaryKeyName = defaultName;
 
+			Logger.LogError("GetPrimaryKeyProperty(type={Type},defaultName={DefaultName}): primaryKeyName → {PrimaryKeyName}", type, defaultName, primaryKeyName);
             var primaryKeyAttribute = GetAttribute<PrimaryKeyAttribute>(type);
+			Logger.LogError("GetPrimaryKeyProperty(type={Type},defaultName={DefaultName}): primaryKeyAttribute → {PrimaryKeyAttribute}", type, defaultName, primaryKeyAttribute);
             if (primaryKeyAttribute != null)
             {
                 primaryKeyName = primaryKeyAttribute.PropertyName;
             }
 
+			Logger.LogWarning("<<< Exiting GetPrimaryKeyProperty(type={Type},defaultName={DefaultName})", type, defaultName);
             return primaryKeyName;
         }
 
         internal static TProperty GetPropertyValue<TEntity, TProperty>(TEntity item, string propertyName)
         {
+			Logger.LogError(">>> Entering GetPropertyValue(item={Item},propertyName={PropertyName})", item, propertyName);
             var modelType = typeof(TEntity);
             var property = modelType.GetProperty(propertyName);
+			Logger.LogError("GetPropertyValue(item={Item},propertyName={PropertyName}): property → {Property}", item, propertyName, property);
+			Logger.LogError("GetPropertyValue(item={Item},propertyName={PropertyName}): modelType → {ModelType}", item, propertyName, modelType);
 
+			Logger.LogWarning("<<< Exiting GetPropertyValue(item={Item},propertyName={PropertyName})", item, propertyName);
             return (TProperty)property.GetValue(item, null);
         }
 
         internal static string GetTableName(Type type)
         {
+			Logger.LogError(">>> Entering GetTableName(type={Type})", type);
+			Logger.LogWarning("<<< Exiting GetTableName(type={Type})", type);
+			Logger.LogWarning("<<< Exiting GetTableName(type={Type},defaultName={DefaultName})", type, defaultName);
             return GetTableName(type, string.Empty);
         }
 
@@ -159,7 +196,10 @@ namespace DotNetNuke.Data
 
         internal static string ReplaceTokens(string sql)
         {
+			Logger.LogError(">>> Entering ReplaceTokens(sql={Sql})", sql);
             var isSqlCe = DataProvider.Instance().Settings.GetValueOrDefault("isSqlCe", false);
+			Logger.LogError("ReplaceTokens(sql={Sql}): isSqlCe → {IsSqlCe}", sql, isSqlCe);
+			Logger.LogWarning("<<< Exiting ReplaceTokens(sql={Sql})", sql);
             return sql.Replace("{databaseOwner}", isSqlCe ? string.Empty : DataProvider.Instance().DatabaseOwner)
                         .Replace("{objectQualifier}", DataProvider.Instance().ObjectQualifier);
         }

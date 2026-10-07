@@ -18,6 +18,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A radio button control.</summary>
     public class DnnFormRadioButtonListItem : DnnFormListItemBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFormRadioButtonListItem));
         private RadioButtonList radioButtonList;
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormRadioButtonListItem"/> class.</summary>
@@ -25,6 +26,8 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnFormRadioButtonListItem()
             : this(null, null)
         {
+		Logger.LogError(">>> Entering DnnFormRadioButtonListItem()");
+        Logger.LogWarning("<<< Exiting DnnFormRadioButtonListItem()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormRadioButtonListItem"/> class.</summary>
@@ -38,6 +41,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void BindList()
         {
+			Logger.LogError(">>> Entering BindList()");
             if (this.radioButtonList != null)
             {
                 string selectedValue = !this.radioButtonList.Page.IsPostBack
@@ -49,6 +53,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     foreach (var item in items)
                     {
                         var listItem = new ListItem(item.Key, item.Value);
+						Logger.LogError("BindList(): listItem → {ListItem}", listItem);
                         listItem.Attributes.Add("onClick", this.OnClientClicked);
 
                         this.radioButtonList.Items.Add(listItem);
@@ -79,13 +84,17 @@ namespace DotNetNuke.Web.UI.WebControls
                     this.UpdateDataSource(this.Value, selectedValue, this.DataField);
                 }
             }
+			Logger.LogWarning("<<< Exiting BindList()");
         }
 
         /// <inheritdoc />
         protected override WebControl CreateControlInternal(Control container)
         {
+			Logger.LogError(">>> Entering CreateControlInternal(container={Container})", container);
             this.radioButtonList = new RadioButtonList { ID = this.ID + "_RadioButtonList", RepeatColumns = 1, RepeatDirection = RepeatDirection.Vertical, RepeatLayout = RepeatLayout.Flow };
 
+			Logger.LogDebug("CreateControlInternal(container={Container}): this.radioButtonList → {Arg1}", container, this.radioButtonList);
+			Logger.LogDebug("CreateControlInternal(container={Container}): radioButtonList → {RadioButtonList}", container, radioButtonList);
             container.Controls.Add(this.radioButtonList);
 
             if (this.ListSource != null)
@@ -93,6 +102,7 @@ namespace DotNetNuke.Web.UI.WebControls
                 this.BindList();
             }
 
+			Logger.LogWarning("<<< Exiting CreateControlInternal(container={Container})", container);
             return this.radioButtonList;
         }
     }

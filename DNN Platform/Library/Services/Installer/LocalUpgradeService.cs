@@ -26,6 +26,7 @@ using Microsoft.Extensions.DependencyInjection;
 /// <summary>The default <see cref="ILocalUpgradeService"/> implementation.</summary>
 public class LocalUpgradeService : ILocalUpgradeService
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LocalUpgradeService));
     private static readonly string[] DefaultUpgradeExclude = new[]
     {
         "App_Data/Database.mdf",
@@ -46,9 +47,14 @@ public class LocalUpgradeService : ILocalUpgradeService
     /// <param name="directory">The directory.</param>
     public LocalUpgradeService(IApplicationInfo application, IApplicationStatusInfo appStatus, IDirectory directory)
     {
+		Logger.LogError(">>> Entering LocalUpgradeService(application={Application},appStatus={AppStatus},directory={Directory})", application, appStatus, directory);
+		Logger.LogDebug("LocalUpgradeService(application={Application},appStatus={AppStatus},directory={Directory}): directory → {Directory1}", application, appStatus, directory, directory);
+		Logger.LogDebug("LocalUpgradeService(application={Application},appStatus={AppStatus},directory={Directory}): appStatus → {AppStatus1}", application, appStatus, directory, appStatus);
         this.application = application ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationInfo>();
         this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
         this.directory = directory ?? Globals.GetCurrentServiceProvider().GetRequiredService<IDirectory>();
+		Logger.LogDebug("LocalUpgradeService(application={Application},appStatus={AppStatus},directory={Directory}): application → {Application1}", application, appStatus, directory, application);
+    Logger.LogWarning("<<< Exiting LocalUpgradeService(application={Application},appStatus={AppStatus},directory={Directory})", application, appStatus, directory);
     }
 
     private string UpgradeDirectoryPath => Path.Combine(this.appStatus.ApplicationMapPath, "App_Data", "Upgrade");
@@ -56,11 +62,13 @@ public class LocalUpgradeService : ILocalUpgradeService
     /// <inheritdoc />
     public async Task<IReadOnlyList<LocalUpgradeInfo>> GetLocalUpgrades(CancellationToken cancellationToken)
     {
+		Logger.LogError(">>> Entering GetLocalUpgrades(cancellationToken=<redacted>)");
         IReadOnlyList<LocalUpgradeInfo> localUpgrades;
         if (this.directory.Exists(this.UpgradeDirectoryPath))
         {
             // clean up any old temp files
             var tempFiles = this.directory.GetFiles(this.UpgradeDirectoryPath, "*.resources", SearchOption.TopDirectoryOnly);
+			Logger.LogError("GetLocalUpgrades(cancellationToken=<redacted>): tempFiles → {TempFiles}", tempFiles);
             foreach (var tempFile in tempFiles)
             {
                 try
@@ -69,32 +77,43 @@ public class LocalUpgradeService : ILocalUpgradeService
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in GetLocalUpgrades(cancellationToken=<redacted>): {Arg1}", ex.Message);
                     Exceptions.LogException(ex);
                 }
             }
 
             var upgradeFiles = this.directory.GetFiles(this.UpgradeDirectoryPath, "*.zip", SearchOption.TopDirectoryOnly);
+			Logger.LogError("GetLocalUpgrades(cancellationToken=<redacted>): upgradeFiles → {UpgradeFiles}", upgradeFiles);
             localUpgrades = await Task.WhenAll(upgradeFiles.Select(file => this.GetLocalUpgradeInfo(file, cancellationToken)));
+			Logger.LogError("GetLocalUpgrades(cancellationToken=<redacted>): localUpgrades → {LocalUpgrades}", localUpgrades);
         }
         else
         {
             localUpgrades = [];
+			Logger.LogDebug("GetLocalUpgrades(cancellationToken=<redacted>): localUpgrades → {LocalUpgrades}", localUpgrades);
         }
 
+		Logger.LogWarning("<<< Exiting GetLocalUpgrades(cancellationToken=<redacted>)");
         return localUpgrades;
     }
 
     /// <inheritdoc />
     public async Task<LocalUpgradeInfo> GetLocalUpgradeInfo(string file, CancellationToken cancellationToken)
     {
+		Logger.LogError(">>> Entering GetLocalUpgradeInfo(file={File},cancellationToken=<redacted>)", file);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         try
         {
             using var archiveStream = File.OpenRead(file);
+			Logger.LogError("GetLocalUpgradeInfo(file={File},cancellationToken=<redacted>): archiveStream → {ArchiveStream}", file, archiveStream);
             return await this.GetLocalUpgradeInfo(Path.GetFileNameWithoutExtension(file), archiveStream, cancellationToken);
         }
         catch (Exception exception)
         {
+			Logger.LogError("Exception in GetLocalUpgradeInfo(file={File},cancellationToken=<redacted>): {Arg2}", file, exception.Message);
             Exceptions.LogException(exception);
+			Logger.LogError("GetLocalUpgradeInfo(file,cancellationToken)={File},<redacted>: external service call took {Arg2} ms", file, __logStart.ElapsedMilliseconds);
+			Logger.LogWarning("<<< Exiting GetLocalUpgradeInfo(file={File},cancellationToken=<redacted>)", file);
             return new LocalUpgradeInfo
             {
                 PackageName = Path.GetFileNameWithoutExtension(file),
@@ -102,6 +121,7 @@ public class LocalUpgradeService : ILocalUpgradeService
                 IsValid = false,
                 IsOutdated = false,
             };
+		Logger.LogWarning("<<< Exiting GetLocalUpgradeInfo(packageName={PackageName},archiveStream={ArchiveStream},cancellationToken=<redacted>)", packageName, archiveStream);
         }
     }
 
@@ -167,32 +187,44 @@ public class LocalUpgradeService : ILocalUpgradeService
     /// <inheritdoc />
     public async Task DeleteLocalUpgrade(string packageName, CancellationToken cancellationToken)
     {
+		Logger.LogError(">>> Entering DeleteLocalUpgrade(packageName={PackageName},cancellationToken=<redacted>)", packageName);
         var upgrades = await this.GetLocalUpgrades(cancellationToken);
         var upgrade = upgrades.FirstOrDefault(u => u.PackageName.Equals(packageName, StringComparison.OrdinalIgnoreCase));
+		Logger.LogError("DeleteLocalUpgrade(packageName={PackageName},cancellationToken=<redacted>): upgrade → {Upgrade}", packageName, upgrade);
         var packagePath = Path.Combine(this.UpgradeDirectoryPath, upgrade.PackageName + ".zip");
+		Logger.LogError("DeleteLocalUpgrade(packageName={PackageName},cancellationToken=<redacted>): packagePath → {PackagePath}", packageName, packagePath);
+		Logger.LogError("DeleteLocalUpgrade(packageName={PackageName},cancellationToken=<redacted>): upgrades → {Upgrades}", packageName, upgrades);
 
         if (File.Exists(packagePath))
         {
             File.Delete(packagePath);
         }
+		Logger.LogWarning("<<< Exiting DeleteLocalUpgrade(packageName={PackageName},cancellationToken=<redacted>)", packageName);
     }
 
     /// <inheritdoc />
     public async Task StartLocalUpgrade(IReadOnlyList<LocalUpgradeInfo> upgrades, CancellationToken cancellationToken)
     {
+		Logger.LogError(">>> Entering StartLocalUpgrade(upgrades={Upgrades},cancellationToken=<redacted>)", upgrades);
         var upgrade = upgrades.Where(u => u.IsValid && !u.IsOutdated).OrderBy(u => u.Version).First();
+		Logger.LogError("StartLocalUpgrade(upgrades={Upgrades},cancellationToken=<redacted>): upgrade → {Upgrade}", upgrades, upgrade);
         await this.StartLocalUpgrade(upgrade, cancellationToken);
+		Logger.LogWarning("<<< Exiting StartLocalUpgrade(upgrades={Upgrades},cancellationToken=<redacted>)", upgrades);
     }
 
     /// <inheritdoc />
     public async Task StartLocalUpgrade(LocalUpgradeInfo upgrade, CancellationToken cancellationToken)
     {
+		Logger.LogError(">>> Entering StartLocalUpgrade(upgrade={Upgrade},cancellationToken=<redacted>)", upgrade);
         var upgradeZipPath = Path.Combine(this.UpgradeDirectoryPath, upgrade.PackageName + ".zip");
         using var fileStream = File.OpenRead(upgradeZipPath);
+		Logger.LogError("StartLocalUpgrade(upgrade={Upgrade},cancellationToken=<redacted>): upgradeZipPath → {UpgradeZipPath}", upgrade, upgradeZipPath);
+		Logger.LogError("StartLocalUpgrade(upgrade={Upgrade},cancellationToken=<redacted>): fileStream → {FileStream}", upgrade, fileStream);
         using var archive = new ZipArchive(fileStream, ZipArchiveMode.Read);
         var upgradeInfo = archive.FileEntries()
             .Where(entry => string.Equals("App_Data/Upgrade/upgrade.json", entry.FullName, StringComparison.OrdinalIgnoreCase))
             .SingleOrDefault();
+			Logger.LogError("StartLocalUpgrade(upgrade={Upgrade},cancellationToken=<redacted>): archive → {Archive}", upgrade, archive);
         var upgradeSettings = new LocalUpgradeSettings
         {
             UpgradeExclude = DefaultUpgradeExclude,
@@ -200,7 +232,9 @@ public class LocalUpgradeService : ILocalUpgradeService
         if (upgradeInfo is not null)
         {
             var upgradeInfoFile = upgradeInfo.ReadTextFile();
+			Logger.LogError("StartLocalUpgrade(upgrade={Upgrade},cancellationToken=<redacted>): upgradeInfoFile → {UpgradeInfoFile}", upgrade, upgradeInfoFile);
             upgradeSettings = Json.Deserialize<LocalUpgradeSettings>(upgradeInfoFile);
+			Logger.LogError("StartLocalUpgrade(upgrade={Upgrade},cancellationToken=<redacted>): upgradeSettings → {UpgradeSettings}", upgrade, upgradeSettings);
         }
 
         var assemblyEntries = archive.FileEntries()
@@ -208,6 +242,7 @@ public class LocalUpgradeService : ILocalUpgradeService
             .Where(entry => string.Equals("bin", Path.GetDirectoryName(entry.FullName), StringComparison.OrdinalIgnoreCase))
             .ToHashSet();
         var installer = new LocalUpgradeAssemblyInstaller(new InstallerInfo(this.appStatus.ApplicationMapPath, InstallMode.Install) { IgnoreWhiteList = true, });
+		Logger.LogError("StartLocalUpgrade(upgrade={Upgrade},cancellationToken=<redacted>): installer → {Installer}", upgrade, installer);
         await installer.AddFiles(assemblyEntries, cancellationToken);
         installer.Install();
         installer.Commit();
@@ -218,12 +253,16 @@ public class LocalUpgradeService : ILocalUpgradeService
                 .Where(entry => !upgradeSettings.UpgradeExclude.Any(filter => entry.FullName.StartsWith(filter, StringComparison.OrdinalIgnoreCase))),
             this.appStatus.ApplicationMapPath,
             cancellationToken);
+			    Logger.LogWarning("<<< Exiting StartLocalUpgrade(upgrade={Upgrade},cancellationToken=<redacted>)", upgrade);
     }
 
     private static async Task<Version> ReadZippedAssemblyVersion(ZipArchiveEntry assemblyEntry, CancellationToken cancellationToken)
     {
+		Logger.LogError(">>> Entering ReadZippedAssemblyVersion(assemblyEntry={AssemblyEntry},cancellationToken=<redacted>)", assemblyEntry);
         var tempPath = Path.Combine(Globals.InstallMapPath, "Temp", Path.GetFileNameWithoutExtension(Path.GetRandomFileName()));
         var tempAssemblyPath = Path.Combine(tempPath, assemblyEntry.Name);
+		Logger.LogError("ReadZippedAssemblyVersion(assemblyEntry={AssemblyEntry},cancellationToken=<redacted>): tempAssemblyPath → {TempAssemblyPath}", assemblyEntry, tempAssemblyPath);
+		Logger.LogError("ReadZippedAssemblyVersion(assemblyEntry={AssemblyEntry},cancellationToken=<redacted>): tempPath → {TempPath}", assemblyEntry, tempPath);
 
         Directory.CreateDirectory(tempPath);
         try
@@ -238,6 +277,7 @@ public class LocalUpgradeService : ILocalUpgradeService
                     cancellationToken);
             }
 
+			Logger.LogWarning("<<< Exiting ReadZippedAssemblyVersion(assemblyEntry={AssemblyEntry},cancellationToken=<redacted>)", assemblyEntry);
             return AssemblyName.GetAssemblyName(tempAssemblyPath).Version;
         }
         finally
@@ -250,19 +290,24 @@ public class LocalUpgradeService : ILocalUpgradeService
     {
         public LocalUpgradeAssemblyInstaller(InstallerInfo installerInfo)
         {
+			Logger.LogError(">>> Entering LocalUpgradeAssemblyInstaller(installerInfo={InstallerInfo})", installerInfo);
             this.Package = new PackageInfo();
+			Logger.LogWarning("<<< Exiting LocalUpgradeAssemblyInstaller(installerInfo={InstallerInfo})", installerInfo);
             this.Package.AttachInstallerInfo(installerInfo);
         }
 
         public async Task AddFiles(IEnumerable<ZipArchiveEntry> assemblyEntries, CancellationToken cancellationToken)
         {
+			Logger.LogError(">>> Entering AddFiles(assemblyEntries={AssemblyEntries},cancellationToken=<redacted>)", assemblyEntries);
             foreach (var entry in assemblyEntries)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var installFile = new InstallFile(entry, this.Package.InstallerInfo);
+				Logger.LogError("AddFiles(assemblyEntries={AssemblyEntries},cancellationToken=<redacted>): installFile → {InstallFile}", assemblyEntries, installFile);
                 installFile.SetVersion(await ReadZippedAssemblyVersion(entry, cancellationToken));
                 this.Files.Add(installFile);
             }
+			Logger.LogWarning("<<< Exiting AddFiles(assemblyEntries={AssemblyEntries},cancellationToken=<redacted>)", assemblyEntries);
         }
     }
 }

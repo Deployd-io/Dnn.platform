@@ -8,30 +8,41 @@ import KeyWords from "./KeyWords";
 import PageTags from "./Tags";
 import DisplayInMenu from "./DisplayInMenu";
 import EnableScheduling from "./EnableScheduling";
+const logger = console;
 
 class AddPages extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this._isFinishLoad = false;
 
     }
 
     onChangeValue(key, value) {
+		logger.error(`>>> Entering onChangeValue(key=${key},value=${value})`, { "event.action": "onChangeValue", "logrite.key": key, "logrite.value": value });
         const {onChangeField} = this.props;
         onChangeField(key, value);
+		logger.warn(`<<< Exiting onChangeValue(key=${key},value=${value})`, { "event.action": "onChangeValue", "logrite.key": key, "logrite.value": value });
     }
 
     onChangeEvent(key, event) {
+		logger.error(`>>> Entering onChangeEvent(key=${key},event=${event})`, { "event.action": "onChangeEvent", "logrite.key": key, "logrite.event": event });
         this.onChangeValue(key, event.target.value);
+		logger.warn(`<<< Exiting onChangeEvent(key=${key},event=${event})`, { "event.action": "onChangeEvent", "logrite.key": key, "logrite.event": event });
     }
 
     onChangeTags(tags) {
+		logger.error(`>>> Entering onChangeTags(tags=${tags})`, { "event.action": "onChangeTags", "logrite.tags": tags });
         this.onChangeValue("tags", tags.join(","));
+		logger.warn(`<<< Exiting onChangeTags(tags=${tags})`, { "event.action": "onChangeTags", "logrite.tags": tags });
     }
 
     getLeftColumnComponents() {
+		logger.error('>>> Entering getLeftColumnComponents()', { "event.action": "getLeftColumnComponents" });
         const {bulkPage} = this.props;
         const tags = bulkPage.tags ? bulkPage.tags.split(",") : [];
+		logger.error(`getLeftColumnComponents(): tags → ${tags}`, { "event.action": "getLeftColumnComponents" });
 
         const defaultLeftColumnComponents = [
             <BranchParent key="branchParent" parentId={bulkPage.parentId}
@@ -51,10 +62,12 @@ class AddPages extends Component {
 
         this.insertElementsInArray(defaultLeftColumnComponents, additionalComponents);
         this._isFinishLoad = true;
+		logger.warn('<<< Exiting getLeftColumnComponents()', { "event.action": "getLeftColumnComponents" });
         return defaultLeftColumnComponents;
     }
 
     insertElementsInArray(array, elements) {
+		logger.error(`>>> Entering insertElementsInArray(array=${array},elements=${elements})`, { "event.action": "insertElementsInArray", "logrite.array": array, "logrite.elements": elements });
         for (let i = 0; i < elements.length; i++) {
             let index = this.getInteger(elements[i].order);
             const Component = elements[i].component;
@@ -65,24 +78,29 @@ class AddPages extends Component {
             if (index || index === 0) {
                 index = Math.min(array.length, Math.max(0, index));
                 array.splice(index, 0, instance);
+				logger.warn(`<<< Exiting insertElementsInArray(array=${array},elements=${elements})`, { "event.action": "insertElementsInArray", "logrite.array": array, "logrite.elements": elements });
             }            
         }
     }
 
     getInteger(value) {
+		logger.error(`>>> Entering getInteger(value=${value})`, { "event.action": "getInteger", "logrite.value": value });
         if (value === 0) {
             return 0;
         }
         if (value) {
             return parseInt(value.toString());
         }
+		logger.warn(`<<< Exiting getInteger(value=${value})`, { "event.action": "getInteger", "logrite.value": value });
         return value;
     } 
     
  
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {bulkPage, onCancel, onValidate, onSave} = this.props;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.addPages}>
                 <div className="addPagesDetail">

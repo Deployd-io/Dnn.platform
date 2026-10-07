@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -15,8 +16,11 @@
 
 CodeMirror.defineMode("tcl", function() {
   function parseWords(str) {
+	logger.error(`>>> Entering parseWords(str=${str})`, { "event.action": "parseWords", "logrite.str": str });
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.error(`parseWords(str=${str}): obj → ${obj}`, { "event.action": "parseWords", "logrite.str": str });
+	logger.warn(`<<< Exiting parseWords(str=${str})`, { "event.action": "parseWords", "logrite.str": str });
     return obj;
   }
   var keywords = parseWords("Tcl safe after append array auto_execok auto_import auto_load " +
@@ -35,13 +39,18 @@ CodeMirror.defineMode("tcl", function() {
     var functions = parseWords("if elseif else and not or eq ne in ni for foreach while switch");
     var isOperatorChar = /[+\-*&%=<>!?^\/\|]/;
     function chain(stream, state, f) {
+	logger.error(`>>> Entering chain(stream=${stream},state=${state},f=${f})`, { "event.action": "chain", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
       state.tokenize = f;
+	logger.warn(`<<< Exiting chain(stream=${stream},state=${state},f=${f})`, { "event.action": "chain", "logrite.stream": stream, "logrite.state": state, "logrite.f": f });
       return f(stream, state);
     }
     function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       var beforeParams = state.beforeParams;
       state.beforeParams = false;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.beforeParams → ${state.beforeParams}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       var ch = stream.next();
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       if ((ch == '"' || ch == "'") && state.inParams)
         return chain(stream, state, tokenString(ch));
       else if (/[\[\]{}\(\),;\.]/.test(ch)) {
@@ -86,10 +95,12 @@ CodeMirror.defineMode("tcl", function() {
           state.beforeParams = true;
           return "keyword";
         }
+		logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         return null;
       }
     }
     function tokenString(quote) {
+	logger.error(`>>> Entering tokenString(quote=${quote})`, { "event.action": "tokenString", "logrite.quote": quote });
       return function(stream, state) {
       var escaped = false, next, end = false;
       while ((next = stream.next()) != null) {
@@ -104,21 +115,26 @@ CodeMirror.defineMode("tcl", function() {
       };
     }
     function tokenComment(stream, state) {
+	logger.error(`>>> Entering tokenComment(stream=${stream},state=${state})`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
       var maybeEnd = false, ch;
       while (ch = stream.next()) {
         if (ch == "#" && maybeEnd) {
           state.tokenize = tokenBase;
+		logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
           break;
         }
         maybeEnd = (ch == "*");
       }
+	logger.error(`tokenComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
       return "comment";
     }
     function tokenUnparsed(stream, state) {
+	logger.error(`>>> Entering tokenUnparsed(stream=${stream},state=${state})`, { "event.action": "tokenUnparsed", "logrite.stream": stream, "logrite.state": state });
       var maybeEnd = 0, ch;
       while (ch = stream.next()) {
         if (ch == "#" && maybeEnd == 2) {
           state.tokenize = tokenBase;
+		logger.debug(`tokenUnparsed(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenUnparsed", "logrite.stream": stream, "logrite.state": state });
           break;
         }
         if (ch == "]")
@@ -126,18 +142,23 @@ CodeMirror.defineMode("tcl", function() {
         else if (ch != " ")
           maybeEnd = 0;
       }
+	logger.warn(`<<< Exiting tokenUnparsed(stream=${stream},state=${state})`, { "event.action": "tokenUnparsed", "logrite.stream": stream, "logrite.state": state });
       return "meta";
     }
     return {
       startState: function() {
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
         return {
           tokenize: tokenBase,
           beforeParams: false,
           inParams: false
         };
+		logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       },
       token: function(stream, state) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if (stream.eatSpace()) return null;
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return state.tokenize(stream, state);
       }
     };

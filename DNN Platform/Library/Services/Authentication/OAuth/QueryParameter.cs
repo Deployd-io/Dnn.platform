@@ -7,12 +7,16 @@ namespace DotNetNuke.Services.Authentication.OAuth
     /// <summary>Provides an internal structure to sort the query parameter.</summary>
     public class QueryParameter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(QueryParameter));
         /// <summary>Initializes a new instance of the <see cref="QueryParameter"/> class.</summary>
         /// <param name="name">The name.</param>
         /// <param name="value">The value.</param>
         public QueryParameter(string name, string value)
         {
+			Logger.LogError(">>> Entering QueryParameter(name={Name},value={Value})", name, value);
             this.Name = name;
+			Logger.LogDebug("QueryParameter(name={Name},value={Value}): this.Name → {Arg2}", name, value, this.Name);
+        Logger.LogWarning("<<< Exiting QueryParameter(name={Name},value={Value})", name, value);
             this.Value = value;
         }
 

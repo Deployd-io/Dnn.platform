@@ -22,6 +22,7 @@ namespace DotNetNuke.Security.Permissions
     /// <inheritdoc />
     public class AdvancedPermissionProvider : PermissionProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AdvancedPermissionProvider));
         /// <summary>Content Editors Advanced Role Name.</summary>
         public const string ContentEditors = "Content Editors";
 
@@ -88,7 +89,12 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="tabController">The tab controller.</param>
         public AdvancedPermissionProvider(IPermissionDefinitionService permissionDefinitions, IModuleController moduleController, IRoleController roleController, ITabController tabController)
         {
+			Logger.LogError(">>> Entering AdvancedPermissionProvider(permissionDefinitions={PermissionDefinitions},moduleController={ModuleController},roleController={RoleController},tabController={TabController})", permissionDefinitions, moduleController, roleController, tabController);
+			Logger.LogDebug("AdvancedPermissionProvider(permissionDefinitions={PermissionDefinitions},moduleController={ModuleController},roleController={RoleController},tabController={TabController}): moduleController → {ModuleController1}", permissionDefinitions, moduleController, roleController, tabController, moduleController);
+			Logger.LogDebug("AdvancedPermissionProvider(permissionDefinitions={PermissionDefinitions},moduleController={ModuleController},roleController={RoleController},tabController={TabController}): roleController → {RoleController1}", permissionDefinitions, moduleController, roleController, tabController, roleController);
+			Logger.LogDebug("AdvancedPermissionProvider(permissionDefinitions={PermissionDefinitions},moduleController={ModuleController},roleController={RoleController},tabController={TabController}): tabController → {TabController1}", permissionDefinitions, moduleController, roleController, tabController, tabController);
             this.permissionDefinitions = permissionDefinitions ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPermissionDefinitionService>();
+			Logger.LogWarning("<<< Exiting AdvancedPermissionProvider(permissionDefinitions={PermissionDefinitions},moduleController={ModuleController},roleController={RoleController},tabController={TabController})", permissionDefinitions, moduleController, roleController, tabController);
             this.moduleController = moduleController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IModuleController>();
             this.roleController = roleController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IRoleController>();
             this.tabController = tabController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITabController>();
@@ -118,8 +124,10 @@ namespace DotNetNuke.Security.Permissions
         /// <inheritdoc />
         public override IEnumerable<RoleInfo> ImplicitRolesForFolders(int portalId)
         {
+			Logger.LogError(">>> Entering ImplicitRolesForFolders(portalId={PortalId})", portalId);
             var list = base.ImplicitRolesForFolders(portalId).ToList();
             list.AddRange(this.GetOrCreateAdvancedRoles(portalId));
+			Logger.LogWarning("<<< Exiting ImplicitRolesForFolders(portalId={PortalId})", portalId);
             return list;
         }
 
@@ -127,19 +135,27 @@ namespace DotNetNuke.Security.Permissions
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public override FolderPermissionCollection GetFolderPermissionsCollectionByFolder(int portalId, string folder)
         {
+			Logger.LogError(">>> Entering GetFolderPermissionsCollectionByFolder(portalId={PortalId},folder={Folder})", portalId, folder);
             var basePermissions = base.GetFolderPermissionsCollectionByFolder(portalId, folder);
 
+			Logger.LogError("GetFolderPermissionsCollectionByFolder(portalId={PortalId},folder={Folder}): basePermissions → {BasePermissions}", portalId, folder, basePermissions);
             // Create a new permission collection and copy base permissions
             var permissions = new FolderPermissionCollection();
+			Logger.LogError("GetFolderPermissionsCollectionByFolder(portalId={PortalId},folder={Folder}): permissions → {Permissions}", portalId, folder, permissions);
             permissions.AddRange(basePermissions);
 
             var folderPermissions = permissions.Cast<FolderPermissionInfo>().ToList();
+			Logger.LogError("GetFolderPermissionsCollectionByFolder(portalId={PortalId},folder={Folder}): folderPermissions → {FolderPermissions}", portalId, folder, folderPermissions);
             var folderId = GetFolderId(folderPermissions);
+			Logger.LogError("GetFolderPermissionsCollectionByFolder(portalId={PortalId},folder={Folder}): folderId → {FolderId}", portalId, folder, folderId);
             var folderPath = GetFolderPath(folderPermissions);
+			Logger.LogError("GetFolderPermissionsCollectionByFolder(portalId={PortalId},folder={Folder}): folderPath → {FolderPath}", portalId, folder, folderPath);
 
             var virtualPermissions = this.GenerateVirtualFolderPermissions(folderPermissions.ToList<PermissionInfoBase>(), portalId, folderId, folderPath);
+			Logger.LogError("GetFolderPermissionsCollectionByFolder(portalId={PortalId},folder={Folder}): virtualPermissions → {VirtualPermissions}", portalId, folder, virtualPermissions);
             permissions.AddRange(virtualPermissions);
 
+			Logger.LogWarning("<<< Exiting GetFolderPermissionsCollectionByFolder(portalId={PortalId},folder={Folder})", portalId, folder);
             return permissions;
         }
 
@@ -188,6 +204,7 @@ namespace DotNetNuke.Security.Permissions
 
             // Create a new permission collection and copy base permissions
             var permissions = new ModulePermissionCollection();
+			Logger.LogError(">>> Entering GetModulePermissions(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
             permissions.AddRange(basePermissions);
 
             if (this.tabController.IsHostOrAdminPage(tab))
@@ -200,13 +217,17 @@ namespace DotNetNuke.Security.Permissions
             var virtualPermissions = this.GenerateVirtualModulePermissions(modulePermissions, module.PortalID, tabId, moduleId);
             virtualPermissions.ForEach(v => permissions.Add(v));
 
+			Logger.LogWarning("<<< Exiting GetModulePermissions(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
             return permissions;
         }
 
         /// <inheritdoc />
         public override bool HasModuleAccess(SecurityAccessLevel accessLevel, string permissionKey, ModuleInfo moduleConfiguration)
         {
+			Logger.LogError(">>> Entering HasModuleAccess(accessLevel={AccessLevel},permissionKey={PermissionKey},moduleConfiguration={ModuleConfiguration})", accessLevel, permissionKey, moduleConfiguration);
             var hasModuleAccess = base.HasModuleAccess(accessLevel, permissionKey, moduleConfiguration);
+			Logger.LogError("HasModuleAccess(accessLevel={AccessLevel},permissionKey={PermissionKey},moduleConfiguration={ModuleConfiguration}): hasModuleAccess → {HasModuleAccess}", accessLevel, permissionKey, moduleConfiguration, hasModuleAccess);
+			Logger.LogWarning("<<< Exiting HasModuleAccess(accessLevel={AccessLevel},permissionKey={PermissionKey},moduleConfiguration={ModuleConfiguration})", accessLevel, permissionKey, moduleConfiguration);
             return accessLevel switch
             {
                 SecurityAccessLevel.Admin or SecurityAccessLevel.Host => hasModuleAccess,
@@ -279,24 +300,30 @@ namespace DotNetNuke.Security.Permissions
         /// <inheritdoc />
         public override IEnumerable<RoleInfo> ImplicitRolesForPages(int portalId)
         {
+			Logger.LogError(">>> Entering ImplicitRolesForPages(portalId={PortalId})", portalId);
             var roles = base.ImplicitRolesForPages(portalId).ToList();
             roles.AddRange(this.GetOrCreateAdvancedRoles(portalId));
+			Logger.LogWarning("<<< Exiting ImplicitRolesForPages(portalId={PortalId})", portalId);
             return roles;
         }
 
         /// <inheritdoc />
         public override TabPermissionCollection GetTabPermissions(int tabId, int portalId)
         {
+			Logger.LogError(">>> Entering GetTabPermissions(tabId={TabId},portalId={PortalId})", tabId, portalId);
             var tab = this.tabController.GetTab(tabId, portalId);
+			Logger.LogError("GetTabPermissions(tabId={TabId},portalId={PortalId}): tab → {Tab}", tabId, portalId, tab);
             if (tab == null)
             {
                 return new TabPermissionCollection();
             }
 
             var basePermissions = base.GetTabPermissions(tabId, portalId);
+			Logger.LogError("GetTabPermissions(tabId={TabId},portalId={PortalId}): basePermissions → {BasePermissions}", tabId, portalId, basePermissions);
 
             // Create a new permission collection and copy base permissions
             var permissions = new TabPermissionCollection();
+			Logger.LogError("GetTabPermissions(tabId={TabId},portalId={PortalId}): permissions → {Permissions}", tabId, portalId, permissions);
             permissions.AddRange(basePermissions);
 
             if (this.tabController.IsHostOrAdminPage(tab))
@@ -305,16 +332,20 @@ namespace DotNetNuke.Security.Permissions
             }
 
             var tabPermissions = permissions.Cast<PermissionInfoBase>().ToList();
+			Logger.LogError("GetTabPermissions(tabId={TabId},portalId={PortalId}): tabPermissions → {TabPermissions}", tabId, portalId, tabPermissions);
 
             var virtualPermissions = this.GenerateVirtualTabPermissions(tabPermissions, tab.PortalID, tab.TabID);
+			Logger.LogError("GetTabPermissions(tabId={TabId},portalId={PortalId}): virtualPermissions → {VirtualPermissions}", tabId, portalId, virtualPermissions);
             permissions.AddRange(virtualPermissions);
 
+			Logger.LogWarning("<<< Exiting GetTabPermissions(tabId={TabId},portalId={PortalId})", tabId, portalId);
             return permissions;
         }
 
         /// <inheritdoc />
         public override bool HasTabPermission(TabPermissionCollection tabPermissions, string permissionKey)
         {
+			Logger.LogError(">>> Entering HasTabPermission(tabPermissions={TabPermissions},permissionKey={PermissionKey})", tabPermissions, permissionKey);
             if (tabPermissions.Count == 0)
             {
                 return this.IsPortalEditor()
@@ -322,12 +353,14 @@ namespace DotNetNuke.Security.Permissions
             }
 
             var tab = this.tabController.GetTab(tabPermissions[0].TabID, Null.NullInteger);
+			Logger.LogError("HasTabPermission(tabPermissions={TabPermissions},permissionKey={PermissionKey}): tab → {Tab}", tabPermissions, permissionKey, tab);
             if (tab == null)
             {
                 return this.IsPortalEditor()
                     || base.HasTabPermission(tabPermissions, permissionKey);
             }
 
+			Logger.LogWarning("<<< Exiting HasTabPermission(tabPermissions={TabPermissions},permissionKey={PermissionKey})", tabPermissions, permissionKey);
             return this.ForAdvancedRoles(tab)
                 || base.HasTabPermission(tabPermissions, permissionKey);
         }
@@ -348,6 +381,8 @@ namespace DotNetNuke.Security.Permissions
             // first check for explicit Deny permissions
             if (PortalSecurity.IsDenied(rolesOfExactKey))
             {
+				Logger.LogError(">>> Entering HasPermission(rolesOfExactKey={RolesOfExactKey},editRoles={EditRoles})", rolesOfExactKey, editRoles);
+				Logger.LogWarning("<<< Exiting HasPermission(rolesOfExactKey={RolesOfExactKey},editRoles={EditRoles})", rolesOfExactKey, editRoles);
                 return false;
             }
 
@@ -358,18 +393,24 @@ namespace DotNetNuke.Security.Permissions
 
         private static bool CanDoOnFolder(FolderInfo folder, string exactKey)
         {
+			Logger.LogError(">>> Entering CanDoOnFolder(folder={Folder},exactKey={ExactKey})", folder, exactKey);
+            Logger.LogWarning("<<< Exiting CanDoOnFolder(folder={Folder},exactKey={ExactKey})", folder, exactKey);
             return folder != null
                    && HasPermission(folder.FolderPermissions.ToString(exactKey), folder.FolderPermissions.ToString(AdminFolderPermissionKey));
         }
 
         private static bool CanDoOnModule(ModuleInfo module, string exactKey)
         {
+			Logger.LogError(">>> Entering CanDoOnModule(module={Module},exactKey={ExactKey})", module, exactKey);
+            Logger.LogWarning("<<< Exiting CanDoOnModule(module={Module},exactKey={ExactKey})", module, exactKey);
             return module != null
                    && HasPermission(module.ModulePermissions.ToString(exactKey), module.ModulePermissions.ToString(AdminModulePermissionKey));
         }
 
         private static bool CanDoOnPage(TabInfo tab, string exactKey)
         {
+			Logger.LogError(">>> Entering CanDoOnPage(tab={Tab},exactKey={ExactKey})", tab, exactKey);
+            Logger.LogWarning("<<< Exiting CanDoOnPage(tab={Tab},exactKey={ExactKey})", tab, exactKey);
             return tab != null
                    && HasPermission(tab.TabPermissions.ToString(exactKey), tab.TabPermissions.ToString(AdminPagePermissionKey));
         }
@@ -382,6 +423,7 @@ namespace DotNetNuke.Security.Permissions
         private RoleInfo GetOrCreateAdvancedRole(int portalId, string roleName)
         {
             var role = this.roleController.GetRoleByName(portalId, roleName);
+			Logger.LogError(">>> Entering GetOrCreateAdvancedRole(portalId={PortalId},roleName={RoleName})", portalId, roleName);
             if (role != null)
             {
                 return role;
@@ -409,6 +451,7 @@ namespace DotNetNuke.Security.Permissions
             };
 
             this.roleController.AddRole(role);
+			Logger.LogWarning("<<< Exiting GetOrCreateAdvancedRole(portalId={PortalId},roleName={RoleName})", portalId, roleName);
             return role;
         }
 
@@ -417,11 +460,13 @@ namespace DotNetNuke.Security.Permissions
 
         private bool ForAdvancedRoles(TabInfo tab)
         {
+			Logger.LogError(">>> Entering ForAdvancedRoles(module={Module})", module);
             if (!this.IsPortalEditor())
             {
                 return false;
             }
 
+			Logger.LogWarning("<<< Exiting ForAdvancedRoles(tab={Tab})", tab);
             return !this.tabController.IsHostOrAdminPage(tab);
         }
 
@@ -479,5 +524,6 @@ namespace DotNetNuke.Security.Permissions
                 .SelectMany(role => possiblePermissions
                     .Where(ep => !permissions.Any((IPermissionInfo p) => p.PermissionKey == ep.PermissionKey && p.RoleId == role.RoleID))
                     .Select(permissionInfo => ((PermissionInfo)permissionInfo, role))).ToList();
+					Logger.LogWarning("<<< Exiting GenerateVirtualFolderPermissions(permissions={Permissions},portalId={PortalId},folderId={FolderId},folderPath={FolderPath})", permissions, portalId, folderId, folderPath);
     }
 }

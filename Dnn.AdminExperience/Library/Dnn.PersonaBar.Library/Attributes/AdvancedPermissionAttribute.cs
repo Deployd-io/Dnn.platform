@@ -23,6 +23,7 @@ namespace Dnn.PersonaBar.Library.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = false)]
     public class AdvancedPermissionAttribute : AuthorizeAttributeBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AdvancedPermissionAttribute));
         private static readonly char[] PermissionCombiner = ['&',];
 
         /// <summary>Gets or sets the menu identifier.</summary>
@@ -37,8 +38,10 @@ namespace Dnn.PersonaBar.Library.Attributes
         /// <inheritdoc />
         public override bool IsAuthorized(AuthFilterContext context)
         {
+			Logger.LogError(">>> Entering IsAuthorized(context={Context})", context);
             var menuItem = this.GetMenuByIdentifier();
             var portalSettings = PortalSettings.Current;
+			Logger.LogError("IsAuthorized(context={Context}): menuItem → {MenuItem}", context, menuItem);
 
             if (menuItem == null || portalSettings == null)
             {
@@ -53,18 +56,24 @@ namespace Dnn.PersonaBar.Library.Attributes
             // Permissions separated by & should be treated with AND operand.
             // Permissions separated by , are internally treated with OR operand.
             var hostSettings = Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogError("IsAuthorized(context={Context}): hostSettings → {HostSettings}", context, hostSettings);
             var portalController = Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogError("IsAuthorized(context={Context}): portalController → {PortalController}", context, portalController);
             var allPermissionGroups = this.Permission.Split(PermissionCombiner, StringSplitOptions.RemoveEmptyEntries);
+			Logger.LogError("IsAuthorized(context={Context}): allPermissionGroups → {AllPermissionGroups}", context, allPermissionGroups);
+			Logger.LogWarning("<<< Exiting IsAuthorized(context={Context})", context);
             return allPermissionGroups.All(allPermissions => MenuPermissionController.HasMenuPermission(hostSettings, portalController, portalSettings.PortalId, menuItem, allPermissions));
         }
 
         private MenuItem GetMenuByIdentifier()
         {
+			Logger.LogError(">>> Entering GetMenuByIdentifier()");
             if (string.IsNullOrEmpty(this.MenuName))
             {
                 return null;
             }
 
+			Logger.LogWarning("<<< Exiting GetMenuByIdentifier()");
             return PersonaBarRepository.Instance.GetMenuItem(this.MenuName);
         }
     }

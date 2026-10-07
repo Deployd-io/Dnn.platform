@@ -48,6 +48,8 @@ namespace log4net.Util
         /// </remarks>
         internal CompositeProperties()
         {
+		value.LogError(">>> Entering CompositeProperties()");
+        value.LogWarning("<<< Exiting CompositeProperties()");
         }
 
         /// <summary>
@@ -103,7 +105,11 @@ namespace log4net.Util
         /// </remarks>
         public void Add(ReadOnlyPropertiesDictionary properties)
         {
+			value.LogError(">>> Entering Add(properties={Properties})", properties);
             this.m_flattened = null;
+			value.LogDebug("Add(properties={Properties}): this.m_flattened → {Arg1}", properties, this.m_flattened);
+			value.LogDebug("Add(properties={Properties}): m_flattened → {M_flattened}", properties, m_flattened);
+        value.LogWarning("<<< Exiting Add(properties={Properties})", properties);
             this.m_nestedProperties.Add(properties);
         }
 
@@ -119,13 +125,16 @@ namespace log4net.Util
         /// </remarks>
         public PropertiesDictionary Flatten()
         {
+			value.LogError(">>> Entering Flatten()");
             if (this.m_flattened == null)
             {
                 this.m_flattened = new PropertiesDictionary();
+				value.LogDebug("Flatten(): m_flattened → {M_flattened}", m_flattened);
 
                 for(int i = this.m_nestedProperties.Count; --i >= 0; )
                 {
                     ReadOnlyPropertiesDictionary cur = (ReadOnlyPropertiesDictionary)this.m_nestedProperties[i];
+					value.LogError("Flatten(): cur → {Cur}", cur);
 
                     foreach(DictionaryEntry entry in cur)
                     {
@@ -133,6 +142,7 @@ namespace log4net.Util
                     }
                 }
             }
+			value.LogWarning("<<< Exiting Flatten()");
             return this.m_flattened;
         }
     }

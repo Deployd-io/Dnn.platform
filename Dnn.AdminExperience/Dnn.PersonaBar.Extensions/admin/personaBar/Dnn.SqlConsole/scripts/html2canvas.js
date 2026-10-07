@@ -1,4 +1,5 @@
-﻿/*
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+/*
   html2canvas 0.4.1 <http://html2canvas.hertzen.com>
   Copyright (c) 2013 Niklas von Hertzen
 
@@ -17,8 +18,10 @@ html2canvas;
 _html2canvas.Util = {};
 
 _html2canvas.Util.log = function(a) {
+logger.error(`>>> Entering log(a=${a})`, { "event.action": "log", "logrite.a": a });
   if (_html2canvas.logging && window.console && window.console.log) {
     window.console.log(a);
+	logger.warn(`<<< Exiting log(a=${a})`, { "event.action": "log", "logrite.a": a });
   }
 };
 
@@ -29,6 +32,8 @@ _html2canvas.Util.trimText = (function(isNative){
 })(String.prototype.trim);
 
 _html2canvas.Util.asFloat = function(v) {
+logger.error(`>>> Entering asFloat(v=${v})`, { "event.action": "asFloat", "logrite.v": v });
+logger.warn(`<<< Exiting asFloat(v=${v})`, { "event.action": "asFloat", "logrite.v": v });
   return parseFloat(v);
 };
 
@@ -64,6 +69,7 @@ _html2canvas.Util.parseBackgroundImage = function (value) {
         c, mode = 0, numParen = 0, quote, args;
 
     var appendResult = function(){
+		logger.error('>>> Entering appendResult()', { "event.action": "appendResult" });
         if(method) {
             if(definition.substr( 0, 1 ) === '"') {
                 definition = definition.substr( 1, definition.length - 2 );
@@ -88,6 +94,7 @@ _html2canvas.Util.parseBackgroundImage = function (value) {
             prefix =
             definition =
             block = '';
+			logger.error(`appendResult(): method → ${method}`, { "event.action": "appendResult" });
     };
 
     appendResult();
@@ -158,10 +165,12 @@ _html2canvas.Util.parseBackgroundImage = function (value) {
 };
 
 _html2canvas.Util.Bounds = function (element) {
+logger.error(`>>> Entering Bounds(element=${element})`, { "event.action": "Bounds", "logrite.element": element });
   var clientRect, bounds = {};
 
   if (element.getBoundingClientRect){
     clientRect = element.getBoundingClientRect();
+	logger.error(`Bounds(element=${element}): clientRect → ${clientRect}`, { "event.action": "Bounds", "logrite.element": element });
 
     // TODO add scroll position to bounds, so no scrolling of window necessary
     bounds.top = clientRect.top;
@@ -172,14 +181,17 @@ _html2canvas.Util.Bounds = function (element) {
     bounds.height = element.offsetHeight;
   }
 
+logger.warn(`<<< Exiting Bounds(element=${element})`, { "event.action": "Bounds", "logrite.element": element });
   return bounds;
 };
 
 // TODO ideally, we'd want everything to go through this function instead of Util.Bounds,
 // but would require further work to calculate the correct positions for elements with offsetParents
 _html2canvas.Util.OffsetBounds = function (element) {
+logger.error(`>>> Entering OffsetBounds(element=${element})`, { "event.action": "OffsetBounds", "logrite.element": element });
   var parent = element.offsetParent ? _html2canvas.Util.OffsetBounds(element.offsetParent) : {top: 0, left: 0};
 
+logger.warn(`<<< Exiting OffsetBounds(element=${element})`, { "event.action": "OffsetBounds", "logrite.element": element });
   return {
     top: element.offsetTop + parent.top,
     bottom: element.offsetTop + element.offsetHeight + parent.top,
@@ -190,6 +202,7 @@ _html2canvas.Util.OffsetBounds = function (element) {
 };
 
 function toPX(element, attribute, value ) {
+	logger.error(`>>> Entering toPX(element=${element},attribute=${attribute},value=${value})`, { "event.action": "toPX", "logrite.element": element, "logrite.attribute": attribute, "logrite.value": value });
     var rsLeft = element.runtimeStyle && element.runtimeStyle[attribute],
         left,
         style = element.style;
@@ -213,6 +226,7 @@ function toPX(element, attribute, value ) {
         style.left = attribute === "fontSize" ? "1em" : (value || 0);
         value = style.pixelLeft + "px";
 
+		logger.error(`toPX(element=${element},attribute=${attribute},value=${value}): value → ${value}`, { "event.action": "toPX", "logrite.element": element, "logrite.attribute": attribute, "logrite.value": value });
         // Revert the changed values
         style.left = left;
         if (rsLeft) {
@@ -224,18 +238,23 @@ function toPX(element, attribute, value ) {
         return Math.round(parseFloat(value)) + "px";
     }
 
+	logger.warn(`<<< Exiting toPX(element=${element},attribute=${attribute},value=${value})`, { "event.action": "toPX", "logrite.element": element, "logrite.attribute": attribute, "logrite.value": value });
     return value;
 }
 
 function asInt(val) {
+	logger.error(`>>> Entering asInt(val=${val})`, { "event.action": "asInt", "logrite.val": val });
+	logger.warn(`<<< Exiting asInt(val=${val})`, { "event.action": "asInt", "logrite.val": val });
     return parseInt(val, 10);
 }
 
 function parseBackgroundSizePosition(value, element, attribute, index) {
+	logger.error(`>>> Entering parseBackgroundSizePosition(value=${value},element=${element},attribute=${attribute},index=${index})`, { "event.action": "parseBackgroundSizePosition", "logrite.value": value, "logrite.element": element, "logrite.attribute": attribute, "logrite.index": index });
     value = (value || '').split(',');
     value = value[index || 0] || value[0] || 'auto';
     value = _html2canvas.Util.trimText(value).split(' ');
 
+	logger.error(`parseBackgroundSizePosition(value=${value},element=${element},attribute=${attribute},index=${index}): value → ${value}`, { "event.action": "parseBackgroundSizePosition", "logrite.value": value, "logrite.element": element, "logrite.attribute": attribute, "logrite.index": index });
     if(attribute === 'backgroundSize' && (!value[0] || value[0].match(/cover|contain|auto/))) {
         //these values will be handled in the parent function
     } else {
@@ -251,10 +270,12 @@ function parseBackgroundSizePosition(value, element, attribute, index) {
         }
         value[1] = (value[1].indexOf("%") === -1) ? toPX(element, attribute + "Y", value[1]) : value[1];
     }
+	logger.warn(`<<< Exiting parseBackgroundSizePosition(value=${value},element=${element},attribute=${attribute},index=${index})`, { "event.action": "parseBackgroundSizePosition", "logrite.value": value, "logrite.element": element, "logrite.attribute": attribute, "logrite.index": index });
     return value;
 }
 
 _html2canvas.Util.getCSS = function (element, attribute, index) {
+	logger.error(`>>> Entering getCSS(element=${element},attribute=${attribute},index=${index})`, { "event.action": "getCSS", "logrite.element": element, "logrite.attribute": attribute, "logrite.index": index });
     if (previousElement !== element) {
       computedCSS = document.defaultView.getComputedStyle(element, null);
     }
@@ -265,9 +286,11 @@ _html2canvas.Util.getCSS = function (element, attribute, index) {
         return parseBackgroundSizePosition(value, element, attribute, index);
     } else if (/border(Top|Bottom)(Left|Right)Radius/.test(attribute)) {
       var arr = value.split(" ");
+	logger.error(`getCSS(element=${element},attribute=${attribute},index=${index}): arr → ${arr}`, { "event.action": "getCSS", "logrite.element": element, "logrite.attribute": attribute, "logrite.index": index });
       if (arr.length <= 1) {
           arr[1] = arr[0];
       }
+	logger.warn(`<<< Exiting getCSS(element=${element},attribute=${attribute},index=${index})`, { "event.action": "getCSS", "logrite.element": element, "logrite.attribute": attribute, "logrite.index": index });
       return arr.map(asInt);
     }
 
@@ -275,6 +298,7 @@ _html2canvas.Util.getCSS = function (element, attribute, index) {
 };
 
 _html2canvas.Util.resizeBounds = function( current_width, current_height, target_width, target_height, stretch_mode ){
+logger.error(`>>> Entering resizeBounds(current_width=${current_width},current_height=${current_height},target_width=${target_width},target_height=${target_height},stretch_mode=${stretch_mode})`, { "event.action": "resizeBounds", "logrite.current_width": current_width, "logrite.current_height": current_height, "logrite.target_width": target_width, "logrite.target_height": target_height, "logrite.stretch_mode": stretch_mode });
   var target_ratio = target_width / target_height,
     current_ratio = current_width / current_height,
     output_width, output_height;
@@ -290,6 +314,7 @@ _html2canvas.Util.resizeBounds = function( current_width, current_height, target
     output_height = target_width / current_ratio;
   }
 
+logger.warn(`<<< Exiting resizeBounds(current_width=${current_width},current_height=${current_height},target_width=${target_width},target_height=${target_height},stretch_mode=${stretch_mode})`, { "event.action": "resizeBounds", "logrite.current_width": current_width, "logrite.current_height": current_height, "logrite.target_width": target_width, "logrite.target_height": target_height, "logrite.stretch_mode": stretch_mode });
   return {
     width: output_width,
     height: output_height
@@ -297,6 +322,7 @@ _html2canvas.Util.resizeBounds = function( current_width, current_height, target
 };
 
 function backgroundBoundsFactory( prop, el, bounds, image, imageIndex, backgroundSize ) {
+	logger.error(`>>> Entering backgroundBoundsFactory(prop=${prop},el=${el},bounds=${bounds},image=${image},imageIndex=${imageIndex},backgroundSize=${backgroundSize})`, { "event.action": "backgroundBoundsFactory", "logrite.prop": prop, "logrite.el": el, "logrite.bounds": bounds, "logrite.image": image, "logrite.imageIndex": imageIndex, "logrite.backgroundSize": backgroundSize });
     var bgposition =  _html2canvas.Util.getCSS( el, prop, imageIndex ) ,
     topPos,
     left,
@@ -325,6 +351,7 @@ function backgroundBoundsFactory( prop, el, bounds, image, imageIndex, backgroun
         } else {
           if (/contain|cover/.test(bgposition[0])) {
             var resized = _html2canvas.Util.resizeBounds(image.width, image.height, bounds.width, bounds.height, bgposition[0]);
+			logger.error(`backgroundBoundsFactory(prop=${prop},el=${el},bounds=${bounds},image=${image},imageIndex=${imageIndex},backgroundSize=${backgroundSize}): resized → ${resized}`, { "event.action": "backgroundBoundsFactory", "logrite.prop": prop, "logrite.el": el, "logrite.bounds": bounds, "logrite.image": image, "logrite.imageIndex": imageIndex, "logrite.backgroundSize": backgroundSize });
             left = resized.width;
             topPos = resized.height;
           } else {
@@ -350,25 +377,32 @@ function backgroundBoundsFactory( prop, el, bounds, image, imageIndex, backgroun
       topPos = parseInt(bgposition[1],10);
     }
 
+	logger.warn(`<<< Exiting backgroundBoundsFactory(prop=${prop},el=${el},bounds=${bounds},image=${image},imageIndex=${imageIndex},backgroundSize=${backgroundSize})`, { "event.action": "backgroundBoundsFactory", "logrite.prop": prop, "logrite.el": el, "logrite.bounds": bounds, "logrite.image": image, "logrite.imageIndex": imageIndex, "logrite.backgroundSize": backgroundSize });
     return [left, topPos];
 }
 
 _html2canvas.Util.BackgroundPosition = function( el, bounds, image, imageIndex, backgroundSize ) {
+	logger.error(`>>> Entering BackgroundPosition(el=${el},bounds=${bounds},image=${image},imageIndex=${imageIndex},backgroundSize=${backgroundSize})`, { "event.action": "BackgroundPosition", "logrite.el": el, "logrite.bounds": bounds, "logrite.image": image, "logrite.imageIndex": imageIndex, "logrite.backgroundSize": backgroundSize });
     var result = backgroundBoundsFactory( 'backgroundPosition', el, bounds, image, imageIndex, backgroundSize );
+	logger.error(`BackgroundPosition(el=${el},bounds=${bounds},image=${image},imageIndex=${imageIndex},backgroundSize=${backgroundSize}): result → ${result}`, { "event.action": "BackgroundPosition", "logrite.el": el, "logrite.bounds": bounds, "logrite.image": image, "logrite.imageIndex": imageIndex, "logrite.backgroundSize": backgroundSize });
     return { left: result[0], top: result[1] };
 };
 
 _html2canvas.Util.BackgroundSize = function( el, bounds, image, imageIndex ) {
+	logger.error(`>>> Entering BackgroundSize(el=${el},bounds=${bounds},image=${image},imageIndex=${imageIndex})`, { "event.action": "BackgroundSize", "logrite.el": el, "logrite.bounds": bounds, "logrite.image": image, "logrite.imageIndex": imageIndex });
     var result = backgroundBoundsFactory( 'backgroundSize', el, bounds, image, imageIndex );
+	logger.error(`BackgroundSize(el=${el},bounds=${bounds},image=${image},imageIndex=${imageIndex}): result → ${result}`, { "event.action": "BackgroundSize", "logrite.el": el, "logrite.bounds": bounds, "logrite.image": image, "logrite.imageIndex": imageIndex });
     return { width: result[0], height: result[1] };
 };
 
 _html2canvas.Util.Extend = function (options, defaults) {
+logger.error(`>>> Entering Extend(options=${options},defaults=${defaults})`, { "event.action": "Extend", "logrite.options": options, "logrite.defaults": defaults });
   for (var key in options) {
     if (options.hasOwnProperty(key)) {
       defaults[key] = options[key];
     }
   }
+logger.warn(`<<< Exiting Extend(options=${options},defaults=${defaults})`, { "event.action": "Extend", "logrite.options": options, "logrite.defaults": defaults });
   return defaults;
 };
 
@@ -380,6 +414,7 @@ _html2canvas.Util.Extend = function (options, defaults) {
  * http://jquery.org/license
  */
 _html2canvas.Util.Children = function( elem ) {
+logger.error(`>>> Entering Children(elem=${elem})`, { "event.action": "Children", "logrite.elem": elem });
   var children;
   try {
     children = (elem.nodeName && elem.nodeName.toUpperCase() === "IFRAME") ? elem.contentDocument || elem.contentWindow.document : (function(array) {
@@ -415,6 +450,8 @@ _html2canvas.Util.Children = function( elem ) {
 };
 
 _html2canvas.Util.isTransparent = function(backgroundColor) {
+logger.error(`>>> Entering isTransparent(backgroundColor=${backgroundColor})`, { "event.action": "isTransparent", "logrite.backgroundColor": backgroundColor });
+logger.warn(`<<< Exiting isTransparent(backgroundColor=${backgroundColor})`, { "event.action": "isTransparent", "logrite.backgroundColor": backgroundColor });
   return (backgroundColor === "transparent" || backgroundColor === "rgba(0, 0, 0, 0)");
 };
 _html2canvas.Util.Font = (function () {
@@ -505,8 +542,14 @@ _html2canvas.Util.Font = (function () {
  * TODO: Maybe some RegExp optimizations are possible ;o)
  */
   Generate.parseGradient = function(css, bounds) {
+	logger.error(`>>> Entering parseGradient(css=${css},bounds=${bounds})`, { "event.action": "parseGradient", "logrite.css": css, "logrite.bounds": bounds });
     var gradient, i, len = reGradients.length, m1, stop, m2, m2Len, step, m3, tl,tr,br,bl;
 
+	logger.debug(`parseGradient(css=${css},bounds=${bounds}): gradient.y0 → ${gradient.y0}`, { "event.action": "parseGradient", "logrite.css": css, "logrite.bounds": bounds });
+	logger.debug(`parseGradient(css=${css},bounds=${bounds}): gradient.y1 → ${gradient.y1}`, { "event.action": "parseGradient", "logrite.css": css, "logrite.bounds": bounds });
+	logger.debug(`parseGradient(css=${css},bounds=${bounds}): gradient.x0 → ${gradient.x0}`, { "event.action": "parseGradient", "logrite.css": css, "logrite.bounds": bounds });
+	logger.debug(`parseGradient(css=${css},bounds=${bounds}): gradient.x1 → ${gradient.x1}`, { "event.action": "parseGradient", "logrite.css": css, "logrite.bounds": bounds });
+	logger.debug(`parseGradient(css=${css},bounds=${bounds}): gradient.type → ${gradient.type}`, { "event.action": "parseGradient", "logrite.css": css, "logrite.bounds": bounds });
     for(i = 0; i < len; i+=1){
       m1 = css.match(reGradients[i]);
       if(m1) {
@@ -803,10 +846,12 @@ _html2canvas.Util.Font = (function () {
       }
     }
 
+	logger.warn(`<<< Exiting parseGradient(css=${css},bounds=${bounds})`, { "event.action": "parseGradient", "logrite.css": css, "logrite.bounds": bounds });
     return gradient;
   };
 
   function addScrollStops(grad) {
+	logger.error(`>>> Entering addScrollStops(grad=${grad})`, { "event.action": "addScrollStops", "logrite.grad": grad });
     return function(colorStop) {
       try {
         grad.addColorStop(colorStop.stop, colorStop.color);
@@ -873,6 +918,7 @@ _html2canvas.Util.Font = (function () {
   };
 
   Generate.ListAlpha = function(number) {
+	logger.error(`>>> Entering ListAlpha(number=${number})`, { "event.action": "ListAlpha", "logrite.number": number });
     var tmp = "",
     modulus;
 
@@ -882,15 +928,18 @@ _html2canvas.Util.Font = (function () {
       number = number / 26;
     }while((number*26) > 26);
 
+	logger.warn(`<<< Exiting ListAlpha(number=${number})`, { "event.action": "ListAlpha", "logrite.number": number });
     return tmp;
   };
 
   Generate.ListRoman = function(number) {
+	logger.error(`>>> Entering ListRoman(number=${number})`, { "event.action": "ListRoman", "logrite.number": number });
     var romanArray = ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"],
     decimal = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1],
     roman = "",
     v,
     len = romanArray.length;
+	logger.error(`ListRoman(number=${number}): romanArray → ${romanArray}`, { "event.action": "ListRoman", "logrite.number": number });
 
     if (number <= 0 || number >= 4000) {
       return number;
@@ -903,65 +952,82 @@ _html2canvas.Util.Font = (function () {
       }
     }
 
+	logger.warn(`<<< Exiting ListRoman(number=${number})`, { "event.action": "ListRoman", "logrite.number": number });
     return roman;
   };
 })();
 function h2cRenderContext(width, height) {
+logger.error(`>>> Entering h2cRenderContext(width=${width},height=${height})`, { "event.action": "h2cRenderContext", "logrite.width": width, "logrite.height": height });
   var storage = [];
   return {
     storage: storage,
     width: width,
     height: height,
     clip: function() {
+	logger.error('>>> Entering clip()', { "event.action": "clip" });
       storage.push({
         type: "function",
         name: "clip",
         'arguments': arguments
       });
+	logger.warn('<<< Exiting clip()', { "event.action": "clip" });
     },
     translate: function() {
+	logger.error('>>> Entering translate()', { "event.action": "translate" });
       storage.push({
         type: "function",
         name: "translate",
         'arguments': arguments
       });
+	logger.warn('<<< Exiting translate()', { "event.action": "translate" });
     },
     fill: function() {
+	logger.error('>>> Entering fill()', { "event.action": "fill" });
       storage.push({
         type: "function",
         name: "fill",
         'arguments': arguments
       });
+	logger.warn('<<< Exiting fill()', { "event.action": "fill" });
     },
     save: function() {
+	logger.error('>>> Entering save()', { "event.action": "save" });
       storage.push({
         type: "function",
         name: "save",
         'arguments': arguments
       });
+	logger.warn('<<< Exiting save()', { "event.action": "save" });
     },
     restore: function() {
+	logger.error('>>> Entering restore()', { "event.action": "restore" });
       storage.push({
         type: "function",
         name: "restore",
         'arguments': arguments
       });
+	logger.warn('<<< Exiting restore()', { "event.action": "restore" });
     },
     fillRect: function () {
+	logger.error('>>> Entering fillRect()', { "event.action": "fillRect" });
       storage.push({
         type: "function",
         name: "fillRect",
         'arguments': arguments
       });
+	logger.warn('<<< Exiting fillRect()', { "event.action": "fillRect" });
     },
     createPattern: function() {
+	logger.error('>>> Entering createPattern()', { "event.action": "createPattern" });
       storage.push({
         type: "function",
         name: "createPattern",
         'arguments': arguments
       });
+	logger.warn('<<< Exiting createPattern()', { "event.action": "createPattern" });
     },
     drawShape: function() {
+	logger.error('>>> Entering drawShape()', { "event.action": "drawShape" });
 
       var shape = [];
 
@@ -973,63 +1039,81 @@ function h2cRenderContext(width, height) {
 
       return {
         moveTo: function() {
+		logger.error('>>> Entering moveTo()', { "event.action": "moveTo" });
           shape.push({
             name: "moveTo",
             'arguments': arguments
           });
+		logger.warn('<<< Exiting moveTo()', { "event.action": "moveTo" });
         },
         lineTo: function() {
+		logger.error('>>> Entering lineTo()', { "event.action": "lineTo" });
           shape.push({
             name: "lineTo",
             'arguments': arguments
           });
+		logger.warn('<<< Exiting lineTo()', { "event.action": "lineTo" });
         },
         arcTo: function() {
+		logger.error('>>> Entering arcTo()', { "event.action": "arcTo" });
           shape.push({
             name: "arcTo",
             'arguments': arguments
           });
+		logger.warn('<<< Exiting arcTo()', { "event.action": "arcTo" });
         },
         bezierCurveTo: function() {
+		logger.error('>>> Entering bezierCurveTo()', { "event.action": "bezierCurveTo" });
           shape.push({
             name: "bezierCurveTo",
             'arguments': arguments
           });
+		logger.warn('<<< Exiting bezierCurveTo()', { "event.action": "bezierCurveTo" });
         },
         quadraticCurveTo: function() {
+		logger.error('>>> Entering quadraticCurveTo()', { "event.action": "quadraticCurveTo" });
           shape.push({
             name: "quadraticCurveTo",
             'arguments': arguments
           });
+		logger.warn('<<< Exiting quadraticCurveTo()', { "event.action": "quadraticCurveTo" });
         }
       };
 
+	logger.warn('<<< Exiting drawShape()', { "event.action": "drawShape" });
     },
     drawImage: function () {
+	logger.error('>>> Entering drawImage()', { "event.action": "drawImage", "logrite.ctx": ctx });
       storage.push({
         type: "function",
         name: "drawImage",
         'arguments': arguments
       });
+	logger.warn('<<< Exiting drawImage()', { "event.action": "drawImage", "logrite.ctx": ctx });
     },
     fillText: function () {
+	logger.error('>>> Entering fillText()', { "event.action": "fillText" });
       storage.push({
         type: "function",
         name: "fillText",
         'arguments': arguments
       });
+	logger.warn('<<< Exiting fillText()', { "event.action": "fillText" });
     },
     setVariable: function (variable, value) {
+	logger.error(`>>> Entering setVariable(variable=${variable},value=${value})`, { "event.action": "setVariable", "logrite.variable": variable, "logrite.value": value });
       storage.push({
         type: "variable",
         name: variable,
         'arguments': value
       });
+	logger.warn(`<<< Exiting setVariable(variable=${variable},value=${value})`, { "event.action": "setVariable", "logrite.variable": variable, "logrite.value": value });
       return value;
     }
   };
 }
 _html2canvas.Parse = function (images, options) {
+logger.error(`>>> Entering Parse(images=${images},options=${options})`, { "event.action": "Parse", "logrite.images": images, "logrite.options": options });
   window.scroll(0,0);
 
   var element = (( options.elements === undefined ) ? document.body : options.elements[0]), // select body by default
@@ -1051,6 +1135,8 @@ _html2canvas.Parse = function (images, options) {
   images = images || {};
 
   function documentWidth () {
+	logger.error('>>> Entering documentWidth()', { "event.action": "documentWidth" });
+	logger.warn('<<< Exiting documentWidth()', { "event.action": "documentWidth" });
     return Math.max(
       Math.max(doc.body.scrollWidth, doc.documentElement.scrollWidth),
       Math.max(doc.body.offsetWidth, doc.documentElement.offsetWidth),
@@ -1059,6 +1145,8 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function documentHeight () {
+	logger.error('>>> Entering documentHeight()', { "event.action": "documentHeight" });
+	logger.warn('<<< Exiting documentHeight()', { "event.action": "documentHeight" });
     return Math.max(
       Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight),
       Math.max(doc.body.offsetHeight, doc.documentElement.offsetHeight),
@@ -1067,25 +1155,32 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function getCSSInt(element, attribute) {
+	logger.error(`>>> Entering getCSSInt(element=${element},attribute=${attribute})`, { "event.action": "getCSSInt", "logrite.element": element, "logrite.attribute": attribute });
     var val = parseInt(getCSS(element, attribute), 10);
+	logger.error(`getCSSInt(element=${element},attribute=${attribute}): val → ${val}`, { "event.action": "getCSSInt", "logrite.element": element, "logrite.attribute": attribute });
     return (isNaN(val)) ? 0 : val; // borders in old IE are throwing 'medium' for demo.html
   }
 
   function renderRect (ctx, x, y, w, h, bgcolor) {
+	logger.error(`>>> Entering renderRect(ctx=${ctx},x=${x},y=${y},w=${w},h=${h},bgcolor=${bgcolor})`, { "event.action": "renderRect", "logrite.ctx": ctx, "logrite.x": x, "logrite.y": y, "logrite.w": w, "logrite.h": h, "logrite.bgcolor": bgcolor });
     if (bgcolor !== "transparent"){
       ctx.setVariable("fillStyle", bgcolor);
       ctx.fillRect(x, y, w, h);
       numDraws+=1;
+	logger.warn(`<<< Exiting renderRect(ctx=${ctx},x=${x},y=${y},w=${w},h=${h},bgcolor=${bgcolor})`, { "event.action": "renderRect", "logrite.ctx": ctx, "logrite.x": x, "logrite.y": y, "logrite.w": w, "logrite.h": h, "logrite.bgcolor": bgcolor });
     }
   }
 
   function capitalize(m, p1, p2) {
+	logger.error(`>>> Entering capitalize(m=${m},p1=${p1},p2=${p2})`, { "event.action": "capitalize", "logrite.m": m, "logrite.p1": p1, "logrite.p2": p2 });
     if (m.length > 0) {
+	logger.warn(`<<< Exiting capitalize(m=${m},p1=${p1},p2=${p2})`, { "event.action": "capitalize", "logrite.m": m, "logrite.p1": p1, "logrite.p2": p2 });
       return p1 + p2.toUpperCase();
     }
   }
 
   function textTransform (text, transform) {
+	logger.error(`>>> Entering textTransform(text=${text},transform=${transform})`, { "event.action": "textTransform", "logrite.text": text, "logrite.transform": transform });
     switch(transform){
       case "lowercase":
         return text.toLowerCase();
@@ -1094,22 +1189,28 @@ _html2canvas.Parse = function (images, options) {
       case "uppercase":
         return text.toUpperCase();
       default:
+		logger.warn(`<<< Exiting textTransform(text=${text},transform=${transform})`, { "event.action": "textTransform", "logrite.text": text, "logrite.transform": transform });
         return text;
     }
   }
 
   function noLetterSpacing(letter_spacing) {
+	logger.error(`>>> Entering noLetterSpacing(letter_spacing=${letter_spacing})`, { "event.action": "noLetterSpacing", "logrite.letter_spacing": letter_spacing });
+	logger.warn(`<<< Exiting noLetterSpacing(letter_spacing=${letter_spacing})`, { "event.action": "noLetterSpacing", "logrite.letter_spacing": letter_spacing });
     return (/^(normal|none|0px)$/.test(letter_spacing));
   }
 
   function drawText(currentText, x, y, ctx){
+	logger.error(`>>> Entering drawText(currentText=${currentText},x=${x},y=${y},ctx=${ctx})`, { "event.action": "drawText", "logrite.currentText": currentText, "logrite.x": x, "logrite.y": y, "logrite.ctx": ctx });
     if (currentText !== null && Util.trimText(currentText).length > 0) {
       ctx.fillText(currentText, x, y);
       numDraws+=1;
+	logger.warn(`<<< Exiting drawText(currentText=${currentText},x=${x},y=${y},ctx=${ctx})`, { "event.action": "drawText", "logrite.currentText": currentText, "logrite.x": x, "logrite.y": y, "logrite.ctx": ctx });
     }
   }
 
   function setTextVariables(ctx, el, text_decoration, color) {
+	logger.error(`>>> Entering setTextVariables(ctx=${ctx},el=${el},text_decoration=${text_decoration},color=${color})`, { "event.action": "setTextVariables", "logrite.ctx": ctx, "logrite.el": el, "logrite.text_decoration": text_decoration, "logrite.color": color });
     var align = false,
     bold = getCSS(el, "fontWeight"),
     family = getCSS(el, "fontFamily"),
@@ -1139,11 +1240,13 @@ _html2canvas.Parse = function (images, options) {
     }
 
     if (text_decoration !== "none"){
+	logger.warn(`<<< Exiting setTextVariables(ctx=${ctx},el=${el},text_decoration=${text_decoration},color=${color})`, { "event.action": "setTextVariables", "logrite.ctx": ctx, "logrite.el": el, "logrite.text_decoration": text_decoration, "logrite.color": color });
       return Util.Font(family, size, doc);
     }
   }
 
   function renderTextDecoration(ctx, text_decoration, bounds, metrics, color) {
+	logger.error(`>>> Entering renderTextDecoration(ctx=${ctx},text_decoration=${text_decoration},bounds=${bounds},metrics=${metrics},color=${color})`, { "event.action": "renderTextDecoration", "logrite.ctx": ctx, "logrite.text_decoration": text_decoration, "logrite.bounds": bounds, "logrite.metrics": metrics, "logrite.color": color });
     switch(text_decoration) {
       case "underline":
         // Draws a line at the baseline of the font
@@ -1158,9 +1261,11 @@ _html2canvas.Parse = function (images, options) {
         renderRect(ctx, bounds.left, Math.ceil(bounds.top + metrics.middle + metrics.lineWidth), bounds.width, 1, color);
         break;
     }
+	logger.warn(`<<< Exiting renderTextDecoration(ctx=${ctx},text_decoration=${text_decoration},bounds=${bounds},metrics=${metrics},color=${color})`, { "event.action": "renderTextDecoration", "logrite.ctx": ctx, "logrite.text_decoration": text_decoration, "logrite.bounds": bounds, "logrite.metrics": metrics, "logrite.color": color });
   }
 
   function getTextBounds(state, text, textDecoration, isLast, transform) {
+	logger.error(`>>> Entering getTextBounds(state=${state},text=${text},textDecoration=${textDecoration},isLast=${isLast},transform=${transform})`, { "event.action": "getTextBounds", "logrite.state": state, "logrite.text": text, "logrite.textDecoration": textDecoration, "logrite.isLast": isLast, "logrite.transform": transform });
     var bounds;
     if (support.rangeBounds && !transform) {
       if (textDecoration !== "none" || Util.trimText(text).length !== 0) {
@@ -1169,20 +1274,27 @@ _html2canvas.Parse = function (images, options) {
       state.textOffset += text.length;
     } else if (state.node && typeof state.node.nodeValue === "string" ){
       var newTextNode = (isLast) ? state.node.splitText(text.length) : null;
+	logger.error(`getTextBounds(state=${state},text=${text},textDecoration=${textDecoration},isLast=${isLast},transform=${transform}): newTextNode → ${newTextNode}`, { "event.action": "getTextBounds", "logrite.state": state, "logrite.text": text, "logrite.textDecoration": textDecoration, "logrite.isLast": isLast, "logrite.transform": transform });
       bounds = textWrapperBounds(state.node, transform);
       state.node = newTextNode;
+	logger.error(`getTextBounds(state=${state},text=${text},textDecoration=${textDecoration},isLast=${isLast},transform=${transform}): bounds → ${bounds}`, { "event.action": "getTextBounds", "logrite.state": state, "logrite.text": text, "logrite.textDecoration": textDecoration, "logrite.isLast": isLast, "logrite.transform": transform });
     }
+	logger.warn(`<<< Exiting getTextBounds(state=${state},text=${text},textDecoration=${textDecoration},isLast=${isLast},transform=${transform})`, { "event.action": "getTextBounds", "logrite.state": state, "logrite.text": text, "logrite.textDecoration": textDecoration, "logrite.isLast": isLast, "logrite.transform": transform });
     return bounds;
   }
 
   function textRangeBounds(text, textNode, textOffset) {
+	logger.error(`>>> Entering textRangeBounds(text=${text},textNode=${textNode},textOffset=${textOffset})`, { "event.action": "textRangeBounds", "logrite.text": text, "logrite.textNode": textNode, "logrite.textOffset": textOffset });
     var range = doc.createRange();
     range.setStart(textNode, textOffset);
+	logger.error(`textRangeBounds(text=${text},textNode=${textNode},textOffset=${textOffset}): range → ${range}`, { "event.action": "textRangeBounds", "logrite.text": text, "logrite.textNode": textNode, "logrite.textOffset": textOffset });
     range.setEnd(textNode, textOffset + text.length);
+	logger.warn(`<<< Exiting textRangeBounds(text=${text},textNode=${textNode},textOffset=${textOffset})`, { "event.action": "textRangeBounds", "logrite.text": text, "logrite.textNode": textNode, "logrite.textOffset": textOffset });
     return range.getBoundingClientRect();
   }
 
   function textWrapperBounds(oldTextNode, transform) {
+	logger.error(`>>> Entering textWrapperBounds(oldTextNode=${oldTextNode},transform=${transform})`, { "event.action": "textWrapperBounds", "logrite.oldTextNode": oldTextNode, "logrite.transform": transform });
     var parent = oldTextNode.parentNode,
     wrapElement = doc.createElement('wrapper'),
     backupText = oldTextNode.cloneNode(true);
@@ -1191,11 +1303,14 @@ _html2canvas.Parse = function (images, options) {
     parent.replaceChild(wrapElement, oldTextNode);
 
     var bounds = transform ? Util.OffsetBounds(wrapElement) : Util.Bounds(wrapElement);
+	logger.error(`textWrapperBounds(oldTextNode=${oldTextNode},transform=${transform}): bounds → ${bounds}`, { "event.action": "textWrapperBounds", "logrite.oldTextNode": oldTextNode, "logrite.transform": transform });
     parent.replaceChild(backupText, wrapElement);
+	logger.warn(`<<< Exiting textWrapperBounds(oldTextNode=${oldTextNode},transform=${transform})`, { "event.action": "textWrapperBounds", "logrite.oldTextNode": oldTextNode, "logrite.transform": transform });
     return bounds;
   }
 
   function renderText(el, textNode, stack) {
+	logger.error(`>>> Entering renderText(el=${el},textNode=${textNode},stack=${stack})`, { "event.action": "renderText", "logrite.el": el, "logrite.textNode": textNode, "logrite.stack": stack });
     var ctx = stack.ctx,
     color = getCSS(el, "color"),
     textDecoration = getCSS(el, "textDecoration"),
@@ -1232,15 +1347,18 @@ _html2canvas.Parse = function (images, options) {
         if (bounds) {
           drawText(text, bounds.left, bounds.bottom, ctx);
           renderTextDecoration(ctx, textDecoration, bounds, metrics, color);
+		logger.warn(`<<< Exiting renderText(el=${el},textNode=${textNode},stack=${stack})`, { "event.action": "renderText", "logrite.el": el, "logrite.textNode": textNode, "logrite.stack": stack });
         }
       });
     }
   }
 
   function listPosition (element, val) {
+	logger.error(`>>> Entering listPosition(element=${element},val=${val})`, { "event.action": "listPosition", "logrite.element": element, "logrite.val": val });
     var boundElement = doc.createElement( "boundelement" ),
     originalType,
     bounds;
+	logger.error(`listPosition(element=${element},val=${val}): boundElement → ${boundElement}`, { "event.action": "listPosition", "logrite.element": element, "logrite.val": val });
 
     boundElement.style.display = "inline";
 
@@ -1254,10 +1372,12 @@ _html2canvas.Parse = function (images, options) {
     bounds = Util.Bounds(boundElement);
     element.removeChild(boundElement);
     element.style.listStyleType = originalType;
+	logger.warn(`<<< Exiting listPosition(element=${element},val=${val})`, { "event.action": "listPosition", "logrite.element": element, "logrite.val": val });
     return bounds;
   }
 
   function elementIndex(el) {
+	logger.error(`>>> Entering elementIndex(el=${el})`, { "event.action": "elementIndex", "logrite.el": el });
     var i = -1,
     count = 1,
     childs = el.parentNode.childNodes;
@@ -1270,15 +1390,18 @@ _html2canvas.Parse = function (images, options) {
       }
       return count;
     } else {
+	logger.warn(`<<< Exiting elementIndex(el=${el})`, { "event.action": "elementIndex", "logrite.el": el });
       return -1;
     }
   }
 
   function listItemText(element, type) {
+	logger.error(`>>> Entering listItemText(element=${element},type=${type})`, { "event.action": "listItemText", "logrite.element": element, "logrite.type": type });
     var currentIndex = elementIndex(element), text;
     switch(type){
       case "decimal":
         text = currentIndex;
+		logger.error(`listItemText(element=${element},type=${type}): currentIndex → ${currentIndex}`, { "event.action": "listItemText", "logrite.element": element, "logrite.type": type });
         break;
       case "decimal-leading-zero":
         text = (currentIndex.toString().length === 1) ? currentIndex = "0" + currentIndex.toString() : currentIndex.toString();
@@ -1297,10 +1420,12 @@ _html2canvas.Parse = function (images, options) {
         break;
     }
 
+	logger.warn(`<<< Exiting listItemText(element=${element},type=${type})`, { "event.action": "listItemText", "logrite.element": element, "logrite.type": type });
     return text + ". ";
   }
 
   function renderListItem(element, stack, elBounds) {
+	logger.error(`>>> Entering renderListItem(element=${element},stack=${stack},elBounds=${elBounds})`, { "event.action": "renderListItem", "logrite.element": element, "logrite.stack": stack, "logrite.elBounds": elBounds });
     var x,
     text,
     ctx = stack.ctx,
@@ -1321,19 +1446,28 @@ _html2canvas.Parse = function (images, options) {
 
       drawText(text, x, listBounds.bottom, ctx);
     }
+	logger.warn(`<<< Exiting renderListItem(element=${element},stack=${stack},elBounds=${elBounds})`, { "event.action": "renderListItem", "logrite.element": element, "logrite.stack": stack, "logrite.elBounds": elBounds });
   }
 
   function loadImage (src){
+	logger.error(`>>> Entering loadImage(src=${src})`, { "event.action": "loadImage", "logrite.src": src });
     var img = images[src];
+	logger.warn(`<<< Exiting loadImage(src=${src})`, { "event.action": "loadImage", "logrite.src": src });
+	logger.debug(`loadImage(src=${src}): img.src → ${img.src}`, { "event.action": "loadImage", "logrite.src": src });
+	logger.debug(`loadImage(src=${src}): img.crossOrigin → ${img.crossOrigin}`, { "event.action": "loadImage", "logrite.src": src });
+	logger.error(`loadImage(src=${src}): img → ${img}`, { "event.action": "loadImage", "logrite.src": src });
     return (img && img.succeeded === true) ? img.img : false;
   }
 
   function clipBounds(src, dst){
+	logger.error(`>>> Entering clipBounds(src=${src},dst=${dst})`, { "event.action": "clipBounds", "logrite.src": src, "logrite.dst": dst });
     var x = Math.max(src.left, dst.left),
     y = Math.max(src.top, dst.top),
     x2 = Math.min((src.left + src.width), (dst.left + dst.width)),
     y2 = Math.min((src.top + src.height), (dst.top + dst.height));
+	logger.error(`clipBounds(src=${src},dst=${dst}): x → ${x}`, { "event.action": "clipBounds", "logrite.src": src, "logrite.dst": dst });
 
+	logger.warn(`<<< Exiting clipBounds(src=${src},dst=${dst})`, { "event.action": "clipBounds", "logrite.src": src, "logrite.dst": dst });
     return {
       left:x,
       top:y,
@@ -1343,11 +1477,15 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function setZ(element, stack, parentStack){
+	logger.error(`>>> Entering setZ(element=${element},stack=${stack},parentStack=${parentStack})`, { "event.action": "setZ", "logrite.element": element, "logrite.stack": stack, "logrite.parentStack": parentStack });
     var newContext,
     isPositioned = stack.cssPosition !== 'static',
     zIndex = isPositioned ? getCSS(element, 'zIndex') : 'auto',
     opacity = getCSS(element, 'opacity'),
     isFloated = getCSS(element, 'cssFloat') !== 'none';
+	logger.debug(`setZ(element=${element},stack=${stack},parentStack=${parentStack}): newContext.opacity → ${newContext.opacity}`, { "event.action": "setZ", "logrite.element": element, "logrite.stack": stack, "logrite.parentStack": parentStack });
+	logger.debug(`setZ(element=${element},stack=${stack},parentStack=${parentStack}): newContext.isPositioned → ${newContext.isPositioned}`, { "event.action": "setZ", "logrite.element": element, "logrite.stack": stack, "logrite.parentStack": parentStack });
+	logger.debug(`setZ(element=${element},stack=${stack},parentStack=${parentStack}): newContext.isFloated → ${newContext.isFloated}`, { "event.action": "setZ", "logrite.element": element, "logrite.stack": stack, "logrite.parentStack": parentStack });
 
     // https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Understanding_z_index/The_stacking_context
     // When a new stacking context should be created:
@@ -1364,16 +1502,20 @@ _html2canvas.Parse = function (images, options) {
 
     if (parentStack) {
       parentStack.zIndex.children.push(stack);
+	logger.warn(`<<< Exiting setZ(element=${element},stack=${stack},parentStack=${parentStack})`, { "event.action": "setZ", "logrite.element": element, "logrite.stack": stack, "logrite.parentStack": parentStack });
     }
   }
 
   function renderImage(ctx, element, image, bounds, borders) {
+logger.error(`>>> Entering renderImage(ctx=${ctx},element=${element},image=${image},bounds=${bounds},borders=${borders})`, { "event.action": "renderImage", "logrite.ctx": ctx, "logrite.element": element, "logrite.image": image, "logrite.bounds": bounds, "logrite.borders": borders });
 
     var paddingLeft = getCSSInt(element, 'paddingLeft'),
     paddingTop = getCSSInt(element, 'paddingTop'),
     paddingRight = getCSSInt(element, 'paddingRight'),
     paddingBottom = getCSSInt(element, 'paddingBottom');
+	logger.error(`renderImage(ctx=${ctx},element=${element},image=${image},bounds=${bounds},borders=${borders}): paddingLeft → ${paddingLeft}`, { "event.action": "renderImage", "logrite.ctx": ctx, "logrite.element": element, "logrite.image": image, "logrite.bounds": bounds, "logrite.borders": borders });
 
+	logger.warn(`<<< Exiting renderImage(ctx=${ctx},element=${element},image=${image},bounds=${bounds},borders=${borders})`, { "event.action": "renderImage", "logrite.ctx": ctx, "logrite.element": element, "logrite.image": image, "logrite.bounds": bounds, "logrite.borders": borders });
     drawImage(
       ctx,
       image,
@@ -1389,16 +1531,20 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function getBorderData(element) {
+	logger.error(`>>> Entering getBorderData(element=${element})`, { "event.action": "getBorderData", "logrite.element": element });
     return ["Top", "Right", "Bottom", "Left"].map(function(side) {
       return {
         width: getCSSInt(element, 'border' + side + 'Width'),
         color: getCSS(element, 'border' + side + 'Color')
       };
     });
+	logger.warn(`<<< Exiting getBorderData(element=${element})`, { "event.action": "getBorderData", "logrite.element": element });
   }
 
   function getBorderRadiusData(element) {
+	logger.error(`>>> Entering getBorderRadiusData(element=${element})`, { "event.action": "getBorderRadiusData", "logrite.element": element });
     return ["TopLeft", "TopRight", "BottomRight", "BottomLeft"].map(function(side) {
+	logger.warn(`<<< Exiting getBorderRadiusData(element=${element})`, { "event.action": "getBorderRadiusData", "logrite.element": element });
       return getCSS(element, 'border' + side + 'Radius');
     });
   }
@@ -1468,38 +1614,50 @@ _html2canvas.Parse = function (images, options) {
   })(4 * ((Math.sqrt(2) - 1) / 3));
 
   function bezierCurve(start, startControl, endControl, end) {
+logger.error(`>>> Entering bezierCurve(start=${start},startControl=${startControl},endControl=${endControl},end=${end})`, { "event.action": "bezierCurve", "logrite.start": start, "logrite.startControl": startControl, "logrite.endControl": endControl, "logrite.end": end });
 
     var lerp = function (a, b, t) {
+	logger.error(`>>> Entering lerp(a=${a},b=${b},t=${t})`, { "event.action": "lerp", "logrite.a": a, "logrite.b": b, "logrite.t": t });
+	logger.warn(`<<< Exiting lerp(a=${a},b=${b},t=${t})`, { "event.action": "lerp", "logrite.a": a, "logrite.b": b, "logrite.t": t });
       return {
         x:a.x + (b.x - a.x) * t,
         y:a.y + (b.y - a.y) * t
       };
     };
 
+	logger.warn(`<<< Exiting bezierCurve(start=${start},startControl=${startControl},endControl=${endControl},end=${end})`, { "event.action": "bezierCurve", "logrite.start": start, "logrite.startControl": startControl, "logrite.endControl": endControl, "logrite.end": end });
     return {
       start: start,
       startControl: startControl,
       endControl: endControl,
       end: end,
       subdivide: function(t) {
+		logger.error(`>>> Entering subdivide(t=${t})`, { "event.action": "subdivide", "logrite.t": t });
         var ab = lerp(start, startControl, t),
         bc = lerp(startControl, endControl, t),
         cd = lerp(endControl, end, t),
         abbc = lerp(ab, bc, t),
         bccd = lerp(bc, cd, t),
         dest = lerp(abbc, bccd, t);
+		logger.error(`subdivide(t=${t}): ab → ${ab}`, { "event.action": "subdivide", "logrite.t": t });
+		logger.warn(`<<< Exiting subdivide(t=${t})`, { "event.action": "subdivide", "logrite.t": t });
         return [bezierCurve(start, ab, abbc, dest), bezierCurve(dest, bccd, cd, end)];
       },
       curveTo: function(borderArgs) {
+		logger.error(`>>> Entering curveTo(borderArgs=${borderArgs})`, { "event.action": "curveTo", "logrite.borderArgs": borderArgs });
         borderArgs.push(["bezierCurve", startControl.x, startControl.y, endControl.x, endControl.y, end.x, end.y]);
+		logger.warn(`<<< Exiting curveTo(borderArgs=${borderArgs})`, { "event.action": "curveTo", "logrite.borderArgs": borderArgs });
       },
       curveToReversed: function(borderArgs) {
+		logger.error(`>>> Entering curveToReversed(borderArgs=${borderArgs})`, { "event.action": "curveToReversed", "logrite.borderArgs": borderArgs });
         borderArgs.push(["bezierCurve", endControl.x, endControl.y, startControl.x, startControl.y, start.x, start.y]);
+		logger.warn(`<<< Exiting curveToReversed(borderArgs=${borderArgs})`, { "event.action": "curveToReversed", "logrite.borderArgs": borderArgs });
       }
     };
   }
 
   function parseCorner(borderArgs, radius1, radius2, corner1, corner2, x, y) {
+	logger.error(`>>> Entering parseCorner(borderArgs=${borderArgs},radius1=${radius1},radius2=${radius2},corner1=${corner1},corner2=${corner2},x=${x},y=${y})`, { "event.action": "parseCorner", "logrite.borderArgs": borderArgs, "logrite.radius1": radius1, "logrite.radius2": radius2, "logrite.corner1": corner1, "logrite.corner2": corner2, "logrite.x": x, "logrite.y": y });
     if (radius1[0] > 0 || radius1[1] > 0) {
       borderArgs.push(["line", corner1[0].start.x, corner1[0].start.y]);
       corner1[0].curveTo(borderArgs);
@@ -1510,10 +1668,12 @@ _html2canvas.Parse = function (images, options) {
 
     if (radius2[0] > 0 || radius2[1] > 0) {
       borderArgs.push(["line", corner2[0].start.x, corner2[0].start.y]);
+	logger.warn(`<<< Exiting parseCorner(borderArgs=${borderArgs},radius1=${radius1},radius2=${radius2},corner1=${corner1},corner2=${corner2},x=${x},y=${y})`, { "event.action": "parseCorner", "logrite.borderArgs": borderArgs, "logrite.radius1": radius1, "logrite.radius2": radius2, "logrite.corner1": corner1, "logrite.corner2": corner2, "logrite.x": x, "logrite.y": y });
     }
   }
 
   function drawSide(borderData, radius1, radius2, outer1, inner1, outer2, inner2) {
+	logger.error(`>>> Entering drawSide(borderData=${borderData},radius1=${radius1},radius2=${radius2},outer1=${outer1},inner1=${inner1},outer2=${outer2},inner2=${inner2})`, { "event.action": "drawSide", "logrite.borderData": borderData, "logrite.radius1": radius1, "logrite.radius2": radius2, "logrite.outer1": outer1, "logrite.inner1": inner1, "logrite.outer2": outer2, "logrite.inner2": inner2 });
     var borderArgs = [];
 
     if (radius1[0] > 0 || radius1[1] > 0) {
@@ -1540,10 +1700,12 @@ _html2canvas.Parse = function (images, options) {
       borderArgs.push([ "line", borderData.c4[0], borderData.c4[1]]);
     }
 
+	logger.warn(`<<< Exiting drawSide(borderData=${borderData},radius1=${radius1},radius2=${radius2},outer1=${outer1},inner1=${inner1},outer2=${outer2},inner2=${inner2})`, { "event.action": "drawSide", "logrite.borderData": borderData, "logrite.radius1": radius1, "logrite.radius2": radius2, "logrite.outer1": outer1, "logrite.inner1": inner1, "logrite.outer2": outer2, "logrite.inner2": inner2 });
     return borderArgs;
   }
 
   function calculateCurvePoints(bounds, borderRadius, borders) {
+logger.error(`>>> Entering calculateCurvePoints(bounds=${bounds},borderRadius=${borderRadius},borders=${borders})`, { "event.action": "calculateCurvePoints", "logrite.bounds": bounds, "logrite.borderRadius": borderRadius, "logrite.borders": borders });
 
     var x = bounds.left,
     y = bounds.top,
@@ -1564,6 +1726,7 @@ _html2canvas.Parse = function (images, options) {
     bottomWidth = width - brh,
     leftHeight = height - blv;
 
+	logger.warn(`<<< Exiting calculateCurvePoints(bounds=${bounds},borderRadius=${borderRadius},borders=${borders})`, { "event.action": "calculateCurvePoints", "logrite.bounds": bounds, "logrite.borderRadius": borderRadius, "logrite.borders": borders });
     return {
       topLeftOuter: getCurvePoints(
         x,
@@ -1624,6 +1787,7 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function getBorderClip(element, borderPoints, borders, radius, bounds) {
+	logger.error(`>>> Entering getBorderClip(element=${element},borderPoints=${borderPoints},borders=${borders},radius=${radius},bounds=${bounds})`, { "event.action": "getBorderClip", "logrite.element": element, "logrite.borderPoints": borderPoints, "logrite.borders": borders, "logrite.radius": radius, "logrite.bounds": bounds });
     var backgroundClip = getCSS(element, 'backgroundClip'),
     borderArgs = [];
 
@@ -1631,6 +1795,7 @@ _html2canvas.Parse = function (images, options) {
       case "content-box":
       case "padding-box":
         parseCorner(borderArgs, radius[0], radius[1], borderPoints.topLeftInner, borderPoints.topRightInner, bounds.left + borders[3].width, bounds.top + borders[0].width);
+		logger.error(`getBorderClip(element=${element},borderPoints=${borderPoints},borders=${borders},radius=${radius},bounds=${bounds}): backgroundClip → ${backgroundClip}`, { "event.action": "getBorderClip", "logrite.element": element, "logrite.borderPoints": borderPoints, "logrite.borders": borders, "logrite.radius": radius, "logrite.bounds": bounds });
         parseCorner(borderArgs, radius[1], radius[2], borderPoints.topRightInner, borderPoints.bottomRightInner, bounds.left + bounds.width - borders[1].width, bounds.top + borders[0].width);
         parseCorner(borderArgs, radius[2], radius[3], borderPoints.bottomRightInner, borderPoints.bottomLeftInner, bounds.left + bounds.width - borders[1].width, bounds.top + bounds.height - borders[2].width);
         parseCorner(borderArgs, radius[3], radius[0], borderPoints.bottomLeftInner, borderPoints.topLeftInner, bounds.left + borders[3].width, bounds.top + bounds.height - borders[2].width);
@@ -1644,10 +1809,12 @@ _html2canvas.Parse = function (images, options) {
         break;
     }
 
+	logger.warn(`<<< Exiting getBorderClip(element=${element},borderPoints=${borderPoints},borders=${borders},radius=${radius},bounds=${bounds})`, { "event.action": "getBorderClip", "logrite.element": element, "logrite.borderPoints": borderPoints, "logrite.borders": borders, "logrite.radius": radius, "logrite.bounds": bounds });
     return borderArgs;
   }
 
   function parseBorders(element, bounds, borders){
+	logger.error(`>>> Entering parseBorders(element=${element},bounds=${bounds},borders=${borders})`, { "event.action": "parseBorders", "logrite.element": element, "logrite.bounds": bounds, "logrite.borders": borders });
     var x = bounds.left,
     y = bounds.top,
     width = bounds.width,
@@ -1735,10 +1902,12 @@ _html2canvas.Parse = function (images, options) {
       }
     }
 
+	logger.warn(`<<< Exiting parseBorders(element=${element},bounds=${bounds},borders=${borders})`, { "event.action": "parseBorders", "logrite.element": element, "logrite.bounds": bounds, "logrite.borders": borders });
     return borderData;
   }
 
   function createShape(ctx, args) {
+	logger.error(`>>> Entering createShape(ctx=${ctx},args=${args})`, { "event.action": "createShape", "logrite.ctx": ctx, "logrite.args": args });
     var shape = ctx.drawShape();
     args.forEach(function(border, index) {
       shape[(index === 0) ? "moveTo" : border[0] + "To" ].apply(null, border.slice(1));
@@ -1747,20 +1916,24 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function renderBorders(ctx, borderArgs, color) {
+	logger.error(`>>> Entering renderBorders(ctx=${ctx},borderArgs=${borderArgs},color=${color})`, { "event.action": "renderBorders", "logrite.ctx": ctx, "logrite.borderArgs": borderArgs, "logrite.color": color });
     if (color !== "transparent") {
       ctx.setVariable( "fillStyle", color);
       createShape(ctx, borderArgs);
       ctx.fill();
       numDraws+=1;
+	logger.warn(`<<< Exiting renderBorders(ctx=${ctx},borderArgs=${borderArgs},color=${color})`, { "event.action": "renderBorders", "logrite.ctx": ctx, "logrite.borderArgs": borderArgs, "logrite.color": color });
     }
   }
 
   function renderFormValue (el, bounds, stack){
+logger.error(`>>> Entering renderFormValue(el=${el},bounds=${bounds},stack=${stack})`, { "event.action": "renderFormValue", "logrite.el": el, "logrite.bounds": bounds, "logrite.stack": stack });
 
     var valueWrap = doc.createElement('valuewrap'),
     cssPropertyArray = ['lineHeight','textAlign','fontFamily','color','fontSize','paddingLeft','paddingTop','width','height','border','borderLeftWidth','borderTopWidth'],
     textValue,
     textNode;
+	logger.error(`renderFormValue(el=${el},bounds=${bounds},stack=${stack}): valueWrap → ${valueWrap}`, { "event.action": "renderFormValue", "logrite.el": el, "logrite.bounds": bounds, "logrite.stack": stack });
 
     cssPropertyArray.forEach(function(property) {
       try {
@@ -1795,16 +1968,21 @@ _html2canvas.Parse = function (images, options) {
 
     renderText(el, textNode, stack);
     body.removeChild(valueWrap);
+	logger.warn(`<<< Exiting renderFormValue(el=${el},bounds=${bounds},stack=${stack})`, { "event.action": "renderFormValue", "logrite.el": el, "logrite.bounds": bounds, "logrite.stack": stack });
   }
 
   function drawImage (ctx) {
+	logger.error(`>>> Entering drawImage(ctx=${ctx})`, { "event.action": "drawImage", "logrite.ctx": ctx });
     ctx.drawImage.apply(ctx, Array.prototype.slice.call(arguments, 1));
     numDraws+=1;
+	logger.warn(`<<< Exiting drawImage(ctx=${ctx})`, { "event.action": "drawImage", "logrite.ctx": ctx });
   }
 
   function getPseudoElement(el, which) {
+	logger.error(`>>> Entering getPseudoElement(el=${el},which=${which})`, { "event.action": "getPseudoElement", "logrite.el": el, "logrite.which": which });
     var elStyle = window.getComputedStyle(el, which);
     if(!elStyle || !elStyle.content || elStyle.content === "none" || elStyle.content === "-moz-alt-content" || elStyle.display === "none") {
+	logger.error(`getPseudoElement(el=${el},which=${which}): elStyle → ${elStyle}`, { "event.action": "getPseudoElement", "logrite.el": el, "logrite.which": which });
       return;
     }
     var content = elStyle.content + '',
@@ -1812,10 +1990,12 @@ _html2canvas.Parse = function (images, options) {
     //strips quotes
     if(first === content.substr( content.length - 1 ) && first.match(/'|"/)) {
       content = content.substr( 1, content.length - 2 );
+	logger.error(`getPseudoElement(el=${el},which=${which}): content → ${content}`, { "event.action": "getPseudoElement", "logrite.el": el, "logrite.which": which });
     }
 
     var isImage = content.substr( 0, 3 ) === 'url',
     elps = document.createElement( isImage ? 'img' : 'span' );
+	logger.error(`Parse(images=${images},options=${options}): isImage → ${isImage}`, { "event.action": "Parse", "logrite.images": images, "logrite.options": options });
 
     elps.className = pseudoHide + "-before " + pseudoHide + "-after";
 
@@ -1837,12 +2017,16 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function indexedProperty(property) {
+	logger.error(`>>> Entering indexedProperty(property=${property})`, { "event.action": "indexedProperty", "logrite.property": property });
+	logger.warn(`<<< Exiting indexedProperty(property=${property})`, { "event.action": "indexedProperty", "logrite.property": property });
     return (isNaN(window.parseInt(property, 10)));
   }
 
   function injectPseudoElements(el, stack) {
+	logger.error(`>>> Entering injectPseudoElements(el=${el},stack=${stack})`, { "event.action": "injectPseudoElements", "logrite.el": el, "logrite.stack": stack });
     var before = getPseudoElement(el, ':before'),
     after = getPseudoElement(el, ':after');
+	logger.error(`injectPseudoElements(el=${el},stack=${stack}): before → ${before}`, { "event.action": "injectPseudoElements", "logrite.el": el, "logrite.stack": stack });
     if(!before && !after) {
       return;
     }
@@ -1861,21 +2045,26 @@ _html2canvas.Parse = function (images, options) {
       parseElement(after, stack, true);
       el.removeChild(after);
       el.className = el.className.replace(pseudoHide + "-after", "").trim();
+	logger.warn(`<<< Exiting injectPseudoElements(el=${el},stack=${stack})`, { "event.action": "injectPseudoElements", "logrite.el": el, "logrite.stack": stack });
     }
 
   }
 
   function renderBackgroundRepeat(ctx, image, backgroundPosition, bounds) {
+	logger.error(`>>> Entering renderBackgroundRepeat(ctx=${ctx},image=${image},backgroundPosition=${backgroundPosition},bounds=${bounds})`, { "event.action": "renderBackgroundRepeat", "logrite.ctx": ctx, "logrite.image": image, "logrite.backgroundPosition": backgroundPosition, "logrite.bounds": bounds });
     var offsetX = Math.round(bounds.left + backgroundPosition.left),
     offsetY = Math.round(bounds.top + backgroundPosition.top);
+	logger.error(`renderBackgroundRepeat(ctx=${ctx},image=${image},backgroundPosition=${backgroundPosition},bounds=${bounds}): offsetX → ${offsetX}`, { "event.action": "renderBackgroundRepeat", "logrite.ctx": ctx, "logrite.image": image, "logrite.backgroundPosition": backgroundPosition, "logrite.bounds": bounds });
 
     ctx.createPattern(image);
     ctx.translate(offsetX, offsetY);
     ctx.fill();
     ctx.translate(-offsetX, -offsetY);
+	logger.warn(`<<< Exiting renderBackgroundRepeat(ctx=${ctx},image=${image},backgroundPosition=${backgroundPosition},bounds=${bounds})`, { "event.action": "renderBackgroundRepeat", "logrite.ctx": ctx, "logrite.image": image, "logrite.backgroundPosition": backgroundPosition, "logrite.bounds": bounds });
   }
 
   function backgroundRepeatShape(ctx, image, backgroundPosition, bounds, left, top, width, height) {
+	logger.error(`>>> Entering backgroundRepeatShape(ctx=${ctx},image=${image},backgroundPosition=${backgroundPosition},bounds=${bounds},left=${left},top=${top},width=${width},height=${height})`, { "event.action": "backgroundRepeatShape", "logrite.ctx": ctx, "logrite.image": image, "logrite.backgroundPosition": backgroundPosition, "logrite.bounds": bounds, "logrite.left": left, "logrite.top": top, "logrite.width": width, "logrite.height": height });
     var args = [];
     args.push(["line", Math.round(left), Math.round(top)]);
     args.push(["line", Math.round(left + width), Math.round(top)]);
@@ -1886,9 +2075,11 @@ _html2canvas.Parse = function (images, options) {
     ctx.clip();
     renderBackgroundRepeat(ctx, image, backgroundPosition, bounds);
     ctx.restore();
+	logger.warn(`<<< Exiting backgroundRepeatShape(ctx=${ctx},image=${image},backgroundPosition=${backgroundPosition},bounds=${bounds},left=${left},top=${top},width=${width},height=${height})`, { "event.action": "backgroundRepeatShape", "logrite.ctx": ctx, "logrite.image": image, "logrite.backgroundPosition": backgroundPosition, "logrite.bounds": bounds, "logrite.left": left, "logrite.top": top, "logrite.width": width, "logrite.height": height });
   }
 
   function renderBackgroundColor(ctx, backgroundBounds, bgcolor) {
+	logger.error(`>>> Entering renderBackgroundColor(ctx=${ctx},backgroundBounds=${backgroundBounds},bgcolor=${bgcolor})`, { "event.action": "renderBackgroundColor", "logrite.ctx": ctx, "logrite.backgroundBounds": backgroundBounds, "logrite.bgcolor": bgcolor });
     renderRect(
       ctx,
       backgroundBounds.left,
@@ -1897,15 +2088,19 @@ _html2canvas.Parse = function (images, options) {
       backgroundBounds.height,
       bgcolor
       );
+	logger.warn(`<<< Exiting renderBackgroundColor(ctx=${ctx},backgroundBounds=${backgroundBounds},bgcolor=${bgcolor})`, { "event.action": "renderBackgroundColor", "logrite.ctx": ctx, "logrite.backgroundBounds": backgroundBounds, "logrite.bgcolor": bgcolor });
   }
 
   function renderBackgroundRepeating(el, bounds, ctx, image, imageIndex) {
+	logger.error(`>>> Entering renderBackgroundRepeating(el=${el},bounds=${bounds},ctx=${ctx},image=${image},imageIndex=${imageIndex})`, { "event.action": "renderBackgroundRepeating", "logrite.el": el, "logrite.bounds": bounds, "logrite.ctx": ctx, "logrite.image": image, "logrite.imageIndex": imageIndex });
     var backgroundSize = Util.BackgroundSize(el, bounds, image, imageIndex),
     backgroundPosition = Util.BackgroundPosition(el, bounds, image, imageIndex, backgroundSize),
     backgroundRepeat = getCSS(el, "backgroundRepeat").split(",").map(Util.trimText);
+	logger.error(`renderBackgroundRepeating(el=${el},bounds=${bounds},ctx=${ctx},image=${image},imageIndex=${imageIndex}): backgroundSize → ${backgroundSize}`, { "event.action": "renderBackgroundRepeating", "logrite.el": el, "logrite.bounds": bounds, "logrite.ctx": ctx, "logrite.image": image, "logrite.imageIndex": imageIndex });
 
     image = resizeImage(image, backgroundSize);
 
+	logger.error(`renderBackgroundRepeating(el=${el},bounds=${bounds},ctx=${ctx},image=${image},imageIndex=${imageIndex}): image → ${image}`, { "event.action": "renderBackgroundRepeating", "logrite.el": el, "logrite.bounds": bounds, "logrite.ctx": ctx, "logrite.image": image, "logrite.imageIndex": imageIndex });
     backgroundRepeat = backgroundRepeat[imageIndex] || backgroundRepeat[0];
 
     switch (backgroundRepeat) {
@@ -1931,11 +2126,13 @@ _html2canvas.Parse = function (images, options) {
           width: image.width,
           height: image.height
         });
+		logger.warn(`<<< Exiting renderBackgroundRepeating(el=${el},bounds=${bounds},ctx=${ctx},image=${image},imageIndex=${imageIndex})`, { "event.action": "renderBackgroundRepeating", "logrite.el": el, "logrite.bounds": bounds, "logrite.ctx": ctx, "logrite.image": image, "logrite.imageIndex": imageIndex });
         break;
     }
   }
 
   function renderBackgroundImage(element, bounds, ctx) {
+	logger.error(`>>> Entering renderBackgroundImage(element=${element},bounds=${bounds},ctx=${ctx})`, { "event.action": "renderBackgroundImage", "logrite.element": element, "logrite.bounds": bounds, "logrite.ctx": ctx });
     var backgroundImage = getCSS(element, "backgroundImage"),
     backgroundImages = Util.parseBackgroundImage(backgroundImage),
     image,
@@ -1950,6 +2147,7 @@ _html2canvas.Parse = function (images, options) {
 
       var key = backgroundImage.method === 'url' ?
       backgroundImage.args[0] :
+	logger.error(`renderBackgroundImage(element=${element},bounds=${bounds},ctx=${ctx}): key → ${key}`, { "event.action": "renderBackgroundImage", "logrite.element": element, "logrite.bounds": bounds, "logrite.ctx": ctx });
       backgroundImage.value;
 
       image = loadImage(key);
@@ -1959,11 +2157,13 @@ _html2canvas.Parse = function (images, options) {
         renderBackgroundRepeating(element, bounds, ctx, image, imageIndex);
       } else {
         Util.log("html2canvas: Error loading background:", backgroundImage);
+		logger.warn(`<<< Exiting renderBackgroundImage(element=${element},bounds=${bounds},ctx=${ctx})`, { "event.action": "renderBackgroundImage", "logrite.element": element, "logrite.bounds": bounds, "logrite.ctx": ctx });
       }
     }
   }
 
   function resizeImage(image, bounds) {
+	logger.error(`>>> Entering resizeImage(image=${image},bounds=${bounds})`, { "event.action": "resizeImage", "logrite.image": image, "logrite.bounds": bounds });
     if(image.width === bounds.width && image.height === bounds.height) {
       return image;
     }
@@ -1972,38 +2172,51 @@ _html2canvas.Parse = function (images, options) {
     canvas.width = bounds.width;
     canvas.height = bounds.height;
     ctx = canvas.getContext("2d");
+	logger.error(`resizeImage(image=${image},bounds=${bounds}): ctx → ${ctx}`, { "event.action": "resizeImage", "logrite.image": image, "logrite.bounds": bounds });
     drawImage(ctx, image, 0, 0, image.width, image.height, 0, 0, bounds.width, bounds.height );
+	logger.warn(`<<< Exiting resizeImage(image=${image},bounds=${bounds})`, { "event.action": "resizeImage", "logrite.image": image, "logrite.bounds": bounds });
     return canvas;
   }
 
   function setOpacity(ctx, element, parentStack) {
+	logger.error(`>>> Entering setOpacity(ctx=${ctx},element=${element},parentStack=${parentStack})`, { "event.action": "setOpacity", "logrite.ctx": ctx, "logrite.element": element, "logrite.parentStack": parentStack });
+	logger.warn(`<<< Exiting setOpacity(ctx=${ctx},element=${element},parentStack=${parentStack})`, { "event.action": "setOpacity", "logrite.ctx": ctx, "logrite.element": element, "logrite.parentStack": parentStack });
     return ctx.setVariable("globalAlpha", getCSS(element, "opacity") * ((parentStack) ? parentStack.opacity : 1));
   }
 
   function removePx(str) {
+	logger.error(`>>> Entering removePx(str=${str})`, { "event.action": "removePx", "logrite.str": str });
+	logger.warn(`<<< Exiting removePx(str=${str})`, { "event.action": "removePx", "logrite.str": str });
     return str.replace("px", "");
   }
 
   var transformRegExp = /(matrix)\((.+)\)/;
+logger.error(`Parse(images=${images},options=${options}): transformRegExp → ${transformRegExp}`, { "event.action": "Parse", "logrite.images": images, "logrite.options": options });
 
   function getTransform(element, parentStack) {
+	logger.error(`>>> Entering getTransform(element=${element},parentStack=${parentStack})`, { "event.action": "getTransform", "logrite.element": element, "logrite.parentStack": parentStack });
     var transform = getCSS(element, "transform") || getCSS(element, "-webkit-transform") || getCSS(element, "-moz-transform") || getCSS(element, "-ms-transform") || getCSS(element, "-o-transform");
     var transformOrigin = getCSS(element, "transform-origin") || getCSS(element, "-webkit-transform-origin") || getCSS(element, "-moz-transform-origin") || getCSS(element, "-ms-transform-origin") || getCSS(element, "-o-transform-origin") || "0px 0px";
+	logger.error(`getTransform(element=${element},parentStack=${parentStack}): transform → ${transform}`, { "event.action": "getTransform", "logrite.element": element, "logrite.parentStack": parentStack });
 
     transformOrigin = transformOrigin.split(" ").map(removePx).map(Util.asFloat);
+	logger.error(`getTransform(element=${element},parentStack=${parentStack}): transformOrigin → ${transformOrigin}`, { "event.action": "getTransform", "logrite.element": element, "logrite.parentStack": parentStack });
 
     var matrix;
     if (transform && transform !== "none") {
       var match = transform.match(transformRegExp);
+	logger.error(`getTransform(element=${element},parentStack=${parentStack}): match → ${match}`, { "event.action": "getTransform", "logrite.element": element, "logrite.parentStack": parentStack });
       if (match) {
         switch(match[1]) {
           case "matrix":
             matrix = match[2].split(",").map(Util.trimText).map(Util.asFloat);
+			logger.error(`getTransform(element=${element},parentStack=${parentStack}): matrix → ${matrix}`, { "event.action": "getTransform", "logrite.element": element, "logrite.parentStack": parentStack });
             break;
         }
       }
     }
 
+	logger.warn(`<<< Exiting getTransform(element=${element},parentStack=${parentStack})`, { "event.action": "getTransform", "logrite.element": element, "logrite.parentStack": parentStack });
     return {
       origin: transformOrigin,
       matrix: matrix
@@ -2011,6 +2224,7 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function createStack(element, parentStack, bounds, transform) {
+	logger.error(`>>> Entering createStack(element=${element},parentStack=${parentStack},bounds=${bounds},transform=${transform})`, { "event.action": "createStack", "logrite.element": element, "logrite.parentStack": parentStack, "logrite.bounds": bounds, "logrite.transform": transform });
     var ctx = h2cRenderContext((!parentStack) ? documentWidth() : bounds.width , (!parentStack) ? documentHeight() : bounds.height),
     stack = {
       ctx: ctx,
@@ -2021,6 +2235,7 @@ _html2canvas.Parse = function (images, options) {
       clip: (parentStack && parentStack.clip) ? Util.Extend( {}, parentStack.clip ) : null
     };
 
+	logger.error(`createStack(element=${element},parentStack=${parentStack},bounds=${bounds},transform=${transform}): ctx → ${ctx}`, { "event.action": "createStack", "logrite.element": element, "logrite.parentStack": parentStack, "logrite.bounds": bounds, "logrite.transform": transform });
     setZ(element, stack, parentStack);
 
     // TODO correct overflow for absolute content residing under a static position
@@ -2028,10 +2243,12 @@ _html2canvas.Parse = function (images, options) {
       stack.clip = (stack.clip) ? clipBounds(stack.clip, bounds) : bounds;
     }
 
+	logger.warn(`<<< Exiting createStack(element=${element},parentStack=${parentStack},bounds=${bounds},transform=${transform})`, { "event.action": "createStack", "logrite.element": element, "logrite.parentStack": parentStack, "logrite.bounds": bounds, "logrite.transform": transform });
     return stack;
   }
 
   function getBackgroundBounds(borders, bounds, clip) {
+	logger.error(`>>> Entering getBackgroundBounds(borders=${borders},bounds=${bounds},clip=${clip})`, { "event.action": "getBackgroundBounds", "logrite.borders": borders, "logrite.bounds": bounds, "logrite.clip": clip });
     var backgroundBounds = {
       left: bounds.left + borders[3].width,
       top: bounds.top + borders[0].width,
@@ -2041,19 +2258,25 @@ _html2canvas.Parse = function (images, options) {
 
     if (clip) {
       backgroundBounds = clipBounds(backgroundBounds, clip);
+	logger.error(`getBackgroundBounds(borders=${borders},bounds=${bounds},clip=${clip}): backgroundBounds → ${backgroundBounds}`, { "event.action": "getBackgroundBounds", "logrite.borders": borders, "logrite.bounds": bounds, "logrite.clip": clip });
     }
 
+	logger.warn(`<<< Exiting getBackgroundBounds(borders=${borders},bounds=${bounds},clip=${clip})`, { "event.action": "getBackgroundBounds", "logrite.borders": borders, "logrite.bounds": bounds, "logrite.clip": clip });
     return backgroundBounds;
   }
 
   function getBounds(element, transform) {
+	logger.error(`>>> Entering getBounds(element=${element},transform=${transform})`, { "event.action": "getBounds", "logrite.element": element, "logrite.transform": transform });
     var bounds = (transform.matrix) ? Util.OffsetBounds(element) : Util.Bounds(element);
     transform.origin[0] += bounds.left;
+	logger.error(`getBounds(element=${element},transform=${transform}): bounds → ${bounds}`, { "event.action": "getBounds", "logrite.element": element, "logrite.transform": transform });
     transform.origin[1] += bounds.top;
+	logger.warn(`<<< Exiting getBounds(element=${element},transform=${transform})`, { "event.action": "getBounds", "logrite.element": element, "logrite.transform": transform });
     return bounds;
   }
 
   function renderElement(element, parentStack, pseudoElement, ignoreBackground) {
+	logger.error(`>>> Entering renderElement(element=${element},parentStack=${parentStack},pseudoElement=${pseudoElement},ignoreBackground=${ignoreBackground})`, { "event.action": "renderElement", "logrite.element": element, "logrite.parentStack": parentStack, "logrite.pseudoElement": pseudoElement, "logrite.ignoreBackground": ignoreBackground });
     var transform = getTransform(element, parentStack),
     bounds = getBounds(element, transform),
     image,
@@ -2063,6 +2286,7 @@ _html2canvas.Parse = function (images, options) {
     backgroundBounds = getBackgroundBounds(borders, bounds, stack.clip),
     borderData = parseBorders(element, bounds, borders),
     backgroundColor = (ignoreElementsRegExp.test(element.nodeName)) ? "#efefef" : getCSS(element, "backgroundColor");
+	logger.error(`renderElement(element=${element},parentStack=${parentStack},pseudoElement=${pseudoElement},ignoreBackground=${ignoreBackground}): transform → ${transform}`, { "event.action": "renderElement", "logrite.element": element, "logrite.parentStack": parentStack, "logrite.pseudoElement": pseudoElement, "logrite.ignoreBackground": ignoreBackground });
 
 
     createShape(ctx, borderData.clip);
@@ -2124,29 +2348,37 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function isElementVisible(element) {
+	logger.error(`>>> Entering isElementVisible(element=${element})`, { "event.action": "isElementVisible", "logrite.element": element });
+	logger.warn(`<<< Exiting isElementVisible(element=${element})`, { "event.action": "isElementVisible", "logrite.element": element });
     return (getCSS(element, 'display') !== "none" && getCSS(element, 'visibility') !== "hidden" && !element.hasAttribute("data-html2canvas-ignore"));
   }
 
   function parseElement (element, stack, pseudoElement) {
+	logger.error(`>>> Entering parseElement(element=${element},stack=${stack},pseudoElement=${pseudoElement})`, { "event.action": "parseElement", "logrite.element": element, "logrite.stack": stack, "logrite.pseudoElement": pseudoElement });
     if (isElementVisible(element)) {
       stack = renderElement(element, stack, pseudoElement, false) || stack;
       if (!ignoreElementsRegExp.test(element.nodeName)) {
         parseChildren(element, stack, pseudoElement);
+		logger.warn(`<<< Exiting parseElement(element=${element},stack=${stack},pseudoElement=${pseudoElement})`, { "event.action": "parseElement", "logrite.element": element, "logrite.stack": stack, "logrite.pseudoElement": pseudoElement });
       }
     }
+	logger.error(`parseElement(element=${element},stack=${stack},pseudoElement=${pseudoElement}): stack → ${stack}`, { "event.action": "parseElement", "logrite.element": element, "logrite.stack": stack, "logrite.pseudoElement": pseudoElement });
   }
 
   function parseChildren(element, stack, pseudoElement) {
+	logger.error(`>>> Entering parseChildren(element=${element},stack=${stack},pseudoElement=${pseudoElement})`, { "event.action": "parseChildren", "logrite.element": element, "logrite.stack": stack, "logrite.pseudoElement": pseudoElement });
     Util.Children(element).forEach(function(node) {
       if (node.nodeType === node.ELEMENT_NODE) {
         parseElement(node, stack, pseudoElement);
       } else if (node.nodeType === node.TEXT_NODE) {
         renderText(element, node, stack);
+		logger.warn(`<<< Exiting parseChildren(element=${element},stack=${stack},pseudoElement=${pseudoElement})`, { "event.action": "parseChildren", "logrite.element": element, "logrite.stack": stack, "logrite.pseudoElement": pseudoElement });
       }
     });
   }
 
   function init() {
+	logger.error('>>> Entering init()', { "event.action": "init" });
     var background = getCSS(document.documentElement, "backgroundColor"),
       transparentBackground = (Util.isTransparent(background) && element === document.body),
       stack = renderElement(element, null, false, transparentBackground);
@@ -2157,6 +2389,7 @@ _html2canvas.Parse = function (images, options) {
     }
 
     body.removeChild(hidePseudoElements);
+	logger.warn('<<< Exiting init()', { "event.action": "init" });
     return {
       backgroundColor: background,
       stack: stack
@@ -2167,6 +2400,8 @@ _html2canvas.Parse = function (images, options) {
 };
 
 function h2czContext(zindex) {
+logger.error(`>>> Entering h2czContext(zindex=${zindex})`, { "event.action": "h2czContext", "logrite.zindex": zindex });
+logger.warn(`<<< Exiting h2czContext(zindex=${zindex})`, { "event.action": "h2czContext", "logrite.zindex": zindex });
   return {
     zindex: zindex,
     children: []
@@ -2174,6 +2409,7 @@ function h2czContext(zindex) {
 }
 
 _html2canvas.Preload = function( options ) {
+logger.error(`>>> Entering Preload(options=${options})`, { "event.action": "Preload", "logrite.options": options });
 
   var images = {
     numLoaded: 0,   // also failed are counted here
@@ -2197,16 +2433,24 @@ _html2canvas.Preload = function( options ) {
   timeoutTimer;
 
   link.href = window.location.href;
+logger.debug(`Preload(options=${options}): link.href → ${link.href}`, { "event.action": "Preload", "logrite.options": options });
+logger.debug(`Preload(options=${options}): imageObj.callbackname → ${imageObj.callbackname}`, { "event.action": "Preload", "logrite.options": options });
+logger.debug(`Preload(options=${options}): imageObj.succeeded → ${imageObj.succeeded}`, { "event.action": "Preload", "logrite.options": options });
   pageOrigin  = link.protocol + link.host;
+logger.debug(`Preload(options=${options}): pageOrigin → ${pageOrigin}`, { "event.action": "Preload", "logrite.options": options });
 
   function isSameOrigin(url){
+	logger.error(`>>> Entering isSameOrigin(url=${url})`, { "event.action": "isSameOrigin", "logrite.url": url });
     link.href = url;
     link.href = link.href; // YES, BELIEVE IT OR NOT, that is required for IE9 - http://jsfiddle.net/niklasvh/2e48b/
     var origin = link.protocol + link.host;
+	logger.debug(`Preload(options=${options}): imageObj.script → ${imageObj.script}`, { "event.action": "Preload", "logrite.options": options });
+	logger.warn(`<<< Exiting isSameOrigin(url=${url})`, { "event.action": "isSameOrigin", "logrite.url": url });
     return (origin === pageOrigin);
   }
 
   function start(){
+	logger.error('>>> Entering start()', { "event.action": "start" });
     Util.log("html2canvas: start: images: " + images.numLoaded + " / " + images.numTotal + " (failed: " + images.numFailed + ")");
     if (!images.firstRun && images.numLoaded >= images.numTotal){
       Util.log("Finished loading images: # " + images.numTotal + " (failed: " + images.numFailed + ")");
@@ -2215,11 +2459,13 @@ _html2canvas.Preload = function( options ) {
         options.complete(images);
       }
 
+	logger.warn('<<< Exiting start()', { "event.action": "start" });
     }
   }
 
   // TODO modify proxy to serve images with CORS enabled, where available
   function proxyGetImage(url, img, imageObj){
+	logger.error(`>>> Entering proxyGetImage(url=${url},img=${img},imageObj=${imageObj})`, { "event.action": "proxyGetImage", "logrite.url": url, "logrite.img": img, "logrite.imageObj": imageObj });
     var callback_name,
     scriptUrl = options.proxy,
     script;
@@ -2228,8 +2474,11 @@ _html2canvas.Preload = function( options ) {
     url = link.href; // work around for pages with base href="" set - WARNING: this may change the url
 
     callback_name = 'html2canvas_' + (count++);
+	logger.error(`proxyGetImage(url=${url},img=${img},imageObj=${imageObj}): callback_name → ${callback_name}`, { "event.action": "proxyGetImage", "logrite.url": url, "logrite.img": img, "logrite.imageObj": imageObj });
     imageObj.callbackname = callback_name;
+	logger.debug(`Preload(options=${options}): callback_name → ${callback_name}`, { "event.action": "Preload", "logrite.options": options });
 
+	logger.debug(`proxyGetImage(url=${url},img=${img},imageObj=${imageObj}): imageObj.callbackname → ${imageObj.callbackname}`, { "event.action": "proxyGetImage", "logrite.url": url, "logrite.img": img, "logrite.imageObj": imageObj });
     if (scriptUrl.indexOf("?") > -1) {
       scriptUrl += "&";
     } else {
@@ -2237,11 +2486,13 @@ _html2canvas.Preload = function( options ) {
     }
     scriptUrl += 'url=' + encodeURIComponent(url) + '&callback=' + callback_name;
     script = doc.createElement("script");
+	logger.debug(`Preload(options=${options}): script → ${script}`, { "event.action": "Preload", "logrite.options": options });
 
     window[callback_name] = function(a){
       if (a.substring(0,6) === "error:"){
         imageObj.succeeded = false;
         images.numLoaded++;
+		logger.debug(`proxyGetImage(url=${url},img=${img},imageObj=${imageObj}): imageObj.succeeded → ${imageObj.succeeded}`, { "event.action": "proxyGetImage", "logrite.url": url, "logrite.img": img, "logrite.imageObj": imageObj });
         images.numFailed++;
         start();
       } else {
@@ -2250,9 +2501,12 @@ _html2canvas.Preload = function( options ) {
       }
       window[callback_name] = undefined; // to work with IE<9  // NOTE: that the undefined callback property-name still exists on the window object (for IE<9)
       try {
+	logger.debug(`proxyGetImage(url=${url},img=${img},imageObj=${imageObj}): img.src → ${img.src}`, { "event.action": "proxyGetImage", "logrite.url": url, "logrite.img": img, "logrite.imageObj": imageObj });
         delete window[callback_name];  // for all browser that support this
       } catch(ex) {}
+	logger.error(`Exception in Preload(options=${options}): ${ex.message}`, ex, { "event.action": "Preload", "event.category": "process", "logrite.options": options });
       script.parentNode.removeChild(script);
+	logger.error(`Exception in proxyGetImage(url=${url},img=${img},imageObj=${imageObj}): ${ex.message}`, ex, { "event.action": "proxyGetImage", "event.category": "process", "logrite.url": url, "logrite.img": img, "logrite.imageObj": imageObj });
       script = null;
       delete imageObj.script;
       delete imageObj.callbackname;
@@ -2261,27 +2515,36 @@ _html2canvas.Preload = function( options ) {
     script.setAttribute("type", "text/javascript");
     script.setAttribute("src", scriptUrl);
     imageObj.script = script;
+	logger.warn(`<<< Exiting proxyGetImage(url=${url},img=${img},imageObj=${imageObj})`, { "event.action": "proxyGetImage", "logrite.url": url, "logrite.img": img, "logrite.imageObj": imageObj });
     window.document.body.appendChild(script);
 
   }
 
   function loadPseudoElement(element, type) {
+	logger.error(`>>> Entering loadPseudoElement(element=${element},type=${type})`, { "event.action": "loadPseudoElement", "logrite.element": element, "logrite.type": type });
     var style = window.getComputedStyle(element, type),
     content = style.content;
+	logger.error(`loadPseudoElement(element=${element},type=${type}): style → ${style}`, { "event.action": "loadPseudoElement", "logrite.element": element, "logrite.type": type });
     if (content.substr(0, 3) === 'url') {
+	logger.debug(`Preload(options=${options}): content → ${content}`, { "event.action": "Preload", "logrite.options": options });
       methods.loadImage(_html2canvas.Util.parseBackgroundImage(content)[0].args[0]);
     }
     loadBackgroundImages(style.backgroundImage, element);
+	logger.warn(`<<< Exiting loadPseudoElement(element=${element},type=${type})`, { "event.action": "loadPseudoElement", "logrite.element": element, "logrite.type": type });
   }
 
   function loadPseudoElementImages(element) {
+	logger.error(`>>> Entering loadPseudoElementImages(element=${element})`, { "event.action": "loadPseudoElementImages", "logrite.element": element });
     loadPseudoElement(element, ":before");
     loadPseudoElement(element, ":after");
+	logger.warn(`<<< Exiting loadPseudoElementImages(element=${element})`, { "event.action": "loadPseudoElementImages", "logrite.element": element });
   }
 
   function loadGradientImage(backgroundImage, bounds) {
+	logger.error(`>>> Entering loadGradientImage(backgroundImage=${backgroundImage},bounds=${bounds})`, { "event.action": "loadGradientImage", "logrite.backgroundImage": backgroundImage, "logrite.bounds": bounds });
     var img = _html2canvas.Generate.Gradient(backgroundImage, bounds);
 
+	logger.error(`loadGradientImage(backgroundImage=${backgroundImage},bounds=${bounds}): img → ${img}`, { "event.action": "loadGradientImage", "logrite.backgroundImage": backgroundImage, "logrite.bounds": bounds });
     if (img !== undefined){
       images[backgroundImage] = {
         img: img,
@@ -2290,14 +2553,18 @@ _html2canvas.Preload = function( options ) {
       images.numTotal++;
       images.numLoaded++;
       start();
+	logger.warn(`<<< Exiting loadGradientImage(backgroundImage=${backgroundImage},bounds=${bounds})`, { "event.action": "loadGradientImage", "logrite.backgroundImage": backgroundImage, "logrite.bounds": bounds });
     }
   }
 
   function invalidBackgrounds(background_image) {
+	logger.error(`>>> Entering invalidBackgrounds(background_image=${background_image})`, { "event.action": "invalidBackgrounds", "logrite.background_image": background_image });
+	logger.warn(`<<< Exiting invalidBackgrounds(background_image=${background_image})`, { "event.action": "invalidBackgrounds", "logrite.background_image": background_image });
     return (background_image && background_image.method && background_image.args && background_image.args.length > 0 );
   }
 
   function loadBackgroundImages(background_image, el) {
+	logger.error(`>>> Entering loadBackgroundImages(background_image=${background_image},el=${el})`, { "event.action": "loadBackgroundImages", "logrite.background_image": background_image, "logrite.el": el });
     var bounds;
 
     _html2canvas.Util.parseBackgroundImage(background_image).filter(invalidBackgrounds).forEach(function(background_image) {
@@ -2313,6 +2580,7 @@ _html2canvas.Preload = function( options ) {
   }
 
   function getImages (el) {
+	logger.error(`>>> Entering getImages(el=${el})`, { "event.action": "getImages", "logrite.el": el });
     var elNodeType = false;
 
     // Firefox fails with permission denied on pages with iframes
@@ -2336,13 +2604,18 @@ _html2canvas.Preload = function( options ) {
         Util.log("html2canvas: failed to get background-image - Exception: " + e.message);
       }
       loadBackgroundImages(el);
+	logger.warn(`<<< Exiting getImages(el=${el})`, { "event.action": "getImages", "logrite.el": el });
     }
   }
 
   function setImageLoadHandlers(img, imageObj) {
+	logger.error(`>>> Entering setImageLoadHandlers(img=${img},imageObj=${imageObj})`, { "event.action": "setImageLoadHandlers", "logrite.img": img, "logrite.imageObj": imageObj });
+	logger.debug(`setImageLoadHandlers(img=${img},imageObj=${imageObj}): imageObj.succeeded → ${imageObj.succeeded}`, { "event.action": "setImageLoadHandlers", "logrite.img": img, "logrite.imageObj": imageObj });
     img.onload = function() {
       if ( imageObj.timer !== undefined ) {
+		logger.error('>>> Entering onload()', { "event.action": "onload" });
         // CORS succeeded
+		logger.warn('<<< Exiting onload()', { "event.action": "onload" });
         window.clearTimeout( imageObj.timer );
       }
 
@@ -2352,6 +2625,7 @@ _html2canvas.Preload = function( options ) {
       start();
     };
     img.onerror = function() {
+	logger.error('>>> Entering onerror()', { "event.action": "onerror" });
       if (img.crossOrigin === "anonymous") {
         // CORS failed
         window.clearTimeout( imageObj.timer );
@@ -2373,7 +2647,9 @@ _html2canvas.Preload = function( options ) {
       imageObj.succeeded = false;
       img.onerror = img.onload = null;
       start();
+	logger.warn('<<< Exiting onerror()', { "event.action": "onerror" });
     };
+	logger.warn(`<<< Exiting setImageLoadHandlers(img=${img},imageObj=${imageObj})`, { "event.action": "setImageLoadHandlers", "logrite.img": img, "logrite.imageObj": imageObj });
   }
 
   methods = {
@@ -2416,6 +2692,7 @@ _html2canvas.Preload = function( options ) {
 
     },
     cleanupDOM: function(cause) {
+	logger.error(`>>> Entering cleanupDOM(cause=${cause})`, { "event.action": "cleanupDOM", "logrite.cause": cause });
       var img, src;
       if (!images.cleanupDone) {
         if (cause && typeof cause === "string") {
@@ -2456,19 +2733,23 @@ _html2canvas.Preload = function( options ) {
         images.cleanupDone = true;
         if (!(cause && typeof cause === "string")) {
           start();
+		logger.warn(`<<< Exiting cleanupDOM(cause=${cause})`, { "event.action": "cleanupDOM", "logrite.cause": cause });
         }
       }
     },
 
     renderingDone: function() {
+	logger.error('>>> Entering renderingDone()', { "event.action": "renderingDone" });
       if (timeoutTimer) {
         window.clearTimeout(timeoutTimer);
+		logger.warn('<<< Exiting renderingDone()', { "event.action": "renderingDone" });
       }
     }
   };
 
   if (options.timeout > 0) {
     timeoutTimer = window.setTimeout(methods.cleanupDOM, options.timeout);
+	logger.error(`Preload(options=${options}): timeoutTimer → ${timeoutTimer}`, { "event.action": "Preload", "logrite.options": options });
   }
 
   Util.log('html2canvas: Preload starts: finding background-images');
@@ -2492,15 +2773,18 @@ _html2canvas.Preload = function( options ) {
 };
 
 _html2canvas.Renderer = function(parseQueue, options){
+logger.error(`>>> Entering Renderer(parseQueue=${parseQueue},options=${options})`, { "event.action": "Renderer", "logrite.parseQueue": parseQueue, "logrite.options": options });
 
   // http://www.w3.org/TR/CSS21/zindex.html
   function createRenderQueue(parseQueue) {
+	logger.error(`>>> Entering createRenderQueue(parseQueue=${parseQueue})`, { "event.action": "createRenderQueue", "logrite.parseQueue": parseQueue });
     var queue = [],
     rootContext;
 
     rootContext = (function buildStackingContext(rootNode) {
       var rootContext = {};
       function insert(context, node, specialParent) {
+		logger.error(`>>> Entering insert(context=${context},node=${node},specialParent=${specialParent})`, { "event.action": "insert", "logrite.context": context, "logrite.node": node, "logrite.specialParent": specialParent });
         var zi = (node.zIndex.zindex === 'auto') ? 0 : Number(node.zIndex.zindex),
         contextForChildren = context, // the stacking context for children
         isPositioned = node.zIndex.isPositioned,
@@ -2526,12 +2810,14 @@ _html2canvas.Renderer = function(parseQueue, options){
         node.zIndex.children.forEach(function(childNode) {
           insert(contextForChildren, childNode, childrenDest);
         });
+		logger.warn(`<<< Exiting insert(context=${context},node=${node},specialParent=${specialParent})`, { "event.action": "insert", "logrite.context": context, "logrite.node": node, "logrite.specialParent": specialParent });
       }
       insert(rootContext, rootNode);
       return rootContext;
     })(parseQueue);
 
     function sortZ(context) {
+	logger.error(`>>> Entering sortZ(context=${context})`, { "event.action": "sortZ", "logrite.context": context });
       Object.keys(context).sort().forEach(function(zi) {
         var nonPositioned = [],
         floated = [],
@@ -2552,10 +2838,12 @@ _html2canvas.Renderer = function(parseQueue, options){
         });
 
         (function walk(arr) {
+		logger.error(`>>> Entering walk(arr=${arr})`, { "event.action": "walk", "logrite.arr": arr });
           arr.forEach(function(v) {
             list.push(v);
             if (v.children) { walk(v.children); }
           });
+		logger.warn(`<<< Exiting walk(arr=${arr})`, { "event.action": "walk", "logrite.arr": arr });
         })(nonPositioned.concat(floated, positioned));
 
         list.forEach(function(v) {
@@ -2563,6 +2851,7 @@ _html2canvas.Renderer = function(parseQueue, options){
             sortZ(v.context);
           } else {
             queue.push(v.node);
+			logger.warn(`<<< Exiting sortZ(context=${context})`, { "event.action": "sortZ", "logrite.context": context });
           }
         });
       });
@@ -2574,6 +2863,7 @@ _html2canvas.Renderer = function(parseQueue, options){
   }
 
   function getRenderer(rendererName) {
+	logger.error(`>>> Entering getRenderer(rendererName=${rendererName})`, { "event.action": "getRenderer", "logrite.rendererName": rendererName });
     var renderer;
 
     if (typeof options.renderer === "string" && _html2canvas.Renderer[rendererName] !== undefined) {
@@ -2581,12 +2871,15 @@ _html2canvas.Renderer = function(parseQueue, options){
     } else if (typeof rendererName === "function") {
       renderer = rendererName(options);
     } else {
+	logger.error(`getRenderer(rendererName=${rendererName}): renderer → ${renderer}`, { "event.action": "getRenderer", "logrite.rendererName": rendererName });
+	logger.debug(`getRenderer(rendererName=${rendererName}): renderer → ${renderer}`, { "event.action": "getRenderer", "logrite.rendererName": rendererName });
       throw new Error("Unknown renderer");
     }
 
     if ( typeof renderer !== "function" ) {
       throw new Error("Invalid renderer defined");
     }
+	logger.warn(`<<< Exiting getRenderer(rendererName=${rendererName})`, { "event.action": "getRenderer", "logrite.rendererName": rendererName });
     return renderer;
   }
 
@@ -2594,11 +2887,15 @@ _html2canvas.Renderer = function(parseQueue, options){
 };
 
 _html2canvas.Util.Support = function (options, doc) {
+logger.error(`>>> Entering Support(options=${options},doc=${doc})`, { "event.action": "Support", "logrite.options": options, "logrite.doc": doc });
 
   function supportSVGRendering() {
+	logger.error('>>> Entering supportSVGRendering()', { "event.action": "supportSVGRendering" });
     var img = new Image(),
     canvas = doc.createElement("canvas"),
     ctx = (canvas.getContext === undefined) ? false : canvas.getContext("2d");
+	logger.error(`supportSVGRendering(): img → ${img}`, { "event.action": "supportSVGRendering" });
+	logger.debug(`supportSVGRendering(): img.src → ${img.src}`, { "event.action": "supportSVGRendering" });
     if (ctx === false) {
       return false;
     }
@@ -2620,6 +2917,7 @@ _html2canvas.Util.Support = function (options, doc) {
       return false;
     }
     _html2canvas.Util.log('html2canvas: Parse: SVG powered rendering available');
+	logger.warn('<<< Exiting supportSVGRendering()', { "event.action": "supportSVGRendering" });
     return true;
   }
 
@@ -2627,10 +2925,12 @@ _html2canvas.Util.Support = function (options, doc) {
   // Opera doesn't provide valid bounds.height/bottom even though it supports the method.
 
   function supportRangeBounds() {
+	logger.error('>>> Entering supportRangeBounds()', { "event.action": "supportRangeBounds" });
     var r, testElement, rangeBounds, rangeHeight, support = false;
 
     if (doc.createRange) {
       r = doc.createRange();
+	logger.error(`supportRangeBounds(): r → ${r}`, { "event.action": "supportRangeBounds" });
       if (r.getBoundingClientRect) {
         testElement = doc.createElement('boundtest');
         testElement.style.height = "123px";
@@ -2648,6 +2948,7 @@ _html2canvas.Util.Support = function (options, doc) {
       }
     }
 
+	logger.warn('<<< Exiting supportRangeBounds()', { "event.action": "supportRangeBounds" });
     return support;
   }
 
@@ -2657,6 +2958,7 @@ _html2canvas.Util.Support = function (options, doc) {
   };
 };
 window.html2canvas = function(elements, opts) {
+logger.error(`>>> Entering html2canvas(elements=${elements},opts=${opts})`, { "event.action": "html2canvas", "logrite.elements": elements, "logrite.opts": opts });
   elements = (elements.length) ? elements : [elements];
   var queue,
   canvas,
@@ -2686,11 +2988,13 @@ window.html2canvas = function(elements, opts) {
     taintTest: true, // do a taint test with all images before applying to canvas
     renderer: "Canvas"
   };
+logger.error(`html2canvas(elements=${elements},opts=${opts}): elements → ${elements}`, { "event.action": "html2canvas", "logrite.elements": elements, "logrite.opts": opts });
 
   options = _html2canvas.Util.Extend(opts, options);
 
   _html2canvas.logging = options.logging;
   options.complete = function( images ) {
+logger.error(`>>> Entering complete(images=${images})`, { "event.action": "complete", "logrite.images": images });
 
     if (typeof options.onpreloaded === "function") {
       if ( options.onpreloaded( images ) === false ) {
@@ -2698,6 +3002,7 @@ window.html2canvas = function(elements, opts) {
       }
     }
     queue = _html2canvas.Parse( images, options );
+	logger.debug(`html2canvas(elements=${elements},opts=${opts}): queue → ${queue}`, { "event.action": "html2canvas", "logrite.elements": elements, "logrite.opts": opts });
 
     if (typeof options.onparsed === "function") {
       if ( options.onparsed( queue ) === false ) {
@@ -2712,6 +3017,7 @@ window.html2canvas = function(elements, opts) {
     }
 
 
+logger.warn(`<<< Exiting complete(images=${images})`, { "event.action": "complete", "logrite.images": images });
   };
 
   // for pages without images, we still want this to be async, i.e. return methods before executing
@@ -2721,16 +3027,21 @@ window.html2canvas = function(elements, opts) {
 
   return {
     render: function( queue, opts ) {
+	logger.error(`>>> Entering render(queue=${queue},opts=${opts})`, { "event.action": "render", "logrite.queue": queue, "logrite.opts": opts });
       return _html2canvas.Renderer( queue, _html2canvas.Util.Extend(opts, options) );
     },
     parse: function( images, opts ) {
+	logger.error(`>>> Entering parse(images=${images},opts=${opts})`, { "event.action": "parse", "logrite.images": images, "logrite.opts": opts });
       return _html2canvas.Parse( images, _html2canvas.Util.Extend(opts, options) );
     },
     preload: function( opts ) {
+	logger.error(`>>> Entering preload(opts=${opts})`, { "event.action": "preload", "logrite.opts": opts });
+	logger.warn(`<<< Exiting Preload(options=${options})`, { "event.action": "Preload", "logrite.options": options });
       return _html2canvas.Preload( _html2canvas.Util.Extend(opts, options) );
     },
     log: _html2canvas.Util.log
   };
+logger.warn(`<<< Exiting html2canvas(elements=${elements},opts=${opts})`, { "event.action": "html2canvas", "logrite.elements": elements, "logrite.opts": opts });
 };
 
 window.html2canvas.log = _html2canvas.Util.log; // for renderers
@@ -2738,6 +3049,7 @@ window.html2canvas.Renderer = {
   Canvas: undefined // We are assuming this will be used
 };
 _html2canvas.Renderer.Canvas = function(options) {
+logger.error(`>>> Entering Canvas(options=${options})`, { "event.action": "Canvas", "logrite.options": options });
   options = options || {};
 
   var doc = document,
@@ -2756,21 +3068,26 @@ _html2canvas.Renderer.Canvas = function(options) {
   }
 
   function safeImage(item) {
+	logger.error(`>>> Entering safeImage(item=${item})`, { "event.action": "safeImage", "logrite.item": item });
     if (safeImages.indexOf(item['arguments'][0].src ) === -1) {
       testctx.drawImage(item['arguments'][0], 0, 0);
       try {
         testctx.getImageData(0, 0, 1, 1);
       } catch(e) {
+		logger.error(`Exception in Canvas(options=${options}): ${e.message}`, e, { "event.action": "Canvas", "event.category": "process", "logrite.options": options });
         testCanvas = doc.createElement("canvas");
         testctx = testCanvas.getContext("2d");
         return false;
       }
       safeImages.push(item['arguments'][0].src);
+	logger.error(`Exception in safeImage(item=${item}): ${e.message}`, e, { "event.action": "safeImage", "event.category": "process", "logrite.item": item });
     }
+	logger.warn(`<<< Exiting safeImage(item=${item})`, { "event.action": "safeImage", "logrite.item": item });
     return true;
   }
 
   function renderItem(ctx, item) {
+	logger.error(`>>> Entering renderItem(ctx=${ctx},item=${item})`, { "event.action": "renderItem", "logrite.ctx": ctx, "logrite.item": item });
     switch(item.type){
       case "variable":
         ctx[item.name] = item['arguments'];
@@ -2802,6 +3119,7 @@ _html2canvas.Renderer.Canvas = function(options) {
         }
         break;
     }
+	logger.warn(`<<< Exiting renderItem(ctx=${ctx},item=${item})`, { "event.action": "renderItem", "logrite.ctx": ctx, "logrite.item": item });
   }
 
   return function(parsedData, options, document, queue, _html2canvas) {
@@ -2810,6 +3128,8 @@ _html2canvas.Renderer.Canvas = function(options) {
     bounds,
     fstyle,
     zStack = parsedData.stack;
+	logger.debug(`Canvas(options=${options}): ctx.fillStyle → ${ctx.fillStyle}`, { "event.action": "Canvas", "logrite.options": options });
+	logger.debug(`Canvas(options=${options}): ctx.textBaseline → ${ctx.textBaseline}`, { "event.action": "Canvas", "logrite.options": options });
 
     canvas.width = canvas.style.width =  options.width || zStack.ctx.width;
     canvas.height = canvas.style.height = options.height || zStack.ctx.height;
@@ -2858,10 +3178,12 @@ _html2canvas.Renderer.Canvas = function(options) {
 
         ctx.drawImage(canvas, bounds.left, bounds.top, bounds.width, bounds.height, 0, 0, bounds.width, bounds.height);
         canvas = null;
+		logger.debug(`Canvas(options=${options}): canvas.width → ${canvas.width}`, { "event.action": "Canvas", "logrite.options": options });
         return newCanvas;
       }
     }
 
+	logger.debug(`Canvas(options=${options}): canvas.height → ${canvas.height}`, { "event.action": "Canvas", "logrite.options": options });
     return canvas;
   };
 };

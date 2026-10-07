@@ -25,7 +25,10 @@ namespace Dnn.PersonaBar.Users.Components.Dto
         /// <param name="visibility">The profile visibility.</param>
         public ProfileVisibilityDto(ProfileVisibility visibility)
         {
+			eventLogger.LogError(">>> Entering ProfileVisibilityDto(visibility={Visibility})", visibility);
             this.VisibilityMode = visibility.VisibilityMode;
+			eventLogger.LogWarning("<<< Exiting ProfileVisibilityDto(visibility={Visibility})", visibility);
+			eventLogger.LogDebug("ProfileVisibilityDto(visibility={Visibility}): this.VisibilityMode → {Arg1}", visibility, this.VisibilityMode);
             this.RoleVisibilities = visibility.RoleVisibilities.Select(r => r.RoleID).ToList();
             this.RelationshipVisibilities = visibility.RelationshipVisibilities.Select(r => r.RelationshipId).ToList();
         }

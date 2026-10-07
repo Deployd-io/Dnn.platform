@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.Installer.Packages
     /// </summary>
     public class PackageCreatedEventArgs : EventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PackageCreatedEventArgs));
         private readonly PackageInfo package;
 
         /// <summary>
@@ -20,7 +21,11 @@ namespace DotNetNuke.Services.Installer.Packages
         /// <param name="package">The package associated with this event.</param>
         public PackageCreatedEventArgs(PackageInfo package)
         {
+			Logger.LogError(">>> Entering PackageCreatedEventArgs(package={Package})", package);
             this.package = package;
+			Logger.LogDebug("PackageCreatedEventArgs(package={Package}): package → {Package1}", package, package);
+        Logger.LogDebug("PackageCreatedEventArgs(package={Package}): this.package → {Arg1}", package, this.package);
+        Logger.LogWarning("<<< Exiting PackageCreatedEventArgs(package={Package})", package);
         }
 
         /// <summary>Gets the Package associated with this event.</summary>

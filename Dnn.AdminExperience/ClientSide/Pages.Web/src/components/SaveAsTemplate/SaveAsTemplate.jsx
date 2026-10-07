@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from "./style.module.less";
 import Localization from "../../localization";
+const logger = console;
 import {
     templateActions as TemplateActions
 } from "../../actions";
@@ -12,13 +13,17 @@ import {
 class SaveAsTemplate extends Component {
 
     onChangeField(key, event) {
+		logger.error(`>>> Entering onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
         const {onChangeField} = this.props;
         onChangeField(key, event.target.value);
+		logger.warn(`<<< Exiting onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {template, onChangeField, onSave, onCancel, errors} = this.props;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.saveAsTemplate}>
                 <div className="saveAsTemplateDetail">
@@ -81,6 +86,8 @@ SaveAsTemplate.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         template: state.template.template,
         errors: state.template.errors
@@ -88,6 +95,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.error(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
+	logger.warn(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
     return bindActionCreators({
         onChangeField: TemplateActions.changeTemplateField,
         onSave: TemplateActions.savePageAsTemplate

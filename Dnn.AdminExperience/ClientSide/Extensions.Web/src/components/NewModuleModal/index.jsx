@@ -8,6 +8,7 @@ import FromManifest from "./FromManifest";
 import FromNew from "./FromNew";
 import Localization from "localization";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 
@@ -29,43 +30,58 @@ const newModuleTypes = [
 class NewModuleModal extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             selectedType: ""
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     onSelectOwnerFolder(ownerFolder) {
+		logger.error(`>>> Entering onSelectOwnerFolder(ownerFolder=${ownerFolder})`, { "event.action": "onSelectOwnerFolder", "logrite.ownerFolder": ownerFolder });
         const { props } = this;
         props.dispatch(FolderActions.getModuleFolders(ownerFolder));
+		logger.warn(`<<< Exiting onSelectOwnerFolder(ownerFolder=${ownerFolder})`, { "event.action": "onSelectOwnerFolder", "logrite.ownerFolder": ownerFolder });
     }
 
     onSelectModuleFolder(parameters) {
+		logger.error(`>>> Entering onSelectModuleFolder(parameters=${parameters})`, { "event.action": "onSelectModuleFolder", "logrite.parameters": parameters });
         const { props } = this;
         props.dispatch(FolderActions.getModuleFiles(parameters));
+		logger.warn(`<<< Exiting onSelectModuleFolder(parameters=${parameters})`, { "event.action": "onSelectModuleFolder", "logrite.parameters": parameters });
     }
 
     retrieveOwnerAndModuleFolders() {
+		logger.error('>>> Entering retrieveOwnerAndModuleFolders()', { "event.action": "retrieveOwnerAndModuleFolders" });
         this.props.dispatch(FolderActions.getOwnerFolders());
         this.props.dispatch(FolderActions.getModuleFolders(""));
+		logger.warn('<<< Exiting retrieveOwnerAndModuleFolders()', { "event.action": "retrieveOwnerAndModuleFolders" });
     }
 
     onSelectNewModuleType(option) {
+		logger.error(`>>> Entering onSelectNewModuleType(option=${option})`, { "event.action": "onSelectNewModuleType", "logrite.option": option });
         this.setState({
             selectedType: option.value
         });
+		logger.warn(`<<< Exiting onSelectNewModuleType(option=${option})`, { "event.action": "onSelectNewModuleType", "logrite.option": option });
     }
 
     getCreateButtonActive() {
+		logger.error('>>> Entering getCreateButtonActive()', { "event.action": "getCreateButtonActive" });
+		logger.warn('<<< Exiting getCreateButtonActive()', { "event.action": "getCreateButtonActive" });
         return this.state.selectedType !== 0 && this.state.selectedType !== 1 && this.state.selectedType !== 2;
     }
 
     onAddNewFolder(payload, type, callback) {
+		logger.error(`>>> Entering onAddNewFolder(payload=${payload},type=${type},callback=${callback})`, { "event.action": "onAddNewFolder", "logrite.payload": payload, "logrite.type": type, "logrite.callback": callback });
         const { props } = this;
 
         props.dispatch(FolderActions.createFolder(payload, type, callback));
+		logger.warn(`<<< Exiting onAddNewFolder(payload=${payload},type=${type},callback=${callback})`, { "event.action": "onAddNewFolder", "logrite.payload": payload, "logrite.type": type, "logrite.callback": callback });
     }
 
     onCreateNewModule(payload) {
+		logger.error(`>>> Entering onCreateNewModule(payload=${payload})`, { "event.action": "onCreateNewModule", "logrite.payload": payload });
         const { props } = this;
         const shouldAppend = props.selectedInstalledPackageType === "Module";
         props.dispatch(ExtensionActions.createNewModule(payload, shouldAppend, (data) => {
@@ -76,10 +92,12 @@ class NewModuleModal extends Component {
                 props.dispatch(ExtensionActions.getInstalledPackages("Module"));
             }
             this.onCancel();
+			logger.warn(`<<< Exiting onCreateNewModule(payload=${payload})`, { "event.action": "onCreateNewModule", "logrite.payload": payload });
         }));
     }
 
     getCreateUI(selectedType) {
+		logger.error(`>>> Entering getCreateUI(selectedType=${selectedType})`, { "event.action": "getCreateUI", "logrite.selectedType": selectedType });
         const { props } = this;
         const ownerFolders = props.ownerFolders.map(folder => {
             return {
@@ -132,6 +150,7 @@ class NewModuleModal extends Component {
                     onCreateNewModule={this.onCreateNewModule.bind(this)}
                     retrieveOwnerAndModuleFolders={this.retrieveOwnerAndModuleFolders.bind(this)}/>;
             default:
+				logger.warn(`<<< Exiting getCreateUI(selectedType=${selectedType})`, { "event.action": "getCreateUI", "logrite.selectedType": selectedType });
                 return <div></div>;
         }
     }
@@ -142,6 +161,8 @@ class NewModuleModal extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.newModuleModal}>
                 <PersonaBarPageHeader title={Localization.get("CreateModule.Action")} />
@@ -185,6 +206,8 @@ NewModuleModal.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         selectedInstalledPackageType: state.extension.selectedInstalledPackageType,
         ownerFolders: state.folder.ownerFolders,

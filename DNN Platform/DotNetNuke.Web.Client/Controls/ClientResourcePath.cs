@@ -10,6 +10,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
     /// <summary>Defines the path to a client resource.</summary>
     public class ClientResourcePath
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ClientResourcePath));
         /// <summary>An event which is triggered during data binding.</summary>
         public event EventHandler DataBinding;
 
@@ -28,14 +29,18 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <summary>Triggers the <see cref="DataBinding"/> event.</summary>
         public void DataBind()
         {
+			Logger.LogError(">>> Entering DataBind()");
             this.OnDataBinding(EventArgs.Empty);
+			Logger.LogWarning("<<< Exiting DataBind()");
         }
 
         /// <summary>Triggers the <see cref="DataBinding"/> event.</summary>
         /// <param name="e">The event args.</param>
         protected void OnDataBinding(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnDataBinding(e={E})", e);
             this.DataBinding?.Invoke(this, e);
+			Logger.LogWarning("<<< Exiting OnDataBinding(e={E})", e);
         }
     }
 }

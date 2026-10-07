@@ -21,6 +21,7 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:DNNLocaleEditControl runat=server></{0}:DNNLocaleEditControl>")]
     public class DNNLocaleEditControl : TextEditControl, IPostBackEventHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DNNLocaleEditControl));
         private string displayMode = "Native";
         private LanguagesListType listType = LanguagesListType.Enabled;
 
@@ -34,12 +35,14 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         public void RaisePostBackEvent(string eventArgument)
         {
+			Logger.LogError(">>> Entering RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
             this.displayMode = eventArgument;
         }
 
         /// <summary>OnAttributesChanged runs when the CustomAttributes property has changed.</summary>
         protected override void OnAttributesChanged()
         {
+			Logger.LogError(">>> Entering OnAttributesChanged()");
             // Get the List settings out of the "Attributes"
             if (this.CustomAttributes != null)
             {
@@ -49,18 +52,23 @@ namespace DotNetNuke.UI.WebControls
                     if (listAtt != null)
                     {
                         this.listType = listAtt.ListType;
+						Logger.LogDebug("OnAttributesChanged(): listType → {ListType}", listType);
+						Logger.LogDebug("OnAttributesChanged(): this.listType → {Arg0}", this.listType);
                         break;
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting OnAttributesChanged()");
         }
 
         /// <summary>RenderViewMode renders the View (readonly) mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderViewMode(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderViewMode(writer={Writer})", writer);
             Locale locale = LocaleController.Instance.GetLocale(this.StringValue);
 
+			Logger.LogError("RenderViewMode(writer={Writer}): locale → {Locale}", writer, locale);
             this.ControlStyle.AddAttributesToRender(writer);
             writer.RenderBeginTag(HtmlTextWriterTag.Div);
             if (locale != null)
@@ -69,21 +77,25 @@ namespace DotNetNuke.UI.WebControls
             }
 
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderViewMode(writer={Writer})", writer);
         }
 
         /// <summary>RenderEditMode renders the Edit mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderEditMode(writer={Writer})", writer);
             // Render div
             writer.AddAttribute(HtmlTextWriterAttribute.Class, "dnnLeft");
             writer.RenderBeginTag(HtmlTextWriterTag.Div);
 
             var cultures = new List<CultureInfo>();
+			Logger.LogError("RenderEditMode(writer={Writer}): cultures → {Cultures}", writer, cultures);
             switch (this.ListType)
             {
                 case LanguagesListType.All:
                     var culturesArray = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
+					Logger.LogError("RenderEditMode(writer={Writer}): culturesArray → {CulturesArray}", writer, culturesArray);
                     Array.Sort(culturesArray, new CultureInfoComparer(this.DisplayMode));
                     cultures = culturesArray.ToList();
                     break;
@@ -144,6 +156,7 @@ namespace DotNetNuke.UI.WebControls
 
                 writer.AddAttribute(HtmlTextWriterAttribute.Type, "text/javascript");
                 writer.RenderBeginTag(HtmlTextWriterTag.Script);
+				Logger.LogWarning("<<< Exiting RenderEditMode(writer={Writer})", writer);
                 writer.Write(@"
 function onLocaleChanged(element){
     var $this = $(element);
@@ -174,11 +187,14 @@ function onLocaleChanged(element){
 
         private bool IsSelected(string locale)
         {
+			Logger.LogError(">>> Entering IsSelected(locale={Locale})", locale);
+            Logger.LogWarning("<<< Exiting IsSelected(locale={Locale})", locale);
             return locale == this.StringValue;
         }
 
         private void RenderModeButtons(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderModeButtons(writer={Writer})", writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Type, "radio");
             writer.AddAttribute("aria-label", "Mode");
             if (this.DisplayMode == "English")
@@ -210,19 +226,23 @@ function onLocaleChanged(element){
             writer.RenderEndTag();
 
             writer.Write(Localization.GetString("NativeName", Localization.GlobalResourceFile));
+			Logger.LogWarning("<<< Exiting RenderModeButtons(writer={Writer})", writer);
         }
 
         private void RenderOption(HtmlTextWriter writer, CultureInfo culture)
         {
+			Logger.LogError(">>> Entering RenderOption(writer={Writer},culture={Culture})", writer, culture);
             string localeName;
 
             if (this.DisplayMode == "Native")
             {
                 localeName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(culture.NativeName);
+				Logger.LogError("RenderOption(writer={Writer},culture={Culture}): localeName → {LocaleName}", writer, culture, localeName);
             }
             else
             {
                 localeName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(culture.EnglishName);
+				Logger.LogDebug("RenderOption(writer={Writer},culture={Culture}): localeName → {LocaleName}", writer, culture, localeName);
             }
 
             // Add the Value Attribute
@@ -237,6 +257,7 @@ function onLocaleChanged(element){
             writer.RenderBeginTag(HtmlTextWriterTag.Option);
             writer.Write(localeName);
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderOption(writer={Writer},culture={Culture})", writer, culture);
         }
     }
 }

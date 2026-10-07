@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -14,17 +15,23 @@
 CodeMirror.defineMode("properties", function() {
   return {
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       var sol = stream.sol() || state.afterSection;
       var eol = stream.eol();
+	logger.error(`token(stream=${stream},state=${state}): sol → ${sol}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+	logger.error(`token(stream=${stream},state=${state}): eol → ${eol}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
 
       state.afterSection = false;
+	logger.debug(`token(stream=${stream},state=${state}): state.afterSection → ${state.afterSection}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
 
       if (sol) {
         if (state.nextMultiline) {
           state.inMultiline = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.inMultiline → ${state.inMultiline}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           state.nextMultiline = false;
         } else {
           state.position = "def";
+		logger.debug(`token(stream=${stream},state=${state}): state.position → ${state.position}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         }
       }
 
@@ -38,6 +45,7 @@ CodeMirror.defineMode("properties", function() {
       }
 
       var ch = stream.next();
+	logger.error(`token(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
 
       if (sol && (ch === "#" || ch === "!" || ch === ";")) {
         state.position = "comment";
@@ -54,6 +62,7 @@ CodeMirror.defineMode("properties", function() {
         if (stream.eol()) {  // end of line?
           // Multiline value
           state.nextMultiline = true;
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         }
       }
 
@@ -61,12 +70,14 @@ CodeMirror.defineMode("properties", function() {
     },
 
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         position : "def",       // Current position, "def", "quote" or "comment"
         nextMultiline : false,  // Is the next line multiline value
         inMultiline : false,    // Is the current line a multiline value
         afterSection : false    // Did we just open a section
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     }
 
   };

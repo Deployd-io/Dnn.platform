@@ -1,12 +1,15 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
 define(['jquery', 'knockout'], function ($, ko) {
     'use strict';
 
     var init = function (element, valueAccessor) {
+		logger.error(`>>> Entering init(element=${element},valueAccessor=${valueAccessor})`, { "event.action": "init", "logrite.element": element, "logrite.valueAccessor": valueAccessor });
         var o = valueAccessor() || {};
         var options = o.jScrollPaneOptions || {};
+		logger.error(`init(element=${element},valueAccessor=${valueAccessor}): o → ${o}`, { "event.action": "init", "logrite.element": element, "logrite.valueAccessor": valueAccessor });
         var parentHeightOptions = o.parentHeightOptions;
         var parentScrollSettings = o.parentScrollSettings;
         var additionalStyles = o.additionalStyles;
@@ -18,6 +21,7 @@ define(['jquery', 'knockout'], function ($, ko) {
             if (options.mouseWheelSpeed === 0) {
                 $(".jspPane", element).unmousewheel();
                 $(".jspPane", element).bind("mousewheel", function mouseWheelHandler(event, delta) {
+					logger.error('>>> Entering mouseWheelHandler()', { "event.action": "mouseWheelHandler" });
                     //Propagate the event to the parent scrolls    
                     if (parentScrollSettings) {
                         var scrollOffset = 15;
@@ -29,21 +33,25 @@ define(['jquery', 'knockout'], function ($, ko) {
                         }
                     }
                     
+					logger.error(`mouseWheelHandler(): parentScroll → ${parentScroll}`, { "event.action": "mouseWheelHandler" });
                     return false;
                 });
             }            
         }, 0);
 
         var reinit = function () {
+			logger.error('>>> Entering reinit()', { "event.action": "reinit" });
             var parentHeight, height, correction;
             if (parentHeightOptions) {
                 parentHeight = $(element).parent().height();
+				logger.error(`reinit(): parentHeight → ${parentHeight}`, { "event.action": "reinit" });
                 correction = parentHeightOptions.heightCorrection ? parentHeightOptions.heightCorrection : 0;
                 height = parentHeight + correction;
                 $(element).height(height <= 0 ? parentHeight : height);
             }
 
             var scroll = $(element).data("jsp");
+			logger.error(`reinit(): scroll → ${scroll}`, { "event.action": "reinit" });
             if (scroll) {
                 scroll.reinitialise();
             }
@@ -55,6 +63,7 @@ define(['jquery', 'knockout'], function ($, ko) {
                     }
                 }
             }, 0);
+			logger.warn('<<< Exiting reinit()', { "event.action": "reinit" });
         };
 
         reinit();
@@ -71,6 +80,7 @@ define(['jquery', 'knockout'], function ($, ko) {
                 }                
             });
         }
+		logger.warn(`<<< Exiting init(element=${element},valueAccessor=${valueAccessor})`, { "event.action": "init", "logrite.element": element, "logrite.valueAccessor": valueAccessor });
     };
 
     ko.bindingHandlers.jScrollPane = {

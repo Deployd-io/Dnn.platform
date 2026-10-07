@@ -4,10 +4,13 @@ import { connect } from "react-redux";
 import { GridCell, SingleLineInputWithError, GridSystem, Button, Label } from "@dnnsoftware/dnn-react-common";
 import Localization from "localization";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 class JavascriptLibrary extends Component {
     getNameVersionRows(list) {
+		logger.error(`>>> Entering getNameVersionRows(list=${list})`, { "event.action": "getNameVersionRows", "logrite.list": list });
+		logger.warn(`<<< Exiting getNameVersionRows(list=${list})`, { "event.action": "getNameVersionRows", "logrite.list": list });
         return list.map((item, i) => {
             return <GridCell key={i} className="js-library-info-row">
                 <GridCell columnSize={70} className="js-library-info-name">
@@ -20,6 +23,8 @@ class JavascriptLibrary extends Component {
         });
     }
     getNameVersionTable(list, label, labelTooltip) {
+		logger.error(`>>> Entering getNameVersionTable(list=${list},label=${label},labelTooltip=${labelTooltip})`, { "event.action": "getNameVersionTable", "logrite.list": list, "logrite.label": label, "logrite.labelTooltip": labelTooltip });
+		logger.warn(`<<< Exiting getNameVersionTable(list=${list},label=${label},labelTooltip=${labelTooltip})`, { "event.action": "getNameVersionTable", "logrite.list": list, "logrite.label": label, "logrite.labelTooltip": labelTooltip });
         return [
             <Label
                 label={label}
@@ -38,8 +43,10 @@ class JavascriptLibrary extends Component {
         ];
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         const { extensionBeingEdited } = props;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.editJSLibrary + (props.className ? " " + props.className : "")}>
                 <GridSystem className="with-right-border top-half">
@@ -122,6 +129,8 @@ JavascriptLibrary.PropTypes = {
     primaryButtonText: PropTypes.string
 };
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         extensionBeingEdited: state.extension.extensionBeingEdited,
         extensionBeingEditedIndex: state.extension.extensionBeingEditedIndex

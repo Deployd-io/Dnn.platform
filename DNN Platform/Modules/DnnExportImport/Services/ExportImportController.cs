@@ -19,6 +19,7 @@ namespace Dnn.ExportImport.Services
     [RequireHost]
     public class ExportImportController : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExportImportController));
         private readonly ExportController exportController;
         private readonly ImportController importController;
         private readonly BaseController baseController;
@@ -29,7 +30,11 @@ namespace Dnn.ExportImport.Services
         /// <param name="baseController">The base controller.</param>
         public ExportImportController(ExportController exportController, ImportController importController, BaseController baseController)
         {
+			Logger.LogError(">>> Entering ExportImportController(exportController={ExportController},importController={ImportController},baseController={BaseController})", exportController, importController, baseController);
+			Logger.LogDebug("ExportImportController(exportController={ExportController},importController={ImportController},baseController={BaseController}): importController → {ImportController1}", exportController, importController, baseController, importController);
+        Logger.LogWarning("<<< Exiting ExportImportController(exportController={ExportController},importController={ImportController},baseController={BaseController})", exportController, importController, baseController);
             this.exportController = exportController;
+			Logger.LogDebug("ExportImportController(exportController={ExportController},importController={ImportController},baseController={BaseController}): this.exportController → {Arg3}", exportController, importController, baseController, this.exportController);
             this.importController = importController;
             this.baseController = baseController;
         }
@@ -41,8 +46,11 @@ namespace Dnn.ExportImport.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Export(ExportDto exportDto)
         {
+			Logger.LogError(">>> Entering Export(exportDto={ExportDto})", exportDto);
             var jobId = this.exportController.QueueOperation(this.PortalSettings.UserId, exportDto);
 
+			Logger.LogError("Export(exportDto={ExportDto}): jobId → {JobId}", exportDto, jobId);
+			Logger.LogWarning("<<< Exiting Export(exportDto={ExportDto})", exportDto);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { jobId });
         }
 
@@ -53,12 +61,15 @@ namespace Dnn.ExportImport.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Import(ImportDto importDto)
         {
+			Logger.LogError(">>> Entering Import(importDto={ImportDto})", importDto);
             if (this.importController.VerifyImportPackage(importDto.PackageId, null, out var message))
             {
                 var jobId = this.importController.QueueOperation(this.PortalSettings.UserId, importDto);
+				Logger.LogError("Import(importDto={ImportDto}): jobId → {JobId}", importDto, jobId);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { jobId });
             }
 
+			Logger.LogWarning("<<< Exiting Import(importDto={ImportDto})", importDto);
             return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
         }
 
@@ -68,9 +79,13 @@ namespace Dnn.ExportImport.Services
         [HttpGet]
         public HttpResponseMessage VerifyImportPackage(string packageId)
         {
+			Logger.LogError(">>> Entering VerifyImportPackage(packageId={PackageId})", packageId);
             var summary = new ImportExportSummary();
             var isValid = this.importController.VerifyImportPackage(packageId, summary, out var message);
+			Logger.LogError("VerifyImportPackage(packageId={PackageId}): isValid → {IsValid}", packageId, isValid);
+			Logger.LogError("VerifyImportPackage(packageId={PackageId}): summary → {Summary}", packageId, summary);
             summary.ConvertToLocal(this.UserInfo);
+			Logger.LogWarning("<<< Exiting VerifyImportPackage(packageId={PackageId})", packageId);
             return isValid
                 ? this.Request.CreateResponse(HttpStatusCode.OK, summary)
                 : this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
@@ -85,8 +100,11 @@ namespace Dnn.ExportImport.Services
         [HttpGet]
         public HttpResponseMessage GetImportPackages(string keyword = "", string order = "newest", int pageIndex = 0, int pageSize = 10)
         {
+			Logger.LogError(">>> Entering GetImportPackages(keyword={Keyword},order={Order},pageIndex={PageIndex},pageSize={PageSize})", keyword, order, pageIndex, pageSize);
             var packages = this.importController.GetImportPackages(out var total, keyword, order, pageIndex, pageSize).ToList();
             packages.ForEach(package => package.ConvertToLocal(this.UserInfo));
+			Logger.LogError("GetImportPackages(keyword={Keyword},order={Order},pageIndex={PageIndex},pageSize={PageSize}): packages → {Packages}", keyword, order, pageIndex, pageSize, packages);
+			Logger.LogWarning("<<< Exiting GetImportPackages(keyword={Keyword},order={Order},pageIndex={PageIndex},pageSize={PageSize})", keyword, order, pageIndex, pageSize);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { packages, total });
         }
 
@@ -100,7 +118,10 @@ namespace Dnn.ExportImport.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage CancelProcess([FromUri] int jobId)
         {
+			Logger.LogError(">>> Entering CancelProcess(jobId={JobId})", jobId);
             var cancelStatus = this.baseController.CancelJob(this.UserInfo.IsSuperUser ? -1 : this.PortalSettings.PortalId, jobId);
+			Logger.LogError("CancelProcess(jobId={JobId}): cancelStatus → {CancelStatus}", jobId, cancelStatus);
+			Logger.LogWarning("<<< Exiting CancelProcess(jobId={JobId})", jobId);
             return this.Request.CreateResponse(
                 cancelStatus ? HttpStatusCode.OK : HttpStatusCode.BadRequest, new { success = cancelStatus });
         }
@@ -115,7 +136,10 @@ namespace Dnn.ExportImport.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage RemoveJob([FromUri] int jobId)
         {
+			Logger.LogError(">>> Entering RemoveJob(jobId={JobId})", jobId);
             var cancelStatus = this.baseController.RemoveJob(this.UserInfo.IsSuperUser ? -1 : this.PortalSettings.PortalId, jobId);
+			Logger.LogError("RemoveJob(jobId={JobId}): cancelStatus → {CancelStatus}", jobId, cancelStatus);
+			Logger.LogWarning("<<< Exiting RemoveJob(jobId={JobId})", jobId);
             return this.Request.CreateResponse(
                 cancelStatus ? HttpStatusCode.OK : HttpStatusCode.BadRequest, new { success = cancelStatus });
         }
@@ -129,9 +153,11 @@ namespace Dnn.ExportImport.Services
         [HttpGet]
         public HttpResponseMessage LastJobTime(int portal, JobType jobType)
         {
+			Logger.LogError(">>> Entering LastJobTime(portal={Portal},jobType={JobType})", portal, jobType);
             if (!this.UserInfo.IsSuperUser && portal != this.PortalSettings.PortalId)
             {
                 var error = Localization.GetString("NotPortalAdmin", Constants.SharedResources);
+				Logger.LogError("LastJobTime(portal={Portal},jobType={JobType}): error → {Error}", portal, jobType, error);
                 return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, error);
             }
 
@@ -143,6 +169,8 @@ namespace Dnn.ExportImport.Services
             }
 
             var lastTime = this.baseController.GetLastJobTime(portal, jobType);
+			Logger.LogError("LastJobTime(portal={Portal},jobType={JobType}): lastTime → {LastTime}", portal, jobType, lastTime);
+			Logger.LogWarning("<<< Exiting LastJobTime(portal={Portal},jobType={JobType})", portal, jobType);
             return this.Request.CreateResponse(
                 HttpStatusCode.OK,
                 new { lastTime = Util.GetDateTimeString(lastTime) });
@@ -160,13 +188,16 @@ namespace Dnn.ExportImport.Services
         [HttpGet]
         public HttpResponseMessage AllJobs(int portal, int? pageSize = 10, int? pageIndex = 0, int? jobType = null, string keywords = null)
         {
+			Logger.LogError(">>> Entering AllJobs(portal={Portal},pageSize={PageSize},pageIndex={PageIndex},jobType={JobType},keywords={Keywords})", portal, pageSize, pageIndex, jobType, keywords);
             if (!this.UserInfo.IsSuperUser && portal != this.PortalSettings.PortalId)
             {
                 var error = Localization.GetString("NotPortalAdmin", Constants.SharedResources);
+				Logger.LogError("AllJobs(portal={Portal},pageSize={PageSize},pageIndex={PageIndex},jobType={JobType},keywords={Keywords}): error → {Error}", portal, pageSize, pageIndex, jobType, keywords, error);
                 return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, error);
             }
 
             var jobs = this.baseController.GetAllJobs(portal, this.PortalSettings.PortalId, pageSize, pageIndex, jobType, keywords);
+			Logger.LogError("AllJobs(portal={Portal},pageSize={PageSize},pageIndex={PageIndex},jobType={JobType},keywords={Keywords}): jobs → {Jobs}", portal, pageSize, pageIndex, jobType, keywords, jobs);
             jobs?.ConvertToLocal(this.UserInfo);
             return this.Request.CreateResponse(HttpStatusCode.OK, jobs);
         }
@@ -179,8 +210,11 @@ namespace Dnn.ExportImport.Services
         [HttpGet]
         public HttpResponseMessage JobDetails(int jobId)
         {
+			Logger.LogError(">>> Entering JobDetails(jobId={JobId})", jobId);
             var job = this.baseController.GetJobDetails(this.UserInfo.IsSuperUser ? -1 : this.PortalSettings.PortalId, jobId);
             job?.ConvertToLocal(this.UserInfo);
+			Logger.LogError("JobDetails(jobId={JobId}): job → {Job}", jobId, job);
+			Logger.LogWarning("<<< Exiting JobDetails(jobId={JobId})", jobId);
             return job != null
                 ? this.Request.CreateResponse(HttpStatusCode.OK, job)
                 : this.Request.CreateResponse(

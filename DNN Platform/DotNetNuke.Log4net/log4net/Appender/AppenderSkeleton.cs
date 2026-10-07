@@ -55,7 +55,10 @@ namespace log4net.Appender
         /// </remarks>
         protected AppenderSkeleton()
         {
+			value.LogError(">>> Entering AppenderSkeleton()");
             this.m_errorHandler = new OnlyOnceErrorHandler(this.GetType().Name);
+			value.LogDebug("AppenderSkeleton(): m_errorHandler → {M_errorHandler}", m_errorHandler);
+        value.LogWarning("<<< Exiting AppenderSkeleton()");
         }
 
         /// <summary>
@@ -182,6 +185,8 @@ namespace log4net.Appender
         /// </remarks>
         public virtual void ActivateOptions() 
         {
+		value.LogError(">>> Entering ActivateOptions()");
+        value.LogWarning("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>
@@ -218,6 +223,7 @@ namespace log4net.Appender
         /// </remarks>
         public void Close()
         {
+			value.LogError(">>> Entering Close()");
             // This lock prevents the appender being closed while it is still appending
             lock(this)
             {
@@ -225,8 +231,10 @@ namespace log4net.Appender
                 {
                     this.OnClose();
                     this.m_closed = true;
+					value.LogDebug("Close(): this.m_closed → {Arg0}", this.m_closed);
                 }
             }
+			value.LogWarning("<<< Exiting Close()");
         }
 
         /// <summary>
@@ -272,6 +280,7 @@ namespace log4net.Appender
         /// </remarks>
         public void DoAppend(LoggingEvent loggingEvent) 
         {
+			value.LogError(">>> Entering DoAppend(loggingEvent={LoggingEvent})", loggingEvent);
             // This lock is absolutely critical for correct formatting
             // of the message in a multi-threaded environment.  Without
             // this, the message may be broken up into elements from
@@ -294,6 +303,7 @@ namespace log4net.Appender
                 try
                 {
                     this.m_recursiveGuard = true;
+					value.LogDebug("DoAppend(loggingEvent={LoggingEvent}): this.m_recursiveGuard → {Arg1}", loggingEvent, this.m_recursiveGuard);
 
                     if (this.FilterEvent(loggingEvent) && this.PreAppendCheck())
                     {
@@ -302,6 +312,7 @@ namespace log4net.Appender
                 }
                 catch(Exception ex)
                 {
+					value.LogError("Exception in DoAppend(loggingEvent={LoggingEvent}): {Arg1}", loggingEvent, ex.Message);
                     this.ErrorHandler.Error("Failed in DoAppend", ex);
                 }
 #if !MONO && !NET_2_0 && !NETSTANDARD
@@ -320,6 +331,7 @@ namespace log4net.Appender
                     this.m_recursiveGuard = false;
                 }
             }
+			value.LogWarning("<<< Exiting DoAppend(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>
@@ -365,6 +377,7 @@ namespace log4net.Appender
         /// </remarks>
         public void DoAppend(LoggingEvent[] loggingEvents) 
         {
+			value.LogError(">>> Entering DoAppend(loggingEvents={LoggingEvents})", loggingEvents);
             // This lock is absolutely critical for correct formatting
             // of the message in a multi-threaded environment.  Without
             // this, the message may be broken up into elements from
@@ -387,8 +400,10 @@ namespace log4net.Appender
                 try
                 {
                     this.m_recursiveGuard = true;
+					value.LogDebug("DoAppend(loggingEvents={LoggingEvents}): this.m_recursiveGuard → {Arg1}", loggingEvents, this.m_recursiveGuard);
 
                     ArrayList filteredEvents = new ArrayList(loggingEvents.Length);
+					value.LogError("DoAppend(loggingEvents={LoggingEvents}): filteredEvents → {FilteredEvents}", loggingEvents, filteredEvents);
 
                     foreach(LoggingEvent loggingEvent in loggingEvents)
                     {
@@ -405,6 +420,7 @@ namespace log4net.Appender
                 }
                 catch(Exception ex)
                 {
+					value.LogError("Exception in DoAppend(loggingEvents={LoggingEvents}): {Arg1}", loggingEvents, ex.Message);
                     this.ErrorHandler.Error("Failed in Bulk DoAppend", ex);
                 }
 #if !MONO && !NET_2_0 && !NETSTANDARD
@@ -458,12 +474,14 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual bool FilterEvent(LoggingEvent loggingEvent)
         {
+			value.LogError(">>> Entering FilterEvent(loggingEvent={LoggingEvent})", loggingEvent);
             if (!this.IsAsSevereAsThreshold(loggingEvent.Level)) 
             {
                 return false;
             }
 
             IFilter f = this.FilterHead;
+			value.LogError("FilterEvent(loggingEvent={LoggingEvent}): f → {F}", loggingEvent, f);
 
             while(f != null) 
             {
@@ -482,6 +500,7 @@ namespace log4net.Appender
                 }
             }
 
+			value.LogWarning("<<< Exiting FilterEvent(loggingEvent={LoggingEvent})", loggingEvent);
             return true;
         }
 
@@ -500,18 +519,25 @@ namespace log4net.Appender
         /// </remarks>
         public virtual void AddFilter(IFilter filter)
         {
+			value.LogError(">>> Entering AddFilter(filter={Filter})", filter);
             if (filter == null)
             {
+				value.LogError("Throwing ArgumentNullException from AddFilter(filter={Filter})", filter);
                 throw new ArgumentNullException("filter param must not be null");
             }
 
             if (this.m_headFilter == null) 
             {
                 this.m_headFilter = this.m_tailFilter = filter;
+				value.LogDebug("AddFilter(filter={Filter}): m_headFilter → {M_headFilter}", filter, m_headFilter);
             } 
             else 
             {
+				value.LogDebug("AddFilter(filter={Filter}): this.m_headFilter → {Arg1}", filter, this.m_headFilter);
+				value.LogDebug("AddFilter(filter={Filter}): m_tailFilter → {M_tailFilter}", filter, m_tailFilter);
+				value.LogDebug("AddFilter(filter={Filter}): this.m_tailFilter → {Arg1}", filter, this.m_tailFilter);
                 this.m_tailFilter.Next = filter;
+				value.LogWarning("<<< Exiting AddFilter(filter={Filter})", filter);
                 this.m_tailFilter = filter;	
             }
         }
@@ -526,7 +552,11 @@ namespace log4net.Appender
         /// </remarks>
         public virtual void ClearFilters()
         {
+			value.LogError(">>> Entering ClearFilters()");
             this.m_headFilter = this.m_tailFilter = null;
+			value.LogDebug("ClearFilters(): m_headFilter → {M_headFilter}", m_headFilter);
+        value.LogDebug("ClearFilters(): this.m_headFilter → {Arg0}", this.m_headFilter);
+        value.LogWarning("<<< Exiting ClearFilters()");
         }
 
         /// <summary>
@@ -544,6 +574,8 @@ namespace log4net.Appender
         /// </returns>
         protected virtual bool IsAsSevereAsThreshold(Level level) 
         {
+			value.LogError(">>> Entering IsAsSevereAsThreshold(level={Level})", level);
+            value.LogWarning("<<< Exiting IsAsSevereAsThreshold(level={Level})", level);
             return ((this.m_threshold == null) || level >= this.m_threshold);
         }
 
@@ -562,7 +594,9 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void OnClose() 
         {
+			value.LogError(">>> Entering OnClose()");
             // Do nothing by default
+			value.LogWarning("<<< Exiting OnClose()");
         }
 
         /// <summary>
@@ -601,6 +635,7 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void Append(LoggingEvent[] loggingEvents)
         {
+			value.LogError(">>> Entering Append(loggingEvents={LoggingEvents})", loggingEvents);
             foreach(LoggingEvent loggingEvent in loggingEvents)
             {
                 this.Append(loggingEvent);
@@ -627,12 +662,14 @@ namespace log4net.Appender
         /// <returns><c>true</c> if the call to <see cref="M:Append(LoggingEvent)"/> should proceed.</returns>
         protected virtual bool PreAppendCheck()
         {
+			value.LogError(">>> Entering PreAppendCheck()");
             if ((this.m_layout == null) && this.RequiresLayout)
             {
                 this.ErrorHandler.Error("AppenderSkeleton: No layout set for the appender named ["+ this.m_name+"].");
                 return false;
             }
 
+			value.LogWarning("<<< Exiting PreAppendCheck()");
             return true;
         }
 
@@ -662,10 +699,12 @@ namespace log4net.Appender
         /// </remarks>
         protected string RenderLoggingEvent(LoggingEvent loggingEvent)
         {
+			value.LogError(">>> Entering RenderLoggingEvent(loggingEvent={LoggingEvent})", loggingEvent);
             // Create the render writer on first use
             if (this.m_renderWriter == null)
             {
                 this.m_renderWriter = new ReusableStringWriter(System.Globalization.CultureInfo.InvariantCulture);
+				value.LogDebug("RenderLoggingEvent(loggingEvent={LoggingEvent}): m_renderWriter → {M_renderWriter}", loggingEvent, m_renderWriter);
             }
 
             lock (this.m_renderWriter)
@@ -674,6 +713,7 @@ namespace log4net.Appender
                 this.m_renderWriter.Reset(c_renderBufferMaxCapacity, c_renderBufferSize);
 
                 this.RenderLoggingEvent(this.m_renderWriter, loggingEvent);
+				value.LogWarning("<<< Exiting RenderLoggingEvent(loggingEvent={LoggingEvent})", loggingEvent);
                 return this.m_renderWriter.ToString();
             }
         }
@@ -760,6 +800,8 @@ namespace log4net.Appender
             /// <returns><c>True</c> if all logging events were flushed successfully, else <c>false</c>.</returns>
             public virtual bool Flush(int millisecondsTimeout)
             {
+			value.LogError(">>> Entering Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
+			value.LogWarning("<<< Exiting Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
             return true;
             }
 

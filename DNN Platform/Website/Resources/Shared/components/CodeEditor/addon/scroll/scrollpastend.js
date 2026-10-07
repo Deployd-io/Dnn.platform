@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -31,8 +32,10 @@
   }
 
   function updateBottomMargin(cm) {
+	logger.error(`>>> Entering updateBottomMargin(cm=${cm})`, { "event.action": "updateBottomMargin", "logrite.cm": cm });
     var padding = "";
     if (cm.lineCount() > 1) {
+	logger.error(`updateBottomMargin(cm=${cm}): padding → ${padding}`, { "event.action": "updateBottomMargin", "logrite.cm": cm });
       var totalH = cm.display.scroller.clientHeight - 30,
           lastLineH = cm.getLineHandle(cm.lastLine()).height;
       padding = (totalH - lastLineH) + "px";
@@ -41,6 +44,7 @@
       cm.state.scrollPastEndPadding = padding;
       cm.display.lineSpace.parentNode.style.paddingBottom = padding;
       cm.setSize();
+	logger.warn(`<<< Exiting updateBottomMargin(cm=${cm})`, { "event.action": "updateBottomMargin", "logrite.cm": cm });
     }
   }
 });

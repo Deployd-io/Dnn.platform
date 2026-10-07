@@ -36,7 +36,10 @@ namespace DotNetNuke.Security.Profile
         /// <param name="dataProvider">The data provider.</param>
         public DNNProfileProvider(IEventLogger eventLogger, DataProvider dataProvider)
         {
+			eventLogger.LogError(">>> Entering DNNProfileProvider(eventLogger={EventLogger},dataProvider={DataProvider})", eventLogger, dataProvider);
+			eventLogger.LogDebug("DNNProfileProvider(eventLogger={EventLogger},dataProvider={DataProvider}): dataProvider → {DataProvider1}", eventLogger, dataProvider, dataProvider);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogWarning("<<< Exiting DNNProfileProvider(eventLogger={EventLogger},dataProvider={DataProvider})", eventLogger, dataProvider);
             this.dataProvider = dataProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>();
         }
 
@@ -47,16 +50,20 @@ namespace DotNetNuke.Security.Profile
         /// <param name="user">The user whose Profile information we are retrieving.</param>
         public override void GetUserProfile(ref UserInfo user)
         {
+			eventLogger.LogError(">>> Entering GetUserProfile(user={User})", user);
             ProfilePropertyDefinition profProperty;
 
             int portalId = user.IsSuperUser ? Globals.glbSuperUserAppName : user.PortalID;
             var properties = ProfileController.GetPropertyDefinitionsByPortal(portalId, true, false);
+			eventLogger.LogError("GetUserProfile(user={User}): properties → {Properties}", user, properties);
 
             // Load the Profile properties
             if (user.UserID > Null.NullInteger)
             {
                 var key = GetProfileCacheKey(user);
+				eventLogger.LogError("GetUserProfile(user={User}): key → {Key}", user, key);
                 var cachedProperties = (ProfilePropertyDefinitionCollection)DataCache.GetCache(key);
+				eventLogger.LogError("GetUserProfile(user={User}): cachedProperties → {CachedProperties}", user, cachedProperties);
                 if (cachedProperties != null)
                 {
                     properties = cachedProperties;
@@ -74,12 +81,17 @@ namespace DotNetNuke.Security.Profile
                             }
 
                             int definitionId = Convert.ToInt32(dr["PropertyDefinitionId"], CultureInfo.InvariantCulture);
+							eventLogger.LogError("GetUserProfile(user={User}): definitionId → {DefinitionId}", user, definitionId);
                             profProperty = properties.GetById(definitionId);
+							eventLogger.LogDebug("GetUserProfile(user={User}): profProperty → {ProfProperty}", user, profProperty);
                             if (profProperty != null)
                             {
+								eventLogger.LogError("GetUserProfile(user={User}): profProperty → {ProfProperty}", user, profProperty);
                                 profProperty.PropertyValue = Convert.ToString(dr["PropertyValue"], CultureInfo.InvariantCulture);
                                 var extendedVisibility = string.Empty;
+								eventLogger.LogError("GetUserProfile(user={User}): extendedVisibility → {ExtendedVisibility}", user, extendedVisibility);
                                 var schemaTable = dr.GetSchemaTable();
+								eventLogger.LogError("GetUserProfile(user={User}): schemaTable → {SchemaTable}", user, schemaTable);
                                 if (schemaTable != null && schemaTable.Select("ColumnName = 'ExtendedVisibility'").Length > 0)
                                 {
                                     extendedVisibility = Convert.ToString(dr["ExtendedVisibility"], CultureInfo.InvariantCulture);
@@ -110,6 +122,7 @@ namespace DotNetNuke.Security.Profile
                 if (string.IsNullOrEmpty(profProperty.PropertyValue) && !string.IsNullOrEmpty(profProperty.DefaultValue))
                 {
                     profProperty.PropertyValue = profProperty.DefaultValue;
+					eventLogger.LogDebug("GetUserProfile(user={User}): profProperty.PropertyValue → {Arg1}", user, profProperty.PropertyValue);
                 }
 
                 user.Profile.ProfileProperties.Add(profProperty);
@@ -120,25 +133,31 @@ namespace DotNetNuke.Security.Profile
 
             // Ensure old and new TimeZone properties are in synch
             this.UpdateTimeZoneInfo(user, properties);
+			eventLogger.LogWarning("<<< Exiting GetUserProfile(user={User})", user);
         }
 
         /// <summary>UpdateUserProfile persists a user's Profile to the Data Store.</summary>
         /// <param name="user">The user to persist to the Data Store.</param>
         public override void UpdateUserProfile(UserInfo user)
         {
+			eventLogger.LogError(">>> Entering UpdateUserProfile(user={User})", user);
             var key = GetProfileCacheKey(user);
             DataCache.ClearCache(key);
+			eventLogger.LogError("UpdateUserProfile(user={User}): key → {Key}", user, key);
 
             ProfilePropertyDefinitionCollection properties = user.Profile.ProfileProperties;
 
             // Ensure old and new TimeZone properties are in synch
             var newTimeZone = properties["PreferredTimeZone"];
+			eventLogger.LogError("UpdateUserProfile(user={User}): newTimeZone → {NewTimeZone}", user, newTimeZone);
             var oldTimeZone = properties["TimeZone"];
+			eventLogger.LogError("UpdateUserProfile(user={User}): oldTimeZone → {OldTimeZone}", user, oldTimeZone);
             if (oldTimeZone != null && newTimeZone != null)
             { // preference given to new property, if new is changed then old should be updated as well.
                 if (newTimeZone.IsDirty && !string.IsNullOrEmpty(newTimeZone.PropertyValue))
                 {
                     var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(newTimeZone.PropertyValue);
+					eventLogger.LogError("UpdateUserProfile(user={User}): timeZoneInfo → {TimeZoneInfo}", user, timeZoneInfo);
                     if (timeZoneInfo != null)
                     {
                         oldTimeZone.PropertyValue = timeZoneInfo.BaseUtcOffset.TotalMinutes.ToString(CultureInfo.InvariantCulture);
@@ -159,6 +178,7 @@ namespace DotNetNuke.Security.Profile
             {
                 if (profProperty.PropertyValue != null && profProperty.IsDirty)
                 {
+			eventLogger.LogWarning("<<< Exiting UpdateUserProfile(user={User})", user);
                     var objSecurity = PortalSecurity.Instance;
 #pragma warning disable CS0618 // Type or member is obsolete
                     string propertyValue = objSecurity.InputFilter(profProperty.PropertyValue, PortalSecurity.FilterFlag.NoScripting);
@@ -178,21 +198,28 @@ namespace DotNetNuke.Security.Profile
 
         private static string GetProfileCacheKey(UserInfo user)
         {
+			eventLogger.LogError(">>> Entering GetProfileCacheKey(user={User})", user);
+            eventLogger.LogWarning("<<< Exiting GetProfileCacheKey(user={User})", user);
             return string.Format(CultureInfo.InvariantCulture, DataCache.UserProfileCacheKey, user.PortalID, user.Username);
         }
 
         private void UpdateTimeZoneInfo(UserInfo user, ProfilePropertyDefinitionCollection properties)
         {
+			eventLogger.LogError(">>> Entering UpdateTimeZoneInfo(user={User},properties={Properties})", user, properties);
             ProfilePropertyDefinition newTimeZone = properties["PreferredTimeZone"];
             ProfilePropertyDefinition oldTimeZone = properties["TimeZone"];
+			eventLogger.LogError("UpdateTimeZoneInfo(user={User},properties={Properties}): newTimeZone → {NewTimeZone}", user, properties, newTimeZone);
             if (newTimeZone != null && oldTimeZone != null)
             {
+				eventLogger.LogError("UpdateTimeZoneInfo(user={User},properties={Properties}): oldTimeZone → {OldTimeZone}", user, properties, oldTimeZone);
                 // Old timezone is present but new is not...we will set that up.
                 if (!string.IsNullOrEmpty(oldTimeZone.PropertyValue) && string.IsNullOrEmpty(newTimeZone.PropertyValue))
                 {
                     if (int.TryParse(oldTimeZone.PropertyValue, out var oldOffset))
                     {
                         TimeZoneInfo timeZoneInfo = Localization.ConvertLegacyTimeZoneOffsetToTimeZoneInfo(oldOffset);
+						eventLogger.LogError("UpdateTimeZoneInfo(user={User},properties={Properties}): timeZoneInfo → {TimeZoneInfo}", user, properties, timeZoneInfo);
+						eventLogger.LogDebug("UpdateTimeZoneInfo(user={User},properties={Properties}): newTimeZone.PropertyValue → {Arg2}", user, properties, newTimeZone.PropertyValue);
                         newTimeZone.PropertyValue = timeZoneInfo.Id;
                         this.UpdateUserProfile(user);
                     }
@@ -208,6 +235,7 @@ namespace DotNetNuke.Security.Profile
                     }
                 }
             }
+			eventLogger.LogWarning("<<< Exiting UpdateTimeZoneInfo(user={User},properties={Properties})", user, properties);
         }
     }
 }

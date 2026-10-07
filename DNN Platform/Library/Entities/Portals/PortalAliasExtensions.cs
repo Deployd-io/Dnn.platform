@@ -21,8 +21,11 @@ namespace DotNetNuke.Entities.Portals
     /// <summary>Extensions for portal aliases.</summary>
     public static partial class PortalAliasExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalAliasExtensions));
         public static bool ContainsAlias(this IEnumerable<PortalAliasInfo> aliases, int portalId, string httpAlias)
         {
+			Logger.LogError(">>> Entering ContainsAlias(aliases={Aliases},portalId={PortalId},httpAlias={HttpAlias})", aliases, portalId, httpAlias);
+            Logger.LogWarning("<<< Exiting ContainsAlias(aliases={Aliases},portalId={PortalId},httpAlias={HttpAlias})", aliases, portalId, httpAlias);
             return aliases.Cast<IPortalAliasInfo>()
                 .Where(alias => alias.PortalId == portalId || portalId == -1)
                 .Any(alias => string.Equals(alias.HttpAlias, httpAlias, StringComparison.OrdinalIgnoreCase));
@@ -30,6 +33,8 @@ namespace DotNetNuke.Entities.Portals
 
         public static bool ContainsSpecificSkins(this IEnumerable<PortalAliasInfo> aliases)
         {
+			Logger.LogError(">>> Entering ContainsSpecificSkins(aliases={Aliases})", aliases);
+			Logger.LogWarning("<<< Exiting ContainsSpecificSkins(aliases={Aliases})", aliases);
             return aliases.Any(alias => !string.IsNullOrEmpty(alias.Skin));
         }
 
@@ -58,6 +63,8 @@ namespace DotNetNuke.Entities.Portals
         public static PortalAliasInfo GetAliasByPortalIdAndSettings(this IEnumerable<PortalAliasInfo> aliases, int portalId, UrlAction result, string cultureCode, FriendlyUrlSettings settings)
         {
 #pragma warning disable CS0618 // Type or member is obsolete
+			Logger.LogError(">>> Entering GetAliasByPortalIdAndSettings(aliases={Aliases},portalId={PortalId},result={Result},cultureCode={CultureCode},settings={Settings})", aliases, portalId, result, cultureCode, settings);
+			Logger.LogWarning("<<< Exiting GetAliasByPortalIdAndSettings(aliases={Aliases},portalId={PortalId},result={Result},cultureCode={CultureCode},settings={Settings})", aliases, portalId, result, cultureCode, settings);
             var browserType = OldBrowserTypes.Normal;
 #pragma warning restore CS0618 // Type or member is obsolete
 
@@ -66,9 +73,11 @@ namespace DotNetNuke.Entities.Portals
             {
                 HttpRequest request = HttpContext.Current.Request;
                 HttpResponse response = HttpContext.Current.Response;
+				Logger.LogError("GetAliasByPortalIdAndSettings(aliases={Aliases},portalId={PortalId},result={Result},cultureCode={CultureCode},settings={Settings}): response → {Response}", aliases, portalId, result, cultureCode, settings, response);
 
                 // TODO: create version of GetBrowserType that returns NewBrowserTypes
                 browserType = FriendlyUrlController.GetBrowserType(request, response, settings);
+				Logger.LogError("GetAliasByPortalIdAndSettings(aliases={Aliases},portalId={PortalId},result={Result},cultureCode={CultureCode},settings={Settings}): browserType → {BrowserType}", aliases, portalId, result, cultureCode, settings, browserType);
             }
 
             return GetAliasByPortalIdAndSettings(aliases, portalId, result, cultureCode, browserType.ToAbstractionsBrowserTypes());
@@ -209,17 +218,22 @@ namespace DotNetNuke.Entities.Portals
 
         public static List<string> GetAliasesForPortalId(this IEnumerable<PortalAliasInfo> aliases, int portalId)
         {
+			Logger.LogError(">>> Entering GetAliasesForPortalId(aliases={Aliases},portalId={PortalId})", aliases, portalId);
             var httpAliases = new List<string>();
+			Logger.LogError("GetAliasesForPortalId(aliases={Aliases},portalId={PortalId}): httpAliases → {HttpAliases}", aliases, portalId, httpAliases);
             foreach (var cpa in aliases.Where((IPortalAliasInfo cpa) => !httpAliases.Contains(cpa.HttpAlias)))
             {
                 httpAliases.Add(cpa.HttpAlias.ToLowerInvariant());
             }
 
+			Logger.LogWarning("<<< Exiting GetAliasesForPortalId(aliases={Aliases},portalId={PortalId})", aliases, portalId);
             return httpAliases;
         }
 
         public static string GetCultureByPortalIdAndAlias(this IEnumerable<PortalAliasInfo> aliases, int portalId, string alias)
         {
+			Logger.LogError(">>> Entering GetCultureByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias})", aliases, portalId, alias);
+            Logger.LogWarning("<<< Exiting GetCultureByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias})", aliases, portalId, alias);
             return (from IPortalAliasInfo portalAlias in aliases
                     where portalAlias.PortalId == portalId && string.Equals(alias, portalAlias.HttpAlias, StringComparison.OrdinalIgnoreCase)
                     select portalAlias.CultureCode)
@@ -238,6 +252,10 @@ namespace DotNetNuke.Entities.Portals
         {
             aliases.GetSettingsByPortalIdAndAlias(portalId, alias, out culture, out NewBrowserTypes newBrowserType, out skin);
             browserType = newBrowserType.ToDeprecatedBrowserTypes();
+			Logger.LogError(">>> Entering GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias})", aliases, portalId, alias);
+			Logger.LogError("GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias}): browserType → {BrowserType}", aliases, portalId, alias, browserType);
+			Logger.LogDebug("GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias}): browserType → {BrowserType}", aliases, portalId, alias, browserType);
+			Logger.LogWarning("<<< Exiting GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias})", aliases, portalId, alias);
         }
 
         /// <summary>Gets the culture, browser type, and skin for the given <paramref name="portalId"/> and <paramref name="alias"/>.</summary>
@@ -251,11 +269,15 @@ namespace DotNetNuke.Entities.Portals
         {
             culture = null;
             browserType = NewBrowserTypes.Normal;
+			Logger.LogDebug("GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias}): culture → {Culture}", aliases, portalId, alias, culture);
             skin = string.Empty;
             foreach (IPortalAliasInfo portalAlias in aliases)
             {
+				Logger.LogError("GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias}): skin → {Skin}", aliases, portalId, alias, skin);
                 if (portalAlias.PortalId == portalId && string.Equals(alias, portalAlias.HttpAlias, StringComparison.OrdinalIgnoreCase))
                 {
+					Logger.LogDebug("GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias}): skin → {Skin}", aliases, portalId, alias, skin);
+					Logger.LogError("GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias}): culture → {Culture}", aliases, portalId, alias, culture);
                     // this is a match
                     culture = portalAlias.CultureCode;
                     browserType = portalAlias.BrowserType;

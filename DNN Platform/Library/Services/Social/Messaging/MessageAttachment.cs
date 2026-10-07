@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Social.Messaging
     [Serializable]
     public class MessageAttachment : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MessageAttachment));
         private int messageattachmentID = -1;
 
         /// <summary>Gets or sets messageAttachmentID - The primary key.</summary>
@@ -61,12 +62,14 @@ namespace DotNetNuke.Services.Social.Messaging
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.MessageAttachmentID = Convert.ToInt32(dr["MessageAttachmentID"], CultureInfo.InvariantCulture);
             this.MessageID = Convert.ToInt32(dr["MessageID"], CultureInfo.InvariantCulture);
             this.FileID = Convert.ToInt32(dr["FileID"], CultureInfo.InvariantCulture);
 
             // add audit column data
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

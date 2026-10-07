@@ -10,9 +10,11 @@ namespace DotNetNuke.Services.Syndication
     /// <summary>Class for managing an OPML feed outline.</summary>
     public class OpmlOutline
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(OpmlOutline));
         /// <summary>Initializes a new instance of the <see cref="OpmlOutline"/> class.</summary>
         public OpmlOutline()
         {
+			Logger.LogError(">>> Entering OpmlOutline()");
             this.Outlines = new OpmlOutlines();
         }
 

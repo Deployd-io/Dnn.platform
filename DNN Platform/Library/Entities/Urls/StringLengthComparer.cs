@@ -10,9 +10,11 @@ namespace DotNetNuke.Entities.Urls
     /// <summary>The StringLengthComparer class is a comparer override used for sorting portal aliases by length.</summary>
     internal class StringLengthComparer : Comparer<string>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(StringLengthComparer));
         /// <inheritdoc />
         public override int Compare(string x, string y)
         {
+			Logger.LogError(">>> Entering Compare(x={X},y={Y})", x, y);
             if (x == null && y == null)
             {
                 return 0;
@@ -43,6 +45,7 @@ namespace DotNetNuke.Entities.Urls
                 return 0;
             }
 
+			Logger.LogWarning("<<< Exiting Compare(x={X},y={Y})", x, y);
             return -1; // should never reach here
         }
     }

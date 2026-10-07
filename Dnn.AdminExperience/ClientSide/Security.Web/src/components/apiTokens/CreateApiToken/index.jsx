@@ -5,6 +5,7 @@ import "./style.less";
 import { Dropdown, GridSystem as Grid, Checkbox, Button, Label, SingleLineInput } from "@dnnsoftware/dnn-react-common";
 import resx from "../../../resources";
 import util from "../../../utils";
+const logger = console;
 
 let isHost = false;
 let isAdmin = false;
@@ -12,6 +13,7 @@ let isAdmin = false;
 class CreateApiToken extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             currentScope: 2,
             apiTokenKeysFiltered: [],
@@ -21,14 +23,19 @@ class CreateApiToken extends Component {
             scopeOptions: (props.apiTokenSettings && props.apiTokenSettings.AllowApiTokens) ? props.scopeOptions : props.scopeOptions.slice(2)
         };
         isHost = util.settings.isHost;
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`, { "event.action": "constructor", "logrite.props": props });
         isAdmin = util.settings.isAdmin;
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.resetApiFilterList();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     resetApiFilterList() {
+		logger.error('>>> Entering resetApiFilterList()', { "event.action": "resetApiFilterList" });
         const f = this.props.apiTokenKeys.filter((item) => {
             return item.Scope === this.state.currentScope;
         });
@@ -36,9 +43,12 @@ class CreateApiToken extends Component {
             apiTokenKeysFiltered: f,
             selectedKeys: []
         });
+		logger.warn('<<< Exiting resetApiFilterList()', { "event.action": "resetApiFilterList" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="apitokens-details">
                 <Grid numberOfColumns={2}>
@@ -168,6 +178,8 @@ CreateApiToken.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         apiTokenSettings: state.security.apiTokenSettings
     };

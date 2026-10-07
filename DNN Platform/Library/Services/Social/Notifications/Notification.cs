@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.Social.Notifications
     [Serializable]
     public class Notification : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Notification));
         private int notificationID = -1;
         private string displayDate;
 
@@ -27,6 +28,7 @@ namespace DotNetNuke.Services.Social.Notifications
         /// </summary>
         public Notification()
         {
+			Logger.LogError(">>> Entering Notification()");
             this.SendToast = true;
         }
 
@@ -120,6 +122,7 @@ namespace DotNetNuke.Services.Social.Notifications
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.NotificationID = Convert.ToInt32(dr["MessageID"], CultureInfo.InvariantCulture);
             this.NotificationTypeID = Convert.ToInt32(dr["NotificationTypeID"], CultureInfo.InvariantCulture);
             this.To = Null.SetNullString(dr["To"]);
@@ -132,6 +135,7 @@ namespace DotNetNuke.Services.Social.Notifications
             this.IncludeDismissAction = Null.SetNullBoolean(dr["IncludeDismissAction"]);
 
             var schema = dr.GetSchemaTable();
+			Logger.LogError("Fill(dr={Dr}): schema → {Schema}", dr, schema);
             if (schema != null)
             {
                 if (schema.Select("ColumnName = 'SendToast'").Length > 0)
@@ -142,10 +146,12 @@ namespace DotNetNuke.Services.Social.Notifications
                 {
                     this.SendToast = false;
                 }
+				Logger.LogDebug("Fill(dr={Dr}): this.SendToast → {Arg1}", dr, this.SendToast);
             }
 
             // add audit column data
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

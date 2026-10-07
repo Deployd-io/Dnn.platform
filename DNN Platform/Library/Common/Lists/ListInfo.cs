@@ -12,6 +12,7 @@ namespace DotNetNuke.Common.Lists
     [Serializable]
     public class ListInfo : BaseEntityInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ListInfo));
         /// <summary>Initializes a new instance of the <see cref="ListInfo"/> class.</summary>
         public ListInfo()
             : this(string.Empty)
@@ -22,13 +23,19 @@ namespace DotNetNuke.Common.Lists
         /// <param name="name">The name of the list.</param>
         public ListInfo(string name)
         {
+			Logger.LogError(">>> Entering ListInfo(name={Name})", name);
             this.SystemList = Null.NullBoolean;
+			Logger.LogWarning("<<< Exiting ListInfo(name={Name})", name);
+			Logger.LogDebug("ListInfo(name={Name}): this.SystemList → {Arg1}", name, this.SystemList);
             this.EnableSortOrder = Null.NullBoolean;
             this.IsPopulated = Null.NullBoolean;
+			Logger.LogDebug("ListInfo(name={Name}): this.EnableSortOrder → {Arg1}", name, this.EnableSortOrder);
+			Logger.LogDebug("ListInfo(name={Name}): this.IsPopulated → {Arg1}", name, this.IsPopulated);
             this.ParentList = Null.NullString;
             this.Parent = Null.NullString;
             this.ParentKey = Null.NullString;
             this.PortalID = Null.NullInteger;
+			Logger.LogDebug("ListInfo(name={Name}): this.ParentList → {Arg1}", name, this.ParentList);
             this.DefinitionID = Null.NullInteger;
             this.Name = name;
         }

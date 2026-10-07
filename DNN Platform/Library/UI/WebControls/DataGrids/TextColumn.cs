@@ -9,6 +9,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The TextColumn control provides a custom Text Column.</summary>
     public class TextColumn : TemplateColumn
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TextColumn));
         /// <summary>Gets or sets the Data Field is the field that binds to the Text Column.</summary>
         /// <value>A String.</value>
         public string DataField { get; set; }
@@ -24,6 +25,7 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>Initialises the Column.</summary>
         public override void Initialize()
         {
+			Logger.LogError(">>> Entering Initialize()");
             this.ItemTemplate = this.CreateTemplate(ListItemType.Item);
             this.EditItemTemplate = this.CreateTemplate(ListItemType.EditItem);
             this.HeaderTemplate = this.CreateTemplate(ListItemType.Header);
@@ -37,28 +39,35 @@ namespace DotNetNuke.UI.WebControls
                 this.HeaderStyle.Font.Bold = true;
                 this.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
             }
+			Logger.LogWarning("<<< Exiting Initialize()");
         }
 
         /// <summary>Creates a TextColumnTemplate.</summary>
         /// <returns>A TextColumnTemplate.</returns>
         private TextColumnTemplate CreateTemplate(ListItemType type)
         {
+			Logger.LogError(">>> Entering CreateTemplate(type={Type})", type);
             bool isDesignMode = false;
+			Logger.LogError("CreateTemplate(type={Type}): isDesignMode → {IsDesignMode}", type, isDesignMode);
             if (HttpContext.Current == null)
             {
                 isDesignMode = true;
             }
 
             var template = new TextColumnTemplate(type);
+			Logger.LogError("CreateTemplate(type={Type}): template → {Template}", type, template);
             if (type != ListItemType.Header)
             {
                 template.DataField = this.DataField;
+				Logger.LogDebug("CreateTemplate(type={Type}): template.DataField → {Arg1}", type, template.DataField);
             }
 
             template.Width = this.Width;
+			Logger.LogDebug("CreateTemplate(type={Type}): template.Width → {Arg1}", type, template.Width);
             if (type == ListItemType.Header)
             {
                 template.Text = this.HeaderText;
+				Logger.LogDebug("CreateTemplate(type={Type}): template.Text → {Arg1}", type, template.Text);
             }
             else
             {
@@ -66,6 +75,8 @@ namespace DotNetNuke.UI.WebControls
             }
 
             template.DesignMode = isDesignMode;
+			Logger.LogDebug("CreateTemplate(type={Type}): template.DesignMode → {Arg1}", type, template.DesignMode);
+			Logger.LogWarning("<<< Exiting CreateTemplate(type={Type})", type);
             return template;
         }
     }

@@ -14,14 +14,18 @@ namespace DotNetNuke.ExtensionPoints
 
     public class ToolBarButtonRenderer : IExtensionControlRenderer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ToolBarButtonRenderer));
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public string GetOutput(IExtensionPoint extensionPoint)
         {
+			Logger.LogError(">>> Entering GetOutput(extensionPoint={ExtensionPoint})", extensionPoint);
             var extension = (IToolBarButtonExtensionPoint)extensionPoint;
 
+			Logger.LogError("GetOutput(extensionPoint={ExtensionPoint}): extension → {Extension}", extensionPoint, extension);
             var cssClass = extension.CssClass;
             var action = extension.Action;
+			Logger.LogError("GetOutput(extensionPoint={ExtensionPoint}): action → {Action}", extensionPoint, action);
             if (!extension.Enabled)
             {
                 cssClass += " disabled";
@@ -29,12 +33,14 @@ namespace DotNetNuke.ExtensionPoints
             }
 
             var icon = extension.Icon;
+			Logger.LogError("GetOutput(extensionPoint={ExtensionPoint}): icon → {Icon}", extensionPoint, icon);
             if (icon.StartsWith("~/", StringComparison.Ordinal))
             {
                 icon = Globals.ResolveUrl(icon);
             }
 
             var str = new StringBuilder();
+			Logger.LogError("GetOutput(extensionPoint={ExtensionPoint}): str → {Str}", extensionPoint, str);
             str.AppendFormat(
                 CultureInfo.InvariantCulture,
                 "<button id=\"{0}\" class=\"{1}\" onclick=\"{2}\" title=\"{3}\">",
@@ -53,6 +59,7 @@ namespace DotNetNuke.ExtensionPoints
 
             str.AppendLine("</button>");
 
+			Logger.LogWarning("<<< Exiting GetOutput(extensionPoint={ExtensionPoint})", extensionPoint);
             return str.ToString();
         }
     }

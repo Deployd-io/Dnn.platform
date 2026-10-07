@@ -4,16 +4,19 @@ import GridCell from "../GridCell";
 import GridCaption from "./GridCaption";
 import GridHeader from "./GridHeader";
 import GridRow from "./GridRow";
+const logger = console;
 
 class Grid extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
 
         this.state = {
         };
     }
 
     onPermissionChange(permission) {
+		logger.error(`>>> Entering onPermissionChange(permission=${permission})`, { "event.action": "onPermissionChange", "logrite.permission": permission });
         const {props, state} = this;
 
         let permissions = props.permissions.map(function (p) {
@@ -33,12 +36,15 @@ class Grid extends Component {
             }
         });
 
+		logger.error(`onPermissionChange(permission=${permission}): permissions → ${permissions}`, { "event.action": "onPermissionChange", "logrite.permission": permission });
         if (typeof props.onChange === "function") {
             props.onChange(permissions);
         }
+		logger.warn(`<<< Exiting onPermissionChange(permission=${permission})`, { "event.action": "onPermissionChange", "logrite.permission": permission });
     }
 
     onPermissionDeleted(permission) {
+		logger.error(`>>> Entering onPermissionDeleted(permission=${permission})`, { "event.action": "onPermissionDeleted", "logrite.permission": permission });
         const {props, state} = this;
 
         let permissions = props.permissions.filter(function (p) {
@@ -50,12 +56,15 @@ class Grid extends Component {
             }
         });
 
+		logger.error(`onPermissionDeleted(permission=${permission}): permissions → ${permissions}`, { "event.action": "onPermissionDeleted", "logrite.permission": permission });
         if (typeof props.onChange === "function") {
             props.onChange(permissions);
         }
+		logger.warn(`<<< Exiting onPermissionDeleted(permission=${permission})`, { "event.action": "onPermissionDeleted", "logrite.permission": permission });
     }
 
     onSuggestion(value) {
+		logger.error(`>>> Entering onSuggestion(value=${value})`, { "event.action": "onSuggestion", "logrite.value": value });
         const {props, state} = this;
 
         let permission = props.permissions.filter(function (p) {
@@ -66,6 +75,7 @@ class Grid extends Component {
             }
         });
 
+		logger.error(`onSuggestion(value=${value}): permission → ${permission}`, { "event.action": "onSuggestion", "logrite.value": value });
         if (!permission.length && typeof props.onAddPermission === "function") {
             let newPermission = props.type === "role" ? {
                 roleId: value.value,
@@ -81,10 +91,12 @@ class Grid extends Component {
                 permissions: []
             };
             props.onAddPermission(newPermission);
+			logger.error(`onSuggestion(value=${value}): newPermission → ${newPermission}`, { "event.action": "onSuggestion", "logrite.value": value });
         }
     }
 
     renderGrid() {
+		logger.error('>>> Entering renderGrid()', { "event.action": "renderGrid" });
         const {props, state} = this;
 
         const totalWidth = 100;
@@ -93,6 +105,7 @@ class Grid extends Component {
         const minimumActionColumnWidth = 8;
 
         let columnWidth = defaultColumnWith;
+		logger.error(`renderGrid(): columnWidth → ${columnWidth}`, { "event.action": "renderGrid" });
         let actionsWidth;
         const tooManyColumns = totalWidth < roleColumnWidth + props.definitions.length * columnWidth;
         if (tooManyColumns) {
@@ -104,6 +117,7 @@ class Grid extends Component {
         }
 
         let self = this;
+		logger.warn('<<< Exiting renderGrid()', { "event.action": "renderGrid" });
         return (
             <GridCell style={{"display":"table"}} className={props.type + "-permissions-grid"}>
                 <GridCaption service={props.service} localization={props.localization} type={props.type} onSuggestion={this.onSuggestion.bind(this) } />
@@ -132,8 +146,10 @@ class Grid extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             this.renderGrid()
         );

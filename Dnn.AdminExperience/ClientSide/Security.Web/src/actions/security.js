@@ -1,9 +1,12 @@
 import { security as ActionTypes } from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
 import util from "../utils";
+const logger = console;
 
 const securityActions = {
     getIpFilters(callback) {
+		logger.error(`>>> Entering getIpFilters(callback=${callback})`, { "event.action": "getIpFilters", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getIpFilters(callback=${callback})`, { "event.action": "getIpFilters", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getIpFilters(data => {
                 dispatch({
@@ -20,6 +23,8 @@ const securityActions = {
         };
     },
     getIpFilter(searchParameters, callback) {
+		logger.error(`>>> Entering getIpFilter(searchParameters=${searchParameters},callback=${callback})`, { "event.action": "getIpFilter", "logrite.searchParameters": searchParameters, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getIpFilter(searchParameters=${searchParameters},callback=${callback})`, { "event.action": "getIpFilter", "logrite.searchParameters": searchParameters, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getIpFilter(searchParameters, data => {
                 dispatch({
@@ -35,6 +40,8 @@ const securityActions = {
         };
     },
     deleteIpFilter(filterId, ipFilters, callback) {
+		logger.error(`>>> Entering deleteIpFilter(filterId=${filterId},ipFilters=${ipFilters},callback=${callback})`, { "event.action": "deleteIpFilter", "logrite.filterId": filterId, "logrite.ipFilters": ipFilters, "logrite.callback": callback });
+		logger.warn(`<<< Exiting deleteIpFilter(filterId=${filterId},ipFilters=${ipFilters},callback=${callback})`, { "event.action": "deleteIpFilter", "logrite.filterId": filterId, "logrite.ipFilters": ipFilters, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.deleteIpFilter(filterId, data => {
                 dispatch({
@@ -53,6 +60,8 @@ const securityActions = {
         };
     },
     getBasicLoginSettings(cultureCode, callback) {
+		logger.error(`>>> Entering getBasicLoginSettings(cultureCode=${cultureCode},callback=${callback})`, { "event.action": "getBasicLoginSettings", "logrite.cultureCode": cultureCode, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getBasicLoginSettings(cultureCode=${cultureCode},callback=${callback})`, { "event.action": "getBasicLoginSettings", "logrite.cultureCode": cultureCode, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getBasicLoginSettings(cultureCode, data => {
                 dispatch({
@@ -71,6 +80,8 @@ const securityActions = {
         };
     },
     updateBasicLoginSettings(payload, callback) {
+		logger.error(`>>> Entering updateBasicLoginSettings(payload=${payload},callback=${callback})`, { "event.action": "updateBasicLoginSettings", "logrite.payload": payload, "logrite.callback": callback });
+		logger.warn(`<<< Exiting updateBasicLoginSettings(payload=${payload},callback=${callback})`, { "event.action": "updateBasicLoginSettings", "logrite.payload": payload, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.updateBasicLoginSettings(payload, data => {
                 dispatch({
@@ -86,6 +97,8 @@ const securityActions = {
         };
     },
     basicLoginSettingsClientModified(parameter) {
+		logger.error(`>>> Entering basicLoginSettingsClientModified(parameter=${parameter})`, { "event.action": "basicLoginSettingsClientModified", "logrite.parameter": parameter });
+		logger.warn(`<<< Exiting basicLoginSettingsClientModified(parameter=${parameter})`, { "event.action": "basicLoginSettingsClientModified", "logrite.parameter": parameter });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_BASIC_LOGIN_SETTINS_CLIENT_MODIFIED,
@@ -97,6 +110,8 @@ const securityActions = {
         };
     },
     memberSettingsClientModified(parameter) {
+		logger.error(`>>> Entering memberSettingsClientModified(parameter=${parameter})`, { "event.action": "memberSettingsClientModified", "logrite.parameter": parameter });
+		logger.warn(`<<< Exiting memberSettingsClientModified(parameter=${parameter})`, { "event.action": "memberSettingsClientModified", "logrite.parameter": parameter });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_MEMBER_SETTINS_CLIENT_MODIFIED,
@@ -108,6 +123,8 @@ const securityActions = {
         };
     },
     registrationSettingsClientModified(parameter) {
+		logger.error(`>>> Entering registrationSettingsClientModified(parameter=${parameter})`, { "event.action": "registrationSettingsClientModified", "logrite.parameter": parameter });
+		logger.warn(`<<< Exiting registrationSettingsClientModified(parameter=${parameter})`, { "event.action": "registrationSettingsClientModified", "logrite.parameter": parameter });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_REGISTRATION_SETTINS_CLIENT_MODIFIED,
@@ -119,6 +136,8 @@ const securityActions = {
         };
     },
     sslSettingsClientModified(parameter) {
+		logger.error(`>>> Entering sslSettingsClientModified(parameter=${parameter})`, { "event.action": "sslSettingsClientModified", "logrite.parameter": parameter });
+		logger.warn(`<<< Exiting sslSettingsClientModified(parameter=${parameter})`, { "event.action": "sslSettingsClientModified", "logrite.parameter": parameter });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_SSL_SETTINS_CLIENT_MODIFIED,
@@ -130,6 +149,8 @@ const securityActions = {
         };
     },
     otherSettingsClientModified(parameter) {
+		logger.error(`>>> Entering otherSettingsClientModified(parameter=${parameter})`, { "event.action": "otherSettingsClientModified", "logrite.parameter": parameter });
+		logger.warn(`<<< Exiting otherSettingsClientModified(parameter=${parameter})`, { "event.action": "otherSettingsClientModified", "logrite.parameter": parameter });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_OTHER_SETTINS_CLIENT_MODIFIED,
@@ -141,6 +162,8 @@ const securityActions = {
         };
     },
     updateIpFilter(payload, callback) {
+		logger.error(`>>> Entering updateIpFilter(payload=${payload},callback=${callback})`, { "event.action": "updateIpFilter", "logrite.payload": payload, "logrite.callback": callback });
+		logger.warn(`<<< Exiting updateIpFilter(payload=${payload},callback=${callback})`, { "event.action": "updateIpFilter", "logrite.payload": payload, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.updateIpFilter(payload, data => {
                 dispatch({
@@ -156,6 +179,8 @@ const securityActions = {
         };
     },
     getMemberSettings(callback) {
+		logger.error(`>>> Entering getMemberSettings(callback=${callback})`, { "event.action": "getMemberSettings", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getMemberSettings(callback=${callback})`, { "event.action": "getMemberSettings", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getMemberSettings(data => {
                 dispatch({
@@ -172,6 +197,8 @@ const securityActions = {
         };
     },
     updateMemberSettings(payload, callback) {
+		logger.error(`>>> Entering updateMemberSettings(payload=${payload},callback=${callback})`, { "event.action": "updateMemberSettings", "logrite.payload": payload, "logrite.callback": callback });
+		logger.warn(`<<< Exiting updateMemberSettings(payload=${payload},callback=${callback})`, { "event.action": "updateMemberSettings", "logrite.payload": payload, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.updateMemberSettings(payload, data => {
                 dispatch({
@@ -187,6 +214,8 @@ const securityActions = {
         };
     },
     getRegistrationSettings(callback) {
+		logger.error(`>>> Entering getRegistrationSettings(callback=${callback})`, { "event.action": "getRegistrationSettings", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getRegistrationSettings(callback=${callback})`, { "event.action": "getRegistrationSettings", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getRegistrationSettings(data => {
                 dispatch({
@@ -205,6 +234,8 @@ const securityActions = {
         };
     },
     updateRegistrationSettings(payload, callback, failureCallback) {
+		logger.error(`>>> Entering updateRegistrationSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateRegistrationSettings", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting updateRegistrationSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateRegistrationSettings", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.updateRegistrationSettings(payload, data => {
                 dispatch({
@@ -224,6 +255,8 @@ const securityActions = {
         };
     },
     getSslSettings(callback) {
+		logger.error(`>>> Entering getSslSettings(callback=${callback})`, { "event.action": "getSslSettings", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getSslSettings(callback=${callback})`, { "event.action": "getSslSettings", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getSslSettings(data => {
                 dispatch({
@@ -240,6 +273,8 @@ const securityActions = {
         };
     },
     updateSslSettings(payload, callback, failureCallback) {
+		logger.error(`>>> Entering updateSslSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateSslSettings", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting updateSslSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateSslSettings", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.updateSslSettings(payload, data => {
                 dispatch({
@@ -259,6 +294,7 @@ const securityActions = {
         };
     },
     setAllPagesSecure(callback, failureCallback) {
+		logger.error(`>>> Entering setAllPagesSecure(callback=${callback},failureCallback=${failureCallback})`, { "event.action": "setAllPagesSecure", "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         ApplicationService.setAllPagesSecure(data => {
             if (callback) {
                 callback(data);
@@ -266,10 +302,13 @@ const securityActions = {
         }, data => {
             if (failureCallback) {
                 failureCallback(data);
+				logger.warn(`<<< Exiting setAllPagesSecure(callback=${callback},failureCallback=${failureCallback})`, { "event.action": "setAllPagesSecure", "logrite.callback": callback, "logrite.failureCallback": failureCallback });
             }
         });
     },
     getOtherSettings(callback) {
+		logger.error(`>>> Entering getOtherSettings(callback=${callback})`, { "event.action": "getOtherSettings", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getOtherSettings(callback=${callback})`, { "event.action": "getOtherSettings", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getOtherSettings(data => {
                 dispatch({
@@ -286,6 +325,8 @@ const securityActions = {
         };
     },
     updateOtherSettings(payload, callback) {
+		logger.error(`>>> Entering updateOtherSettings(payload=${payload},callback=${callback})`, { "event.action": "updateOtherSettings", "logrite.payload": payload, "logrite.callback": callback });
+		logger.warn(`<<< Exiting updateOtherSettings(payload=${payload},callback=${callback})`, { "event.action": "updateOtherSettings", "logrite.payload": payload, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.updateOtherSettings(payload, data => {
                 dispatch({
@@ -301,6 +342,8 @@ const securityActions = {
         };
     },
     getSecurityBulletins(callback, failureCallback) {
+		logger.error(`>>> Entering getSecurityBulletins(callback=${callback},failureCallback=${failureCallback})`, { "event.action": "getSecurityBulletins", "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting getSecurityBulletins(callback=${callback},failureCallback=${failureCallback})`, { "event.action": "getSecurityBulletins", "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.getSecurityBulletins(data => {
                 dispatch({
@@ -321,6 +364,8 @@ const securityActions = {
         };
     },
     getSuperuserActivities(callback) {
+		logger.error(`>>> Entering getSuperuserActivities(callback=${callback})`, { "event.action": "getSuperuserActivities", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getSuperuserActivities(callback=${callback})`, { "event.action": "getSuperuserActivities", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getSuperuserActivities(data => {
                 dispatch({
@@ -336,6 +381,8 @@ const securityActions = {
         };
     },
     getAuditCheckResults(callback) {
+		logger.error(`>>> Entering getAuditCheckResults(callback=${callback})`, { "event.action": "getAuditCheckResults", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getAuditCheckResults(callback=${callback})`, { "event.action": "getAuditCheckResults", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getAuditCheckResults(data => {
                 dispatch({
@@ -351,6 +398,8 @@ const securityActions = {
         };
     },
     getAuditCheckResult(id, callback) {
+		logger.error(`>>> Entering getAuditCheckResult(id=${id},callback=${callback})`, { "event.action": "getAuditCheckResult", "logrite.id": id, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getAuditCheckResult(id=${id},callback=${callback})`, { "event.action": "getAuditCheckResult", "logrite.id": id, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getAuditCheckResult(id, data => {
                 dispatch({
@@ -366,6 +415,8 @@ const securityActions = {
         };
     },
     searchFileSystemAndDatabase(searchParameters, callback) {
+		logger.error(`>>> Entering searchFileSystemAndDatabase(searchParameters=${searchParameters},callback=${callback})`, { "event.action": "searchFileSystemAndDatabase", "logrite.searchParameters": searchParameters, "logrite.callback": callback });
+		logger.warn(`<<< Exiting searchFileSystemAndDatabase(searchParameters=${searchParameters},callback=${callback})`, { "event.action": "searchFileSystemAndDatabase", "logrite.searchParameters": searchParameters, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.searchFileSystemAndDatabase(searchParameters, data => {
                 dispatch({
@@ -383,6 +434,8 @@ const securityActions = {
         };
     },
     clearFileSystemAndDatabaseSearch() {
+		logger.error('>>> Entering clearFileSystemAndDatabaseSearch()', { "event.action": "clearFileSystemAndDatabaseSearch" });
+		logger.warn('<<< Exiting clearFileSystemAndDatabaseSearch()', { "event.action": "clearFileSystemAndDatabaseSearch" });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.RETRIEVED_SECURITY_SEARCH_FILE_SYSTEM_DATABASE,
@@ -395,6 +448,8 @@ const securityActions = {
         };
     },
     getLastModifiedSettings(callback) {
+		logger.error(`>>> Entering getLastModifiedSettings(callback=${callback})`, { "event.action": "getLastModifiedSettings", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getLastModifiedSettings(callback=${callback})`, { "event.action": "getLastModifiedSettings", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getLastModifiedSettings(data => {
                 dispatch({
@@ -411,6 +466,8 @@ const securityActions = {
         };
     },
     getLastModifiedFiles(callback) {
+		logger.error(`>>> Entering getLastModifiedFiles(callback=${callback})`, { "event.action": "getLastModifiedFiles", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getLastModifiedFiles(callback=${callback})`, { "event.action": "getLastModifiedFiles", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getLastModifiedFiles(data => {
                 dispatch({
@@ -427,6 +484,8 @@ const securityActions = {
         };
     },
     updatefileSystemAndDatabaseSearchKeyword(keyword) {
+		logger.error(`>>> Entering updatefileSystemAndDatabaseSearchKeyword(keyword=${keyword})`, { "event.action": "updatefileSystemAndDatabaseSearchKeyword", "logrite.keyword": keyword });
+		logger.warn(`<<< Exiting updatefileSystemAndDatabaseSearchKeyword(keyword=${keyword})`, { "event.action": "updatefileSystemAndDatabaseSearchKeyword", "logrite.keyword": keyword });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.UPDATED_SECURITY_SEARCH_FILE_SYSTEM_DATABASE_KEYWORD,
@@ -438,6 +497,8 @@ const securityActions = {
         };
     },
     updatefileSystemAndDatabaseActiveTab(tab) {
+		logger.error(`>>> Entering updatefileSystemAndDatabaseActiveTab(tab=${tab})`, { "event.action": "updatefileSystemAndDatabaseActiveTab", "logrite.tab": tab });
+		logger.warn(`<<< Exiting updatefileSystemAndDatabaseActiveTab(tab=${tab})`, { "event.action": "updatefileSystemAndDatabaseActiveTab", "logrite.tab": tab });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.UPDATED_SECURITY_SEARCH_FILE_SYSTEM_DATABASE_ACTIVE_TAB,
@@ -448,6 +509,8 @@ const securityActions = {
         };
     },
     getPortalList(addAll, callback) {
+		logger.error(`>>> Entering getPortalList(addAll=${addAll},callback=${callback})`, { "event.action": "getPortalList", "logrite.addAll": addAll, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getPortalList(addAll=${addAll},callback=${callback})`, { "event.action": "getPortalList", "logrite.addAll": addAll, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getPortalList(addAll, data => {
                 dispatch({
@@ -464,6 +527,8 @@ const securityActions = {
         };
     },
     getApiTokenSettings(callback) {
+		logger.error(`>>> Entering getApiTokenSettings(callback=${callback})`, { "event.action": "getApiTokenSettings", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getApiTokenSettings(callback=${callback})`, { "event.action": "getApiTokenSettings", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getApiTokenSettings(data => {
                 dispatch({
@@ -480,6 +545,8 @@ const securityActions = {
         };
     },
     updateApiTokenSettings(payload, callback) {
+		logger.error(`>>> Entering updateApiTokenSettings(payload=${payload},callback=${callback})`, { "event.action": "updateApiTokenSettings", "logrite.payload": payload, "logrite.callback": callback });
+		logger.warn(`<<< Exiting updateApiTokenSettings(payload=${payload},callback=${callback})`, { "event.action": "updateApiTokenSettings", "logrite.payload": payload, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.updateApiTokenSettings(payload, data => {
                 dispatch({
@@ -495,6 +562,8 @@ const securityActions = {
         };
     },
     apiTokenSettingsClientModified(parameter) {
+		logger.error(`>>> Entering apiTokenSettingsClientModified(parameter=${parameter})`, { "event.action": "apiTokenSettingsClientModified", "logrite.parameter": parameter });
+		logger.warn(`<<< Exiting apiTokenSettingsClientModified(parameter=${parameter})`, { "event.action": "apiTokenSettingsClientModified", "logrite.parameter": parameter });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_APITOKEN_SETTINS_CLIENT_MODIFIED,
@@ -506,6 +575,8 @@ const securityActions = {
         };
     },
     getApiTokenKeys(callback) {
+		logger.error(`>>> Entering getApiTokenKeys(callback=${callback})`, { "event.action": "getApiTokenKeys", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getApiTokenKeys(callback=${callback})`, { "event.action": "getApiTokenKeys", "logrite.callback": callback });
         return () => {
             ApplicationService.getApiTokenKeys(data => {
                 if (callback) {
@@ -550,6 +621,8 @@ const securityActions = {
         };
     },
     deleteExpiredApiTokens(callback) {
+		logger.error(`>>> Entering deleteExpiredApiTokens(callback=${callback})`, { "event.action": "deleteExpiredApiTokens", "logrite.callback": callback });
+		logger.warn(`<<< Exiting deleteExpiredApiTokens(callback=${callback})`, { "event.action": "deleteExpiredApiTokens", "logrite.callback": callback });
         return () => {
             ApplicationService.deleteExpiredApiTokens(data => {
                 if (callback) {
@@ -559,6 +632,8 @@ const securityActions = {
         };
     },
     deleteExpiredAndRevokedApiTokens(callback) {
+		logger.error(`>>> Entering deleteExpiredAndRevokedApiTokens(callback=${callback})`, { "event.action": "deleteExpiredAndRevokedApiTokens", "logrite.callback": callback });
+		logger.warn(`<<< Exiting deleteExpiredAndRevokedApiTokens(callback=${callback})`, { "event.action": "deleteExpiredAndRevokedApiTokens", "logrite.callback": callback });
         return () => {
             ApplicationService.deleteExpiredAndRevokedApiTokens(data => {
                 if (callback) {
@@ -568,6 +643,8 @@ const securityActions = {
         };
     },
     getCspSettings(callback) {
+		logger.error(`>>> Entering getCspSettings(callback=${callback})`, { "event.action": "getCspSettings", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getCspSettings(callback=${callback})`, { "event.action": "getCspSettings", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getCspSettings(data => {
                 dispatch({
@@ -584,6 +661,8 @@ const securityActions = {
         };
     },
     updateCspSettings(payload, callback) {
+		logger.error(`>>> Entering updateCspSettings(payload=${payload},callback=${callback})`, { "event.action": "updateCspSettings", "logrite.payload": payload, "logrite.callback": callback });
+		logger.warn(`<<< Exiting updateCspSettings(payload=${payload},callback=${callback})`, { "event.action": "updateCspSettings", "logrite.payload": payload, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.updateCspSettings(payload, data => {
                 if (data.Success) {
@@ -602,6 +681,8 @@ const securityActions = {
         };
     },
     cspSettingsClientModified(parameter) {
+		logger.error(`>>> Entering cspSettingsClientModified(parameter=${parameter})`, { "event.action": "cspSettingsClientModified", "logrite.parameter": parameter });
+		logger.warn(`<<< Exiting cspSettingsClientModified(parameter=${parameter})`, { "event.action": "cspSettingsClientModified", "logrite.parameter": parameter });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_CSP_SETTINS_CLIENT_MODIFIED,

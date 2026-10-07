@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 /// <reference name="MicrosoftAjaxDebug.js" />
 /// <reference name="dnn.controls.js" assembly="DotNetNuke.WebControls" />
 /// <reference name="dnn.js" assembly="DotNetNuke.WebUtility" />
@@ -16,6 +17,7 @@ dnn.extend(dnn.controls, {
             menu.initialize();
             return menu;
         }
+		logger.warn(`<<< Exiting initMenu(ctl=${ctl})`, { "event.action": "initMenu", "logrite.ctl": ctl });
     }
 });
 
@@ -96,6 +98,7 @@ dnn.controls.DNNMenu.prototype =
 
     initialize: function()
     {
+		logger.error('>>> Entering initialize()', { "event.action": "initialize" });
         dnn.controls.DNNMenu.callBaseMethod(this, 'initialize');
         if (this.keyboardAccess)
         {
@@ -110,12 +113,14 @@ dnn.controls.DNNMenu.prototype =
         }
         this._hideMenusDelegate = dnn.createDelegate(this, this.hideMenus);
         this._expandNodeDelegate = dnn.createDelegate(this, this.__expandNode);
+		logger.warn('<<< Exiting initialize()', { "event.action": "initialize" });
     },
 
     //--- Generates menu HTML ---//
 
     generateMenuHTML: function()
     {
+		logger.error('>>> Entering generateMenuHTML()', { "event.action": "generateMenuHTML" });
         this.container.className = this.mbcss;
         dnn.dom.disableTextSelect(this.container);
 
@@ -126,6 +131,7 @@ dnn.controls.DNNMenu.prototype =
 
         if (dnn.dom.browser.isType(dnn.dom.browser.Mozilla, dnn.dom.browser.Safari) == false) //firefox cannot clear this value.  if F5 pressed, won't cause onsubmit.  Ctrl+F5 will...  
             dnn.setVar(this.ns + '_json', '');  //clear out xml for postbacks don't need payload, unless enablePostbackState is set, which will trigger _onSubmit
+			logger.warn('<<< Exiting generateMenuHTML()', { "event.action": "generateMenuHTML" });
     },
 
     renderNode: function(node, ctr)
@@ -188,25 +194,33 @@ dnn.controls.DNNMenu.prototype =
             for (var i = 0; i < node.childNodeCount(); i++)	//recursively call child rendering
                 this.renderNode(node.childNodes(i), subMenu);
         }
+		logger.warn(`<<< Exiting renderNode(node=${node},ctr=${ctr})`, { "event.action": "renderNode", "logrite.node": node, "logrite.ctr": ctr });
     },
 
     renderCustomHTML: function(sHTML)
     {
+		logger.error(`>>> Entering renderCustomHTML(sHTML=${sHTML})`, { "event.action": "renderCustomHTML", "logrite.sHTML": sHTML });
         var ctl = dnn.dom.createElement('span');
         ctl.innerHTML = sHTML;
+		logger.error(`renderCustomHTML(sHTML=${sHTML}): ctl → ${ctl}`, { "event.action": "renderCustomHTML", "logrite.sHTML": sHTML });
+		logger.warn(`<<< Exiting renderCustomHTML(sHTML=${sHTML})`, { "event.action": "renderCustomHTML", "logrite.sHTML": sHTML });
         return ctl;
     },
 
     renderIcon: function(mNode)
     {
+		logger.error(`>>> Entering renderIcon(mNode=${mNode})`, { "event.action": "renderIcon", "logrite.mNode": mNode });
         var ctl = dnn.dom.createElement('span');
+		logger.error(`renderIcon(mNode=${mNode}): ctl → ${ctl}`, { "event.action": "renderIcon", "logrite.mNode": mNode });
         if (mNode.imageIndex > -1 || mNode.image != '')
         {
             var img = this.createChildControl('img', mNode.id, 'icn');
+			logger.error(`renderIcon(mNode=${mNode}): img → ${img}`, { "event.action": "renderIcon", "logrite.mNode": mNode });
             img.src = (mNode.image.length > 0 ? mNode.image : this.imageList[mNode.imageIndex]);
             ctl.appendChild(img);
         }
 
+		logger.warn(`<<< Exiting renderIcon(mNode=${mNode})`, { "event.action": "renderIcon", "logrite.mNode": mNode });
         return ctl;
     },
 
@@ -231,19 +245,26 @@ dnn.controls.DNNMenu.prototype =
                 }
             }
         }
+		logger.warn(`<<< Exiting renderArrow(mNode=${mNode},ctr=${ctr})`, { "event.action": "renderArrow", "logrite.mNode": mNode, "logrite.ctr": ctr });
     },
 
     renderText: function(mNode)
     {
+		logger.error(`>>> Entering renderText(mNode=${mNode})`, { "event.action": "renderText", "logrite.mNode": mNode });
         var ctl = this.createChildControl('span', mNode.id, 't');
         ctl.className = 'txt';
+		logger.error(`renderText(mNode=${mNode}): ctl → ${ctl}`, { "event.action": "renderText", "logrite.mNode": mNode });
+		logger.debug(`renderText(mNode=${mNode}): ctl.className → ${ctl.className}`, { "event.action": "renderText", "logrite.mNode": mNode });
         ctl.innerHTML = mNode.text;
+		logger.debug(`renderText(mNode=${mNode}): ctl.innerHTML → ${ctl.innerHTML}`, { "event.action": "renderText", "logrite.mNode": mNode });
         ctl.style.cursor = 'pointer';
+		logger.warn(`<<< Exiting renderText(mNode=${mNode})`, { "event.action": "renderText", "logrite.mNode": mNode });
         return ctl;
     },
 
     renderSubMenu: function(mNode)
     {
+		logger.error(`>>> Entering renderSubMenu(mNode=${mNode})`, { "event.action": "renderSubMenu", "logrite.mNode": mNode });
         var menuBuilder = this._getMenuBuilder(mNode, null);
         /*if (this.suborient == dnn.controls.orient.vertical) // (this.useTables)
         menuBuilder = new dnn.controls.DNNMenuTableBuilder(this, mNode);		
@@ -251,6 +272,8 @@ dnn.controls.DNNMenu.prototype =
         menuBuilder = new dnn.controls.DNNMenuBuilder(this, mNode);
         */
         var subMenu = menuBuilder.createSubMenu();
+		logger.error(`renderSubMenu(mNode=${mNode}): menuBuilder → ${menuBuilder}`, { "event.action": "renderSubMenu", "logrite.mNode": mNode });
+		logger.error(`renderSubMenu(mNode=${mNode}): subMenu → ${subMenu}`, { "event.action": "renderSubMenu", "logrite.mNode": mNode });
         subMenu.style.position = 'absolute';
         subMenu.style.display = 'none';
         var css = this.mcss;
@@ -258,6 +281,8 @@ dnn.controls.DNNMenu.prototype =
         css += ' mid' + mNode.id;
 
         subMenu.className = css;
+		logger.debug(`renderSubMenu(mNode=${mNode}): subMenu.className → ${subMenu.className}`, { "event.action": "renderSubMenu", "logrite.mNode": mNode });
+		logger.warn(`<<< Exiting renderSubMenu(mNode=${mNode})`, { "event.action": "renderSubMenu", "logrite.mNode": mNode });
         return subMenu;
     },
 
@@ -265,6 +290,7 @@ dnn.controls.DNNMenu.prototype =
     //todo: move
     _getMenuBuilder: function(mNode, ctr)
     {
+		logger.error(`>>> Entering _getMenuBuilder(mNode=${mNode},ctr=${ctr})`, { "event.action": "_getMenuBuilder", "logrite.mNode": mNode, "logrite.ctr": ctr });
         var menuBuilder;
         if (ctr)
         {
@@ -285,11 +311,13 @@ dnn.controls.DNNMenu.prototype =
                 menuBuilder = new dnn.controls.DNNMenuBuilder(this, mNode);
         }
 
+		logger.warn(`<<< Exiting _getMenuBuilder(mNode=${mNode},ctr=${ctr})`, { "event.action": "_getMenuBuilder", "logrite.mNode": mNode, "logrite.ctr": ctr });
         return menuBuilder;
     },
 
     hoverNode: function(mNode)
     {
+		logger.error(`>>> Entering hoverNode(mNode=${mNode})`, { "event.action": "hoverNode", "logrite.mNode": mNode });
         if (this.hoverMNode != null)
         {
             this.hoverMNode.hover = false;
@@ -298,18 +326,23 @@ dnn.controls.DNNMenu.prototype =
         if (mNode != null)
         {
             mNode.hover = true;
+			logger.debug(`hoverNode(mNode=${mNode}): mNode.hover → ${mNode.hover}`, { "event.action": "hoverNode", "logrite.mNode": mNode });
             this.assignCss(mNode);
         }
         this.hoverMNode = mNode;
+		logger.debug(`hoverNode(mNode=${mNode}): this.hoverMNode → ${this.hoverMNode}`, { "event.action": "hoverNode", "logrite.mNode": mNode });
     },
 
     __expandNode: function(ctx)
     {
+		logger.error(`>>> Entering __expandNode(ctx=${ctx})`, { "event.action": "__expandNode", "logrite.ctx": ctx });
         this.expandNode(ctx, true);
+		logger.warn(`<<< Exiting __expandNode(ctx=${ctx})`, { "event.action": "__expandNode", "logrite.ctx": ctx });
     },
 
     expandNode: function(mNode, force)
     {
+		logger.error(`>>> Entering expandNode(mNode=${mNode},force=${force})`, { "event.action": "expandNode", "logrite.mNode": mNode, "logrite.force": force });
         dnn.cancelDelay(this.ns + 'min');
         if (mNode.hasPendingNodes)
         {
@@ -317,7 +350,9 @@ dnn.controls.DNNMenu.prototype =
             {
                 this.podInProgress = true;
                 this.showWorkImage(mNode, true);
+				logger.debug(`expandNode(mNode=${mNode},force=${force}): this.podInProgress → ${this.podInProgress}`, { "event.action": "expandNode", "logrite.mNode": mNode, "logrite.force": force });
                 mNode.menu = this; //need to give reference back to self
+				logger.debug(`expandNode(mNode=${mNode},force=${force}): mNode.menu → ${mNode.menu}`, { "event.action": "expandNode", "logrite.mNode": mNode, "logrite.force": force });
 
                 if (this.callBack.indexOf('[NODEXML]') > -1)
                     eval(this.callBack.replace('[NODEXML]', dnn.escapeForEval(mNode.node.getXml())));
@@ -333,13 +368,16 @@ dnn.controls.DNNMenu.prototype =
             {
                 this.hideMenus(new dnn.controls.DNNMenuNode(mNode.node.parentNode())); //MinDelay???
                 var subMenu = this.getChildControl(mNode.id, 'sub');
+				logger.error(`expandNode(mNode=${mNode},force=${force}): subMenu → ${subMenu}`, { "event.action": "expandNode", "logrite.mNode": mNode, "logrite.force": force });
                 if (subMenu != null)
                 {
                     this.positionMenu(mNode, subMenu);
                     this.showSubMenu(subMenu, true, mNode);
                     this.openMenus[this.openMenus.length] = mNode;
                     mNode.expanded = true;
+					logger.debug(`expandNode(mNode=${mNode},force=${force}): mNode.expanded → ${mNode.expanded}`, { "event.action": "expandNode", "logrite.mNode": mNode, "logrite.force": force });
                     mNode.update();
+					logger.warn(`<<< Exiting expandNode(mNode=${mNode},force=${force})`, { "event.action": "expandNode", "logrite.mNode": mNode, "logrite.force": force });
                 }
             }
             else
@@ -350,6 +388,7 @@ dnn.controls.DNNMenu.prototype =
 
     showSubMenu: function(subMenu, show, mNode)
     {
+		logger.error(`>>> Entering showSubMenu(subMenu=${subMenu},show=${show},mNode=${mNode})`, { "event.action": "showSubMenu", "logrite.subMenu": subMenu, "logrite.show": show, "logrite.mNode": mNode });
         dnn.dom.positioning.placeOnTop(subMenu, show, this.sysImgPath + 'spacer.gif');
         subMenu.style.clip = 'rect(auto,auto,auto,auto)';
         if (this.animation != 0)  //0=none
@@ -361,6 +400,7 @@ dnn.controls.DNNMenu.prototype =
             else
                 dir = (show ? dnn.motion.animationDir.Down : dnn.motion.animationDir.Up);
             dnn.dom.animate(subMenu, this.animation, dir, this.easingType, this.easingDir, this.animationLen, this.animationInterval);
+			logger.error(`showSubMenu(subMenu=${subMenu},show=${show},mNode=${mNode}): dir → ${dir}`, { "event.action": "showSubMenu", "logrite.subMenu": subMenu, "logrite.show": show, "logrite.mNode": mNode });
         }
         else
             subMenu.style.display = (show ? '' : 'none');
@@ -369,9 +409,12 @@ dnn.controls.DNNMenu.prototype =
 
     showWorkImage: function(mNode, show)
     {
+		logger.error(`>>> Entering showWorkImage(mNode=${mNode},show=${show})`, { "event.action": "showWorkImage", "logrite.mNode": mNode, "logrite.show": show });
         if (this.workImg != null)
         {
             var icon = this.getChildControl(mNode.id, 'icn');
+			logger.error(`showWorkImage(mNode=${mNode},show=${show}): icon → ${icon}`, { "event.action": "showWorkImage", "logrite.mNode": mNode, "logrite.show": show });
+			logger.debug(`showWorkImage(mNode=${mNode},show=${show}): icon.src → ${icon.src}`, { "event.action": "showWorkImage", "logrite.mNode": mNode, "logrite.show": show });
             if (icon != null)
             {
                 if (show)
@@ -379,23 +422,28 @@ dnn.controls.DNNMenu.prototype =
                 else
                     icon.src = (mNode.image.length > 0 ? mNode.image : this.imageList[mNode.imageIndex]);
             }
+		logger.warn(`<<< Exiting showWorkImage(mNode=${mNode},show=${show})`, { "event.action": "showWorkImage", "logrite.mNode": mNode, "logrite.show": show });
         }
 
     },
 
     isNodeVertical: function(mNode)
     {
+		logger.error(`>>> Entering isNodeVertical(mNode=${mNode})`, { "event.action": "isNodeVertical", "logrite.mNode": mNode });
+		logger.warn(`<<< Exiting isNodeVertical(mNode=${mNode})`, { "event.action": "isNodeVertical", "logrite.mNode": mNode });
         return ((mNode.level == 0 && this.orient == dnn.controls.orient.vertical) || (mNode.level > 0 && this.suborient == dnn.controls.orient.vertical));
     },
 
     hideMenus: function(mNode)
     {
+		logger.error(`>>> Entering hideMenus(mNode=${mNode})`, { "event.action": "hideMenus", "logrite.mNode": mNode });
         for (var i = this.openMenus.length - 1; i >= 0; i--)
         {
             if (mNode != null && this.openMenus[i].id == mNode.id)
                 break;
             this.collapseNode(this.openMenus[i]);
             this.openMenus.length = this.openMenus.length - 1;
+			logger.warn(`<<< Exiting hideMenus(mNode=${mNode})`, { "event.action": "hideMenus", "logrite.mNode": mNode });
         }
     },
 
@@ -410,6 +458,7 @@ dnn.controls.DNNMenu.prototype =
             mNode.update();
             return true;
         }
+		logger.warn(`<<< Exiting collapseNode(mNode=${mNode})`, { "event.action": "collapseNode", "logrite.mNode": mNode });
     },
 
     positionMenu: function(mNode, menu)
@@ -465,12 +514,15 @@ dnn.controls.DNNMenu.prototype =
         }
         menu.style.top = iNewTop + 'px';
         menu.style.left = iNewLeft + 'px';
+		logger.warn(`<<< Exiting positionMenu(mNode=${mNode},menu=${menu})`, { "event.action": "positionMenu", "logrite.mNode": mNode, "logrite.menu": menu });
     },
 
     selectNode: function(mNode)
     {
+		logger.error(`>>> Entering selectNode(mNode=${mNode})`, { "event.action": "selectNode", "logrite.mNode": mNode });
         var arg = new dnn.controls.DNNNodeEventArgs(mNode);
         this.invoke_handler('click', arg);
+		logger.error(`selectNode(mNode=${mNode}): arg → ${arg}`, { "event.action": "selectNode", "logrite.mNode": mNode });
         if (arg.get_cancel())
             return;
 
@@ -488,6 +540,7 @@ dnn.controls.DNNMenu.prototype =
 
         this.selMNode = mNode;
 
+		logger.debug(`selectNode(mNode=${mNode}): this.selMNode → ${this.selMNode}`, { "event.action": "selectNode", "logrite.mNode": mNode });
         if (mNode.hasNodes || mNode.hasPendingNodes)
             this.expandNode(mNode, true); //force display
 
@@ -517,8 +570,10 @@ dnn.controls.DNNMenu.prototype =
 
     assignCss: function(mNode)
     {
+		logger.error(`>>> Entering assignCss(mNode=${mNode})`, { "event.action": "assignCss", "logrite.mNode": mNode });
         var ctr = this.getChildControl(mNode.id, 'ctr');
         var css = this.css;
+		logger.error(`assignCss(mNode=${mNode}): ctr → ${ctr}`, { "event.action": "assignCss", "logrite.mNode": mNode });
 
         if (mNode.level > 0 && this.cssChild.length > 0)
             css = this.cssChild;
@@ -552,38 +607,49 @@ dnn.controls.DNNMenu.prototype =
 
 
         ctr.className = css;
+		logger.debug(`assignCss(mNode=${mNode}): ctr.className → ${ctr.className}`, { "event.action": "assignCss", "logrite.mNode": mNode });
     },
 
     update: function()
     {
+		logger.error('>>> Entering update()', { "event.action": "update" });
         dnn.setVar(this.ns + '_json', this.rootNode.getJSON());
+		logger.warn('<<< Exiting update()', { "event.action": "update" });
     },
 
     //--- Event Handlers ---//
     _onsubmit: function()
     {
+		logger.error('>>> Entering _onsubmit()', { "event.action": "_onsubmit" });
         this.update(true);
+		logger.warn('<<< Exiting _onsubmit()', { "event.action": "_onsubmit" });
     },
 
     _bodyClick: function()
     {
+		logger.error('>>> Entering _bodyClick()', { "event.action": "_bodyClick" });
         this.hideMenus();
+		logger.warn('<<< Exiting _bodyClick()', { "event.action": "_bodyClick" });
     },
 
     focusHandler: function(e)
     {
+		logger.error(`>>> Entering focusHandler(e=${e})`, { "event.action": "focusHandler", "logrite.e": e });
         var mNode = this.hoverMNode;
         if (mNode == null)
             mNode = this.selMNode;
+			logger.error(`focusHandler(e=${e}): mNode → ${mNode}`, { "event.action": "focusHandler", "logrite.e": e });
         if (mNode == null)
             mNode = new dnn.controls.DNNMenuNode(this.nodes[0]);
         //mNode = new dnn.controls.DNNMenuNode(this.rootNode.childNodes(0));
         this.hoverNode(mNode);
         this.container.onfocus = null;
+		logger.warn(`<<< Exiting focusHandler(e=${e})`, { "event.action": "focusHandler", "logrite.e": e });
     },
 
     blurHandler: function(e)
     {
+		logger.error(`>>> Entering blurHandler(e=${e})`, { "event.action": "blurHandler", "logrite.e": e });
         if (this.hoverMNode != null)
             this.hoverNode(null);
 
@@ -596,6 +662,7 @@ dnn.controls.DNNMenu.prototype =
 
     safariKeyHandler: function(e)
     {
+		logger.error(`>>> Entering safariKeyHandler(e=${e})`, { "event.action": "safariKeyHandler", "logrite.e": e });
         if (e.charCode == KEY_RETURN)
         {
             if (this.hoverMNode != null && this.hoverMNode.enabled)
@@ -606,6 +673,7 @@ dnn.controls.DNNMenu.prototype =
 
     keyboardHandler: function(e)
     {
+		logger.error(`>>> Entering keyboardHandler(e=${e})`, { "event.action": "keyboardHandler", "logrite.e": e });
         var code = e.keyCode;
         if (code == null)
             code = e.charCode;
@@ -625,15 +693,19 @@ dnn.controls.DNNMenu.prototype =
         if (code >= KEY_LEFT_ARROW && code <= KEY_DOWN_ARROW)
         {
             var iDir = (code == KEY_UP_ARROW || code == KEY_LEFT_ARROW) ? -1 : 1;
+			logger.error(`keyboardHandler(e=${e}): iDir → ${iDir}`, { "event.action": "keyboardHandler", "logrite.e": e });
             var sAxis = (code == KEY_UP_ARROW || code == KEY_DOWN_ARROW) ? 'y' : 'x';
+			logger.error(`keyboardHandler(e=${e}): sAxis → ${sAxis}`, { "event.action": "keyboardHandler", "logrite.e": e });
 
             var mNode = this.hoverMNode;
+			logger.error(`keyboardHandler(e=${e}): mNode → ${mNode}`, { "event.action": "keyboardHandler", "logrite.e": e });
             var oNewMNode;
             if (mNode == null)
                 mNode = new dnn.controls.DNNMenuNode(this.nodes[0]);
             //mNode = new dnn.controls.DNNMenuNode(this.rootNode.childNodes(0));
 
             var bHor = !this.isNodeVertical(mNode);
+			logger.error(`keyboardHandler(e=${e}): bHor → ${bHor}`, { "event.action": "keyboardHandler", "logrite.e": e });
             if ((sAxis == 'y' && !bHor) || (bHor && sAxis == 'x'))
             {
                 this.hideMenus(new dnn.controls.DNNMenuNode(mNode.node.parentNode()));
@@ -664,17 +736,20 @@ dnn.controls.DNNMenu.prototype =
                     else
                     {
                         var node = mNode.node;
+						logger.error(`keyboardHandler(e=${e}): node → ${node}`, { "event.action": "keyboardHandler", "logrite.e": e });
                         while (node.parentNode().nodeName() != 'root')
                             node = node.parentNode();
                         oNewMNode = new dnn.controls.DNNMenuNode(node);
                         oNewMNode = this.__getNextNode(oNewMNode, iDir);
                         this.hideMenus(new dnn.controls.DNNMenuNode(oNewMNode.node.parentNode()));
+						logger.error(`keyboardHandler(e=${e}): oNewMNode → ${oNewMNode}`, { "event.action": "keyboardHandler", "logrite.e": e });
                     }
                 }
             }
             if (oNewMNode != null && oNewMNode.node.nodeName() != 'root')
                 this.hoverNode(oNewMNode);
 
+		logger.warn(`<<< Exiting keyboardHandler(e=${e})`, { "event.action": "keyboardHandler", "logrite.e": e });
             return false;
         }
 
@@ -682,17 +757,23 @@ dnn.controls.DNNMenu.prototype =
 
     dispose: function()
     {
+		logger.error('>>> Entering dispose()', { "event.action": "dispose" });
         this._onsubmitDelegate = null;
         this._hideMenusDelegate = null;
+		logger.debug(`dispose(): this._onsubmitDelegate → ${this._onsubmitDelegate}`, { "event.action": "dispose" });
         this._expandNodeDelegate = null;
         dnn.controls.DNNMenu.callBaseMethod(this, 'dispose');
+		logger.debug(`dispose(): this._hideMenusDelegate → ${this._hideMenusDelegate}`, { "event.action": "dispose" });
     },
 
     __getNextNode: function(mNode, iDir)
     {
+		logger.error(`>>> Entering __getNextNode(mNode=${mNode},iDir=${iDir})`, { "event.action": "__getNextNode", "logrite.mNode": mNode, "logrite.iDir": iDir });
         var node;
         var parentNode = mNode.node.parentNode();
+		logger.error(`__getNextNode(mNode=${mNode},iDir=${iDir}): parentNode → ${parentNode}`, { "event.action": "__getNextNode", "logrite.mNode": mNode, "logrite.iDir": iDir });
         var nodeIndex = mNode.node.getNodeIndex('id');
+		logger.error(`__getNextNode(mNode=${mNode},iDir=${iDir}): nodeIndex → ${nodeIndex}`, { "event.action": "__getNextNode", "logrite.mNode": mNode, "logrite.iDir": iDir });
         if (nodeIndex + iDir < 0)	//if first node was selected and going left, select last node
             node = parentNode.nodes[parentNode.childNodeCount() - 1]; //node = parentNode.childNodes(parentNode.childNodeCount()-1);
         else if (nodeIndex + iDir > parentNode.childNodeCount() - 1)
@@ -701,6 +782,7 @@ dnn.controls.DNNMenu.prototype =
             node = parentNode.nodes[nodeIndex + iDir]; //node = parentNode.childNodes(nodeIndex + iDir);
 
         var oRetNode = new dnn.controls.DNNMenuNode(node);
+		logger.error(`__getNextNode(mNode=${mNode},iDir=${iDir}): oRetNode → ${oRetNode}`, { "event.action": "__getNextNode", "logrite.mNode": mNode, "logrite.iDir": iDir });
         if (oRetNode.isBreak)
         {
             nodeIndex += iDir; //check next one
@@ -710,6 +792,7 @@ dnn.controls.DNNMenu.prototype =
                 node = parentNode.childNodes(0);
             else
                 node = parentNode.childNodes(nodeIndex + iDir);
+			logger.error(`__getNextNode(mNode=${mNode},iDir=${iDir}): node → ${node}`, { "event.action": "__getNextNode", "logrite.mNode": mNode, "logrite.iDir": iDir });
             return new dnn.controls.DNNMenuNode(node);
         }
         else
@@ -718,31 +801,44 @@ dnn.controls.DNNMenu.prototype =
 
     callBackFail: function(result, ctx, req)
     {
+		logger.error(`>>> Entering callBackFail(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackFail", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
         var mNode = ctx;
         var menu = mNode.menu;
         menu.invoke_handler('callBackFail', new dnn.controls.DNNCallbackEventArgs(result, ctx, req));
+		logger.warn(`<<< Exiting callBackFail(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackFail", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
     },
 
     callBackStatus: function(result, ctx, req)
     {
+		logger.error(`>>> Entering callBackStatus(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackStatus", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
         var mNode = ctx;
         var menu = mNode.menu;
         menu.invoke_compatHandler('callBackStatus', result, ctx, req);
+		logger.warn(`<<< Exiting callBackStatus(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackStatus", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
     },
 
     callBackSuccess: function(result, ctx, req)
     {
+		logger.error(`>>> Entering callBackSuccess(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
         var mNode = ctx;
         var node = mNode.node;
+		logger.error(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): mNode → ${mNode}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
+		logger.error(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): node → ${node}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
+		logger.debug(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): node.nodes → ${node.nodes}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
+		logger.debug(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): mNode.hasPendingNodes → ${mNode.hasPendingNodes}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
         var menu = mNode.menu;
 
         menu.showWorkImage(mNode, false);
         //node.appendXml(result);
         var json = dnn.evalJSON("{" + result + "}");
+		logger.error(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): json → ${json}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
+		logger.debug(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): mNode.hasNodes → ${mNode.hasNodes}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
+		logger.debug(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): menu.podInProgress → ${menu.podInProgress}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
         node.nodes = json.nodes;
         node.setupJSONNodes(node.rootNode(), node, node.nodes);
 
         var subMenu = menu.getChildControl(mNode.id, 'sub');
+		logger.error(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): subMenu → ${subMenu}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
         for (var i = 0; i < node.childNodeCount(); i++)
             menu.renderNode(node.childNodes(i), subMenu);
 
@@ -758,28 +854,36 @@ dnn.controls.DNNMenu.prototype =
         menu.podInProgress = false;
 
         menu.invoke_handler('callBackSuccess', new dnn.controls.DNNCallbackEventArgs(result, ctx, req));
+		logger.warn(`<<< Exiting callBackSuccess(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
     },
 
     _nodeTextClick: function(evt)
     {
+		logger.error(`>>> Entering _nodeTextClick(evt=${evt})`, { "event.action": "_nodeTextClick", "logrite.evt": evt });
         var node = this._findEventNode(evt);
         var mNode;
+		logger.error(`_nodeTextClick(evt=${evt}): node → ${node}`, { "event.action": "_nodeTextClick", "logrite.evt": evt });
 
         if (node != null)
         {
             mNode = new dnn.controls.DNNMenuNode(node);
             this.selectNode(mNode);
+			logger.error(`_nodeTextClick(evt=${evt}): mNode → ${mNode}`, { "event.action": "_nodeTextClick", "logrite.evt": evt });
         }
         evt.stopPropagation();
+		logger.warn(`<<< Exiting _nodeTextClick(evt=${evt})`, { "event.action": "_nodeTextClick", "logrite.evt": evt });
     },
 
     _menuMOver: function(evt, element)
     {
+		logger.error(`>>> Entering _menuMOver(evt=${evt},element=${element})`, { "event.action": "_menuMOver", "logrite.evt": evt, "logrite.element": element });
         dnn.cancelDelay(this.ns + 'mout');
+		logger.warn(`<<< Exiting _menuMOver(evt=${evt},element=${element})`, { "event.action": "_menuMOver", "logrite.evt": evt, "logrite.element": element });
     },
 
     _menuMOut: function(evt, element)
     {
+		logger.error(`>>> Entering _menuMOut(evt=${evt},element=${element})`, { "event.action": "_menuMOut", "logrite.evt": evt, "logrite.element": element });
         dnn.cancelDelay(this.ns + 'min');
         if (this.moutDelay > 0)
             dnn.doDelay(this.ns + 'mout', this.moutDelay, dnn.createDelegate(this, this.hideMenus));
@@ -790,12 +894,16 @@ dnn.controls.DNNMenu.prototype =
 
     _nodeMOver: function(evt, element)
     {
+		logger.error(`>>> Entering _nodeMOver(evt=${evt},element=${element})`, { "event.action": "_nodeMOver", "logrite.evt": evt, "logrite.element": element });
         var node = this._findEventNode(evt);
+		logger.error(`_nodeMOver(evt=${evt},element=${element}): node → ${node}`, { "event.action": "_nodeMOver", "logrite.evt": evt, "logrite.element": element });
         if (node != null)
         {
             var mNode = new dnn.controls.DNNMenuNode(node);
+			logger.error(`_nodeMOver(evt=${evt},element=${element}): mNode → ${mNode}`, { "event.action": "_nodeMOver", "logrite.evt": evt, "logrite.element": element });
             //this.hideMenus(new dnn.controls.DNNMenuNode(node.parentNode())); //MinDelay???
             mNode.hover = true;
+			logger.debug(`_nodeMOver(evt=${evt},element=${element}): mNode.hover → ${mNode.hover}`, { "event.action": "_nodeMOver", "logrite.evt": evt, "logrite.element": element });
             this.assignCss(mNode);
 
             if (mNode.expanded != true)
@@ -803,17 +911,22 @@ dnn.controls.DNNMenu.prototype =
             evt.stopPropagation();
         }
         this._menuMOver(evt, element);
+		logger.warn(`<<< Exiting _nodeMOver(evt=${evt},element=${element})`, { "event.action": "_nodeMOver", "logrite.evt": evt, "logrite.element": element });
     },
 
     _nodeMOut: function(evt, element)
     {
+		logger.error(`>>> Entering _nodeMOut(evt=${evt},element=${element})`, { "event.action": "_nodeMOut", "logrite.evt": evt, "logrite.element": element });
         var node = this._findEventNode(evt);
+		logger.error(`_nodeMOut(evt=${evt},element=${element}): node → ${node}`, { "event.action": "_nodeMOut", "logrite.evt": evt, "logrite.element": element });
         if (node != null)
         {
             var mNode = new dnn.controls.DNNMenuNode(node);
+			logger.error(`_nodeMOut(evt=${evt},element=${element}): mNode → ${mNode}`, { "event.action": "_nodeMOut", "logrite.evt": evt, "logrite.element": element });
             this.assignCss(mNode);
             this._menuMOut(evt, element);
             evt.stopPropagation();
+			logger.warn(`<<< Exiting _nodeMOut(evt=${evt},element=${element})`, { "event.action": "_nodeMOut", "logrite.evt": evt, "logrite.element": element });
         }
     },
 
@@ -821,30 +934,39 @@ dnn.controls.DNNMenu.prototype =
     //OBSOLETE!
     getXml: function()
     {
+		logger.error('>>> Entering getXml()', { "event.action": "getXml" });
+		logger.warn('<<< Exiting getXml()', { "event.action": "getXml" });
         return this.rootNode.getXml();
     },
 
     _findEventNode: function(evt)
     {
+		logger.error(`>>> Entering _findEventNode(evt=${evt})`, { "event.action": "_findEventNode", "logrite.evt": evt });
         if (dnn.dom.isNonTextNode(evt.target))
             return this.rootNode.findNode(this.getChildControlBaseId(evt.target));
     },
 
     _loadNodes: function()
     {
+		logger.error('>>> Entering _loadNodes()', { "event.action": "_loadNodes" });
         var json = dnn.evalJSON(dnn.getVar(this.ns + '_json'));
+		logger.error(`_loadNodes(): json → ${json}`, { "event.action": "_loadNodes" });
         if (json)
         {
             this.nodes = json.nodes;
             this.rootNode = {};
+			logger.debug(`_loadNodes(): this.nodes → ${this.nodes}`, { "event.action": "_loadNodes" });
             this.rootNode.nodes = this.nodes;
             this.rootNode.id = this.ns;
             this.rootNode = new dnn.controls.JSONNode(this.rootNode, 'root', 0);
+			logger.debug(`_loadNodes(): this.rootNode → ${this.rootNode}`, { "event.action": "_loadNodes" });
+			logger.warn('<<< Exiting _loadNodes()', { "event.action": "_loadNodes" });
         }
     },
 
     _setupKeyHandling: function()
     {
+		logger.error('>>> Entering _setupKeyHandling()', { "event.action": "_setupKeyHandling" });
         if (this.container.tabIndex <= 0)
         {
             this.container.tabIndex = 0;
@@ -856,7 +978,9 @@ dnn.controls.DNNMenu.prototype =
         else
         {
             var txt = document.createElement('input');
+			logger.error(`_setupKeyHandling(): txt → ${txt}`, { "event.action": "_setupKeyHandling" });
             txt.type = 'text';
+			logger.debug(`_setupKeyHandling(): txt.type → ${txt.type}`, { "event.action": "_setupKeyHandling" });
             txt.style.width = 0;
             txt.style.height = 0;
             txt.style.background = 'transparent';
@@ -878,6 +1002,7 @@ dnn.controls.DNNMenu.prototype =
             }, this);
 
             this.container.parentNode.appendChild(txt);
+			logger.warn('<<< Exiting _setupKeyHandling()', { "event.action": "_setupKeyHandling" });
         }
     }
 
@@ -903,29 +1028,37 @@ dnn.controls.DNNMenuBuilder.prototype =
 {
     appendChild: function(ctl, isNewCell)
     {
+		logger.error(`>>> Entering appendChild(ctl=${ctl},isNewCell=${isNewCell})`, { "event.action": "appendChild", "logrite.ctl": ctl, "logrite.isNewCell": isNewCell });
         this.subcont.appendChild(ctl);
+		logger.warn(`<<< Exiting appendChild(ctl=${ctl},isNewCell=${isNewCell})`, { "event.action": "appendChild", "logrite.ctl": ctl, "logrite.isNewCell": isNewCell });
     },
 
     newCell: function() { },
 
     newCont: function()
     {
+		logger.error('>>> Entering newCont()', { "event.action": "newCont" });
         if (this.isVertical)
             this.row = this.menu.createChildControl('div', this.mNode.id, 'ctr'); //container for Node
         else
             this.row = this.menu.createChildControl('span', this.mNode.id, 'ctr'); //container for Node
         this.subcont = this.row;
         this.container.appendChild(this.subcont);
+		logger.debug(`newCont(): this.subcont → ${this.subcont}`, { "event.action": "newCont" });
     },
 
     newRow: function()
     {
+		logger.error('>>> Entering newRow()', { "event.action": "newRow" });
         //if (this.container.childNodes.length > 0)
+		logger.warn('<<< Exiting newRow()', { "event.action": "newRow" });
         //	this.container.appendChild(document.createElement('br'));
     },
 
     createSubMenu: function()
     {
+		logger.error('>>> Entering createSubMenu()', { "event.action": "createSubMenu" });
+		logger.warn('<<< Exiting createSubMenu()', { "event.action": "createSubMenu" });
         return this.menu.createChildControl('DIV', this.mNode.id, 'sub'); //Not using SPAN due to FireFox bug...
     }
 }
@@ -955,9 +1088,12 @@ dnn.controls.DNNMenuTableBuilder.prototype =
 
     newCell: function()
     {
+		logger.error('>>> Entering newCell()', { "event.action": "newCell" });
         var td = dnn.dom.createElement('td');
         this.row.appendChild(td);
+		logger.error(`newCell(): td → ${td}`, { "event.action": "newCell" });
         this.subcont = td;
+		logger.warn('<<< Exiting newCell()', { "event.action": "newCell" });
         return td;
     },
 
@@ -966,13 +1102,18 @@ dnn.controls.DNNMenuTableBuilder.prototype =
         this.row = this.menu.createChildControl('tr', this.mNode.id, 'ctr'); //TR
         var tb = dnn.dom.getByTagName('TBODY', this.container);
         tb[0].appendChild(this.row);
+		logger.error(`newRow(): tb → ${tb}`, { "event.action": "newRow" });
     },
 
     createSubMenu: function()
     {
         var subMenu = this.menu.createChildControl('table', this.mNode.id, 'sub');
         subMenu.border = 0;
+		logger.error(`createSubMenu(): subMenu → ${subMenu}`, { "event.action": "createSubMenu" });
+		logger.debug(`createSubMenu(): subMenu.border → ${subMenu.border}`, { "event.action": "createSubMenu" });
+		logger.debug(`createSubMenu(): subMenu.cellSpacing → ${subMenu.cellSpacing}`, { "event.action": "createSubMenu" });
         subMenu.cellPadding = 0;
+		logger.debug(`createSubMenu(): subMenu.cellPadding → ${subMenu.cellPadding}`, { "event.action": "createSubMenu" });
         subMenu.cellSpacing = 0;
         subMenu.appendChild(dnn.dom.createElement('tbody'));
         return subMenu;
@@ -1022,6 +1163,7 @@ dnn.controls.DNNMenuListBuilder.prototype =
         //ctl.style.padding = 0; //WCT-9771
         //ctl.style.float = 'left';
         //ctl.style.clear = 'left';
+		logger.warn(`<<< Exiting _setStyles(ctl=${ctl})`, { "event.action": "_setStyles", "logrite.ctl": ctl });
     }
 }
 
@@ -1050,12 +1192,15 @@ dnn.controls.DNNMenuNode.prototype =
 {
     childNodes: function(iIndex)
     {
+		logger.error(`>>> Entering childNodes(iIndex=${iIndex})`, { "event.action": "childNodes", "logrite.iIndex": iIndex });
+		logger.warn(`<<< Exiting childNodes(iIndex=${iIndex})`, { "event.action": "childNodes", "logrite.iIndex": iIndex });
         if (this.node.nodes(iIndex) != null)
             return new dnn.controls.DNNMenuNode(this.node.nodes(iIndex));
 
     },
     getUrl: function(menu)
     {
+		logger.error(`>>> Entering getUrl(menu=${menu})`, { "event.action": "getUrl", "logrite.menu": menu });
         if (this.urlIndex > -1)
             return menu.urlList[this.urlIndex] + this.url;
         else

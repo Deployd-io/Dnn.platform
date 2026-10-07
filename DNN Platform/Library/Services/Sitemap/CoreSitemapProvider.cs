@@ -31,20 +31,26 @@ namespace DotNetNuke.Services.Sitemap
         /// <inheritdoc />
         public override List<SitemapUrl> GetUrls(int portalId, PortalSettings ps, string version)
         {
+			Logger.LogError(">>> Entering GetUrls(portalId={PortalId},ps={Ps},version={Version})", portalId, ps, version);
             SitemapUrl pageUrl = null;
             var urls = new List<SitemapUrl>();
+			Logger.LogError("GetUrls(portalId={PortalId},ps={Ps},version={Version}): urls → {Urls}", portalId, ps, version, urls);
+			Logger.LogError("GetUrls(portalId={PortalId},ps={Ps},version={Version}): pageUrl → {PageUrl}", portalId, ps, version, pageUrl);
 
             this.useLevelBasedPagePriority = bool.Parse(PortalController.GetPortalSetting("SitemapLevelMode", portalId, "False"));
             this.minPagePriority = float.Parse(PortalController.GetPortalSetting("SitemapMinPriority", portalId, "0.1"), CultureInfo.InvariantCulture);
+			Logger.LogDebug("GetUrls(portalId={PortalId},ps={Ps},version={Version}): minPagePriority → {MinPagePriority}", portalId, ps, version, minPagePriority);
             this.includeHiddenPages = bool.Parse(PortalController.GetPortalSetting("SitemapIncludeHidden", portalId, "True"));
 
             var currentLanguage = ps.CultureCode;
+			Logger.LogError("GetUrls(portalId={PortalId},ps={Ps},version={Version}): currentLanguage → {CurrentLanguage}", portalId, ps, version, currentLanguage);
             if (string.IsNullOrEmpty(currentLanguage))
             {
                 currentLanguage = Localization.GetPageLocale((IPortalSettings)ps).Name;
             }
 
             var languagePublished = LocaleController.Instance.GetLocale(ps.PortalId, currentLanguage).IsPublished;
+			Logger.LogError("GetUrls(portalId={PortalId},ps={Ps},version={Version}): languagePublished → {LanguagePublished}", portalId, ps, version, languagePublished);
             var tabs = TabController.Instance.GetTabsByPortal(portalId).Values
                         .Where(t => (!t.IsSystem
                                     && !ps.ContentLocalizationEnabled) || (languagePublished && t.CultureCode.Equals(currentLanguage, StringComparison.OrdinalIgnoreCase)));
@@ -72,6 +78,7 @@ namespace DotNetNuke.Services.Sitemap
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in GetUrls(portalId={PortalId},ps={Ps},version={Version}): {Arg3}", portalId, ps, version, ex.Message);
                     var exceptionMessage = Localization.GetExceptionMessage(
                         "SitemapUrlGenerationError",
                         "URL sitemap generation for page '{0} - {1}' caused an exception: {2}",
@@ -82,13 +89,16 @@ namespace DotNetNuke.Services.Sitemap
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetUrls(portalId={PortalId},ps={Ps},version={Version})", portalId, ps, version);
             return urls;
         }
 
         public virtual bool IsTabPublic(TabPermissionCollection objTabPermissions)
         {
+			Logger.LogError(">>> Entering IsTabPublic(objTabPermissions={ObjTabPermissions})", objTabPermissions);
             string roles = objTabPermissions.ToString("VIEW");
             bool hasPublicRole = false;
+			Logger.LogError("IsTabPublic(objTabPermissions={ObjTabPermissions}): hasPublicRole → {HasPublicRole}", objTabPermissions, hasPublicRole);
 
             if (roles != null)
             {
@@ -121,6 +131,7 @@ namespace DotNetNuke.Services.Sitemap
                 }
             }
 
+			Logger.LogWarning("<<< Exiting IsTabPublic(objTabPermissions={ObjTabPermissions})", objTabPermissions);
             return hasPublicRole;
         }
 
@@ -133,8 +144,10 @@ namespace DotNetNuke.Services.Sitemap
         /// <returns>The priority assigned to the page.</returns>
         protected float GetPriority(TabInfo objTab)
         {
+			Logger.LogError(">>> Entering GetPriority(objTab={ObjTab})", objTab);
             float priority = objTab.SiteMapPriority;
 
+			Logger.LogError("GetPriority(objTab={ObjTab}): priority → {Priority}", objTab, priority);
             if (this.useLevelBasedPagePriority)
             {
                 if (objTab.Level >= 9)
@@ -152,6 +165,7 @@ namespace DotNetNuke.Services.Sitemap
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetPriority(objTab={ObjTab})", objTab);
             return priority;
         }
 
@@ -162,16 +176,21 @@ namespace DotNetNuke.Services.Sitemap
         /// <returns>A SitemapUrl object for the current page.</returns>
         private SitemapUrl GetPageUrl(TabInfo objTab, string language, PortalSettings ps)
         {
+			Logger.LogError(">>> Entering GetPageUrl(objTab={ObjTab},language={Language},ps={Ps})", objTab, language, ps);
             var pageUrl = new SitemapUrl();
             var url = TestableGlobals.Instance.NavigateURL(objTab.TabID, objTab.IsSuperTab, ps, string.Empty, language);
+			Logger.LogError("GetPageUrl(objTab={ObjTab},language={Language},ps={Ps}): pageUrl → {PageUrl}", objTab, language, ps, pageUrl);
             if ((ps.SSLSetup == Abstractions.Security.SiteSslSetup.On || ps.SSLEnforced || (objTab.IsSecure && ps.SSLEnabled)) && url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
             {
                 url = "https://" + url.Substring("http://".Length);
+				Logger.LogError("GetPageUrl(objTab={ObjTab},language={Language},ps={Ps}): url → {Url}", objTab, language, ps, url);
             }
 
             pageUrl.Url = url;
+			Logger.LogDebug("GetPageUrl(objTab={ObjTab},language={Language},ps={Ps}): pageUrl.Url → {Arg3}", objTab, language, ps, pageUrl.Url);
             pageUrl.Priority = this.GetPriority(objTab);
             pageUrl.LastModified = objTab.LastModifiedOnDate;
+			Logger.LogDebug("GetPageUrl(objTab={ObjTab},language={Language},ps={Ps}): pageUrl.LastModified → {Arg3}", objTab, language, ps, pageUrl.LastModified);
             foreach (ModuleInfo m in ModuleController.Instance.GetTabModules(objTab.TabID).Values)
             {
                 if (m.LastModifiedOnDate > objTab.LastModifiedOnDate)
@@ -181,12 +200,15 @@ namespace DotNetNuke.Services.Sitemap
             }
 
             pageUrl.ChangeFrequency = SitemapChangeFrequency.Daily;
+			Logger.LogDebug("GetPageUrl(objTab={ObjTab},language={Language},ps={Ps}): pageUrl.ChangeFrequency → {Arg3}", objTab, language, ps, pageUrl.ChangeFrequency);
 
             // support for alternate pages: https://support.google.com/webmasters/answer/2620865?hl=en
             if (ps.ContentLocalizationEnabled && !objTab.IsNeutralCulture)
             {
                 List<AlternateUrl> alternates = new List<AlternateUrl>();
+				Logger.LogError("GetPageUrl(objTab={ObjTab},language={Language},ps={Ps}): alternates → {Alternates}", objTab, language, ps, alternates);
                 TabInfo currentTab = objTab;
+				Logger.LogError("GetPageUrl(objTab={ObjTab},language={Language},ps={Ps}): currentTab → {CurrentTab}", objTab, language, ps, currentTab);
 
                 if (!objTab.IsDefaultLanguage)
                 {
@@ -221,6 +243,7 @@ namespace DotNetNuke.Services.Sitemap
                     });
 
                     pageUrl.AlternateUrls = alternates;
+					Logger.LogDebug("GetPageUrl(objTab={ObjTab},language={Language},ps={Ps}): pageUrl.AlternateUrls → {Arg3}", objTab, language, ps, pageUrl.AlternateUrls);
                 }
             }
 

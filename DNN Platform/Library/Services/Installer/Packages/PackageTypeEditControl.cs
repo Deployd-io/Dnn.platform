@@ -18,12 +18,15 @@ namespace DotNetNuke.Services.Installer.Packages.WebControls
     [ToolboxData("<{0}:PackageTypeEditControl runat=server></{0}:PackageTypeEditControl>")]
     public class PackageTypeEditControl : TextEditControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PackageTypeEditControl));
         /// <summary>RenderEditMode renders the Edit mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderEditMode(writer={Writer})", writer);
             IList<PackageType> packageTypes = PackageController.Instance.GetExtensionPackageTypes();
 
+			Logger.LogError("RenderEditMode(writer={Writer}): packageTypes → {PackageTypes}", writer, packageTypes);
             // Render the Select Tag
             this.ControlStyle.AddAttributesToRender(writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Type, "text");
@@ -62,6 +65,7 @@ namespace DotNetNuke.Services.Installer.Packages.WebControls
 
             // Close Select Tag
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
     }
 }

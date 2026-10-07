@@ -15,10 +15,13 @@ namespace DotNetNuke.Services.Localization
     [Serializable]
     public class Locale : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Locale));
         /// <summary>Initializes a new instance of the <see cref="Locale"/> class.</summary>
         public Locale()
         {
+			Logger.LogError(">>> Entering Locale()");
             this.PortalId = Null.NullInteger;
+			Logger.LogDebug("Locale(): this.PortalId → {Arg0}", this.PortalId);
             this.LanguageId = Null.NullInteger;
             this.IsPublished = Null.NullBoolean;
         }
@@ -102,6 +105,7 @@ namespace DotNetNuke.Services.Localization
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.LanguageId = Null.SetNullInteger(dr["LanguageID"]);
             this.Code = Null.SetNullString(dr["CultureCode"]);
             this.Text = Null.SetNullString(dr["CultureName"]);
@@ -109,6 +113,7 @@ namespace DotNetNuke.Services.Localization
 
             // These fields may not be populated (for Host level locales)
             DataTable schemaTable = dr.GetSchemaTable();
+			Logger.LogError("Fill(dr={Dr}): schemaTable → {SchemaTable}", dr, schemaTable);
             bool hasColumns = schemaTable.Select("ColumnName = 'IsPublished' Or ColumnName = 'PortalID'").Length == 2;
 
             if (hasColumns)
@@ -119,6 +124,7 @@ namespace DotNetNuke.Services.Localization
 
             // Call the base classes fill method to populate base class proeprties
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

@@ -42,9 +42,11 @@ namespace Dnn.PersonaBar.Sites.Services
         [HttpGet]
         public HttpResponseMessage GetPortals(int portalGroupId, string filter, int pageIndex, int pageSize)
         {
+			Logger.LogError(">>> Entering GetPortals(portalGroupId={PortalGroupId},filter={Filter},pageIndex={PageIndex},pageSize={PageSize})", portalGroupId, filter, pageIndex, pageSize);
             try
             {
                 var totalRecords = 0;
+				Logger.LogError("GetPortals(portalGroupId={PortalGroupId},filter={Filter},pageIndex={PageIndex},pageSize={PageSize}): totalRecords → {TotalRecords}", portalGroupId, filter, pageIndex, pageSize, totalRecords);
                 IEnumerable<PortalInfo> portals;
 
                 if (portalGroupId > Null.NullInteger)
@@ -55,6 +57,7 @@ namespace Dnn.PersonaBar.Sites.Services
                                 .ToList();
                     totalRecords = portals.Count();
                     portals = portals.Skip(pageIndex * pageSize).Take(pageSize);
+					Logger.LogError("GetPortals(portalGroupId={PortalGroupId},filter={Filter},pageIndex={PageIndex},pageSize={PageSize}): portals → {Portals}", portalGroupId, filter, pageIndex, pageSize, portals);
                 }
                 else
                 {
@@ -77,6 +80,7 @@ namespace Dnn.PersonaBar.Sites.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetPortals(portalGroupId={PortalGroupId},filter={Filter},pageIndex={PageIndex},pageSize={PageSize})", portalGroupId, filter, pageIndex, pageSize);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -90,9 +94,11 @@ namespace Dnn.PersonaBar.Sites.Services
         [RequireHost]
         public HttpResponseMessage CreatePortal(CreatePortalRequest request)
         {
+			Logger.LogError(">>> Entering CreatePortal(request={Request})", request);
             try
             {
                 var errors = new List<string>();
+				Logger.LogError("CreatePortal(request={Request}): errors → {Errors}", request, errors);
                 var portalId = this.controller.CreatePortal(
                     errors,
                     this.GetDomainName(),
@@ -120,6 +126,7 @@ namespace Dnn.PersonaBar.Sites.Services
                 }
 
                 var portal = PortalController.Instance.GetPortal(portalId);
+				Logger.LogError("CreatePortal(request={Request}): portal → {Portal}", request, portal);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
                 {
                     Portal = this.GetPortalDto(portal),
@@ -129,6 +136,7 @@ namespace Dnn.PersonaBar.Sites.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting CreatePortal(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -141,15 +149,18 @@ namespace Dnn.PersonaBar.Sites.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DeletePortal(int portalId)
         {
+			Logger.LogError(">>> Entering DeletePortal(portalId={PortalId})", portalId);
             try
             {
                 var portal = PortalController.Instance.GetPortal(portalId);
+				Logger.LogError("DeletePortal(portalId={PortalId}): portal → {Portal}", portalId, portal);
                 if (portal != null)
                 {
                     if (portal.PortalID != this.PortalSettings.PortalId &&
                         !PortalController.IsMemberOfPortalGroup(portal.PortalID))
                     {
                         var strMessage = PortalController.DeletePortal(portal, this.GetAbsoluteServerPath());
+						Logger.LogError("DeletePortal(portalId={PortalId}): strMessage → {StrMessage}", portalId, strMessage);
                         if (string.IsNullOrEmpty(strMessage))
                         {
                             return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, });
@@ -170,6 +181,7 @@ namespace Dnn.PersonaBar.Sites.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting DeletePortal(portalId={PortalId})", portalId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -182,10 +194,12 @@ namespace Dnn.PersonaBar.Sites.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage ExportPortalTemplate(ExportTemplateRequest request)
         {
+			Logger.LogError(">>> Entering ExportPortalTemplate(request={Request})", request);
             try
             {
                 bool success;
                 var message = this.controller.ExportPortalTemplate(request, this.UserInfo, out success);
+				Logger.LogError("ExportPortalTemplate(request={Request}): message → {Message}", request, message);
 
                 if (!success)
                 {
@@ -193,7 +207,9 @@ namespace Dnn.PersonaBar.Sites.Services
                 }
 
                 var template = this.controller.GetPortalTemplates().First(x => x.Name == request.FileName);
+				Logger.LogError("ExportPortalTemplate(request={Request}): template → {Template}", request, template);
                 var templateItem = this.controller.CreateListItem(template);
+				Logger.LogError("ExportPortalTemplate(request={Request}): templateItem → {TemplateItem}", request, templateItem);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
                 {
                     Message = message,
@@ -207,6 +223,7 @@ namespace Dnn.PersonaBar.Sites.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting ExportPortalTemplate(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -218,11 +235,14 @@ namespace Dnn.PersonaBar.Sites.Services
         [HttpGet]
         public HttpResponseMessage GetPortalLocales(int portalId)
         {
+			Logger.LogError(">>> Entering GetPortalLocales(portalId={PortalId})", portalId);
             try
             {
                 var locales = LocaleController.Instance.GetLocales(portalId).Values;
+				Logger.LogError("GetPortalLocales(portalId={PortalId}): locales → {Locales}", portalId, locales);
                 var response = new
                 {
+					Logger.LogDebug("GetPortalLocales(portalId={PortalId}): Results → {Results}", portalId, Results);
                     Success = true,
                     Results = locales.Select(l => new
                     {
@@ -238,6 +258,7 @@ namespace Dnn.PersonaBar.Sites.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetPortalLocales(portalId={PortalId})", portalId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -249,6 +270,7 @@ namespace Dnn.PersonaBar.Sites.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DeleteExpiredPortals()
         {
+			Logger.LogError(">>> Entering DeleteExpiredPortals()");
             try
             {
                 PortalController.DeleteExpiredPortals(this.GetAbsoluteServerPath());
@@ -257,6 +279,7 @@ namespace Dnn.PersonaBar.Sites.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting DeleteExpiredPortals()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -267,14 +290,19 @@ namespace Dnn.PersonaBar.Sites.Services
         [HttpGet]
         public HttpResponseMessage GetPortalTemplates()
         {
+			Logger.LogError(">>> Entering GetPortalTemplates()");
             try
             {
                 var defaultTemplate = this.controller.GetDefaultTemplate();
+				Logger.LogError("GetPortalTemplates(): defaultTemplate → {DefaultTemplate}", defaultTemplate);
                 var temps = new List<Tuple<string, string>>();
+				Logger.LogError("GetPortalTemplates(): temps → {Temps}", temps);
                 var templates = this.controller.GetPortalTemplates();
+				Logger.LogError("GetPortalTemplates(): templates → {Templates}", templates);
                 foreach (var template in templates)
                 {
                     var item = this.controller.CreateListItem(template);
+					Logger.LogError("GetPortalTemplates(): item → {Item}", item);
                     temps.Add(new Tuple<string, string>(item.Text, item.Value));
                     if (item.Value.StartsWith(defaultTemplate, StringComparison.OrdinalIgnoreCase))
                     {
@@ -284,6 +312,7 @@ namespace Dnn.PersonaBar.Sites.Services
 
                 var response = new
                 {
+					Logger.LogDebug("GetPortalTemplates(): Results → {Results}", Results);
                     Success = true,
                     Results = new
                     {
@@ -302,6 +331,7 @@ namespace Dnn.PersonaBar.Sites.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetPortalTemplates()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -312,6 +342,7 @@ namespace Dnn.PersonaBar.Sites.Services
         [HttpGet]
         public HttpResponseMessage RequiresQuestionAndAnswer()
         {
+			Logger.LogError(">>> Entering RequiresQuestionAndAnswer()");
             try
             {
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
@@ -322,17 +353,21 @@ namespace Dnn.PersonaBar.Sites.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting RequiresQuestionAndAnswer()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
 
         private string GetAbsoluteServerPath()
         {
+			Logger.LogError(">>> Entering GetAbsoluteServerPath()");
             var httpContext = this.Request.Properties["MS_HttpContext"] as HttpContextWrapper;
             var strServerPath = string.Empty;
+			Logger.LogError("GetAbsoluteServerPath(): httpContext → {HttpContext}", httpContext);
             if (httpContext != null)
             {
                 strServerPath = httpContext.Request.MapPath(httpContext.Request.ApplicationPath);
+				Logger.LogError("GetAbsoluteServerPath(): strServerPath → {StrServerPath}", strServerPath);
             }
 
             if (!strServerPath.EndsWith(@"\", StringComparison.OrdinalIgnoreCase))
@@ -345,6 +380,8 @@ namespace Dnn.PersonaBar.Sites.Services
 
         private string GetDomainName()
         {
+			Logger.LogError(">>> Entering GetDomainName()");
+            Logger.LogWarning("<<< Exiting GetDomainName()");
             return this.Request.Properties["MS_HttpContext"] is HttpContextWrapper httpContext
                 ? Globals.GetDomainName(httpContext.Request, true)
                 : string.Empty;
@@ -352,6 +389,7 @@ namespace Dnn.PersonaBar.Sites.Services
 
         private object GetPortalDto(PortalInfo portal)
         {
+			Logger.LogError(">>> Entering GetPortalDto(portal={Portal})", portal);
             string contentLocalizable;
             var portalDto = new
             {
@@ -373,6 +411,7 @@ namespace Dnn.PersonaBar.Sites.Services
                     portal.PortalID != this.PortalSettings.PortalId &&
                      !PortalController.IsMemberOfPortalGroup(portal.PortalID),
             };
+			Logger.LogWarning("<<< Exiting GetPortalDto(portal={Portal})", portal);
             return portalDto;
         }
     }

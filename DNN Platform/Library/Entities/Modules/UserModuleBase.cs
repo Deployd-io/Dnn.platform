@@ -56,6 +56,7 @@ namespace DotNetNuke.Entities.Modules
     /// <summary>The UserModuleBase class defines a custom base class inherited by all desktop portal modules within the Portal that manage Users.</summary>
     public partial class UserModuleBase : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserModuleBase));
         private UserInfo user;
 
         /// <summary>Initializes a new instance of the <see cref="UserModuleBase"/> class.</summary>
@@ -70,7 +71,9 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="hostSettings">The host settings.</param>
         public UserModuleBase(ListController listController, IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering UserModuleBase(listController={ListController},hostSettings={HostSettings})", listController, hostSettings);
             this.ListController = listController ?? this.DependencyProvider.GetRequiredService<ListController>();
+			Logger.LogWarning("<<< Exiting UserModuleBase(listController={ListController},hostSettings={HostSettings})", listController, hostSettings);
             this.HostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
         }
 
@@ -208,12 +211,15 @@ namespace DotNetNuke.Entities.Modules
         /// <returns>The setting value or <see langword="null"/>.</returns>
         public static object GetSetting(int portalId, string settingKey)
         {
+			Logger.LogError(">>> Entering GetSetting(portalId={PortalId},settingKey={SettingKey})", portalId, settingKey);
             Hashtable settings = UserController.GetUserSettings(portalId);
+			Logger.LogError("GetSetting(portalId={PortalId},settingKey={SettingKey}): settings → {Settings}", portalId, settingKey, settings);
             if (settings[settingKey] == null)
             {
                 settings = UserController.GetUserSettings(portalId, settings);
             }
 
+			Logger.LogWarning("<<< Exiting GetSetting(portalId={PortalId},settingKey={SettingKey})", portalId, settingKey);
             return settings[settingKey];
         }
 
@@ -233,6 +239,7 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="setting">The setting value.</param>
         public static void UpdateSetting(IHostSettingsService hostSettingsService, IPortalController portalController, int portalId, string key, string setting)
         {
+			Logger.LogError(">>> Entering UpdateSetting(portalId={PortalId},key={Key},setting={Setting})", portalId, key, setting);
             if (portalId == Null.NullInteger)
             {
                 hostSettingsService.Update(new ConfigurationSetting { Value = setting, Key = key, });
@@ -241,6 +248,7 @@ namespace DotNetNuke.Entities.Modules
             {
                 PortalController.UpdatePortalSetting(portalController, portalId, key, setting);
             }
+			Logger.LogWarning("<<< Exiting UpdateSetting(hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},key={Key},setting={Setting})", hostSettingsService, portalController, portalId, key, setting);
         }
 
         /// <summary>Updates the Settings for the Module.</summary>
@@ -257,14 +265,21 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="settings">The settings to update.</param>
         public static void UpdateSettings(IHostSettingsService hostSettingsService, IPortalController portalController, int portalId, Hashtable settings)
         {
+			Logger.LogError(">>> Entering UpdateSettings(portalId={PortalId},settings={Settings})", portalId, settings);
             var settingsEnumerator = settings.GetEnumerator();
+			Logger.LogError("UpdateSettings(hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},settings={Settings}): settingsEnumerator → {SettingsEnumerator}", hostSettingsService, portalController, portalId, settings, settingsEnumerator);
             using var disposable = settingsEnumerator as IDisposable;
             while (settingsEnumerator.MoveNext())
             {
+				Logger.LogError("UpdateSettings(portalId={PortalId},settings={Settings}): settingsEnumerator → {SettingsEnumerator}", portalId, settings, settingsEnumerator);
                 var key = Convert.ToString(settingsEnumerator.Key, CultureInfo.InvariantCulture);
+				Logger.LogError("UpdateSettings(portalId={PortalId},settings={Settings}): key → {Key}", portalId, settings, key);
+				Logger.LogError("UpdateSettings(hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},settings={Settings}): key → {Key}", hostSettingsService, portalController, portalId, settings, key);
                 var setting = Convert.ToString(settingsEnumerator.Value, CultureInfo.InvariantCulture);
                 UpdateSetting(hostSettingsService, portalController, portalId, key, setting);
+				Logger.LogError("UpdateSettings(portalId={PortalId},settings={Settings}): setting → {Setting}", portalId, settings, setting);
             }
+			        Logger.LogWarning("<<< Exiting UpdateSettings(hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},settings={Settings})", hostSettingsService, portalController, portalId, settings);
         }
 
         /// <summary>AddLocalizedModuleMessage adds a localized module message.</summary>
@@ -273,10 +288,12 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="display">A flag that determines whether the message should be displayed.</param>
         protected void AddLocalizedModuleMessage(string message, ModuleMessage.ModuleMessageType type, bool display)
         {
+			Logger.LogError(">>> Entering AddLocalizedModuleMessage(message={Message},type={Type},display={Display})", message, type, display);
             if (display)
             {
                 UI.Skins.Skin.AddModuleMessage(this, message, type);
             }
+			Logger.LogWarning("<<< Exiting AddLocalizedModuleMessage(message={Message},type={Type},display={Display})", message, type, display);
         }
 
         /// <summary>AddModuleMessage adds a module message.</summary>
@@ -285,13 +302,17 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="display">A flag that determines whether the message should be displayed.</param>
         protected void AddModuleMessage(string message, ModuleMessage.ModuleMessageType type, bool display)
         {
+			Logger.LogError(">>> Entering AddModuleMessage(message={Message},type={Type},display={Display})", message, type, display);
             this.AddLocalizedModuleMessage(Localization.GetString(message, this.LocalResourceFile), type, display);
+			Logger.LogWarning("<<< Exiting AddModuleMessage(message={Message},type={Type},display={Display})", message, type, display);
         }
 
         protected string CompleteUserCreation(UserCreateStatus createStatus, UserInfo newUser, bool notify, bool register)
         {
+			Logger.LogError(">>> Entering CompleteUserCreation(createStatus={CreateStatus},newUser={NewUser},notify={Notify},register={Register})", createStatus, newUser, notify, register);
             var strMessage = string.Empty;
             var message = ModuleMessage.ModuleMessageType.RedError;
+			Logger.LogError("CompleteUserCreation(createStatus={CreateStatus},newUser={NewUser},notify={Notify},register={Register}): message → {Message}", createStatus, newUser, notify, register, message);
             if (register)
             {
                 // send notification to portal administrator of new user registration
@@ -356,15 +377,19 @@ namespace DotNetNuke.Entities.Modules
                 }
             }
 
+			Logger.LogWarning("<<< Exiting CompleteUserCreation(createStatus={CreateStatus},newUser={NewUser},notify={Notify},register={Register})", createStatus, newUser, notify, register);
             return strMessage;
         }
 
         private static void SendAdminNotification(UserInfo newUser, PortalSettings portalSettings)
         {
+			Logger.LogError(">>> Entering SendAdminNotification(newUser={NewUser},portalSettings={PortalSettings})", newUser, portalSettings);
             var notificationType = newUser.Membership.Approved ? "NewUserRegistration" : "NewUnauthorizedUserRegistration";
             var locale = LocaleController.Instance.GetDefaultLocale(portalSettings.PortalId).Code;
+			Logger.LogError("SendAdminNotification(newUser={NewUser},portalSettings={PortalSettings}): notificationType → {NotificationType}", newUser, portalSettings, notificationType);
             var notification = new Notification
             {
+				Logger.LogError("SendAdminNotification(newUser={NewUser},portalSettings={PortalSettings}): locale → {Locale}", newUser, portalSettings, locale);
                 NotificationTypeID = NotificationsController.Instance.GetNotificationType(notificationType).NotificationTypeId,
                 IncludeDismissAction = newUser.Membership.Approved,
                 SenderUserID = portalSettings.AdministratorId,
@@ -373,39 +398,51 @@ namespace DotNetNuke.Entities.Modules
                 Context = newUser.UserID.ToString(CultureInfo.InvariantCulture),
             };
             var adminrole = RoleController.Instance.GetRoleById(portalSettings.PortalId, portalSettings.AdministratorRoleId);
+			Logger.LogError("SendAdminNotification(newUser={NewUser},portalSettings={PortalSettings}): adminrole → {Adminrole}", newUser, portalSettings, adminrole);
             var roles = new List<RoleInfo> { adminrole };
             NotificationsController.Instance.SendNotification(notification, portalSettings.PortalId, roles, new List<UserInfo>());
+			Logger.LogWarning("<<< Exiting SendAdminNotification(newUser={NewUser},portalSettings={PortalSettings})", newUser, portalSettings);
         }
 
         private static string GetNotificationBody(string locale, UserInfo newUser, PortalSettings portalSettings)
         {
+			Logger.LogError(">>> Entering GetNotificationBody(locale={Locale},newUser={NewUser},portalSettings={PortalSettings})", locale, newUser, portalSettings);
             const string text = "EMAIL_USER_REGISTRATION_ADMINISTRATOR_BODY";
+			Logger.LogWarning("<<< Exiting GetNotificationBody(locale={Locale},newUser={NewUser},portalSettings={PortalSettings})", locale, newUser, portalSettings);
             return LocalizeNotificationText(text, locale, newUser, portalSettings);
         }
 
         private static string LocalizeNotificationText(string text, string locale, UserInfo user, PortalSettings portalSettings)
         {
+			Logger.LogError(">>> Entering LocalizeNotificationText(text={Text},locale={Locale},user={User},portalSettings={PortalSettings})", text, locale, user, portalSettings);
             // This method could need a custom ArrayList in future notification types. Currently it is null
+			Logger.LogWarning("<<< Exiting LocalizeNotificationText(text={Text},locale={Locale},user={User},portalSettings={PortalSettings})", text, locale, user, portalSettings);
             return Localization.GetSystemMessage(locale, portalSettings, text, user, Localization.GlobalResourceFile, null, string.Empty, portalSettings.AdministratorId);
         }
 
         private static string GetNotificationSubject(string locale, UserInfo newUser, PortalSettings portalSettings)
         {
+			Logger.LogError(">>> Entering GetNotificationSubject(locale={Locale},newUser={NewUser},portalSettings={PortalSettings})", locale, newUser, portalSettings);
             const string text = "EMAIL_USER_REGISTRATION_ADMINISTRATOR_SUBJECT";
+			Logger.LogWarning("<<< Exiting GetNotificationSubject(locale={Locale},newUser={NewUser},portalSettings={PortalSettings})", locale, newUser, portalSettings);
             return LocalizeNotificationText(text, locale, newUser, portalSettings);
         }
 
         /// <summary>InitialiseUser initialises a "new" user.</summary>
         private UserInfo InitialiseUser()
         {
+			Logger.LogError(">>> Entering InitialiseUser()");
             var newUser = new UserInfo();
+			Logger.LogError("InitialiseUser(): newUser → {NewUser}", newUser);
             if (this.IsHostMenu && !this.IsRegister)
             {
                 newUser.IsSuperUser = true;
+				Logger.LogDebug("InitialiseUser(): newUser.IsSuperUser → {Arg0}", newUser.IsSuperUser);
             }
             else
             {
                 newUser.PortalID = this.PortalId;
+				Logger.LogDebug("InitialiseUser(): newUser.PortalID → {Arg0}", newUser.PortalID);
             }
 
             // Initialize the ProfileProperties Collection
@@ -418,9 +455,11 @@ namespace DotNetNuke.Entities.Modules
 
             // Set default country
             var country = this.LookupCountry();
+			Logger.LogError("InitialiseUser(): country → {Country}", country);
             if (!string.IsNullOrEmpty(country))
             {
                 var listItem = this.ListController.GetListEntryInfo("Country", country);
+				Logger.LogError("InitialiseUser(): listItem → {ListItem}", listItem);
                 if (listItem != null)
                 {
                     country = listItem.EntryID.ToString(CultureInfo.InvariantCulture);
@@ -431,24 +470,32 @@ namespace DotNetNuke.Entities.Modules
 
             // Set AffiliateId
             int affiliateId = Null.NullInteger;
+			Logger.LogError("InitialiseUser(): affiliateId → {AffiliateId}", affiliateId);
             if (this.Request.Cookies["AffiliateId"] != null)
             {
                 affiliateId = int.Parse(this.Request.Cookies["AffiliateId"].Value, CultureInfo.InvariantCulture);
             }
 
             newUser.AffiliateID = affiliateId;
+			Logger.LogDebug("InitialiseUser(): newUser.AffiliateID → {Arg0}", newUser.AffiliateID);
+			Logger.LogWarning("<<< Exiting InitialiseUser()");
             return newUser;
         }
 
         private string LookupCountry()
         {
+			Logger.LogError(">>> Entering LookupCountry()");
             string ip;
             bool isLocal = false;
+			Logger.LogError("LookupCountry(): isLocal → {IsLocal}", isLocal);
             bool cacheGeoIPData = true;
             string geoIPFile;
             geoIPFile = "controls/CountryListBox/Data/GeoIP.dat";
+			Logger.LogError("LookupCountry(): geoIPFile → {GeoIPFile}", geoIPFile);
+			Logger.LogDebug("LookupCountry(): geoIPFile → {GeoIPFile}", geoIPFile);
             var userRequestIpAddressController = UserRequestIPAddressController.Instance;
             var ipAddress = userRequestIpAddressController.GetUserRequestIPAddress(new HttpRequestWrapper(this.Request));
+			Logger.LogError("LookupCountry(): ipAddress → {IpAddress}", ipAddress);
             if (ipAddress == "127.0.0.1")
             {
                 // 'The country cannot be detected because the user is local.
@@ -456,6 +503,7 @@ namespace DotNetNuke.Entities.Modules
 
                 // Set the IP address in case they didn't specify LocalhostCountryCode
                 ip = this.Page.Request.UserHostAddress;
+				Logger.LogError("LookupCountry(): ip → {Ip}", ip);
             }
             else
             {
@@ -487,24 +535,29 @@ namespace DotNetNuke.Entities.Modules
             {
                 // Yes, get it from cache
                 countryLookup = new CountryLookup((MemoryStream)this.Context.Cache.Get("GeoIPData"));
+				Logger.LogError("LookupCountry(): countryLookup → {CountryLookup}", countryLookup);
             }
             else
             {
+				Logger.LogDebug("LookupCountry(): countryLookup → {CountryLookup}", countryLookup);
                 // No, get it from file
                 countryLookup = new CountryLookup(this.Context.Server.MapPath(geoIPFile));
             }
 
             // Get the country code based on the IP address
             string country = Null.NullString;
+			Logger.LogError("LookupCountry(): country → {Country}", country);
             try
             {
                 country = countryLookup.LookupCountryName(ip);
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in LookupCountry(): {Arg0}", ex.Message);
                 Exceptions.LogException(ex);
             }
 
+			Logger.LogWarning("<<< Exiting LookupCountry()");
             return country;
         }
     }

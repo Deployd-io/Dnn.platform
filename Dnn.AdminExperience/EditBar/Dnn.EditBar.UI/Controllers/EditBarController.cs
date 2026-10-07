@@ -51,6 +51,8 @@ namespace Dnn.EditBar.UI.Controllers
         public EditBarController()
             : this(null, null)
         {
+		Logger.LogError(">>> Entering EditBarController()");
+        Logger.LogWarning("<<< Exiting EditBarController()");
         }
 
         /// <inheritdoc />
@@ -79,6 +81,8 @@ namespace Dnn.EditBar.UI.Controllers
         /// <inheritdoc />
         public IList<BaseMenuItem> GetMenuItems()
         {
+			Logger.LogError(">>> Entering GetMenuItems()");
+            Logger.LogWarning("<<< Exiting GetMenuItems()");
             return this.menuItems
                     .Where(m => m.Visible())
                     .OrderBy(m => m.Parent)
@@ -90,23 +94,29 @@ namespace Dnn.EditBar.UI.Controllers
         protected override Func<IEditBarController> GetFactory()
         {
 #pragma warning disable CS0618 // Type or member is obsolete
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new EditBarController();
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
         private static IEnumerable<BaseMenuItem> GetMenuItemInstances()
         {
+			Logger.LogError(">>> Entering GetMenuItemInstances()");
             var types = GetAllMenuItemTypes();
 
+			Logger.LogError("GetMenuItemInstances(): types → {Types}", types);
             foreach (var type in types)
             {
                 BaseMenuItem menuItem;
                 try
                 {
                     menuItem = Activator.CreateInstance(type) as BaseMenuItem;
+					Logger.LogError("GetMenuItemInstances(): menuItem → {MenuItem}", menuItem);
                 }
                 catch (Exception e)
                 {
+					Logger.LogDebug("GetMenuItemInstances(): menuItem → {MenuItem}", menuItem);
                     Logger.ErrorFormat(
                         CultureInfo.InvariantCulture,
                         "Unable to create {0} while getting all edit bar menu items. {1}",
@@ -120,11 +130,15 @@ namespace Dnn.EditBar.UI.Controllers
                     yield return menuItem;
                 }
             }
+			Logger.LogWarning("<<< Exiting GetMenuItemInstances()");
         }
 
         private static IEnumerable<Type> GetAllMenuItemTypes()
         {
+			Logger.LogError(">>> Entering GetAllMenuItemTypes()");
             var typeLocator = new TypeLocator();
+			Logger.LogError("GetAllMenuItemTypes(): typeLocator → {TypeLocator}", typeLocator);
+			Logger.LogWarning("<<< Exiting GetAllMenuItemTypes()");
             return typeLocator.GetAllMatchingTypes(
                 t => t is { IsClass: true, IsAbstract: false, } && typeof(BaseMenuItem).IsAssignableFrom(t));
         }

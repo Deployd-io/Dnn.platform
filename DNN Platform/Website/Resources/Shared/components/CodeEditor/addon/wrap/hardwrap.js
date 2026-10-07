@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -14,8 +15,10 @@
   var Pos = CodeMirror.Pos;
 
   function findParagraph(cm, pos, options) {
+	logger.error(`>>> Entering findParagraph(cm=${cm},pos=${pos},options=${options})`, { "event.action": "findParagraph", "logrite.cm": cm, "logrite.pos": pos, "logrite.options": options });
     var startRE = options.paragraphStart || cm.getHelper(pos, "paragraphStart");
     for (var start = pos.line, first = cm.firstLine(); start > first; --start) {
+	logger.error(`findParagraph(cm=${cm},pos=${pos},options=${options}): startRE → ${startRE}`, { "event.action": "findParagraph", "logrite.cm": cm, "logrite.pos": pos, "logrite.options": options });
       var line = cm.getLine(start);
       if (startRE && startRE.test(line)) break;
       if (!/\S/.test(line)) { ++start; break; }
@@ -23,39 +26,50 @@
     var endRE = options.paragraphEnd || cm.getHelper(pos, "paragraphEnd");
     for (var end = pos.line + 1, last = cm.lastLine(); end <= last; ++end) {
       var line = cm.getLine(end);
+	logger.error(`findParagraph(cm=${cm},pos=${pos},options=${options}): line → ${line}`, { "event.action": "findParagraph", "logrite.cm": cm, "logrite.pos": pos, "logrite.options": options });
       if (endRE && endRE.test(line)) { ++end; break; }
       if (!/\S/.test(line)) break;
     }
+	logger.error(`findParagraph(cm=${cm},pos=${pos},options=${options}): endRE → ${endRE}`, { "event.action": "findParagraph", "logrite.cm": cm, "logrite.pos": pos, "logrite.options": options });
     return {from: start, to: end};
   }
 
   function findBreakPoint(text, column, wrapOn, killTrailingSpace) {
+	logger.error(`>>> Entering findBreakPoint(text=${text},column=${column},wrapOn=${wrapOn},killTrailingSpace=${killTrailingSpace})`, { "event.action": "findBreakPoint", "logrite.text": text, "logrite.column": column, "logrite.wrapOn": wrapOn, "logrite.killTrailingSpace": killTrailingSpace });
     for (var at = column; at > 0; --at)
       if (wrapOn.test(text.slice(at - 1, at + 1))) break;
     if (at == 0) at = column;
     var endOfText = at;
     if (killTrailingSpace)
       while (text.charAt(endOfText - 1) == " ") --endOfText;
+	logger.warn(`<<< Exiting findBreakPoint(text=${text},column=${column},wrapOn=${wrapOn},killTrailingSpace=${killTrailingSpace})`, { "event.action": "findBreakPoint", "logrite.text": text, "logrite.column": column, "logrite.wrapOn": wrapOn, "logrite.killTrailingSpace": killTrailingSpace });
     return {from: endOfText, to: at};
   }
 
   function wrapRange(cm, from, to, options) {
+	logger.error(`>>> Entering wrapRange(cm=${cm},from=${from},to=${to},options=${options})`, { "event.action": "wrapRange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.options": options });
     from = cm.clipPos(from); to = cm.clipPos(to);
     var column = options.column || 80;
+	logger.error(`wrapRange(cm=${cm},from=${from},to=${to},options=${options}): from → ${from}`, { "event.action": "wrapRange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.options": options });
     var wrapOn = options.wrapOn || /\s\S|-[^\.\d]/;
     var killTrailing = options.killTrailingSpace !== false;
     var changes = [], curLine = "", curNo = from.line;
+	logger.error(`wrapRange(cm=${cm},from=${from},to=${to},options=${options}): changes → ${changes}`, { "event.action": "wrapRange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.options": options });
     var lines = cm.getRange(from, to, false);
+	logger.error(`wrapRange(cm=${cm},from=${from},to=${to},options=${options}): lines → ${lines}`, { "event.action": "wrapRange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.options": options });
     if (!lines.length) return null;
     var leadingSpace = lines[0].match(/^[ \t]*/)[0];
+	logger.error(`wrapRange(cm=${cm},from=${from},to=${to},options=${options}): leadingSpace → ${leadingSpace}`, { "event.action": "wrapRange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.options": options });
 
     for (var i = 0; i < lines.length; ++i) {
       var text = lines[i], oldLen = curLine.length, spaceInserted = 0;
+	logger.error(`wrapRange(cm=${cm},from=${from},to=${to},options=${options}): text → ${text}`, { "event.action": "wrapRange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.options": options });
       if (curLine && text && !wrapOn.test(curLine.charAt(curLine.length - 1) + text.charAt(0))) {
         curLine += " ";
         spaceInserted = 1;
       }
       var spaceTrimmed = "";
+	logger.error(`wrapRange(cm=${cm},from=${from},to=${to},options=${options}): spaceTrimmed → ${spaceTrimmed}`, { "event.action": "wrapRange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.options": options });
       if (i) {
         spaceTrimmed = text.match(/^\s*/)[0];
         text = text.slice(spaceTrimmed.length);
@@ -76,6 +90,7 @@
       }
       while (curLine.length > column) {
         var bp = findBreakPoint(curLine, column, wrapOn, killTrailing);
+		logger.error(`wrapRange(cm=${cm},from=${from},to=${to},options=${options}): bp → ${bp}`, { "event.action": "wrapRange", "logrite.cm": cm, "logrite.from": from, "logrite.to": to, "logrite.options": options });
         changes.push({text: ["", leadingSpace],
                       from: Pos(curNo, bp.from),
                       to: Pos(curNo, bp.to)});
@@ -115,6 +130,7 @@
         wrapRange(cm, span.from, span.to, {});
       }
     });
+	logger.warn(`<<< Exiting wrapLines(cm=${cm})`, { "event.action": "wrapLines", "logrite.cm": cm });
   };
 
   CodeMirror.defineExtension("wrapRange", function(from, to, options) {

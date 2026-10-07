@@ -10,18 +10,23 @@ import ModePanel from "./modePanel";
 import util from "../../utils";
 import resx from "../../resources";
 import EditIcon from "./../svg/edit.svg";
+const logger = console;
 
 class TopPane extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             modePanelOpen: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const {props} = this;
         const persistedSettings = util.utilities.persistent.load();
+		logger.error(`componentDidMount(): persistedSettings → ${persistedSettings}`, { "event.action": "componentDidMount" });
 
         props.dispatch(TaskActions.getSchedulerSettings());
         props.dispatch(TaskActions.getTaskStatusList());
@@ -30,13 +35,17 @@ class TopPane extends Component {
                 props.dispatch(TaskActions.getTaskStatusList());
             }
         }, 5000);
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         clearInterval(this.taskListTimeout);
+		logger.warn('<<< Exiting componentWillUnmount()', { "event.action": "componentWillUnmount" });
     }
 
     onClick() {
+		logger.error('>>> Entering onClick()', { "event.action": "onClick" });
         const {props} = this;
         if (this.isStopped()) {
             props.dispatch(TaskActions.startSchedule(() => {
@@ -52,38 +61,46 @@ class TopPane extends Component {
                 props.dispatch(TaskActions.getTaskStatusList());
             }, () => {
                 util.utilities.notify(resx.get("SchedulerStopError"));
+				logger.warn('<<< Exiting onClick()', { "event.action": "onClick" });
             }));
         }
     }
 
     getButtonDisplay() {
+		logger.error('>>> Entering getButtonDisplay()', { "event.action": "getButtonDisplay" });
         if (this.isStopped() || this.props.schedulerMode === "2") {
             return <TextOverflowWrapper text={resx.get("StartSchedule") } maxWidth={100}/>;
         }
         else {
+			logger.warn('<<< Exiting getButtonDisplay()', { "event.action": "getButtonDisplay" });
             return <TextOverflowWrapper text={resx.get("StopSchedule") } maxWidth={100}/>;
         }
     }
 
     isStopped() {
+		logger.error('>>> Entering isStopped()', { "event.action": "isStopped" });
         const {props} = this;
         if (props.status === "STOPPED") {
             return true;
         }
         else {
+			logger.warn('<<< Exiting isStopped()', { "event.action": "isStopped" });
             return false;
         }
     }
 
     getschedulerModeDisplay() {
+		logger.error('>>> Entering getschedulerModeDisplay()', { "event.action": "getschedulerModeDisplay" });
         const {props} = this;
         if (props.schedulerMode) {
             return props.schedulerModeOptions[parseInt(props.schedulerMode)].Key;
         }
+		logger.warn('<<< Exiting getschedulerModeDisplay()', { "event.action": "getschedulerModeDisplay" });
         return "";
     }
 
     toggleModePanel() {
+		logger.error('>>> Entering toggleModePanel()', { "event.action": "toggleModePanel" });
         if (this.props.status !== "SHUTTING_DOWN") {
             this.setState({
                 modePanelOpen: !this.state.modePanelOpen
@@ -91,6 +108,7 @@ class TopPane extends Component {
         }
         else {
             if (this.state.modePanelOpen) {
+				logger.warn('<<< Exiting toggleModePanel()', { "event.action": "toggleModePanel" });
                 this.setState({
                     modePanelOpen: !this.state.modePanelOpen
                 });
@@ -99,17 +117,20 @@ class TopPane extends Component {
     }
 
     getModeOptions() {
+		logger.error('>>> Entering getModeOptions()', { "event.action": "getModeOptions" });
         const {props} = this;
         if (props.schedulerModeOptions) {
             let options = props.schedulerModeOptions.map((mode) => {
                 return { value: mode.Value, label: mode.Key };
             });
+			logger.error(`getModeOptions(): options → ${options}`, { "event.action": "getModeOptions" });
             return options;
         }
         else return [{ value: "", label: "" }];
     }
 
     renderButton() {
+		logger.error('>>> Entering renderButton()', { "event.action": "renderButton" });
         const {props} = this;
         if (props.status !== "SHUTTING_DOWN") {
             if (props.schedulingEnabled === "True") {
@@ -136,6 +157,7 @@ class TopPane extends Component {
             }
         }
         else {
+			logger.warn('<<< Exiting renderButton()', { "event.action": "renderButton" });
             return (<Button
                 type="primary" disabled={true}>
                 {this.getButtonDisplay()}
@@ -145,7 +167,9 @@ class TopPane extends Component {
 
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.topPaneWrapper}>
                 <div className="topPane-time">
@@ -218,6 +242,8 @@ TopPane.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         schedulingEnabled: state.task.schedulingEnabled,
         status: state.task.status,

@@ -49,7 +49,11 @@ namespace log4net.Layout
         /// </remarks>
         public Layout2RawLayoutAdapter(ILayout layout)
         {
+			log.ErrorFormat(">>> Entering Layout2RawLayoutAdapter(layout={0})", layout);
             this.m_layout = layout;
+			log.DebugFormat("Layout2RawLayoutAdapter(layout={0}): m_layout → {1}", layout, m_layout);
+        log.DebugFormat("Layout2RawLayoutAdapter(layout={0}): this.m_layout → {1}", layout, this.m_layout);
+        log.WarnFormat("<<< Exiting Layout2RawLayoutAdapter(layout={0})", layout);
         }
 
         /// <summary>Format the logging event as an object.</summary>
@@ -66,9 +70,11 @@ namespace log4net.Layout
         /// </remarks>
         public virtual object Format(LoggingEvent loggingEvent)
         {
+			log.ErrorFormat(">>> Entering Format(loggingEvent={0})", loggingEvent);
             using (var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture))
             {
                 this.m_layout.Format(writer, loggingEvent);
+				log.WarnFormat("<<< Exiting Format(loggingEvent={0})", loggingEvent);
                 return writer.ToString();
             }
         }

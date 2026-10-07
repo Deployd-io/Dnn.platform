@@ -13,9 +13,12 @@ namespace DotNetNuke.Services.Search.Internals
     /// <summary>Low-level APIs to manage Lucene Layer. This is an Internal class and should not be used outside of Core.</summary>
     internal class LuceneController : ServiceLocator<ILuceneController, LuceneController>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LuceneController));
         /// <inheritdoc />
         protected override Func<ILuceneController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => ActivatorUtilities.GetServiceOrCreateInstance<LuceneControllerImpl>(Globals.DependencyProvider);
         }
     }

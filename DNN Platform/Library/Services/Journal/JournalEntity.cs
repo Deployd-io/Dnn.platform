@@ -12,17 +12,22 @@ namespace DotNetNuke.Services.Journal
 
     public class JournalEntity : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JournalEntity));
         /// <summary>Initializes a new instance of the <see cref="JournalEntity"/> class.</summary>
         public JournalEntity()
         {
+		Logger.LogError(">>> Entering JournalEntity()");
+		Logger.LogWarning("<<< Exiting JournalEntity()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="JournalEntity"/> class.</summary>
         /// <param name="entityXML">XML serialized entity.</param>
         public JournalEntity(string entityXML)
         {
+			Logger.LogError(">>> Entering JournalEntity(entityXML={EntityXML})", entityXML);
             if (!string.IsNullOrEmpty(entityXML))
             {
+				Logger.LogWarning("<<< Exiting JournalEntity()");
                 var xDoc = new XmlDocument { XmlResolver = null, };
                 using (var entityReader = XmlReader.Create(new StringReader(entityXML), new XmlReaderSettings { XmlResolver = null, }))
                 {
@@ -34,6 +39,7 @@ namespace DotNetNuke.Services.Journal
                     XmlNode xRoot = xDoc.DocumentElement;
                     XmlNode xNode = null;
                     xNode = xRoot.SelectSingleNode("//entity");
+					Logger.LogError("JournalEntity(entityXML={EntityXML}): xNode → {XNode}", entityXML, xNode);
                     if (xNode != null)
                     {
                         this.Id = int.Parse(xNode["id"].InnerText, CultureInfo.InvariantCulture);
@@ -64,7 +70,9 @@ namespace DotNetNuke.Services.Journal
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, System.Globalization.CultureInfo formatProvider, Entities.Users.UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogError(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             string outputFormat = string.Empty;
+			Logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): outputFormat → {OutputFormat}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, outputFormat);
             if (format == string.Empty)
             {
                 outputFormat = "g";
@@ -75,6 +83,7 @@ namespace DotNetNuke.Services.Journal
             }
 
             propertyName = propertyName.ToLowerInvariant();
+			Logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): propertyName → {PropertyName1}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, propertyName);
             switch (propertyName)
             {
                 case "id":
@@ -88,6 +97,7 @@ namespace DotNetNuke.Services.Journal
             }
 
             propertyNotFound = true;
+			Logger.LogWarning("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return string.Empty;
         }
     }

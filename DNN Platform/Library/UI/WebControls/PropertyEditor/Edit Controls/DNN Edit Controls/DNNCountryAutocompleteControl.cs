@@ -48,6 +48,8 @@ namespace DotNetNuke.UI.WebControls
         public DnnCountryAutocompleteControl(IServicesFramework servicesFramework)
             : this(servicesFramework, null, null, null, null, null)
         {
+		eventLogger.LogError(">>> Entering DnnCountryAutocompleteControl(servicesFramework={ServicesFramework})", servicesFramework);
+        eventLogger.LogWarning("<<< Exiting DnnCountryAutocompleteControl(servicesFramework={ServicesFramework})", servicesFramework);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnCountryAutocompleteControl"/> class.</summary>
@@ -59,13 +61,21 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="portalController">The portal controller.</param>
         public DnnCountryAutocompleteControl(IServicesFramework servicesFramework, ListController listController, IClientResourceController clientResourceController, IApplicationStatusInfo appStatus, IEventLogger eventLogger, IPortalController portalController)
         {
+			eventLogger.LogError(">>> Entering DnnCountryAutocompleteControl(servicesFramework={ServicesFramework},listController={ListController},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController})", servicesFramework, listController, clientResourceController, appStatus, eventLogger, portalController);
+			eventLogger.LogDebug("DnnCountryAutocompleteControl(servicesFramework={ServicesFramework},listController={ListController},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController}): listController → {ListController1}", servicesFramework, listController, clientResourceController, appStatus, eventLogger, portalController, listController);
+			eventLogger.LogDebug("DnnCountryAutocompleteControl(servicesFramework={ServicesFramework},listController={ListController},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController}): clientResourceController → {ClientResourceController1}", servicesFramework, listController, clientResourceController, appStatus, eventLogger, portalController, clientResourceController);
+			eventLogger.LogDebug("DnnCountryAutocompleteControl(servicesFramework={ServicesFramework},listController={ListController},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController}): appStatus → {AppStatus1}", servicesFramework, listController, clientResourceController, appStatus, eventLogger, portalController, appStatus);
+			eventLogger.LogDebug("DnnCountryAutocompleteControl(servicesFramework={ServicesFramework},listController={ListController},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController}): eventLogger → {EventLogger1}", servicesFramework, listController, clientResourceController, appStatus, eventLogger, portalController, eventLogger);
+			eventLogger.LogDebug("DnnCountryAutocompleteControl(servicesFramework={ServicesFramework},listController={ListController},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController}): portalController → {PortalController1}", servicesFramework, listController, clientResourceController, appStatus, eventLogger, portalController, portalController);
             this.servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
+			eventLogger.LogWarning("<<< Exiting DnnCountryAutocompleteControl(servicesFramework={ServicesFramework},listController={ListController},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController})", servicesFramework, listController, clientResourceController, appStatus, eventLogger, portalController);
             this.listController = listController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
             this.clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
             this.Init += this.DnnCountryRegionControl_Init;
+			eventLogger.LogDebug("DnnCountryAutocompleteControl(servicesFramework={ServicesFramework},listController={ListController},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController}): servicesFramework → {ServicesFramework1}", servicesFramework, listController, clientResourceController, appStatus, eventLogger, portalController, servicesFramework);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnCountryAutocompleteControl"/> class.</summary>
@@ -74,6 +84,8 @@ namespace DotNetNuke.UI.WebControls
         public DnnCountryAutocompleteControl(string type)
             : this(type, null, null, null, null, null, null)
         {
+		eventLogger.LogError(">>> Entering DnnCountryAutocompleteControl(type={Type})", type);
+        eventLogger.LogWarning("<<< Exiting DnnCountryAutocompleteControl(type={Type})", type);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnCountryAutocompleteControl"/> class.</summary>
@@ -160,22 +172,32 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         public override bool LoadPostData(string postDataKey, System.Collections.Specialized.NameValueCollection postCollection)
         {
+			eventLogger.LogError(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             bool dataChanged = false;
             string presentValue = this.StringValue;
+			eventLogger.LogError("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): dataChanged → {DataChanged}", postDataKey, postCollection, dataChanged);
             string postedValue = postCollection[postDataKey + "_id"];
             if (!presentValue.Equals(postedValue, StringComparison.Ordinal))
             {
                 this.Value = postedValue;
                 dataChanged = true;
             }
+			eventLogger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): this.Value → {Arg2}", postDataKey, postCollection, this.Value);
 
+			eventLogger.LogWarning("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             return dataChanged;
         }
 
         /// <inheritdoc />
         protected override void OnDataChanged(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnDataChanged(e={E})", e);
             PropertyEditorEventArgs args = new PropertyEditorEventArgs(this.Name);
+			eventLogger.LogWarning("<<< Exiting OnDataChanged(e={E})", e);
+			eventLogger.LogDebug("OnDataChanged(e={E}): args.Value → {Arg1}", e, args.Value);
+			eventLogger.LogDebug("OnDataChanged(e={E}): args.OldValue → {Arg1}", e, args.OldValue);
+			eventLogger.LogDebug("OnDataChanged(e={E}): args.StringValue → {Arg1}", e, args.StringValue);
+			eventLogger.LogError("OnDataChanged(e={E}): args → {Args}", e, args);
             args.Value = this.StringValue;
             args.OldValue = this.OldStringValue;
             args.StringValue = this.StringValue;
@@ -185,6 +207,7 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			eventLogger.LogError(">>> Entering CreateChildControls()");
             base.CreateChildControls();
 
             this.CountryName.ControlStyle.CopyFrom(this.ControlStyle);
@@ -198,11 +221,13 @@ namespace DotNetNuke.UI.WebControls
 
             this.CountryId.ID = this.ID + "_id";
             this.Controls.Add(this.CountryId);
+			eventLogger.LogWarning("<<< Exiting CreateChildControls()");
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             this.LoadControls();
@@ -212,30 +237,38 @@ namespace DotNetNuke.UI.WebControls
                 this.Page.RegisterRequiresPostBack(this);
                 this.Page.RegisterRequiresPostBack(this.CountryId);
             }
+			eventLogger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			eventLogger.LogError(">>> Entering RenderEditMode(writer={Writer})", writer);
             this.RenderChildren(writer);
+			eventLogger.LogWarning("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
 
         private void DnnCountryRegionControl_Init(object sender, EventArgs e)
         {
+			eventLogger.LogError(">>> Entering DnnCountryRegionControl_Init(sender={Sender},e={E})", sender, e);
             this.servicesFramework.RequestAjaxAntiForgerySupport();
             this.clientResourceController.RegisterScript("~/Resources/Shared/components/CountriesRegions/dnn.CountriesRegions.js");
             this.clientResourceController.CreateStylesheet("~/Resources/Shared/components/CountriesRegions/dnn.CountriesRegions.css").SetPriority(FileOrder.Css.FeatureCss).Register();
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.portalController.GetCurrentSettings(), CommonJs.jQuery);
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.portalController.GetCurrentSettings(), CommonJs.jQueryUI);
+			eventLogger.LogWarning("<<< Exiting DnnCountryRegionControl_Init(sender={Sender},e={E})", sender, e);
         }
 
         private void LoadControls()
         {
+			eventLogger.LogError(">>> Entering LoadControls()");
             this.CountryName.Text = this.StringValue;
             string countryCode = CountryLookup.CodeByName(this.StringValue);
+			eventLogger.LogError("LoadControls(): countryCode → {CountryCode}", countryCode);
             if (!string.IsNullOrEmpty(this.StringValue) && int.TryParse(this.StringValue, out var countryId))
             {
                 var c = this.listController.GetListEntryInfo(countryId);
+				eventLogger.LogError("LoadControls(): c → {C}", c);
                 this.CountryName.Text = c.Text;
                 countryCode = c.Value;
             }
@@ -243,11 +276,14 @@ namespace DotNetNuke.UI.WebControls
             this.CountryId.Value = this.StringValue;
 
             var regionControl2 = ControlUtilities.FindFirstDescendent<DNNRegionEditControl>(this.Page, c => this.IsCoupledRegionControl(c));
+			eventLogger.LogError("LoadControls(): regionControl2 → {RegionControl2}", regionControl2);
             regionControl2?.ParentKey = "Country." + countryCode;
+			eventLogger.LogWarning("<<< Exiting LoadControls()");
         }
 
         private bool IsCoupledRegionControl(Control ctr)
         {
+			eventLogger.LogError(">>> Entering IsCoupledRegionControl(ctr={Ctr})", ctr);
             if (ctr is DNNRegionEditControl regionEditControl)
             {
                 if (regionEditControl.Category == this.Category)
@@ -256,6 +292,7 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting IsCoupledRegionControl(ctr={Ctr})", ctr);
             return false;
         }
     }

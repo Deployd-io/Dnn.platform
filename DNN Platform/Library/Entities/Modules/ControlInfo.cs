@@ -13,9 +13,11 @@ namespace DotNetNuke.Entities.Modules
     [Serializable]
     public abstract class ControlInfo : BaseEntityInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ControlInfo));
         /// <summary>Initializes a new instance of the <see cref="ControlInfo"/> class.</summary>
         protected ControlInfo()
         {
+			Logger.LogError(">>> Entering ControlInfo()");
             this.SupportsPartialRendering = Null.NullBoolean;
         }
 
@@ -38,8 +40,10 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="dr">The Data Reader to use.</param>
         protected override void FillInternal(IDataReader dr)
         {
+			Logger.LogError(">>> Entering FillInternal(dr={Dr})", dr);
             // Call EntityBaseInfo's implementation
             base.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting FillInternal(dr={Dr})", dr);
             this.ControlKey = Null.SetNullString(dr["ControlKey"]);
             this.ControlSrc = Null.SetNullString(dr["ControlSrc"]);
             this.SupportsPartialRendering = Null.SetNullBoolean(dr["SupportsPartialRendering"]);
@@ -47,6 +51,7 @@ namespace DotNetNuke.Entities.Modules
 
         protected void ReadXmlInternal(XmlReader reader)
         {
+			Logger.LogError(">>> Entering ReadXmlInternal(reader={Reader})", reader);
             switch (reader.Name)
             {
                 case "controlKey":
@@ -64,14 +69,17 @@ namespace DotNetNuke.Entities.Modules
 
                     break;
             }
+			Logger.LogWarning("<<< Exiting ReadXmlInternal(reader={Reader})", reader);
         }
 
         protected void WriteXmlInternal(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteXmlInternal(writer={Writer})", writer);
             // write out properties
             writer.WriteElementString("controlKey", this.ControlKey);
             writer.WriteElementString("controlSrc", this.ControlSrc);
             writer.WriteElementString("supportsPartialRendering", this.SupportsPartialRendering.ToString());
+			Logger.LogWarning("<<< Exiting WriteXmlInternal(writer={Writer})", writer);
         }
     }
 }

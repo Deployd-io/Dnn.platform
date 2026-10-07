@@ -48,45 +48,59 @@ namespace DotNetNuke.Web.DDRMenu
 
         public static Settings FromXml(string xml)
         {
+			eventLogger.LogError(">>> Entering FromXml(xml={Xml})", xml);
             var ser = new XmlSerializer(typeof(Settings));
+			eventLogger.LogError("FromXml(xml={Xml}): ser → {Ser}", xml, ser);
             using (var reader = new StringReader(xml))
             {
+				eventLogger.LogWarning("<<< Exiting FromXml(xml={Xml})", xml);
                 return (Settings)ser.Deserialize(reader);
             }
         }
 
         public static List<ClientOption> ClientOptionsFromSettingString(string s)
         {
+			eventLogger.LogError(">>> Entering ClientOptionsFromSettingString(s={S})", s);
             var result = new List<ClientOption>();
+			eventLogger.LogError("ClientOptionsFromSettingString(s={S}): result → {Result}", s, result);
             if (!string.IsNullOrEmpty(s))
             {
                 foreach (var clientOption in SplitIntoStrings(s))
                 {
                     var n = clientOption.IndexOf('=');
+					eventLogger.LogError("ClientOptionsFromSettingString(s={S}): n → {N}", s, n);
                     result.Add(new ClientOption(clientOption.Substring(0, n), clientOption.Substring(n + 1)));
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting ClientOptionsFromSettingString(s={S})", s);
             return result;
         }
 
         public static List<TemplateArgument> TemplateArgumentsFromSettingString(string s)
         {
+			eventLogger.LogError(">>> Entering TemplateArgumentsFromSettingString(s={S})", s);
             var result = new List<TemplateArgument>();
+			eventLogger.LogError("TemplateArgumentsFromSettingString(s={S}): result → {Result}", s, result);
             if (!string.IsNullOrEmpty(s))
             {
                 foreach (var templateArgument in SplitIntoStrings(s))
                 {
                     var n = templateArgument.IndexOf('=');
+					eventLogger.LogError("TemplateArgumentsFromSettingString(s={S}): n → {N}", s, n);
                     result.Add(new TemplateArgument(templateArgument.Substring(0, n), templateArgument.Substring(n + 1)));
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting TemplateArgumentsFromSettingString(s={S})", s);
             return result;
         }
 
         public static string ToSettingString(List<ClientOption> clientOptions)
         {
+			eventLogger.LogError(">>> Entering ToSettingString(clientOptions={ClientOptions})", clientOptions);
+			eventLogger.LogWarning("<<< Exiting ToSettingString(clientOptions={ClientOptions})", clientOptions);
+			eventLogger.LogWarning("<<< Exiting ToSettingString(templateArguments={TemplateArguments})", templateArguments);
             return string.Join("\r\n", clientOptions.ConvertAll(o => o.Name + "=" + o.Value).ToArray());
         }
 
@@ -97,33 +111,43 @@ namespace DotNetNuke.Web.DDRMenu
 
         public string ToXml()
         {
+			eventLogger.LogError(">>> Entering ToXml()");
             var sb = new StringBuilder();
             var ser = new XmlSerializer(typeof(Settings));
+			eventLogger.LogError("ToXml(): sb → {Sb}", sb);
             using (var writer = new StringWriter(sb))
             {
+				eventLogger.LogError("ToXml(): ser → {Ser}", ser);
                 ser.Serialize(writer, this);
             }
 
+			eventLogger.LogWarning("<<< Exiting ToXml()");
             return sb.ToString();
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
+			eventLogger.LogError(">>> Entering ToString()");
             try
             {
                 return this.ToXml();
             }
             catch (Exception exc)
             {
+				eventLogger.LogError("Exception in ToString(): {Arg0}", exc.Message);
+				eventLogger.LogWarning("<<< Exiting ToString()");
                 return exc.ToString();
             }
         }
 
         private static IEnumerable<string> SplitIntoStrings(string fullString)
         {
+			eventLogger.LogError(">>> Entering SplitIntoStrings(fullString={FullString})", fullString);
             var strings = new List<string>(fullString.Split('\r', '\n'));
             strings.RemoveAll(string.IsNullOrEmpty);
+			eventLogger.LogError("SplitIntoStrings(fullString={FullString}): strings → {Strings}", fullString, strings);
+			eventLogger.LogWarning("<<< Exiting SplitIntoStrings(fullString={FullString})", fullString);
             return strings;
         }
     }

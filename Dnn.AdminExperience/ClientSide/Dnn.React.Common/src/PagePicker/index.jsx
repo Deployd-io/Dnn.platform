@@ -7,6 +7,7 @@ import Html from "../Html";
 import "./style.less";
 import Service from "./Service";
 import PagePickerScrollbar from "./PagePickerScrollbar";
+const logger = console;
 
 
 function format() {
@@ -14,6 +15,7 @@ function format() {
     let methodsArguments = arguments;
     return format.replace(/{(\d+)}/gi, function (value, index) {
         let argumentsIndex = parseInt(index) + 1;
+	logger.warn('<<< Exiting format()', { "event.action": "format" });
         return methodsArguments[argumentsIndex];
     });
 }
@@ -21,6 +23,7 @@ function format() {
 class PagePicker extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             dropDownOpen: false,
             portalTabs: [],
@@ -29,19 +32,25 @@ class PagePicker extends Component {
             selectedPage: props.defaultLabel
         };
         this.loaded = false;
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`, { "event.action": "constructor", "logrite.props": props });
+		logger.debug(`constructor(props=${props}): this.loaded → ${this.loaded}`, { "event.action": "constructor", "logrite.props": props });
         this.handleClick = this.handleClick.bind(this);
 
         this.dnnPagePickerRef = React.createRef();
         this.pagePickerContent = React.createRef();
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         this._isMounted = false;
         if (!this.props.IsMultiSelect) {
             this.setDefaultPage(this.props);
         }
         if (!this.props.IsInDropDown) {
+			logger.debug(`UNSAFE_componentWillMount(): this._isMounted → ${this._isMounted}`, { "event.action": "UNSAFE_componentWillMount" });
             this.initialize(this.props);
+			logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         }
         this.setState({
             selectedPage: this.props.defaultLabel
@@ -49,6 +58,7 @@ class PagePicker extends Component {
     }
 
     UNSAFE_componentWillReceiveProps(newProps) {
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.newProps": newProps });
         //reload if any query param changed
         const {props} = this;
         if (props.PortalTabsParameters.portalId !== newProps.PortalTabsParameters.portalId ||
@@ -58,6 +68,7 @@ class PagePicker extends Component {
             props.PortalTabsParameters.roles !== newProps.PortalTabsParameters.roles) {
             this.setState({portalTabs: []});
             this.loaded = false;
+		logger.debug(`UNSAFE_componentWillReceiveProps(newProps=${newProps}): this.loaded → ${this.loaded}`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.newProps": newProps });
             return;
         }
 
@@ -76,23 +87,30 @@ class PagePicker extends Component {
                 this.setDefaultPage(newProps);
             }
         }
+		logger.warn(`<<< Exiting UNSAFE_componentWillReceiveProps(newProps=${newProps})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.newProps": newProps });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this._isMounted = true;
         const {props} = this;
         if (props.closeOnBlur) {
+			logger.debug(`componentDidMount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentDidMount" });
             document.addEventListener("click", this.handleClick);
         }
         this._isMounted = true;
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         document.removeEventListener("click", this.handleClick);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentWillUnmount" });
     }
 
     initialize(props, callback) {
+		logger.error(`>>> Entering initialize(props=${props},callback=${callback})`, { "event.action": "initialize", "logrite.props": props, "logrite.callback": callback });
         this.getPortalTabs(props.cultureCode, () => {
             this.setPages(() => {
                 if (callback)
@@ -102,8 +120,10 @@ class PagePicker extends Component {
     }
 
     getPortalTabs(cultureCode, callback) {
+		logger.error(`>>> Entering getPortalTabs(cultureCode=${cultureCode},callback=${callback})`, { "event.action": "getPortalTabs", "logrite.cultureCode": cultureCode, "logrite.callback": callback });
         const { props } = this;
         let service = new Service(this.props.serviceFramework, this.props.moduleRoot, this.props.controller);
+		logger.error(`getPortalTabs(cultureCode=${cultureCode},callback=${callback}): service → ${service}`, { "event.action": "getPortalTabs", "logrite.cultureCode": cultureCode, "logrite.callback": callback });
         const portalTabsParameters = !props.IsMultiSelect ? Object.assign(props.PortalTabsParameters, { selectedTabId: props.selectedTabId }) : Object.assign(props.PortalTabsParameters);
         service.getPortalTabs(portalTabsParameters, (data) => {
             this.setState({
@@ -111,15 +131,18 @@ class PagePicker extends Component {
             }, () => {
                 if (callback) {
                     callback();
+					logger.warn(`<<< Exiting getPortalTabs(cultureCode=${cultureCode},callback=${callback})`, { "event.action": "getPortalTabs", "logrite.cultureCode": cultureCode, "logrite.callback": callback });
                 }
             });
         });
     }
 
     setPages(callback) {
+		logger.error(`>>> Entering setPages(callback=${callback})`, { "event.action": "setPages", "logrite.callback": callback });
         const {props} = this;
         this.loaded = true;
         let {portalTabs} = this.state;
+		logger.debug(`setPages(callback=${callback}): this.loaded → ${this.loaded}`, { "event.action": "setPages", "logrite.callback": callback });
         if (!props.IsMultiSelect) {
             portalTabs[0].Name = props.noneSpecifiedText;
         }
@@ -146,6 +169,7 @@ class PagePicker extends Component {
     }
 
     getClassName() {
+		logger.error('>>> Entering getClassName()', { "event.action": "getClassName" });
         const {props} = this;
         let className = "dnn-page-picker";
         if (props.IsInDropDown) {
@@ -157,16 +181,20 @@ class PagePicker extends Component {
         if (!props.enabled) {
             className += " disabled";
         }
+		logger.warn('<<< Exiting getClassName()', { "event.action": "getClassName" });
         return className;
     }
 
     getDropdownLabel() {
+		logger.error('>>> Entering getDropdownLabel()', { "event.action": "getDropdownLabel" });
         const { state } = this;
         let label = state.selectedPage;
+		logger.warn('<<< Exiting getDropdownLabel()', { "event.action": "getDropdownLabel" });
         return label;
     }
 
     SetOpenNodesCount(root, lastId, count) {
+		logger.error(`>>> Entering SetOpenNodesCount(root=${root},lastId=${lastId},count=${count})`, { "event.action": "SetOpenNodesCount", "logrite.root": root, "logrite.lastId": lastId, "logrite.count": count });
         if (root.IsOpen && root.ChildTabs !== null && root.ChildTabs.length > 0) {
             root.ChildTabs.map((child) => {
                 count++;
@@ -181,16 +209,20 @@ class PagePicker extends Component {
                 totalCount: count
             });
         }
+		logger.warn(`<<< Exiting SetOpenNodesCount(root=${root},lastId=${lastId},count=${count})`, { "event.action": "SetOpenNodesCount", "logrite.root": root, "logrite.lastId": lastId, "logrite.count": count });
         return count;
     }
 
     onPageSelect(page, keepOpen) {
+		logger.error(`>>> Entering onPageSelect(page=${page},keepOpen=${keepOpen})`, { "event.action": "onPageSelect", "logrite.page": page, "logrite.keepOpen": keepOpen });
         keepOpen = keepOpen === undefined || (typeof keepOpen) !== "boolean" ? false : keepOpen;
         const {props} = this;
+		logger.error(`onPageSelect(page=${page},keepOpen=${keepOpen}): keepOpen → ${keepOpen}`, { "event.action": "onPageSelect", "logrite.page": page, "logrite.keepOpen": keepOpen });
         if (props.IsMultiSelect) {
             page.CheckedState = page.CheckedState === 1 ? 0 : 1;
             let selectedPagesC = Object.assign([], this.state.selectedPages);
             selectedPagesC = this.CheckUnCheckAllChildren(page, page.CheckedState, selectedPagesC);
+			logger.error(`onPageSelect(page=${page},keepOpen=${keepOpen}): selectedPagesC → ${selectedPagesC}`, { "event.action": "onPageSelect", "logrite.page": page, "logrite.keepOpen": keepOpen });
             this.setState({ selectedPages: selectedPagesC }, () => {
                 this.DoRecursiveSelect(page, page.TabId, page.CheckedState, () => {
                     let {selectedPages} = this.state;
@@ -212,6 +244,7 @@ class PagePicker extends Component {
                         this.props.OnSelect(page.TabId, page.Name);
                     }
                     if (props.IsInDropDown) {
+						logger.warn(`<<< Exiting onPageSelect(page=${page},keepOpen=${keepOpen})`, { "event.action": "onPageSelect", "logrite.page": page, "logrite.keepOpen": keepOpen });
                         this.setState({
                             selectedPage: page.Name,
                             dropDownOpen: keepOpen
@@ -223,11 +256,13 @@ class PagePicker extends Component {
     }
     //page is passed by reference.
     getDescendants(page, callback, event) {
+		logger.error(`>>> Entering getDescendants(page=${page},callback=${callback},event=${event})`, { "event.action": "getDescendants", "logrite.page": page, "logrite.callback": callback, "logrite.event": event });
         if (event) {
             event.stopPropagation();
         }
         const { props } = this;
         let parentToAddChildrenTo = page;
+		logger.debug(`getDescendants(page=${page},callback=${callback},event=${event}): parentToAddChildrenTo.IsOpen → ${parentToAddChildrenTo.IsOpen}`, { "event.action": "getDescendants", "logrite.page": page, "logrite.callback": callback, "logrite.event": event });
         if (parentToAddChildrenTo.ChildTabs && parentToAddChildrenTo.ChildTabs.length > 0) {
             parentToAddChildrenTo.IsOpen = !parentToAddChildrenTo.IsOpen;
 
@@ -241,6 +276,7 @@ class PagePicker extends Component {
             return;
         }
         const portalTabsDescendantsParameters = Object.assign(props.PortalTabsParameters, { parentId: page.TabId });
+		logger.error(`getDescendants(page=${page},callback=${callback},event=${event}): portalTabsDescendantsParameters → ${portalTabsDescendantsParameters}`, { "event.action": "getDescendants", "logrite.page": page, "logrite.callback": callback, "logrite.event": event });
 
         let service = new Service(this.props.serviceFramework, this.props.moduleRoot, this.props.controller);
         service.getTabsDescendants(portalTabsDescendantsParameters,
@@ -276,28 +312,36 @@ class PagePicker extends Component {
                     callback();
                 }
             });
+			logger.warn(`<<< Exiting getDescendants(page=${page},callback=${callback},event=${event})`, { "event.action": "getDescendants", "logrite.page": page, "logrite.callback": callback, "logrite.event": event });
     }
 
     getSelected(page, isCurrentOrDescendant) {
+		logger.error(`>>> Entering getSelected(page=${page},isCurrentOrDescendant=${isCurrentOrDescendant})`, { "event.action": "getSelected", "logrite.page": page, "logrite.isCurrentOrDescendant": isCurrentOrDescendant });
         let className = "page-value";
         if (page.Selectable && !isCurrentOrDescendant)      
             className += (page.CheckedState !== 1 ? " selected" : "");
         else
             className += " non-selectable";
+		logger.warn(`<<< Exiting getSelected(page=${page},isCurrentOrDescendant=${isCurrentOrDescendant})`, { "event.action": "getSelected", "logrite.page": page, "logrite.isCurrentOrDescendant": isCurrentOrDescendant });
         return className;
     }
 
      
     getChildItems(children, isCurrentOrDescendant) {
+		logger.error(`>>> Entering getChildItems(children=${children},isCurrentOrDescendant=${isCurrentOrDescendant})`, { "event.action": "getChildItems", "logrite.children": children, "logrite.isCurrentOrDescendant": isCurrentOrDescendant });
         if (!children) {
             return [];
         }        
         return children.map((page) => {
             const {props} = this;
             const checkboxIcon = this.getCheckboxIcon(page.CheckedState);
+			logger.error(`getChildItems(children=${children},isCurrentOrDescendant=${isCurrentOrDescendant}): checkboxIcon → ${checkboxIcon}`, { "event.action": "getChildItems", "logrite.children": children, "logrite.isCurrentOrDescendant": isCurrentOrDescendant });
             const pageIcon = PagesIcon;
             const textClass = props.IsMultiSelect && props.ShowIcon ? " text-with-page-icon" : (!props.IsMultiSelect && !props.ShowIcon ? "no-icon" : "");
+			logger.error(`getChildItems(children=${children},isCurrentOrDescendant=${isCurrentOrDescendant}): textClass → ${textClass}`, { "event.action": "getChildItems", "logrite.children": children, "logrite.isCurrentOrDescendant": isCurrentOrDescendant });
+			logger.error(`getChildItems(children=${children},isCurrentOrDescendant=${isCurrentOrDescendant}): parentNotSelectable → ${parentNotSelectable}`, { "event.action": "getChildItems", "logrite.children": children, "logrite.isCurrentOrDescendant": isCurrentOrDescendant });
             const pageClass = props.IsMultiSelect && props.ShowIcon ? " page-icon" : "";
+			logger.error(`getChildItems(children=${children},isCurrentOrDescendant=${isCurrentOrDescendant}): pageClass → ${pageClass}`, { "event.action": "getChildItems", "logrite.children": children, "logrite.isCurrentOrDescendant": isCurrentOrDescendant });
             const parentNotSelectable = isCurrentOrDescendant ? isCurrentOrDescendant : this.props.currentTabId === parseInt(page.TabId);
             
             return <li key={page.TabId} className={"page-item page-" + page.TabId + (page.HasChildren ? " has-children" : "") + (page.IsOpen ? " opened" : " closed") }>
@@ -317,9 +361,11 @@ class PagePicker extends Component {
                 }
             </li>;
         });
+		logger.warn(`<<< Exiting getChildItems(children=${children},isCurrentOrDescendant=${isCurrentOrDescendant})`, { "event.action": "getChildItems", "logrite.children": children, "logrite.isCurrentOrDescendant": isCurrentOrDescendant });
     }
 
     toggleDropdown() {
+		logger.error('>>> Entering toggleDropdown()', { "event.action": "toggleDropdown" });
         const {props} = this;
         if (!this.loaded) {
             this.initialize(props, () => {
@@ -334,6 +380,7 @@ class PagePicker extends Component {
             });
         }
         else {
+			logger.warn('<<< Exiting toggleDropdown()', { "event.action": "toggleDropdown" });
             this.setState({
                 dropDownOpen: false
             });
@@ -341,10 +388,13 @@ class PagePicker extends Component {
     }
 
     getCountText() {
+		logger.error('>>> Entering getCountText()', { "event.action": "getCountText" });
+		logger.warn('<<< Exiting getCountText()', { "event.action": "getCountText" });
         return format(this.props.CountText, this.state.totalCount);
     }
 
     findTabById(tabId, tabs, tab) {
+		logger.error(`>>> Entering findTabById(tabId=${tabId},tabs=${tabs},tab=${tab})`, { "event.action": "findTabById", "logrite.tabId": tabId, "logrite.tabs": tabs, "logrite.tab": tab });
         if (tab === null) {
             for (let i = 0; i < tabs.length; i++) {
                 let child = tabs[i];
@@ -360,15 +410,18 @@ class PagePicker extends Component {
                 }
             }
         }
+		logger.warn(`<<< Exiting findTabById(tabId=${tabId},tabs=${tabs},tab=${tab})`, { "event.action": "findTabById", "logrite.tabId": tabId, "logrite.tabs": tabs, "logrite.tab": tab });
         return tab;
     }
     //Single Selection Methods
     //Set the dropdown label to the default selected page name.
     setDefaultPage(props, keepOpen) {
+		logger.error(`>>> Entering setDefaultPage(props=${props},keepOpen=${keepOpen})`, { "event.action": "setDefaultPage", "logrite.props": props, "logrite.keepOpen": keepOpen });
         if (props.IsInDropDown && !props.IsMultiSelect) {
             let {portalTabs} = this.state;
             if (portalTabs !== undefined && portalTabs.length > 0) {
                 let page = null;
+				logger.error(`setDefaultPage(props=${props},keepOpen=${keepOpen}): page → ${page}`, { "event.action": "setDefaultPage", "logrite.props": props, "logrite.keepOpen": keepOpen });
                 if (props.selectedTabId === -1) {
                     page = portalTabs[0];
                 } else {
@@ -376,6 +429,7 @@ class PagePicker extends Component {
                 }
                 if (page !== undefined && page !== null) {
                     this.onPageSelect(page, keepOpen);
+					logger.warn(`<<< Exiting setDefaultPage(props=${props},keepOpen=${keepOpen})`, { "event.action": "setDefaultPage", "logrite.props": props, "logrite.keepOpen": keepOpen });
                 }
             }
             else if (props.selectedTabId >= 0) {
@@ -399,12 +453,14 @@ class PagePicker extends Component {
     }
 
     handleClick(event) {
+		logger.error(`>>> Entering handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         const {props} = this;
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
         // the "findDOMNode was called on an unmounted component." error we need to check if the component is mounted before execute this code
         if (!this._isMounted || !props.closeOnBlur || !props.IsInDropDown) { return; }
         if (!this.dnnPagePickerRef.current.contains(event.target) && (typeof event.target.className === "string" && event.target.className.indexOf("do-not-close") === -1)) {
+			logger.warn(`<<< Exiting handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
             this.setState({
                 dropDownOpen: false
             });
@@ -412,6 +468,7 @@ class PagePicker extends Component {
     }
 
     UnCheckAllExcept(root, page, callback) {
+		logger.error(`>>> Entering UnCheckAllExcept(root=${root},page=${page},callback=${callback})`, { "event.action": "UnCheckAllExcept", "logrite.root": root, "logrite.page": page, "logrite.callback": callback });
         if (page.CheckedState !== 0) {
             if (root.HasChildren && root.ChildTabs !== null && root.ChildTabs.length > 0) {
                 root.ChildTabs = root.ChildTabs.map(child => {
@@ -431,15 +488,19 @@ class PagePicker extends Component {
         if (callback !== undefined) {
             callback(root);
         }
+		logger.warn(`<<< Exiting UnCheckAllExcept(root=${root},page=${page},callback=${callback})`, { "event.action": "UnCheckAllExcept", "logrite.root": root, "logrite.page": page, "logrite.callback": callback });
         return root;
     }
 
     onSearch(value) {
+		logger.error(`>>> Entering onSearch(value=${value})`, { "event.action": "onSearch", "logrite.value": value });
         const {props} = this;
 
         if (value !== "") {
             const apiParameters = Object.assign(props.PortalTabsParameters, { searchText: value });
+			logger.error(`onSearch(value=${value}): apiParameters → ${apiParameters}`, { "event.action": "onSearch", "logrite.value": value });
             let service = new Service(this.props.serviceFramework, this.props.moduleRoot, this.props.controller);
+			logger.error(`onSearch(value=${value}): service → ${service}`, { "event.action": "onSearch", "logrite.value": value });
 
             service.searchPortalTabs(apiParameters, (data) => {
                 this.setState({
@@ -450,24 +511,29 @@ class PagePicker extends Component {
             });
         } else {
             this.initialize(props);
+			logger.warn(`<<< Exiting onSearch(value=${value})`, { "event.action": "onSearch", "logrite.value": value });
         }
     }
     //Single Selection Methods Ends
 
     //Multi Selection Methods
     CheckUnCheckAllChildren(root, checked, selectedPages) {
+		logger.error(`>>> Entering CheckUnCheckAllChildren(root=${root},checked=${checked},selectedPages=${selectedPages})`, { "event.action": "CheckUnCheckAllChildren", "logrite.root": root, "logrite.checked": checked, "logrite.selectedPages": selectedPages });
         selectedPages = this.UpdateSelectedData(root, checked, selectedPages);
         root.CheckedState = checked;
         this.setState({});
+		logger.debug(`CheckUnCheckAllChildren(root=${root},checked=${checked},selectedPages=${selectedPages}): root.CheckedState → ${root.CheckedState}`, { "event.action": "CheckUnCheckAllChildren", "logrite.root": root, "logrite.checked": checked, "logrite.selectedPages": selectedPages });
         if (root.HasChildren && root.ChildTabs.length > 0) {
             root.ChildTabs.forEach(child => {
                 selectedPages = this.CheckUnCheckAllChildren(child, checked, selectedPages);
             });
         }
+		logger.warn(`<<< Exiting CheckUnCheckAllChildren(root=${root},checked=${checked},selectedPages=${selectedPages})`, { "event.action": "CheckUnCheckAllChildren", "logrite.root": root, "logrite.checked": checked, "logrite.selectedPages": selectedPages });
         return selectedPages;
     }
 
     UpdateSelectedData(Tab, checked, selectedPages) {
+		logger.error(`>>> Entering UpdateSelectedData(Tab=${Tab},checked=${checked},selectedPages=${selectedPages})`, { "event.action": "UpdateSelectedData", "logrite.Tab": Tab, "logrite.checked": checked, "logrite.selectedPages": selectedPages });
         if ((checked === 0 || checked === 2) && !selectedPages.some(page => page.TabId === Tab.TabId && page.CheckedState === checked)) {
             selectedPages = selectedPages.filter(page => {
                 return page.TabId !== Tab.TabId;
@@ -483,10 +549,12 @@ class PagePicker extends Component {
                 return page.TabId !== Tab.TabId;
             });
         }
+		logger.warn(`<<< Exiting UpdateSelectedData(Tab=${Tab},checked=${checked},selectedPages=${selectedPages})`, { "event.action": "UpdateSelectedData", "logrite.Tab": Tab, "logrite.checked": checked, "logrite.selectedPages": selectedPages });
         return selectedPages;
     }
 
     DoRecursiveSelect(page, mainKey, originalChecked, callback) {
+		logger.error(`>>> Entering DoRecursiveSelect(page=${page},mainKey=${mainKey},originalChecked=${originalChecked},callback=${callback})`, { "event.action": "DoRecursiveSelect", "logrite.page": page, "logrite.mainKey": mainKey, "logrite.originalChecked": originalChecked, "logrite.callback": callback });
         let {portalTabs} = this.state;
         let checked = originalChecked;
         if (mainKey !== page.TabId && page.HasChildren && page.ChildTabs.length > 0) {
@@ -506,6 +574,7 @@ class PagePicker extends Component {
             if (parentId !== undefined) {
                 let children = portalTabs;
                 let parent = this.RecursiveFindParent(parentId, children);
+				logger.error(`DoRecursiveSelect(page=${page},mainKey=${mainKey},originalChecked=${originalChecked},callback=${callback}): parent → ${parent}`, { "event.action": "DoRecursiveSelect", "logrite.page": page, "logrite.mainKey": mainKey, "logrite.originalChecked": originalChecked, "logrite.callback": callback });
                 if (parent !== undefined && parent !== null) {
                     this.setState({});
                     if (parent.HasChildren && parent.ChildTabs.length > 0) {
@@ -517,6 +586,7 @@ class PagePicker extends Component {
             } else {
                 let selectedPages = Object.assign([], this.state.selectedPages);
                 selectedPages = this.UpdateSelectedData(this.state.portalTabs[0], checked, selectedPages);
+				logger.error(`DoRecursiveSelect(page=${page},mainKey=${mainKey},originalChecked=${originalChecked},callback=${callback}): selectedPages → ${selectedPages}`, { "event.action": "DoRecursiveSelect", "logrite.page": page, "logrite.mainKey": mainKey, "logrite.originalChecked": originalChecked, "logrite.callback": callback });
                 this.setState({ selectedPages });
                 if (callback)
                     callback();
@@ -527,6 +597,7 @@ class PagePicker extends Component {
     }
 
     RecursiveFindParent(parentId, currentTree) {
+		logger.error(`>>> Entering RecursiveFindParent(parentId=${parentId},currentTree=${currentTree})`, { "event.action": "RecursiveFindParent", "logrite.parentId": parentId, "logrite.currentTree": currentTree });
         let parent = null;
         if (currentTree.some(child => child.IsOpen && child.TabId === parentId)) {
             parent = currentTree.find(child => child.IsOpen && child.TabId === parentId);
@@ -544,6 +615,7 @@ class PagePicker extends Component {
     }
 
     getCheckboxIcon(selected) {
+		logger.error(`>>> Entering getCheckboxIcon(selected=${selected})`, { "event.action": "getCheckboxIcon", "logrite.selected": selected });
         switch (selected) {
             case 0:
                 return CheckboxCheckedIcon;
@@ -552,6 +624,7 @@ class PagePicker extends Component {
             case 1:
                 return CheckboxUncheckedIcon;
             default:
+				logger.warn(`<<< Exiting getCheckboxIcon(selected=${selected})`, { "event.action": "getCheckboxIcon", "logrite.selected": selected });
                 return CheckboxUncheckedIcon;
         }
     }
@@ -559,12 +632,14 @@ class PagePicker extends Component {
     //Multi Selection Methods Ends
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         
         if (this.loaded || props.IsInDropDown) {
             let picker = <div/>;
             if (state.portalTabs.length > 0 && state.portalTabs[0].Processed) {
                 let children = state.portalTabs.length > 0 && state.portalTabs[0].Processed && this.getChildItems(state.portalTabs);
+				logger.error(`render(): children → ${children}`, { "event.action": "render" });
                 picker =
                     <PagePickerScrollbar style={props.scrollAreaStyle} ref={node => this.node = node}>
                         <div className="pages-container">
@@ -617,6 +692,7 @@ class PagePicker extends Component {
             );
         }
         else {
+			logger.warn('<<< Exiting render()', { "event.action": "render" });
             return (<div/>);
         }
     }

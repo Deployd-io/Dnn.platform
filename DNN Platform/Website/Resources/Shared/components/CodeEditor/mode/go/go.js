@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -38,6 +39,7 @@ CodeMirror.defineMode("go", function(config) {
   var curPunc;
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.next();
     if (ch == '"' || ch == "'" || ch == "`") {
       state.tokenize = tokenString(ch);
@@ -87,6 +89,7 @@ CodeMirror.defineMode("go", function(config) {
       while ((next = stream.next()) != null) {
         if (next == quote && !escaped) {end = true; break;}
         escaped = !escaped && quote != "`" && next == "\\";
+		logger.error(`>>> Entering tokenString(quote=${quote})`, { "event.action": "tokenString", "logrite.quote": quote });
       }
       if (end || !(escaped || quote == "`"))
         state.tokenize = tokenBase;

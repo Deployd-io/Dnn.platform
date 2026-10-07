@@ -11,6 +11,7 @@ namespace DotNetNuke.Collections.Internal
     [Serializable]
     public class ReaderWriterLockStrategy : IDisposable, ILockStrategy
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ReaderWriterLockStrategy));
         [NonSerialized]
         private ReaderWriterLockSlim @lock;
 
@@ -22,13 +23,17 @@ namespace DotNetNuke.Collections.Internal
         public ReaderWriterLockStrategy()
             : this(LockRecursionPolicy.NoRecursion)
         {
+		Logger.LogWarning("<<< Exiting ReaderWriterLockStrategy(recursionPolicy={RecursionPolicy})", recursionPolicy);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ReaderWriterLockStrategy"/> class.</summary>
         /// <param name="recursionPolicy">An instance of a <see cref="LockRecursionPolicy"/> to use.</param>
         public ReaderWriterLockStrategy(LockRecursionPolicy recursionPolicy)
         {
+			Logger.LogError(">>> Entering ReaderWriterLockStrategy(recursionPolicy={RecursionPolicy})", recursionPolicy);
             this.lockRecursionPolicy = recursionPolicy;
+			Logger.LogWarning("<<< Exiting ReaderWriterLockStrategy(recursionPolicy={RecursionPolicy})", recursionPolicy);
+			Logger.LogDebug("ReaderWriterLockStrategy(recursionPolicy={RecursionPolicy}): this.lockRecursionPolicy → {Arg1}", recursionPolicy, this.lockRecursionPolicy);
             this.@lock = new ReaderWriterLockSlim(recursionPolicy);
         }
 
@@ -40,7 +45,10 @@ namespace DotNetNuke.Collections.Internal
         /// <param name="context">The streaming context to use.</param>
         public ReaderWriterLockStrategy(SerializationInfo info, StreamingContext context)
         {
+			Logger.LogError(">>> Entering ReaderWriterLockStrategy(info={Info},context={Context})", info, context);
             this.lockRecursionPolicy = (LockRecursionPolicy)info.GetValue("_lockRecursionPolicy", typeof(LockRecursionPolicy));
+			Logger.LogWarning("<<< Exiting ReaderWriterLockStrategy(info={Info},context={Context})", info, context);
+			Logger.LogDebug("ReaderWriterLockStrategy(info={Info},context={Context}): lockRecursionPolicy → {LockRecursionPolicy}", info, context, lockRecursionPolicy);
             this.@lock = new ReaderWriterLockSlim(this.lockRecursionPolicy);
         }
 
@@ -96,13 +104,17 @@ namespace DotNetNuke.Collections.Internal
         /// <param name="context">The <see cref="StreamingContext"/> to use.</param>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+			Logger.LogError(">>> Entering GetObjectData(info={Info},context={Context})", info, context);
             // Use the AddValue method to specify serialized values.
             info.AddValue("_lockRecursionPolicy", this.lockRecursionPolicy, typeof(LockRecursionPolicy));
+			Logger.LogWarning("<<< Exiting GetObjectData(info={Info},context={Context})", info, context);
         }
 
         /// <inheritdoc />
         public ISharedCollectionLock GetReadLock()
         {
+			Logger.LogError(">>> Entering GetReadLock()");
+			Logger.LogWarning("<<< Exiting GetReadLock()");
             return this.GetReadLock(TimeSpan.FromMilliseconds(-1));
         }
 
@@ -124,6 +136,8 @@ namespace DotNetNuke.Collections.Internal
         /// <inheritdoc />
         public ISharedCollectionLock GetWriteLock()
         {
+			Logger.LogError(">>> Entering GetWriteLock()");
+			Logger.LogWarning("<<< Exiting GetWriteLock()");
             return this.GetWriteLock(TimeSpan.FromMilliseconds(-1));
         }
 
@@ -145,17 +159,21 @@ namespace DotNetNuke.Collections.Internal
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogError(">>> Entering Dispose()");
             // Do not change this code.  Put cleanup code in Dispose(ByVal disposing As Boolean) above.
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			Logger.LogWarning("<<< Exiting Dispose()");
         }
 
         /// <summary>Disposes this instance resources.</summary>
         /// <param name="disposing">A value indicating whether this instance is currently disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogError(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (!this.isDisposed)
             {
+				Logger.LogWarning("<<< Exiting Dispose()");
                 if (disposing)
                 {
                     // dispose managed state (managed objects).
@@ -173,10 +191,13 @@ namespace DotNetNuke.Collections.Internal
 
         private void EnsureNotDisposed()
         {
+			Logger.LogError(">>> Entering EnsureNotDisposed()");
             if (this.isDisposed)
             {
+				Logger.LogError("Throwing ObjectDisposedException from EnsureNotDisposed()");
                 throw new ObjectDisposedException("ReaderWriterLockStrategy");
             }
+			Logger.LogWarning("<<< Exiting EnsureNotDisposed()");
         }
     }
 }

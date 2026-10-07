@@ -14,6 +14,7 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
     /// <summary>Base class for all resource types.</summary>
     public abstract class ResourceBase : IResource
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ResourceBase));
         private string name;
 
         /// <inheritdoc />
@@ -81,6 +82,7 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
         /// <returns>The versioned path.</returns>
         internal string GetVersionedPath(int crmVersion, bool useCdn, string applicationPath)
         {
+			Logger.LogError(">>> Entering GetVersionedPath(crmVersion={CrmVersion},useCdn={UseCdn},applicationPath={ApplicationPath})", crmVersion, useCdn, applicationPath);
             var path = this.ResolvedPath;
             if (useCdn && !string.IsNullOrEmpty(this.CdnUrl))
             {
@@ -110,6 +112,7 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
                 return $"{path}?cdv={crmVersion}";
             }
 
+			Logger.LogWarning("<<< Exiting GetVersionedPath(crmVersion={CrmVersion},useCdn={UseCdn},applicationPath={ApplicationPath})", crmVersion, useCdn, applicationPath);
             return $"{applicationPath}/{path}?cdv={crmVersion}";
         }
 
@@ -117,16 +120,19 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
         /// <param name="htmlString">The HTML string builder to append to.</param>
         protected void RenderBlocking(StringBuilder htmlString)
         {
+			Logger.LogError(">>> Entering RenderBlocking(htmlString={HtmlString})", htmlString);
             if (this.Blocking && !this.Attributes.ContainsKey("blocking"))
             {
                 htmlString.Append(" blocking=\"render\"");
             }
+			Logger.LogWarning("<<< Exiting RenderBlocking(htmlString={HtmlString})", htmlString);
         }
 
         /// <summary>Renders the <c>crossorigin</c> attribute.</summary>
         /// <param name="htmlString">The HTML string builder to append to.</param>
         protected void RenderCrossOriginAttribute(StringBuilder htmlString)
         {
+			Logger.LogError(">>> Entering RenderCrossOriginAttribute(htmlString={HtmlString})", htmlString);
             if (this.Attributes.ContainsKey("crossorigin"))
             {
                 return;
@@ -143,6 +149,8 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
                 case CrossOrigin.None:
                     return;
                 default:
+					Logger.LogError("Throwing InvalidOperationException from RenderCrossOriginAttribute(htmlString={HtmlString})", htmlString);
+			Logger.LogWarning("<<< Exiting RenderCrossOriginAttribute(htmlString={HtmlString})", htmlString);
                     throw new InvalidOperationException($"Unexpected CrossOrigin value: {this.CrossOrigin}");
             }
         }
@@ -151,6 +159,7 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
         /// <param name="htmlString">The HTML string builder to append to.</param>
         protected void RenderFetchPriority(StringBuilder htmlString)
         {
+			Logger.LogError(">>> Entering RenderFetchPriority(htmlString={HtmlString})", htmlString);
             if (this.Attributes.ContainsKey("fetchpriority"))
             {
                 return;
@@ -167,6 +176,8 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
                 case FetchPriority.Auto:
                     return;
                 default:
+					Logger.LogError("Throwing InvalidOperationException from RenderFetchPriority(htmlString={HtmlString})", htmlString);
+			Logger.LogWarning("<<< Exiting RenderFetchPriority(htmlString={HtmlString})", htmlString);
                     throw new InvalidOperationException($"Unexpected FetchPriority value: {this.FetchPriority}");
             }
         }
@@ -175,16 +186,19 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
         /// <param name="htmlString">The HTML string builder to append to.</param>
         protected void RenderIntegrity(StringBuilder htmlString)
         {
+			Logger.LogError(">>> Entering RenderIntegrity(htmlString={HtmlString})", htmlString);
             if (!string.IsNullOrEmpty(this.Integrity) && !this.Attributes.ContainsKey("integrity"))
             {
                 htmlString.Append($" integrity=\"{this.Integrity}\"");
             }
+			Logger.LogWarning("<<< Exiting RenderIntegrity(htmlString={HtmlString})", htmlString);
         }
 
         /// <summary>Renders the <c>referrerpolicy</c> attribute.</summary>
         /// <param name="htmlString">The HTML string builder to append to.</param>
         protected void RenderReferrerPolicy(StringBuilder htmlString)
         {
+			Logger.LogError(">>> Entering RenderReferrerPolicy(htmlString={HtmlString})", htmlString);
             if (this.Attributes.ContainsKey("referrerpolicy"))
             {
                 return;
@@ -219,6 +233,8 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
                 case ReferrerPolicy.None:
                     return;
                 default:
+					Logger.LogError("Throwing InvalidOperationException from RenderReferrerPolicy(htmlString={HtmlString})", htmlString);
+			Logger.LogWarning("<<< Exiting RenderReferrerPolicy(htmlString={HtmlString})", htmlString);
                     throw new InvalidOperationException($"Unexpected ReferrerPolicy value: {this.ReferrerPolicy}");
             }
         }
@@ -227,16 +243,19 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
         /// <param name="htmlString">The HTML string builder to append to.</param>
         protected void RenderType(StringBuilder htmlString)
         {
+			Logger.LogError(">>> Entering RenderType(htmlString={HtmlString})", htmlString);
             if (!string.IsNullOrEmpty(this.Type) && !this.Attributes.ContainsKey("type"))
             {
                 htmlString.Append($" type=\"{this.Type}\"");
             }
+			Logger.LogWarning("<<< Exiting RenderType(htmlString={HtmlString})", htmlString);
         }
 
         /// <summary>Renders the attributes.</summary>
         /// <param name="htmlString">The HTML string builder to append to.</param>
         protected void RenderAttributes(StringBuilder htmlString)
         {
+			Logger.LogError(">>> Entering RenderAttributes(htmlString={HtmlString})", htmlString);
             foreach (var attribute in this.Attributes)
             {
                 if (attribute.Value is null)
@@ -248,6 +267,7 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
                     htmlString.Append($" {attribute.Key}=\"{attribute.Value}\"");
                 }
             }
+			Logger.LogWarning("<<< Exiting RenderAttributes(htmlString={HtmlString})", htmlString);
         }
     }
 }

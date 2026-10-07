@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 /// <reference name="MicrosoftAjax.js" />
 /// <reference name="dnn.controls.js" assembly="DotNetNuke.WebControls" />
 /// <reference name="dnn.js" assembly="DotNetNuke.WebUtility" />
@@ -9,10 +10,13 @@ Type.registerNamespace('dnn.controls');
 dnn.extend(dnn.controls, {
     initTree: function(ctl)
     {
+		logger.error(`>>> Entering initTree(ctl=${ctl})`, { "event.action": "initTree", "logrite.ctl": ctl });
         if (ctl && dnn.controls.controls[ctl.id] == null)
         {
             var tree = new dnn.controls.DNNTree(ctl);
             tree.initialize();
+			logger.error(`initTree(ctl=${ctl}): tree → ${tree}`, { "event.action": "initTree", "logrite.ctl": ctl });
+			logger.warn(`<<< Exiting initTree(ctl=${ctl})`, { "event.action": "initTree", "logrite.ctl": ctl });
             return tree;
         }
     }
@@ -90,21 +94,28 @@ dnn.controls.DNNTree.prototype =
 {
 
 	initialize: function () {
+		logger.error('>>> Entering initialize()', { "event.action": "initialize" });
 		dnn.controls.DNNTree.callBaseMethod(this, 'initialize');
 		this.generateTreeHTML();
+		logger.warn('<<< Exiting initialize()', { "event.action": "initialize" });
 	},
 
 	focusHandler: function (e) {
+		logger.error(`>>> Entering focusHandler(e=${e})`, { "event.action": "focusHandler", "logrite.e": e });
 		var tNode = this.hoverTreeNode;
 		if (tNode == null)
 			tNode = new dnn.controls.DNNTreeNode(this.rootNode.childNodes(0));
+			logger.error(`focusHandler(e=${e}): tNode → ${tNode}`, { "event.action": "focusHandler", "logrite.e": e });
 		this.hoverNode(tNode);
 		this.container.onfocus = null;
+		logger.warn(`<<< Exiting focusHandler(e=${e})`, { "event.action": "focusHandler", "logrite.e": e });
 	},
 
 	keydownHandler: function (e) {
+		logger.error(`>>> Entering keydownHandler(e=${e})`, { "event.action": "keydownHandler", "logrite.e": e });
 		var dir = 0;
 		var axis = '';
+		logger.error(`keydownHandler(e=${e}): axis → ${axis}`, { "event.action": "keydownHandler", "logrite.e": e });
 
 		if (e.keyCode == KEY_UP_ARROW) {
 			dir = -1;
@@ -125,6 +136,7 @@ dnn.controls.DNNTree.prototype =
 
 		if (dir != 0) {
 			var tNode = this.hoverTreeNode;
+			logger.error(`keydownHandler(e=${e}): tNode → ${tNode}`, { "event.action": "keydownHandler", "logrite.e": e });
 			var node;
 			if (tNode == null)
 				tNode = new dnn.controls.DNNTreeNode(this.rootNode.childNodes(0));
@@ -198,34 +210,48 @@ dnn.controls.DNNTree.prototype =
 	},
 
 	hoverNode: function (tNode) {
+		logger.error(`>>> Entering hoverNode(tNode=${tNode})`, { "event.action": "hoverNode", "logrite.tNode": tNode });
 		if (this.hoverTreeNode != null) {
 			this.hoverTreeNode.hover = false;
 			this.assignCss(this.hoverTreeNode);
 		}
 		tNode.hover = true;
+		logger.debug(`hoverNode(tNode=${tNode}): tNode.hover → ${tNode.hover}`, { "event.action": "hoverNode", "logrite.tNode": tNode });
 		this.assignCss(tNode);
 		this.hoverTreeNode = tNode;
+		logger.debug(`hoverNode(tNode=${tNode}): this.hoverTreeNode → ${this.hoverTreeNode}`, { "event.action": "hoverNode", "logrite.tNode": tNode });
 	},
 
 	getXml: function () {
+		logger.error('>>> Entering getXml()', { "event.action": "getXml" });
+		logger.warn('<<< Exiting getXml()', { "event.action": "getXml" });
 		return this.rootNode.getXml();
 	},
 
 	expandNode: function (tNode) {
+		logger.error(`>>> Entering expandNode(tNode=${tNode})`, { "event.action": "expandNode", "logrite.tNode": tNode });
 		var ctr = this.getChildControl(tNode.id, 'pctr');
 		var expandCol = this.getChildControl(tNode.id, 'expcol');
+		logger.error(`expandNode(tNode=${tNode}): ctr → ${ctr}`, { "event.action": "expandNode", "logrite.tNode": tNode });
+		logger.error(`expandNode(tNode=${tNode}): expandCol → ${expandCol}`, { "event.action": "expandNode", "logrite.tNode": tNode });
 
 		expandCol.src = this.expandImg;
+		logger.debug(`expandNode(tNode=${tNode}): expandCol.src → ${expandCol.src}`, { "event.action": "expandNode", "logrite.tNode": tNode });
 		tNode.expanded = true;
+		logger.debug(`expandNode(tNode=${tNode}): tNode.expanded → ${tNode.expanded}`, { "event.action": "expandNode", "logrite.tNode": tNode });
 		tNode.update();
 		this.update();
 
 		if (tNode.hasPendingNodes) {
 			var sXml = tNode.node.getXml();
+			logger.error(`expandNode(tNode=${tNode}): sXml → ${sXml}`, { "event.action": "expandNode", "logrite.tNode": tNode });
 			tNode.tree = this; //need to give reference back to self
 
+			logger.debug(`expandNode(tNode=${tNode}): tNode.tree → ${tNode.tree}`, { "event.action": "expandNode", "logrite.tNode": tNode });
 			if (this.workImg != null) {
 				var icon = this.getChildControl(tNode.id, 'icn');
+				logger.error(`expandNode(tNode=${tNode}): icon → ${icon}`, { "event.action": "expandNode", "logrite.tNode": tNode });
+				logger.debug(`expandNode(tNode=${tNode}): icon.src → ${icon.src}`, { "event.action": "expandNode", "logrite.tNode": tNode });
 				if (icon)
 					icon.src = this.sysImgPath + this.workImg;
 			}
@@ -235,31 +261,43 @@ dnn.controls.DNNTree.prototype =
 				eval(this.callBack.replace('[NODEID]', tNode.id));
 
 			tNode.hasPendingNodes = false;
+			logger.debug(`expandNode(tNode=${tNode}): tNode.hasPendingNodes → ${tNode.hasPendingNodes}`, { "event.action": "expandNode", "logrite.tNode": tNode });
 			tNode.hasNodes = true;
+			logger.debug(`expandNode(tNode=${tNode}): tNode.hasNodes → ${tNode.hasNodes}`, { "event.action": "expandNode", "logrite.tNode": tNode });
 			this.hoverTreeNode = tNode;
 		}
 		else {
+			logger.debug(`expandNode(tNode=${tNode}): this.hoverTreeNode → ${this.hoverTreeNode}`, { "event.action": "expandNode", "logrite.tNode": tNode });
 			dnn.dom.expandElement(ctr, this.animf);
 		}
 
+		logger.warn(`<<< Exiting expandNode(tNode=${tNode})`, { "event.action": "expandNode", "logrite.tNode": tNode });
 		return true;
 	},
 
 	collapseNode: function (tNode) {
+		logger.error(`>>> Entering collapseNode(tNode=${tNode})`, { "event.action": "collapseNode", "logrite.tNode": tNode });
 		var ctr = this.getChildControl(tNode.id, 'pctr');
 		var expandCol = this.getChildControl(tNode.id, 'expcol');
+		logger.error(`collapseNode(tNode=${tNode}): ctr → ${ctr}`, { "event.action": "collapseNode", "logrite.tNode": tNode });
 		//ctr.style.display = 'none';
 		dnn.dom.collapseElement(ctr, this.animf);
+		logger.error(`collapseNode(tNode=${tNode}): expandCol → ${expandCol}`, { "event.action": "collapseNode", "logrite.tNode": tNode });
 		expandCol.src = this.collapseImg;
+		logger.debug(`collapseNode(tNode=${tNode}): expandCol.src → ${expandCol.src}`, { "event.action": "collapseNode", "logrite.tNode": tNode });
 		tNode.expanded = null;
+		logger.debug(`collapseNode(tNode=${tNode}): tNode.expanded → ${tNode.expanded}`, { "event.action": "collapseNode", "logrite.tNode": tNode });
 		tNode.update();
 		this.update();
+		logger.warn(`<<< Exiting collapseNode(tNode=${tNode})`, { "event.action": "collapseNode", "logrite.tNode": tNode });
 		return true;
 	},
 
 	selectNode: function (tNode) {
+		logger.error(`>>> Entering selectNode(tNode=${tNode})`, { "event.action": "selectNode", "logrite.tNode": tNode });
 		var arg = new dnn.controls.DNNNodeEventArgs(tNode);
 		this.invoke_handler('click', arg);
+		logger.error(`selectNode(tNode=${tNode}): arg → ${arg}`, { "event.action": "selectNode", "logrite.tNode": tNode });
 		if (arg.get_cancel())
 			return;
 
@@ -271,19 +309,24 @@ dnn.controls.DNNTree.prototype =
 
 		if (tNode.selected) {
 			tNode.selected = null;
+			logger.debug(`selectNode(tNode=${tNode}): tNode.selected → ${tNode.selected}`, { "event.action": "selectNode", "logrite.tNode": tNode });
 			this.assignCss(tNode);
 		}
 		else {
 			tNode.selected = true;
 			this.hoverTreeNode = tNode;
 			this.assignCss(tNode);
+			logger.debug(`selectNode(tNode=${tNode}): this.hoverTreeNode → ${this.hoverTreeNode}`, { "event.action": "selectNode", "logrite.tNode": tNode });
 		}
 		tNode.update('selected');
 
 		this.selTreeNode = tNode;
 		this.update();
+		logger.debug(`selectNode(tNode=${tNode}): this.selTreeNode → ${this.selTreeNode}`, { "event.action": "selectNode", "logrite.tNode": tNode });
 
 		var chk = this.getChildControl(tNode.id, 'chk');
+		logger.error(`selectNode(tNode=${tNode}): chk → ${chk}`, { "event.action": "selectNode", "logrite.tNode": tNode });
+		logger.debug(`selectNode(tNode=${tNode}): chk.checked → ${chk.checked}`, { "event.action": "selectNode", "logrite.tNode": tNode });
 		if (chk != null)
 			chk.checked = tNode.selected;
 
@@ -317,19 +360,24 @@ dnn.controls.DNNTree.prototype =
 	},
 
 	selectAllChildren: function (tNode) {
+		logger.error(`>>> Entering selectAllChildren(tNode=${tNode})`, { "event.action": "selectAllChildren", "logrite.tNode": tNode });
 		var childTNode;
 		for (var i = 0; i < tNode.childNodeCount(); i++) {
 			childTNode = tNode.childNodes(i);
 			if (childTNode.selected != tNode.selected)
 				this.selectNode(childTNode);
 
+			logger.debug(`selectAllChildren(tNode=${tNode}): childTNode → ${childTNode}`, { "event.action": "selectAllChildren", "logrite.tNode": tNode });
 			this.selectAllChildren(childTNode);
+			logger.warn(`<<< Exiting selectAllChildren(tNode=${tNode})`, { "event.action": "selectAllChildren", "logrite.tNode": tNode });
 		}
 	},
 
 	assignCss: function (tNode) {
+		logger.error(`>>> Entering assignCss(tNode=${tNode})`, { "event.action": "assignCss", "logrite.tNode": tNode });
 		var oText = this.getChildControl(tNode.id, 't'); //, this.container);
 		var sNodeCss = this.css;
+		logger.error(`assignCss(tNode=${tNode}): oText → ${oText}`, { "event.action": "assignCss", "logrite.tNode": tNode });
 
 		if (tNode.level > 0 && this.cssChild.length > 0)
 			sNodeCss = this.cssChild;
@@ -345,39 +393,52 @@ dnn.controls.DNNTree.prototype =
 			sNodeCss += ' ' + (tNode.cssSel.length > 0 ? tNode.cssSel : this.cssSel);
 
 		oText.className = sNodeCss;
+		logger.debug(`assignCss(tNode=${tNode}): oText.className → ${oText.className}`, { "event.action": "assignCss", "logrite.tNode": tNode });
 	},
 
 	update: function (force) {
+		logger.error(`>>> Entering update(force=${force})`, { "event.action": "update", "logrite.force": force });
 		if (force) {
 			if (this.selTreeNode)
 				dnn.setVar(this.ns + ':selected', this.selTreeNode.id); 	//BACKWARDS COMPAT ONLY!!!  
 			dnn.setVar(this.ns + '_json', dnn.decodeHTML(this.rootNode.getJSON()));
+			logger.warn(`<<< Exiting update(force=${force})`, { "event.action": "update", "logrite.force": force });
 		}
 		return true;
 	},
 
 	//--- Event Handlers ---//
 	_onsubmit: function () {
+		logger.error('>>> Entering _onsubmit()', { "event.action": "_onsubmit" });
 		this.update(true);
+		logger.warn('<<< Exiting _onsubmit()', { "event.action": "_onsubmit" });
 	},
 
 	callBackStatus: function (result, ctx, req) {
+		logger.error(`>>> Entering callBackStatus(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackStatus", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 		var tNode = ctx;
 		var tree = tNode.tree;
 		tree.invoke_compatHandler('callBackStatus', result, ctx, req);
+		logger.warn(`<<< Exiting callBackStatus(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackStatus", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 	},
 
 	callBackSuccess: function (result, ctx, req) {
+		logger.error(`>>> Entering callBackSuccess(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 		var tNode = ctx;
 		var tree = tNode.tree;
 		var parent = tNode.node; ;
+		logger.error(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): parent → ${parent}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 
 		var json = dnn.evalJSON("{" + result + "}");
+		logger.error(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): json → ${json}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 		parent.nodes = json.nodes;
+		logger.debug(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): parent.nodes → ${parent.nodes}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 		parent.setupJSONNodes(parent.rootNode(), parent, parent.nodes);
 
 		if (tree.workImg != null) {
 			var icon = tree.getChildControl(tNode.id, 'icn');
+			logger.error(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): icon → ${icon}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
+			logger.debug(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): icon.src → ${icon.src}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 			if (tNode.image != '')
 				icon.src = tNode.image;
 			else if (tNode.imageIndex > -1)
@@ -387,6 +448,7 @@ dnn.controls.DNNTree.prototype =
 		//ctx.tree.generateTreeHTML();	
 		//get container
 		var ctr = tree.getChildControl(tNode.id, 'pctr');
+		logger.error(`callBackSuccess(result=${result},ctx=${ctx},req=${req}): ctr → ${ctr}`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 		tree.renderNode(tNode.node, ctr, true);
 
 		tree.update();
@@ -396,18 +458,24 @@ dnn.controls.DNNTree.prototype =
 
 		tree.invoke_compatHandler('callBackStatus', result, ctx, req);
 		tree.invoke_handler('callBackSuccess', new dnn.controls.DNNCallbackEventArgs(result, ctx, req));
+		logger.warn(`<<< Exiting callBackSuccess(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackSuccess", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 	},
 
 	callBackFail: function (result, ctx, req) {
+		logger.error(`>>> Entering callBackFail(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackFail", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 		var tNode = ctx;
 		var tree = tNode.tree;
 		tree.invoke_handler('callBackFail', new dnn.controls.DNNCallbackEventArgs(result, ctx, req));
+		logger.warn(`<<< Exiting callBackFail(result=${result},ctx=${ctx},req=${req})`, { "event.action": "callBackFail", "logrite.result": result, "logrite.ctx": ctx, "logrite.req": req });
 	},
 
 	nodeExpColClick: function (evt) {
+		logger.error(`>>> Entering nodeExpColClick(evt=${evt})`, { "event.action": "nodeExpColClick", "logrite.evt": evt });
 		var node = this._findEventNode(evt);
 		if (node != null) {
+			logger.error(`nodeExpColClick(evt=${evt}): node → ${node}`, { "event.action": "nodeExpColClick", "logrite.evt": evt });
 			var tNode = new dnn.controls.DNNTreeNode(node);
+			logger.error(`nodeExpColClick(evt=${evt}): tNode → ${tNode}`, { "event.action": "nodeExpColClick", "logrite.evt": evt });
 
 			var ctr = this.getChildControl(tNode.id, 'pctr');
 			if (tNode.expanded)
@@ -418,9 +486,12 @@ dnn.controls.DNNTree.prototype =
 	},
 
 	nodeCheck: function (evt) {
+		logger.error(`>>> Entering nodeCheck(evt=${evt})`, { "event.action": "nodeCheck", "logrite.evt": evt });
 		var node = this._findEventNode(evt);
 		if (node != null) {
+			logger.error(`nodeCheck(evt=${evt}): node → ${node}`, { "event.action": "nodeCheck", "logrite.evt": evt });
 			var tNode = new dnn.controls.DNNTreeNode(node);
+			logger.error(`nodeCheck(evt=${evt}): tNode → ${tNode}`, { "event.action": "nodeCheck", "logrite.evt": evt });
 			if (this.checkBoxMode == 2 && this.selTreeNode != null)
 				this.selectNode(this.selTreeNode);   //unselect node
 
@@ -429,51 +500,68 @@ dnn.controls.DNNTree.prototype =
 			if (this.checkBoxMode == 1)
 				this.selectAllChildren(tNode);
 
+		logger.warn(`<<< Exiting nodeCheck(evt=${evt})`, { "event.action": "nodeCheck", "logrite.evt": evt });
 		}
 	},
 
 	nodeTextClick: function (evt) {
+		logger.error(`>>> Entering nodeTextClick(evt=${evt})`, { "event.action": "nodeTextClick", "logrite.evt": evt });
 		var node = this._findEventNode(evt);
 		if (node != null) {
+			logger.error(`nodeTextClick(evt=${evt}): node → ${node}`, { "event.action": "nodeTextClick", "logrite.evt": evt });
 			this.selectNode(new dnn.controls.DNNTreeNode(node));
+			logger.warn(`<<< Exiting nodeTextClick(evt=${evt})`, { "event.action": "nodeTextClick", "logrite.evt": evt });
 		}
 	},
 
 	nodeTextMOver: function (evt) {
+		logger.error(`>>> Entering nodeTextMOver(evt=${evt})`, { "event.action": "nodeTextMOver", "logrite.evt": evt });
 		var node = this._findEventNode(evt);
 		if (node != null)
 			this.hoverNode(new dnn.controls.DNNTreeNode(node));
+			logger.warn(`<<< Exiting nodeTextMOver(evt=${evt})`, { "event.action": "nodeTextMOver", "logrite.evt": evt });
 	},
 
 	nodeTextMOut: function (evt) {
+		logger.error(`>>> Entering nodeTextMOut(evt=${evt})`, { "event.action": "nodeTextMOut", "logrite.evt": evt });
 		var node = this._findEventNode(evt);
 		if (node != null)
 			this.assignCss(new dnn.controls.DNNTreeNode(node));
+			logger.warn(`<<< Exiting nodeTextMOut(evt=${evt})`, { "event.action": "nodeTextMOut", "logrite.evt": evt });
 	},
 
 	dispose: function () {
+		logger.error('>>> Entering dispose()', { "event.action": "dispose" });
 		this._onsubmitDelegate = null;
 		dnn.controls.DNNTree.callBaseMethod(this, 'dispose');
+		logger.debug(`dispose(): this._onsubmitDelegate → ${this._onsubmitDelegate}`, { "event.action": "dispose" });
 	},
 
 	//--- Generates tree HTML through passed in XML DOM ---//
 	generateTreeHTML: function () {
+		logger.error('>>> Entering generateTreeHTML()', { "event.action": "generateTreeHTML" });
 		//this.debugWrite('generateTreeHTML', 'generateTreeHTML');
 		//this.rootNode = this.DOM.rootNode();
 		this.renderNode(null, this.container);
+		logger.warn('<<< Exiting generateTreeHTML()', { "event.action": "generateTreeHTML" });
 		//this.debugWrite('generateTreeHTML', 'generateTreeHTML [END]');	
 	},
 
 	renderNode: function (node, oCont, bExists) {
+		logger.error(`>>> Entering renderNode(node=${node},oCont=${oCont},bExists=${bExists})`, { "event.action": "renderNode", "logrite.node": node, "logrite.oCont": oCont, "logrite.bExists": bExists });
 		var oChildCont = oCont;
 		var tNode;
+		logger.error(`renderNode(node=${node},oCont=${oCont},bExists=${bExists}): oChildCont → ${oChildCont}`, { "event.action": "renderNode", "logrite.node": node, "logrite.oCont": oCont, "logrite.bExists": bExists });
 
 		if (bExists != true) {
 			if (node != null) {
 				//render node
 				tNode = new dnn.controls.DNNTreeNode(node);
 				var oNewContainer;
+				logger.error(`renderNode(node=${node},oCont=${oCont},bExists=${bExists}): tNode → ${tNode}`, { "event.action": "renderNode", "logrite.node": node, "logrite.oCont": oCont, "logrite.bExists": bExists });
+				logger.debug(`renderNode(node=${node},oCont=${oCont},bExists=${bExists}): tNode → ${tNode}`, { "event.action": "renderNode", "logrite.node": node, "logrite.oCont": oCont, "logrite.bExists": bExists });
 				oNewContainer = this.createChildControl('DIV', tNode.id, 'ctr'); //container for Node
+				logger.error(`renderNode(node=${node},oCont=${oCont},bExists=${bExists}): oNewContainer → ${oNewContainer}`, { "event.action": "renderNode", "logrite.node": node, "logrite.oCont": oCont, "logrite.bExists": bExists });
 				if (document.getElementById(oNewContainer.id) == null) {
 					oNewContainer.appendChild(this.renderSpacer((this.indentWidth * tNode.level) + ((tNode.hasNodes || tNode.hasPendingNodes) ? 0 : this.expImgWidth))); //indent node
 					if (tNode.hasNodes || tNode.hasPendingNodes)	//if node has children then render expand/collapse icon
@@ -483,6 +571,7 @@ dnn.controls.DNNTree.prototype =
 						oNewContainer.appendChild(this.renderCheckbox(tNode));
 
 					var oIconCont = this.renderIconCont(tNode);
+					logger.error(`renderNode(node=${node},oCont=${oCont},bExists=${bExists}): oIconCont → ${oIconCont}`, { "event.action": "renderNode", "logrite.node": node, "logrite.oCont": oCont, "logrite.bExists": bExists });
 					oNewContainer.appendChild(oIconCont);
 					if (tNode.imageIndex > -1 || tNode.image != '')	//if node has image 
 					{
@@ -517,8 +606,11 @@ dnn.controls.DNNTree.prototype =
 	},
 
 	renderExpCol: function (tNode) {
+		logger.error(`>>> Entering renderExpCol(tNode=${tNode})`, { "event.action": "renderExpCol", "logrite.tNode": tNode });
 		var img = this.createChildControl('IMG', tNode.id, 'expcol');
 		if ((tNode.hasNodes || tNode.hasPendingNodes) && this.expandImg.length) {
+			logger.error(`renderExpCol(tNode=${tNode}): img → ${img}`, { "event.action": "renderExpCol", "logrite.tNode": tNode });
+			logger.debug(`renderExpCol(tNode=${tNode}): img.src → ${img.src}`, { "event.action": "renderExpCol", "logrite.tNode": tNode });
 			if (tNode.expanded)
 				img.src = this.expandImg;
 			else
@@ -532,52 +624,74 @@ dnn.controls.DNNTree.prototype =
 		//img.onclick = dnn.dom.getObjMethRef(this, 'nodeExpColClick');
 		this.addHandlers(img, { "click": this.nodeExpColClick }, this);
 
+		logger.warn(`<<< Exiting renderExpCol(tNode=${tNode})`, { "event.action": "renderExpCol", "logrite.tNode": tNode });
 		return img;
 	},
 
 	renderIconCont: function (tNode) {
+		logger.error(`>>> Entering renderIconCont(tNode=${tNode})`, { "event.action": "renderIconCont", "logrite.tNode": tNode });
 		var span = this.createChildControl('SPAN', tNode.id, 'icnc');
 		if (tNode.cssIcon.length > 0)
 			span.className = tNode.cssIcon;
 		else if (this.cssIcon.length > 0)
 			span.className = this.cssIcon;
+			logger.debug(`renderIconCont(tNode=${tNode}): span.className → ${span.className}`, { "event.action": "renderIconCont", "logrite.tNode": tNode });
 
+		logger.warn(`<<< Exiting renderIconCont(tNode=${tNode})`, { "event.action": "renderIconCont", "logrite.tNode": tNode });
 		return span;
 	},
 
 	renderIcon: function (tNode) {
+		logger.error(`>>> Entering renderIcon(tNode=${tNode})`, { "event.action": "renderIcon", "logrite.tNode": tNode });
 		var img = this.createChildControl('IMG', tNode.id, 'icn');
 		if (tNode.image != '')
 			img.src = tNode.image;
 		else if (tNode.imageIndex > -1)
 			img.src = this.imageList[tNode.imageIndex];
 		//img.style.paddingRight = 10;	//doesn't work in IE???
+		logger.debug(`renderIcon(tNode=${tNode}): img.src → ${img.src}`, { "event.action": "renderIcon", "logrite.tNode": tNode });
 		return img;
 	},
 
 	renderCheckbox: function (tNode) {
+		logger.error(`>>> Entering renderCheckbox(tNode=${tNode})`, { "event.action": "renderCheckbox", "logrite.tNode": tNode });
 		var chk = this.createChildControl('INPUT', tNode.id, 'chk');
 		chk.type = 'checkbox';
+		logger.error(`renderCheckbox(tNode=${tNode}): chk → ${chk}`, { "event.action": "renderCheckbox", "logrite.tNode": tNode });
+		logger.debug(`renderCheckbox(tNode=${tNode}): chk.type → ${chk.type}`, { "event.action": "renderCheckbox", "logrite.tNode": tNode });
 		chk.defaultChecked = tNode.selected;
+		logger.debug(`renderCheckbox(tNode=${tNode}): chk.defaultChecked → ${chk.defaultChecked}`, { "event.action": "renderCheckbox", "logrite.tNode": tNode });
 		chk.checked = tNode.selected;
+		logger.debug(`renderCheckbox(tNode=${tNode}): chk.checked → ${chk.checked}`, { "event.action": "renderCheckbox", "logrite.tNode": tNode });
 
 		this.addHandlers(chk, { "click": this.nodeCheck }, this);
+		logger.warn(`<<< Exiting renderCheckbox(tNode=${tNode})`, { "event.action": "renderCheckbox", "logrite.tNode": tNode });
 		return chk;
 	},
 
 	renderSpacer: function (width) {
+		logger.error(`>>> Entering renderSpacer(width=${width})`, { "event.action": "renderSpacer", "logrite.width": width });
 		var img = document.createElement('IMG');
 		img.src = this.sysImgPath + 'spacer.gif';
+		logger.error(`renderSpacer(width=${width}): img → ${img}`, { "event.action": "renderSpacer", "logrite.width": width });
+		logger.debug(`renderSpacer(width=${width}): img.src → ${img.src}`, { "event.action": "renderSpacer", "logrite.width": width });
 		img.width = width;
+		logger.debug(`renderSpacer(width=${width}): img.width → ${img.width}`, { "event.action": "renderSpacer", "logrite.width": width });
 		img.height = 1;
+		logger.debug(`renderSpacer(width=${width}): img.height → ${img.height}`, { "event.action": "renderSpacer", "logrite.width": width });
 		img.style.width = width + 'px';
 		img.style.height = '1px';
+		logger.warn(`<<< Exiting renderSpacer(width=${width})`, { "event.action": "renderSpacer", "logrite.width": width });
 		return img;
 	},
 
 	renderText: function (tNode) {
+		logger.error(`>>> Entering renderText(tNode=${tNode})`, { "event.action": "renderText", "logrite.tNode": tNode });
 		var span = this.createChildControl('SPAN', tNode.id, 't');
 		span.innerHTML = tNode.text;
+		logger.error(`renderText(tNode=${tNode}): span → ${span}`, { "event.action": "renderText", "logrite.tNode": tNode });
+		logger.debug(`renderText(tNode=${tNode}): span.innerHTML → ${span.innerHTML}`, { "event.action": "renderText", "logrite.tNode": tNode });
+		logger.debug(`renderText(tNode=${tNode}): span.title → ${span.title}`, { "event.action": "renderText", "logrite.tNode": tNode });
 		span.style.cursor = 'pointer';
 
 		if (tNode.toolTip.length > 0)
@@ -603,23 +717,33 @@ dnn.controls.DNNTree.prototype =
 		if (tNode.selected) {
 			this.selTreeNode = tNode;
 			this.hoverTreeNode = tNode;
+			logger.debug(`renderText(tNode=${tNode}): this.selTreeNode → ${this.selTreeNode}`, { "event.action": "renderText", "logrite.tNode": tNode });
 		}
 
+		logger.debug(`renderText(tNode=${tNode}): this.hoverTreeNode → ${this.hoverTreeNode}`, { "event.action": "renderText", "logrite.tNode": tNode });
+		logger.warn(`<<< Exiting renderText(tNode=${tNode})`, { "event.action": "renderText", "logrite.tNode": tNode });
 		return span;
 	},
 
 	_findEventNode: function (evt) {
+		logger.error(`>>> Entering _findEventNode(evt=${evt})`, { "event.action": "_findEventNode", "logrite.evt": evt });
+		logger.warn(`<<< Exiting _findEventNode(evt=${evt})`, { "event.action": "_findEventNode", "logrite.evt": evt });
 		return this.rootNode.findNode(this.getChildControlBaseId(evt.target));
 	},
 
 	_loadNodes: function () {
+		logger.error('>>> Entering _loadNodes()', { "event.action": "_loadNodes" });
 		var json = dnn.evalJSON(dnn.getVar(this.ns + '_json'));
 		if (json) {
+			logger.error(`_loadNodes(): json → ${json}`, { "event.action": "_loadNodes" });
 			this.nodes = json.nodes;
 			this.rootNode = {};
+			logger.debug(`_loadNodes(): this.nodes → ${this.nodes}`, { "event.action": "_loadNodes" });
 			this.rootNode.nodes = this.nodes;
 			this.rootNode.id = this.ns;
 			this.rootNode = new dnn.controls.JSONNode(this.rootNode, 'root', 0);
+			logger.debug(`_loadNodes(): this.rootNode → ${this.rootNode}`, { "event.action": "_loadNodes" });
+			logger.warn('<<< Exiting _loadNodes()', { "event.action": "_loadNodes" });
 		}
 	}
 
@@ -694,6 +818,7 @@ dnn.controls.DNNTree.prototype =
 {
     childNodes: function(iIndex)
     {
+		logger.error(`>>> Entering childNodes(iIndex=${iIndex})`, { "event.action": "childNodes", "logrite.iIndex": iIndex });
         if (this.node.childNodes(iIndex) != null)
             return new dnn.controls.DNNTreeNode(this.node.childNodes(iIndex));
     }
@@ -709,17 +834,25 @@ dnn.controls.DNNTree.prototype =
 
     function __dt_DNNTreeNode(ctl)
     {
+		logger.error(`>>> Entering __dt_DNNTreeNode(ctl=${ctl})`, { "event.action": "__dt_DNNTreeNode", "logrite.ctl": ctl });
         var node = dnn.controls.controls[ctl.ns].rootNode.findNode(ctl.nodeid);
+		logger.error(`__dt_DNNTreeNode(ctl=${ctl}): node → ${node}`, { "event.action": "__dt_DNNTreeNode", "logrite.ctl": ctl });
         if (node != null)
         {
             var tNode = new dnn.controls.DNNTreeNode(node);
+			logger.error(`__dt_DNNTreeNode(ctl=${ctl}): tNode → ${tNode}`, { "event.action": "__dt_DNNTreeNode", "logrite.ctl": ctl });
 
             this.ctl = ctl;
             this.id = ctl.id;
+			logger.debug(`__dt_DNNTreeNode(ctl=${ctl}): ctl → ${ctl}`, { "event.action": "__dt_DNNTreeNode", "logrite.ctl": ctl });
+			logger.debug(`__dt_DNNTreeNode(ctl=${ctl}): this.ctl → ${this.ctl}`, { "event.action": "__dt_DNNTreeNode", "logrite.ctl": ctl });
+			logger.debug(`__dt_DNNTreeNode(ctl=${ctl}): this.id → ${this.id}`, { "event.action": "__dt_DNNTreeNode", "logrite.ctl": ctl });
             this.key = tNode.key;
             this.nodeID = ctl.nodeid; //trim off t
             this.text = tNode.text;
             this.serverName = ctl.name;
+			logger.debug(`__dt_DNNTreeNode(ctl=${ctl}): this.key → ${this.key}`, { "event.action": "__dt_DNNTreeNode", "logrite.ctl": ctl });
+			logger.debug(`__dt_DNNTreeNode(ctl=${ctl}): this.nodeID → ${this.nodeID}`, { "event.action": "__dt_DNNTreeNode", "logrite.ctl": ctl });
         }
     }
 

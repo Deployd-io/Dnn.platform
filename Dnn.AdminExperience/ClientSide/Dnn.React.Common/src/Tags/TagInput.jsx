@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+const logger = console;
 
 const KEY = {
     BACKSPACE: 8,
@@ -13,10 +14,13 @@ const KEY = {
 export default class TagInput extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.handleClick = this.handleClick.bind(this);
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     handleClick(e) {
+		logger.error(`>>> Entering handleClick(e=${e})`, { "event.action": "handleClick", "logrite.e": e });
         if (!this.props.container || this.props.container.contains(e.target)) {
             return;
         }   
@@ -26,21 +30,28 @@ export default class TagInput extends Component {
         }
         
         this.close();
+		logger.warn(`<<< Exiting handleClick(e=${e})`, { "event.action": "handleClick", "logrite.e": e });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.focusInput();
         document.addEventListener("click", this.handleClick, true);
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         this.close();
         document.removeEventListener("click", this.handleClick, true);
+		logger.warn('<<< Exiting componentWillUnmount()', { "event.action": "componentWillUnmount" });
     }
 
     addTag(tag) {
+		logger.error(`>>> Entering addTag(tag=${tag})`, { "event.action": "addTag", "logrite.tag": tag });
         this.props.addTag(tag);
         this.inputField.focus();
+		logger.warn(`<<< Exiting addTag(tag=${tag})`, { "event.action": "addTag", "logrite.tag": tag });
     }
 
     onChange(event) {
@@ -48,14 +59,18 @@ export default class TagInput extends Component {
     }
 
     close() {
+		logger.error('>>> Entering close()', { "event.action": "close" });
         this.props.onClose();
+		logger.warn('<<< Exiting close()', { "event.action": "close" });
     }
 
     removeLastTag() {
+		logger.error('>>> Entering removeLastTag()', { "event.action": "removeLastTag" });
         if (this.props.newTagText) {
             return;
         }
         this.props.removeLastTag();
+		logger.warn('<<< Exiting removeLastTag()', { "event.action": "removeLastTag" });
     }
 
     onKeyDown(event) {
@@ -84,14 +99,18 @@ export default class TagInput extends Component {
     }
 
     focusInput() {
+		logger.error('>>> Entering focusInput()', { "event.action": "focusInput" });
         if (typeof(this.props.onFocus) === "function") {
             this.props.onFocus(this.props.newTagText);
+			logger.warn('<<< Exiting focusInput()', { "event.action": "focusInput" });
         }
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {opts} = this.props;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <div className="input-container">

@@ -30,6 +30,7 @@ namespace DotNetNuke.Modules.MemberDirectory
     [PresenterBinding(typeof(ModuleSettingsPresenter))]
     public partial class Settings : SettingsView<MemberDirectorySettingsModel>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Settings.ascx));
         public const int DefaultPageSize = 20;
 
         private static string templatePath = "~/DesktopModules/MemberDirectory/Templates/";
@@ -81,7 +82,9 @@ namespace DotNetNuke.Modules.MemberDirectory
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
 
             this.AutoDataBind = false;
         }
@@ -89,6 +92,7 @@ namespace DotNetNuke.Modules.MemberDirectory
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             if (!this.IsPostBack)
@@ -110,8 +114,10 @@ namespace DotNetNuke.Modules.MemberDirectory
                 }
 
                 var profileResourceFile = "~/DesktopModules/Admin/Security/App_LocalResources/Profile.ascx";
+				Logger.LogError("OnLoad(e={E}): profileResourceFile → {ProfileResourceFile}", e, profileResourceFile);
 
                 System.Web.UI.WebControls.ListItemCollection propertiesCollection = this.GetPropertiesCollection(profileResourceFile);
+				Logger.LogError("OnLoad(e={E}): propertiesCollection → {PropertiesCollection}", e, propertiesCollection);
 
                 // Bind the ListItemCollection to the list
                 this.propertyList.DataSource = propertiesCollection;
@@ -159,11 +165,13 @@ namespace DotNetNuke.Modules.MemberDirectory
 
                 this.ExcludeHostUsersCheckBox.Checked = bool.Parse(this.GetTabModuleSetting("ExcludeHostUsers", "false"));
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnSettingsLoaded()
         {
+			Logger.LogError(">>> Entering OnSettingsLoaded()");
             base.OnSettingsLoaded();
 
             if (!this.IsPostBack)
@@ -186,17 +194,20 @@ namespace DotNetNuke.Modules.MemberDirectory
                 this.pageSize.Text = this.GetTabModuleSetting("PageSize", DefaultPageSize.ToString(CultureInfo.InvariantCulture));
                 this.disablePager.Checked = bool.Parse(this.GetTabModuleSetting("DisablePaging", "False"));
             }
+			Logger.LogWarning("<<< Exiting OnSettingsLoaded()");
         }
 
         /// <inheritdoc />
         protected override void OnSavingSettings()
         {
+			Logger.LogError(">>> Entering OnSavingSettings()");
             this.Model.TabModuleSettings["ItemTemplate"] = this.itemTemplate.Text;
             this.Model.TabModuleSettings["AlternateItemTemplate"] = this.alternateItemTemplate.Text;
             this.Model.TabModuleSettings["PopUpTemplate"] = this.popUpTemplate.Text;
             this.Model.TabModuleSettings["EnablePopUp"] = this.enablePopUp.Checked.ToString(CultureInfo.InvariantCulture);
 
             this.filterBy = this.filterBySelector.SelectedValue;
+			Logger.LogDebug("OnSavingSettings(): this.filterBy → {Arg0}", this.filterBy);
             this.Model.ModuleSettings["FilterBy"] = this.filterBy;
 
             switch (this.filterBy)
@@ -229,33 +240,43 @@ namespace DotNetNuke.Modules.MemberDirectory
             this.Model.TabModuleSettings["ExcludeHostUsers"] = this.ExcludeHostUsersCheckBox.Checked.ToString(CultureInfo.InvariantCulture);
 
             base.OnSavingSettings();
+			Logger.LogWarning("<<< Exiting OnSavingSettings()");
         }
 
         private ListItemCollection GetPropertiesCollection(string profileResourceFile)
         {
+			Logger.LogError(">>> Entering GetPropertiesCollection(profileResourceFile={ProfileResourceFile})", profileResourceFile);
             var result = new ListItemCollection();
+			Logger.LogError("GetPropertiesCollection(profileResourceFile={ProfileResourceFile}): result → {Result}", profileResourceFile, result);
             foreach (var property in this.Model.ProfileProperties)
             {
                 result.Add(new ListItem(this.GetLocalizeName(property.PropertyName, profileResourceFile), property.PropertyName));
             }
 
+			Logger.LogWarning("<<< Exiting GetPropertiesCollection(profileResourceFile={ProfileResourceFile})", profileResourceFile);
             return result;
         }
 
         private string GetLocalizeName(string propertyName, string resourceFile)
         {
+			Logger.LogError(">>> Entering GetLocalizeName(propertyName={PropertyName},resourceFile={ResourceFile})", propertyName, resourceFile);
             var name = Localization.GetString("ProfileProperties_" + propertyName, resourceFile);
+			Logger.LogError("GetLocalizeName(propertyName={PropertyName},resourceFile={ResourceFile}): name → {Name}", propertyName, resourceFile, name);
+			Logger.LogWarning("<<< Exiting GetLocalizeName(propertyName={PropertyName},resourceFile={ResourceFile})", propertyName, resourceFile);
             return string.IsNullOrEmpty(name) ? propertyName : name.Trim(':');
         }
 
         private void BindSortList()
         {
+			Logger.LogError(">>> Entering BindSortList()");
             this.sortFieldList.Items.Add(this.AddSearchItem("UserId"));
             this.sortFieldList.Items.Add(this.AddSearchItem("LastName"));
             this.sortFieldList.Items.Add(this.AddSearchItem("DisplayName"));
             this.sortFieldList.Items.Add(this.AddSearchItem("CreatedOnDate", "DateCreated"));
             var controller = new ListController();
+			Logger.LogError("BindSortList(): controller → {Controller}", controller);
             var imageDataType = controller.GetListEntryInfo("DataType", "Image");
+			Logger.LogError("BindSortList(): imageDataType → {ImageDataType}", imageDataType);
             foreach (ProfilePropertyDefinition definition in this.Model.ProfileProperties)
             {
                 if (imageDataType != null && definition.DataType != imageDataType.EntryID)
@@ -263,10 +284,14 @@ namespace DotNetNuke.Modules.MemberDirectory
                     this.sortFieldList.Items.Add(this.AddSearchItem(definition.PropertyName));
                 }
             }
+			Logger.LogWarning("<<< Exiting BindSortList()");
         }
 
         private ListItem AddSearchItem(string name)
         {
+			Logger.LogError(">>> Entering AddSearchItem(name={Name})", name);
+			Logger.LogWarning("<<< Exiting AddSearchItem(name={Name})", name);
+			Logger.LogWarning("<<< Exiting AddSearchItem(name={Name},resourceKey={ResourceKey})", name, resourceKey);
             return this.AddSearchItem(name, name);
         }
 

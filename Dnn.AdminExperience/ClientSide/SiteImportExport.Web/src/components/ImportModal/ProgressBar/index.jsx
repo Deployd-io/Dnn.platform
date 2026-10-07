@@ -6,29 +6,37 @@ import {
 } from "actions";
 import { Line } from "rc-progress";
 import "./style.less";
+const logger = console;
 
 class ProgressBar extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
 
         this.timeout = "";
         this.started = false;
+		logger.debug(`constructor(): this.timeout → ${this.timeout}`, { "event.action": "constructor" });
         this.state = {
             percent: 0
         };
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.started = true;
         this.increase();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         clearTimeout(this.timeout);
         this.setState({ percent: 0 });
+		logger.warn('<<< Exiting componentWillUnmount()', { "event.action": "componentWillUnmount" });
     }
 
     componentDidUpdate() {
+		logger.error('>>> Entering componentDidUpdate()', { "event.action": "componentDidUpdate" });
         let { props } = this;
         if (props.visible !== undefined) {
 
@@ -42,11 +50,13 @@ class ProgressBar extends Component {
                 this.started = true;
                 this.setState({ percent: 0 });
                 this.increase();
+				logger.warn('<<< Exiting componentDidUpdate()', { "event.action": "componentDidUpdate" });
             }
         }
     }
 
     increase() {
+		logger.error('>>> Entering increase()', { "event.action": "increase" });
         if (this.state.percent > 95) {
             //clearTimeout(this.timeout);
             this.setState({ percent: 0 });
@@ -70,11 +80,15 @@ class ProgressBar extends Component {
         this.timeout = setTimeout(() => {
             this.increase();
         }, 200);
+		logger.warn('<<< Exiting increase()', { "event.action": "increase" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let visibility = this.props.visible ? "block" : "none";
 
+		logger.error(`render(): visibility → ${visibility}`, { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div id="progressContainer" className={this.props.className} style={{ display: visibility }}>
                 <Line
@@ -97,6 +111,8 @@ ProgressBar.propTypes = {
 };
 
 function mapStateToProps() {
+	logger.error('>>> Entering mapStateToProps()', { "event.action": "mapStateToProps" });
+	logger.warn('<<< Exiting mapStateToProps()', { "event.action": "mapStateToProps" });
     return {};
 }
 

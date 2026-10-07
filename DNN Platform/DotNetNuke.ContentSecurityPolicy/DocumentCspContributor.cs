@@ -7,12 +7,14 @@ namespace DotNetNuke.ContentSecurityPolicy
     using System;
     using System.Linq;
     using System.Text.RegularExpressions;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Contributor for document-level directives.
     /// </summary>
     public class DocumentCspContributor : BaseCspContributor
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Compiled regex for validating MIME type format (type/subtype).
         /// </summary>
@@ -32,7 +34,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="checkSyntax">Check syntax of value.</param>
         public DocumentCspContributor(CspDirectiveType directiveType, string value, bool checkSyntax)
         {
+			_logger.LogError(">>> Entering DocumentCspContributor(directiveType={DirectiveType},value={Value},checkSyntax={CheckSyntax})", directiveType, value, checkSyntax);
             this.checkSyntax = checkSyntax;
+			_logger.LogDebug("DocumentCspContributor(directiveType={DirectiveType},value={Value},checkSyntax={CheckSyntax}): this.checkSyntax → {Arg3}", directiveType, value, checkSyntax, this.checkSyntax);
             this.DirectiveType = directiveType;
             this.DirectiveValue = value;
         }
@@ -64,6 +68,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The directive string.</returns>
         public override string GenerateDirective()
         {
+			_logger.LogError(">>> Entering GenerateDirective()");
             if (this.DirectiveType == CspDirectiveType.UpgradeInsecureRequests)
             {
                 return $"{CspDirectiveNameMapper.GetDirectiveName(this.DirectiveType)}";
@@ -74,6 +79,7 @@ namespace DotNetNuke.ContentSecurityPolicy
                 return string.Empty;
             }
 
+			_logger.LogWarning("<<< Exiting GenerateDirective()");
             return $"{CspDirectiveNameMapper.GetDirectiveName(this.DirectiveType)} {this.DirectiveValue}";
         }
 
@@ -82,17 +88,21 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private static void ValidatePluginTypes(string value)
         {
+			_logger.LogError(">>> Entering ValidatePluginTypes(value={Value})", value);
             if (string.IsNullOrWhiteSpace(value))
             {
+				_logger.LogError("Throwing ArgumentException from ValidatePluginTypes(value={Value})", value);
                 throw new ArgumentException("Plugin types cannot be empty");
             }
 
             var types = value.Split(SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
+			_logger.LogError("ValidatePluginTypes(value={Value}): types → {Types}", value, types);
 
             if (types.Any(t => !MimeTypeRegex.IsMatch(t)))
             {
                 throw new ArgumentException($"Invalid MIME type format: {value}");
             }
+			_logger.LogWarning("<<< Exiting ValidatePluginTypes(value={Value})", value);
         }
 
         /// <summary>
@@ -100,6 +110,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private static void ValidateSandboxDirective(string value)
         {
+			_logger.LogError(">>> Entering ValidateSandboxDirective(value={Value})", value);
             var validSandboxValues = new string[]
             {
                 "allow-forms",
@@ -116,11 +127,14 @@ namespace DotNetNuke.ContentSecurityPolicy
             };
 
             var values = value.Split(SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
+			_logger.LogError("ValidateSandboxDirective(value={Value}): values → {Values}", value, values);
 
             if (values.Any(v => !validSandboxValues.Contains(v)))
             {
+				_logger.LogError("Throwing ArgumentException from ValidateSandboxDirective(value={Value})", value);
                 throw new ArgumentException($"Invalid sandbox directive value: {value}");
             }
+			_logger.LogWarning("<<< Exiting ValidateSandboxDirective(value={Value})", value);
         }
 
         /// <summary>
@@ -128,6 +142,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private static void ValidateDirectiveValue(CspDirectiveType type, string value)
         {
+			_logger.LogError(">>> Entering ValidateDirectiveValue(type={Type},value={Value})", type, value);
             switch (type)
             {
                 case CspDirectiveType.PluginTypes:
@@ -137,6 +152,7 @@ namespace DotNetNuke.ContentSecurityPolicy
                     ValidateSandboxDirective(value);
                     break;
             }
+			_logger.LogWarning("<<< Exiting ValidateDirectiveValue(type={Type},value={Value})", type, value);
         }
     }
 }

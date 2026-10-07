@@ -1,4 +1,5 @@
-﻿(function ($, dnn) {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+(function ($, dnn) {
     if (typeof dnn == 'undefined' || dnn == null) dnn = {};
     dnn.searchResult = {};
 
@@ -37,6 +38,7 @@
     dnn.searchResult.service = null;
 
     dnn.searchResult.queryUrl = function () {
+		logger.error('>>> Entering queryUrl()', { "event.action": "queryUrl" });
         if (!dnn.searchResult.service)
             dnn.searchResult.service = $.dnnSF ? $.dnnSF(dnn.searchResult.moduleId) : null;
 
@@ -49,7 +51,9 @@
         var params = {};
         var query = dnn.searchResult.queryOptions;
         var advancedQuery = query.advancedTerm ? ' ' + query.advancedTerm : '';
+		logger.error(`queryUrl(): advancedQuery → ${advancedQuery}`, { "event.action": "queryUrl" });
         var queryString = query.searchTerm ? query.searchTerm.replace(/^\s+|\s+$/g, '') + advancedQuery : query.advancedTerm;
+		logger.error(`queryUrl(): queryString → ${queryString}`, { "event.action": "queryUrl" });
 
         params['search'] = queryString;
         params['pageIndex'] = query.pageIndex;
@@ -64,16 +68,20 @@
 
         if (urlAppend.length) {
             url += url.indexOf('?') === -1 ? '?' : '&';
+			logger.error(`queryUrl(): url → ${url}`, { "event.action": "queryUrl" });
             url += urlAppend.join('&');
         }
+		logger.warn('<<< Exiting queryUrl()', { "event.action": "queryUrl" });
         return url;
     };
     
     dnn.searchResult.renderPager = function (totalHits, pageIndex, more) {
+		logger.error(`>>> Entering renderPager(totalHits=${totalHits},pageIndex=${pageIndex},more=${more})`, { "event.action": "renderPager", "logrite.totalHits": totalHits, "logrite.pageIndex": pageIndex, "logrite.more": more });
         // render
         $('.dnnSearchResultPager').show();
         $('.dnnSearchResultPager > .dnnLeft > span').html(dnn.searchResult.defaultSettings.resultsCountText.replace('{0}', totalHits));
         var pager = '';
+		logger.error(`renderPager(totalHits=${totalHits},pageIndex=${pageIndex},more=${more}): pager → ${pager}`, { "event.action": "renderPager", "logrite.totalHits": totalHits, "logrite.pageIndex": pageIndex, "logrite.more": more });
 
         if (pageIndex > 1 || more) {
             
@@ -104,13 +112,16 @@
                 dnn.searchResult.queryOptions.pageIndex++;
 
             dnn.searchResult.doSearch();
+		logger.warn(`<<< Exiting renderPager(totalHits=${totalHits},pageIndex=${pageIndex},more=${more})`, { "event.action": "renderPager", "logrite.totalHits": totalHits, "logrite.pageIndex": pageIndex, "logrite.more": more });
             return false;
         });
     };
 
     dnn.searchResult.renderResult = function(data, renderUrl) {
+		logger.error(`>>> Entering renderResult(data=${data},renderUrl=${renderUrl})`, { "event.action": "renderResult", "logrite.data": data, "logrite.renderUrl": renderUrl });
         var markup = '';
         markup += '<div class="dnnSearchResultItem-Title">';
+		logger.error(`renderResult(data=${data},renderUrl=${renderUrl}): markup → ${markup}`, { "event.action": "renderResult", "logrite.data": data, "logrite.renderUrl": renderUrl });
         markup += '<a href="' + data.DocumentUrl + '"' + dnn.searchResult.defaultSettings.linkTarget + '>' + data.Title + '</a></div>';
         if(renderUrl)
             markup += '<div class="dnnSearchResultItem-Link"><a href="' + data.DocumentUrl + '"' + dnn.searchResult.defaultSettings.linkTarget + '>' + data.DocumentUrl + '</a></div>';
@@ -123,6 +134,7 @@
 
         if (showDescription && data.Description) {
             var description = $.trim(data.Description);
+			logger.error(`renderResult(data=${data},renderUrl=${renderUrl}): description → ${description}`, { "event.action": "renderResult", "logrite.data": data, "logrite.renderUrl": renderUrl });
             var maxDescriptionLength = dnn.searchResult.defaultSettings.maxDescriptionLength;
             if (description.length > maxDescriptionLength) {
                 description = description.substr(0, maxDescriptionLength) + "...";
@@ -166,17 +178,22 @@
         
         markup += '</div>';
 
+		logger.warn(`<<< Exiting renderResult(data=${data},renderUrl=${renderUrl})`, { "event.action": "renderResult", "logrite.data": data, "logrite.renderUrl": renderUrl });
         return markup;
     };
     
     dnn.searchResult.renderResults = function (data) {
+	logger.error(`>>> Entering renderResults(data=${data})`, { "event.action": "renderResults", "logrite.data": data });
 
         var markup = '', totalHits = 0;
+		logger.error(`renderResults(data=${data}): markup → ${markup}`, { "event.action": "renderResults", "logrite.data": data });
         if (data && data.results && data.results.length) {
             var results = data.results;
+			logger.error(`renderResults(data=${data}): results → ${results}`, { "event.action": "renderResults", "logrite.data": data });
             totalHits = data.totalHits;
             for (var i = 0; i < results.length; i++) {
                 var result = results[i];
+				logger.error(`renderResults(data=${data}): result → ${result}`, { "event.action": "renderResults", "logrite.data": data });
                 if (result.Results.length > 1) {
                     // grouped
                     var groupedTitle = result.Title;
@@ -239,20 +256,27 @@
         } else {
             $('.dnnSearchResultPager').hide();
         }
+		logger.warn(`<<< Exiting renderResults(data=${data})`, { "event.action": "renderResults", "logrite.data": data });
     };
 
 	dnn.searchResult.parseLocationInfo = function() {
+		logger.error('>>> Entering parseLocationInfo()', { "event.action": "parseLocationInfo" });
 	    var query = location.search.substring(1);
 	    var path = location.href.replace(location.search, '');
+		logger.error(`parseLocationInfo(): query → ${query}`, { "event.action": "parseLocationInfo" });
+		logger.error(`parseLocationInfo(): path → ${path}`, { "event.action": "parseLocationInfo" });
 	    var queries = {};
 		var vars = query.split("&");
+		logger.error(`parseLocationInfo(): vars → ${vars}`, { "event.action": "parseLocationInfo" });
 		for (var i = 0; i < vars.length; i++) {
 		    var pair = vars[i].split("=");
+			logger.error(`parseLocationInfo(): pair → ${pair}`, { "event.action": "parseLocationInfo" });
 			if (pair.length === 2) {
 			    var value = pair[1];
 			    queries['qs-' + pair[0].toLowerCase()] = unescape(value);
 			}
 		}
+		logger.warn('<<< Exiting parseLocationInfo()', { "event.action": "parseLocationInfo" });
 		return {
 		    path: path,
             queries: queries
@@ -260,10 +284,12 @@
 	};
 
     dnn.searchResult.buildLocationInfo = function(info) {
+		logger.error(`>>> Entering buildLocationInfo(info=${info})`, { "event.action": "buildLocationInfo", "logrite.info": info });
         var path = info.path;
         for (var name in info.queries) {
             if (name.indexOf('qs-') > -1 && info.queries[name]) {
                 var param = name.substr(3) + '=' + info.queries[name];
+				logger.error(`buildLocationInfo(info=${info}): param → ${param}`, { "event.action": "buildLocationInfo", "logrite.info": info });
                 if (path.indexOf('?') === -1) {
                     path += '?' + param;
                 } else {
@@ -272,10 +298,12 @@
             }
         }
 
+		logger.warn(`<<< Exiting buildLocationInfo(info=${info})`, { "event.action": "buildLocationInfo", "logrite.info": info });
         return path;
     };
 
 	dnn.searchResult.pushHistoryState = function () {
+		logger.error('>>> Entering pushHistoryState()', { "event.action": "pushHistoryState" });
 		if (!dnn.searchResult.catchHistoryState) {
 			return;
 		}
@@ -287,6 +315,7 @@
         }
 
         var locationInfo = dnn.searchResult.parseLocationInfo();
+		logger.error(`pushHistoryState(): locationInfo → ${locationInfo}`, { "event.action": "pushHistoryState" });
         var queries = locationInfo.queries;
 	    var urlChanged = false;
 	    if (queries['qs-search'] !== keyword) {
@@ -297,6 +326,7 @@
 	    var tags = dnn.searchResult.advancedSearchOptions.tags;
         if (tags && tags.length) {
             var tagsString = '';
+			logger.error(`pushHistoryState(): tagsString → ${tagsString}`, { "event.action": "pushHistoryState" });
             for (var i = 0; i < tags.length; i++) {
                 if (tagsString)
                     tagsString += ',';
@@ -326,6 +356,7 @@
 	    var types = dnn.searchResult.advancedSearchOptions.types;
 	    if (types && types.length) {
 	        var typesString = types.join(',');
+			logger.error(`pushHistoryState(): typesString → ${typesString}`, { "event.action": "pushHistoryState" });
 	        if (queries['qs-scope'] !== typesString) {
 	            queries['qs-scope'] = typesString;
                 urlChanged = true;
@@ -382,10 +413,12 @@
         if (urlChanged) {
 	        var url = dnn.searchResult.buildLocationInfo(locationInfo);
 	        history.pushState({searchState: true}, "Search", url);
+			logger.error(`pushHistoryState(): url → ${url}`, { "event.action": "pushHistoryState" });
 	    }
 	}
 
     dnn.searchResult.doSearch = function () {
+		logger.error('>>> Entering doSearch()', { "event.action": "doSearch" });
         var sterm = dnn.searchResult.queryOptions.searchTerm;
         var advancedTerm = dnn.searchResult.queryOptions.advancedTerm;
         if ((!sterm || $.trim(sterm).length <= 1) && (!advancedTerm || $.trim(advancedTerm).length <= 1)) {
@@ -395,28 +428,37 @@
         dnn.searchResult.addLoading();
 
         var url = dnn.searchResult.queryUrl();
+		logger.error(`doSearch(): url → ${url}`, { "event.action": "doSearch" });
         if (url) {
             $.ajax({
                 url: url,
                 beforeSend: dnn.searchResult.service.setModuleHeaders,
                 success: function (results) {
+					logger.error(`>>> Entering success(results=${results})`, { "event.action": "success", "logrite.results": results });
                     dnn.searchResult.renderResults(results);
 	                dnn.searchResult.pushHistoryState();
+					logger.warn(`<<< Exiting success(results=${results})`, { "event.action": "success", "logrite.results": results });
                 },
                 complete: function () {
+					logger.error('>>> Entering complete()', { "event.action": "complete" });
                     dnn.searchResult.removeLoading();
+					logger.warn('<<< Exiting complete()', { "event.action": "complete" });
                 },
                 type: 'GET',
                 dataType: 'json',
                 contentType: "application/json"
             });
         }
+		logger.warn('<<< Exiting doSearch()', { "event.action": "doSearch" });
     };
 
     dnn.searchResult.generateAdvancedSearchTerm = function () {
+		logger.error('>>> Entering generateAdvancedSearchTerm()', { "event.action": "generateAdvancedSearchTerm" });
         // clean term first
         var term = $('#dnnSearchResult_dnnSearchBox_input').val();
+		logger.error(`generateAdvancedSearchTerm(): term → ${term}`, { "event.action": "generateAdvancedSearchTerm" });
         var advancedTerm = "";
+		logger.error(`generateAdvancedSearchTerm(): advancedTerm → ${advancedTerm}`, { "event.action": "generateAdvancedSearchTerm" });
         term = term
                 .replace(/\"/gi, '')
                 .replace(/^\s+|\s+$/g, '');
@@ -452,8 +494,11 @@
         dnn.searchResult.queryOptions.searchTerm = term;
 
         var advancedTextCtrl = $('#dnnSearchResult_dnnSearchBox_input').prev().prev();
+		logger.error(`generateAdvancedSearchTerm(): advancedTextCtrl → ${advancedTextCtrl}`, { "event.action": "generateAdvancedSearchTerm" });
         var advancedTextClear = $('#dnnSearchResult_dnnSearchBox_input').prev();
+		logger.error(`generateAdvancedSearchTerm(): advancedTextClear → ${advancedTextClear}`, { "event.action": "generateAdvancedSearchTerm" });
         var wrapWidth = $('#dnnSearchResult_dnnSearchBox_input').parent().width();
+		logger.error(`generateAdvancedSearchTerm(): wrapWidth → ${wrapWidth}`, { "event.action": "generateAdvancedSearchTerm" });
 
         if (advancedTerm) {
             advancedTextCtrl.show();
@@ -469,6 +514,8 @@
                 left: w + 20
             });
         } else {
+			logger.error(`generateAdvancedSearchTerm(): htmlAdvancedTerm → ${htmlAdvancedTerm}`, { "event.action": "generateAdvancedSearchTerm" });
+			logger.error(`generateAdvancedSearchTerm(): w → ${w}`, { "event.action": "generateAdvancedSearchTerm" });
             advancedTextCtrl.html('').hide();
             var w1 = $('#dnnSearchResult_dnnSearchBox_input').next().next().next().width();
             $('#dnnSearchResult_dnnSearchBox_input').css({
@@ -480,32 +527,42 @@
                 right: w1 + 35
             });
             advancedTextClear.removeClass('dnnShow');
+			logger.error(`generateAdvancedSearchTerm(): w1 → ${w1}`, { "event.action": "generateAdvancedSearchTerm" });
         }
 
         if (term) {
             $('#dnnSearchResult_dnnSearchBox_input').next().addClass('dnnShow');
         } else {
             $('#dnnSearchResult_dnnSearchBox_input').next().removeClass('dnnShow');
+			logger.warn('<<< Exiting generateAdvancedSearchTerm()', { "event.action": "generateAdvancedSearchTerm" });
         }
     };
 
     dnn.searchResult.addLoading = function () {
+		logger.error('>>> Entering addLoading()', { "event.action": "addLoading" });
         var resultContainer = $('.dnnSearchResultContainer');
         var h = resultContainer.outerHeight(), w = resultContainer.outerWidth();
+		logger.error(`addLoading(): resultContainer → ${resultContainer}`, { "event.action": "addLoading" });
+		logger.error(`addLoading(): h → ${h}`, { "event.action": "addLoading" });
         var loading = $('.dnnSearchLoading');
         if (loading.length == 0) {
             loading = $('<div class="dnnSearchLoading"></div>');
+			logger.error(`addLoading(): loading → ${loading}`, { "event.action": "addLoading" });
             loading.insertBefore(resultContainer);
         }
 
         loading.css({ width: w, height: h });
+		logger.warn('<<< Exiting addLoading()', { "event.action": "addLoading" });
     };
 
     dnn.searchResult.removeLoading = function () {
+		logger.error('>>> Entering removeLoading()', { "event.action": "removeLoading" });
         $('.dnnSearchLoading').remove();
+		logger.warn('<<< Exiting removeLoading()', { "event.action": "removeLoading" });
     };
 
     dnn.searchResult.init = function (settings) {
+	logger.error(`>>> Entering init(settings=${settings})`, { "event.action": "init", "logrite.settings": settings });
 
     	dnn.searchResult.defaultSettings = $.extend(dnn.searchResult.defaultSettings, settings);
     	dnn.searchResult.catchHistoryState = typeof history.pushState !== "undefined";
@@ -531,13 +588,17 @@
             enablePreview: false,
             refreshSearchResult: true,
             beforeRefreshSearchResult: function () {
+				logger.error('>>> Entering beforeRefreshSearchResult()', { "event.action": "beforeRefreshSearchResult" });
                 $('#dnnSearchResult-advancedTipContainer').slideUp('fast');
+				logger.warn('<<< Exiting beforeRefreshSearchResult()', { "event.action": "beforeRefreshSearchResult" });
             },
             moduleId: dnn.searchResult.moduleId,
             searchFunction: function (val) {
+				logger.error(`>>> Entering searchFunction(val=${val})`, { "event.action": "searchFunction", "logrite.val": val });
                 dnn.searchResult.queryOptions.searchTerm = val;
                 dnn.searchResult.queryOptions.pageIndex = 1;
                 dnn.searchResult.doSearch();
+				logger.warn(`<<< Exiting searchFunction(val=${val})`, { "event.action": "searchFunction", "logrite.val": val });
             }
         });
 
@@ -680,6 +741,7 @@
         }
 
         setTimeout(function() { $('#dnnSearchResultAdvancedSearch').trigger("click", [true]); }, 0);
+		logger.warn(`<<< Exiting init(settings=${settings})`, { "event.action": "init", "logrite.settings": settings });
     };
 
 })(jQuery, dnn);

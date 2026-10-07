@@ -1,5 +1,7 @@
-﻿(function ($, window) {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+(function ($, window) {
     $.fn.journalEditor = function (options) {
+		logger.error(`>>> Entering journalEditor(options=${options})`, { "event.action": "journalEditor", "logrite.options": options });
         $.fn.journalEditor.defaultOptions = {
             buttonSelector: 'button',
             closeSelector: '.close',
@@ -19,6 +21,7 @@
             $menu = $("<ul class='jacmenu'></ul>"),
             $tokens = opts.tokens,
             $id = $(this).attr('id');
+			logger.error(`journalEditor(options=${options}): opts → ${opts}`, { "event.action": "journalEditor", "logrite.options": options });
 
         var savedRange = null;
         var triggerPos = 0;
@@ -36,6 +39,7 @@
             COMMA: 188
         };
         $wrap.on("mouseup", function () {
+			logger.error(`journalEditor(options=${options}): KEY → ${KEY}`, { "event.action": "journalEditor", "logrite.options": options });
             saveSelection();
         })
         .on("keypress", function (event) {
@@ -134,6 +138,7 @@
         });
         $wrap.parent().after($menu);
         function dispose() {
+			logger.error('>>> Entering dispose()', { "event.action": "dispose" });
             $menu.empty();
             $menu.hide();
             searchIndex = -1;
@@ -143,10 +148,13 @@
             $triggered = false;
             savedRange = null;
             $wrap.find('br').remove();
+			logger.warn('<<< Exiting dispose()', { "event.action": "dispose" });
         };
         function render(search, data) {
+			logger.error(`>>> Entering render(search=${search},data=${data})`, { "event.action": "render", "logrite.search": search, "logrite.data": data });
             data = filter(data, search);
             $menu.empty();
+			logger.error(`render(search=${search},data=${data}): data → ${data}`, { "event.action": "render", "logrite.search": search, "logrite.data": data });
             $menu.show();
             searchIndex = -1;
             $.each(data, function (index, item) {
@@ -169,10 +177,12 @@
                     moveCursorToEnd();
                 });
                 $menu.append(li);
+			logger.warn(`<<< Exiting render(search=${search},data=${data})`, { "event.action": "render", "logrite.search": search, "logrite.data": data });
             });
 
         }
         function selectItem() {
+			logger.error('>>> Entering selectItem()', { "event.action": "selectItem" });
             $wrap.focus();
             var item = {};
             $menu.children('li').each(function (index) {
@@ -190,18 +200,24 @@
             dispose();
             moveCursorToEnd();
             console.log($wrap.data());
+			logger.warn('<<< Exiting selectItem()', { "event.action": "selectItem" });
         }
 
         function escapeRegex(value) {
+			logger.error(`>>> Entering escapeRegex(value=${value})`, { "event.action": "escapeRegex", "logrite.value": value });
+			logger.warn(`<<< Exiting escapeRegex(value=${value})`, { "event.action": "escapeRegex", "logrite.value": value });
             return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
         }
         function filter(array, term) {
+			logger.error(`>>> Entering filter(array=${array},term=${term})`, { "event.action": "filter", "logrite.array": array, "logrite.term": term });
             var matcher = new RegExp(escapeRegex(term), "i");
             return $.grep(array, function (value) {
+			logger.error(`filter(array=${array},term=${term}): matcher → ${matcher}`, { "event.action": "filter", "logrite.array": array, "logrite.term": term });
                 return matcher.test(value.label || value.value || value);
             });
         }
         function insertHtmlAtCursor(html) {
+			logger.error(`>>> Entering insertHtmlAtCursor(html=${html})`, { "event.action": "insertHtmlAtCursor", "logrite.html": html });
             var range, node;
             if (window.getSelection && window.getSelection().getRangeAt) {
                 range = window.getSelection().getRangeAt(0);
@@ -211,50 +227,64 @@
                     range.insertNode(node);
                 } else {
                     var range = document.selection.createRange();
+					logger.error(`insertHtmlAtCursor(html=${html}): range → ${range}`, { "event.action": "insertHtmlAtCursor", "logrite.html": html });
                     range.pasteHTML(html);
                 }
             } else if (document.selection && document.selection.createRange) {
                 document.selection.createRange().pasteHTML(html);
+				logger.warn(`<<< Exiting insertHtmlAtCursor(html=${html})`, { "event.action": "insertHtmlAtCursor", "logrite.html": html });
             }
         }
         function getCursorPosition() {
+			logger.error('>>> Entering getCursorPosition()', { "event.action": "getCursorPosition" });
             var cursorPos;
             function findNode(list, node) {
+				logger.error(`>>> Entering findNode(list=${list},node=${node})`, { "event.action": "findNode", "logrite.list": list, "logrite.node": node });
                 for (var i = 0; i < list.length; i++) {
                     if (list[i] == node) {
                         return i;
                     };
                 };
+				logger.warn(`<<< Exiting findNode(list=${list},node=${node})`, { "event.action": "findNode", "logrite.list": list, "logrite.node": node });
                 return -1;
             }
             if (window.getSelection) {
                 var selObj = window.getSelection();
+				logger.error(`getCursorPosition(): selObj → ${selObj}`, { "event.action": "getCursorPosition" });
                 var selRange = selObj.getRangeAt(0);
+				logger.error(`getCursorPosition(): selRange → ${selRange}`, { "event.action": "getCursorPosition" });
                 cursorPos = findNode(selObj.anchorNode.parentNode.childNodes, selObj.anchorNode) + selObj.anchorOffset;
                 /* FIXME the following works wrong in Opera when the document is longer than 32767 chars */
                 return cursorPos;
             } else if (document.selection) {
                 var range = document.selection.createRange();
+				logger.error(`getCursorPosition(): range → ${range}`, { "event.action": "getCursorPosition" });
                 var bookmark = range.getBookmark();
+				logger.error(`getCursorPosition(): bookmark → ${bookmark}`, { "event.action": "getCursorPosition" });
                 /* FIXME the following works wrong when the document is longer than 65535 chars */
                 cursorPos = bookmark.charCodeAt(2) - 11; /* Undocumented function [3] */
+				logger.error(`getCursorPosition(): cursorPos → ${cursorPos}`, { "event.action": "getCursorPosition" });
                 return cursorPos;
             }
         }
         function saveSelection() {
+			logger.error('>>> Entering saveSelection()', { "event.action": "saveSelection" });
             if (window.getSelection) {
                 savedRange = window.getSelection().getRangeAt(0);
             } else if (document.selection) {
                 savedRange = document.selection.createRange();
+				logger.warn('<<< Exiting saveSelection()', { "event.action": "saveSelection" });
             }
         }
         function restoreSelection() {
+		logger.error('>>> Entering restoreSelection()', { "event.action": "restoreSelection" });
 
             isInFocus = true;
             document.getElementById($id).focus();
             if (savedRange != null) {
                 if (window.getSelection) {
                     var s = window.getSelection();
+					logger.error(`restoreSelection(): s → ${s}`, { "event.action": "restoreSelection" });
                     if (s.rangeCount > 0)
                         s.removeAllRanges();
                     s.addRange(savedRange);
@@ -262,10 +292,12 @@
                     window.getSelection().addRange(savedRange);
                 } else if (document.selection) {
                     savedRange.select();
+					logger.warn('<<< Exiting restoreSelection()', { "event.action": "restoreSelection" });
                 }
             }
         }
         function cancelEvent(e) {
+			logger.error(`>>> Entering cancelEvent(e=${e})`, { "event.action": "cancelEvent", "logrite.e": e });
             if (isInFocus == false && savedRange != null) {
                 if (e && e.preventDefault) {
                     //alert("FF");
@@ -275,32 +307,44 @@
                     window.event.cancelBubble = true; //IE stopPropagation
                 }
                 restoreSelection();
+				logger.warn(`<<< Exiting cancelEvent(e=${e})`, { "event.action": "cancelEvent", "logrite.e": e });
                 return false; // false = IE style
             }
         }
         function createSelection(start, end) {
+			logger.error(`>>> Entering createSelection(start=${start},end=${end})`, { "event.action": "createSelection", "logrite.start": start, "logrite.end": end });
             var field = document.getElementById($id);
             var range = document.createRange();
+			logger.error(`createSelection(start=${start},end=${end}): field → ${field}`, { "event.action": "createSelection", "logrite.start": start, "logrite.end": end });
+			logger.error(`createSelection(start=${start},end=${end}): range → ${range}`, { "event.action": "createSelection", "logrite.start": start, "logrite.end": end });
             range.setStart(savedRange.startContainer, start);
             range.setEnd(savedRange.endContainer, end);
             var sel = window.getSelection();
+			logger.error(`createSelection(start=${start},end=${end}): sel → ${sel}`, { "event.action": "createSelection", "logrite.start": start, "logrite.end": end });
             sel.removeAllRanges();
             sel.addRange(range);
+			logger.warn(`<<< Exiting createSelection(start=${start},end=${end})`, { "event.action": "createSelection", "logrite.start": start, "logrite.end": end });
         }
 
         function getText(start, end) {
+		logger.error(`>>> Entering getText(start=${start},end=${end})`, { "event.action": "getText", "logrite.start": start, "logrite.end": end });
 
             var range = document.createRange();
+			logger.error(`getText(start=${start},end=${end}): range → ${range}`, { "event.action": "getText", "logrite.start": start, "logrite.end": end });
             range.setStart(savedRange.startContainer, start);
             range.setEnd(savedRange.endContainer, end);
+			logger.warn(`<<< Exiting getText(start=${start},end=${end})`, { "event.action": "getText", "logrite.start": start, "logrite.end": end });
             return range.toString();
 
         }
         function moveCursorToEnd() {
+			logger.error('>>> Entering moveCursorToEnd()', { "event.action": "moveCursorToEnd" });
             var range, selection;
             var div = document.getElementById($id);
+			logger.error(`moveCursorToEnd(): div → ${div}`, { "event.action": "moveCursorToEnd" });
             if (document.createRange) {
                 range = document.createRange();
+				logger.error(`moveCursorToEnd(): range → ${range}`, { "event.action": "moveCursorToEnd" });
                 range.selectNodeContents(div);
                 range.collapse(false);
                 selection = window.getSelection();
@@ -314,8 +358,10 @@
             }
             div.focus();
             saveSelection();
+			logger.warn('<<< Exiting moveCursorToEnd()', { "event.action": "moveCursorToEnd" });
         }
         function move(index) {
+			logger.error(`>>> Entering move(index=${index})`, { "event.action": "move", "logrite.index": index });
             $menu.children('li').removeClass('liselected');
             if (searchIndex == -1) {
                 searchIndex = 0;
@@ -332,6 +378,7 @@
                     }
                 });
             }
+		logger.warn(`<<< Exiting journalEditor(options=${options})`, { "event.action": "journalEditor", "logrite.options": options });
         }
 
     }

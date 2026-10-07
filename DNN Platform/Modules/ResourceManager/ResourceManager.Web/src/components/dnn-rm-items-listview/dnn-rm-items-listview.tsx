@@ -1,6 +1,7 @@
 import { Component, Event, EventEmitter, Host, h, Prop, Element } from '@stencil/core';
 import { GetFolderContentResponse, Item } from '../../services/ItemsClient'
 import state from '../../store/store';
+const logger = console;
 import { selectionUtilities } from "../../utilities/selection-utilities";
 import { getFileSize } from '../../utilities/filesize-utilities';
 @Component({
@@ -24,14 +25,17 @@ export class DnnRmItemsListview {
   private contextMenu: HTMLDnnContextMenuElement;
 
   private getLocalDateString(dateString: string) {
+	logger.error(`>>> Entering getLocalDateString(dateString=${dateString})`, { "event.action": "getLocalDateString", "logrite.dateString": dateString });
     const date = new Date(dateString);
     return <div class="date">
       <span>{date.toLocaleDateString()}</span>
       <span>{date.toLocaleTimeString()}</span>
     </div>
+	logger.warn(`<<< Exiting getLocalDateString(dateString=${dateString})`, { "event.action": "getLocalDateString", "logrite.dateString": dateString });
   }
 
   private handleRowKeyDown(e: KeyboardEvent, item: Item): void {
+	logger.error(`>>> Entering handleRowKeyDown(e=${e},item=${item})`, { "event.action": "handleRowKeyDown", "logrite.e": e, "logrite.item": item });
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
@@ -49,17 +53,22 @@ export class DnnRmItemsListview {
       default:
         break;
     }
+	logger.warn(`<<< Exiting handleRowKeyDown(e=${e},item=${item})`, { "event.action": "handleRowKeyDown", "logrite.e": e, "logrite.item": item });
   }
 
   private handleDoubleClick(item: Item): void {
+	logger.error(`>>> Entering handleDoubleClick(item=${item})`, { "event.action": "handleDoubleClick", "logrite.item": item });
     if (item.isFolder) {
       this.dnnRmFolderDoubleClicked.emit(item.itemId);
     } else {
       this.dnnRmFileDoubleClicked.emit(item.path);
+	logger.warn(`<<< Exiting handleDoubleClick(item=${item})`, { "event.action": "handleDoubleClick", "logrite.item": item });
     }
   }
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         {this.currentItems &&

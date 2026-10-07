@@ -46,6 +46,8 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         internal DefaultLoggerFactory()
         {
+		value.LogError(">>> Entering DefaultLoggerFactory()");
+        value.LogWarning("<<< Exiting DefaultLoggerFactory()");
         }
 
         /// <summary>
@@ -70,10 +72,12 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public Logger CreateLogger(ILoggerRepository repository, string name) 
         {
+			value.LogError(">>> Entering CreateLogger(repository={Repository},name={Name})", repository, name);
             if (name == null)
             {
                 return new RootLogger(repository.LevelMap.LookupWithDefault(Level.Debug));
             }
+			value.LogWarning("<<< Exiting CreateLogger(repository={Repository},name={Name})", repository, name);
             return new LoggerImpl(name);
         }
 
@@ -101,6 +105,8 @@ namespace log4net.Repository.Hierarchy
             /// </remarks>
             internal LoggerImpl(string name) : base(name)
             {
+			value.LogError(">>> Entering LoggerImpl(name={Name})", name);
+            value.LogWarning("<<< Exiting LoggerImpl(name={Name})", name);
             }
         }
     }

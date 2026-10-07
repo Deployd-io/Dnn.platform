@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { action } from "storybook/actions";
 import Switch from "./index";
+const logger = console;
 
 export default {
     component: Switch,
@@ -9,10 +10,14 @@ export default {
 class MyControlledSwitch extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = { value: props.value ? props.value : false};
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`, { "event.action": "constructor", "logrite.props": props });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <Switch
                 labelHidden={false}

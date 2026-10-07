@@ -16,17 +16,21 @@ namespace DotNetNuke.Entities.Content.Common
     [DnnDeprecated(10, 2, 4, "Resolve types via Dependency Injection")]
     public static partial class Util
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Util));
         /// <summary>Gets the data service.</summary>
         /// <returns>data service instance from ComponentFactory.</returns>
         public static IDataService GetDataService()
         {
+			Logger.LogError(">>> Entering GetDataService()");
             var ds = ComponentFactory.GetComponent<IDataService>();
+			Logger.LogError("GetDataService(): ds → {Ds}", ds);
             if (ds == null)
             {
                 ds = new DataService();
                 ComponentFactory.RegisterComponentInstance<IDataService>(ds);
             }
 
+			Logger.LogWarning("<<< Exiting GetDataService()");
             return ds;
         }
 
@@ -42,15 +46,19 @@ namespace DotNetNuke.Entities.Content.Common
         /// <returns>ContentController from ComponentFactory.</returns>
         public static IContentController GetContentController(IDataService dataService, IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering GetContentController()");
             var ctl = ComponentFactory.GetComponent<IContentController>();
             if (ctl == null)
             {
                 ctl = new ContentController(
+				Logger.LogError("GetContentController(dataService={DataService},hostSettings={HostSettings}): ctl → {Ctl}", dataService, hostSettings, ctl);
                     dataService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IDataService>(),
                     hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>());
+					Logger.LogError("GetContentController(): ctl → {Ctl}", ctl);
                 ComponentFactory.RegisterComponentInstance<IContentController>(ctl);
             }
 
+			Logger.LogWarning("<<< Exiting GetContentController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
             return ctl;
         }
 
@@ -66,15 +74,19 @@ namespace DotNetNuke.Entities.Content.Common
         /// <returns>ScopeTypeController from ComponentFactory.</returns>
         public static IScopeTypeController GetScopeTypeController(IDataService dataService, IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering GetScopeTypeController()");
             var ctl = ComponentFactory.GetComponent<IScopeTypeController>();
             if (ctl == null)
             {
                 ctl = new ScopeTypeController(
+				Logger.LogError("GetScopeTypeController(dataService={DataService},hostSettings={HostSettings}): ctl → {Ctl}", dataService, hostSettings, ctl);
                     dataService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IDataService>(),
                     hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>());
+					Logger.LogError("GetScopeTypeController(): ctl → {Ctl}", ctl);
                 ComponentFactory.RegisterComponentInstance<IScopeTypeController>(ctl);
             }
 
+			Logger.LogWarning("<<< Exiting GetScopeTypeController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
             return ctl;
         }
 
@@ -90,15 +102,19 @@ namespace DotNetNuke.Entities.Content.Common
         /// <returns>TermController from ComponentFactory.</returns>
         public static ITermController GetTermController(IDataService dataService, IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering GetTermController()");
             var ctl = ComponentFactory.GetComponent<ITermController>();
             if (ctl == null)
             {
                 ctl = new TermController(
+				Logger.LogError("GetTermController(dataService={DataService},hostSettings={HostSettings}): ctl → {Ctl}", dataService, hostSettings, ctl);
                     dataService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IDataService>(),
                     hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>());
+					Logger.LogError("GetTermController(): ctl → {Ctl}", ctl);
                 ComponentFactory.RegisterComponentInstance<ITermController>(ctl);
             }
 
+			Logger.LogWarning("<<< Exiting GetTermController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
             return ctl;
         }
 
@@ -114,15 +130,19 @@ namespace DotNetNuke.Entities.Content.Common
         /// <returns>VocabularyController from ComponentFactory.</returns>
         public static IVocabularyController GetVocabularyController(IDataService dataService, IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering GetVocabularyController()");
             var ctl = ComponentFactory.GetComponent<IVocabularyController>();
             if (ctl == null)
             {
                 ctl = new VocabularyController(
+				Logger.LogError("GetVocabularyController(dataService={DataService},hostSettings={HostSettings}): ctl → {Ctl}", dataService, hostSettings, ctl);
                     dataService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IDataService>(),
                     hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>());
+					Logger.LogError("GetVocabularyController(): ctl → {Ctl}", ctl);
                 ComponentFactory.RegisterComponentInstance<IVocabularyController>(ctl);
             }
 
+			Logger.LogWarning("<<< Exiting GetVocabularyController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
             return ctl;
         }
     }

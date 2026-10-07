@@ -12,6 +12,7 @@ namespace DotNetNuke.Web.UI.WebControls
     [DataContract]
     public class DnnDropDownListOptions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnDropDownListOptions));
         /// <summary>Gets or sets the selected item CSS.</summary>
         [DataMember(Name = "selectedItemCss")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
@@ -59,9 +60,13 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <summary>Initializes a new instance of the <see cref="DnnDropDownListOptions"/> class.</summary>
         public DnnDropDownListOptions()
         {
+			Logger.LogError(">>> Entering DnnDropDownListOptions()");
             this.SelectedItemCss = "selected-item";
+			Logger.LogDebug("DnnDropDownListOptions(): this.SelectedItemCss → {Arg0}", this.SelectedItemCss);
             this.SelectItemDefaultText = string.Empty;
             this.Services = new ItemListServicesOptions();
+			Logger.LogDebug("DnnDropDownListOptions(): this.SelectItemDefaultText → {Arg0}", this.SelectItemDefaultText);
+        Logger.LogWarning("<<< Exiting DnnDropDownListOptions()");
             this.ItemList = new ItemListOptions();
         }
 

@@ -1,16 +1,23 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 (function ($) {
     //Customize Selectize Plugin
 
     Selectize.define('dnn-combo-box', function (options) {
         this.get_options = function() {
+			logger.error('>>> Entering get_options()', { "event.action": "get_options" });
+			logger.warn('<<< Exiting get_options()', { "event.action": "get_options" });
             return this.search('').items;
         };
 
         this.get_items = function () {
+			logger.error('>>> Entering get_items()', { "event.action": "get_items" });
+			logger.warn('<<< Exiting get_items()', { "event.action": "get_items" });
             return this.items;
         };
 
         this.get_count = function() {
+			logger.error('>>> Entering get_count()', { "event.action": "get_count" });
+			logger.warn('<<< Exiting get_count()', { "event.action": "get_count" });
             return this.get_options().length
         }
     });
@@ -30,7 +37,9 @@
         if (typeof opts.load === "string") {
             var loadEvent = opts.load;
             opts.load = function () {
+				logger.error('>>> Entering load()', { "event.action": "load" });
                 eval('(' + loadEvent + ')').apply(this, arguments);
+				logger.warn('<<< Exiting load()', { "event.action": "load" });
             }
         }
 
@@ -47,10 +56,12 @@
 
         var originalInitialize = opts.onInitialize;
         opts.onInitialize = function () {
+			logger.error('>>> Entering onInitialize()', { "event.action": "onInitialize" });
             this.$control_input.attr('aria-label', "Search");
 
             if (typeof originalInitialize === "function") {
                 originalInitialize.apply(this, arguments);
+				logger.warn('<<< Exiting onInitialize()', { "event.action": "onInitialize" });
             }
         };
 
@@ -66,14 +77,17 @@
             opts.hideSelected = false;
             opts.render = $.extend({}, {
                 option: function (data, escape) {
+					logger.error(`>>> Entering option(data=${data},escape=${escape})`, { "event.action": "option", "logrite.data": data, "logrite.escape": escape });
                     var $option = $('<div><span></span><label></label></div>');
                     $option.find('label').html(data.text);
 
+					logger.warn(`<<< Exiting option(data=${data},escape=${escape})`, { "event.action": "option", "logrite.data": data, "logrite.escape": escape });
                     return '<div class="option">' + $option.html() + '</div>';
                 }
             }, opts.render);
 
             var buildSummary = function() {
+				logger.error('>>> Entering buildSummary()', { "event.action": "buildSummary" });
                 this.$control.find('input.summary').remove();
                 var $summary = $('<input class="summary" aria-label="Summary" />').prependTo(this.$control);
 
@@ -83,6 +97,8 @@
                     return options[i][opts.labelField];
                 });
                 var summaryText = "";
+				logger.error(`buildSummary(): labels → ${labels}`, { "event.action": "buildSummary" });
+				logger.error(`buildSummary(): summaryText → ${summaryText}`, { "event.action": "buildSummary" });
                 if (items.length === this.get_options().length) {
                     summaryText = opts.localization["AllItemsChecked"];
                 } else if (items.length === 1) {
@@ -92,6 +108,7 @@
                 }
 
                 $summary.val(summaryText);
+				logger.warn('<<< Exiting buildSummary()', { "event.action": "buildSummary" });
             }
 
             var originalonChangeEvent = opts.onChange;
@@ -123,6 +140,7 @@
             if (opts.checkbox) {
                 var selectize = $this[0].selectize;
                 selectize.onOptionSelect = function (e) {
+					logger.error(`>>> Entering onOptionSelect(e=${e})`, { "event.action": "onOptionSelect", "logrite.e": e });
                     if (e.type !== "mousedown") return;
                     var value, $target, $option, self = this;
 
@@ -140,11 +158,15 @@
                         });
                     } else {
                         value = $target.attr('data-value');
+						logger.error(`onOptionSelect(e=${e}): value → ${value}`, { "event.action": "onOptionSelect", "logrite.e": e });
                         if (typeof value !== 'undefined') {
                             self.lastQuery = null;
+							logger.debug(`dnnComboBox(options=${options}): self.lastQuery → ${self.lastQuery}`, { "event.action": "dnnComboBox", "logrite.options": options });
                             self.setTextboxValue('');
 
+							logger.debug(`onOptionSelect(e=${e}): self.lastQuery → ${self.lastQuery}`, { "event.action": "onOptionSelect", "logrite.e": e });
                             var alreadySelected = self.items.indexOf(value) !== -1;
+							logger.error(`onOptionSelect(e=${e}): alreadySelected → ${alreadySelected}`, { "event.action": "onOptionSelect", "logrite.e": e });
                             if (alreadySelected) {
                                 self.removeItem(value);
                                 e.stopImmediatePropagation();
@@ -159,6 +181,7 @@
                                     if (self.$activeOption) self.$activeOption.removeClass('selected').addClass('active');
                                 } else {
                                     self.setActiveOption(self.getOption(value));
+									logger.warn(`<<< Exiting onOptionSelect(e=${e})`, { "event.action": "onOptionSelect", "logrite.e": e });
                                 }
                             }
                         }

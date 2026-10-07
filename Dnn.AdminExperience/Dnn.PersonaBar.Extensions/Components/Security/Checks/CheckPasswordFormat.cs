@@ -19,13 +19,17 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			eventLogger.LogError(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
+			eventLogger.LogError("Execute(): result → {Result}", result);
             try
             {
                 var format = MembershipProvider.Instance().PasswordFormat;
+				eventLogger.LogError("Execute(): format → {Format}", format);
                 if (format == PasswordFormat.Hashed)
                 {
                     result.Severity = SeverityEnum.Pass;
+					eventLogger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                 }
                 else
                 {
@@ -35,6 +39,8 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in Execute(): {Arg0}", Exception.Message);
+			eventLogger.LogWarning("<<< Exiting Execute()");
                 throw;
             }
 

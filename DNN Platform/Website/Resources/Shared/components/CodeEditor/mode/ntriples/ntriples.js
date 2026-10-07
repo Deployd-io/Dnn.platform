@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -57,6 +58,7 @@ CodeMirror.defineMode("ntriples", function() {
     ERROR               : 12
   };
   function transitState(currState, c) {
+	logger.error(`>>> Entering transitState(currState=${currState},c=${c})`, { "event.action": "transitState", "logrite.currState": currState, "logrite.c": c });
     var currLocation = currState.location;
     var ret;
 
@@ -99,10 +101,12 @@ CodeMirror.defineMode("ntriples", function() {
     else ret = Location.ERROR;
 
     currState.location=ret;
+	logger.warn(`<<< Exiting transitState(currState=${currState},c=${c})`, { "event.action": "transitState", "logrite.currState": currState, "logrite.c": c });
   }
 
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
        return {
            location : Location.PRE_SUBJECT,
            uris     : [],
@@ -111,12 +115,16 @@ CodeMirror.defineMode("ntriples", function() {
            langs    : [],
            types    : []
        };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       var ch = stream.next();
       if(ch == '<') {
          transitState(state, ch);
+		logger.error(`token(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
          var parsedURI = '';
+		logger.error(`token(stream=${stream},state=${state}): parsedURI → ${parsedURI}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
          stream.eatWhile( function(c) { if( c != '#' && c != '>' ) { parsedURI += c; return true; } return false;} );
          state.uris.push(parsedURI);
          if( stream.match('#', false) ) return 'variable';
@@ -126,6 +134,7 @@ CodeMirror.defineMode("ntriples", function() {
       }
       if(ch == '#') {
         var parsedAnchor = '';
+		logger.error(`token(stream=${stream},state=${state}): parsedAnchor → ${parsedAnchor}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         stream.eatWhile(function(c) { if(c != '>' && c != ' ') { parsedAnchor+= c; return true; } return false;});
         state.anchors.push(parsedAnchor);
         return 'variable-2';
@@ -137,6 +146,7 @@ CodeMirror.defineMode("ntriples", function() {
       if(ch == '_') {
           transitState(state, ch);
           var parsedBNode = '';
+		logger.error(`token(stream=${stream},state=${state}): parsedBNode → ${parsedBNode}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           stream.eatWhile(function(c) { if( c != ' ' ) { parsedBNode += c; return true; } return false;});
           state.bnodes.push(parsedBNode);
           stream.next();
@@ -155,6 +165,7 @@ CodeMirror.defineMode("ntriples", function() {
       if( ch == '@' ) {
           transitState(state, '@');
           var parsedLang = '';
+		logger.error(`token(stream=${stream},state=${state}): parsedLang → ${parsedLang}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           stream.eatWhile(function(c) { if( c != ' ' ) { parsedLang += c; return true; } return false;});
           state.langs.push(parsedLang);
           stream.next();
@@ -165,6 +176,7 @@ CodeMirror.defineMode("ntriples", function() {
           stream.next();
           transitState(state, '^');
           var parsedType = '';
+		logger.error(`token(stream=${stream},state=${state}): parsedType → ${parsedType}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           stream.eatWhile(function(c) { if( c != '>' ) { parsedType += c; return true; } return false;} );
           state.types.push(parsedType);
           stream.next();
@@ -176,6 +188,7 @@ CodeMirror.defineMode("ntriples", function() {
       }
       if( ch == '.' ) {
           transitState(state, ch);
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       }
     }
   };

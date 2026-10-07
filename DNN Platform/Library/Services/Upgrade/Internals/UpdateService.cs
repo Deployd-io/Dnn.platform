@@ -12,6 +12,7 @@ namespace DotNetNuke.Services.Upgrade.Internals
 
     public class UpdateService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UpdateService));
         private static string ApplicationVersion
         {
             get
@@ -31,17 +32,21 @@ namespace DotNetNuke.Services.Upgrade.Internals
 
         public static StreamReader GetLanguageList()
         {
+			Logger.LogError(">>> Entering GetLanguageList()");
             string url = DotNetNukeContext.Current.Application.UpgradeUrl + "/languages.aspx";
             url += "?core=" + ApplicationVersion;
             url += "&type=Framework";
             url += "&name=" + ApplicationName;
 
             StreamReader myResponseReader = GetResponseAsStream(url);
+			Logger.LogError("GetLanguageList(): myResponseReader → {MyResponseReader}", myResponseReader);
+			Logger.LogWarning("<<< Exiting GetLanguageList()");
             return myResponseReader;
         }
 
         public static string GetLanguageDownloadUrl(string cultureCode)
         {
+			Logger.LogError(">>> Entering GetLanguageDownloadUrl(cultureCode={CultureCode})", cultureCode);
             string url = DotNetNukeContext.Current.Application.UpgradeUrl + "/languages.aspx";
             url += "?core=" + ApplicationVersion;
             url += "&type=Framework";
@@ -49,29 +54,41 @@ namespace DotNetNuke.Services.Upgrade.Internals
             url += "&culture=" + cultureCode;
 
             StreamReader myResponseReader = GetResponseAsStream(url);
+			Logger.LogError("GetLanguageDownloadUrl(cultureCode={CultureCode}): myResponseReader → {MyResponseReader}", cultureCode, myResponseReader);
             string downloadUrl = myResponseReader.ReadToEnd();
+			Logger.LogWarning("<<< Exiting GetLanguageDownloadUrl(cultureCode={CultureCode})", cultureCode);
             return downloadUrl;
         }
 
         private static StreamReader GetResponseAsStream(string url)
         {
+			Logger.LogError(">>> Entering GetResponseAsStream(url={Url})", url);
+            var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // creating the proxy for the service call using the HttpWebRequest class
             var webReq = (HttpWebRequest)WebRequest.Create(url);
+			Logger.LogError("GetResponseAsStream(url={Url}): webReq → {WebReq}", url, webReq);
 
             // Set the method/action type
             webReq.Method = "GET";
+			Logger.LogDebug("GetResponseAsStream(url={Url}): webReq.Method → {Arg1}", url, webReq.Method);
 
             // We use form contentType
             webReq.ContentType = "text/xml; charset=utf-8";
+			Logger.LogDebug("GetResponseAsStream(url={Url}): webReq.ContentType → {Arg1}", url, webReq.ContentType);
 
             // Get the response handle, we have no true response yet!
             var webResp = (HttpWebResponse)webReq.GetResponse();
+			Logger.LogError("GetResponseAsStream(url={Url}): webResp → {WebResp}", url, webResp);
 
             // Now, we read the response (the string), and output it.
             Stream myResponse = webResp.GetResponseStream();
+			Logger.LogError("GetResponseAsStream(url={Url}): myResponse → {MyResponse}", url, myResponse);
 
             // read the stream into streamreader
             var myResponseReader = new StreamReader(myResponse);
+			Logger.LogError("GetResponseAsStream(url={Url}): myResponseReader → {MyResponseReader}", url, myResponseReader);
+			Logger.LogError("GetResponseAsStream(url)={Url}: external service call {Url1} took {Arg2} ms", url, url, __logStart.ElapsedMilliseconds);
+			Logger.LogWarning("<<< Exiting GetResponseAsStream(url={Url})", url);
             return myResponseReader;
         }
     }

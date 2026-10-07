@@ -24,6 +24,7 @@ namespace DotNetNuke.Services.Upgrade.Internals
     /// <summary>The Controller class for Installer.</summary>
     internal class InstallControllerImpl : IInstallController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InstallControllerImpl));
         private static readonly string[] VersionSeparator = [".",];
 
         /// <inheritdoc />
@@ -33,8 +34,10 @@ namespace DotNetNuke.Services.Upgrade.Internals
         /// <returns>ConnectionConfig object. Null if information is not present in the config file.</returns>
         public ConnectionConfig GetConnectionFromWebConfig()
         {
+			Logger.LogError(">>> Entering GetConnectionFromWebConfig()");
             var connectionConfig = new ConnectionConfig();
 
+			Logger.LogError("GetConnectionFromWebConfig(): connectionConfig → {ConnectionConfig}", connectionConfig);
             string connection = Config.GetConnectionString();
             foreach (string connectionParam in connection.Split(';'))
             {
@@ -51,19 +54,23 @@ namespace DotNetNuke.Services.Upgrade.Internals
                         case "addr":
                         case "network address":
                             connectionConfig.Server = value;
+							Logger.LogDebug("GetConnectionFromWebConfig(): connectionConfig.Server → {Arg0}", connectionConfig.Server);
                             break;
                         case "database":
                         case "initial catalog":
                             connectionConfig.Database = value;
+							Logger.LogDebug("GetConnectionFromWebConfig(): connectionConfig.Database → {Arg0}", connectionConfig.Database);
                             break;
                         case "uid":
                         case "user id":
                         case "user":
                             connectionConfig.User = value;
+							Logger.LogDebug("GetConnectionFromWebConfig(): connectionConfig.User → {Arg0}", connectionConfig.User);
                             break;
                         case "pwd":
                         case "password":
                             connectionConfig.Password = value;
+							Logger.LogDebug("GetConnectionFromWebConfig(): connectionConfig.Password → {Arg0}", connectionConfig.Password);
                             break;
                         case "integrated security":
                             connectionConfig.Integrated = value.Equals("true", StringComparison.OrdinalIgnoreCase);
@@ -79,12 +86,14 @@ namespace DotNetNuke.Services.Upgrade.Internals
             connectionConfig.RunAsDbowner = Config.GetDataBaseOwner() == "dbo.";
             connectionConfig.UpgradeConnectionString = Config.GetUpgradeConnectionString();
 
+			Logger.LogWarning("<<< Exiting GetConnectionFromWebConfig()");
             return connectionConfig;
         }
 
         /// <inheritdoc />
         public void SetInstallConfig(InstallConfig installConfig)
         {
+			Logger.LogError(">>> Entering SetInstallConfig(installConfig={InstallConfig})", installConfig);
             if (installConfig == null)
             {
                 return;
@@ -94,11 +103,13 @@ namespace DotNetNuke.Services.Upgrade.Internals
             var installTemplate = new XmlDocument { XmlResolver = null };
             Upgrade.GetInstallTemplate(installTemplate);
             XmlNode dotnetnukeNode = installTemplate.SelectSingleNode("//dotnetnuke");
+			Logger.LogError("SetInstallConfig(installConfig={InstallConfig}): dotnetnukeNode → {DotnetnukeNode}", installConfig, dotnetnukeNode);
 
             // Set Version
             if (!string.IsNullOrEmpty(installConfig.Version))
             {
                 XmlNode versionNode = installTemplate.SelectSingleNode("//dotnetnuke/version");
+				Logger.LogError("SetInstallConfig(installConfig={InstallConfig}): versionNode → {VersionNode}", installConfig, versionNode);
 
                 if (versionNode == null)
                 {
@@ -106,6 +117,7 @@ namespace DotNetNuke.Services.Upgrade.Internals
                 }
 
                 versionNode.InnerText = installConfig.Version;
+				Logger.LogDebug("SetInstallConfig(installConfig={InstallConfig}): versionNode.InnerText → {Arg1}", installConfig, versionNode.InnerText);
             }
 
             // Set installer culture
@@ -125,6 +137,7 @@ namespace DotNetNuke.Services.Upgrade.Internals
             if (installConfig.SuperUser != null)
             {
                 XmlNode superUserNode = installTemplate.SelectSingleNode("//dotnetnuke/superuser");
+				Logger.LogError("SetInstallConfig(installConfig={InstallConfig}): superUserNode → {SuperUserNode}", installConfig, superUserNode);
                 if (superUserNode == null)
                 {
                     superUserNode = AppendNewXmlNode(ref installTemplate, ref dotnetnukeNode, "superuser", installConfig.Version);
@@ -146,6 +159,7 @@ namespace DotNetNuke.Services.Upgrade.Internals
             if (!string.IsNullOrEmpty(installConfig.FolderMappingsSettings))
             {
                 XmlNode folderMappingsNode = installTemplate.SelectSingleNode("//dotnetnuke/" + FolderMappingsConfigController.Instance.ConfigNode);
+				Logger.LogError("SetInstallConfig(installConfig={InstallConfig}): folderMappingsNode → {FolderMappingsNode}", installConfig, folderMappingsNode);
 
                 if (folderMappingsNode == null)
                 {
@@ -153,12 +167,14 @@ namespace DotNetNuke.Services.Upgrade.Internals
                 }
 
                 folderMappingsNode.InnerText = installConfig.FolderMappingsSettings;
+				Logger.LogDebug("SetInstallConfig(installConfig={InstallConfig}): folderMappingsNode.InnerText → {Arg1}", installConfig, folderMappingsNode.InnerText);
             }
 
             // Set Portals
             if (installConfig.Portals != null && installConfig.Portals.Count > 0)
             {
                 XmlNode portalsNode = installTemplate.SelectSingleNode("//dotnetnuke/portals");
+				Logger.LogError("SetInstallConfig(installConfig={InstallConfig}): portalsNode → {PortalsNode}", installConfig, portalsNode);
                 if (portalsNode == null)
                 {
                     portalsNode = AppendNewXmlNode(ref installTemplate, ref dotnetnukeNode, "portals", installConfig.Version);
@@ -171,8 +187,11 @@ namespace DotNetNuke.Services.Upgrade.Internals
                 foreach (PortalConfig portalConfig in installConfig.Portals)
                 {
                     XmlNode portalNode = AppendNewXmlNode(ref installTemplate, ref portalsNode, "portal", null);
+					Logger.LogError("SetInstallConfig(installConfig={InstallConfig}): portalNode → {PortalNode}", installConfig, portalNode);
                     XmlNode administratorNode = AppendNewXmlNode(ref installTemplate, ref portalNode, "administrator", null);
+					Logger.LogError("SetInstallConfig(installConfig={InstallConfig}): administratorNode → {AdministratorNode}", installConfig, administratorNode);
                     XmlNode portalAliasesNode = AppendNewXmlNode(ref installTemplate, ref portalNode, "portalaliases", null);
+					Logger.LogError("SetInstallConfig(installConfig={InstallConfig}): portalAliasesNode → {PortalAliasesNode}", installConfig, portalAliasesNode);
                     AppendNewXmlNode(ref installTemplate, ref portalNode, "portalname", portalConfig.PortalName);
                     AppendNewXmlNode(ref installTemplate, ref portalNode, "isssl", portalConfig.IsSsl.ToString());
                     AppendNewXmlNode(ref installTemplate, ref administratorNode, "firstname", portalConfig.AdminFirstName);
@@ -197,6 +216,7 @@ namespace DotNetNuke.Services.Upgrade.Internals
             if (installConfig.Settings != null && installConfig.Settings.Count > 0)
             {
                 XmlNode settingsNode = installTemplate.SelectSingleNode("//dotnetnuke/settings");
+				Logger.LogError("SetInstallConfig(installConfig={InstallConfig}): settingsNode → {SettingsNode}", installConfig, settingsNode);
                 if (settingsNode == null)
                 {
                     settingsNode = AppendNewXmlNode(ref installTemplate, ref dotnetnukeNode, "settings", null);
@@ -210,10 +230,13 @@ namespace DotNetNuke.Services.Upgrade.Internals
                 foreach (HostSettingConfig setting in installConfig.Settings)
                 {
                     XmlNode settingNode = AppendNewXmlNode(ref installTemplate, ref settingsNode, setting.Name, setting.Value);
+					Logger.LogError("SetInstallConfig(installConfig={InstallConfig}): settingNode → {SettingNode}", installConfig, settingNode);
                     if (setting.IsSecure)
                     {
                         XmlAttribute attribute = installTemplate.CreateAttribute("Secure");
+						Logger.LogError("SetInstallConfig(installConfig={InstallConfig}): attribute → {Attribute}", installConfig, attribute);
                         attribute.Value = "true";
+						Logger.LogDebug("SetInstallConfig(installConfig={InstallConfig}): attribute.Value → {Arg1}", installConfig, attribute.Value);
                         settingNode.Attributes.Append(attribute);
                     }
                 }
@@ -223,6 +246,7 @@ namespace DotNetNuke.Services.Upgrade.Internals
             if (installConfig.Connection != null)
             {
                 XmlNode connectionNode = installTemplate.SelectSingleNode("//dotnetnuke/connection");
+				Logger.LogError("SetInstallConfig(installConfig={InstallConfig}): connectionNode → {ConnectionNode}", installConfig, connectionNode);
                 if (connectionNode == null)
                 {
                     connectionNode = AppendNewXmlNode(ref installTemplate, ref dotnetnukeNode, "connection", null);
@@ -244,12 +268,15 @@ namespace DotNetNuke.Services.Upgrade.Internals
             }
 
             Upgrade.SetInstallTemplate(installTemplate);
+			Logger.LogWarning("<<< Exiting SetInstallConfig(installConfig={InstallConfig})", installConfig);
         }
 
         /// <inheritdoc />
         public void RemoveFromInstallConfig(string xmlNodePath)
         {
+			Logger.LogError(">>> Entering RemoveFromInstallConfig(xmlNodePath={XmlNodePath})", xmlNodePath);
             InstallConfig config = this.GetInstallConfig();
+			Logger.LogError("RemoveFromInstallConfig(xmlNodePath={XmlNodePath}): config → {Config}", xmlNodePath, config);
             if (config == null)
             {
                 return;
@@ -258,26 +285,31 @@ namespace DotNetNuke.Services.Upgrade.Internals
             var installTemplate = new XmlDocument { XmlResolver = null };
             Upgrade.GetInstallTemplate(installTemplate);
             XmlNodeList nodes = installTemplate.SelectNodes(xmlNodePath);
+			Logger.LogError("RemoveFromInstallConfig(xmlNodePath={XmlNodePath}): nodes → {Nodes}", xmlNodePath, nodes);
             if (nodes != null && nodes.Count > 0 && nodes[0].ParentNode != null)
             {
                 nodes[0].ParentNode.RemoveChild(nodes[0]);
             }
 
             Upgrade.SetInstallTemplate(installTemplate);
+			Logger.LogWarning("<<< Exiting RemoveFromInstallConfig(xmlNodePath={XmlNodePath})", xmlNodePath);
         }
 
         /// <summary>GetInstallConfig - Returns configuration stored in DotNetNuke.Install.Config.</summary>
         /// <returns>ConnectionConfig object. Null if information is not present in the config file.</returns>
         public InstallConfig GetInstallConfig()
         {
+			Logger.LogError(">>> Entering GetInstallConfig()");
             var installConfig = new InstallConfig();
 
+			Logger.LogError("GetInstallConfig(): installConfig → {InstallConfig}", installConfig);
             // Load Template
             var installTemplate = new XmlDocument { XmlResolver = null };
             Upgrade.GetInstallTemplate(installTemplate);
 
             // Parse the root node
             XmlNode rootNode = installTemplate.SelectSingleNode("//dotnetnuke");
+			Logger.LogError("GetInstallConfig(): rootNode → {RootNode}", rootNode);
             if (rootNode != null)
             {
                 installConfig.Version = XmlUtils.GetNodeValue(rootNode.CreateNavigator(), "version");
@@ -287,6 +319,7 @@ namespace DotNetNuke.Services.Upgrade.Internals
 
             // Parse the scripts node
             XmlNode scriptsNode = installTemplate.SelectSingleNode("//dotnetnuke/scripts");
+			Logger.LogError("GetInstallConfig(): scriptsNode → {ScriptsNode}", scriptsNode);
             if (scriptsNode != null)
             {
                 foreach (XmlNode scriptNode in scriptsNode)
@@ -300,9 +333,11 @@ namespace DotNetNuke.Services.Upgrade.Internals
 
             // Parse the connection node
             XmlNode connectionNode = installTemplate.SelectSingleNode("//dotnetnuke/connection");
+			Logger.LogError("GetInstallConfig(): connectionNode → {ConnectionNode}", connectionNode);
             if (connectionNode != null)
             {
                 var connectionConfig = new ConnectionConfig();
+				Logger.LogError("GetInstallConfig(): connectionConfig → {ConnectionConfig}", connectionConfig);
 
                 // Build connection string from the file
                 connectionConfig.Server = XmlUtils.GetNodeValue(connectionNode.CreateNavigator(), "server");
@@ -316,13 +351,16 @@ namespace DotNetNuke.Services.Upgrade.Internals
                 connectionConfig.UpgradeConnectionString = XmlUtils.GetNodeValue(connectionNode.CreateNavigator(), "upgradeconnectionstring");
 
                 installConfig.Connection = connectionConfig;
+				Logger.LogDebug("GetInstallConfig(): installConfig.Connection → {Arg0}", installConfig.Connection);
             }
 
             // Parse the superuser node
             XmlNode superUserNode = installTemplate.SelectSingleNode("//dotnetnuke/superuser");
+			Logger.LogError("GetInstallConfig(): superUserNode → {SuperUserNode}", superUserNode);
             if (superUserNode != null)
             {
                 var superUserConfig = new SuperUserConfig();
+				Logger.LogError("GetInstallConfig(): superUserConfig → {SuperUserConfig}", superUserConfig);
 
                 superUserConfig.FirstName = XmlUtils.GetNodeValue(superUserNode.CreateNavigator(), "firstname");
                 superUserConfig.LastName = XmlUtils.GetNodeValue(superUserNode.CreateNavigator(), "lastname");
@@ -333,10 +371,12 @@ namespace DotNetNuke.Services.Upgrade.Internals
                 superUserConfig.UpdatePassword = XmlUtils.GetNodeValue(superUserNode.CreateNavigator(), "updatepassword").Equals("true", StringComparison.OrdinalIgnoreCase);
 
                 installConfig.SuperUser = superUserConfig;
+				Logger.LogDebug("GetInstallConfig(): installConfig.SuperUser → {Arg0}", installConfig.SuperUser);
             }
 
             // Parse the settings node
             XmlNode settingsNode = installTemplate.SelectSingleNode("//dotnetnuke/settings");
+			Logger.LogError("GetInstallConfig(): settingsNode → {SettingsNode}", settingsNode);
             if (settingsNode != null)
             {
                 foreach (XmlNode settingNode in settingsNode.ChildNodes)
@@ -344,9 +384,11 @@ namespace DotNetNuke.Services.Upgrade.Internals
                     if (settingNode != null && !string.IsNullOrEmpty(settingNode.Name))
                     {
                         bool settingIsSecure = false;
+						Logger.LogError("GetInstallConfig(): settingIsSecure → {SettingIsSecure}", settingIsSecure);
                         if (settingNode.Attributes != null)
                         {
                             XmlAttribute secureAttrib = settingNode.Attributes["Secure"];
+							Logger.LogError("GetInstallConfig(): secureAttrib → {SecureAttrib}", secureAttrib);
                             if (secureAttrib != null)
                             {
                                 if (secureAttrib.Value.Equals("true", StringComparison.OrdinalIgnoreCase))
@@ -362,10 +404,12 @@ namespace DotNetNuke.Services.Upgrade.Internals
             }
 
             var folderMappingsNode = installTemplate.SelectSingleNode("//dotnetnuke/" + FolderMappingsConfigController.Instance.ConfigNode);
+			Logger.LogError("GetInstallConfig(): folderMappingsNode → {FolderMappingsNode}", folderMappingsNode);
             installConfig.FolderMappingsSettings = (folderMappingsNode != null) ? folderMappingsNode.InnerXml : string.Empty;
 
             // Parse the portals node
             XmlNodeList portalsNode = installTemplate.SelectNodes("//dotnetnuke/portals/portal");
+			Logger.LogError("GetInstallConfig(): portalsNode → {PortalsNode}", portalsNode);
             if (portalsNode != null)
             {
                 foreach (XmlNode portalNode in portalsNode)
@@ -373,10 +417,12 @@ namespace DotNetNuke.Services.Upgrade.Internals
                     if (portalNode != null)
                     {
                         var portalConfig = new PortalConfig();
+						Logger.LogError("GetInstallConfig(): portalConfig → {PortalConfig}", portalConfig);
                         portalConfig.PortalName = XmlUtils.GetNodeValue(portalNode.CreateNavigator(), "portalname");
                         portalConfig.IsSsl = bool.Parse(XmlUtils.GetNodeValue(portalNode.CreateNavigator(), "isssl", "false"));
 
                         XmlNode adminNode = portalNode.SelectSingleNode("administrator");
+						Logger.LogError("GetInstallConfig(): adminNode → {AdminNode}", adminNode);
                         if (adminNode != null)
                         {
                             portalConfig.AdminFirstName = XmlUtils.GetNodeValue(adminNode.CreateNavigator(), "firstname");
@@ -394,6 +440,7 @@ namespace DotNetNuke.Services.Upgrade.Internals
 
                         // Get the Portal Alias
                         XmlNodeList portalAliases = portalNode.SelectNodes("portalaliases/portalalias");
+						Logger.LogError("GetInstallConfig(): portalAliases → {PortalAliases}", portalAliases);
                         if (portalAliases != null)
                         {
                             foreach (XmlNode portalAlias in portalAliases)
@@ -410,25 +457,32 @@ namespace DotNetNuke.Services.Upgrade.Internals
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetInstallConfig()");
             return installConfig;
         }
 
         /// <inheritdoc />
         public bool IsValidSqlServerVersion(string connectionString)
         {
+			Logger.LogError(">>> Entering IsValidSqlServerVersion(connectionString={ConnectionString})", connectionString);
             // todo: check if we can use globals.DatabaseEngineVersion instead
             var isValidVersion = false;
+			Logger.LogError("IsValidSqlServerVersion(connectionString={ConnectionString}): isValidVersion → {IsValidVersion}", connectionString, isValidVersion);
             using var sqlConnection = new SqlConnection(connectionString);
+			Logger.LogError("IsValidSqlServerVersion(connectionString={ConnectionString}): sqlConnection → {SqlConnection}", connectionString, sqlConnection);
             try
             {
                 sqlConnection.Open();
 
                 var serverVersion = sqlConnection.ServerVersion;
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 if (serverVersion != null)
                 {
                     var serverVersionDetails = serverVersion.Split(VersionSeparator, StringSplitOptions.None);
+					Logger.LogError("IsValidSqlServerVersion(connectionString={ConnectionString}): serverVersionDetails → {ServerVersionDetails}", connectionString, serverVersionDetails);
 
                     var versionNumber = int.Parse(serverVersionDetails[0], CultureInfo.InvariantCulture);
+					Logger.LogError("IsValidSqlServerVersion(connectionString={ConnectionString}): versionNumber → {VersionNumber}", connectionString, versionNumber);
 
                     // SQL Server 2017 and up, traditional version numbers are ok
                     if (versionNumber >= 14)
@@ -441,12 +495,15 @@ namespace DotNetNuke.Services.Upgrade.Internals
                         using var testCommand = new SqlCommand("select serverproperty('Edition')", sqlConnection);
                         var result = testCommand.ExecuteScalar();
                         isValidVersion = result.ToString().Equals("SQL Azure", StringComparison.OrdinalIgnoreCase);
+						Logger.LogError("IsValidSqlServerVersion(connectionString={ConnectionString}): testCommand → {TestCommand}", connectionString, testCommand);
                     }
                 }
+				Logger.LogError("IsValidSqlServerVersion(connectionString)={ConnectionString}: database query executed in {Arg1} ms", connectionString, __logStart.ElapsedMilliseconds);
             }
             catch (Exception)
             {
                 // cannot connect with the details
+				Logger.LogError("Exception in IsValidSqlServerVersion(connectionString={ConnectionString}): {Arg1}", connectionString, Exception.Message);
                 isValidVersion = false;
             }
             finally
@@ -454,37 +511,50 @@ namespace DotNetNuke.Services.Upgrade.Internals
                 sqlConnection.Close();
             }
 
+			Logger.LogWarning("<<< Exiting IsValidSqlServerVersion(connectionString={ConnectionString})", connectionString);
             return isValidVersion;
         }
 
         /// <inheritdoc />
         public bool IsAbleToPerformDatabaseActions(string connectionString)
         {
+			Logger.LogError(">>> Entering IsAbleToPerformDatabaseActions(connectionString={ConnectionString})", connectionString);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var fakeName = "{databaseOwner}[{objectQualifier}FakeTable_" + DateTime.Now.Ticks.ToString("x16", CultureInfo.InvariantCulture) + "]";
             var databaseActions = $"CREATE TABLE {fakeName}([fakeColumn] [int] NULL); SELECT * FROM {fakeName}; DROP TABLE {fakeName};";
             var strExceptions = DataProvider.Instance().ExecuteScript(connectionString, databaseActions);
+			Logger.LogError("IsAbleToPerformDatabaseActions(connectionString={ConnectionString}): fakeName → {FakeName}", connectionString, fakeName);
+			Logger.LogError("IsAbleToPerformDatabaseActions(connectionString={ConnectionString}): databaseActions → {DatabaseActions}", connectionString, databaseActions);
+			Logger.LogError("IsAbleToPerformDatabaseActions(connectionString={ConnectionString}): strExceptions → {StrExceptions}", connectionString, strExceptions);
+			Logger.LogError("IsAbleToPerformDatabaseActions(connectionString)={ConnectionString}: find query executed in {Arg1} ms", connectionString, __logStart.ElapsedMilliseconds);
 
             // if no exceptions we have necessary drop etc. permissions
+			Logger.LogWarning("<<< Exiting IsAbleToPerformDatabaseActions(connectionString={ConnectionString})", connectionString);
             return string.IsNullOrEmpty(strExceptions);
         }
 
         /// <inheritdoc />
         public bool IsValidDotNetVersion()
         {
+			Logger.LogError(">>> Entering IsValidDotNetVersion()");
             // todo: check that this works for 4.5 etc.
+			Logger.LogWarning("<<< Exiting IsValidDotNetVersion()");
             return Upgrade.IsNETFrameworkCurrent("4.0");
         }
 
         /// <inheritdoc />
         public bool IsSqlServerDbo()
         {
+			Logger.LogError(">>> Entering IsSqlServerDbo()");
             string dbo = DataProvider.Instance().Settings["databaseOwner"];
+			Logger.LogWarning("<<< Exiting IsSqlServerDbo()");
             return !dbo.Trim().Equals("dbo.", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <inheritdoc />
         public bool IsAvailableLanguagePack(string cultureCode)
         {
+			Logger.LogError(">>> Entering IsAvailableLanguagePack(cultureCode={CultureCode})", cultureCode);
             try
             {
                 string downloadUrl = UpdateService.GetLanguageDownloadUrl(cultureCode);
@@ -495,6 +565,7 @@ namespace DotNetNuke.Services.Upgrade.Internals
                 if (cultureCode != "en-us" && !string.IsNullOrEmpty(downloadUrl))
                 {
                     var newCulture = new CultureInfo(cultureCode);
+					Logger.LogError("IsAvailableLanguagePack(cultureCode={CultureCode}): newCulture → {NewCulture}", cultureCode, newCulture);
                     Thread.CurrentThread.CurrentCulture = newCulture;
                     GetLanguagePack(downloadUrl, installFolder);
                     return true;
@@ -504,6 +575,8 @@ namespace DotNetNuke.Services.Upgrade.Internals
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in IsAvailableLanguagePack(cultureCode={CultureCode}): {Arg1}", cultureCode, Exception.Message);
+				Logger.LogWarning("<<< Exiting IsAvailableLanguagePack(cultureCode={CultureCode})", cultureCode);
                 return false;
             }
         }
@@ -511,8 +584,10 @@ namespace DotNetNuke.Services.Upgrade.Internals
         /// <inheritdoc />
         public CultureInfo GetCurrentLanguage()
         {
+			Logger.LogError(">>> Entering GetCurrentLanguage()");
             CultureInfo pageCulture = null;
 
+			Logger.LogError("GetCurrentLanguage(): pageCulture → {PageCulture}", pageCulture);
             // 1. querystring
             pageCulture = GetCultureFromQs();
 
@@ -522,6 +597,7 @@ namespace DotNetNuke.Services.Upgrade.Internals
             // 3. browser
             pageCulture = this.GetCultureFromBrowser();
 
+			Logger.LogWarning("<<< Exiting GetCurrentLanguage()");
             return pageCulture;
         }
 
@@ -530,8 +606,11 @@ namespace DotNetNuke.Services.Upgrade.Internals
         /// <returns>The connection string, or an error message (prefixed with <c>"ERROR:"</c>).</returns>
         public string TestDatabaseConnection(ConnectionConfig config)
         {
+			Logger.LogError(">>> Entering TestDatabaseConnection(config={Config})", config);
             DbConnectionStringBuilder builder = DataProvider.Instance().GetConnectionStringBuilder();
             string owner = string.Empty;
+			Logger.LogError("TestDatabaseConnection(config={Config}): owner → {Owner}", config, owner);
+			Logger.LogError("TestDatabaseConnection(config={Config}): builder → {Builder}", config, builder);
             string objectQualifier = config.Qualifier;
 
             builder["data source"] = config.Server;
@@ -554,58 +633,77 @@ namespace DotNetNuke.Services.Upgrade.Internals
                 owner = "dbo.";
             }
 
+			Logger.LogWarning("<<< Exiting TestDatabaseConnection(config={Config})", config);
             return DataProvider.Instance().TestDatabaseConnection(builder, owner, objectQualifier);
         }
 
         /// <inheritdoc />
         public CultureInfo GetCultureFromCookie()
         {
+			Logger.LogError(">>> Entering GetCultureFromCookie()");
             var langCookie = HttpContext.Current.Request.Cookies["language"];
             var language = langCookie != null ? langCookie.Value : @"en-US";
+			Logger.LogError("GetCultureFromCookie(): language → {Language}", language);
             var culture = new CultureInfo(language);
+			Logger.LogError("GetCultureFromCookie(): culture → {Culture}", culture);
+			Logger.LogError("GetCultureFromCookie(): langCookie → {LangCookie}", langCookie);
+			Logger.LogWarning("<<< Exiting GetCultureFromCookie()");
             return culture;
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public CultureInfo GetCultureFromBrowser()
         {
+			Logger.LogError(">>> Entering GetCultureFromBrowser()");
             CultureInfo culture = null;
+			Logger.LogError("GetCultureFromBrowser(): culture → {Culture}", culture);
             foreach (string userLang in HttpContext.Current.Request.UserLanguages)
             {
                 // split userlanguage by ";"... all but the first language will contain a preferrence index eg. ;q=.5
                 string language = userLang.Split(';')[0];
+				Logger.LogError("GetCultureFromBrowser(): language → {Language}", language);
                 culture = new CultureInfo(language);
             }
 
+			Logger.LogWarning("<<< Exiting GetCultureFromBrowser()");
             return culture;
         }
 
         private static XmlNode AppendNewXmlNode(ref XmlDocument document, ref XmlNode parentNode, string elementName, string elementValue)
         {
+			Logger.LogError(">>> Entering AppendNewXmlNode(document={Document},parentNode={ParentNode},elementName={ElementName},elementValue={ElementValue})", document, parentNode, elementName, elementValue);
             XmlNode newNode = document.CreateNode(XmlNodeType.Element, elementName, null);
+			Logger.LogError("AppendNewXmlNode(document={Document},parentNode={ParentNode},elementName={ElementName},elementValue={ElementValue}): newNode → {NewNode}", document, parentNode, elementName, elementValue, newNode);
             if (!string.IsNullOrEmpty(elementValue))
             {
                 newNode.InnerText = elementValue;
+				Logger.LogDebug("AppendNewXmlNode(document={Document},parentNode={ParentNode},elementName={ElementName},elementValue={ElementValue}): newNode.InnerText → {Arg4}", document, parentNode, elementName, elementValue, newNode.InnerText);
             }
 
             parentNode.AppendChild(newNode);
+			Logger.LogWarning("<<< Exiting AppendNewXmlNode(document={Document},parentNode={ParentNode},elementName={ElementName},elementValue={ElementValue})", document, parentNode, elementName, elementValue);
             return newNode;
         }
 
         private static CultureInfo GetCultureFromQs()
         {
+			Logger.LogError(">>> Entering GetCultureFromQs()");
             if (HttpContext.Current == null || HttpContext.Current.Request["language"] == null)
             {
                 return null;
             }
 
             string language = HttpContext.Current.Request["language"];
+			Logger.LogError("GetCultureFromQs(): language → {Language}", language);
             var culture = new CultureInfo(language);
+			Logger.LogError("GetCultureFromQs(): culture → {Culture}", culture);
+			Logger.LogWarning("<<< Exiting GetCultureFromQs()");
             return culture;
         }
 
         private static void GetLanguagePack(string downloadUrl, string installFolder)
         {
+			Logger.LogError(">>> Entering GetLanguagePack(downloadUrl={DownloadUrl},installFolder={InstallFolder})", downloadUrl, installFolder);
             string myfile = string.Empty;
             WebResponse wr = Util.GetExternalRequest(
                 downloadUrl,
@@ -622,10 +720,12 @@ namespace DotNetNuke.Services.Upgrade.Internals
                 "wpi://2.1.0.0/Microsoft Windows NT 6.1.7600.0",
                 out myfile,
                 10000);
+				Logger.LogError("GetLanguagePack(downloadUrl={DownloadUrl},installFolder={InstallFolder}): myfile → {Myfile}", downloadUrl, installFolder, myfile);
 
             // use fixed name for later installation
             myfile = "installlanguage.resources";
             Util.DeployExtension(wr, myfile, installFolder);
+			Logger.LogWarning("<<< Exiting GetLanguagePack(downloadUrl={DownloadUrl},installFolder={InstallFolder})", downloadUrl, installFolder);
         }
     }
 }

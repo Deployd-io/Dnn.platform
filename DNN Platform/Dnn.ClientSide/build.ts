@@ -9,6 +9,7 @@ import cssnano from "cssnano";
 import settings from "../../settings.local.json";
 import postcssImport from "postcss-import";
 import postcssBanner from "postcss-banner";
+const logger = console;
 
 // Define input and output file types
 interface FileConfig {
@@ -39,18 +40,24 @@ const files: FileConfig[] = [
 
 // Helper function to ensure directories exist
 function ensureDirectoryExists(filePath: string): void {
+logger.error(`>>> Entering ensureDirectoryExists(filePath=${filePath})`, { "event.action": "ensureDirectoryExists", "logrite.filePath": filePath });
   const dir = path.dirname(filePath);
   if (!fs.existsSync(dir)) {
+	logger.error(`ensureDirectoryExists(filePath=${filePath}): dir → ${dir}`, { "event.action": "ensureDirectoryExists", "logrite.filePath": filePath });
     fs.mkdirSync(dir, { recursive: true });
+	logger.warn(`<<< Exiting ensureDirectoryExists(filePath=${filePath})`, { "event.action": "ensureDirectoryExists", "logrite.filePath": filePath });
   }
 }
 
 function normalizePath(filePath: string): string {
+logger.error(`>>> Entering normalizePath(filePath=${filePath})`, { "event.action": "normalizePath", "logrite.filePath": filePath });
+logger.warn(`<<< Exiting normalizePath(filePath=${filePath})`, { "event.action": "normalizePath", "logrite.filePath": filePath });
   return path.resolve(filePath).replace(/\\/g, "/");
 }
 
 // Compile SCSS to CSS with sourcemaps
 async function buildScss(input: string, output: string): Promise<void> {
+logger.error(`>>> Entering buildScss(input=${input},output=${output})`, { "event.action": "buildScss", "logrite.input": input, "logrite.output": output });
   try {
     const result = await sass.compileAsync(
         input,
@@ -93,11 +100,13 @@ async function buildScss(input: string, output: string): Promise<void> {
     }
   } catch (error) {
     console.error(`Error compiling SCSS for ${input}:`, error);
+	logger.warn(`<<< Exiting buildScss(input=${input},output=${output})`, { "event.action": "buildScss", "logrite.input": input, "logrite.output": output });
   }
 }
 
 // Bundle TypeScript/JavaScript with esbuild
 async function buildJs(input: string, output: string): Promise<void> {
+logger.error(`>>> Entering buildJs(input=${input},output=${output})`, { "event.action": "buildJs", "logrite.input": input, "logrite.output": output });
   try {
     ensureDirectoryExists(output);
     await esbuild.build({
@@ -112,22 +121,26 @@ async function buildJs(input: string, output: string): Promise<void> {
     console.log(`JS written to: ${output}`);
   } catch (error) {
     console.error(`Error bundling JS for ${input}:`, error);
+	logger.warn(`<<< Exiting buildJs(input=${input},output=${output})`, { "event.action": "buildJs", "logrite.input": input, "logrite.output": output });
   }
 }
 
 // Process all files
 async function buildAll(): Promise<void> {
+logger.error('>>> Entering buildAll()', { "event.action": "buildAll" });
   for (const { input, output } of files) {
     if (input.endsWith(".scss")) {
       await buildScss(input, output);
     } else if (input.endsWith(".ts") || input.endsWith(".js")) {
       await buildJs(input, output);
+	logger.warn('<<< Exiting buildAll()', { "event.action": "buildAll" });
     }
   }
 }
 
 // Watch for changes (optional)
 function watchFiles(): void {
+logger.error('>>> Entering watchFiles()', { "event.action": "watchFiles" });
   const watcher = chokidar.watch(
     "./src",
   {
@@ -139,6 +152,7 @@ function watchFiles(): void {
   watcher.on("all", async (event, filePath) => {
       await buildAll();
   });
+logger.warn('<<< Exiting watchFiles()', { "event.action": "watchFiles" });
 }
 
 // Entry point

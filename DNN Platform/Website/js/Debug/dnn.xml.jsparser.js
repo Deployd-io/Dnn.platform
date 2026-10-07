@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 /// <reference name="MicrosoftAjax.js" />
 /// <reference name="dnn.js" assembly="DotNetNuke.WebUtility" />
 /// <reference name="dnn.xml.js" assembly="DotNetNuke.WebUtility" />
@@ -15,6 +16,8 @@ dnn.xml.JsDocument.prototype =
 {
     hasChildNodes: function ()
     {
+		logger.error('>>> Entering hasChildNodes()', { "event.action": "hasChildNodes" });
+		logger.warn('<<< Exiting hasChildNodes()', { "event.action": "hasChildNodes" });
 	    return this.childNodes.length > 0;
     },
 
@@ -22,11 +25,14 @@ dnn.xml.JsDocument.prototype =
     {
 	    var oParser = new dnn.xml.JsParser();
 	    oParser.parse(sXml, this.root);
+		logger.warn(`<<< Exiting loadXml(sXml=${sXml})`, { "event.action": "loadXml", "logrite.sXml": sXml });
 	    return true;
     },
 
     getXml: function()
     {
+		logger.error('>>> Entering getXml()', { "event.action": "getXml", "logrite.oNode": oNode });
+		logger.warn('<<< Exiting getXml()', { "event.action": "getXml", "logrite.oNode": oNode });
 	    return this.root.getXml();
     },
 
@@ -55,11 +61,14 @@ dnn.xml.JsDocument.prototype =
 				    return o;
 		    }
 	    }
+		logger.warn(`<<< Exiting findNode(oParent=${oParent},sNodeName=${sNodeName},sAttr=${sAttr},sValue=${sValue})`, { "event.action": "findNode", "logrite.oParent": oParent, "logrite.sNodeName": sNodeName, "logrite.sAttr": sAttr, "logrite.sValue": sValue });
     },
 
     getNextHashCode: function()
     {
+		logger.error('>>> Entering getNextHashCode()', { "event.action": "getNextHashCode" });
 	    this.currentHashCode++;
+		logger.warn('<<< Exiting getNextHashCode()', { "event.action": "getNextHashCode" });
 	    return this.currentHashCode;
     }
 }
@@ -84,8 +93,10 @@ dnn.xml.JsXmlNode.prototype =
 {
     appendChild: function(oNode)
     {
+		logger.error(`>>> Entering appendChild(oNode=${oNode})`, { "event.action": "appendChild", "logrite.oNode": oNode });
 	    this.childNodes[this.childNodes.length] = oNode;
 	    oNode.parentNode = this;
+		logger.warn(`<<< Exiting appendChild(oNode=${oNode})`, { "event.action": "appendChild", "logrite.oNode": oNode });
     },
 
     removeChild: function(oNode)
@@ -105,6 +116,7 @@ dnn.xml.JsXmlNode.prototype =
 	    }
 	    if (bFound)
 		    oParent.childNodes.length = oParent.childNodes.length - 1; //remove last node
+		logger.warn(`<<< Exiting removeChild(oNode=${oNode})`, { "event.action": "removeChild", "logrite.oNode": oNode });
 	    return oNode;
     },
 
@@ -115,10 +127,12 @@ dnn.xml.JsXmlNode.prototype =
 
     getXml: function(oNode)
     {
+		logger.error(`>>> Entering getXml(oNode=${oNode})`, { "event.action": "getXml", "logrite.oNode": oNode });
 	    if (oNode == null)
 		    oNode = this;
 
 	    var sXml = '';
+		logger.error(`getXml(oNode=${oNode}): sXml → ${sXml}`, { "event.action": "getXml", "logrite.oNode": oNode });
     	
 	    if (oNode.nodeName != '__root')
 		    sXml =  '<' + oNode.nodeName + this.getAttributes(oNode) + '>';
@@ -134,25 +148,33 @@ dnn.xml.JsXmlNode.prototype =
 
     getAttributes: function(oNode)
     {
+		logger.error(`>>> Entering getAttributes(oNode=${oNode})`, { "event.action": "getAttributes", "logrite.oNode": oNode });
 	    var sRet = '';
 	    for (var sAttr in oNode.attributes)
 		    sRet += ' ' + sAttr + '="' + dnn.encodeHTML(oNode.attributes[sAttr]) + '"';					
+			logger.warn(`<<< Exiting getAttributes(oNode=${oNode})`, { "event.action": "getAttributes", "logrite.oNode": oNode });
 	    return sRet;
     },
 
     getAttribute: function(sAttr)
     {
+		logger.error(`>>> Entering getAttribute(sAttr=${sAttr})`, { "event.action": "getAttribute", "logrite.sAttr": sAttr });
+		logger.warn(`<<< Exiting getAttribute(sAttr=${sAttr})`, { "event.action": "getAttribute", "logrite.sAttr": sAttr });
 	    return this.attributes[sAttr];
     },
 
     setAttribute: function(sAttr, sVal)
     {
+		logger.error(`>>> Entering setAttribute(sAttr=${sAttr},sVal=${sVal})`, { "event.action": "setAttribute", "logrite.sAttr": sAttr, "logrite.sVal": sVal });
 	    this.attributes[sAttr] = sVal;
+		logger.warn(`<<< Exiting setAttribute(sAttr=${sAttr},sVal=${sVal})`, { "event.action": "setAttribute", "logrite.sAttr": sAttr, "logrite.sVal": sVal });
     },
 
     removeAttribute: function(sAttr)
     {
+		logger.error(`>>> Entering removeAttribute(sAttr=${sAttr})`, { "event.action": "removeAttribute", "logrite.sAttr": sAttr });
 	    delete this.attributes[sAttr];
+		logger.warn(`<<< Exiting removeAttribute(sAttr=${sAttr})`, { "event.action": "removeAttribute", "logrite.sAttr": sAttr });
     }
 }
 dnn.xml.JsXmlNode.registerClass('dnn.xml.JsXmlNode');    
@@ -170,16 +192,21 @@ dnn.xml.JsParser.prototype =
 {
     parse: function(sXml, oRoot)
     {
+		logger.error(`>>> Entering parse(sXml=${sXml},oRoot=${oRoot})`, { "event.action": "parse", "logrite.sXml": sXml, "logrite.oRoot": oRoot });
 	    this.pos = 0;
 	    this.xmlArray = sXml.split('>');
+		logger.debug(`parse(sXml=${sXml},oRoot=${oRoot}): this.pos → ${this.pos}`, { "event.action": "parse", "logrite.sXml": sXml, "logrite.oRoot": oRoot });
 	    this.processXml(oRoot);
+		logger.warn(`<<< Exiting parse(sXml=${sXml},oRoot=${oRoot})`, { "event.action": "parse", "logrite.sXml": sXml, "logrite.oRoot": oRoot });
     },
 
     getProcessString: function ()
     {
+		logger.error('>>> Entering getProcessString()', { "event.action": "getProcessString" });
 	    var s = this.xmlArray[this.pos];
 	    if (s == null)
 		    s = '';
+		logger.error(`getProcessString(): s → ${s}`, { "event.action": "getProcessString" });
 	    return s.replace(/^\s*/, "").replace(/\s*$/, ""); //trim off spaces on both sides
     },
 
@@ -209,10 +236,12 @@ dnn.xml.JsParser.prototype =
 	    if (bClose && s.substr(0,1) != '<')
 		    oParent.text = s.substr(0,s.indexOf('<'));
 	    this.pos +=1;
+		logger.warn(`<<< Exiting processXml(oParent=${oParent})`, { "event.action": "processXml", "logrite.oParent": oParent });
     },
 
     isCloseTag: function()
     {
+		logger.error('>>> Entering isCloseTag()', { "event.action": "isCloseTag" });
 	    var s = this.getProcessString();
 	    if (s.substr(0, 1) == '/' || s.indexOf('</') > -1 || s.substr(s.length-1) == '/')
 		    return true;
@@ -222,6 +251,7 @@ dnn.xml.JsParser.prototype =
 
     isOpenTag: function()
     {
+		logger.error('>>> Entering isOpenTag()', { "event.action": "isOpenTag" });
 	    var s = this.getProcessString();
 	    if (s.substr(0, 1) == '<' && s.substr(0, 2) != '</' && s.substr(0,2) != '<?')
 		    return true;
@@ -231,37 +261,48 @@ dnn.xml.JsParser.prototype =
 
     processOpenTag: function(oParent)
     {		
+		logger.error(`>>> Entering processOpenTag(oParent=${oParent})`, { "event.action": "processOpenTag", "logrite.oParent": oParent });
 	    if (this.isOpenTag(this.getProcessString()))
 	    {
 		    var sArr = this.getProcessString().split(' ');
+			logger.error(`processOpenTag(oParent=${oParent}): sArr → ${sArr}`, { "event.action": "processOpenTag", "logrite.oParent": oParent });
 		    var oNode = new dnn.xml.JsXmlNode(oParent.ownerDocument);
+			logger.error(`processOpenTag(oParent=${oParent}): oNode → ${oNode}`, { "event.action": "processOpenTag", "logrite.oParent": oParent });
+			logger.debug(`processOpenTag(oParent=${oParent}): oNode.parentNode → ${oNode.parentNode}`, { "event.action": "processOpenTag", "logrite.oParent": oParent });
     		
 		    oNode.nodeName = sArr[0].substr(1).replace('/', '');
 		    oNode.parentNode = oParent;
 		    this.processAttributes(oNode);
 		    oParent.appendChild(oNode);
 		    oParent = oNode;
+			logger.warn(`<<< Exiting processOpenTag(oParent=${oParent})`, { "event.action": "processOpenTag", "logrite.oParent": oParent });
 	    }
 	    return oParent
     },
 
     processAttributes: function(oNode)
     {
+		logger.error(`>>> Entering processAttributes(oNode=${oNode})`, { "event.action": "processAttributes", "logrite.oNode": oNode });
 	    var s = this.getProcessString();
 	    if (s.indexOf(' ') > -1)
 		    s = s.substr(s.indexOf(' ') + 1);
+			logger.error(`processAttributes(oNode=${oNode}): s → ${s}`, { "event.action": "processAttributes", "logrite.oNode": oNode });
     	
 	    if (s.indexOf('=') > -1)
 	    {
 		    var bValue=false;
 		    var sName='';
+			logger.error(`processAttributes(oNode=${oNode}): sName → ${sName}`, { "event.action": "processAttributes", "logrite.oNode": oNode });
 		    var sValue='';
+			logger.error(`processAttributes(oNode=${oNode}): sValue → ${sValue}`, { "event.action": "processAttributes", "logrite.oNode": oNode });
 		    var sChar;
 		    for (var i=0; i<s.length; i++)
 		    {
 			    sChar = s.substr(i, 1);
+				logger.error(`processAttributes(oNode=${oNode}): sChar → ${sChar}`, { "event.action": "processAttributes", "logrite.oNode": oNode });
 			    if (sChar == '"')
 			    {
+					logger.debug(`processAttributes(oNode=${oNode}): sChar → ${sChar}`, { "event.action": "processAttributes", "logrite.oNode": oNode });
 				    if (bValue)
 				    {
 					    //need to escape out special characters

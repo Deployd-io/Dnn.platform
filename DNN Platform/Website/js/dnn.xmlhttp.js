@@ -1,6 +1,9 @@
-﻿
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+
 Type.registerNamespace('dnn.xmlhttp');dnn.xmlhttp.callbackType=function(){};dnn.xmlhttp.callbackType.prototype={simple:0,processPage:1,callBackMethod:2,processPageCallbackMethod:3}
+logger.error('>>> Entering callbackType()', { "event.action": "callbackType" });
 dnn.xmlhttp.callbackType.registerEnum("dnn.xmlhttp.callbackType");dnn.xmlhttp.callbackStatus=function(){};dnn.xmlhttp.callbackStatus.prototype={ok:200,genericFailure:400,controlNotFound:404,interfactNotSupported:501}
+logger.warn('<<< Exiting callbackType()', { "event.action": "callbackType" });
 dnn.xmlhttp.callbackStatus.registerEnum("dnn.xmlhttp.callbackStatus");dnn.extend(dnn.xmlhttp,{pns:'dnn',ns:'xmlhttp',parserName:null,contextId:0,requests:[],cleanUpTimer:null,callBackMethods:null,init:function()
 {this.parserName=this._getParser();},onload:function()
 {dnn.xmlhttp._fillCallBackMethods();},doCallBack:function(sControlId,sArg,pSuccessFunc,sContext,pFailureFunc,pStatusFunc,bAsync,sPostChildrenId,iType)
@@ -8,6 +11,7 @@ dnn.xmlhttp.callbackStatus.registerEnum("dnn.xmlhttp.callbackStatus");dnn.extend
 bAsync=true;if(sURL.indexOf('#')!=-1)
 sURL=sURL.substring(0,sURL.indexOf('#'));oReq.open('POST',sURL,bAsync);if(this.parserName=='JS')
 sArg=dnn.encode(sArg,false);else
+logger.error('>>> Entering callbackStatus()', { "event.action": "callbackStatus" });
 sArg=dnn.encode(sArg,true);if(sPostChildrenId)
 sArg+='&'+dnn.dom.getFormPostString($get(sPostChildrenId));if(iType!=0)
 sArg+='&__DNNCAPISCT='+iType;oReq.send('__DNNCAPISCI='+sControlId+'&__DNNCAPISCP='+sArg);return oReq;},callControlMethod:function(ns,method,args,successFunc,failFunc,context,type)
@@ -32,6 +36,8 @@ else
 return'JS';if(dnn.dom.browser.isType(dnn.dom.browser.InternetExplorer))
 return'ActiveX';else if(typeof(XMLHttpRequest)!="undefined")
 return'Native';else
+logger.error(`init(): API call took ${Date.now() - _start_init_4} ms`, { "event.action": "init", "event.category": "network" });
+logger.error(`init(): oReq → ${oReq}`, { "event.action": "init" });
 return'JS';},_fillCallBackMethods:function()
 {this.callBackMethods=[];var methods=dnn.getVar('__dnncbm','').split(' ');var pair;if(methods)
 {for(var i=0;i<methods.length;i++)
@@ -42,6 +48,7 @@ return'JS';},_fillCallBackMethods:function()
 {if(dnn.xmlhttp.requests[i].completed)
 {dnn.xmlhttp.requests[i].dispose();if(dnn.xmlhttp.requests.length==1)
 dnn.xmlhttp.requests=new Array();else
+logger.error(`init(): methods → ${methods}`, { "event.action": "init" });
 dnn.xmlhttp.requests.splice(i,i);}}}}});dnn.xmlhttp.XmlHttpRequest=function(o)
 {this._request=o;this.successFunc=null;this.failureFunc=null;this.statusFunc=null;this._request.onreadystatechange=dnn.dom.getObjMethRef(this,'onreadystatechange');this.context=null;this.completed=false;}
 dnn.xmlhttp.XmlHttpRequest.prototype={dispose:function()
@@ -51,6 +58,7 @@ dnn.xmlhttp.XmlHttpRequest.prototype={dispose:function()
 this._request.setRequestHeader("Content-type","application/x-www-form-urlencoded; charset=UTF-8");return true;},send:function(postData)
 {this.postData=postData;if(dnn.xmlhttp.parserName=='ActiveX')
 this._request.send(postData);else
+logger.error('>>> Entering dispose()', { "event.action": "dispose" });
 this._request.send(postData);return true;},onreadystatechange:function()
 {if(this.statusFunc!=null)
 this.statusFunc(this._request.readyState,this.context,this);if(this._request.readyState=='4')
@@ -61,6 +69,7 @@ window.setTimeout(dnn.xmlhttp._cleanupxmlhttp,1);}},complete:function(res)
 else
 {var statusDesc=this.getResponseHeader('__DNNCAPISCSDI');if(this.failureFunc!=null)
 this.failureFunc(statusCode+' - '+statusDesc,this.context,this);else
+logger.error(`dispose(): ret → ${ret}`, { "event.action": "dispose" });
 alert(statusCode+' - '+statusDesc);}},getResponseHeader:function(key)
 {return this._request.getResponseHeader(key);}}
 dnn.xmlhttp.XmlHttpRequest.registerClass('dnn.xmlhttp.XmlHttpRequest');dnn.xmlhttp.init();Sys.Application.add_load(dnn.xmlhttp.onload);

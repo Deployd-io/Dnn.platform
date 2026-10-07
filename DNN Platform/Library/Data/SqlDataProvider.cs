@@ -30,6 +30,8 @@ namespace DotNetNuke.Data
         public SqlDataProvider()
             : this(null)
         {
+		Logger.LogError(">>> Entering SqlDataProvider()");
+        Logger.LogWarning("<<< Exiting SqlDataProvider()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="SqlDataProvider"/> class.</summary>
@@ -48,42 +50,57 @@ namespace DotNetNuke.Data
         /// <inheritdoc />
         public override void ExecuteNonQuery(string procedureName, params object[] commandParameters)
         {
+			Logger.LogError(">>> Entering ExecuteNonQuery(procedureName={ProcedureName},commandParameters={CommandParameters})", procedureName, commandParameters);
             dbConnectionProvider.ExecuteNonQuery(this.ConnectionString, CommandType.StoredProcedure, 0, this.DatabaseOwner + this.ObjectQualifier + procedureName, commandParameters);
+			Logger.LogWarning("<<< Exiting ExecuteNonQuery(procedureName={ProcedureName},commandParameters={CommandParameters})", procedureName, commandParameters);
         }
 
         /// <inheritdoc />
         public override void ExecuteNonQuery(int timeoutSec, string procedureName, params object[] commandParameters)
         {
+			Logger.LogError(">>> Entering ExecuteNonQuery(timeoutSec={TimeoutSec},procedureName={ProcedureName},commandParameters={CommandParameters})", timeoutSec, procedureName, commandParameters);
             dbConnectionProvider.ExecuteNonQuery(this.ConnectionString, CommandType.StoredProcedure, timeoutSec, this.DatabaseOwner + this.ObjectQualifier + procedureName, commandParameters);
+			Logger.LogWarning("<<< Exiting ExecuteNonQuery(timeoutSec={TimeoutSec},procedureName={ProcedureName},commandParameters={CommandParameters})", timeoutSec, procedureName, commandParameters);
         }
 
         /// <inheritdoc />
         public override void BulkInsert(string procedureName, string tableParameterName, DataTable dataTable)
         {
+			Logger.LogError(">>> Entering BulkInsert(procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable})", procedureName, tableParameterName, dataTable);
             dbConnectionProvider.BulkInsert(this.ConnectionString, 0, this.DatabaseOwner + this.ObjectQualifier + procedureName, tableParameterName, dataTable);
+			Logger.LogWarning("<<< Exiting BulkInsert(procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable})", procedureName, tableParameterName, dataTable);
         }
 
         /// <inheritdoc />
         public override void BulkInsert(string procedureName, string tableParameterName, DataTable dataTable, int timeoutSec)
         {
+			Logger.LogError(">>> Entering BulkInsert(procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable},timeoutSec={TimeoutSec})", procedureName, tableParameterName, dataTable, timeoutSec);
             dbConnectionProvider.BulkInsert(this.ConnectionString, timeoutSec, this.DatabaseOwner + this.ObjectQualifier + procedureName, tableParameterName, dataTable);
+			Logger.LogWarning("<<< Exiting BulkInsert(procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable},timeoutSec={TimeoutSec})", procedureName, tableParameterName, dataTable, timeoutSec);
         }
 
         /// <inheritdoc />
         public override void BulkInsert(string procedureName, string tableParameterName, DataTable dataTable, Dictionary<string, object> commandParameters)
         {
+			Logger.LogError(">>> Entering BulkInsert(procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable},commandParameters={CommandParameters})", procedureName, tableParameterName, dataTable, commandParameters);
             dbConnectionProvider.BulkInsert(this.ConnectionString, 0, this.DatabaseOwner + this.ObjectQualifier + procedureName, tableParameterName, dataTable, commandParameters);
+			Logger.LogWarning("<<< Exiting BulkInsert(procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable},commandParameters={CommandParameters})", procedureName, tableParameterName, dataTable, commandParameters);
         }
 
         /// <inheritdoc />
         public override void BulkInsert(string procedureName, string tableParameterName, DataTable dataTable, int timeoutSec, Dictionary<string, object> commandParameters)
         {
+			Logger.LogError(">>> Entering BulkInsert(procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable},timeoutSec={TimeoutSec},commandParameters={CommandParameters})", procedureName, tableParameterName, dataTable, timeoutSec, commandParameters);
             dbConnectionProvider.BulkInsert(this.ConnectionString, 0, this.DatabaseOwner + this.ObjectQualifier + procedureName, tableParameterName, dataTable, commandParameters);
+			Logger.LogWarning("<<< Exiting BulkInsert(procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable},timeoutSec={TimeoutSec},commandParameters={CommandParameters})", procedureName, tableParameterName, dataTable, timeoutSec, commandParameters);
         }
 
         /// <inheritdoc />
         public override IDataReader ExecuteReader(string procedureName, params object[] commandParameters)
         {
+			Logger.LogError(">>> Entering ExecuteReader(procedureName={ProcedureName},commandParameters={CommandParameters})", procedureName, commandParameters);
+            Logger.LogWarning("<<< Exiting ExecuteReader(procedureName={ProcedureName},commandParameters={CommandParameters})", procedureName, commandParameters);
+			Logger.LogWarning("<<< Exiting ExecuteReader(timeoutSec={TimeoutSec},procedureName={ProcedureName},commandParameters={CommandParameters})", timeoutSec, procedureName, commandParameters);
             return dbConnectionProvider.ExecuteReader(this.ConnectionString, CommandType.StoredProcedure, 0, this.DatabaseOwner + this.ObjectQualifier + procedureName, commandParameters);
         }
 
@@ -96,6 +113,8 @@ namespace DotNetNuke.Data
         /// <inheritdoc />
         public override T ExecuteScalar<T>(string procedureName, params object[] commandParameters)
         {
+			Logger.LogError(">>> Entering ExecuteScalar(procedureName={ProcedureName},commandParameters={CommandParameters})", procedureName, commandParameters);
+            Logger.LogWarning("<<< Exiting ExecuteScalar(procedureName={ProcedureName},commandParameters={CommandParameters})", procedureName, commandParameters);
             return dbConnectionProvider.ExecuteScalar<T>(this.ConnectionString, CommandType.StoredProcedure, 0, this.DatabaseOwner + this.ObjectQualifier + procedureName, commandParameters);
         }
 
@@ -108,6 +127,9 @@ namespace DotNetNuke.Data
         /// <inheritdoc />
         public override string ExecuteScript(string script)
         {
+			Logger.LogError(">>> Entering ExecuteScript(script={Script})", script);
+			Logger.LogWarning("<<< Exiting ExecuteScript(script={Script})", script);
+			Logger.LogWarning("<<< Exiting ExecuteScript(script={Script},timeoutSec={TimeoutSec})", script, timeoutSec);
             return this.ExecuteScript(script, 0);
         }
 
@@ -171,6 +193,8 @@ namespace DotNetNuke.Data
         /// <inheritdoc />
         public override IDataReader ExecuteSQL(string sql)
         {
+			Logger.LogError(">>> Entering ExecuteSQL(sql={Sql})", sql);
+            Logger.LogWarning("<<< Exiting ExecuteSQL(sql={Sql})", sql);
             return ExecuteSQLInternal(this.ConnectionString, sql);
         }
 
@@ -183,7 +207,10 @@ namespace DotNetNuke.Data
         /// <inheritdoc />
         public override IDataReader ExecuteSQLTemp(string connectionString, string sql)
         {
+			Logger.LogError(">>> Entering ExecuteSQLTemp(connectionString={ConnectionString},sql={Sql})", connectionString, sql);
             string errorMessage;
+			Logger.LogWarning("<<< Exiting ExecuteSQLTemp(connectionString={ConnectionString},sql={Sql})", connectionString, sql);
+			Logger.LogWarning("<<< Exiting ExecuteSQLTemp(connectionString={ConnectionString},sql={Sql},timeoutSec={TimeoutSec})", connectionString, sql, timeoutSec);
             return this.ExecuteSQLTemp(connectionString, sql, out errorMessage);
         }
 
@@ -208,13 +235,16 @@ namespace DotNetNuke.Data
 
         private static string ExecuteScriptInternal(string connectionString, string script, int timeoutSec = 0)
         {
+			Logger.LogError(">>> Entering ExecuteScriptInternal(connectionString={ConnectionString},script={Script},timeoutSec={TimeoutSec})", connectionString, script, timeoutSec);
             string exceptions = string.Empty;
 
             var sqlDelimiterRegex = RegexUtils.GetCachedRegex(ScriptDelimiter, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+			Logger.LogError("ExecuteScriptInternal(connectionString={ConnectionString},script={Script},timeoutSec={TimeoutSec}): sqlDelimiterRegex → {SqlDelimiterRegex}", connectionString, script, timeoutSec, sqlDelimiterRegex);
             string[] sqlStatements = sqlDelimiterRegex.Split(script);
             foreach (string statement in sqlStatements)
             {
                 var sql = statement.Trim();
+				Logger.LogError("ExecuteScriptInternal(connectionString={ConnectionString},script={Script},timeoutSec={TimeoutSec}): sql → {Sql}", connectionString, script, timeoutSec, sql);
                 if (!string.IsNullOrEmpty(sql))
                 {
                     // script dynamic substitution
@@ -224,6 +254,8 @@ namespace DotNetNuke.Data
                     {
                         Logger.Trace("Executing SQL Script " + sql);
 
+						var __logStart = System.Diagnostics.Stopwatch.StartNew();
+						Logger.LogError("ExecuteScriptInternal(connectionString,script,timeoutSec)={ConnectionString},{Script},{TimeoutSec}: database query executed in {Arg3} ms", connectionString, script, timeoutSec, __logStart.ElapsedMilliseconds);
                         dbConnectionProvider.ExecuteNonQuery(connectionString, CommandType.Text, timeoutSec, sql);
                     }
                     catch (SqlException objException)
@@ -270,32 +302,41 @@ namespace DotNetNuke.Data
             }
 
             errorMessage += Environment.NewLine + Environment.NewLine + sql + Environment.NewLine + Environment.NewLine;
+			Logger.LogWarning("<<< Exiting ExecuteSQLInternal(connectionString={ConnectionString},sql={Sql},timeoutSec={TimeoutSec})", connectionString, sql, timeoutSec);
             return null;
         }
 
         private bool CanConnect()
         {
+			Logger.LogError(">>> Entering CanConnect()");
             bool connectionValid = true;
 
+			Logger.LogError("CanConnect(): connectionValid → {ConnectionValid}", connectionValid);
             try
             {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				Logger.LogError("CanConnect(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 this.ExecuteNonQuery("GetDatabaseVersion");
             }
             catch (SqlException ex)
             {
+				Logger.LogError("Exception in CanConnect(): {Arg0}", ex.Message);
                 if (ex.Errors.Cast<SqlError>().Any(c => !(c.Number == 2812 && c.Class == 16)))
                 {
                     connectionValid = false;
                 }
             }
 
+			Logger.LogWarning("<<< Exiting CanConnect()");
             return connectionValid;
         }
 
         private string GetConnectionStringUserId()
         {
+			Logger.LogError(">>> Entering GetConnectionStringUserId()");
             string dbUser = "public";
 
+			Logger.LogError("GetConnectionStringUserId(): dbUser → {DbUser}", dbUser);
             // If connection string does not use integrated security, then get user id.
             // Normalize to uppercase before all the comparisons
             if (this.ConnectionString.Contains("USER ID", StringComparison.OrdinalIgnoreCase)
@@ -303,11 +344,13 @@ namespace DotNetNuke.Data
                 || this.ConnectionString.Contains("USER", StringComparison.OrdinalIgnoreCase))
             {
                 var connSettings = this.ConnectionString.Split(';');
+				Logger.LogError("GetConnectionStringUserId(): connSettings → {ConnSettings}", connSettings);
                 foreach (var s in connSettings)
                 {
                     if (s != string.Empty)
                     {
                         var connSetting = s.Split('=');
+						Logger.LogError("GetConnectionStringUserId(): connSetting → {ConnSetting}", connSetting);
                         if ("USER ID|UID|USER".Contains(connSetting[0].Trim(), StringComparison.OrdinalIgnoreCase))
                         {
                             dbUser = connSetting[1].Trim();
@@ -316,11 +359,14 @@ namespace DotNetNuke.Data
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetConnectionStringUserId()");
             return dbUser;
         }
 
         private string GrantStoredProceduresPermission(string permission, string loginOrRole)
         {
+			Logger.LogError(">>> Entering GrantStoredProceduresPermission(permission={Permission},loginOrRole={LoginOrRole})", permission, loginOrRole);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // grant rights to a login or role for all stored procedures
             var sql = "if exists (select * from dbo.sysusers where name='" + loginOrRole + "')"
                 + "  begin"
@@ -342,12 +388,16 @@ namespace DotNetNuke.Data
                 + "      end "
                 + "    deallocate sp_cursor"
                 + "  end ";
+				Logger.LogError("GrantStoredProceduresPermission(permission,loginOrRole)={Permission},{LoginOrRole}: find query executed in {Arg2} ms", permission, loginOrRole, __logStart.ElapsedMilliseconds);
 
+			Logger.LogWarning("<<< Exiting GrantStoredProceduresPermission(permission={Permission},loginOrRole={LoginOrRole})", permission, loginOrRole);
             return this.ExecuteUpgradedConnectionQuery(sql);
         }
 
         private string GrantUserDefinedFunctionsPermission(string scalarPermission, string tablePermission, string loginOrRole)
         {
+			Logger.LogError(">>> Entering GrantUserDefinedFunctionsPermission(scalarPermission={ScalarPermission},tablePermission={TablePermission},loginOrRole={LoginOrRole})", scalarPermission, tablePermission, loginOrRole);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // grant EXECUTE rights to a login or role for all functions
             var sql = "if exists (select * from dbo.sysusers where name='" + loginOrRole + "')"
                 + "  begin"
@@ -380,16 +430,21 @@ namespace DotNetNuke.Data
                 + "      end "
                 + "    deallocate sp_cursor"
                 + "  end ";
+				Logger.LogError("GrantUserDefinedFunctionsPermission(scalarPermission,tablePermission,loginOrRole)={ScalarPermission},{TablePermission},{LoginOrRole}: find query executed in {Arg3} ms", scalarPermission, tablePermission, loginOrRole, __logStart.ElapsedMilliseconds);
 
+			Logger.LogWarning("<<< Exiting GrantUserDefinedFunctionsPermission(scalarPermission={ScalarPermission},tablePermission={TablePermission},loginOrRole={LoginOrRole})", scalarPermission, tablePermission, loginOrRole);
             return this.ExecuteUpgradedConnectionQuery(sql);
         }
 
         private string ExecuteUpgradedConnectionQuery(string sql)
         {
+			Logger.LogError(">>> Entering ExecuteUpgradedConnectionQuery(sql={Sql})", sql);
             var exceptions = string.Empty;
 
             try
             {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				Logger.LogError("ExecuteUpgradedConnectionQuery(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 dbConnectionProvider.ExecuteNonQuery(this.UpgradeConnectionString, CommandType.Text, 0, sql);
             }
             catch (SqlException objException)
@@ -399,6 +454,7 @@ namespace DotNetNuke.Data
                 exceptions += objException + Environment.NewLine + Environment.NewLine + sql + Environment.NewLine + Environment.NewLine;
             }
 
+			Logger.LogWarning("<<< Exiting ExecuteUpgradedConnectionQuery(sql={Sql})", sql);
             return exceptions;
         }
     }

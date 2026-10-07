@@ -31,6 +31,8 @@ namespace DotNetNuke.Entities.Tabs
         public TabPublishingController()
             : this(null)
         {
+		Logger.LogError(">>> Entering TabPublishingController()");
+        Logger.LogWarning("<<< Exiting TabPublishingController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="TabPublishingController"/> class.</summary>
@@ -38,26 +40,37 @@ namespace DotNetNuke.Entities.Tabs
         public TabPublishingController(IPermissionDefinitionService permissionDefinitionService)
         {
             this.permissionDefinitionService = permissionDefinitionService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPermissionDefinitionService>();
+			Logger.LogDebug("TabPublishingController(permissionDefinitionService={PermissionDefinitionService}): permissionDefinitionService → {PermissionDefinitionService1}", permissionDefinitionService, permissionDefinitionService);
+        Logger.LogWarning("<<< Exiting TabPublishingController(permissionDefinitionService={PermissionDefinitionService})", permissionDefinitionService);
         }
 
         /// <inheritdoc />
         public bool IsTabPublished(int tabID, int portalID)
         {
+			Logger.LogError(">>> Entering IsTabPublished(tabID={TabID},portalID={PortalID})", tabID, portalID);
             var allUsersRoleId = int.Parse(Globals.glbRoleAllUsers, CultureInfo.InvariantCulture);
             var tab = TabController.Instance.GetTab(tabID, portalID);
+			Logger.LogError("IsTabPublished(tabID={TabID},portalID={PortalID}): tab → {Tab}", tabID, portalID, tab);
+			Logger.LogError("IsTabPublished(tabID={TabID},portalID={PortalID}): allUsersRoleId → {AllUsersRoleId}", tabID, portalID, allUsersRoleId);
 
             var existPermission = GetAlreadyPermission(this.permissionDefinitionService, tab, "VIEW", allUsersRoleId);
+			Logger.LogError("IsTabPublished(tabID={TabID},portalID={PortalID}): existPermission → {ExistPermission}", tabID, portalID, existPermission);
+			Logger.LogWarning("<<< Exiting IsTabPublished(tabID={TabID},portalID={PortalID})", tabID, portalID);
             return existPermission is { AllowAccess: true, };
         }
 
         /// <inheritdoc />
         public void SetTabPublishing(int tabID, int portalID, bool publish)
         {
+			Logger.LogError(">>> Entering SetTabPublishing(tabID={TabID},portalID={PortalID},publish={Publish})", tabID, portalID, publish);
             var tab = TabController.Instance.GetTab(tabID, portalID);
+			Logger.LogError("SetTabPublishing(tabID={TabID},portalID={PortalID},publish={Publish}): tab → {Tab}", tabID, portalID, publish, tab);
             if (!TabPermissionController.CanAdminPage(tab))
             {
                 var errorMessage = Localization.GetExceptionMessage("PublishPagePermissionsNotMet", "Permissions are not met. The page has not been published.");
+				Logger.LogError("SetTabPublishing(tabID={TabID},portalID={PortalID},publish={Publish}): errorMessage → {ErrorMessage}", tabID, portalID, publish, errorMessage);
                 var permissionsNotMetExc = new PermissionsNotMetException(tabID, errorMessage);
+				Logger.LogError("SetTabPublishing(tabID={TabID},portalID={PortalID},publish={Publish}): permissionsNotMetExc → {PermissionsNotMetExc}", tabID, portalID, publish, permissionsNotMetExc);
                 Logger.Error(errorMessage, permissionsNotMetExc);
                 throw permissionsNotMetExc;
             }
@@ -70,18 +83,22 @@ namespace DotNetNuke.Entities.Tabs
             {
                 UnpublishTabInternal(tab);
             }
+			Logger.LogWarning("<<< Exiting SetTabPublishing(tabID={TabID},portalID={PortalID},publish={Publish})", tabID, portalID, publish);
         }
 
         /// <inheritdoc />
         public bool CanPublishingBePerformed(int tabID, int portalID)
         {
+			Logger.LogError(">>> Entering CanPublishingBePerformed(tabID={TabID},portalID={PortalID})", tabID, portalID);
             var tab = TabController.Instance.GetTab(tabID, portalID);
+			Logger.LogError("CanPublishingBePerformed(tabID={TabID},portalID={PortalID}): tab → {Tab}", tabID, portalID, tab);
             if (!TabPermissionController.CanAdminPage(tab))
             {
                 return false; // User has no permission
             }
 
             Hashtable settings = TabController.Instance.GetTabSettings(tabID);
+			Logger.LogError("CanPublishingBePerformed(tabID={TabID},portalID={PortalID}): settings → {Settings}", tabID, portalID, settings);
             if (settings["WorkflowID"] != null)
             {
                 return Convert.ToInt32(settings["WorkflowID"], CultureInfo.InvariantCulture) == 1; // If workflowID is 1, then the Page workflow is Direct Publish
@@ -90,21 +107,28 @@ namespace DotNetNuke.Entities.Tabs
             // If workflowID is 1, then the Page workflow is Direct Publish
             // If WorkflowID is -1, then there is no Workflow setting
             var workflowId = Convert.ToInt32(PortalController.GetPortalSetting("WorkflowID", portalID, "-1"), CultureInfo.InvariantCulture);
+			Logger.LogError("CanPublishingBePerformed(tabID={TabID},portalID={PortalID}): workflowId → {WorkflowId}", tabID, portalID, workflowId);
 
+			Logger.LogWarning("<<< Exiting CanPublishingBePerformed(tabID={TabID},portalID={PortalID})", tabID, portalID);
             return workflowId is 1 or -1;
         }
 
         /// <inheritdoc />
         protected override Func<ITabPublishingController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<ITabPublishingController>;
         }
 
         private static void PublishTabInternal(IPermissionDefinitionService permissionDefinitionService, TabInfo tab)
         {
+			Logger.LogError(">>> Entering PublishTabInternal(permissionDefinitionService={PermissionDefinitionService},tab={Tab})", permissionDefinitionService, tab);
             var allUsersRoleId = int.Parse(Globals.glbRoleAllUsers, CultureInfo.InvariantCulture);
 
+			Logger.LogError("PublishTabInternal(permissionDefinitionService={PermissionDefinitionService},tab={Tab}): allUsersRoleId → {AllUsersRoleId}", permissionDefinitionService, tab, allUsersRoleId);
             var existPermission = GetAlreadyPermission(permissionDefinitionService, tab, "VIEW", allUsersRoleId);
+			Logger.LogError("PublishTabInternal(permissionDefinitionService={PermissionDefinitionService},tab={Tab}): existPermission → {ExistPermission}", permissionDefinitionService, tab, existPermission);
             if (existPermission != null)
             {
                 tab.TabPermissions.Remove(existPermission);
@@ -113,12 +137,16 @@ namespace DotNetNuke.Entities.Tabs
             tab.TabPermissions.Add(GetTabPermissionByRole(permissionDefinitionService, tab.TabID, "VIEW", allUsersRoleId));
             TabPermissionController.SaveTabPermissions(tab);
             ClearTabCache(tab);
+			Logger.LogWarning("<<< Exiting PublishTabInternal(permissionDefinitionService={PermissionDefinitionService},tab={Tab})", permissionDefinitionService, tab);
         }
 
         private static void UnpublishTabInternal(TabInfo tab)
         {
+			Logger.LogError(">>> Entering UnpublishTabInternal(tab={Tab})", tab);
             var administratorsRoleID = PortalController.Instance.GetPortal(tab.PortalID).AdministratorRoleId;
             var permissionsToRemove = new List<int>();
+			Logger.LogError("UnpublishTabInternal(tab={Tab}): permissionsToRemove → {PermissionsToRemove}", tab, permissionsToRemove);
+			Logger.LogError("UnpublishTabInternal(tab={Tab}): administratorsRoleID → {AdministratorsRoleID}", tab, administratorsRoleID);
             permissionsToRemove.AddRange(tab.TabPermissions.Where(p => p.RoleID != administratorsRoleID).Select(p => p.TabPermissionID));
             foreach (var tabPermissionId in permissionsToRemove)
             {
@@ -127,25 +155,33 @@ namespace DotNetNuke.Entities.Tabs
 
             TabPermissionController.SaveTabPermissions(tab);
             ClearTabCache(tab);
+			Logger.LogWarning("<<< Exiting UnpublishTabInternal(tab={Tab})", tab);
         }
 
         private static void ClearTabCache(TabInfo tabInfo)
         {
+			Logger.LogError(">>> Entering ClearTabCache(tabInfo={TabInfo})", tabInfo);
             TabController.Instance.ClearCache(tabInfo.PortalID);
 
             // Clear the Tab's Cached modules
             DataCache.ClearModuleCache(tabInfo.TabID);
+			Logger.LogWarning("<<< Exiting ClearTabCache(tabInfo={TabInfo})", tabInfo);
         }
 
         private static TabPermissionInfo GetAlreadyPermission(IPermissionDefinitionService permissionDefinitionService, TabInfo tab, string permissionKey, int roleId)
         {
+			Logger.LogError(">>> Entering GetAlreadyPermission(permissionDefinitionService={PermissionDefinitionService},tab={Tab},permissionKey={PermissionKey},roleId={RoleId})", permissionDefinitionService, tab, permissionKey, roleId);
             var permission = permissionDefinitionService.GetDefinitionsByTab().Single(p => p.PermissionKey == permissionKey);
+			Logger.LogError("GetAlreadyPermission(permissionDefinitionService={PermissionDefinitionService},tab={Tab},permissionKey={PermissionKey},roleId={RoleId}): permission → {Permission}", permissionDefinitionService, tab, permissionKey, roleId, permission);
+			Logger.LogWarning("<<< Exiting GetAlreadyPermission(permissionDefinitionService={PermissionDefinitionService},tab={Tab},permissionKey={PermissionKey},roleId={RoleId})", permissionDefinitionService, tab, permissionKey, roleId);
             return tab.TabPermissions.FirstOrDefault(tp => ((IPermissionInfo)tp).RoleId == roleId && ((IPermissionDefinitionInfo)tp).PermissionId == permission.PermissionId);
         }
 
         private static TabPermissionInfo GetTabPermissionByRole(IPermissionDefinitionService permissionDefinitionService, int tabID, string permissionKey, int roleID)
         {
+			Logger.LogError(">>> Entering GetTabPermissionByRole(permissionDefinitionService={PermissionDefinitionService},tabID={TabID},permissionKey={PermissionKey},roleID={RoleID})", permissionDefinitionService, tabID, permissionKey, roleID);
             var permission = permissionDefinitionService.GetDefinitionsByTab().Single(p => p.PermissionKey == permissionKey);
+			Logger.LogError("GetTabPermissionByRole(permissionDefinitionService={PermissionDefinitionService},tabID={TabID},permissionKey={PermissionKey},roleID={RoleID}): permission → {Permission}", permissionDefinitionService, tabID, permissionKey, roleID, permission);
             var tabPermission = new TabPermissionInfo
             {
                 TabID = tabID,
@@ -156,6 +192,7 @@ namespace DotNetNuke.Entities.Tabs
             ((IPermissionInfo)tabPermission).PermissionId = permission.PermissionId;
             ((IPermissionInfo)tabPermission).RoleId = roleID;
             ((IPermissionInfo)tabPermission).UserId = Null.NullInteger;
+			Logger.LogWarning("<<< Exiting GetTabPermissionByRole(permissionDefinitionService={PermissionDefinitionService},tabID={TabID},permissionKey={PermissionKey},roleID={RoleID})", permissionDefinitionService, tabID, permissionKey, roleID);
             return tabPermission;
         }
     }

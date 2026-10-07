@@ -11,16 +11,19 @@ namespace DotNetNuke.Services.FileSystem
 
     public class SynchronizeFileSystem : SchedulerClient
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SynchronizeFileSystem));
         /// <summary>Initializes a new instance of the <see cref="SynchronizeFileSystem"/> class.</summary>
         /// <param name="objScheduleHistoryItem">The schedule history item.</param>
         public SynchronizeFileSystem(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogError(">>> Entering SynchronizeFileSystem(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             this.ScheduleHistoryItem = objScheduleHistoryItem;
         }
 
         /// <inheritdoc />
         public override void DoWork()
         {
+			Logger.LogError(">>> Entering DoWork()");
             try
             {
                 // notification that the event is progressing
@@ -34,6 +37,7 @@ namespace DotNetNuke.Services.FileSystem
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in DoWork(): {Arg0}", exc.Message);
                 this.ScheduleHistoryItem.Succeeded = false;
 
                 this.ScheduleHistoryItem.AddLogNote("File System Synchronization failed. " + exc);
@@ -44,22 +48,27 @@ namespace DotNetNuke.Services.FileSystem
                 // log the exception
                 Exceptions.Exceptions.LogException(exc); // OPTIONAL
             }
+			Logger.LogWarning("<<< Exiting DoWork()");
         }
 
         private static void Synchronize()
         {
+			Logger.LogError(">>> Entering Synchronize()");
             var folderManager = FolderManager.Instance;
 
             folderManager.Synchronize(Null.NullInteger);
 
             var portals = PortalController.Instance.GetPortals();
+			Logger.LogError("Synchronize(): portals → {Portals}", portals);
 
             // Sync Portals
             for (var intIndex = 0; intIndex <= portals.Count - 1; intIndex++)
             {
                 var portal = (PortalInfo)portals[intIndex];
+				Logger.LogError("Synchronize(): portal → {Portal}", portal);
                 folderManager.Synchronize(portal.PortalID);
             }
+			Logger.LogWarning("<<< Exiting Synchronize()");
         }
     }
 }

@@ -12,7 +12,9 @@ namespace DotNetNuke.Web.DDRMenu
     {
         protected string GetStringSetting(string name, string defaultValue)
         {
+			eventLogger.LogError(">>> Entering GetStringSetting(name={Name},defaultValue={DefaultValue})", name, defaultValue);
             var result = this.Request.QueryString[name];
+			eventLogger.LogError("GetStringSetting(name={Name},defaultValue={DefaultValue}): result → {Result}", name, defaultValue, result);
             if (string.IsNullOrEmpty(result))
             {
                 result = (string)this.Settings[name];
@@ -33,6 +35,7 @@ namespace DotNetNuke.Web.DDRMenu
                 result = string.Empty;
             }
 
+			eventLogger.LogWarning("<<< Exiting GetStringSetting(name={Name},defaultValue={DefaultValue})", name, defaultValue);
             return result;
         }
 
@@ -43,6 +46,8 @@ namespace DotNetNuke.Web.DDRMenu
 
         protected int GetIntSetting(string name, int defaultValue)
         {
+			eventLogger.LogError(">>> Entering GetIntSetting(name={Name},defaultValue={DefaultValue})", name, defaultValue);
+            eventLogger.LogWarning("<<< Exiting GetIntSetting(name={Name},defaultValue={DefaultValue})", name, defaultValue);
             return Convert.ToInt32(this.GetStringSetting(name, defaultValue.ToString()));
         }
 
@@ -53,7 +58,10 @@ namespace DotNetNuke.Web.DDRMenu
 
         protected bool GetBoolSetting(string name, bool defaultValue)
         {
+			eventLogger.LogError(">>> Entering GetBoolSetting(name={Name},defaultValue={DefaultValue})", name, defaultValue);
             var result = this.GetStringSetting(name);
+			eventLogger.LogError("GetBoolSetting(name={Name},defaultValue={DefaultValue}): result → {Result}", name, defaultValue, result);
+			eventLogger.LogWarning("<<< Exiting GetBoolSetting(name={Name},defaultValue={DefaultValue})", name, defaultValue);
             return (result == string.Empty) ? defaultValue : Convert.ToBoolean(result);
         }
 

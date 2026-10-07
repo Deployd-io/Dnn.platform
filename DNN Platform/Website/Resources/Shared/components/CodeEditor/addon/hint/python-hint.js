@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -12,10 +13,13 @@
   "use strict";
 
   function forEach(arr, f) {
+	logger.error(`>>> Entering forEach(arr=${arr},f=${f})`, { "event.action": "forEach", "logrite.arr": arr, "logrite.f": f });
     for (var i = 0, e = arr.length; i < e; ++i) f(arr[i]);
+	logger.warn(`<<< Exiting forEach(arr=${arr},f=${f})`, { "event.action": "forEach", "logrite.arr": arr, "logrite.f": f });
   }
 
   function arrayContains(arr, item) {
+	logger.error(`>>> Entering arrayContains(arr=${arr},item=${item})`, { "event.action": "arrayContains", "logrite.arr": arr, "logrite.item": item });
     if (!Array.prototype.indexOf) {
       var i = arr.length;
       while (i--) {
@@ -25,6 +29,7 @@
       }
       return false;
     }
+	logger.warn(`<<< Exiting arrayContains(arr=${arr},item=${item})`, { "event.action": "arrayContains", "logrite.arr": arr, "logrite.item": item });
     return arr.indexOf(item) != -1;
   }
 
@@ -50,6 +55,7 @@
   }
 
   function pythonHint(editor) {
+	logger.error(`>>> Entering pythonHint(editor=${editor})`, { "event.action": "pythonHint", "logrite.editor": editor });
     return scriptHint(editor, pythonKeywordsU, function (e, cur) {return e.getTokenAt(cur);});
   }
   CodeMirror.registerHelper("hint", "python", pythonHint);
@@ -73,14 +79,18 @@
   function getCompletions(token, context) {
     var found = [], start = token.string;
     function maybeAdd(str) {
+	logger.error(`>>> Entering maybeAdd(str=${str})`, { "event.action": "maybeAdd", "logrite.str": str });
       if (str.lastIndexOf(start, 0) == 0 && !arrayContains(found, str)) found.push(str);
+	logger.warn(`<<< Exiting maybeAdd(str=${str})`, { "event.action": "maybeAdd", "logrite.str": str });
     }
 
     function gatherCompletions(_obj) {
+		logger.error(`>>> Entering gatherCompletions(_obj=${_obj})`, { "event.action": "gatherCompletions", "logrite._obj": _obj });
         forEach(pythonBuiltinsL, maybeAdd);
         forEach(pythonBuiltinsU, maybeAdd);
         forEach(pythonKeywordsL, maybeAdd);
         forEach(pythonKeywordsU, maybeAdd);
+		logger.warn(`<<< Exiting gatherCompletions(_obj=${_obj})`, { "event.action": "gatherCompletions", "logrite._obj": _obj });
     }
 
     if (context) {

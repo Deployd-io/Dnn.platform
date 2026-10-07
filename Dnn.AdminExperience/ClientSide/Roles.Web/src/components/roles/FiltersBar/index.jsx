@@ -11,11 +11,13 @@ import {
     roles as RolesActions
 } from "../../../actions";
 import util from "utils";
+const logger = console;
 
 let canEdit = false;
 class FiltersBar extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             selectedGroup: {
                 label: resx.get("GlobalRolesGroup"),
@@ -24,8 +26,10 @@ class FiltersBar extends Component {
             showPopup: false
         };
         canEdit = util.settings.isHost || util.settings.isAdmin || util.settings.permissions.EDIT;
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
     onDeleteGroup(e) {
+		logger.error(`>>> Entering onDeleteGroup(e=${e})`, { "event.action": "onDeleteGroup", "logrite.e": e });
         e.stopPropagation();
 
         const {props} = this;
@@ -43,20 +47,26 @@ class FiltersBar extends Component {
             }));
         }, () => {
         });
+		logger.warn(`<<< Exiting onDeleteGroup(e=${e})`, { "event.action": "onDeleteGroup", "logrite.e": e });
     }
 
     onSave(group) {
+		logger.error(`>>> Entering onSave(group=${group})`, { "event.action": "onSave", "logrite.group": group });
         this.updateSelectedGroup({ label: group.name, value: group.id });
         let {showPopup} = this.state;
+		logger.warn(`<<< Exiting onSave(group=${group})`, { "event.action": "onSave", "logrite.group": group });
         showPopup = !showPopup;
         this.setState({
             showPopup
         });
     }
     closeDropDown() {
+		logger.error('>>> Entering closeDropDown()', { "event.action": "closeDropDown" });
         /*This is done in order to keep the dropdown closed on click on edit/delete*/
         let {state} = this.groupsDropdownRef;
+		logger.debug(`closeDropDown(): state.dropDownOpen → ${state.dropDownOpen}`, { "event.action": "closeDropDown" });
         if (state) {
+			logger.warn('<<< Exiting closeDropDown()', { "event.action": "closeDropDown" });
             state.dropDownOpen = false;
             this.groupsDropdownRef.setState({
                 state
@@ -68,6 +78,7 @@ class FiltersBar extends Component {
         this.props.onRoleGroupChanged(option);
     }
     toggleEditGroup() {
+		logger.error('>>> Entering toggleEditGroup()', { "event.action": "toggleEditGroup" });
         let {showPopup} = this.state;
         showPopup = !showPopup;
         this.setState({
@@ -75,21 +86,26 @@ class FiltersBar extends Component {
         }, () => {
             this.closeDropDown();
         });
+		logger.warn('<<< Exiting toggleEditGroup()', { "event.action": "toggleEditGroup" });
     }
     updateSelectedGroup(option) {
+		logger.error(`>>> Entering updateSelectedGroup(option=${option})`, { "event.action": "updateSelectedGroup", "logrite.option": option });
         let { label} = option;
         let { value} = option;
         let {selectedGroup} = this.state;
         selectedGroup.label = label;
         selectedGroup.value = value;
+		logger.warn(`<<< Exiting updateSelectedGroup(option=${option})`, { "event.action": "updateSelectedGroup", "logrite.option": option });
         this.setState({
             selectedGroup
         });
     }
 
     getCurrentLabel() {
+		logger.error('>>> Entering getCurrentLabel()', { "event.action": "getCurrentLabel" });
         let {props} = this;
         let selectedGroup = Object.assign({}, this.state.selectedGroup);
+		logger.error(`getCurrentLabel(): selectedGroup → ${selectedGroup}`, { "event.action": "getCurrentLabel" });
         let value = selectedGroup.value;
         let label = selectedGroup.label;
         /*eslint-disable no-unused-vars*/
@@ -107,24 +123,30 @@ class FiltersBar extends Component {
                 </div>;
             }
         }
+		logger.error(`getCurrentLabel(): group → ${group}`, { "event.action": "getCurrentLabel" });
         return label;
     }
     getCurrentGroup() {
+		logger.error('>>> Entering getCurrentGroup()', { "event.action": "getCurrentGroup" });
         let {props} = this;
         let selectedGroup = Object.assign({}, this.state.selectedGroup);
+		logger.error(`getCurrentGroup(): selectedGroup → ${selectedGroup}`, { "event.action": "getCurrentGroup" });
         let value = selectedGroup.value;
         let label = selectedGroup.label;
         let group = { id: value, name: label };
         if (props.roleGroups.some(group => group.id === this.state.selectedGroup.value)) {
             group = Object.assign({}, props.roleGroups.filter(group => group.id === value)[0]);
         }
+		logger.error(`getCurrentGroup(): group → ${group}`, { "event.action": "getCurrentGroup" });
         return group;
     }
 
 
     getRoleGroupsDropDown() {
+		logger.error('>>> Entering getRoleGroupsDropDown()', { "event.action": "getRoleGroupsDropDown" });
         let label = this.getCurrentLabel();
         let roleGroupsOptions = this.BuildRoleGroupsOptions();
+		logger.error(`getRoleGroupsDropDown(): label → ${label}`, { "event.action": "getRoleGroupsDropDown" });
         let GroupsDropDown = <Dropdown  style={{ width: "100%" }}
             withBorder={false}
             options={roleGroupsOptions}
@@ -132,6 +154,7 @@ class FiltersBar extends Component {
             onSelect={this.onSelect.bind(this) }
             ref={node => this.groupsDropdownRef = node}
         />;
+		logger.warn('<<< Exiting getRoleGroupsDropDown()', { "event.action": "getRoleGroupsDropDown" });
         return <div className="groups-filter">{GroupsDropDown}<div className="clear"></div></div>;
     }
 
@@ -143,6 +166,8 @@ class FiltersBar extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <div className="filter-container">
             <GridCell columnSize={35} >
                 {this.props.roleGroups.length > 0 && this.getRoleGroupsDropDown() }
@@ -176,6 +201,8 @@ FiltersBar.propTypes = {
     DeleteAllowed: PropTypes.bool
 };
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         roleGroups: state.roles.roleGroups
     };

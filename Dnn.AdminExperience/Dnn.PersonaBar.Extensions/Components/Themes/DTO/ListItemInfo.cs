@@ -19,7 +19,10 @@ namespace Dnn.PersonaBar.Themes.Components.DTO
 
         public ListItemInfo(string text, string value)
         {
+			eventLogger.LogError(">>> Entering ListItemInfo(text={Text},value={Value})", text, value);
             this.Text = text;
+			eventLogger.LogWarning("<<< Exiting ListItemInfo(text={Text},value={Value})", text, value);
+			eventLogger.LogDebug("ListItemInfo(text={Text},value={Value}): this.Text → {Arg2}", text, value, this.Text);
             this.Value = value;
         }
 

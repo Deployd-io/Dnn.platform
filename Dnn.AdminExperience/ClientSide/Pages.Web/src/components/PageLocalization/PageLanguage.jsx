@@ -5,18 +5,22 @@ import Module from "./Module";
 import { Checkbox, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./PageLanguage.less";
 import utils from "../../utils";
+const logger = console;
 
 class PageLanguage extends Component {
 
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             allModulesLinked: false,
             allModulesSelected: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     updateAllModules(key, value) {
+		logger.error(`>>> Entering updateAllModules(key=${key},value=${value})`, { "event.action": "updateAllModules", "logrite.key": key, "logrite.value": value });
         const {modules} = this.props;
         const CultureCode = this.props.local.CultureCode;
         modules.forEach((module, index) => {
@@ -25,47 +29,60 @@ class PageLanguage extends Component {
             }
             this.props.onUpdateModules(CultureCode, index, value, key);
         });
+		logger.warn(`<<< Exiting updateAllModules(key=${key},value=${value})`, { "event.action": "updateAllModules", "logrite.key": key, "logrite.value": value });
     }
 
     selectAllModules(e) {
+		logger.error(`>>> Entering selectAllModules(e=${e})`, { "event.action": "selectAllModules", "logrite.e": e });
         const allModulesSelected = e;
         this.setState({ allModulesSelected }, ()=> {
             this.updateAllModules("IsTranslated", e);
         });
+		logger.warn(`<<< Exiting selectAllModules(e=${e})`, { "event.action": "selectAllModules", "logrite.e": e });
     }
 
     linkAllModules() {
+		logger.error('>>> Entering linkAllModules()', { "event.action": "linkAllModules" });
         const allModulesLinked = !this.state.allModulesLinked;
         this.setState({ allModulesLinked }, () => {
             this.updateAllModules("IsLocalized", allModulesLinked);
         });
+		logger.warn('<<< Exiting linkAllModules()', { "event.action": "linkAllModules" });
     } 
 
     onUpdatePages(key, e) {
+		logger.error(`>>> Entering onUpdatePages(key=${key},e=${e})`, { "event.action": "onUpdatePages", "logrite.key": key, "logrite.e": e });
         const value = e.target ? e.target.value: e;
         const CultureCode = this.props.local.CultureCode;
         this.props.onUpdatePages(CultureCode, key, value);
+		logger.warn(`<<< Exiting onUpdatePages(key=${key},e=${e})`, { "event.action": "onUpdatePages", "logrite.key": key, "logrite.e": e });
     }
 
     onViewPage(url, e) {
+		logger.error(`>>> Entering onViewPage(url=${url},e=${e})`, { "event.action": "onViewPage", "logrite.url": url, "logrite.e": e });
         utils.getUtilities().closePersonaBar(function () {
             window.parent.location = url;
         });
 
         e.preventDefault();
         e.stopPropagation();
+		logger.warn(`<<< Exiting onViewPage(url=${url},e=${e})`, { "event.action": "onViewPage", "logrite.url": url, "logrite.e": e });
     }
 
     onSettingPage(url, e) {
+		logger.error(`>>> Entering onSettingPage(url=${url},e=${e})`, { "event.action": "onSettingPage", "logrite.url": url, "logrite.e": e });
         let panelId = window.$(".socialpanel:visible").attr("id");
         utils.getUtilities().panelViewData(panelId, {tab: [0]});
+		logger.error(`onSettingPage(url=${url},e=${e}): panelId → ${panelId}`, { "event.action": "onSettingPage", "logrite.url": url, "logrite.e": e });
         window.parent.location = url;
         
         e.preventDefault();
         e.stopPropagation();
+		logger.warn(`<<< Exiting onSettingPage(url=${url},e=${e})`, { "event.action": "onSettingPage", "logrite.url": url, "logrite.e": e });
     }
 
     onDeletePage(page, e) {
+		logger.error(`>>> Entering onDeletePage(page=${page},e=${e})`, { "event.action": "onDeletePage", "logrite.page": page, "logrite.e": e });
         let confirmText = Localization.get("DeleteTranslationConfirm");
         confirmText = confirmText.replace("{0}", page.CultureCode);
         utils.confirm(
@@ -78,15 +95,20 @@ class PageLanguage extends Component {
         );
         e.preventDefault();
         e.stopPropagation();
+		logger.warn(`<<< Exiting onDeletePage(page=${page},e=${e})`, { "event.action": "onDeletePage", "logrite.page": page, "logrite.e": e });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const iconSrc = this.props.local && this.props.local.Icon ? this.props.local.Icon : "";
         const cultureCode = this.props.local && this.props.local.CultureCode ? this.props.local.CultureCode : "";
+		logger.error(`render(): iconSrc → ${iconSrc}`, { "event.action": "render" });
+		logger.error(`render(): cultureCode → ${cultureCode}`, { "event.action": "render" });
         const page = this.props.page || {};
         const modules = this.props.modules || [];
         const isCurrentPage = page.TabId === utils.getCurrentPageId();
+		logger.error(`render(): isCurrentPage → ${isCurrentPage}`, { "event.action": "render" });
         const isSpecialPage = page && page.IsSpecial ? true : false;
         const moduleComponents = modules.map((module, index) => {
             return <Module
@@ -100,6 +122,7 @@ class PageLanguage extends Component {
                 cultureCode={cultureCode}
             />;
         });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="page-language">
                 <div className="page-language-row">

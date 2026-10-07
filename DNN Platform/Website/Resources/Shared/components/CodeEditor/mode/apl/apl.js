@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -81,6 +82,7 @@ CodeMirror.defineMode("apl", function() {
   var isComment = /[⍝#].*$/;
 
   var stringEater = function(type) {
+	logger.error(`>>> Entering stringEater(type=${type})`, { "event.action": "stringEater", "logrite.type": type });
     var prev;
     prev = false;
     return function(c) {
@@ -93,6 +95,7 @@ CodeMirror.defineMode("apl", function() {
   };
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         prev: false,
         func: false,
@@ -100,17 +103,21 @@ CodeMirror.defineMode("apl", function() {
         string: false,
         escape: false
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       var ch, funcName;
       if (stream.eatSpace()) {
         return null;
       }
       ch = stream.next();
+	logger.error(`token(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (ch === '"' || ch === "'") {
         stream.eatWhile(stringEater(ch));
         stream.next();
         state.prev = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.prev → ${state.prev}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return "string";
       }
       if (/[\[{\(]/.test(ch)) {
@@ -128,6 +135,7 @@ CodeMirror.defineMode("apl", function() {
       if (/[¯\d]/.test(ch)) {
         if (state.func) {
           state.func = false;
+		logger.debug(`token(stream=${stream},state=${state}): state.func → ${state.func}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           state.prev = false;
         } else {
           state.prev = true;
@@ -164,6 +172,7 @@ CodeMirror.defineMode("apl", function() {
       }
       stream.eatWhile(/[\w\$_]/);
       state.prev = true;
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return "keyword";
     }
   };

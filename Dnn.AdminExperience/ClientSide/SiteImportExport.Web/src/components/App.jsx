@@ -10,19 +10,23 @@ import Dashboard from "./Dashboard";
 import ExportModal from "./ExportModal";
 import ImportModal from "./ImportModal";
 import util from "../utils";
+const logger = console;
 import { PersonaBarPageHeader, PersonaBarPageBody, PersonaBarPage } from "@dnnsoftware/dnn-react-common";
 
 class App extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             referrer: util.settings.referrer,
             referrerText: util.settings.referrerText,
             backToReferrerFunc: null
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     backToReferrer(callback) {
+		logger.error(`>>> Entering backToReferrer(callback=${callback})`, { "event.action": "backToReferrer", "logrite.callback": callback });
         if (typeof callback === "function") {
             callback();
         }
@@ -33,17 +37,21 @@ class App extends Component {
                 backToReferrerFunc: null
             });
         }, 750);
+		logger.warn(`<<< Exiting backToReferrer(callback=${callback})`, { "event.action": "backToReferrer", "logrite.callback": callback });
     }
 
     updateReferrerInfo(event) {
+		logger.error(`>>> Entering updateReferrerInfo(event=${event})`, { "event.action": "updateReferrerInfo", "logrite.event": event });
         this.setState({
             referrer: event.referrer,
             referrerText: event.referrerText,
             backToReferrerFunc: this.backToReferrer.bind(this, event.backToReferrerFunc)
         });
+		logger.warn(`<<< Exiting updateReferrerInfo(event=${event})`, { "event.action": "updateReferrerInfo", "logrite.event": event });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const { props } = this;
 
         document.addEventListener("siteImportExport", (e) => {
@@ -60,19 +68,23 @@ class App extends Component {
                 this.selectPanel(util.settings.importExportJob.jobType === "Export" ? 1 : 2);
             }));
             this.updateReferrerInfo(util.settings);
+			logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
         }
     }
 
     selectPanel(panel, event) {
+		logger.error(`>>> Entering selectPanel(panel=${panel},event=${event})`, { "event.action": "selectPanel", "logrite.panel": panel, "logrite.event": event });
         if (event) {
             event.preventDefault();
         }
         const { props } = this;
         props.dispatch(VisiblePanelActions.selectPanel(panel));
         props.dispatch(ImportExportActions.jobSelected());
+		logger.warn(`<<< Exiting selectPanel(panel=${panel},event=${event})`, { "event.action": "selectPanel", "logrite.panel": panel, "logrite.event": event });
     }
 
     selectPanelInternal(panel, event) {
+		logger.error(`>>> Entering selectPanelInternal(panel=${panel},event=${event})`, { "event.action": "selectPanelInternal", "logrite.panel": panel, "logrite.event": event });
         if (event) {
             event.preventDefault();
         }
@@ -91,9 +103,11 @@ class App extends Component {
             props.dispatch(VisiblePanelActions.selectPanel(panel));
         }
         props.dispatch(ImportExportActions.jobSelected());
+		logger.warn(`<<< Exiting selectPanelInternal(panel=${panel},event=${event})`, { "event.action": "selectPanelInternal", "logrite.panel": panel, "logrite.event": event });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props, state } = this;
         const PageHeaderSubtitleStyles = {
             clear:"both",
@@ -103,6 +117,7 @@ class App extends Component {
         };
 
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div>
                 <PersonaBarPage isOpen={props.selectedPage === 0} className={(props.selectedPage !== 0 ? "hidden" : "")}>
@@ -159,6 +174,8 @@ App.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         selectedPage: state.visiblePanel.selectedPage,
         selectedPageVisibleIndex: state.visiblePanel.selectedPageVisibleIndex,

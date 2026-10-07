@@ -15,6 +15,7 @@ namespace DotNetNuke.Services.Upgrade
     /// <summary>This class is used to write log into separate installer log file.</summary>
     internal class DnnInstallLogger
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnInstallLogger));
         private static StackFrame CallingFrame
         {
             get
@@ -49,26 +50,35 @@ namespace DotNetNuke.Services.Upgrade
 
         public static void InstallLogError(object message)
         {
+			Logger.LogError(">>> Entering InstallLogError(message={Message})", message);
             LogInstaller("[ERROR]", message.ToString());
+			Logger.LogWarning("<<< Exiting InstallLogError(message={Message})", message);
         }
 
         public static void InstallLogError(string message, Exception exception)
         {
+			Logger.LogError(">>> Entering InstallLogError(message={Message},exception={Exception})", message, exception);
             LogInstaller("[ERROR]", message.ToString(CultureInfo.InvariantCulture) + " : " + exception);
+			Logger.LogWarning("<<< Exiting InstallLogError(message={Message},exception={Exception})", message, exception);
         }
 
         public static void InstallLogInfo(object message)
         {
+			Logger.LogError(">>> Entering InstallLogInfo(message={Message})", message);
             LogInstaller("[INFO]", message.ToString());
+			Logger.LogWarning("<<< Exiting InstallLogInfo(message={Message})", message);
         }
 
         private static void LogInstaller(string logType, string message)
         {
+			Logger.LogError(">>> Entering LogInstaller(logType={LogType},message={Message})", logType, message);
             var logFile = InstallController.Instance.InstallerLogName;
             var logfilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Portals\_default\Logs\" + logFile);
             using (var writer = new StreamWriter(logfilePath, true))
             {
+				Logger.LogError("LogInstaller(logType={LogType},message={Message}): logfilePath → {LogfilePath}", logType, message, logfilePath);
                 writer.WriteLine(DateTime.UtcNow.ToString(CultureInfo.InvariantCulture) + " " + logType + " " + CallingType + " " + message);
+				Logger.LogWarning("<<< Exiting LogInstaller(logType={LogType},message={Message})", logType, message);
             }
         }
     }

@@ -6,17 +6,22 @@ import {
     SingleLineInputWithError,
 } from "@dnnsoftware/dnn-react-common";
 import GlobalIcon from "./GlobalIcon";
+const logger = console;
 
 export default class EditPwdBlock extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             canChange: props.value === "",
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props, state } = this;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <InputGroup>
                 <Label

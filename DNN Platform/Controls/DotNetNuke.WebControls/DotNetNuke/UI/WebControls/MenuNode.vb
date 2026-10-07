@@ -8,20 +8,30 @@ Imports System.Collections
 Imports System.ComponentModel
 Imports System.Web.UI
 Imports System.Xml
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     Public Class MenuNode
         Inherits DNNNode
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Public Sub New()
+		_logger.LogError(">>> Entering New()")
+		_logger.LogError(">>> Entering New(strText={StrText})", strText)
+		_logger.LogWarning("<<< Exiting New(strText={StrText})", strText)
         End Sub
 
         Public Sub New(ByVal strText As String)
+			_logger.LogError(">>> Entering New(strText={StrText})", strText)
             MyBase.New(strText)
+			_logger.LogWarning("<<< Exiting New(strText={StrText})", strText)
+			_logger.LogError(">>> Entering New(ctlOwner={CtlOwner})", ctlOwner)
+			_logger.LogWarning("<<< Exiting New(ctlOwner={CtlOwner})", ctlOwner)
         End Sub
 
         Friend Sub New(ByVal ctlOwner As Control)
             Me.m_DNNMenu = DirectCast(ctlOwner, DNNMenu)
+			_logger.LogWarning("<<< Exiting New(objXmlNode={ObjXmlNode},ctlOwner={CtlOwner})", objXmlNode, ctlOwner)
         End Sub
 
         Friend Sub New(ByVal objXmlNode As XmlNode, ByVal ctlOwner As Control)
@@ -30,18 +40,23 @@ Namespace DotNetNuke.UI.WebControls
         End Sub
 
         Public Sub Click()
+			_logger.LogError(">>> Entering Click()")
             Me.Selected = Not Me.Selected
+			_logger.LogDebug("Click(): Me.Selected → {Arg0}", Me.Selected)
             If Me.DNNMenu.IsDownLevel Then
                 Dim enumerator As IEnumerator = Nothing
                 Try 
                     enumerator = Me.DNNMenu.SelectedMenuNodes.GetEnumerator
+					_logger.LogDebug("Click(): enumerator → {Enumerator}", enumerator)
                     Do While True
                         If Not enumerator.MoveNext Then
                             Exit Do
                         End If
                         Dim current As MenuNode = DirectCast(enumerator.Current, MenuNode)
+						_logger.LogError("Click(): current → {Current}", current)
                         If (If(((current.Level < Me.Level) OrElse (current.ID = Me.ID)), 0, 1) <> 0) Then
                             current.Selected = False
+							_logger.LogDebug("Click(): current.Selected → {Arg0}", current.Selected)
                         End If
                     Loop
                 Finally
@@ -51,13 +66,19 @@ Namespace DotNetNuke.UI.WebControls
                 End Try
             End If
             Me.DNNMenu.OnNodeClick(New DNNMenuNodeClickEventArgs(Me))
+			_logger.LogWarning("<<< Exiting Click()")
         End Sub
 
         Public Overridable Sub Render(ByVal writer As HtmlTextWriter)
+			_logger.LogError(">>> Entering Render(writer={Writer})", writer)
             Me.NodeWriter.RenderNode(writer, Me)
+			_logger.LogWarning("<<< Exiting Render(writer={Writer})", writer)
         End Sub
 
         Friend Sub SetDNNMenu(ByVal objMenu As DNNMenu)
+			_logger.LogError(">>> Entering SetDNNMenu(objMenu={ObjMenu})", objMenu)
+			_logger.LogDebug("SetDNNMenu(objMenu={ObjMenu}): Me.m_DNNMenu → {Arg1}", objMenu, Me.m_DNNMenu)
+        _logger.LogWarning("<<< Exiting SetDNNMenu(objMenu={ObjMenu})", objMenu)
             Me.m_DNNMenu = objMenu
         End Sub
 

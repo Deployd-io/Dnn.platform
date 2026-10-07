@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21,8 +22,11 @@ CodeMirror.defineMode("verilog", function(config, parserConfig) {
       hooks = parserConfig.hooks || {};
 
   function words(str) {
+	logger.error(`>>> Entering words(str=${str})`, { "event.action": "words", "logrite.str": str });
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.error(`words(str=${str}): obj → ${obj}`, { "event.action": "words", "logrite.str": str });
+	logger.warn(`<<< Exiting words(str=${str})`, { "event.action": "words", "logrite.str": str });
     return obj;
   }
 
@@ -108,8 +112,10 @@ CodeMirror.defineMode("verilog", function(config, parserConfig) {
   var statementKeywords = words("always always_comb always_ff always_latch assert assign assume else export for foreach forever if import initial repeat while");
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.peek(), style;
     if (hooks[ch] && (style = hooks[ch](stream, state)) != false) return style;
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     if (hooks.tokenBase && (style = hooks.tokenBase(stream, state)) != false)
       return style;
 

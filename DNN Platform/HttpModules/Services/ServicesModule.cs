@@ -13,32 +13,40 @@ namespace DotNetNuke.HttpModules.Services
     /// <summary>An <see cref="IHttpModule"/> for DNN's ASP.NET Web API Services Framework.</summary>
     public class ServicesModule : IHttpModule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ServicesModule));
         /// <inheritdoc cref="Globals.ServicesFrameworkRegex"/>
         public static readonly Regex ServiceApi = Globals.ServicesFrameworkRegex;
 
         /// <inheritdoc />
         public void Init(HttpApplication context)
         {
+			Logger.LogError(">>> Entering Init(context={Context})", context);
             context.BeginRequest += InitDnn;
 
             context.PreSendRequestHeaders += OnPreSendRequestHeaders;
+			Logger.LogWarning("<<< Exiting Init(context={Context})", context);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+		Logger.LogError(">>> Entering Dispose()");
+        Logger.LogWarning("<<< Exiting Dispose()");
         }
 
         private static void InitDnn(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering InitDnn(sender={Sender},e={E})", sender, e);
             if (sender is HttpApplication app && ServiceApi.IsMatch(app.Context.Request.RawUrl.ToLowerInvariant()))
             {
                 Initialize.Init(app);
             }
+			Logger.LogWarning("<<< Exiting InitDnn(sender={Sender},e={E})", sender, e);
         }
 
         private static void OnPreSendRequestHeaders(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreSendRequestHeaders(sender={Sender},e={E})", sender, e);
             if (sender is HttpApplication app)
             {
                 // WEB API should not send cookies and other specific headers in response;
@@ -52,6 +60,7 @@ namespace DotNetNuke.HttpModules.Services
                 ////   headers.Remove("Set-Cookie");
                 ////}
             }
+			Logger.LogWarning("<<< Exiting OnPreSendRequestHeaders(sender={Sender},e={E})", sender, e);
         }
     }
 }

@@ -47,6 +47,8 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnRibbonBarTool()
             : this(null)
         {
+		eventLogger.LogError(">>> Entering DnnRibbonBarTool()");
+        eventLogger.LogWarning("<<< Exiting DnnRibbonBarTool()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnRibbonBarTool"/> class.</summary>
@@ -199,6 +201,7 @@ namespace DotNetNuke.Web.UI.WebControls
         [SuppressMessage("Microsoft.Design", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Breaking change")]
         public virtual void ControlPanelTool_OnClick(object sender, EventArgs e)
         {
+			eventLogger.LogError(">>> Entering ControlPanelTool_OnClick(sender={Sender},e={E})", sender, e);
             switch (this.ToolInfo.ToolName)
             {
                 case "DeletePage":
@@ -242,34 +245,43 @@ namespace DotNetNuke.Web.UI.WebControls
 
                     break;
             }
+			eventLogger.LogWarning("<<< Exiting ControlPanelTool_OnClick(sender={Sender},e={E})", sender, e);
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			eventLogger.LogError(">>> Entering CreateChildControls()");
             this.Controls.Clear();
             this.Controls.Add(this.DnnLinkButton);
             this.Controls.Add(this.DnnLink);
+			eventLogger.LogWarning("<<< Exiting CreateChildControls()");
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnInit(e={E})", e);
             this.EnsureChildControls();
             this.DnnLinkButton.Click += this.ControlPanelTool_OnClick;
+			eventLogger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnPreRender(e={E})", e);
             this.ProcessTool();
+			eventLogger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
             this.Visible = this.DnnLink.Visible || this.DnnLinkButton.Visible;
+			eventLogger.LogDebug("OnPreRender(e={E}): this.Visible → {Arg1}", e, this.Visible);
             base.OnPreRender(e);
         }
 
         /// <summary>Processes the tool.</summary>
         protected virtual void ProcessTool()
         {
+			eventLogger.LogError(">>> Entering ProcessTool()");
             this.DnnLink.Visible = false;
             this.DnnLinkButton.Visible = false;
 
@@ -329,14 +341,17 @@ namespace DotNetNuke.Web.UI.WebControls
                     this.DnnLink.Target = this.ToolInfo.LinkWindowTarget;
                 }
             }
+			eventLogger.LogWarning("<<< Exiting ProcessTool()");
         }
 
         /// <summary>Enable the tool.</summary>
         /// <returns>Whether it was successfully enabled.</returns>
         protected virtual bool EnableTool()
         {
+			eventLogger.LogError(">>> Entering EnableTool()");
             bool returnValue = true;
 
+			eventLogger.LogError("EnableTool(): returnValue → {ReturnValue}", returnValue);
             switch (this.ToolInfo.ToolName)
             {
                 case "DeletePage":
@@ -360,6 +375,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     break;
             }
 
+			eventLogger.LogWarning("<<< Exiting EnableTool()");
             return returnValue;
         }
 
@@ -368,7 +384,9 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <returns>Whether the user can access the tool.</returns>
         protected virtual bool HasToolPermissions(string toolName)
         {
+			eventLogger.LogError(">>> Entering HasToolPermissions(toolName={ToolName})", toolName);
             bool isHostTool = false;
+			eventLogger.LogError("HasToolPermissions(toolName={ToolName}): isHostTool → {IsHostTool}", toolName, isHostTool);
             if (this.ToolInfo.ToolName == toolName)
             {
                 isHostTool = this.ToolInfo.IsHostTool;
@@ -384,6 +402,7 @@ namespace DotNetNuke.Web.UI.WebControls
             }
 
             bool returnValue = true;
+			eventLogger.LogError("HasToolPermissions(toolName={ToolName}): returnValue → {ReturnValue}", toolName, returnValue);
             switch (toolName)
             {
                 case "PageSettings":
@@ -422,6 +441,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     // if it has a module definition, look it up and check permissions
                     // if it doesn't exist, assume no permission
                     string friendlyName = string.Empty;
+					eventLogger.LogError("HasToolPermissions(toolName={ToolName}): friendlyName → {FriendlyName}", toolName, friendlyName);
                     if (this.ToolInfo.ToolName == toolName)
                     {
                         friendlyName = this.ToolInfo.ModuleFriendlyName;
@@ -439,6 +459,7 @@ namespace DotNetNuke.Web.UI.WebControls
                         if (isHostTool)
                         {
                             moduleInfo = GetInstalledModule(Null.NullInteger, friendlyName);
+							eventLogger.LogError("HasToolPermissions(toolName={ToolName}): moduleInfo → {ModuleInfo}", toolName, moduleInfo);
                         }
                         else
                         {
@@ -454,6 +475,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     break;
             }
 
+			eventLogger.LogWarning("<<< Exiting HasToolPermissions(toolName={ToolName})", toolName);
             return returnValue;
         }
 
@@ -461,6 +483,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <returns>The URL.</returns>
         protected virtual string BuildToolUrl()
         {
+			eventLogger.LogError(">>> Entering BuildToolUrl()");
             if (this.ToolInfo.IsHostTool && !UserController.Instance.GetCurrentUserInfo().IsSuperUser)
             {
                 return "javascript:void(0);";
@@ -472,6 +495,7 @@ namespace DotNetNuke.Web.UI.WebControls
             }
 
             string returnValue = "javascript:void(0);";
+			eventLogger.LogError("BuildToolUrl(): returnValue → {ReturnValue}", returnValue);
             switch (this.ToolInfo.ToolName)
             {
                 case "PageSettings":
@@ -501,6 +525,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     if (!string.IsNullOrEmpty(this.hostSettings.HelpUrl))
                     {
                         var version = Globals.FormatVersion(DotNetNukeContext.Current.Application.Version, false);
+						eventLogger.LogError("BuildToolUrl(): version → {Version}", version);
                         returnValue = TestableGlobals.Instance.FormatHelpUrl(this.hostSettings.HelpUrl, PortalSettings, "Home", version);
                     }
 
@@ -513,12 +538,14 @@ namespace DotNetNuke.Web.UI.WebControls
                     if (!string.IsNullOrEmpty(this.ToolInfo.ModuleFriendlyName))
                     {
                         var additionalParams = new List<string>();
+						eventLogger.LogError("BuildToolUrl(): additionalParams → {AdditionalParams}", additionalParams);
                         returnValue = this.GetTabURL(additionalParams);
                     }
 
                     break;
             }
 
+			eventLogger.LogWarning("<<< Exiting BuildToolUrl()");
             return returnValue;
         }
 
@@ -526,11 +553,13 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <returns>The text.</returns>
         protected virtual string GetText()
         {
+			eventLogger.LogError(">>> Entering GetText()");
             if (string.IsNullOrEmpty(this.Text))
             {
                 return this.GetString($"Tool.{this.ToolInfo.ToolName}.Text");
             }
 
+			eventLogger.LogWarning("<<< Exiting GetText()");
             return this.Text;
         }
 
@@ -538,6 +567,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <returns>The tooltip text.</returns>
         protected virtual string GetToolTip()
         {
+			eventLogger.LogError(">>> Entering GetToolTip()");
             if (this.ToolInfo.ToolName == "DeletePage")
             {
                 if (TabController.IsSpecialTab(TabController.CurrentPage.TabID, PortalSettings.PortalId))
@@ -549,6 +579,7 @@ namespace DotNetNuke.Web.UI.WebControls
             if (string.IsNullOrEmpty(this.Text))
             {
                 string tip = this.GetString($"Tool.{this.ToolInfo.ToolName}.ToolTip");
+				eventLogger.LogError("GetToolTip(): tip → {Tip}", tip);
                 if (string.IsNullOrEmpty(tip))
                 {
                     tip = this.GetString($"Tool.{this.ToolInfo.ToolName}.Text");
@@ -557,6 +588,7 @@ namespace DotNetNuke.Web.UI.WebControls
                 return tip;
             }
 
+			eventLogger.LogWarning("<<< Exiting GetToolTip()");
             return this.ToolTip;
         }
 
@@ -565,11 +597,13 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <returns>The URL.</returns>
         protected virtual string GetTabURL(List<string> additionalParams)
         {
+			eventLogger.LogError(">>> Entering GetTabURL(additionalParams={AdditionalParams})", additionalParams);
             int portalId = this.ToolInfo.IsHostTool ? Null.NullInteger : PortalSettings.PortalId;
 
             additionalParams ??= [];
 
             var moduleInfo = ModuleController.Instance.GetModuleByDefinition(portalId, this.ToolInfo.ModuleFriendlyName);
+			eventLogger.LogError("GetTabURL(additionalParams={AdditionalParams}): moduleInfo → {ModuleInfo}", additionalParams, moduleInfo);
 
             if (moduleInfo == null)
             {
@@ -588,6 +622,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
             string currentCulture = Thread.CurrentThread.CurrentCulture.Name;
 
+			eventLogger.LogWarning("<<< Exiting GetTabURL(additionalParams={AdditionalParams})", additionalParams);
             return this.NavigationManager.NavigateURL(moduleInfo.TabID, isHostPage, PortalSettings, this.ToolInfo.ControlKey, currentCulture, additionalParams.ToArray());
         }
 
@@ -595,13 +630,16 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <returns>Whether the page has children.</returns>
         protected virtual bool ActiveTabHasChildren()
         {
+			eventLogger.LogError(">>> Entering ActiveTabHasChildren()");
             var children = TabController.GetTabsByParent(PortalSettings.ActiveTab.TabID, PortalSettings.ActiveTab.PortalID);
 
+			eventLogger.LogError("ActiveTabHasChildren(): children → {Children}", children);
             if ((children == null) || children.Count < 1)
             {
                 return false;
             }
 
+			eventLogger.LogWarning("<<< Exiting ActiveTabHasChildren()");
             return true;
         }
 
@@ -610,26 +648,35 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <returns>The localized text.</returns>
         protected virtual string GetString(string key)
         {
+			eventLogger.LogError(">>> Entering GetString(key={Key})", key);
+            eventLogger.LogWarning("<<< Exiting GetString(key={Key})", key);
             return Utilities.GetLocalizedStringFromParent(key, this);
         }
 
         /// <summary>Clears the cache.</summary>
         protected virtual void ClearCache()
         {
+			eventLogger.LogError(">>> Entering ClearCache()");
             DataCache.ClearCache();
+			eventLogger.LogWarning("<<< Exiting ClearCache()");
         }
 
         /// <summary>Restarts the application.</summary>
         protected virtual void RestartApplication()
         {
+			eventLogger.LogError(">>> Entering RestartApplication()");
             var log = new LogInfo { BypassBuffering = true, LogTypeKey = nameof(EventLogType.HOST_ALERT), };
             log.AddProperty("Message", this.GetString("UserRestart"));
+			eventLogger.LogError("RestartApplication(): log → {Log}", log);
             LogController.Instance.AddLog(log);
             Config.Touch(this.appStatus);
+			eventLogger.LogWarning("<<< Exiting RestartApplication()");
         }
 
         private static ModuleInfo GetInstalledModule(int portalId, string friendlyName)
         {
+			eventLogger.LogError(">>> Entering GetInstalledModule(portalId={PortalId},friendlyName={FriendlyName})", portalId, friendlyName);
+            eventLogger.LogWarning("<<< Exiting GetInstalledModule(portalId={PortalId},friendlyName={FriendlyName})", portalId, friendlyName);
             return ModuleController.Instance.GetModuleByDefinition(portalId, friendlyName);
         }
     }

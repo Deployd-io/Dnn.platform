@@ -11,18 +11,25 @@ namespace DotNetNuke.Framework.Reflections
 
     public class AssemblyWrapper : IAssembly
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AssemblyWrapper));
         private readonly Assembly assembly;
 
         /// <summary>Initializes a new instance of the <see cref="AssemblyWrapper"/> class.</summary>
         /// <param name="assembly">The assembly.</param>
         public AssemblyWrapper(Assembly assembly)
         {
+			Logger.LogError(">>> Entering AssemblyWrapper(assembly={Assembly})", assembly);
             this.assembly = assembly;
+			Logger.LogDebug("AssemblyWrapper(assembly={Assembly}): assembly → {Assembly1}", assembly, assembly);
+        Logger.LogDebug("AssemblyWrapper(assembly={Assembly}): this.assembly → {Arg1}", assembly, this.assembly);
+        Logger.LogWarning("<<< Exiting AssemblyWrapper(assembly={Assembly})", assembly);
         }
 
         /// <inheritdoc />
         public Type[] GetTypes()
         {
+			Logger.LogError(">>> Entering GetTypes()");
+            Logger.LogWarning("<<< Exiting GetTypes()");
             return this.assembly.GetTypes();
         }
     }

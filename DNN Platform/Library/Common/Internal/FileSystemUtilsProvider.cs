@@ -9,10 +9,13 @@ namespace DotNetNuke.Common.Internal
     /// <inheritdoc cref="IFileSystemUtils" />
     internal class FileSystemUtilsProvider : IFileSystemUtils
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FileSystemUtilsProvider));
         /// <inheritdoc />
         public void DeleteEmptyFoldersRecursive(string path)
         {
+			Logger.LogError(">>> Entering DeleteEmptyFoldersRecursive(path={Path})", path);
             FileSystemUtils.DeleteEmptyFoldersRecursive(path);
+			Logger.LogWarning("<<< Exiting DeleteEmptyFoldersRecursive(path={Path})", path);
         }
     }
 }

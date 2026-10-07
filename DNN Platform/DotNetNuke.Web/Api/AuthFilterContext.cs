@@ -11,12 +11,16 @@ namespace DotNetNuke.Web.Api
     /// <summary>Context information passed to an authorization filter.</summary>
     public class AuthFilterContext
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AuthFilterContext));
         /// <summary>Initializes a new instance of the <see cref="AuthFilterContext"/> class.</summary>
         /// <param name="actionContext">The HTTP action context.</param>
         /// <param name="authFailureMessage">The message to include in the response if there's an auth failure.</param>
         public AuthFilterContext(HttpActionContext actionContext, string authFailureMessage)
         {
+			Logger.LogError(">>> Entering AuthFilterContext(actionContext={ActionContext},authFailureMessage={AuthFailureMessage})", actionContext, authFailureMessage);
             this.ActionContext = actionContext;
+			Logger.LogDebug("AuthFilterContext(actionContext={ActionContext},authFailureMessage={AuthFailureMessage}): this.ActionContext → {Arg2}", actionContext, authFailureMessage, this.ActionContext);
+        Logger.LogWarning("<<< Exiting AuthFilterContext(actionContext={ActionContext},authFailureMessage={AuthFailureMessage})", actionContext, authFailureMessage);
             this.AuthFailureMessage = authFailureMessage;
         }
 
@@ -32,7 +36,9 @@ namespace DotNetNuke.Web.Api
         /// </summary>
         public virtual void HandleUnauthorizedRequest()
         {
+			Logger.LogError(">>> Entering HandleUnauthorizedRequest()");
             this.ActionContext.Response = this.ActionContext.ControllerContext.Request.CreateErrorResponse(HttpStatusCode.Unauthorized, this.AuthFailureMessage);
+			Logger.LogWarning("<<< Exiting HandleUnauthorizedRequest()");
         }
     }
 }

@@ -1,3 +1,4 @@
+const logger = console;
 /** vim: et:ts=4:sw=4:sts=4
  * @license RequireJS 2.3.5 Copyright jQuery Foundation and other contributors.
  * Released under MIT license, https://github.com/requirejs/requirejs/blob/master/LICENSE
@@ -41,10 +42,14 @@ var requirejs, require, define;
     }
 
     function isFunction(it) {
+		logger.error(`>>> Entering isFunction(it=${it})`, { "event.action": "isFunction", "logrite.it": it });
+		logger.warn(`<<< Exiting isFunction(it=${it})`, { "event.action": "isFunction", "logrite.it": it });
         return ostring.call(it) === '[object Function]';
     }
 
     function isArray(it) {
+		logger.error(`>>> Entering isArray(it=${it})`, { "event.action": "isArray", "logrite.it": it });
+		logger.warn(`<<< Exiting isArray(it=${it})`, { "event.action": "isArray", "logrite.it": it });
         return ostring.call(it) === '[object Array]';
     }
 
@@ -53,10 +58,12 @@ var requirejs, require, define;
      * a true value, it will break out of the loop.
      */
     function each(ary, func) {
+		logger.error(`>>> Entering each(ary=${ary},func=${func})`, { "event.action": "each", "logrite.ary": ary, "logrite.func": func });
         if (ary) {
             var i;
             for (i = 0; i < ary.length; i += 1) {
                 if (ary[i] && func(ary[i], i, ary)) {
+					logger.warn(`<<< Exiting each(ary=${ary},func=${func})`, { "event.action": "each", "logrite.ary": ary, "logrite.func": func });
                     break;
                 }
             }
@@ -68,10 +75,12 @@ var requirejs, require, define;
      * returns a true value, it will break out of the loop.
      */
     function eachReverse(ary, func) {
+		logger.error(`>>> Entering eachReverse(ary=${ary},func=${func})`, { "event.action": "eachReverse", "logrite.ary": ary, "logrite.func": func });
         if (ary) {
             var i;
             for (i = ary.length - 1; i > -1; i -= 1) {
                 if (ary[i] && func(ary[i], i, ary)) {
+					logger.warn(`<<< Exiting eachReverse(ary=${ary},func=${func})`, { "event.action": "eachReverse", "logrite.ary": ary, "logrite.func": func });
                     break;
                 }
             }
@@ -79,10 +88,14 @@ var requirejs, require, define;
     }
 
     function hasProp(obj, prop) {
+		logger.error(`>>> Entering hasProp(obj=${obj},prop=${prop})`, { "event.action": "hasProp", "logrite.obj": obj, "logrite.prop": prop });
+		logger.warn(`<<< Exiting hasProp(obj=${obj},prop=${prop})`, { "event.action": "hasProp", "logrite.obj": obj, "logrite.prop": prop });
         return hasOwn.call(obj, prop);
     }
 
     function getOwn(obj, prop) {
+		logger.error(`>>> Entering getOwn(obj=${obj},prop=${prop})`, { "event.action": "getOwn", "logrite.obj": obj, "logrite.prop": prop });
+		logger.warn(`<<< Exiting getOwn(obj=${obj},prop=${prop})`, { "event.action": "getOwn", "logrite.obj": obj, "logrite.prop": prop });
         return hasProp(obj, prop) && obj[prop];
     }
 
@@ -92,10 +105,12 @@ var requirejs, require, define;
      * iteration is stopped.
      */
     function eachProp(obj, func) {
+		logger.error(`>>> Entering eachProp(obj=${obj},func=${func})`, { "event.action": "eachProp", "logrite.obj": obj, "logrite.func": func });
         var prop;
         for (prop in obj) {
             if (hasProp(obj, prop)) {
                 if (func(obj[prop], prop)) {
+					logger.warn(`<<< Exiting eachProp(obj=${obj},func=${func})`, { "event.action": "eachProp", "logrite.obj": obj, "logrite.func": func });
                     break;
                 }
             }
@@ -107,6 +122,7 @@ var requirejs, require, define;
      * but only if target does not already have a property of the same name.
      */
     function mixin(target, source, force, deepStringMixin) {
+		logger.error(`>>> Entering mixin(target=${target},source=${source},force=${force},deepStringMixin=${deepStringMixin})`, { "event.action": "mixin", "logrite.target": target, "logrite.source": source, "logrite.force": force, "logrite.deepStringMixin": deepStringMixin });
         if (source) {
             eachProp(source, function (value, prop) {
                 if (force || !hasProp(target, prop)) {
@@ -124,28 +140,34 @@ var requirejs, require, define;
                 }
             });
         }
+		logger.warn(`<<< Exiting mixin(target=${target},source=${source},force=${force},deepStringMixin=${deepStringMixin})`, { "event.action": "mixin", "logrite.target": target, "logrite.source": source, "logrite.force": force, "logrite.deepStringMixin": deepStringMixin });
         return target;
     }
 
     //Similar to Function.prototype.bind, but the 'this' object is specified
     //first, since it is easier to read/figure out what 'this' will be.
     function bind(obj, fn) {
+		logger.error(`>>> Entering bind(obj=${obj},fn=${fn})`, { "event.action": "bind", "logrite.obj": obj, "logrite.fn": fn });
         return function () {
             return fn.apply(obj, arguments);
         };
     }
 
     function scripts() {
+		logger.error('>>> Entering scripts()', { "event.action": "scripts" });
         return document.getElementsByTagName('script');
     }
 
     function defaultOnError(err) {
+		logger.error(`>>> Entering defaultOnError(err=${err})`, { "event.action": "defaultOnError", "logrite.err": err });
+		logger.warn(`<<< Exiting defaultOnError(err=${err})`, { "event.action": "defaultOnError", "logrite.err": err });
         throw err;
     }
 
     //Allow getting a global that is expressed in
     //dot notation, like 'a.b.c'.
     function getGlobal(value) {
+		logger.error(`>>> Entering getGlobal(value=${value})`, { "event.action": "getGlobal", "logrite.value": value });
         if (!value) {
             return value;
         }
@@ -165,12 +187,18 @@ var requirejs, require, define;
      * @returns {Error}
      */
     function makeError(id, msg, err, requireModules) {
+		logger.error(`>>> Entering makeError(id=${id},msg=${msg},err=${err},requireModules=${requireModules})`, { "event.action": "makeError", "logrite.id": id, "logrite.msg": msg, "logrite.err": err, "logrite.requireModules": requireModules });
         var e = new Error(msg + '\nhttp://requirejs.org/docs/errors.html#' + id);
         e.requireType = id;
+		logger.error(`makeError(id=${id},msg=${msg},err=${err},requireModules=${requireModules}): e → ${e}`, { "event.action": "makeError", "logrite.id": id, "logrite.msg": msg, "logrite.err": err, "logrite.requireModules": requireModules });
+		logger.debug(`makeError(id=${id},msg=${msg},err=${err},requireModules=${requireModules}): e.requireType → ${e.requireType}`, { "event.action": "makeError", "logrite.id": id, "logrite.msg": msg, "logrite.err": err, "logrite.requireModules": requireModules });
+		logger.debug(`makeError(id=${id},msg=${msg},err=${err},requireModules=${requireModules}): e.originalError → ${e.originalError}`, { "event.action": "makeError", "logrite.id": id, "logrite.msg": msg, "logrite.err": err, "logrite.requireModules": requireModules });
         e.requireModules = requireModules;
+		logger.debug(`makeError(id=${id},msg=${msg},err=${err},requireModules=${requireModules}): e.requireModules → ${e.requireModules}`, { "event.action": "makeError", "logrite.id": id, "logrite.msg": msg, "logrite.err": err, "logrite.requireModules": requireModules });
         if (err) {
             e.originalError = err;
         }
+		logger.warn(`<<< Exiting makeError(id=${id},msg=${msg},err=${err},requireModules=${requireModules})`, { "event.action": "makeError", "logrite.id": id, "logrite.msg": msg, "logrite.err": err, "logrite.requireModules": requireModules });
         return e;
     }
 
@@ -197,6 +225,7 @@ var requirejs, require, define;
     }
 
     function newContext(contextName) {
+		logger.error(`>>> Entering newContext(contextName=${contextName})`, { "event.action": "newContext", "logrite.contextName": contextName });
         var inCheckLoaded, Module, context, handlers,
             checkLoadedTimeoutId,
             config = {
@@ -234,6 +263,7 @@ var requirejs, require, define;
          * @param {Array} ary the array of path segments.
          */
         function trimDots(ary) {
+			logger.error(`>>> Entering trimDots(ary=${ary})`, { "event.action": "trimDots", "logrite.ary": ary });
             var i, part;
             for (i = 0; i < ary.length; i++) {
                 part = ary[i];
@@ -251,6 +281,7 @@ var requirejs, require, define;
                     } else if (i > 0) {
                         ary.splice(i - 1, 2);
                         i -= 2;
+						logger.warn(`<<< Exiting trimDots(ary=${ary})`, { "event.action": "trimDots", "logrite.ary": ary });
                     }
                 }
             }
@@ -267,6 +298,7 @@ var requirejs, require, define;
          * @returns {String} normalized name
          */
         function normalize(name, baseName, applyMap) {
+			logger.error(`>>> Entering normalize(name=${name},baseName=${baseName},applyMap=${applyMap})`, { "event.action": "normalize", "logrite.name": name, "logrite.baseName": baseName, "logrite.applyMap": applyMap });
             var pkgMain, mapValue, nameParts, i, j, nameSegment, lastIndex,
                 foundMap, foundI, foundStarMap, starI, normalizedBaseParts,
                 baseParts = (baseName && baseName.split('/')),
@@ -348,14 +380,17 @@ var requirejs, require, define;
                 }
             }
 
+			logger.error(`normalize(name=${name},baseName=${baseName},applyMap=${applyMap}): name → ${name}`, { "event.action": "normalize", "logrite.name": name, "logrite.baseName": baseName, "logrite.applyMap": applyMap });
             // If the name points to a package's name, use
             // the package main instead.
             pkgMain = getOwn(config.pkgs, name);
+			logger.error(`normalize(name=${name},baseName=${baseName},applyMap=${applyMap}): pkgMain → ${pkgMain}`, { "event.action": "normalize", "logrite.name": name, "logrite.baseName": baseName, "logrite.applyMap": applyMap });
 
             return pkgMain ? pkgMain : name;
         }
 
         function removeScript(name) {
+			logger.error(`>>> Entering removeScript(name=${name})`, { "event.action": "removeScript", "logrite.name": name });
             if (isBrowser) {
                 each(scripts(), function (scriptNode) {
                     if (scriptNode.getAttribute('data-requiremodule') === name &&
@@ -365,11 +400,14 @@ var requirejs, require, define;
                     }
                 });
             }
+			logger.warn(`<<< Exiting removeScript(name=${name})`, { "event.action": "removeScript", "logrite.name": name });
         }
 
         function hasPathFallback(id) {
+			logger.error(`>>> Entering hasPathFallback(id=${id})`, { "event.action": "hasPathFallback", "logrite.id": id });
             var pathConfig = getOwn(config.paths, id);
             if (pathConfig && isArray(pathConfig) && pathConfig.length > 1) {
+				logger.error(`hasPathFallback(id=${id}): pathConfig → ${pathConfig}`, { "event.action": "hasPathFallback", "logrite.id": id });
                 //Pop off the first array value, since it failed, and
                 //retry
                 pathConfig.shift();
@@ -383,18 +421,22 @@ var requirejs, require, define;
 
                 return true;
             }
+			logger.warn(`<<< Exiting hasPathFallback(id=${id})`, { "event.action": "hasPathFallback", "logrite.id": id });
         }
 
         //Turns a plugin!resource to [plugin, resource]
         //with the plugin being undefined if the name
         //did not have a plugin prefix.
         function splitPrefix(name) {
+			logger.error(`>>> Entering splitPrefix(name=${name})`, { "event.action": "splitPrefix", "logrite.name": name });
             var prefix,
                 index = name ? name.indexOf('!') : -1;
             if (index > -1) {
                 prefix = name.substring(0, index);
+				logger.error(`splitPrefix(name=${name}): prefix → ${prefix}`, { "event.action": "splitPrefix", "logrite.name": name });
                 name = name.substring(index + 1, name.length);
             }
+			logger.warn(`<<< Exiting splitPrefix(name=${name})`, { "event.action": "splitPrefix", "logrite.name": name });
             return [prefix, name];
         }
 
@@ -414,6 +456,7 @@ var requirejs, require, define;
          * @returns {Object}
          */
         function makeModuleMap(name, parentModuleMap, isNormalized, applyMap) {
+			logger.error(`>>> Entering makeModuleMap(name=${name},parentModuleMap=${parentModuleMap},isNormalized=${isNormalized},applyMap=${applyMap})`, { "event.action": "makeModuleMap", "logrite.name": name, "logrite.parentModuleMap": parentModuleMap, "logrite.isNormalized": isNormalized, "logrite.applyMap": applyMap });
             var url, pluginModule, suffix, nameParts,
                 prefix = null,
                 parentName = parentModuleMap ? parentModuleMap.name : null,
@@ -432,6 +475,7 @@ var requirejs, require, define;
             prefix = nameParts[0];
             name = nameParts[1];
 
+			logger.error(`makeModuleMap(name=${name},parentModuleMap=${parentModuleMap},isNormalized=${isNormalized},applyMap=${applyMap}): name → ${name}`, { "event.action": "makeModuleMap", "logrite.name": name, "logrite.parentModuleMap": parentModuleMap, "logrite.isNormalized": isNormalized, "logrite.applyMap": applyMap });
             if (prefix) {
                 prefix = normalize(prefix, parentName, applyMap);
                 pluginModule = getOwn(defined, prefix);
@@ -472,6 +516,7 @@ var requirejs, require, define;
                     isNormalized = true;
 
                     url = context.nameToUrl(normalizedName);
+					logger.error(`makeModuleMap(name=${name},parentModuleMap=${parentModuleMap},isNormalized=${isNormalized},applyMap=${applyMap}): url → ${url}`, { "event.action": "makeModuleMap", "logrite.name": name, "logrite.parentModuleMap": parentModuleMap, "logrite.isNormalized": isNormalized, "logrite.applyMap": applyMap });
                 }
             }
 
@@ -497,13 +542,16 @@ var requirejs, require, define;
         }
 
         function getModule(depMap) {
+			logger.error(`>>> Entering getModule(depMap=${depMap})`, { "event.action": "getModule", "logrite.depMap": depMap });
             var id = depMap.id,
                 mod = getOwn(registry, id);
+				logger.error(`getModule(depMap=${depMap}): id → ${id}`, { "event.action": "getModule", "logrite.depMap": depMap });
 
             if (!mod) {
                 mod = registry[id] = new context.Module(depMap);
             }
 
+			logger.warn(`<<< Exiting getModule(depMap=${depMap})`, { "event.action": "getModule", "logrite.depMap": depMap });
             return mod;
         }
 
@@ -527,6 +575,7 @@ var requirejs, require, define;
         }
 
         function onError(err, errback) {
+			logger.error(`>>> Entering onError(err=${err},errback=${errback})`, { "event.action": "onError", "logrite.err": err, "logrite.errback": errback });
             var ids = err.requireModules,
                 notified = false;
 
@@ -556,6 +605,7 @@ var requirejs, require, define;
          * defQueue.
          */
         function takeGlobalQueue() {
+			logger.error('>>> Entering takeGlobalQueue()', { "event.action": "takeGlobalQueue" });
             //Push all the globalDefQueue items into the context's defQueue
             if (globalDefQueue.length) {
                 each(globalDefQueue, function(queueItem) {
@@ -566,28 +616,35 @@ var requirejs, require, define;
                     defQueue.push(queueItem);
                 });
                 globalDefQueue = [];
+				logger.warn('<<< Exiting takeGlobalQueue()', { "event.action": "takeGlobalQueue" });
             }
         }
 
         handlers = {
             'require': function (mod) {
+				logger.error(`>>> Entering require(mod=${mod})`, { "event.action": "require", "logrite.mod": mod });
                 if (mod.require) {
                     return mod.require;
                 } else {
+					logger.warn(`<<< Exiting require(mod=${mod})`, { "event.action": "require", "logrite.mod": mod });
                     return (mod.require = context.makeRequire(mod.map));
                 }
             },
             'exports': function (mod) {
+				logger.error(`>>> Entering exports(mod=${mod})`, { "event.action": "exports", "logrite.mod": mod });
                 mod.usingExports = true;
                 if (mod.map.isDefine) {
+					logger.debug(`exports(mod=${mod}): mod.usingExports → ${mod.usingExports}`, { "event.action": "exports", "logrite.mod": mod });
                     if (mod.exports) {
                         return (defined[mod.map.id] = mod.exports);
                     } else {
+						logger.warn(`<<< Exiting exports(mod=${mod})`, { "event.action": "exports", "logrite.mod": mod });
                         return (mod.exports = defined[mod.map.id] = {});
                     }
                 }
             },
             'module': function (mod) {
+				logger.error(`>>> Entering module(mod=${mod})`, { "event.action": "module", "logrite.mod": mod });
                 if (mod.module) {
                     return mod.module;
                 } else {
@@ -595,6 +652,9 @@ var requirejs, require, define;
                         id: mod.map.id,
                         uri: mod.map.url,
                         config: function () {
+							logger.error('>>> Entering config()', { "event.action": "config", "logrite.config": config });
+							logger.warn('<<< Exiting config()', { "event.action": "config", "logrite.config": config });
+							logger.warn(`<<< Exiting config(config=${config})`, { "event.action": "config", "logrite.config": config });
                             return getOwn(config.config, mod.map.id) || {};
                         },
                         exports: mod.exports || (mod.exports = {})
@@ -604,17 +664,22 @@ var requirejs, require, define;
         };
 
         function cleanRegistry(id) {
+			logger.error(`>>> Entering cleanRegistry(id=${id})`, { "event.action": "cleanRegistry", "logrite.id": id });
             //Clean up machinery used for waiting modules.
             delete registry[id];
             delete enabledRegistry[id];
+			logger.warn(`<<< Exiting cleanRegistry(id=${id})`, { "event.action": "cleanRegistry", "logrite.id": id });
         }
 
         function breakCycle(mod, traced, processed) {
+			logger.error(`>>> Entering breakCycle(mod=${mod},traced=${traced},processed=${processed})`, { "event.action": "breakCycle", "logrite.mod": mod, "logrite.traced": traced, "logrite.processed": processed });
             var id = mod.map.id;
 
+			logger.error(`breakCycle(mod=${mod},traced=${traced},processed=${processed}): id → ${id}`, { "event.action": "breakCycle", "logrite.mod": mod, "logrite.traced": traced, "logrite.processed": processed });
             if (mod.error) {
                 mod.emit('error', mod.error);
             } else {
+				logger.warn(`<<< Exiting breakCycle(mod=${mod},traced=${traced},processed=${processed})`, { "event.action": "breakCycle", "logrite.mod": mod, "logrite.traced": traced, "logrite.processed": processed });
                 traced[id] = true;
                 each(mod.depMaps, function (depMap, i) {
                     var depId = depMap.id,
@@ -638,6 +703,7 @@ var requirejs, require, define;
         }
 
         function checkLoaded() {
+			logger.error('>>> Entering checkLoaded()', { "event.action": "checkLoaded" });
             var err, usingPathFallback,
                 waitInterval = config.waitSeconds * 1000,
                 //It is possible to disable the wait interval by using waitSeconds of 0.
@@ -722,6 +788,7 @@ var requirejs, require, define;
             }
 
             inCheckLoaded = false;
+			logger.warn('<<< Exiting checkLoaded()', { "event.action": "checkLoaded" });
         }
 
         Module = function (map) {
@@ -742,6 +809,7 @@ var requirejs, require, define;
 
         Module.prototype = {
             init: function (depMaps, factory, errback, options) {
+				logger.error(`>>> Entering init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options})`, { "event.action": "init", "logrite.depMaps": depMaps, "logrite.factory": factory, "logrite.errback": errback, "logrite.options": options });
                 options = options || {};
 
                 //Do not do more inits if already done. Can happen if there
@@ -753,6 +821,8 @@ var requirejs, require, define;
 
                 this.factory = factory;
 
+				logger.debug(`init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options}): factory → ${factory}`, { "event.action": "init", "logrite.depMaps": depMaps, "logrite.factory": factory, "logrite.errback": errback, "logrite.options": options });
+				logger.debug(`init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options}): this.factory → ${this.factory}`, { "event.action": "init", "logrite.depMaps": depMaps, "logrite.factory": factory, "logrite.errback": errback, "logrite.options": options });
                 if (errback) {
                     //Register for errors on this module.
                     this.on('error', errback);
@@ -771,13 +841,18 @@ var requirejs, require, define;
                 //would affect that config.
                 this.depMaps = depMaps && depMaps.slice(0);
 
+				logger.debug(`init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options}): depMaps → ${depMaps}`, { "event.action": "init", "logrite.depMaps": depMaps, "logrite.factory": factory, "logrite.errback": errback, "logrite.options": options });
                 this.errback = errback;
 
+				logger.debug(`init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options}): errback → ${errback}`, { "event.action": "init", "logrite.depMaps": depMaps, "logrite.factory": factory, "logrite.errback": errback, "logrite.options": options });
                 //Indicate this module has be initialized
                 this.inited = true;
+				logger.debug(`init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options}): this.errback → ${this.errback}`, { "event.action": "init", "logrite.depMaps": depMaps, "logrite.factory": factory, "logrite.errback": errback, "logrite.options": options });
+				logger.debug(`init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options}): this.inited → ${this.inited}`, { "event.action": "init", "logrite.depMaps": depMaps, "logrite.factory": factory, "logrite.errback": errback, "logrite.options": options });
 
                 this.ignore = options.ignore;
 
+				logger.debug(`init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options}): this.ignore → ${this.ignore}`, { "event.action": "init", "logrite.depMaps": depMaps, "logrite.factory": factory, "logrite.errback": errback, "logrite.options": options });
                 //Could have option to init this module in enabled mode,
                 //or could have been previously marked as enabled. However,
                 //the dependencies are not known until init is called. So
@@ -789,24 +864,29 @@ var requirejs, require, define;
                 } else {
                     this.check();
                 }
+				logger.warn(`<<< Exiting init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options})`, { "event.action": "init", "logrite.depMaps": depMaps, "logrite.factory": factory, "logrite.errback": errback, "logrite.options": options });
             },
 
             defineDep: function (i, depExports) {
+				logger.error(`>>> Entering defineDep(i=${i},depExports=${depExports})`, { "event.action": "defineDep", "logrite.i": i, "logrite.depExports": depExports });
                 //Because of cycles, defined callback for a given
                 //export can be called more than once.
                 if (!this.depMatched[i]) {
                     this.depMatched[i] = true;
                     this.depCount -= 1;
                     this.depExports[i] = depExports;
+					logger.warn(`<<< Exiting defineDep(i=${i},depExports=${depExports})`, { "event.action": "defineDep", "logrite.i": i, "logrite.depExports": depExports });
                 }
             },
 
             fetch: function () {
+				logger.error('>>> Entering fetch()', { "event.action": "fetch" });
                 if (this.fetched) {
                     return;
                 }
                 this.fetched = true;
 
+				logger.debug(`fetch(): this.fetched → ${this.fetched}`, { "event.action": "fetch" });
                 context.startTime = (new Date()).getTime();
 
                 var map = this.map;
@@ -820,6 +900,7 @@ var requirejs, require, define;
                         return map.prefix ? this.callPlugin() : this.load();
                     }));
                 } else {
+					logger.warn('<<< Exiting fetch()', { "event.action": "fetch" });
                     //Regular dependency.
                     return map.prefix ? this.callPlugin() : this.load();
                 }
@@ -943,6 +1024,7 @@ var requirejs, require, define;
             },
 
             callPlugin: function () {
+				logger.error('>>> Entering callPlugin()', { "event.action": "callPlugin" });
                 var map = this.map,
                     id = map.id,
                     //Map already normalized the prefix.
@@ -951,6 +1033,7 @@ var requirejs, require, define;
                 //Mark this as a dependency for this plugin, so it
                 //can be traced for cycles.
                 this.depMaps.push(pluginMap);
+				logger.warn('<<< Exiting callPlugin()', { "event.action": "callPlugin" });
 
                 on(pluginMap, 'defined', bind(this, function (plugin) {
                     var load, normalizedMap, normalizedMod,
@@ -1100,15 +1183,19 @@ var requirejs, require, define;
             },
 
             enable: function () {
+				logger.error('>>> Entering enable()', { "event.action": "enable", "logrite.depMap": depMap });
                 enabledRegistry[this.map.id] = this;
                 this.enabled = true;
 
+				logger.debug(`enable(): this.enabled → ${this.enabled}`, { "event.action": "enable", "logrite.depMap": depMap });
                 //Set flag mentioning that the module is enabling,
                 //so that immediate calls to the defined callbacks
                 //for dependencies do not trigger inadvertent load
                 //with the depCount still being zero.
                 this.enabling = true;
 
+				logger.warn('<<< Exiting enable()', { "event.action": "enable", "logrite.depMap": depMap });
+				logger.debug(`enable(): this.enabling → ${this.enabling}`, { "event.action": "enable", "logrite.depMap": depMap });
                 //Enable each dependency
                 each(this.depMaps, bind(this, function (depMap, i) {
                     var id, mod, handler;
@@ -1185,6 +1272,7 @@ var requirejs, require, define;
             },
 
             emit: function (name, evt) {
+				logger.error(`>>> Entering emit(name=${name},evt=${evt})`, { "event.action": "emit", "logrite.name": name, "logrite.evt": evt });
                 each(this.events[name], function (cb) {
                     cb(evt);
                 });
@@ -1193,18 +1281,22 @@ var requirejs, require, define;
                     //the listeners, since this broken Module instance
                     //can stay around for a while in the registry.
                     delete this.events[name];
+					logger.warn(`<<< Exiting emit(name=${name},evt=${evt})`, { "event.action": "emit", "logrite.name": name, "logrite.evt": evt });
                 }
             }
         };
 
         function callGetModule(args) {
+			logger.error(`>>> Entering callGetModule(args=${args})`, { "event.action": "callGetModule", "logrite.args": args });
             //Skip modules already defined.
             if (!hasProp(defined, args[0])) {
                 getModule(makeModuleMap(args[0], null, true)).init(args[1], args[2]);
+				logger.warn(`<<< Exiting callGetModule(args=${args})`, { "event.action": "callGetModule", "logrite.args": args });
             }
         }
 
         function removeListener(node, func, name, ieName) {
+			logger.error(`>>> Entering removeListener(node=${node},func=${func},name=${name},ieName=${ieName})`, { "event.action": "removeListener", "logrite.node": node, "logrite.func": func, "logrite.name": name, "logrite.ieName": ieName });
             //Favor detachEvent because of IE9
             //issue, see attachEvent/addEventListener comment elsewhere
             //in this file.
@@ -1216,6 +1308,7 @@ var requirejs, require, define;
                 }
             } else {
                 node.removeEventListener(name, func, false);
+				logger.warn(`<<< Exiting removeListener(node=${node},func=${func},name=${name},ieName=${ieName})`, { "event.action": "removeListener", "logrite.node": node, "logrite.func": func, "logrite.name": name, "logrite.ieName": ieName });
             }
         }
 
@@ -1226,6 +1319,7 @@ var requirejs, require, define;
          * @returns {Object}
          */
         function getScriptData(evt) {
+			logger.error(`>>> Entering getScriptData(evt=${evt})`, { "event.action": "getScriptData", "logrite.evt": evt });
             //Using currentTarget instead of target for Firefox 2.0's sake. Not
             //all old browsers will be supported, but this one was easy enough
             //to support and still makes sense.
@@ -1235,6 +1329,7 @@ var requirejs, require, define;
             removeListener(node, context.onScriptLoad, 'load', 'onreadystatechange');
             removeListener(node, context.onScriptError, 'error');
 
+			logger.warn(`<<< Exiting getScriptData(evt=${evt})`, { "event.action": "getScriptData", "logrite.evt": evt });
             return {
                 node: node,
                 id: node && node.getAttribute('data-requiremodule')
@@ -1242,6 +1337,7 @@ var requirejs, require, define;
         }
 
         function intakeDefines() {
+			logger.error('>>> Entering intakeDefines()', { "event.action": "intakeDefines" });
             var args;
 
             //Any defined modules in the global queue, intake them now.
@@ -1251,6 +1347,8 @@ var requirejs, require, define;
             while (defQueue.length) {
                 args = defQueue.shift();
                 if (args[0] === null) {
+					logger.error(`intakeDefines(): args → ${args}`, { "event.action": "intakeDefines" });
+						logger.debug(`intakeDefines(): args → ${args}`, { "event.action": "intakeDefines" });
                     return onError(makeError('mismatch', 'Mismatched anonymous define() module: ' +
                         args[args.length - 1]));
                 } else {
@@ -1260,6 +1358,7 @@ var requirejs, require, define;
                 }
             }
             context.defQueueMap = {};
+			logger.warn('<<< Exiting intakeDefines()', { "event.action": "intakeDefines" });
         }
 
         context = {
@@ -1280,6 +1379,7 @@ var requirejs, require, define;
              * @param {Object} cfg config object to integrate.
              */
             configure: function (cfg) {
+				logger.error(`>>> Entering configure(cfg=${cfg})`, { "event.action": "configure", "logrite.cfg": cfg });
                 //Make sure the baseUrl ends in a slash.
                 if (cfg.baseUrl) {
                     if (cfg.baseUrl.charAt(cfg.baseUrl.length - 1) !== '/') {
@@ -1291,6 +1391,8 @@ var requirejs, require, define;
                 if (typeof cfg.urlArgs === 'string') {
                     var urlArgs = cfg.urlArgs;
                     cfg.urlArgs = function(id, url) {
+						logger.error(`>>> Entering urlArgs(id=${id},url=${url})`, { "event.action": "urlArgs", "logrite.id": id, "logrite.url": url });
+						logger.warn(`<<< Exiting urlArgs(id=${id},url=${url})`, { "event.action": "urlArgs", "logrite.id": id, "logrite.url": url });
                         return (url.indexOf('?') === -1 ? '?' : '&') + urlArgs;
                     };
                 }
@@ -1390,10 +1492,12 @@ var requirejs, require, define;
 
             makeShimExports: function (value) {
                 function fn() {
+					logger.error('>>> Entering fn()', { "event.action": "fn" });
                     var ret;
                     if (value.init) {
                         ret = value.init.apply(global, arguments);
                     }
+					logger.error(`fn(): ret → ${ret}`, { "event.action": "fn" });
                     return ret || (value.exports && getGlobal(value.exports));
                 }
                 return fn;
@@ -1403,12 +1507,14 @@ var requirejs, require, define;
                 options = options || {};
 
                 function localRequire(deps, callback, errback) {
+					logger.error(`>>> Entering localRequire(deps=${deps},callback=${callback},errback=${errback})`, { "event.action": "localRequire", "logrite.deps": deps, "logrite.callback": callback, "logrite.errback": errback });
                     var id, map, requireMod;
 
                     if (options.enableBuildCallback && callback && isFunction(callback)) {
                         callback.__requireJsBuild = true;
                     }
 
+					logger.debug(`localRequire(deps=${deps},callback=${callback},errback=${errback}): callback.__requireJsBuild → ${callback.__requireJsBuild}`, { "event.action": "localRequire", "logrite.deps": deps, "logrite.callback": callback, "logrite.errback": errback });
                     if (typeof deps === 'string') {
                         if (isFunction(callback)) {
                             //Invalid call
@@ -1431,6 +1537,7 @@ var requirejs, require, define;
                         //Normalize module name, if it contains . or ..
                         map = makeModuleMap(deps, relMap, false, true);
                         id = map.id;
+						logger.error(`localRequire(deps=${deps},callback=${callback},errback=${errback}): id → ${id}`, { "event.action": "localRequire", "logrite.deps": deps, "logrite.callback": callback, "logrite.errback": errback });
 
                         if (!hasProp(defined, id)) {
                             return onError(makeError('notloaded', 'Module name "' +
@@ -1464,6 +1571,7 @@ var requirejs, require, define;
                         checkLoaded();
                     });
 
+					logger.warn(`<<< Exiting localRequire(deps=${deps},callback=${callback},errback=${errback})`, { "event.action": "localRequire", "logrite.deps": deps, "logrite.callback": callback, "logrite.errback": errback });
                     return localRequire;
                 }
 
@@ -1476,6 +1584,7 @@ var requirejs, require, define;
                      * plain URLs like nameToUrl.
                      */
                     toUrl: function (moduleNamePlusExt) {
+						logger.error(`>>> Entering toUrl(moduleNamePlusExt=${moduleNamePlusExt})`, { "event.action": "toUrl", "logrite.moduleNamePlusExt": moduleNamePlusExt });
                         var ext,
                             index = moduleNamePlusExt.lastIndexOf('.'),
                             segment = moduleNamePlusExt.split('/')[0],
@@ -1485,19 +1594,26 @@ var requirejs, require, define;
                         //dots from a relative path.
                         if (index !== -1 && (!isRelative || index > 1)) {
                             ext = moduleNamePlusExt.substring(index, moduleNamePlusExt.length);
+							logger.error(`toUrl(moduleNamePlusExt=${moduleNamePlusExt}): ext → ${ext}`, { "event.action": "toUrl", "logrite.moduleNamePlusExt": moduleNamePlusExt });
                             moduleNamePlusExt = moduleNamePlusExt.substring(0, index);
                         }
 
+						logger.error(`toUrl(moduleNamePlusExt=${moduleNamePlusExt}): moduleNamePlusExt → ${moduleNamePlusExt}`, { "event.action": "toUrl", "logrite.moduleNamePlusExt": moduleNamePlusExt });
+												logger.warn(`<<< Exiting toUrl(moduleNamePlusExt=${moduleNamePlusExt})`, { "event.action": "toUrl", "logrite.moduleNamePlusExt": moduleNamePlusExt });
                         return context.nameToUrl(normalize(moduleNamePlusExt,
                                                 relMap && relMap.id, true), ext,  true);
                     },
 
                     defined: function (id) {
+						logger.error(`>>> Entering defined(id=${id})`, { "event.action": "defined", "logrite.id": id });
+						logger.warn(`<<< Exiting defined(id=${id})`, { "event.action": "defined", "logrite.id": id });
                         return hasProp(defined, makeModuleMap(id, relMap, false, true).id);
                     },
 
                     specified: function (id) {
+						logger.error(`>>> Entering specified(id=${id})`, { "event.action": "specified", "logrite.id": id });
                         id = makeModuleMap(id, relMap, false, true).id;
+						logger.warn(`<<< Exiting specified(id=${id})`, { "event.action": "specified", "logrite.id": id });
                         return hasProp(defined, id) || hasProp(registry, id);
                     }
                 });
@@ -1505,12 +1621,14 @@ var requirejs, require, define;
                 //Only allow undef on top level require calls
                 if (!relMap) {
                     localRequire.undef = function (id) {
+						logger.error(`>>> Entering undef(id=${id})`, { "event.action": "undef", "logrite.id": id });
                         //Bind any waiting define() calls to this context,
                         //fix for #408
                         takeGlobalQueue();
 
                         var map = makeModuleMap(id, relMap, true),
                             mod = getOwn(registry, id);
+							logger.error(`undef(id=${id}): map → ${map}`, { "event.action": "undef", "logrite.id": id });
 
                         mod.undefed = true;
                         removeScript(id);
@@ -1538,6 +1656,7 @@ var requirejs, require, define;
                             }
 
                             cleanRegistry(id);
+							logger.warn(`<<< Exiting undef(id=${id})`, { "event.action": "undef", "logrite.id": id });
                         }
                     };
                 }
@@ -1552,9 +1671,12 @@ var requirejs, require, define;
              * the optimizer. Not shown here to keep code compact.
              */
             enable: function (depMap) {
+				logger.error(`>>> Entering enable(depMap=${depMap})`, { "event.action": "enable", "logrite.depMap": depMap });
                 var mod = getOwn(registry, depMap.id);
                 if (mod) {
+					logger.error(`enable(depMap=${depMap}): mod → ${mod}`, { "event.action": "enable", "logrite.depMap": depMap });
                     getModule(depMap).enable();
+					logger.warn(`<<< Exiting enable(depMap=${depMap})`, { "event.action": "enable", "logrite.depMap": depMap });
                 }
             },
 
@@ -1565,6 +1687,7 @@ var requirejs, require, define;
              * @param {String} moduleName the name of the module to potentially complete.
              */
             completeLoad: function (moduleName) {
+				logger.error(`>>> Entering completeLoad(moduleName=${moduleName})`, { "event.action": "completeLoad", "logrite.moduleName": moduleName });
                 var found, args, mod,
                     shim = getOwn(config.shim, moduleName) || {},
                     shExports = shim.exports;
@@ -1613,6 +1736,7 @@ var requirejs, require, define;
                 }
 
                 checkLoaded();
+				logger.warn(`<<< Exiting completeLoad(moduleName=${moduleName})`, { "event.action": "completeLoad", "logrite.moduleName": moduleName });
             },
 
             /**
@@ -1677,11 +1801,14 @@ var requirejs, require, define;
 
                 return config.urlArgs && !/^blob\:/.test(url) ?
                        url + config.urlArgs(moduleName, url) : url;
+					logger.warn(`<<< Exiting nameToUrl(moduleName=${moduleName},ext=${ext},skipExt=${skipExt})`, { "event.action": "nameToUrl", "logrite.moduleName": moduleName, "logrite.ext": ext, "logrite.skipExt": skipExt });
             },
 
             //Delegates to req.load. Broken out as a separate function to
             //allow overriding in the optimizer.
             load: function (id, url) {
+				logger.error(`>>> Entering load(id=${id},url=${url})`, { "event.action": "load", "logrite.context": context, "logrite.moduleName": moduleName, "logrite.url": url });
+				logger.warn('<<< Exiting load()', { "event.action": "load", "logrite.context": context, "logrite.moduleName": moduleName, "logrite.url": url });
                 req.load(context, id, url);
             },
 
@@ -1693,6 +1820,8 @@ var requirejs, require, define;
              * @private
              */
             execCb: function (name, callback, args, exports) {
+				logger.error(`>>> Entering execCb(name=${name},callback=${callback},args=${args},exports=${exports})`, { "event.action": "execCb", "logrite.name": name, "logrite.callback": callback, "logrite.args": args, "logrite.exports": exports });
+				logger.warn(`<<< Exiting execCb(name=${name},callback=${callback},args=${args},exports=${exports})`, { "event.action": "execCb", "logrite.name": name, "logrite.callback": callback, "logrite.args": args, "logrite.exports": exports });
                 return callback.apply(exports, args);
             },
 
@@ -1703,6 +1832,7 @@ var requirejs, require, define;
              * that was loaded.
              */
             onScriptLoad: function (evt) {
+				logger.error(`>>> Entering onScriptLoad(evt=${evt})`, { "event.action": "onScriptLoad", "logrite.evt": evt });
                 //Using currentTarget instead of target for Firefox 2.0's sake. Not
                 //all old browsers will be supported, but this one was easy enough
                 //to support and still makes sense.
@@ -1715,6 +1845,7 @@ var requirejs, require, define;
                     //Pull out the name of the module and the context.
                     var data = getScriptData(evt);
                     context.completeLoad(data.id);
+					logger.error(`onScriptLoad(evt=${evt}): data → ${data}`, { "event.action": "onScriptLoad", "logrite.evt": evt });
                 }
             },
 
@@ -1722,9 +1853,12 @@ var requirejs, require, define;
              * Callback for script errors.
              */
             onScriptError: function (evt) {
+				logger.error(`>>> Entering onScriptError(evt=${evt})`, { "event.action": "onScriptError", "logrite.evt": evt });
                 var data = getScriptData(evt);
                 if (!hasPathFallback(data.id)) {
+					logger.error(`onScriptError(evt=${evt}): data → ${data}`, { "event.action": "onScriptError", "logrite.evt": evt });
                     var parents = [];
+					logger.warn(`<<< Exiting onScriptError(evt=${evt})`, { "event.action": "onScriptError", "logrite.evt": evt });
                     eachProp(registry, function(value, key) {
                         if (key.indexOf('_@r') !== 0) {
                             each(value.depMaps, function(depMap) {
@@ -1762,6 +1896,7 @@ var requirejs, require, define;
      * name for minification/local scope use.
      */
     req = requirejs = function (deps, callback, errback, optional) {
+	logger.error(`>>> Entering requirejs(deps=${deps},callback=${callback},errback=${errback},optional=${optional})`, { "event.action": "requirejs", "logrite.deps": deps, "logrite.callback": callback, "logrite.errback": errback, "logrite.optional": optional });
 
         //Find the right context, use default
         var context, config,
@@ -1786,6 +1921,7 @@ var requirejs, require, define;
         }
 
         context = getOwn(contexts, contextName);
+		logger.error(`requirejs(deps=${deps},callback=${callback},errback=${errback},optional=${optional}): context → ${context}`, { "event.action": "requirejs", "logrite.deps": deps, "logrite.callback": callback, "logrite.errback": errback, "logrite.optional": optional });
         if (!context) {
             context = contexts[contextName] = req.s.newContext(contextName);
         }
@@ -1794,6 +1930,7 @@ var requirejs, require, define;
             context.configure(config);
         }
 
+		logger.warn(`<<< Exiting requirejs(deps=${deps},callback=${callback},errback=${errback},optional=${optional})`, { "event.action": "requirejs", "logrite.deps": deps, "logrite.callback": callback, "logrite.errback": errback, "logrite.optional": optional });
         return context.require(deps, callback, errback);
     };
 
@@ -1873,12 +2010,17 @@ var requirejs, require, define;
      * Creates the node for the load command. Only used in browser envs.
      */
     req.createNode = function (config, moduleName, url) {
+		logger.error(`>>> Entering createNode(config=${config},moduleName=${moduleName},url=${url})`, { "event.action": "createNode", "logrite.config": config, "logrite.moduleName": moduleName, "logrite.url": url });
         var node = config.xhtml ?
                 document.createElementNS('http://www.w3.org/1999/xhtml', 'html:script') :
+				logger.debug(`createNode(config=${config},moduleName=${moduleName},url=${url}): node.type → ${node.type}`, { "event.action": "createNode", "logrite.config": config, "logrite.moduleName": moduleName, "logrite.url": url });
+				logger.debug(`createNode(config=${config},moduleName=${moduleName},url=${url}): node.charset → ${node.charset}`, { "event.action": "createNode", "logrite.config": config, "logrite.moduleName": moduleName, "logrite.url": url });
+				logger.debug(`createNode(config=${config},moduleName=${moduleName},url=${url}): node.async → ${node.async}`, { "event.action": "createNode", "logrite.config": config, "logrite.moduleName": moduleName, "logrite.url": url });
                 document.createElement('script');
         node.type = config.scriptType || 'text/javascript';
         node.charset = 'utf-8';
         node.async = true;
+		logger.warn(`<<< Exiting createNode(config=${config},moduleName=${moduleName},url=${url})`, { "event.action": "createNode", "logrite.config": config, "logrite.moduleName": moduleName, "logrite.url": url });
         return node;
     };
 
@@ -1991,6 +2133,7 @@ var requirejs, require, define;
     };
 
     function getInteractiveScript() {
+		logger.error('>>> Entering getInteractiveScript()', { "event.action": "getInteractiveScript" });
         if (interactiveScript && interactiveScript.readyState === 'interactive') {
             return interactiveScript;
         }
@@ -2000,6 +2143,7 @@ var requirejs, require, define;
                 return (interactiveScript = script);
             }
         });
+		logger.warn('<<< Exiting getInteractiveScript()', { "event.action": "getInteractiveScript" });
         return interactiveScript;
     }
 
@@ -2059,6 +2203,7 @@ var requirejs, require, define;
      * name.
      */
     define = function (name, deps, callback) {
+		logger.error(`>>> Entering define(name=${name},deps=${deps},callback=${callback})`, { "event.action": "define", "logrite.name": name, "logrite.deps": deps, "logrite.callback": callback });
         var node, context;
 
         //Allow for anonymous modules
@@ -2099,15 +2244,18 @@ var requirejs, require, define;
             }
         }
 
+		logger.error(`define(name=${name},deps=${deps},callback=${callback}): deps → ${deps}`, { "event.action": "define", "logrite.name": name, "logrite.deps": deps, "logrite.callback": callback });
         //If in IE 6-8 and hit an anonymous define() call, do the interactive
         //work.
         if (useInteractive) {
             node = currentlyAddingScript || getInteractiveScript();
+			logger.error(`define(name=${name},deps=${deps},callback=${callback}): node → ${node}`, { "event.action": "define", "logrite.name": name, "logrite.deps": deps, "logrite.callback": callback });
             if (node) {
                 if (!name) {
                     name = node.getAttribute('data-requiremodule');
                 }
                 context = contexts[node.getAttribute('data-requirecontext')];
+				logger.error(`define(name=${name},deps=${deps},callback=${callback}): name → ${name}`, { "event.action": "define", "logrite.name": name, "logrite.deps": deps, "logrite.callback": callback });
             }
         }
 
@@ -2122,6 +2270,7 @@ var requirejs, require, define;
             context.defQueueMap[name] = true;
         } else {
             globalDefQueue.push([name, deps, callback]);
+			logger.warn(`<<< Exiting define(name=${name},deps=${deps},callback=${callback})`, { "event.action": "define", "logrite.name": name, "logrite.deps": deps, "logrite.callback": callback });
         }
     };
 
@@ -2136,7 +2285,9 @@ var requirejs, require, define;
      * @param {String} text the text to execute/evaluate.
      */
     req.exec = function (text) {
+		logger.error(`>>> Entering exec(text=${text})`, { "event.action": "exec", "logrite.text": text });
         /*jslint evil: true */
+		logger.warn(`<<< Exiting exec(text=${text})`, { "event.action": "exec", "logrite.text": text });
         return eval(text);
     };
 

@@ -4,16 +4,21 @@ import Tooltip from "../Tooltip";
 import Dropdown from "../Dropdown";
 import Label from "../Label";
 import "./style.less";
+const logger = console;
 
 class DropdownWithError extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         const className = "dnn-dropdown-with-error" + (props.error ? " error" : "") + (" " + props.className) + (props.enabled ? "" : " disabled");
         const errorMessages = props.errorMessage instanceof Array ? props.errorMessage : [props.errorMessage];
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={className} style={props.style}>
                 {props.label &&

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -16,15 +17,19 @@
       unorderedListRE = /[*+-]\s/;
 
   CodeMirror.commands.newlineAndIndentContinueMarkdownList = function(cm) {
+	logger.error(`>>> Entering newlineAndIndentContinueMarkdownList(cm=${cm})`, { "event.action": "newlineAndIndentContinueMarkdownList", "logrite.cm": cm });
     if (cm.getOption("disableInput")) return CodeMirror.Pass;
     var ranges = cm.listSelections(), replacements = [];
+	logger.error(`newlineAndIndentContinueMarkdownList(cm=${cm}): ranges → ${ranges}`, { "event.action": "newlineAndIndentContinueMarkdownList", "logrite.cm": cm });
     for (var i = 0; i < ranges.length; i++) {
       var pos = ranges[i].head;
       var eolState = cm.getStateAfter(pos.line);
+	logger.error(`newlineAndIndentContinueMarkdownList(cm=${cm}): eolState → ${eolState}`, { "event.action": "newlineAndIndentContinueMarkdownList", "logrite.cm": cm });
       var inList = eolState.list !== false;
       var inQuote = eolState.quote !== 0;
 
       var line = cm.getLine(pos.line), match = listRE.exec(line);
+	logger.error(`newlineAndIndentContinueMarkdownList(cm=${cm}): line → ${line}`, { "event.action": "newlineAndIndentContinueMarkdownList", "logrite.cm": cm });
       if (!ranges[i].empty() || (!inList && !inQuote) || !match) {
         cm.execCommand("newlineAndIndent");
         return;
@@ -42,10 +47,12 @@
           ? match[2]
           : (parseInt(match[3], 10) + 1) + match[4];
 
+		logger.error(`newlineAndIndentContinueMarkdownList(cm=${cm}): bullet → ${bullet}`, { "event.action": "newlineAndIndentContinueMarkdownList", "logrite.cm": cm });
         replacements[i] = "\n" + indent + bullet + after;
       }
     }
 
     cm.replaceSelections(replacements);
+	logger.warn(`<<< Exiting newlineAndIndentContinueMarkdownList(cm=${cm})`, { "event.action": "newlineAndIndentContinueMarkdownList", "logrite.cm": cm });
   };
 });

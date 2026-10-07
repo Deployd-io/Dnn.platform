@@ -8,6 +8,7 @@ import { InputGroup, Switch, GridSystem, Dropdown, Label, Button } from "@dnnsof
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let timeIntervalOptions = [];
 let recipientLimitOptions = [];
@@ -15,12 +16,15 @@ let recipientLimitOptions = [];
 class MessagingSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             messagingSettings: undefined
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         const {props} = this;
         if (props.messagingSettings) {
             let portalIdChanged = props.portalId !== undefined && prevProps.portalId !== props.portalId;
@@ -28,15 +32,19 @@ class MessagingSettingsPanelBody extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
             }
         }
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.loadData();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     loadData() {
+		logger.error('>>> Entering loadData()', { "event.action": "loadData" });
         const {props} = this;
         
         timeIntervalOptions = [];
@@ -64,6 +72,7 @@ class MessagingSettingsPanelBody extends Component {
         recipientLimitOptions.push({ "value": 100, "label": "100" });
 
         props.dispatch(SiteBehaviorActions.getMessagingSettings(props.portalId, (data) => {
+			logger.warn('<<< Exiting loadData()', { "event.action": "loadData" });
             this.setState({
                 messagingSettings: Object.assign({}, data.Settings)
             });
@@ -71,8 +80,10 @@ class MessagingSettingsPanelBody extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {state, props} = this;
         let messagingSettings = Object.assign({}, state.messagingSettings);
+		logger.error(`onSettingChange(key=${key},event=${event}): messagingSettings → ${messagingSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
 
         if (key === "ThrottlingInterval" || key === "RecipientLimit") {
             messagingSettings[key] = event.value;
@@ -86,9 +97,11 @@ class MessagingSettingsPanelBody extends Component {
         });
 
         props.dispatch(SiteBehaviorActions.messagingSettingsClientModified(messagingSettings));
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
 
@@ -96,13 +109,16 @@ class MessagingSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         }));
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SiteBehaviorActions.getMessagingSettings(props.portalId, (data) => {
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
                 this.setState({
                     messagingSettings: Object.assign({}, data.Settings)
                 });
@@ -112,6 +128,7 @@ class MessagingSettingsPanelBody extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {state} = this;
         if (state.messagingSettings) {
             const columnOne = <div key="column-one" className="left-column">
@@ -250,6 +267,8 @@ MessagingSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         messagingSettings: state.siteBehavior.messagingSettings,

@@ -12,14 +12,17 @@ namespace DotNetNuke.Services.Exceptions
 
     public static class ExceptionExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExceptionExtensions));
         public static string Hash(this Exception exc)
         {
+			Logger.LogError(">>> Entering Hash(exc={Exc})", exc);
             if (exc == null)
             {
                 return string.Empty;
             }
 
             var sb = new StringBuilder();
+			Logger.LogError("Hash(exc={Exc}): sb → {Sb}", exc, sb);
 
             AddException(sb, exc);
 
@@ -28,11 +31,13 @@ namespace DotNetNuke.Services.Exceptions
                 AddException(sb, exc.InnerException);
             }
 
+			Logger.LogWarning("<<< Exiting Hash(exc={Exc})", exc);
             return sb.ToString().ToUpperInvariant().GenerateSha256Hash();
         }
 
         private static void AddException(StringBuilder sb, Exception ex)
         {
+			Logger.LogError(">>> Entering AddException(sb={Sb},ex={Ex})", sb, ex);
             if (!string.IsNullOrEmpty(ex.Message))
             {
                 sb.AppendLine(ex.Message);
@@ -42,6 +47,7 @@ namespace DotNetNuke.Services.Exceptions
             {
                 sb.AppendLine(ex.StackTrace);
             }
+			Logger.LogWarning("<<< Exiting AddException(sb={Sb},ex={Ex})", sb, ex);
         }
     }
 }

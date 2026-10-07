@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -25,9 +26,21 @@
     if (val) {
       data = cm.state.selectionPointer = {
         value: typeof val == "string" ? val : "default",
-        mousemove: function(event) { mousemove(cm, event); },
-        mouseout: function(event) { mouseout(cm, event); },
-        windowScroll: function() { reset(cm); },
+        mousemove: function(event) {
+            logger.error(`>>> Entering mousemove(event=${event})`, { "event.action": "mousemove", "logrite.cm": cm, "logrite.event": event });
+            logger.warn(`<<< Exiting mousemove(event=${event})`, { "event.action": "mousemove", "logrite.cm": cm, "logrite.event": event });
+            mousemove(cm, event);
+        },
+        mouseout: function(event) {
+            logger.error(`>>> Entering mouseout(event=${event})`, { "event.action": "mouseout", "logrite.cm": cm, "logrite.event": event });
+            logger.warn(`<<< Exiting mouseout(event=${event})`, { "event.action": "mouseout", "logrite.cm": cm, "logrite.event": event });
+            mouseout(cm, event);
+        },
+        windowScroll: function() {
+            logger.error('>>> Entering windowScroll()', { "event.action": "windowScroll" });
+            logger.warn('<<< Exiting windowScroll()', { "event.action": "windowScroll" });
+            reset(cm);
+        },
         rects: null,
         mouseX: null, mouseY: null,
         willUpdate: false
@@ -43,40 +56,51 @@
   function mousemove(cm, event) {
     var data = cm.state.selectionPointer;
     if (event.buttons == null ? event.which : event.buttons) {
+	logger.debug(`mousemove(cm=${cm},event=${event}): data.mouseY → ${data.mouseY}`, { "event.action": "mousemove", "logrite.cm": cm, "logrite.event": event });
       data.mouseX = data.mouseY = null;
     } else {
       data.mouseX = event.clientX;
       data.mouseY = event.clientY;
     }
     scheduleUpdate(cm);
+	logger.error(`mousemove(cm=${cm},event=${event}): data → ${data}`, { "event.action": "mousemove", "logrite.cm": cm, "logrite.event": event });
   }
 
   function mouseout(cm, event) {
     if (!cm.getWrapperElement().contains(event.relatedTarget)) {
       var data = cm.state.selectionPointer;
+	logger.error(`mouseout(cm=${cm},event=${event}): data → ${data}`, { "event.action": "mouseout", "logrite.cm": cm, "logrite.event": event });
       data.mouseX = data.mouseY = null;
       scheduleUpdate(cm);
+	logger.debug(`mouseout(cm=${cm},event=${event}): data.mouseX → ${data.mouseX}`, { "event.action": "mouseout", "logrite.cm": cm, "logrite.event": event });
     }
   }
 
   function reset(cm) {
+	logger.error(`>>> Entering reset(cm=${cm})`, { "event.action": "reset", "logrite.cm": cm });
     cm.state.selectionPointer.rects = null;
     scheduleUpdate(cm);
+	logger.warn(`<<< Exiting reset(cm=${cm})`, { "event.action": "reset", "logrite.cm": cm });
   }
 
   function scheduleUpdate(cm) {
+	logger.error(`>>> Entering scheduleUpdate(cm=${cm})`, { "event.action": "scheduleUpdate", "logrite.cm": cm });
     if (!cm.state.selectionPointer.willUpdate) {
       cm.state.selectionPointer.willUpdate = true;
       setTimeout(function() {
         update(cm);
         cm.state.selectionPointer.willUpdate = false;
       }, 50);
+	logger.warn(`<<< Exiting scheduleUpdate(cm=${cm})`, { "event.action": "scheduleUpdate", "logrite.cm": cm });
     }
   }
 
   function update(cm) {
+	logger.error(`>>> Entering update(cm=${cm})`, { "event.action": "update", "logrite.cm": cm });
     var data = cm.state.selectionPointer;
     if (!data) return;
+	logger.error(`update(cm=${cm}): data → ${data}`, { "event.action": "update", "logrite.cm": cm });
+	logger.debug(`update(cm=${cm}): data.rects → ${data.rects}`, { "event.action": "update", "logrite.cm": cm });
     if (data.rects == null && data.mouseX != null) {
       data.rects = [];
       if (cm.somethingSelected()) {
@@ -92,6 +116,7 @@
         inside = true;
     }
     var cursor = inside ? data.value : "";
+	logger.error(`update(cm=${cm}): cursor → ${cursor}`, { "event.action": "update", "logrite.cm": cm });
     if (cm.display.lineDiv.style.cursor != cursor)
       cm.display.lineDiv.style.cursor = cursor;
   }

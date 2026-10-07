@@ -19,12 +19,17 @@ namespace DotNetNuke.UI.WebControls
     /// </remarks>
     public class ActionLink : HyperLink
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ActionLink));
         /// <summary>Initializes a new instance of the <see cref="ActionLink"/> class.</summary>
         public ActionLink()
         {
+			Logger.LogError(">>> Entering ActionLink()");
             this.RequireEditMode = false;
+			Logger.LogDebug("ActionLink(): this.RequireEditMode → {Arg0}", this.RequireEditMode);
             this.Security = "Edit";
             this.ControlKey = string.Empty;
+			Logger.LogDebug("ActionLink(): this.Security → {Arg0}", this.Security);
+        Logger.LogWarning("<<< Exiting ActionLink()");
             this.Title = string.Empty;
         }
 
@@ -45,9 +50,11 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>CreateChildControls builds the control tree.</summary>
         protected override void CreateChildControls()
         {
+			Logger.LogError(">>> Entering CreateChildControls()");
             // Call base class method to ensure Control Tree is built
             base.CreateChildControls();
 
+			Logger.LogWarning("<<< Exiting CreateChildControls()");
             // Set Causes Validation and Enables ViewState to false
             this.EnableViewState = false;
         }
@@ -56,6 +63,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (this.Visible && this.IsVisible((SecurityAccessLevel)Enum.Parse(typeof(SecurityAccessLevel), this.Security)))
@@ -64,21 +72,27 @@ namespace DotNetNuke.UI.WebControls
                 this.NavigateUrl = this.ControlKey != string.Empty
                                 ? this.ModuleControl.ModuleContext.EditUrl(this.KeyName, this.KeyValue, this.ControlKey)
                                 : this.ModuleControl.ModuleContext.EditUrl(this.Title);
+								Logger.LogDebug("OnPreRender(e={E}): this.Text → {Arg1}", e, this.Text);
 
                 if (this.CssClass == string.Empty)
                 {
                     this.CssClass = "dnnPrimaryAction";
+					Logger.LogDebug("OnPreRender(e={E}): this.CssClass → {Arg1}", e, this.CssClass);
                 }
             }
             else
             {
+				Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
                 this.Visible = false;
+				Logger.LogDebug("OnPreRender(e={E}): this.Visible → {Arg1}", e, this.Visible);
             }
         }
 
         private bool IsVisible(SecurityAccessLevel security)
         {
+			Logger.LogError(">>> Entering IsVisible(security={Security})", security);
             bool isVisible = false;
+			Logger.LogError("IsVisible(security={Security}): isVisible → {IsVisible}", security, isVisible);
             if (ModulePermissionController.HasModuleAccess(security, Null.NullString, this.ModuleControl.ModuleContext.Configuration))
             {
                 if ((this.RequireEditMode != true || Personalization.GetUserMode() == PortalSettings.Mode.Edit) || (security == SecurityAccessLevel.Anonymous || security == SecurityAccessLevel.View))
@@ -87,6 +101,7 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting IsVisible(security={Security})", security);
             return isVisible;
         }
     }

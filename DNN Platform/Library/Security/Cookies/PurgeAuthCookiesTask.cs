@@ -11,16 +11,19 @@ namespace DotNetNuke.Security.Cookies
     /// <summary>Scheduled task to remove old cookies.</summary>
     public class PurgeAuthCookiesTask : SchedulerClient
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PurgeAuthCookiesTask));
         /// <summary>Initializes a new instance of the <see cref="PurgeAuthCookiesTask"/> class.</summary>
         /// <param name="objScheduleHistoryItem">Object that will get added to the database as a record of this run.</param>
         public PurgeAuthCookiesTask(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogError(">>> Entering PurgeAuthCookiesTask(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             this.ScheduleHistoryItem = objScheduleHistoryItem;
         }
 
         /// <inheritdoc />
         public override void DoWork()
         {
+			Logger.LogError(">>> Entering DoWork()");
             try
             {
                 AuthCookieController.Instance.DeleteExpired(DateTime.UtcNow);
@@ -29,11 +32,13 @@ namespace DotNetNuke.Security.Cookies
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in DoWork(): {Arg0}", exc.Message);
                 this.ScheduleHistoryItem.Succeeded = false;
                 this.ScheduleHistoryItem.AddLogNote($"Purging auth cookies task failed: {exc.ToString()}.");
                 this.Errored(ref exc);
                 Exceptions.LogException(exc);
             }
+			Logger.LogWarning("<<< Exiting DoWork()");
         }
     }
 }

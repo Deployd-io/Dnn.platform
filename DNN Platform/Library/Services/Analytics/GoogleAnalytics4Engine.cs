@@ -12,6 +12,7 @@ namespace DotNetNuke.Services.Analytics
     /// <inheritdoc />
     public class GoogleAnalytics4Engine : AnalyticsEngineBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(GoogleAnalytics4Engine));
         /// <inheritdoc />
         public override string EngineName
         {
@@ -24,16 +25,20 @@ namespace DotNetNuke.Services.Analytics
         /// <inheritdoc />
         public override string RenderScript(string scriptTemplate)
         {
+			Logger.LogError(">>> Entering RenderScript(scriptTemplate={ScriptTemplate})", scriptTemplate);
             AnalyticsConfiguration config = this.GetConfig();
 
+			Logger.LogError("RenderScript(scriptTemplate={ScriptTemplate}): config → {Config}", scriptTemplate, config);
             if (config == null)
             {
                 return string.Empty;
             }
 
             var trackingId = string.Empty;
+			Logger.LogError("RenderScript(scriptTemplate={ScriptTemplate}): trackingId → {TrackingId}", scriptTemplate, trackingId);
             var urlParameter = string.Empty;
             var trackForAdmin = true;
+			Logger.LogError("RenderScript(scriptTemplate={ScriptTemplate}): trackForAdmin → {TrackForAdmin}", scriptTemplate, trackForAdmin);
 
             foreach (AnalyticsSetting setting in config.Settings)
             {
@@ -68,7 +73,9 @@ namespace DotNetNuke.Services.Analytics
             }
 
             scriptTemplate = scriptTemplate.Replace("[GA4_ID]", trackingId);
+			Logger.LogError("RenderScript(scriptTemplate={ScriptTemplate}): scriptTemplate → {ScriptTemplate1}", scriptTemplate, scriptTemplate);
 
+			Logger.LogWarning("<<< Exiting RenderScript(scriptTemplate={ScriptTemplate})", scriptTemplate);
             return scriptTemplate;
         }
     }

@@ -42,7 +42,10 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <param name="userControllerWrapper">The user controller.</param>
         public GetUser(IUserValidator userValidator, IUserControllerWrapper userControllerWrapper)
         {
+			eventLogger.LogError(">>> Entering GetUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper})", userValidator, userControllerWrapper);
             this.userValidator = userValidator;
+			eventLogger.LogWarning("<<< Exiting GetUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper})", userValidator, userControllerWrapper);
+			eventLogger.LogDebug("GetUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper}): this.userValidator → {Arg2}", userValidator, userControllerWrapper, this.userValidator);
             this.userControllerWrapper = userControllerWrapper;
         }
 
@@ -58,6 +61,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.UserId = this.GetFlagValue<int?>(FlagId, "User Id", null);
             this.Email = this.GetFlagValue(FlagEmail, "Email", string.Empty);
             this.Username = this.GetFlagValue(FlagUsername, "Username", string.Empty);
@@ -73,6 +77,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                     }
                     else
                     {
+						eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.Email → {Arg4}", args, portalSettings, userInfo, activeTabId, this.Email);
                         int tmpId;
                         if (int.TryParse(args[1], out tmpId))
                         {
@@ -80,9 +85,11 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                         }
                         else
                         {
+							eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.UserId → {Arg4}", args, portalSettings, userInfo, activeTabId, this.UserId);
                             // assume it's a username
                             this.Username = args[1];
                         }
+						eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.Username → {Arg4}", args, portalSettings, userInfo, activeTabId, this.Username);
                     }
                 }
 
@@ -91,13 +98,16 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                     this.AddMessage(this.LocalizeString("Prompt_SearchUserParameterRequired"));
                 }
             }
+			eventLogger.LogWarning("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             var lst = new List<UserModel>();
 
+			eventLogger.LogError("Run(): lst → {Lst}", lst);
             // if no argument, default to current user
             if (this.Args.Length == 1)
             {
@@ -107,10 +117,12 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             {
                 var recCount = 0;
                 var userId = this.UserId;
+				eventLogger.LogError("Run(): userId → {UserId}", userId);
                 if (!userId.HasValue && !string.IsNullOrEmpty(this.Username))
                 {
                     // do username lookup
                     var searchTerm = this.Username.Replace("%", string.Empty).Replace("*", "%");
+					eventLogger.LogError("Run(): searchTerm → {SearchTerm}", searchTerm);
 
                     userId = this.userControllerWrapper.GetUsersByUserName(this.PortalId, searchTerm, -1, int.MaxValue, ref recCount, true, false) ?? UserIdZero;
 
@@ -147,6 +159,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                 lst.Add(new UserModel(userInfo));
             }
 
+			eventLogger.LogWarning("<<< Exiting Run()");
             return new ConsoleResultModel(string.Empty)
             {
                 Data = lst,

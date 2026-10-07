@@ -9,10 +9,12 @@ import util from "../../../utils";
 import resx from "../../../resources";
 import styles from "./style.module.less";
 import MessageBox from "../../messageBox";
+const logger = console;
 
 class LanguagePackPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             languagePack: {
                 PackType: "Core",
@@ -28,9 +30,11 @@ class LanguagePackPanelBody extends Component {
             showMessageBox: false,
             message: ""
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     getLanguageOptions() {
+		logger.error('>>> Entering getLanguageOptions()', { "event.action": "getLanguageOptions" });
         const {props} = this;
         let options = [];
         if (props.languages !== undefined) {
@@ -57,21 +61,26 @@ class LanguagePackPanelBody extends Component {
                 }
             });
         }
+		logger.warn('<<< Exiting getLanguageOptions()', { "event.action": "getLanguageOptions" });
         return options;
     }
 
     getTypeOptions() {
+		logger.error('>>> Entering getTypeOptions()', { "event.action": "getTypeOptions" });
         let options = [{ label: resx.get("Core.LangPackType"), value: "Core" },
             { label: resx.get("Module.LangPackType"), value: "Module" },
             { label: resx.get("Provider.LangPackType"), value: "Provider" },
             { label: resx.get("AuthSystem.LangPackType"), value: "AuthSystem" },
             { label: resx.get("Full.LangPackType"), value: "Full" }];
+		logger.warn('<<< Exiting getTypeOptions()', { "event.action": "getTypeOptions" });
         return options;
     }
 
     renderModuleSelection() {
+		logger.error('>>> Entering renderModuleSelection()', { "event.action": "renderModuleSelection" });
         const {props} = this;
         if (props.modules) {
+			logger.warn('<<< Exiting renderModuleSelection()', { "event.action": "renderModuleSelection" });
             return props.modules.map((item, i) => {
                 return (
                     <div className="languagePack-module" key={i}>
@@ -87,13 +96,17 @@ class LanguagePackPanelBody extends Component {
     }
 
     isModuleSelected(id) {
+		logger.error(`>>> Entering isModuleSelected(id=${id})`, { "event.action": "isModuleSelected", "logrite.id": id });
         const { state} = this;
+		logger.warn(`<<< Exiting isModuleSelected(id=${id})`, { "event.action": "isModuleSelected", "logrite.id": id });
         return state.languagePack.ModuleIds.indexOf(id) > -1 ? true : false;
     }
 
     onModuleSelectionChange(id, event) {
+		logger.error(`>>> Entering onModuleSelectionChange(id=${id},event=${event})`, { "event.action": "onModuleSelectionChange", "logrite.id": id, "logrite.event": event });
         let {state} = this;
         let languagePack = Object.assign({}, state.languagePack);
+		logger.error(`onModuleSelectionChange(id=${id},event=${event}): languagePack → ${languagePack}`, { "event.action": "onModuleSelectionChange", "logrite.id": id, "logrite.event": event });
 
         let index = languagePack.ModuleIds.indexOf(id);
         if (event) {
@@ -112,6 +125,7 @@ class LanguagePackPanelBody extends Component {
         }
         else {
             state.error["module"] = false;
+			logger.warn(`<<< Exiting onModuleSelectionChange(id=${id},event=${event})`, { "event.action": "onModuleSelectionChange", "logrite.id": id, "logrite.event": event });
         }
 
         this.setState({
@@ -122,11 +136,14 @@ class LanguagePackPanelBody extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {state, props} = this;
         let languagePack = Object.assign({}, state.languagePack);
+		logger.error(`onSettingChange(key=${key},event=${event}): languagePack → ${languagePack}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
 
         if (key === "CultureCode") {
             languagePack[key] = event.value;
+			logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         }
         else if (key === "PackType") {
             languagePack[key] = event;
@@ -157,6 +174,7 @@ class LanguagePackPanelBody extends Component {
     }
 
     onCreate(event) {
+		logger.error(`>>> Entering onCreate(event=${event})`, { "event.action": "onCreate", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -179,18 +197,23 @@ class LanguagePackPanelBody extends Component {
         }, (error) => {
             const errorMessage = JSON.parse(error.responseText);
             util.utilities.notifyError(errorMessage.Message);
+			logger.error(`onCreate(event=${event}): errorMessage → ${errorMessage}`, { "event.action": "onCreate", "logrite.event": event });
         }));
     }
 
     closeMessageBox() {
+		logger.error('>>> Entering closeMessageBox()', { "event.action": "closeMessageBox" });
         this.setState({
             showMessageBox: false
         });
+		logger.warn('<<< Exiting closeMessageBox()', { "event.action": "closeMessageBox" });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.languagePack}>
                 <PersonaBarPageBody
@@ -289,6 +312,8 @@ LanguagePackPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         languages: state.languages.languageList,

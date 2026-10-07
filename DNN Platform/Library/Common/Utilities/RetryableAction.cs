@@ -20,7 +20,11 @@ namespace DotNetNuke.Common.Utilities.Internal
 
         static RetryableAction()
         {
+			Logger.LogError(">>> Entering RetryableAction()");
             SleepAction = GoToSleep;
+			Logger.LogDebug("RetryableAction(): SleepAction → {SleepAction}", SleepAction);
+        Logger.LogDebug("RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay},delayMultiplier={DelayMultiplier}): this.MaxRetries → {Arg5}", action, description, maxRetries, delay, delayMultiplier, this.MaxRetries);
+        Logger.LogWarning("<<< Exiting RetryableAction()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="RetryableAction"/> class.</summary>
@@ -31,6 +35,8 @@ namespace DotNetNuke.Common.Utilities.Internal
         public RetryableAction(Action action, string description, int maxRetries, TimeSpan delay)
             : this(action, description, maxRetries, delay, 1)
         {
+		Logger.LogError(">>> Entering RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay})", action, description, maxRetries, delay);
+        Logger.LogWarning("<<< Exiting RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay})", action, description, maxRetries, delay);
         }
 
         /// <summary>Initializes a new instance of the <see cref="RetryableAction"/> class.</summary>
@@ -43,12 +49,15 @@ namespace DotNetNuke.Common.Utilities.Internal
         {
             if (delay.TotalMilliseconds > int.MaxValue)
             {
+				Logger.LogError("Throwing ArgumentException from RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay},delayMultiplier={DelayMultiplier})", action, description, maxRetries, delay, delayMultiplier);
                 throw new ArgumentException($"delay must be less than {int.MaxValue} milliseconds");
             }
 
             this.Action = action;
+			Logger.LogDebug("RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay},delayMultiplier={DelayMultiplier}): this.Action → {Arg5}", action, description, maxRetries, delay, delayMultiplier, this.Action);
             this.Description = description;
             this.MaxRetries = maxRetries;
+			Logger.LogDebug("RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay},delayMultiplier={DelayMultiplier}): this.Description → {Arg5}", action, description, maxRetries, delay, delayMultiplier, this.Description);
             this.Delay = delay;
             this.DelayMultiplier = delayMultiplier;
         }
@@ -80,18 +89,24 @@ namespace DotNetNuke.Common.Utilities.Internal
 
         public static void RetryEverySecondFor30Seconds(Action action, string description)
         {
+			Logger.LogError(">>> Entering RetryEverySecondFor30Seconds(action={Action},description={Description})", action, description);
             new RetryableAction(action, description, 30, TimeSpan.FromSeconds(1)).TryIt();
+			Logger.LogWarning("<<< Exiting RetryEverySecondFor30Seconds(action={Action},description={Description})", action, description);
         }
 
         public static void Retry5TimesWith2SecondsDelay(Action action, string description)
         {
+			Logger.LogError(">>> Entering Retry5TimesWith2SecondsDelay(action={Action},description={Description})", action, description);
             new RetryableAction(action, description, 5, TimeSpan.FromSeconds(2)).TryIt();
+			Logger.LogWarning("<<< Exiting Retry5TimesWith2SecondsDelay(action={Action},description={Description})", action, description);
         }
 
         public void TryIt()
         {
+			Logger.LogError(">>> Entering TryIt()");
             var currentDelay = (int)this.Delay.TotalMilliseconds;
             var retriesRemaining = this.MaxRetries;
+			Logger.LogError("TryIt(): currentDelay → {CurrentDelay}", currentDelay);
 
             do
             {
@@ -130,11 +145,14 @@ namespace DotNetNuke.Common.Utilities.Internal
                 retriesRemaining--;
             }
             while (true);
+			Logger.LogWarning("<<< Exiting TryIt()");
         }
 
         private static void GoToSleep(int delay)
         {
+			Logger.LogError(">>> Entering GoToSleep(delay={Delay})", delay);
             Thread.Sleep(delay);
+			Logger.LogWarning("<<< Exiting GoToSleep(delay={Delay})", delay);
         }
     }
 }

@@ -21,6 +21,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
         /// <inheritdoc />
         public PackageInfoDto GetPackageDetail(int portalId, PackageInfo package)
         {
+			Logger.LogError(">>> Entering GetPackageDetail(portalId={PortalId},package={Package})", portalId, package);
             var usedBy = PackageController.Instance.GetPackageDependencies(d =>
                             d.PackageName.Equals(package.Name, StringComparison.OrdinalIgnoreCase) &&
                             d.Version <= package.Version).Select(d => d.PackageId);
@@ -30,6 +31,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
                                  select new UsedByPackage { Id = p.PackageID, Name = p.Name, Version = p.Version.ToString() };
 
             var library = JavaScriptLibraryController.Instance.GetLibrary(l => l.PackageID == package.PackageID);
+			Logger.LogError("GetPackageDetail(portalId={PortalId},package={Package}): library → {Library}", portalId, package, library);
             var detail = new JsLibraryPackageDetailDto(portalId, package)
             {
                 Name = library.LibraryName,
@@ -48,21 +50,26 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
                 UsedBy = usedByPackages,
             };
 
+			Logger.LogWarning("<<< Exiting GetPackageDetail(portalId={PortalId},package={Package})", portalId, package);
             return detail;
         }
 
         /// <inheritdoc />
         public bool SavePackageSettings(PackageSettingsDto packageSettings, out string errorMessage)
         {
+			Logger.LogError(">>> Entering SavePackageSettings(packageSettings={PackageSettings})", packageSettings);
             errorMessage = string.Empty;
 
+			Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): errorMessage → {ErrorMessage}", packageSettings, errorMessage);
             try
             {
+				Logger.LogError("SavePackageSettings(packageSettings={PackageSettings}): errorMessage → {ErrorMessage}", packageSettings, errorMessage);
                 string value;
                 if (packageSettings.EditorActions.TryGetValue("customCdn", out value)
                     && !string.IsNullOrEmpty(value))
                 {
                     var library = JavaScriptLibraryController.Instance.GetLibrary(l => l.PackageID == packageSettings.PackageId);
+					Logger.LogError("SavePackageSettings(packageSettings={PackageSettings}): library → {Library}", packageSettings, library);
                     HostController.Instance.Update("CustomCDN_" + library.LibraryName, value);
                 }
 
@@ -72,6 +79,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
             {
                 Logger.Error(ex);
                 errorMessage = ex.Message;
+				Logger.LogWarning("<<< Exiting SavePackageSettings(packageSettings={PackageSettings})", packageSettings);
                 return false;
             }
         }

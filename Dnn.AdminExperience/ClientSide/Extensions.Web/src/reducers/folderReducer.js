@@ -1,6 +1,9 @@
+const logger = console;
 import { folder as ActionTypes } from "constants/actionTypes";
 
 function addToFolders(value, folders) {
+	logger.error(`>>> Entering addToFolders(value=${value},folders=${folders})`, { "event.action": "addToFolders", "logrite.value": value, "logrite.folders": folders });
+	logger.warn(`<<< Exiting addToFolders(value=${value},folders=${folders})`, { "event.action": "addToFolders", "logrite.value": value, "logrite.folders": folders });
     return folders.concat(value).sort();
 }
 

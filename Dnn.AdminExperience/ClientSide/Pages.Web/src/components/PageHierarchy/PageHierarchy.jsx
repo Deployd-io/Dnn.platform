@@ -5,9 +5,11 @@ import utils from "../../utils";
 import "./css/pages-hierarchy.css";
 import Html from "../Html";
 import pagesHtml from "./pages.html?raw";
+const logger = console;
 
 class PageHierarchy extends Component {
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const {itemTemplate, dragItemTemplate, searchKeyword} = this.props;
         pageHierarchyManager.utility = utils.getUtilities();
         pageHierarchyManager.resx = pageHierarchyManager.utility.resx.Pages;
@@ -19,9 +21,11 @@ class PageHierarchy extends Component {
         pageHierarchyManager.setSearchKeyword(searchKeyword);   
         pageHierarchyManager.setCurrentTabIdAndSiteRoot(utils.getCurrentPageId(), utils.getSiteRoot());
         pageHierarchyManager.selectedPagePathChanged = p => this.props.onSelectedPagePathChanged([...p]);
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         const {itemTemplate, dragItemTemplate, searchKeyword, selectedPage} = prevProps;
         if (itemTemplate && itemTemplate !== this.props.itemTemplate) {
             pageHierarchyManager.setItemTemplate(this.props.itemTemplate);
@@ -37,20 +41,25 @@ class PageHierarchy extends Component {
 
         if (selectedPage && selectedPage !== this.props.selectedPage) {
             pageHierarchyManager.selectPageFromBreadCrumbs(this.props.selectedPage);
+			logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         }
     }
     
     initCallback() {
+		logger.error('>>> Entering initCallback()', { "event.action": "initCallback" });
         const {createdPage} = this.props;
 
         if (createdPage !== null) {
             pageHierarchyManager.addPage(createdPage);
+			logger.warn('<<< Exiting initCallback()', { "event.action": "initCallback" });
         }
     }
 
     callPageSettings(action, params) {
+		logger.error(`>>> Entering callPageSettings(action=${action},params=${params})`, { "event.action": "callPageSettings", "logrite.action": action, "logrite.params": params });
         const pageId = params[0];
         this.props.onPageSettings(pageId);
+		logger.warn(`<<< Exiting callPageSettings(action=${action},params=${params})`, { "event.action": "callPageSettings", "logrite.action": action, "logrite.params": params });
     }
     
     render() {

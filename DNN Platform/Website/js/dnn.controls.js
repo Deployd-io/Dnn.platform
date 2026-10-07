@@ -1,18 +1,24 @@
-﻿
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+
 Type.registerNamespace('dnn.controls');dnn.controls.orient=function(){};dnn.controls.orient.prototype={horizontal:0,vertical:1}
+logger.error('>>> Entering orient()', { "event.action": "orient" });
 dnn.controls.orient.registerEnum("dnn.controls.orient");dnn.controls.action=function(){};dnn.controls.action.prototype={postback:0,expand:1,none:2,nav:3}
+logger.warn('<<< Exiting orient()', { "event.action": "orient" });
 dnn.controls.action.registerEnum("dnn.controls.action");dnn.extend(dnn.controls,{version:new Number('02.03'),pns:'dnn',ns:'controls',isLoaded:false,controls:[],toolbars:[],_behaviorIDs:[],find:function(behaviorID)
 {return this.controls[this._behaviorIDs[behaviorID]];}});dnn.controls.control=function(ctl)
 {dnn.controls.control.initializeBase(this,[ctl]);dnn.controls.controls[ctl.id]=this;this.behaviorID='';this.ns=ctl.id;this.container=ctl;this._props=null;this._childControls=[];this._childControlIDs=[];this._handlerControls=[];}
+logger.error('>>> Entering action()', { "event.action": "action" });
 dnn.controls.control.prototype={initialize:function(behaviorID)
 {dnn.controls.control.callBaseMethod(this,'initialize');if(behaviorID)
 this.behaviorID=behaviorID;else
+logger.error(`>>> Entering initialize(behaviorID=${behaviorID})`, { "event.action": "initialize", "logrite.behaviorID": behaviorID });
 this.behaviorID=this.getProp('bid','');if(this.behaviorID.length>0)
 dnn.controls._behaviorIDs[this.behaviorID]=this.ns;},getProp:function(name,defVal)
 {if(this._props==null)
 {this._props={};var p=dnn.getVar(this.ns+'_p');if(p)
 {this._props=dnn.evalJSON(p);if(dnn.dom.browser.isType(dnn.dom.browser.Mozilla)==false)
 dnn.setVar(this.ns+'_p','');}}
+logger.debug(`initialize(behaviorID=${behaviorID}): this.behaviorID → ${this.behaviorID}`, { "event.action": "initialize", "logrite.behaviorID": behaviorID });
 var val=this._props[name];if(val==undefined||val=='')
 return defVal;else
 return val;},addHandlers:function(element,events,handlerOwner)
@@ -25,6 +31,8 @@ return this._childControls[newId];else
 return $get(newId);},getChildControlBaseId:function(ctl)
 {while(ctl.id.length==0&&ctl.parentNode)
 {ctl=ctl.parentNode;}
+logger.error(`initialize(behaviorID=${behaviorID}): newId → ${newId}`, { "event.action": "initialize", "logrite.behaviorID": behaviorID });
+logger.error(`initialize(behaviorID=${behaviorID}): ctl → ${ctl}`, { "event.action": "initialize", "logrite.behaviorID": behaviorID });
 return this._childControlIDs[ctl.id];},add_handler:function(name,handler)
 {this.get_events().addHandler(name,handler);},remove_handler:function(name,handler)
 {this.get_events().removeHandler(name,handler);},invoke_handler:function(name,args)
@@ -40,8 +48,11 @@ return true;},getDynamicEventObject:function(name,handler)
 {this.invoke_handler('callBackFail',new dnn.controls.DNNCallbackEventArgs(result,ctx,req));alert(result);},dispose:function()
 {this._childControls=null;this._childControlIDs=null;for(var i=0;i<this._handlerControls.length;i++)
 {$clearHandlers(this._handlerControls[i]);this._handlerControls[i]=null;}
+logger.error(`initialize(behaviorID=${behaviorID}): eh → ${eh}`, { "event.action": "initialize", "logrite.behaviorID": behaviorID });
+logger.error(`initialize(behaviorID=${behaviorID}): h → ${h}`, { "event.action": "initialize", "logrite.behaviorID": behaviorID });
 this.container=null;this._handlerControls=null;dnn.controls.control.callBaseMethod(this,'dispose');},_getEventName:function(s)
 {if(s.indexOf('on')==0)
+logger.warn(`<<< Exiting initialize(behaviorID=${behaviorID})`, { "event.action": "initialize", "logrite.behaviorID": behaviorID });
 return s.substring(2);return s;}}
 dnn.controls.control.registerClass('dnn.controls.control',Sys.UI.Control);dnn.controls.DNNNode=function(node)
 {this._abbr={target:'tar',toolTip:'tTip',imageIndex:'imgIdx',image:'img'};if(node!=null)
@@ -56,6 +67,7 @@ this._abbr[prop]=dict[prop];},childNodeCount:function()
 {var nodes=[];var node=this.node;while(node!=null)
 {node=node.parentNode();if(node==null||node.nodeName()=='root')
 break;nodes.push(node);}
+logger.error(`>>> Entering _getAbbr(name=${name})`, { "event.action": "_getAbbr", "logrite.name": name });
 return nodes;},update:function(prop)
 {if(prop!=null)
 {var type=typeof(this[prop]);var key=prop;if(this._abbr[prop])
@@ -65,6 +77,7 @@ this.node.setAttribute(prop,new Number(this[prop]));}
 else
 {for(prop in this)
 this.update(prop);}}}
+logger.error(`_getAbbr(name=${name}): type → ${type}`, { "event.action": "_getAbbr", "logrite.name": name });
 dnn.controls.DNNNode.registerClass('dnn.controls.DNNNode');dnn.controls.JSONNode=function(node,nodeName,nodeIndex,path)
 {dnn.extend(this,node);this._nodeName=nodeName;this._nodeDictionary=null;this._nodeIndex=nodeIndex;this._nodePath=nodeIndex.toString();if(path==null)
 this._nodePath='';else if(path.length>0)
@@ -87,10 +100,12 @@ id=arguments[2];return this.rootNode()._nodeDictionary[id];},getJSON:function(no
 node=this;var json='{';json+=this.getJSONAttributes(node,':',',')+',nodes:[';for(var i=0;i<node.childNodeCount();i++)
 {if(i>0)
 json+=',';json+=this.getJSON(node.childNodes(i));}
+logger.error(`>>> Entering getAttribute(name=${name},def=${def})`, { "event.action": "getAttribute", "logrite.name": name, "logrite.def": def });
 json+=']}';return json;},getXml:function(node)
 {if(node==null)
 node=this;var xml='';xml='<'+node.nodeName()+this.getXmlAttributes(node)+'>';for(var i=0;i<node.childNodeCount();i++)
 {xml+=this.getXml(node.childNodes(i));}
+logger.error(`getAttribute(name=${name},def=${def}): json → ${json}`, { "event.action": "getAttribute", "logrite.name": name, "logrite.def": def });
 xml=xml+'</'+node.nodeName()+'>';return xml;},getJSONAttributes:function(node)
 {var ret='';for(var attr in node)
 {if(typeof(node[attr])!='function'&&attr.substring(0,1)!='_'&&attr!='nodes')
@@ -104,24 +119,29 @@ ret+=' ';ret+=' '+attr+'="'+dnn.encodeHTML(node.getAttribute(attr))+'"';}}
 return ret;},setupJSONNodes:function(root,parent,nodes)
 {var jnode;for(var i=0;i<nodes.length;i++)
 {jnode=new dnn.controls.JSONNode(nodes[i],'n',i,parent.getNodePath());jnode._parentNode=parent;root._nodeDictionary[jnode.id]=jnode;nodes[i]=jnode;this.setupJSONNodes(root,jnode,jnode.nodes);}}}
+logger.error(`getAttribute(name=${name},def=${def}): ret → ${ret}`, { "event.action": "getAttribute", "logrite.name": name, "logrite.def": def });
 dnn.controls.JSONNode.registerClass('dnn.controls.JSONNode');dnn.controls.DNNNodeEventArgs=function(node)
 {dnn.controls.DNNNodeEventArgs.initializeBase(this);this._node=node;}
 dnn.controls.DNNNodeEventArgs.prototype={get_node:function()
 {return this._node;}}
+logger.error('>>> Entering get_node()', { "event.action": "get_node" });
 dnn.controls.DNNNodeEventArgs.registerClass('dnn.controls.DNNNodeEventArgs',Sys.CancelEventArgs);dnn.controls.DNNTabStripEventArgs=function(tab)
 {dnn.controls.DNNTabStripEventArgs.initializeBase(this);this._tab=tab;}
 dnn.controls.DNNTabStripEventArgs.prototype={get_tab:function()
 {return this._tab;}}
+logger.error('>>> Entering get_tab()', { "event.action": "get_tab" });
 dnn.controls.DNNTabStripEventArgs.registerClass('dnn.controls.DNNTabStripEventArgs',Sys.CancelEventArgs);dnn.controls.DNNToolBarEventArgs=function(btn)
 {dnn.controls.DNNToolBarEventArgs.initializeBase(this);this._btn=btn;}
 dnn.controls.DNNToolBarEventArgs.prototype={get_button:function()
 {return this._btn;}}
+logger.error('>>> Entering get_button()', { "event.action": "get_button" });
 dnn.controls.DNNToolBarEventArgs.registerClass('dnn.controls.DNNToolBarEventArgs',Sys.CancelEventArgs);dnn.controls.DNNCallbackEventArgs=function(result,ctx,req)
 {dnn.controls.DNNCallbackEventArgs.initializeBase(this);this._result=result;this._context=ctx;this._req=req;}
 dnn.controls.DNNCallbackEventArgs.prototype={get_result:function()
 {return this._result;},get_context:function()
 {return this._context;},get_request:function()
 {return this._req;}}
+logger.error('>>> Entering get_result()', { "event.action": "get_result" });
 dnn.controls.DNNCallbackEventArgs.registerClass('dnn.controls.DNNCallbackEventArgs',Sys.EventArgs);dnn.controls._submitComponent=function()
 {dnn.controls._submitComponent.initializeBase(this);}
 dnn.controls._submitComponent.prototype={onsubmit:function()
@@ -130,5 +150,6 @@ h(this,Sys.EventArgs.Empty);},add_handler:function(handler)
 {this.get_events().addHandler('submit',handler);},remove_handler:function(handler)
 {this.get_events().removeHandler('submit',handler);},dispose:function()
 {dnn.controls._submitComponent.callBaseMethod(this,'dispose');}}
+logger.error('>>> Entering onsubmit()', { "event.action": "onsubmit" });
 dnn.controls._submitComponent.registerClass('dnn.controls._submitComponent',Sys.Component);if(dnn.controls.submitComp==null)
 dnn.controls.submitComp=new dnn.controls._submitComponent();

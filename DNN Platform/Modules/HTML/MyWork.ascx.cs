@@ -10,20 +10,26 @@ namespace DotNetNuke.Modules.Html
     using DotNetNuke.Entities.Modules;
     using DotNetNuke.Services.Exceptions;
     using Microsoft.Extensions.DependencyInjection;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>  MyWork allows a user to view any outstanding workflow items.</summary>
     public partial class MyWork : PortalModuleBase
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private readonly INavigationManager navigationManager;
 
         /// <summary>Initializes a new instance of the <see cref="MyWork"/> class.</summary>
         public MyWork()
         {
+			_logger.LogError(">>> Entering MyWork()");
             this.navigationManager = this.DependencyProvider.GetRequiredService<INavigationManager>();
+			_logger.LogDebug("MyWork(): navigationManager → {NavigationManager}", navigationManager);
+        _logger.LogWarning("<<< Exiting MyWork()");
         }
 
         public string FormatURL(object dataItem)
         {
+			_logger.LogError(">>> Entering FormatURL(dataItem={DataItem})", dataItem);
             var objHtmlTextUser = (HtmlTextUserInfo)dataItem;
             return "<a href=\"" + this.navigationManager.NavigateURL(objHtmlTextUser.TabID) + "#" + objHtmlTextUser.ModuleID + "\">" + objHtmlTextUser.ModuleTitle + " ( " + objHtmlTextUser.StateName + " )</a>";
         }
@@ -32,6 +38,7 @@ namespace DotNetNuke.Modules.Html
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			_logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             this.hlCancel.NavigateUrl = this.navigationManager.NavigateURL();
 
@@ -40,14 +47,17 @@ namespace DotNetNuke.Modules.Html
                 if (!this.Page.IsPostBack)
                 {
                     var objHtmlTextUsers = new HtmlTextUserController();
+					_logger.LogError("OnLoad(e={E}): objHtmlTextUsers → {ObjHtmlTextUsers}", e, objHtmlTextUsers);
                     this.dgTabs.DataSource = objHtmlTextUsers.GetHtmlTextUser(this.UserInfo.UserID);
                     this.dgTabs.DataBind();
                 }
             }
             catch (Exception exc)
             {
+				_logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			_logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

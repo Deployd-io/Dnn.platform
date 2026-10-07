@@ -8,10 +8,12 @@ namespace DotNetNuke.Services.Analytics
     using DotNetNuke.Entities.Portals;
     using DotNetNuke.Entities.Users;
     using DotNetNuke.Services.Analytics.Config;
+	using Microsoft.Extensions.Logging;
 
     /// <inheritdoc />
     public class GoogleTagManagerEngine : AnalyticsEngineBase
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <inheritdoc />
         public override string EngineName
         {
@@ -24,16 +26,20 @@ namespace DotNetNuke.Services.Analytics
         /// <inheritdoc />
         public override string RenderScript(string scriptTemplate)
         {
+			_logger.LogError(">>> Entering RenderScript(scriptTemplate={ScriptTemplate})", scriptTemplate);
             AnalyticsConfiguration config = this.GetConfig();
 
+			_logger.LogError("RenderScript(scriptTemplate={ScriptTemplate}): config → {Config}", scriptTemplate, config);
             if (config == null)
             {
                 return string.Empty;
             }
 
             var trackingId = string.Empty;
+			_logger.LogError("RenderScript(scriptTemplate={ScriptTemplate}): trackingId → {TrackingId}", scriptTemplate, trackingId);
             var urlParameter = string.Empty;
             var trackForAdmin = true;
+			_logger.LogError("RenderScript(scriptTemplate={ScriptTemplate}): trackForAdmin → {TrackForAdmin}", scriptTemplate, trackForAdmin);
 
             foreach (AnalyticsSetting setting in config.Settings)
             {
@@ -68,7 +74,9 @@ namespace DotNetNuke.Services.Analytics
             }
 
             scriptTemplate = scriptTemplate.Replace("[GTM_ID]", trackingId);
+			_logger.LogError("RenderScript(scriptTemplate={ScriptTemplate}): scriptTemplate → {ScriptTemplate1}", scriptTemplate, scriptTemplate);
 
+			_logger.LogWarning("<<< Exiting RenderScript(scriptTemplate={ScriptTemplate})", scriptTemplate);
             return scriptTemplate;
         }
     }

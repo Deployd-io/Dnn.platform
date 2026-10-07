@@ -44,17 +44,21 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
         public TokenTemplateProcessor()
             : this(null)
         {
+		eventLogger.LogError(">>> Entering TokenTemplateProcessor()");
+        eventLogger.LogWarning("<<< Exiting TokenTemplateProcessor()");
         }
 
         /// <inheritdoc />
         public bool LoadDefinition(TemplateDefinition baseDefinition)
         {
+			eventLogger.LogError(">>> Entering LoadDefinition(baseDefinition={BaseDefinition})", baseDefinition);
             if (!baseDefinition.TemplateVirtualPath.EndsWith(".txt", StringComparison.InvariantCultureIgnoreCase))
             {
                 return false;
             }
 
             var templateText = Utilities.CachedFileContent(baseDefinition.TemplatePath);
+			eventLogger.LogError("LoadDefinition(baseDefinition={BaseDefinition}): templateText → {TemplateText}", baseDefinition, templateText);
             var xml = new XmlDocument { XmlResolver = null };
             const string xmlNs = "http://www.w3.org/1999/XSL/Transform";
             const string xslXml = $"""
@@ -73,19 +77,24 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             }
 
             var validParams = baseDefinition.DefaultTemplateArguments.ConvertAll(a => a.Name.ToLowerInvariant());
+			eventLogger.LogError("LoadDefinition(baseDefinition={BaseDefinition}): validParams → {ValidParams}", baseDefinition, validParams);
             validParams.AddRange(["controlid", "options", "dnnpath", "manifestpath", "portalpath", "skinpath",]);
 
             var docElt = xml.DocumentElement;
             var outputElt = (XmlElement)docElt.GetElementsByTagName("output", xmlNs)[0];
+			eventLogger.LogError("LoadDefinition(baseDefinition={BaseDefinition}): outputElt → {OutputElt}", baseDefinition, outputElt);
             foreach (var param in validParams)
             {
                 var elt = xml.CreateElement("param", xmlNs);
+				eventLogger.LogError("LoadDefinition(baseDefinition={BaseDefinition}): elt → {Elt}", baseDefinition, elt);
                 elt.SetAttribute("name", param);
                 docElt.InsertAfter(elt, outputElt);
             }
 
             var current = (XmlElement)docElt.GetElementsByTagName("template", xmlNs)[1];
+			eventLogger.LogError("LoadDefinition(baseDefinition={BaseDefinition}): current → {Current}", baseDefinition, current);
             var stack = new Stack<XmlElement>();
+			eventLogger.LogError("LoadDefinition(baseDefinition={BaseDefinition}): stack → {Stack}", baseDefinition, stack);
 
             var index = 0;
             foreach (Match match in TemplatesRegex.Matches(templateText))
@@ -101,9 +110,12 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                 {
                     nodeName = alias;
                 }
+				eventLogger.LogError("LoadDefinition(baseDefinition={BaseDefinition}): directive → {Directive}", baseDefinition, directive);
+				eventLogger.LogError("LoadDefinition(baseDefinition={BaseDefinition}): nodeName → {NodeName}", baseDefinition, nodeName);
 
                 if (directive == "=")
                 {
+					eventLogger.LogError("LoadDefinition(baseDefinition={BaseDefinition}): modeName → {ModeName}", baseDefinition, modeName);
                     var elt = xml.CreateElement("value-of", xmlNs);
                     if (validParams.Contains(nodeName))
                     {
@@ -147,6 +159,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                     {
                         elt = xml.CreateElement("when", xmlNs);
                         var test = string.Format("{0} or (@{0}=1) or (@{0}!=0 and @{0}!=1 and @{0}!='')", nodeName);
+						eventLogger.LogError("LoadDefinition(baseDefinition={BaseDefinition}): test → {Test}", baseDefinition, test);
                         if (directive == "?!")
                         {
                             test = string.Format("not({0})", test);
@@ -155,6 +168,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                         elt.SetAttribute("test", test);
 
                         var choose = xml.CreateElement("choose", xmlNs);
+						eventLogger.LogError("LoadDefinition(baseDefinition={BaseDefinition}): choose → {Choose}", baseDefinition, choose);
                         current.AppendChild(choose);
                         choose.AppendChild(elt);
                         stack.Push(current);
@@ -178,15 +192,20 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             current.AppendChild(xml.CreateTextNode(templateText.Substring(index)));
 
             this.xsl = new XslCompiledTransform();
+			eventLogger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): xsl → {Xsl}", baseDefinition, xsl);
             this.xsl.Load(xml);
+			eventLogger.LogWarning("<<< Exiting LoadDefinition(baseDefinition={BaseDefinition})", baseDefinition);
             return true;
         }
 
         /// <inheritdoc />
         public void Render(object source, HtmlTextWriter htmlWriter, TemplateDefinition liveDefinition)
         {
+			eventLogger.LogError(">>> Entering Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition})", source, htmlWriter, liveDefinition);
             var resolver = new PathResolver(this.hostSettings, liveDefinition.Folder);
             var args = new XsltArgumentList();
+			eventLogger.LogError("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): args → {Args}", source, htmlWriter, liveDefinition, args);
+			eventLogger.LogError("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): resolver → {Resolver}", source, htmlWriter, liveDefinition, resolver);
             args.AddExtensionObject("urn:ddrmenu", new XsltFunctions());
             args.AddExtensionObject("urn:dnngarden", new XsltFunctions());
             args.AddParam("controlid", string.Empty, DNNContext.Current.HostControl.ClientID);
@@ -198,6 +217,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             liveDefinition.TemplateArguments.ForEach(a => args.AddParam(a.Name.ToLowerInvariant(), string.Empty, a.Value));
 
             var sb = new StringBuilder();
+			eventLogger.LogError("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): sb → {Sb}", source, htmlWriter, liveDefinition, sb);
 
             using (var xmlStream = new MemoryStream())
             using (var outputWriter = new StringWriter(sb))
@@ -209,12 +229,15 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             }
 
             htmlWriter.Write(HttpUtility.HtmlDecode(sb.ToString()));
+			eventLogger.LogWarning("<<< Exiting Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition})", source, htmlWriter, liveDefinition);
         }
 
         protected static string ConvertToJson(List<ClientOption> options)
         {
+			eventLogger.LogError(">>> Entering ConvertToJson(options={Options})", options);
             var result = new StringBuilder();
             result.Append("{");
+			eventLogger.LogError("ConvertToJson(options={Options}): result → {Result}", options, result);
 
             if (options != null)
             {
@@ -246,6 +269,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             }
 
             result.Append("}");
+			eventLogger.LogWarning("<<< Exiting ConvertToJson(options={Options})", options);
             return result.ToString();
         }
     }

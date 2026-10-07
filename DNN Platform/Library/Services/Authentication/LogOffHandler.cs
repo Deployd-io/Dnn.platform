@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.Authentication
     /// <summary>The LogOffHandler class provides a replacement for the LogOff page.</summary>
     public class LogOffHandler : IHttpHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LogOffHandler));
         /// <inheritdoc />
         public bool IsReusable
         {
@@ -22,7 +23,9 @@ namespace DotNetNuke.Services.Authentication
         /// <inheritdoc />
         public void ProcessRequest(HttpContext context)
         {
+			Logger.LogError(">>> Entering ProcessRequest(context={Context})", context);
             context.Response.Redirect(TestableGlobals.Instance.NavigateURL("LogOff"));
+			Logger.LogWarning("<<< Exiting ProcessRequest(context={Context})", context);
         }
     }
 }

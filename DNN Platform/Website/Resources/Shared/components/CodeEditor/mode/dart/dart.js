@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21,8 +22,10 @@
   var builtins = "void bool num int double dynamic var String".split(" ");
 
   function set(words) {
+	logger.error(`>>> Entering set(words=${words})`, { "event.action": "set", "logrite.words": words });
     var obj = {};
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.warn(`<<< Exiting set(words=${words})`, { "event.action": "set", "logrite.words": words });
     return obj;
   }
 

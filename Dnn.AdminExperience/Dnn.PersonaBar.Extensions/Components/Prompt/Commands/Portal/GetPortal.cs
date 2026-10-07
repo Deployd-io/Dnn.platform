@@ -28,6 +28,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Portal
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             // default usage: return current portal if nothing else specified
             if (args.Length == 1)
             {
@@ -35,6 +36,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Portal
             }
             else
             {
+				eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.PortalIdFlagValue → {Arg4}", args, portalSettings, userInfo, activeTabId, this.PortalIdFlagValue);
                 // allow hosts to get info on other portals
                 if (this.User.IsSuperUser && args.Length >= 2)
                 {
@@ -46,15 +48,20 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Portal
                     this.AddMessage(this.LocalizeString("Prompt_GetPortal_NoArgs"));
                 }
             }
+			eventLogger.LogWarning("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             var pc = new PortalController();
             var lst = new List<PortalModel>();
+			eventLogger.LogError("Run(): lst → {Lst}", lst);
+			eventLogger.LogError("Run(): pc → {Pc}", pc);
 
             var portal = pc.GetPortal((int)this.PortalIdFlagValue);
+			eventLogger.LogError("Run(): portal → {Portal}", portal);
             if (portal == null)
             {
                 return new ConsoleErrorResultModel(
@@ -65,6 +72,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Portal
             }
 
             lst.Add(new PortalModel(portal));
+			eventLogger.LogWarning("<<< Exiting Run()");
             return new ConsoleResultModel(string.Empty)
             {
                 Data = lst,

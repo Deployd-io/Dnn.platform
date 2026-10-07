@@ -18,6 +18,7 @@ namespace DotNetNuke.Modules.Groups
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+			eventLogger.LogError(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
             string path = Constants.ModulePath;
             switch (this.LoadView)
             {
@@ -33,9 +34,12 @@ namespace DotNetNuke.Modules.Groups
             }
 
             GroupsModuleBase ctl = new GroupsModuleBase();
+			eventLogger.LogError("Page_Load(sender={Sender},e={E}): ctl → {Ctl}", sender, e, ctl);
             ctl = (GroupsModuleBase)this.LoadControl(path);
             ctl.ModuleConfiguration = this.ModuleConfiguration;
+			eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): ctl.ModuleConfiguration → {Arg2}", sender, e, ctl.ModuleConfiguration);
             this.plhContent.Controls.Add(ctl);
+			eventLogger.LogWarning("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
         }
     }
 }

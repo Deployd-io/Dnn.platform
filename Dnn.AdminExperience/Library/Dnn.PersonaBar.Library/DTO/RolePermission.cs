@@ -12,9 +12,11 @@ namespace Dnn.PersonaBar.Library.Dto
     [SuppressMessage("Microsoft.Design", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "Breaking change")]
     public class RolePermission
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RolePermission));
         /// <summary>Initializes a new instance of the <see cref="RolePermission"/> class.</summary>
         public RolePermission()
         {
+			Logger.LogError(">>> Entering RolePermission()");
             this.Permissions = new List<Permission>();
         }
 

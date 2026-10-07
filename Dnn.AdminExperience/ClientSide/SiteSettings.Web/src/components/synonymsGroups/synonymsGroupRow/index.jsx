@@ -2,27 +2,34 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Collapsible, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
+const logger = console;
 
 class SynonymsGroupRow extends Component {
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     toggle() {
+		logger.error('>>> Entering toggle()', { "event.action": "toggle" });
         if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
             this.props.Collapse();
         } else {
             this.props.OpenCollapse(this.props.id);
+			logger.warn('<<< Exiting toggle()', { "event.action": "toggle" });
         }
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={"collapsible-component-synonyms" + (opened ? " row-opened" : "") + (this.props.id === "add" ? " row-new-item" : "")}>
                 {props.visible &&

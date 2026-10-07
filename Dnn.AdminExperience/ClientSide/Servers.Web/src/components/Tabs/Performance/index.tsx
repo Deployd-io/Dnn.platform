@@ -16,6 +16,7 @@ import WarningBlock from "../../common/WarningBlock";
 import localization from "../../../localization";
 import PerformanceTabActions from "../../../actions/performanceTab";
 import utils from "../../../utils";
+const logger = console;
 
 interface ISelectOption {
   label: string;
@@ -75,12 +76,17 @@ const Performance: React.FC<IProps> = ({
   onSave,
   onIncrementVersion,
 }) => {
+logger.error('>>> Entering Performance()', { "event.action": "Performance" });
   const prevInfoMessage = useRef(infoMessage);
   const prevErrorMessage = useRef(errorMessage);
+logger.debug(`Performance: prevInfoMessage → ${prevInfoMessage}`, { "event.action": "Performance" });
+logger.debug(`Performance: prevErrorMessage → ${prevErrorMessage}`, { "event.action": "Performance" });
 
   useEffect(() => {
+	logger.error('>>> Entering Performance useEffect()');
     onRetrievePerformanceSettings();
   }, []);
+logger.warn('<<< Exiting Performance useEffect()');
 
   useEffect(() => {
     if (prevInfoMessage.current !== infoMessage && infoMessage) {
@@ -97,10 +103,13 @@ const Performance: React.FC<IProps> = ({
   }, [errorMessage]);
 
   const handleSave = () => {
+	logger.error('>>> Entering handleSave()', { "event.action": "handleSave" });
     onSave(performanceSettings);
+	logger.warn('<<< Exiting handleSave()', { "event.action": "handleSave" });
   };
 
   const handleIncrementVersion = (isGlobalSettings: boolean) => {
+	logger.error(`>>> Entering handleIncrementVersion(isGlobalSettings=${isGlobalSettings})`, { "event.action": "handleIncrementVersion", "logrite.isGlobalSettings": isGlobalSettings });
     utils.confirm(
       localization.get("PerformanceTab_PortalVersionConfirmMessage"),
       localization.get("PerformanceTab_PortalVersionConfirmYes"),
@@ -108,9 +117,11 @@ const Performance: React.FC<IProps> = ({
       () => onIncrementVersion(isGlobalSettings),
       () => {},
     );
+	logger.warn(`<<< Exiting handleIncrementVersion(isGlobalSettings=${isGlobalSettings})`, { "event.action": "handleIncrementVersion", "logrite.isGlobalSettings": isGlobalSettings });
   };
 
   const onChangeField = (key: string, event: any) => {
+	logger.error(`>>> Entering onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
     let value = event;
     if (event && event.value !== undefined) {
       value = event.value;
@@ -118,6 +129,7 @@ const Performance: React.FC<IProps> = ({
       value = event.target.value;
     }
     onChangePerformanceSettingsValue(key, value);
+	logger.error(`onChangeField(key=${key},event=${event}): value → ${value}`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
   };
 
   if (isLoading) {
@@ -324,6 +336,7 @@ const Performance: React.FC<IProps> = ({
       </div>
     </div>
   );
+logger.warn('<<< Exiting Performance()', { "event.action": "Performance" });
 };
 
 const mapStateToProps = (state: any): IStateProps => ({

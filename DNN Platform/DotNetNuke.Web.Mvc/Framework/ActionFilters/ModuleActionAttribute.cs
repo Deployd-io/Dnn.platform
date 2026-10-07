@@ -17,9 +17,11 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
     /// </summary>
     public class ModuleActionAttribute : ActionFilterAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleActionAttribute));
         /// <summary>Initializes a new instance of the <see cref="ModuleActionAttribute"/> class.</summary>
         public ModuleActionAttribute()
         {
+			Logger.LogError(">>> Entering ModuleActionAttribute()");
             this.SecurityAccessLevel = SecurityAccessLevel.Edit;
         }
 
@@ -41,10 +43,12 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
         /// <inheritdoc />
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
+			Logger.LogError(">>> Entering OnActionExecuting(filterContext={FilterContext})", filterContext);
             var controller = filterContext.Controller as IDnnController;
 
             if (controller == null)
             {
+				Logger.LogError("Throwing InvalidOperationException from OnActionExecuting(filterContext={FilterContext})", filterContext);
                 throw new InvalidOperationException("This attribute can only be applied to Controllers that implement IDnnController");
             }
 
@@ -64,6 +68,7 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
                 this.SecurityAccessLevel,
                 true,
                 false);
+				Logger.LogWarning("<<< Exiting OnActionExecuting(filterContext={FilterContext})", filterContext);
         }
     }
 }

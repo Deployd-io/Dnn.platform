@@ -16,6 +16,7 @@ namespace DotNetNuke.Security.Permissions
     [Serializable]
     public class PermissionInfo : BaseEntityInfo, IPermissionDefinitionInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PermissionInfo));
         /// <inheritdoc cref="IPermissionDefinitionInfo.ModuleDefId" />
         [XmlIgnore]
         [JsonIgnore]
@@ -66,9 +67,11 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="dr">The Data Reader to use.</param>
         protected override void FillInternal(IDataReader dr)
         {
+			Logger.LogError(">>> Entering FillInternal(dr={Dr})", dr);
             base.FillInternal(dr);
 
             var @this = (IPermissionDefinitionInfo)this;
+			Logger.LogWarning("<<< Exiting FillInternal(dr={Dr})", dr);
             @this.PermissionId = Null.SetNullInteger(dr["PermissionID"]);
             @this.ModuleDefId = Null.SetNullInteger(dr["ModuleDefID"]);
             @this.PermissionCode = Null.SetNullString(dr["PermissionCode"]);

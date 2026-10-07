@@ -42,6 +42,8 @@ namespace Dnn.PersonaBar.UI.Components
         public BusinessController()
             : this(null, null, null)
         {
+		Logger.LogError(">>> Entering BusinessController()");
+        Logger.LogWarning("<<< Exiting BusinessController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="BusinessController"/> class.</summary>
@@ -64,6 +66,7 @@ namespace Dnn.PersonaBar.UI.Components
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			Logger.LogError(">>> Entering UpgradeModule(version={Version})", version);
             switch (version)
             {
                 case "01.00.00":
@@ -78,6 +81,7 @@ namespace Dnn.PersonaBar.UI.Components
                     break;
             }
 
+			Logger.LogWarning("<<< Exiting UpgradeModule(version={Version})", version);
             return "Success";
         }
 
@@ -100,36 +104,45 @@ namespace Dnn.PersonaBar.UI.Components
             {
                 Logger.Info($"{Util.ASSEMBLY_InUse} - {assemblyName}");
             }
+			Logger.LogWarning("<<< Exiting RemoveAssembly(assemblyName={AssemblyName})", assemblyName);
         }
 
         private static void CreateAdminLinks(IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering CreateAdminLinks(hostSettings={HostSettings})", hostSettings);
             foreach (IPortalInfo portal in PortalController.Instance.GetPortals())
             {
                 CreatePageLinks(hostSettings, portal.PortalId, "Admin");
             }
 
             CreatePageLinks(hostSettings, Null.NullInteger, "Host");
+			Logger.LogWarning("<<< Exiting CreateAdminLinks(hostSettings={HostSettings})", hostSettings);
         }
 
         private static void CreatePageLinks(IHostSettings hostSettings, int portalId, string parentPath)
         {
+			Logger.LogError(">>> Entering CreatePageLinks(hostSettings={HostSettings},portalId={PortalId},parentPath={ParentPath})", hostSettings, portalId, parentPath);
             var parentTab = TabController.GetTabByTabPath(hostSettings, portalId, "//" + parentPath, string.Empty);
+			Logger.LogError("CreatePageLinks(hostSettings={HostSettings},portalId={PortalId},parentPath={ParentPath}): parentTab → {ParentTab}", hostSettings, portalId, parentPath, parentTab);
             if (parentTab == Null.NullInteger)
             {
                 return;
             }
 
             var adminTabs = TabController.GetTabsByParent(parentTab, portalId);
+			Logger.LogError("CreatePageLinks(hostSettings={HostSettings},portalId={PortalId},parentPath={ParentPath}): adminTabs → {AdminTabs}", hostSettings, portalId, parentPath, adminTabs);
             foreach (var tab in adminTabs)
             {
                 AdminMenuController.Instance.CreateLinkMenu(tab);
             }
+			Logger.LogWarning("<<< Exiting CreatePageLinks(hostSettings={HostSettings},portalId={PortalId},parentPath={ParentPath})", hostSettings, portalId, parentPath);
         }
 
         private static void UpdateEditPermissions(IHostSettings hostSettings, IPortalController portalController)
         {
+			Logger.LogError(">>> Entering UpdateEditPermissions(hostSettings={HostSettings},portalController={PortalController})", hostSettings, portalController);
             var menuItems = PersonaBarRepository.Instance.GetMenu().AllItems;
+			Logger.LogError("UpdateEditPermissions(hostSettings={HostSettings},portalController={PortalController}): menuItems → {MenuItems}", hostSettings, portalController, menuItems);
             foreach (IPortalInfo portal in PortalController.Instance.GetPortals())
             {
                 var portalId = portal.PortalId;
@@ -138,12 +151,16 @@ namespace Dnn.PersonaBar.UI.Components
                     menuItems.ForEach(i => SaveEditPermission(hostSettings, portalController, portalId, i));
                 }
             }
+			Logger.LogWarning("<<< Exiting UpdateEditPermissions(hostSettings={HostSettings},portalController={PortalController})", hostSettings, portalController);
         }
 
         private static void SaveEditPermission(IHostSettings hostSettings, IPortalController portalController, int portalId, MenuItem menuItem)
         {
+			Logger.LogError(">>> Entering SaveEditPermission(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId},menuItem={MenuItem})", hostSettings, portalController, portalId, menuItem);
             var viewPermission = MenuPermissionController.GetPermissions(hostSettings, menuItem.MenuId).FirstOrDefault(p => p.PermissionKey == "VIEW");
             var editPermission = MenuPermissionController.GetPermissions(hostSettings, menuItem.MenuId).FirstOrDefault(p => p.PermissionKey == "EDIT");
+			Logger.LogError("SaveEditPermission(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId},menuItem={MenuItem}): editPermission → {EditPermission}", hostSettings, portalController, portalId, menuItem, editPermission);
+			Logger.LogError("SaveEditPermission(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId},menuItem={MenuItem}): viewPermission → {ViewPermission}", hostSettings, portalController, portalId, menuItem, viewPermission);
 
             if (viewPermission == null || editPermission == null)
             {
@@ -151,6 +168,7 @@ namespace Dnn.PersonaBar.UI.Components
             }
 
             var permissions = MenuPermissionController.GetMenuPermissions(hostSettings, portalController, portalId, menuItem.Identifier).ToList();
+			Logger.LogError("SaveEditPermission(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId},menuItem={MenuItem}): permissions → {Permissions}", hostSettings, portalController, portalId, menuItem, permissions);
             permissions.ForEach((IPermissionInfo p) =>
             {
                 if (p.PermissionId != viewPermission.PermissionId)
@@ -176,10 +194,12 @@ namespace Dnn.PersonaBar.UI.Components
 
                 MenuPermissionController.SaveMenuPermissions(portalId, menuItem, menuPermissionInfo);
             });
+			Logger.LogWarning("<<< Exiting SaveEditPermission(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId},menuItem={MenuItem})", hostSettings, portalController, portalId, menuItem);
         }
 
         private static void RemovePersonaBarOldAssemblies()
         {
+			Logger.LogError(">>> Entering RemovePersonaBarOldAssemblies()");
             string[] oldPersonaBarAssemblies =
             [
                 "Dnn.PersonaBar.AdminLogs",
@@ -208,11 +228,14 @@ namespace Dnn.PersonaBar.UI.Components
             {
                 RemoveAssembly(assemblyName);
             }
+			Logger.LogWarning("<<< Exiting RemovePersonaBarOldAssemblies()");
         }
 
         private void UpdateControlPanel()
         {
+			Logger.LogError(">>> Entering UpdateControlPanel()");
             this.hostSettingsService.Update("ControlPanel", "DesktopModules/admin/Dnn.PersonaBar/UserControls/PersonaBarContainer.ascx");
+			Logger.LogWarning("<<< Exiting UpdateControlPanel()");
         }
     }
 }

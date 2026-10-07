@@ -42,7 +42,10 @@ namespace DotNetNuke.Web.InternalServices
         /// <param name="dataProvider">The data provider.</param>
         public ModuleServiceController(IHostSettings hostSettings, DataProvider dataProvider)
         {
+			Logger.LogError(">>> Entering ModuleServiceController(hostSettings={HostSettings},dataProvider={DataProvider})", hostSettings, dataProvider);
+			Logger.LogDebug("ModuleServiceController(hostSettings={HostSettings},dataProvider={DataProvider}): dataProvider → {DataProvider1}", hostSettings, dataProvider, dataProvider);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogWarning("<<< Exiting ModuleServiceController(hostSettings={HostSettings},dataProvider={DataProvider})", hostSettings, dataProvider);
             this.dataProvider = dataProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>();
         }
 
@@ -55,11 +58,15 @@ namespace DotNetNuke.Web.InternalServices
         [DnnAuthorize(StaticRoles = "Registered Users")]
         public HttpResponseMessage GetModuleShareable(int moduleId, int tabId, int portalId = -1)
         {
+			Logger.LogError(">>> Entering GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId})", moduleId, tabId, portalId);
             var requiresWarning = false;
             if (portalId <= -1)
             {
+				Logger.LogError("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): requiresWarning → {RequiresWarning}", moduleId, tabId, portalId, requiresWarning);
                 var portalDict = PortalController.GetPortalDictionary(this.hostSettings, this.dataProvider);
+				Logger.LogError("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): portalDict → {PortalDict}", moduleId, tabId, portalId, portalDict);
                 portalId = portalDict[tabId];
+				Logger.LogError("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): portalId → {PortalId1}", moduleId, tabId, portalId, portalId);
             }
             else
             {
@@ -70,10 +77,13 @@ namespace DotNetNuke.Web.InternalServices
             if (tabId < 0)
             {
                 desktopModule = DesktopModuleController.GetDesktopModule(this.hostSettings, moduleId, portalId);
+				Logger.LogError("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): desktopModule → {DesktopModule}", moduleId, tabId, portalId, desktopModule);
             }
             else
             {
+				Logger.LogDebug("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): desktopModule → {DesktopModule}", moduleId, tabId, portalId, desktopModule);
                 var moduleInfo = ModuleController.Instance.GetModule(moduleId, tabId, false);
+				Logger.LogError("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): moduleInfo → {ModuleInfo}", moduleId, tabId, portalId, moduleInfo);
 
                 desktopModule = moduleInfo.DesktopModule;
 
@@ -83,6 +93,7 @@ namespace DotNetNuke.Web.InternalServices
             if (desktopModule == null)
             {
                 var message = $"Cannot find module ID {moduleId} (tab ID {tabId}, portal ID {portalId})";
+				Logger.LogError("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): message → {Message}", moduleId, tabId, portalId, message);
                 Logger.Error(message);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message);
             }
@@ -98,12 +109,14 @@ namespace DotNetNuke.Web.InternalServices
         [DnnPageEditor]
         public HttpResponseMessage MoveModule(MoveModuleDTO postData)
         {
+			Logger.LogError(">>> Entering MoveModule(postData={PostData})", postData);
             var moduleOrder = postData.ModuleOrder;
             if (moduleOrder > 0)
             {
                 // DNN-7099: the deleted modules won't show in page, so when the module index calculated from client, it will lost the
                 // index count of deleted modules and will cause order issue.
                 var deletedModules = ModuleController.Instance.GetTabModules(postData.TabId).Values.Where(m => m.IsDeleted);
+				Logger.LogError("MoveModule(postData={PostData}): deletedModules → {DeletedModules}", postData, deletedModules);
                 foreach (var module in deletedModules)
                 {
                     if (module.ModuleOrder < moduleOrder && module.PaneName == postData.Pane)
@@ -116,6 +129,7 @@ namespace DotNetNuke.Web.InternalServices
             ModuleController.Instance.UpdateModuleOrder(postData.TabId, postData.ModuleId, moduleOrder, postData.Pane);
             ModuleController.Instance.UpdateTabModuleOrder(postData.TabId);
 
+			Logger.LogWarning("<<< Exiting MoveModule(postData={PostData})", postData);
             return this.Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -128,13 +142,17 @@ namespace DotNetNuke.Web.InternalServices
         [DnnAuthorize(StaticRoles = "Administrators")]
         public HttpResponseMessage DeleteModule(DeleteModuleDto deleteModuleDto)
         {
+			Logger.LogError(">>> Entering DeleteModule(deleteModuleDto={DeleteModuleDto})", deleteModuleDto);
             ModuleController.Instance.DeleteTabModule(deleteModuleDto.TabId, deleteModuleDto.ModuleId, deleteModuleDto.SoftDelete);
 
+			Logger.LogWarning("<<< Exiting DeleteModule(deleteModuleDto={DeleteModuleDto})", deleteModuleDto);
             return this.Request.CreateResponse(HttpStatusCode.OK);
         }
 
         private int FixPortalId(int portalId)
         {
+			Logger.LogError(">>> Entering FixPortalId(portalId={PortalId})", portalId);
+			Logger.LogWarning("<<< Exiting FixPortalId(portalId={PortalId})", portalId);
             return this.UserInfo.IsSuperUser &&
                    this.PortalSettings.PortalId != portalId &&
                    PortalController.Instance.GetPortals().OfType<IPortalInfo>().Any(x => x.PortalId == portalId)

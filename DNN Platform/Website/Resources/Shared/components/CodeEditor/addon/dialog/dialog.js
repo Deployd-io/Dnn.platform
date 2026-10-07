@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -12,26 +13,34 @@
     mod(CodeMirror);
 })(function(CodeMirror) {
   function dialogDiv(cm, template, bottom) {
+	logger.error(`>>> Entering dialogDiv(cm=${cm},template=${template},bottom=${bottom})`, { "event.action": "dialogDiv", "logrite.cm": cm, "logrite.template": template, "logrite.bottom": bottom });
     var wrap = cm.getWrapperElement();
     var dialog;
+	logger.error(`dialogDiv(cm=${cm},template=${template},bottom=${bottom}): wrap → ${wrap}`, { "event.action": "dialogDiv", "logrite.cm": cm, "logrite.template": template, "logrite.bottom": bottom });
     dialog = wrap.appendChild(document.createElement("div"));
     if (bottom)
       dialog.className = "CodeMirror-dialog CodeMirror-dialog-bottom";
     else
       dialog.className = "CodeMirror-dialog CodeMirror-dialog-top";
 
+	logger.debug(`dialogDiv(cm=${cm},template=${template},bottom=${bottom}): dialog → ${dialog}`, { "event.action": "dialogDiv", "logrite.cm": cm, "logrite.template": template, "logrite.bottom": bottom });
+	logger.debug(`dialogDiv(cm=${cm},template=${template},bottom=${bottom}): dialog.className → ${dialog.className}`, { "event.action": "dialogDiv", "logrite.cm": cm, "logrite.template": template, "logrite.bottom": bottom });
+	logger.debug(`dialogDiv(cm=${cm},template=${template},bottom=${bottom}): dialog.innerHTML → ${dialog.innerHTML}`, { "event.action": "dialogDiv", "logrite.cm": cm, "logrite.template": template, "logrite.bottom": bottom });
     if (typeof template == "string") {
       dialog.innerHTML = template;
     } else { // Assuming it's a detached DOM element.
       dialog.appendChild(template);
     }
+	logger.warn(`<<< Exiting dialogDiv(cm=${cm},template=${template},bottom=${bottom})`, { "event.action": "dialogDiv", "logrite.cm": cm, "logrite.template": template, "logrite.bottom": bottom });
     return dialog;
   }
 
   function closeNotification(cm, newVal) {
+	logger.error(`>>> Entering closeNotification(cm=${cm},newVal=${newVal})`, { "event.action": "closeNotification", "logrite.cm": cm, "logrite.newVal": newVal });
     if (cm.state.currentNotificationClose)
       cm.state.currentNotificationClose();
     cm.state.currentNotificationClose = newVal;
+	logger.warn(`<<< Exiting closeNotification(cm=${cm},newVal=${newVal})`, { "event.action": "closeNotification", "logrite.cm": cm, "logrite.newVal": newVal });
   }
 
   CodeMirror.defineExtension("openDialog", function(template, callback, options) {
@@ -42,6 +51,7 @@
     var dialog = dialogDiv(this, template, options.bottom);
     var closed = false, me = this;
     function close(newVal) {
+	logger.error(`>>> Entering close(newVal=${newVal})`, { "event.action": "close" });
       if (typeof newVal == 'string') {
         inp.value = newVal;
       } else {
@@ -51,7 +61,10 @@
         me.focus();
 
         if (options.onClose) options.onClose(dialog);
+		logger.warn(`<<< Exiting close(newVal=${newVal})`, { "event.action": "close" });
       }
+	logger.error('>>> Entering close()', { "event.action": "close" });
+	logger.warn('<<< Exiting close()', { "event.action": "close" });
     }
 
     var inp = dialog.getElementsByTagName("input")[0], button;

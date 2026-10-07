@@ -8,12 +8,14 @@ namespace DotNetNuke.UI.WebControls
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class RequiredAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RequiredAttribute));
         private readonly bool required;
 
         /// <summary>Initializes a new instance of the <see cref="RequiredAttribute"/> class.</summary>
         /// <param name="required">Whether the value is required.</param>
         public RequiredAttribute(bool required)
         {
+			Logger.LogError(">>> Entering RequiredAttribute(required={Required})", required);
             this.required = required;
         }
 

@@ -51,9 +51,13 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <param name="rolesController">The roles controller.</param>
         public AddRoles(IUserValidator userValidator, IUsersController userController, IRolesController rolesController)
         {
+			eventLogger.LogError(">>> Entering AddRoles(userValidator={UserValidator},userController={UserController},rolesController={RolesController})", userValidator, userController, rolesController);
             this.userValidator = userValidator;
+			eventLogger.LogWarning("<<< Exiting AddRoles(userValidator={UserValidator},userController={UserController},rolesController={RolesController})", userValidator, userController, rolesController);
+			eventLogger.LogDebug("AddRoles(userValidator={UserValidator},userController={UserController},rolesController={RolesController}): this.userValidator → {Arg3}", userValidator, userController, rolesController, this.userValidator);
             this.usersController = userController;
             this.rolesController = rolesController;
+			eventLogger.LogDebug("AddRoles(userValidator={UserValidator},userController={UserController},rolesController={RolesController}): usersController → {UsersController}", userValidator, userController, rolesController, usersController);
         }
 
         /// <inheritdoc />
@@ -70,6 +74,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.UserId = this.GetFlagValue(FlagId, "User Id", -1, true, true, true);
             this.Roles = this.GetFlagValue(FlagRoles, "Roles", string.Empty, true);
             this.StartDate = this.GetFlagValue<DateTime?>(FlagStart, "Start Date", null);
@@ -83,11 +88,13 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                     this.AddMessage(this.LocalizeString("Prompt_StartDateGreaterThanEnd") + " ");
                 }
             }
+			eventLogger.LogWarning("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             ConsoleErrorResultModel errorResultModel;
             UserInfo userInfo;
 
@@ -103,17 +110,22 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                 this.usersController.AddUserToRoles(this.User, userInfo.UserID, userInfo.PortalID, this.Roles, ",", this.StartDate, this.EndDate);
                 int totalRoles;
                 var userRoles = this.usersController.GetUserRoles(userInfo, string.Empty, out totalRoles).Select(UserRoleModel.FromDnnUserRoleInfo).ToList();
+				eventLogger.LogError("Run(): userRoles → {UserRoles}", userRoles);
                 return new ConsoleResultModel(string.Empty) { Data = userRoles, Output = "Total Roles: " + totalRoles, Records = userRoles.Count };
             }
             catch (Exception ex)
             {
+				eventLogger.LogError("Exception in Run(): {Arg0}", ex.Message);
+				eventLogger.LogWarning("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(ex.Message);
             }
         }
 
         private void CheckRoles()
         {
+			eventLogger.LogError(">>> Entering CheckRoles()");
             var rolesFilter = new List<string>();
+			eventLogger.LogError("CheckRoles(): rolesFilter → {RolesFilter}", rolesFilter);
             if (!string.IsNullOrWhiteSpace(this.Roles))
             {
                 this.Roles.Split(',').ToList().ForEach(role => rolesFilter.Add(role.Trim()));
@@ -122,8 +134,11 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             if (rolesFilter.Count > 0)
             {
                 var foundRoles = this.rolesController.GetRolesByNames(this.PortalSettings, -1, rolesFilter);
+				eventLogger.LogError("CheckRoles(): foundRoles → {FoundRoles}", foundRoles);
                 var foundRolesNames = new HashSet<string>(foundRoles.Select(role => role.RoleName));
+				eventLogger.LogError("CheckRoles(): foundRolesNames → {FoundRolesNames}", foundRolesNames);
                 var roleFiltersSet = new HashSet<string>(rolesFilter);
+				eventLogger.LogError("CheckRoles(): roleFiltersSet → {RoleFiltersSet}", roleFiltersSet);
                 roleFiltersSet.ExceptWith(foundRolesNames);
 
                 int notFoundCount = roleFiltersSet.Count;
@@ -134,9 +149,11 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                         this.LocalizeString("Prompt_AddRoles_NotFound"),
                         notFoundCount > 1 ? "s" : string.Empty,
                         string.Join(",", roleFiltersSet));
+						eventLogger.LogError("Throwing RoleNotFoundException from CheckRoles()");
                     throw new RoleNotFoundException(message);
                 }
             }
+			eventLogger.LogWarning("<<< Exiting CheckRoles()");
         }
     }
 }

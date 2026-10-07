@@ -12,49 +12,64 @@ import styles from "./style.module.less";
 import {sort} from "../../helpers";
 import Localization from "localization";
 import ColumnSizes from "./columnSizes";
+const logger = console;
 import {canManageRoles, canManageProfile, canViewSettings, canAddUser} from "../permissionHelpers.js";
 import { GridCell } from "@dnnsoftware/dnn-react-common";
 
 class UserTable extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             openId: "",
             renderIndex: -1
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.collapse();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     unCollapse(id, index) {
+		logger.error(`>>> Entering unCollapse(id=${id},index=${index})`, { "event.action": "unCollapse", "logrite.id": id, "logrite.index": index });
         this.setState({
             openId: id,
             renderIndex: index
         });
+		logger.warn(`<<< Exiting unCollapse(id=${id},index=${index})`, { "event.action": "unCollapse", "logrite.id": id, "logrite.index": index });
     }
     collapse() {
+		logger.error('>>> Entering collapse()', { "event.action": "collapse" });
         if (this.state.openId !== "") {
             this.setState({
                 openId: "",
                 renderIndex: -1
             });
+			logger.warn('<<< Exiting collapse()', { "event.action": "collapse" });
         }
     }
     toggle(openId, index) {
+		logger.error(`>>> Entering toggle(openId=${openId},index=${index})`, { "event.action": "toggle", "logrite.openId": openId, "logrite.index": index });
         if (openId !== "") {
             this.unCollapse(openId, index);
         } else {
             this.collapse();
+			logger.warn(`<<< Exiting toggle(openId=${openId},index=${index})`, { "event.action": "toggle", "logrite.openId": openId, "logrite.index": index });
         }
     }
     onAddUser() {
+		logger.error('>>> Entering onAddUser()', { "event.action": "onAddUser" });
         this.toggle(this.state.openId === "add" ? "" : "add", 0);
+		logger.warn('<<< Exiting onAddUser()', { "event.action": "onAddUser" });
     }
     getChildren(user) {
+		logger.error(`>>> Entering getChildren(user=${user})`, { "event.action": "getChildren", "user.name": String(user) });
         let children = [];
         children = children.concat((this.props.getUserTabs && this.props.getUserTabs(user)) || []);
+		logger.error(`getChildren(user=${user}): children → ${children}`, { "event.action": "getChildren", "user.name": String(user) });
         if (canViewSettings(this.props.appSettings.applicationSettings.settings))
         {
             const userSettings = <UserSettings key={`usersettings-${user.userId}`} userId={user.userId} collapse={this.collapse.bind(this) } appSettings={this.props.appSettings}/>;
@@ -79,6 +94,7 @@ class UserTable extends Component {
                 content: <EditProfile key={`editprofile-${user.userId}`} userId={user.userId} />
             }]);
         }
+		logger.warn(`<<< Exiting getChildren(user=${user})`, { "event.action": "getChildren", "user.name": String(user) });
         return sort(children, "index", "desc").map((child) => {
             return child.content;
         });
@@ -112,12 +128,16 @@ class UserTable extends Component {
     }
     
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         let i = 0;
         let opened = (this.state.openId === "add");
+		logger.error(`render(): opened → ${opened}`, { "event.action": "render" });
         const addIsOpened = opened && canAddUser(this.props.appSettings.applicationSettings.settings);
+		logger.error(`render(): addIsOpened → ${addIsOpened}`, { "event.action": "render" });
         const headers = this.getHeaders();
         const createUserBox = () => [<CreateUserBox key={`create-user-box-${i++}`} filter={props.filter} onCancel={this.collapse.bind(this) } appSettings={props.appSettings}/>];
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.usersList}>
                 <HeaderRow headers={headers} changeSortOrder={props.changeSortOrder} currentSortAscending={props.currentSortAscending} currentSortColumn={props.currentSortColumn} />
@@ -187,6 +207,8 @@ UserTable.propTypes = {
     users: PropTypes.array
 };
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         users: state.users.users
     };

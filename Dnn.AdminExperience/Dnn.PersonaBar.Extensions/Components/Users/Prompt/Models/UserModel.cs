@@ -39,13 +39,18 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Models
         public UserModel(UserInfo user)
             : base(user)
         {
+			eventLogger.LogError(">>> Entering UserModel(user={User})", user);
             this.LastLogin = user.Membership.LastLoginDate.ToPromptLongDateString();
             this.DisplayName = user.DisplayName;
+			eventLogger.LogDebug("UserModel(user={User}): this.DisplayName → {Arg1}", user, this.DisplayName);
             this.FirstName = user.FirstName;
             this.LastName = user.LastName;
+			eventLogger.LogDebug("UserModel(user={User}): this.FirstName → {Arg1}", user, this.FirstName);
+			eventLogger.LogDebug("UserModel(user={User}): this.LastName → {Arg1}", user, this.LastName);
             this.LastActivity = user.Membership.LastActivityDate.ToPromptLongDateString();
             this.LastLockout = user.Membership.LastLockoutDate.ToPromptLongDateString();
             this.LastPasswordChange = user.Membership.LastPasswordChangeDate.ToPromptLongDateString();
+			eventLogger.LogWarning("<<< Exiting UserModel(user={User})", user);
             this.Created = user.CreatedOnDate.ToPromptLongDateString();
         }
 

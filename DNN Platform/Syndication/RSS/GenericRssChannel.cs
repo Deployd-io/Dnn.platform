@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.Syndication
     /// <summary>Class to consume (or create) a channel in a late-bound way.</summary>
     public sealed class GenericRssChannel : RssChannelBase<GenericRssElement, GenericRssElement>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(GenericRssChannel));
         /// <inheritdoc cref="RssElementBase.Attributes" />
         public new Dictionary<string, string> Attributes => base.Attributes;
 
@@ -29,8 +30,12 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>A new <see cref="GenericRssChannel"/> instance.</returns>
         public static GenericRssChannel LoadChannel(string url)
         {
+			Logger.LogError(">>> Entering LoadChannel(url={Url})", url);
             var channel = new GenericRssChannel();
             channel.LoadFromUrl(url);
+			Logger.LogError("LoadChannel(url={Url}): channel → {Channel}", url, channel);
+			Logger.LogWarning("<<< Exiting LoadChannel(url={Url})", url);
+			Logger.LogWarning("<<< Exiting LoadChannel(doc={Doc})", doc);
             return channel;
         }
 
@@ -49,6 +54,9 @@ namespace DotNetNuke.Services.Syndication
         /// <remarks>This method is for programmatic data-binding.</remarks>
         public IEnumerable SelectItems()
         {
+			Logger.LogError(">>> Entering SelectItems()");
+			Logger.LogWarning("<<< Exiting SelectItems()");
+			Logger.LogWarning("<<< Exiting SelectItems(maxItems={MaxItems})", maxItems);
             return this.SelectItems(-1);
         }
 

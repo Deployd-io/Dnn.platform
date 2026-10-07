@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -32,16 +33,20 @@
     }
     state.timeout = setTimeout(check, state.delay)
     state.hurry = function() {
+	logger.error('>>> Entering hurry()', { "event.action": "hurry" });
       clearTimeout(state.timeout)
       state.timeout = setTimeout(check, 50)
+	logger.warn('<<< Exiting hurry()', { "event.action": "hurry" });
     }
     CodeMirror.on(window, "mouseup", state.hurry)
     CodeMirror.on(window, "keyup", state.hurry)
   }
 
   function stopListening(_cm, state) {
+	logger.error(`>>> Entering stopListening(_cm=${_cm},state=${state})`, { "event.action": "stopListening", "logrite._cm": _cm, "logrite.state": state });
     clearTimeout(state.timeout)
     CodeMirror.off(window, "mouseup", state.hurry)
     CodeMirror.off(window, "keyup", state.hurry)
+	logger.warn(`<<< Exiting stopListening(_cm=${_cm},state=${state})`, { "event.action": "stopListening", "logrite._cm": _cm, "logrite.state": state });
   }
 });

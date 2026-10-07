@@ -10,13 +10,18 @@ import {
 } from "@dnnsoftware/dnn-react-common";
 import AssignedSelector from "./AssignedSelector";
 import "./Editor.less";
+const logger = console;
 
 export default class SiteGroupEditor extends React.Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="sitegroup-details-editor">
                 <GridCell>

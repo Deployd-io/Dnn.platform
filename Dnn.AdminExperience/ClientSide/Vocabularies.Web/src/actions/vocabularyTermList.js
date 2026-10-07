@@ -1,9 +1,12 @@
 import {vocabularyTermList as ActionTypes}  from "../constants/actionTypes";
 import VocabularyTermService from "../services/vocabularyTermService";
 import utils from "../utils";
+const logger = console;
 
 const vocabularyTermActions = {
     getVocabularyTerms(vocabularyId) {
+		logger.error(`>>> Entering getVocabularyTerms(vocabularyId=${vocabularyId})`, { "event.action": "getVocabularyTerms", "logrite.vocabularyId": vocabularyId });
+		logger.warn(`<<< Exiting getVocabularyTerms(vocabularyId=${vocabularyId})`, { "event.action": "getVocabularyTerms", "logrite.vocabularyId": vocabularyId });
         return (dispatch) => {
             VocabularyTermService.getVocabularyTerms(vocabularyId, data => {
                 dispatch({
@@ -20,6 +23,9 @@ const vocabularyTermActions = {
         };
     },
     addVocabularyTerm(term, totalCount, callback) {
+		logger.error(`>>> Entering addVocabularyTerm(term=${term},totalCount=${totalCount},callback=${callback})`, { "event.action": "addVocabularyTerm", "logrite.term": term, "logrite.totalCount": totalCount, "logrite.callback": callback });
+		logger.debug(`addVocabularyTerm(term=${term},totalCount=${totalCount},callback=${callback}): term.TermId → ${term.TermId}`, { "event.action": "addVocabularyTerm", "logrite.term": term, "logrite.totalCount": totalCount, "logrite.callback": callback });
+		logger.warn(`<<< Exiting addVocabularyTerm(term=${term},totalCount=${totalCount},callback=${callback})`, { "event.action": "addVocabularyTerm", "logrite.term": term, "logrite.totalCount": totalCount, "logrite.callback": callback });
         return (dispatch) => {
             VocabularyTermService.addVocabularyTerm(term, data => {
                 term.TermId = data.TermId;
@@ -40,6 +46,8 @@ const vocabularyTermActions = {
         };
     },
     updateVocabularyTerm(payload, index, callback) {
+		logger.error(`>>> Entering updateVocabularyTerm(payload=${payload},index=${index},callback=${callback})`, { "event.action": "updateVocabularyTerm", "logrite.payload": payload, "logrite.index": index, "logrite.callback": callback });
+		logger.warn(`<<< Exiting updateVocabularyTerm(payload=${payload},index=${index},callback=${callback})`, { "event.action": "updateVocabularyTerm", "logrite.payload": payload, "logrite.index": index, "logrite.callback": callback });
         return (dispatch) => {
             VocabularyTermService.updateVocabularyTerm(payload, () => {
                 dispatch({
@@ -59,6 +67,8 @@ const vocabularyTermActions = {
         };
     },
     deleteVocabularyTerm(termId, vocabularyTerms, totalCount) {
+		logger.error(`>>> Entering deleteVocabularyTerm(termId=${termId},vocabularyTerms=${vocabularyTerms},totalCount=${totalCount})`, { "event.action": "deleteVocabularyTerm", "logrite.termId": termId, "logrite.vocabularyTerms": vocabularyTerms, "logrite.totalCount": totalCount });
+		logger.warn(`<<< Exiting deleteVocabularyTerm(termId=${termId},vocabularyTerms=${vocabularyTerms},totalCount=${totalCount})`, { "event.action": "deleteVocabularyTerm", "logrite.termId": termId, "logrite.vocabularyTerms": vocabularyTerms, "logrite.totalCount": totalCount });
         return (dispatch) => {
             VocabularyTermService.deleteVocabularyTerm(termId, () => {
                 dispatch({
@@ -75,6 +85,8 @@ const vocabularyTermActions = {
         };
     },
     setTermSelected(updatedTerm, index) {
+		logger.error(`>>> Entering setTermSelected(updatedTerm=${updatedTerm},index=${index})`, { "event.action": "setTermSelected", "logrite.updatedTerm": updatedTerm, "logrite.index": index });
+		logger.warn(`<<< Exiting setTermSelected(updatedTerm=${updatedTerm},index=${index})`, { "event.action": "setTermSelected", "logrite.updatedTerm": updatedTerm, "logrite.index": index });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SET_TERM_SELECTED,
@@ -86,6 +98,8 @@ const vocabularyTermActions = {
         };
     },
     clearSelected(vocabularyTerms) {
+		logger.error(`>>> Entering clearSelected(vocabularyTerms=${vocabularyTerms})`, { "event.action": "clearSelected", "logrite.vocabularyTerms": vocabularyTerms });
+		logger.warn(`<<< Exiting clearSelected(vocabularyTerms=${vocabularyTerms})`, { "event.action": "clearSelected", "logrite.vocabularyTerms": vocabularyTerms });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CLEAR_TERMS_SELECTED,

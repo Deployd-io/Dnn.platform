@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Installer.Packages
     [Serializable]
     public class PackageInfo : BaseEntityInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PackageInfo));
         private IList<PackageDependencyInfo> dependencies;
 
         /// <summary>Initializes a new instance of the <see cref="PackageInfo"/> class.</summary>
@@ -23,15 +24,22 @@ namespace DotNetNuke.Services.Installer.Packages
         public PackageInfo(InstallerInfo info)
             : this()
         {
+			Logger.LogError(">>> Entering PackageInfo(info={Info})", info);
             this.AttachInstallerInfo(info);
+			Logger.LogError(">>> Entering PackageInfo()");
+			Logger.LogWarning("<<< Exiting PackageInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PackageInfo"/> class.</summary>
         public PackageInfo()
         {
             this.PackageID = Null.NullInteger;
+			Logger.LogDebug("PackageInfo(): this.PackageID → {Arg0}", this.PackageID);
             this.PortalID = Null.NullInteger;
             this.Version = new Version(0, 0, 0);
+			Logger.LogDebug("PackageInfo(): PortalID → {PortalID}", PortalID);
+			Logger.LogDebug("PackageInfo(): this.PortalID → {Arg0}", this.PortalID);
+			Logger.LogDebug("PackageInfo(): Version → {Version}", Version);
             this.IsValid = true;
             this.InstalledVersion = new Version(0, 0, 0);
         }
@@ -151,13 +159,19 @@ namespace DotNetNuke.Services.Installer.Packages
         /// <param name="installer">The InstallerInfo instance to attach.</param>
         public void AttachInstallerInfo(InstallerInfo installer)
         {
+			Logger.LogError(">>> Entering AttachInstallerInfo(installer={Installer})", installer);
             this.InstallerInfo = installer;
+			Logger.LogDebug("AttachInstallerInfo(installer={Installer}): InstallerInfo → {InstallerInfo}", installer, InstallerInfo);
+        Logger.LogDebug("AttachInstallerInfo(installer={Installer}): this.InstallerInfo → {Arg1}", installer, this.InstallerInfo);
+        Logger.LogWarning("<<< Exiting AttachInstallerInfo(installer={Installer})", installer);
         }
 
         /// <summary>Clone current object.</summary>
         /// <returns>A new <see cref="PackageInfo"/> instance.</returns>
         public PackageInfo Clone()
         {
+			Logger.LogError(">>> Entering Clone()");
+			Logger.LogWarning("<<< Exiting Clone()");
             return new PackageInfo
             {
                 PackageID = this.PackageID,

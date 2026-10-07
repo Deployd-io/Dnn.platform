@@ -18,6 +18,7 @@ namespace DotNetNuke.Common.Utilities
     [Serializable]
     public class ObjectMappingInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ObjectMappingInfo));
         private const string RootCacheKey = "ObjectCache_";
         private readonly Dictionary<string, string> columnNames;
         private readonly Dictionary<string, PropertyInfo> properties;
@@ -33,7 +34,10 @@ namespace DotNetNuke.Common.Utilities
         /// </summary>
         public ObjectMappingInfo()
         {
+			Logger.LogError(">>> Entering ObjectMappingInfo()");
             this.properties = new Dictionary<string, PropertyInfo>();
+			Logger.LogDebug("ObjectMappingInfo(): properties → {Properties}", properties);
+        Logger.LogWarning("<<< Exiting ObjectMappingInfo()");
             this.columnNames = new Dictionary<string, string>();
         }
 

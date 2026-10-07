@@ -15,9 +15,12 @@ namespace DotNetNuke.Services.Search.Controllers
     [DnnDeprecated(10, 0, 0, "Please resolve ISearchController via Dependency Injection")]
     public partial class SearchController : ServiceLocator<ISearchController, SearchController>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchController));
         /// <inheritdoc />
         protected override Func<ISearchController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<ISearchController>;
         }
     }

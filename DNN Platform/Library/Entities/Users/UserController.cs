@@ -67,6 +67,7 @@ namespace DotNetNuke.Entities.Users
     /// <seealso cref="DotNetNuke.Security.Membership.MembershipProvider"/>
     public partial class UserController : ServiceLocator<IUserController, UserController>, IUserController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserController));
         /// <summary>Gets or sets the display name format with support for replacing some tokens.</summary>
         /// <remarks>Valid tokens are: [USERID], [FIRSTNAME], [LASTNAME] and [USERNAME].</remarks>
         public string DisplayFormat { get; set; }
@@ -78,6 +79,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns>An integer representing the amount of duplicate emails.</returns>
         public static int GetDuplicateEmailCount()
         {
+			Logger.LogError(">>> Entering GetDuplicateEmailCount()");
+            Logger.LogWarning("<<< Exiting GetDuplicateEmailCount()");
             return DataProvider.Instance().GetDuplicateEmailCount(PortalSettings.Current.PortalId);
         }
 
@@ -86,10 +89,12 @@ namespace DotNetNuke.Entities.Users
         /// <param name="userId">user ID.</param>
         public static void AddUserPortal(int portalId, int userId)
         {
+			Logger.LogError(">>> Entering AddUserPortal(portalId={PortalId},userId={UserId})", portalId, userId);
             Requires.NotNullOrEmpty("portalId", portalId.ToString(CultureInfo.InvariantCulture));
             Requires.NotNullOrEmpty("userId", userId.ToString(CultureInfo.InvariantCulture));
 
             MembershipProvider.Instance().AddUserPortal(portalId, userId);
+			Logger.LogWarning("<<< Exiting AddUserPortal(portalId={PortalId},userId={UserId})", portalId, userId);
         }
 
         /// <summary>ApproveUser removes the Unverified Users role from the user and adds the auto assigned roles.</summary>
@@ -117,11 +122,15 @@ namespace DotNetNuke.Entities.Users
         /// <param name="user">The user to update.</param>
         public static void ApproveUser(RoleProvider roleProvider, IRoleController roleController, IEventManager eventManager, IPortalController portalController, IUserController userController, IEventLogger eventLogger, PortalSettings portalSettings, UserInfo user)
         {
+			Logger.LogError(">>> Entering ApproveUser(user={User})", user);
             Requires.NotNull("user", user);
 
             var role = RoleController.Instance.GetRole(portalSettings.PortalId, r => r.RoleName == "Unverified Users");
+			Logger.LogError("ApproveUser(user={User}): role → {Role}", user, role);
+			Logger.LogError("ApproveUser(roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},portalSettings={PortalSettings},user={User}): role → {Role}", roleProvider, roleController, eventManager, portalController, userController, eventLogger, portalSettings, user, role);
 
             RoleController.DeleteUserRole(roleProvider, roleController, eventManager, portalController, userController, eventLogger, user, role, portalSettings, false);
+			Logger.LogWarning("<<< Exiting ApproveUser(user={User})", user);
 
             AutoAssignUsersToRoles(user, portalSettings.PortalId);
         }
@@ -130,16 +139,20 @@ namespace DotNetNuke.Entities.Users
         /// <param name="user">The user that agreed.</param>
         public static void UserAgreedToTerms(UserInfo user)
         {
+			Logger.LogError(">>> Entering UserAgreedToTerms(user={User})", user);
             Requires.NotNull("user", user);
             MembershipProvider.Instance().UserAgreedToTerms(user);
+			Logger.LogWarning("<<< Exiting UserAgreedToTerms(user={User})", user);
         }
 
         /// <summary>When called all users in the portal will need to agree to terms and conditions again.</summary>
         /// <param name="portalId">The portal for which to reset.</param>
         public static void ResetTermsAgreement(int portalId)
         {
+			Logger.LogError(">>> Entering ResetTermsAgreement(portalId={PortalId})", portalId);
             Requires.NotNull("portalId", portalId);
             MembershipProvider.Instance().ResetTermsAgreement(portalId);
+			Logger.LogWarning("<<< Exiting ResetTermsAgreement(portalId={PortalId})", portalId);
         }
 
         /// <summary>
@@ -150,8 +163,10 @@ namespace DotNetNuke.Entities.Users
         /// <param name="remove">A value indicating whether the user has requested removal.</param>
         public static void UserRequestsRemoval(UserInfo user, bool remove)
         {
+			Logger.LogError(">>> Entering UserRequestsRemoval(user={User},remove={Remove})", user, remove);
             Requires.NotNull("user", user);
             MembershipProvider.Instance().UserRequestsRemoval(user, remove);
+			Logger.LogWarning("<<< Exiting UserRequestsRemoval(user={User},remove={Remove})", user, remove);
         }
 
         /// <summary>Attempts to change the users password.</summary>
@@ -171,6 +186,7 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A Boolean indicating success or failure.</returns>
         public static bool ChangePassword(IEventLogger eventLogger, UserInfo user, string oldPassword, string newPassword)
         {
+			Logger.LogError(">>> Entering ChangePassword(user={User},oldPassword=<redacted>,newPassword=<redacted>)", user);
             bool passwordChanged;
 
             // Although we would hope that the caller has already validated the password,
@@ -178,9 +194,12 @@ namespace DotNetNuke.Entities.Users
             if (ValidatePassword(newPassword))
             {
                 passwordChanged = MembershipProvider.Instance().ChangePassword(user, oldPassword, newPassword);
+				Logger.LogError("ChangePassword(user={User},oldPassword=<redacted>,newPassword=<redacted>): passwordChanged → {PasswordChanged}", user, passwordChanged);
+				Logger.LogDebug("ChangePassword(eventLogger={EventLogger},user={User},oldPassword=<redacted>,newPassword=<redacted>): passwordChanged → {PasswordChanged}", eventLogger, user, passwordChanged);
 
                 if (passwordChanged)
                 {
+					Logger.LogError("ChangePassword(eventLogger={EventLogger},user={User},oldPassword=<redacted>,newPassword=<redacted>): passwordChanged → {PasswordChanged}", eventLogger, user, passwordChanged);
                     // Update User
                     user.Membership.UpdatePassword = false;
                     UpdateUser(eventLogger, user.PortalID, user);
@@ -188,6 +207,9 @@ namespace DotNetNuke.Entities.Users
             }
             else
             {
+				Logger.LogError("Throwing InvalidPasswordException from ChangePassword(user={User},oldPassword=<redacted>,newPassword=<redacted>)", user);
+				Logger.LogError("Throwing InvalidPasswordException from ChangePassword(eventLogger={EventLogger},user={User},oldPassword=<redacted>,newPassword=<redacted>)", eventLogger, user);
+			Logger.LogWarning("<<< Exiting ChangePassword(eventLogger={EventLogger},user={User},oldPassword=<redacted>,newPassword=<redacted>)", eventLogger, user);
                 throw new InvalidPasswordException("Invalid Password");
             }
 
@@ -213,11 +235,17 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A Boolean indicating whether the password change succeeded.</returns>
         public static bool ChangePasswordByToken(IEventLogger eventLogger, int portalId, string username, string newPassword, string resetToken)
         {
+			Logger.LogError(">>> Entering ChangePasswordByToken(portalid={Portalid},username={Username},newPassword=<redacted>,resetToken=<redacted>)", portalid, username);
             bool passwordChanged;
+			Logger.LogError(">>> Entering ChangePasswordByToken(eventLogger={EventLogger},portalId={PortalId},username={Username},newPassword=<redacted>,resetToken=<redacted>)", eventLogger, portalId, username);
 
             Guid resetTokenGuid = new Guid(resetToken);
+			Logger.LogError("ChangePasswordByToken(portalid={Portalid},username={Username},newPassword=<redacted>,resetToken=<redacted>): resetTokenGuid → {ResetTokenGuid}", portalid, username, resetTokenGuid);
+			Logger.LogError("ChangePasswordByToken(eventLogger={EventLogger},portalId={PortalId},username={Username},newPassword=<redacted>,resetToken=<redacted>): resetTokenGuid → {ResetTokenGuid}", eventLogger, portalId, username, resetTokenGuid);
 
             var user = GetUserByName(portalId, username);
+			Logger.LogError("ChangePasswordByToken(portalid={Portalid},username={Username},newPassword=<redacted>,resetToken=<redacted>): user → {User}", portalid, username, user);
+			Logger.LogError("ChangePasswordByToken(eventLogger={EventLogger},portalId={PortalId},username={Username},newPassword=<redacted>,resetToken=<redacted>): user → {User}", eventLogger, portalId, username, user);
 
             // if user does not exist return false
             if (user == null)
@@ -232,8 +260,10 @@ namespace DotNetNuke.Entities.Users
             }
 
             var m = new MembershipPasswordController();
+			Logger.LogError("ChangePasswordByToken(portalid={Portalid},username={Username},newPassword=<redacted>,resetToken=<redacted>): m → {M}", portalid, username, m);
             if (m.IsPasswordInHistory(user.UserID, user.PortalID, newPassword))
             {
+				Logger.LogError("ChangePasswordByToken(eventLogger={EventLogger},portalId={PortalId},username={Username},newPassword=<redacted>,resetToken=<redacted>): m → {M}", eventLogger, portalId, username, m);
                 return false;
             }
 
@@ -242,6 +272,10 @@ namespace DotNetNuke.Entities.Users
             if (ValidatePassword(newPassword))
             {
                 passwordChanged = MembershipProvider.Instance().ResetAndChangePassword(user, newPassword);
+				Logger.LogError("ChangePasswordByToken(portalid={Portalid},username={Username},newPassword=<redacted>,resetToken=<redacted>): passwordChanged → {PasswordChanged}", portalid, username, passwordChanged);
+				Logger.LogError("ChangePasswordByToken(eventLogger={EventLogger},portalId={PortalId},username={Username},newPassword=<redacted>,resetToken=<redacted>): passwordChanged → {PasswordChanged}", eventLogger, portalId, username, passwordChanged);
+				Logger.LogDebug("ChangePasswordByToken(eventLogger={EventLogger},portalId={PortalId},username={Username},newPassword=<redacted>,resetToken=<redacted>): passwordChanged → {PasswordChanged}", eventLogger, portalId, username, passwordChanged);
+				Logger.LogDebug("ChangePasswordByToken(eventLogger={EventLogger},portalId={PortalId},username={Username},newPassword=<redacted>,resetToken=<redacted>): user.PasswordResetExpiration → {Arg5}", eventLogger, portalId, username, user.PasswordResetExpiration);
 
                 // update reset token values to ensure token is 1-time use
                 user.PasswordResetExpiration = DateTime.MinValue;
@@ -256,6 +290,10 @@ namespace DotNetNuke.Entities.Users
             }
             else
             {
+				Logger.LogError("Throwing InvalidPasswordException from ChangePasswordByToken(portalid={Portalid},username={Username},newPassword=<redacted>,resetToken=<redacted>)", portalid, username);
+				Logger.LogError("Throwing InvalidPasswordException from ChangePasswordByToken(eventLogger={EventLogger},portalId={PortalId},username={Username},newPassword=<redacted>,resetToken=<redacted>)", eventLogger, portalId, username);
+			Logger.LogWarning("<<< Exiting ChangePasswordByToken(eventLogger={EventLogger},portalId={PortalId},username={Username},newPassword=<redacted>,resetToken=<redacted>)", eventLogger, portalId, username);
+			Logger.LogWarning("<<< Exiting ChangePasswordByToken(portalid={Portalid},username={Username},newPassword=<redacted>,answer={Answer},resetToken=<redacted>)", portalid, username, answer);
                 throw new InvalidPasswordException("Invalid Password");
             }
 
@@ -363,6 +401,7 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A Boolean indicating success or failure.</returns>
         public static bool ChangePasswordQuestionAndAnswer(IEventLogger eventLogger, UserInfo user, string password, string passwordQuestion, string passwordAnswer)
         {
+			Logger.LogError(">>> Entering ChangePasswordQuestionAndAnswer(user={User},password=<redacted>,passwordQuestion=<redacted>,passwordAnswer=<redacted>)", user);
             eventLogger.AddLog(user, PortalController.Instance.GetCurrentSettings(), GetCurrentUserInternal().UserID, string.Empty, EventLogType.USER_UPDATED);
             return MembershipProvider.Instance().ChangePasswordQuestionAndAnswer(user, password, passwordQuestion, passwordAnswer);
         }
@@ -375,7 +414,9 @@ namespace DotNetNuke.Entities.Users
         /// <param name="newUsername">new one.</param>
         public static void ChangeUsername(int userId, string newUsername)
         {
+			Logger.LogError(">>> Entering ChangeUsername(userId={UserId},newUsername={NewUsername})", userId, newUsername);
             MembershipProvider.Instance().ChangeUsername(userId, newUsername);
+			Logger.LogWarning("<<< Exiting ChangeUsername(userId={UserId},newUsername={NewUsername})", userId, newUsername);
         }
 
         /// <summary>Checks if the user has known default username and password.</summary>
@@ -389,15 +430,18 @@ namespace DotNetNuke.Entities.Users
         [DnnDeprecated(9, 8, 1, "No alternative method implemented")]
         public static partial void CheckInsecurePassword(string username, string password, ref UserLoginStatus loginStatus)
         {
+			Logger.LogError(">>> Entering CheckInsecurePassword(username={Username},password=<redacted>,loginStatus={LoginStatus})", username, loginStatus);
             if (username == "admin" && password is "admin" or "dnnadmin")
             {
                 loginStatus = UserLoginStatus.LOGIN_INSECUREADMINPASSWORD;
+				Logger.LogError("CheckInsecurePassword(username={Username},password=<redacted>,loginStatus={LoginStatus}): loginStatus → {LoginStatus1}", username, loginStatus, loginStatus);
             }
 
             if (username == "host" && password is "host" or "dnnhost")
             {
                 loginStatus = UserLoginStatus.LOGIN_INSECUREHOSTPASSWORD;
             }
+			Logger.LogWarning("<<< Exiting CheckInsecurePassword(username={Username},password=<redacted>,loginStatus={LoginStatus})", username, loginStatus);
         }
 
         /// <summary>Copies a user to a different portal.</summary>
@@ -406,7 +450,9 @@ namespace DotNetNuke.Entities.Users
         /// <param name="mergeUser">A flag that indicates whether to merge the original user.</param>
         public static void CopyUserToPortal(UserInfo user, PortalInfo destinationPortal, bool mergeUser)
         {
+			Logger.LogError(">>> Entering CopyUserToPortal(user={User},destinationPortal={DestinationPortal},mergeUser={MergeUser})", user, destinationPortal, mergeUser);
             var targetUser = GetUserById(destinationPortal.PortalID, user.UserID);
+			Logger.LogError("CopyUserToPortal(user={User},destinationPortal={DestinationPortal},mergeUser={MergeUser}): targetUser → {TargetUser}", user, destinationPortal, mergeUser, targetUser);
             if (targetUser == null)
             {
                 AddUserPortal(destinationPortal.PortalID, user.UserID);
@@ -423,6 +469,7 @@ namespace DotNetNuke.Entities.Users
             else
             {
                 targetUser.PortalID = destinationPortal.PortalID;
+				Logger.LogDebug("CopyUserToPortal(user={User},destinationPortal={DestinationPortal},mergeUser={MergeUser}): targetUser.PortalID → {Arg3}", user, destinationPortal, mergeUser, targetUser.PortalID);
 
                 if (mergeUser)
                 {
@@ -432,6 +479,7 @@ namespace DotNetNuke.Entities.Users
             }
 
             UpdateUser(targetUser.PortalID, targetUser);
+			Logger.LogWarning("<<< Exiting CopyUserToPortal(user={User},destinationPortal={DestinationPortal},mergeUser={MergeUser})", user, destinationPortal, mergeUser);
         }
 
         /// <summary>Creates a new User in the Data Store.</summary>
@@ -439,6 +487,9 @@ namespace DotNetNuke.Entities.Users
         /// <returns>The <see cref="UserCreateStatus"/> ot the User.</returns>
         public static UserCreateStatus CreateUser(ref UserInfo user)
         {
+			Logger.LogError(">>> Entering CreateUser(user={User})", user);
+            Logger.LogWarning("<<< Exiting CreateUser(user={User})", user);
+			Logger.LogWarning("<<< Exiting CreateUser(eventLogger={EventLogger},user={User},sendEmailNotification={SendEmailNotification})", eventLogger, user, sendEmailNotification);
             return CreateUser(ref user, false);
         }
 
@@ -495,7 +546,9 @@ namespace DotNetNuke.Entities.Users
         /// <param name="portalId">The Id of the Portal.</param>
         public static void DeleteUnauthorizedUsers(int portalId)
         {
+			Logger.LogError(">>> Entering DeleteUnauthorizedUsers(portalId={PortalId})", portalId);
             var arrUsers = (portalId == -1) ? GetUsers(true, true, portalId) : GetUnAuthorizedUsers(portalId);
+			Logger.LogError("DeleteUnauthorizedUsers(portalId={PortalId}): arrUsers → {ArrUsers}", portalId, arrUsers);
             for (int i = 0; i < arrUsers.Count; i++)
             {
                 var user = arrUsers[i] as UserInfo;
@@ -506,7 +559,10 @@ namespace DotNetNuke.Entities.Users
                         DeleteUser(ref user, true, false);
                     }
                 }
+				Logger.LogError(">>> Entering GetUsers(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting GetUsers(portalId={PortalId})", portalId);
             }
+			Logger.LogWarning("<<< Exiting DeleteUnauthorizedUsers(portalId={PortalId})", portalId);
         }
 
         /// <summary>Deletes an existing User from the Data Store.</summary>
@@ -526,14 +582,19 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A Boolean value that indicates whether the User was successfully deleted.</returns>
         public static bool DeleteUser(IEventLogger eventLogger, ref UserInfo user, bool notify, bool deleteAdmin)
         {
+			Logger.LogError(">>> Entering DeleteUser(user={User},notify={Notify},deleteAdmin={DeleteAdmin})", user, notify, deleteAdmin);
             int portalId = user.PortalID;
             user.PortalID = GetEffectivePortalId(portalId);
 
             // If the HTTP Current Context is unavailable (e.g. when called from within a SchedulerClient) GetCurrentPortalSettings() returns null and the
             // PortalSettings are created/loaded for the portal (originally) assigned to the user.
             var portalSettings = PortalSettings.Current ?? new PortalSettings(portalId);
+			Logger.LogError("DeleteUser(user={User},notify={Notify},deleteAdmin={DeleteAdmin}): portalSettings → {PortalSettings}", user, notify, deleteAdmin, portalSettings);
+			Logger.LogError("DeleteUser(eventLogger={EventLogger},user={User},notify={Notify},deleteAdmin={DeleteAdmin}): portalSettings → {PortalSettings}", eventLogger, user, notify, deleteAdmin, portalSettings);
 
             var canDelete = deleteAdmin || (user.UserID != portalSettings.AdministratorId);
+			Logger.LogError("DeleteUser(user={User},notify={Notify},deleteAdmin={DeleteAdmin}): canDelete → {CanDelete}", user, notify, deleteAdmin, canDelete);
+			Logger.LogError("DeleteUser(eventLogger={EventLogger},user={User},notify={Notify},deleteAdmin={DeleteAdmin}): canDelete → {CanDelete}", eventLogger, user, notify, deleteAdmin, canDelete);
 
             if (canDelete)
             {
@@ -577,6 +638,7 @@ namespace DotNetNuke.Entities.Users
 
             FixMemberPortalId(user, portalId);
             UpdateUser(portalId, GetUserById(portalId, user.UserID));
+			Logger.LogWarning("<<< Exiting DeleteUser(eventLogger={EventLogger},user={User},notify={Notify},deleteAdmin={DeleteAdmin})", eventLogger, user, notify, deleteAdmin);
             return canDelete;
         }
 
@@ -586,18 +648,23 @@ namespace DotNetNuke.Entities.Users
         /// <param name="deleteAdmin">A flag that indicates whether the Portal Administrator should be deleted.</param>
         public static void DeleteUsers(int portalId, bool notify, bool deleteAdmin)
         {
+			Logger.LogError(">>> Entering DeleteUsers(portalId={PortalId},notify={Notify},deleteAdmin={DeleteAdmin})", portalId, notify, deleteAdmin);
             var arrUsers = GetUsers(portalId);
+			Logger.LogError("DeleteUsers(portalId={PortalId},notify={Notify},deleteAdmin={DeleteAdmin}): arrUsers → {ArrUsers}", portalId, notify, deleteAdmin, arrUsers);
             for (int i = 0; i < arrUsers.Count; i++)
             {
                 var objUser = arrUsers[i] as UserInfo;
                 DeleteUser(ref objUser, notify, deleteAdmin);
             }
+			Logger.LogWarning("<<< Exiting DeleteUsers(portalId={PortalId},notify={Notify},deleteAdmin={DeleteAdmin})", portalId, notify, deleteAdmin);
         }
 
         /// <summary>Generates a new random password.</summary>
         /// <returns>A string representing the randomly generated password which is the minimum password length + 4 characters.</returns>
         public static string GeneratePassword()
         {
+			Logger.LogError(">>> Entering GeneratePassword()");
+            Logger.LogWarning("<<< Exiting GeneratePassword()");
             return GeneratePassword(MembershipProviderConfig.MinPasswordLength + 4);
         }
 
@@ -630,20 +697,28 @@ namespace DotNetNuke.Entities.Users
         /// <returns>The user as a <see cref="UserInfo"/> object.</returns>
         public static UserInfo GetCachedUser(IHostSettings hostSettings, int portalId, string username)
         {
+			Logger.LogError(">>> Entering GetCachedUser(portalId={PortalId},username={Username})", portalId, username);
             var masterPortalId = GetEffectivePortalId(portalId);
 
             var user = MembershipProvider.Instance().GetUserByUserName(masterPortalId, username);
+			Logger.LogError("GetCachedUser(hostSettings={HostSettings},portalId={PortalId},username={Username}): masterPortalId → {MasterPortalId}", hostSettings, portalId, username, masterPortalId);
+			Logger.LogError("GetCachedUser(portalId={PortalId},username={Username}): user → {User}", portalId, username, user);
+			Logger.LogError("GetCachedUser(portalId={PortalId},username={Username}): masterPortalId → {MasterPortalId}", portalId, username, masterPortalId);
             FixMemberPortalId(user, portalId);
 
             if (user != null)
             {
+				Logger.LogError("GetCachedUser(hostSettings={HostSettings},portalId={PortalId},username={Username}): user → {User}", hostSettings, portalId, username, user);
                 var lookUp = GetUserLookupDictionary(hostSettings, portalId);
+				Logger.LogError("GetCachedUser(portalId={PortalId},username={Username}): lookUp → {LookUp}", portalId, username, lookUp);
                 using (lookUp.GetWriteLock())
                 {
+					Logger.LogError("GetCachedUser(hostSettings={HostSettings},portalId={PortalId},username={Username}): lookUp → {LookUp}", hostSettings, portalId, username, lookUp);
                     lookUp[user.UserID] = user.Username;
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetCachedUser(hostSettings={HostSettings},portalId={PortalId},username={Username})", hostSettings, portalId, username);
             return user;
         }
 
@@ -652,6 +727,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns>An ArrayList of <see cref="UserInfo"/>.</returns>
         public static ArrayList GetDeletedUsers(int portalId)
         {
+			Logger.LogError(">>> Entering GetDeletedUsers(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting GetDeletedUsers(portalId={PortalId})", portalId);
             return MembershipProvider.Instance().GetDeletedUsers(GetEffectivePortalId(portalId));
         }
 
@@ -661,6 +738,8 @@ namespace DotNetNuke.Entities.Users
         [DnnDeprecated(8, 0, 0, "Other solutions exist outside of the DNN Platform", RemovalVersion = 11)]
         public static partial ArrayList GetOnlineUsers(int portalId)
         {
+			Logger.LogError(">>> Entering GetOnlineUsers(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting GetOnlineUsers(portalId={PortalId})", portalId);
             return MembershipProvider.Instance().GetOnlineUsers(GetEffectivePortalId(portalId));
         }
 
@@ -675,6 +754,7 @@ namespace DotNetNuke.Entities.Users
         /// <exception cref="ConfigurationErrorsException">is thrown if the current configuration does not allow password retrieval.</exception>
         public static string GetPassword(ref UserInfo user, string passwordAnswer)
         {
+			Logger.LogError(">>> Entering GetPassword(user={User},passwordAnswer=<redacted>)", user);
             if (MembershipProviderConfig.PasswordRetrievalEnabled)
             {
                 user.Membership.Password = MembershipProvider.Instance().GetPassword(user, passwordAnswer);
@@ -682,6 +762,8 @@ namespace DotNetNuke.Entities.Users
             else
             {
                 // Throw a configuration exception as password retrieval is not enabled
+				Logger.LogError("Throwing ConfigurationErrorsException from GetPassword(user={User},passwordAnswer=<redacted>)", user);
+			Logger.LogWarning("<<< Exiting GetPassword(user={User},passwordAnswer=<redacted>)", user);
                 throw new ConfigurationErrorsException("Password Retrieval is not enabled");
             }
 
@@ -695,6 +777,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns>An ArrayList of <see cref="UserInfo"/>.</returns>
         public static ArrayList GetUnAuthorizedUsers(int portalId, bool includeDeleted, bool superUsersOnly)
         {
+			Logger.LogError(">>> Entering GetUnAuthorizedUsers(portalId={PortalId},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, includeDeleted, superUsersOnly);
+            Logger.LogWarning("<<< Exiting GetUnAuthorizedUsers(portalId={PortalId},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, includeDeleted, superUsersOnly);
             return MembershipProvider.Instance().GetUnAuthorizedUsers(GetEffectivePortalId(portalId), includeDeleted, superUsersOnly);
         }
 
@@ -717,6 +801,7 @@ namespace DotNetNuke.Entities.Users
         /// <param name="userId">The user ID.</param>
         public static UserInfo GetUserById(IHostSettings hostSettings, int portalId, int userId)
         {
+			Logger.LogError(">>> Entering GetUserById(portalId={PortalId},userId={UserId})", portalId, userId);
             // stop any SQL calls for guest users
             if (userId == Null.NullInteger)
             {
@@ -724,6 +809,8 @@ namespace DotNetNuke.Entities.Users
             }
 
             var lookUp = GetUserLookupDictionary(hostSettings, portalId);
+			Logger.LogError("GetUserById(portalId={PortalId},userId={UserId}): lookUp → {LookUp}", portalId, userId, lookUp);
+			Logger.LogError("GetUserById(hostSettings={HostSettings},portalId={PortalId},userId={UserId}): lookUp → {LookUp}", hostSettings, portalId, userId, lookUp);
 
             UserInfo user;
             string userName;
@@ -731,15 +818,21 @@ namespace DotNetNuke.Entities.Users
             using (lookUp.GetReadLock())
             {
                 userFound = lookUp.TryGetValue(userId, out userName);
+				Logger.LogError("GetUserById(portalId={PortalId},userId={UserId}): userFound → {UserFound}", portalId, userId, userFound);
+				Logger.LogError("GetUserById(hostSettings={HostSettings},portalId={PortalId},userId={UserId}): userFound → {UserFound}", hostSettings, portalId, userId, userFound);
+				Logger.LogDebug("GetUserById(hostSettings={HostSettings},portalId={PortalId},userId={UserId}): userFound → {UserFound}", hostSettings, portalId, userId, userFound);
             }
 
             if (userFound)
             {
                 user = GetCachedUser(hostSettings, portalId, userName);
+				Logger.LogDebug("GetUserById(hostSettings={HostSettings},portalId={PortalId},userId={UserId}): user → {User}", hostSettings, portalId, userId, user);
             }
             else
             {
                 user = MembershipProvider.Instance().GetUser(GetEffectivePortalId(portalId), userId);
+				Logger.LogError("GetUserById(portalId={PortalId},userId={UserId}): user → {User}", portalId, userId, user);
+				Logger.LogError("GetUserById(hostSettings={HostSettings},portalId={PortalId},userId={UserId}): user → {User}", hostSettings, portalId, userId, user);
                 FixMemberPortalId(user, portalId);
                 if (user != null)
                 {
@@ -750,6 +843,7 @@ namespace DotNetNuke.Entities.Users
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetUserById(hostSettings={HostSettings},portalId={PortalId},userId={UserId})", hostSettings, portalId, userId);
             return user;
         }
 
@@ -758,6 +852,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns>The User as a <see cref="UserInfo"/> object.</returns>
         public static UserInfo GetUserByName(string username)
         {
+			Logger.LogError(">>> Entering GetUserByName(username={Username})", username);
+            Logger.LogWarning("<<< Exiting GetUserByName(username={Username})", username);
             return MembershipProvider.Instance().GetUserByUserName(-1, username);
         }
 
@@ -776,7 +872,10 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A user as a <see cref="UserInfo"/> object.</returns>
         public static UserInfo GetUserByVanityUrl(int portalId, string vanityUrl)
         {
+			Logger.LogError(">>> Entering GetUserByVanityUrl(portalId={PortalId},vanityUrl={VanityUrl})", portalId, vanityUrl);
             portalId = GetEffectivePortalId(portalId);
+			Logger.LogError("GetUserByVanityUrl(portalId={PortalId},vanityUrl={VanityUrl}): portalId → {PortalId1}", portalId, vanityUrl, portalId);
+			Logger.LogWarning("<<< Exiting GetUserByVanityUrl(portalId={PortalId},vanityUrl={VanityUrl})", portalId, vanityUrl);
             return MembershipProvider.Instance().GetUserByVanityUrl(portalId, vanityUrl);
         }
 
@@ -786,7 +885,10 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A user represented in a <see cref="UserInfo"/> object.</returns>
         public static UserInfo GetUserByPasswordResetToken(int portalId, string resetToken)
         {
+			Logger.LogError(">>> Entering GetUserByPasswordResetToken(portalId={PortalId},resetToken=<redacted>)", portalId);
             portalId = GetEffectivePortalId(portalId);
+			Logger.LogError("GetUserByPasswordResetToken(portalId={PortalId},resetToken=<redacted>): portalId → {PortalId1}", portalId, portalId);
+			Logger.LogWarning("<<< Exiting GetUserByPasswordResetToken(portalId={PortalId},resetToken=<redacted>)", portalId);
             return MembershipProvider.Instance().GetUserByPasswordResetToken(portalId, resetToken);
         }
 
@@ -803,8 +905,14 @@ namespace DotNetNuke.Entities.Users
         /// <returns>The no of users the portal contains.</returns>
         public static int GetUserCountByPortal(IHostSettings hostSettings, int portalId)
         {
+			Logger.LogError(">>> Entering GetUserCountByPortal(portalId={PortalId})", portalId);
             portalId = GetEffectivePortalId(portalId);
+			Logger.LogError("GetUserCountByPortal(hostSettings={HostSettings},portalId={PortalId}): portalId → {PortalId1}", hostSettings, portalId, portalId);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.PortalUserCountCacheKey, portalId);
+			Logger.LogError("GetUserCountByPortal(portalId={PortalId}): portalId → {PortalId1}", portalId, portalId);
+        Logger.LogError("GetUserCountByPortal(portalId={PortalId}): cacheKey → {CacheKey}", portalId, cacheKey);
+        Logger.LogError("GetUserCountByPortal(hostSettings={HostSettings},portalId={PortalId}): cacheKey → {CacheKey}", hostSettings, portalId, cacheKey);
+        Logger.LogWarning("<<< Exiting GetUserCountByPortal(hostSettings={HostSettings},portalId={PortalId})", hostSettings, portalId);
             return CBO.GetCachedObject<int>(
                 hostSettings,
                 new CacheItemArgs(
@@ -820,6 +928,7 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A localized string representing the user creation status.</returns>
         public static string GetUserCreateStatus(UserCreateStatus userRegistrationStatus)
         {
+			Logger.LogError(">>> Entering GetUserCreateStatus(userRegistrationStatus={UserRegistrationStatus})", userRegistrationStatus);
             switch (userRegistrationStatus)
             {
                 case UserCreateStatus.DuplicateEmail:
@@ -832,6 +941,7 @@ namespace DotNetNuke.Entities.Users
                     string strInvalidPassword = Localization.GetString("InvalidPassword");
                     strInvalidPassword = strInvalidPassword.Replace("[PasswordLength]", MembershipProviderConfig.MinPasswordLength.ToString(CultureInfo.CurrentCulture));
                     strInvalidPassword = strInvalidPassword.Replace("[NoneAlphabet]", MembershipProviderConfig.MinNonAlphanumericCharacters.ToString(CultureInfo.CurrentCulture));
+					Logger.LogError("GetUserCreateStatus(userRegistrationStatus={UserRegistrationStatus}): strInvalidPassword → {StrInvalidPassword}", userRegistrationStatus, strInvalidPassword);
                     return strInvalidPassword;
                 case UserCreateStatus.PasswordMismatch:
                     return Localization.GetString("PasswordMismatch");
@@ -860,6 +970,8 @@ namespace DotNetNuke.Entities.Users
                 case UserCreateStatus.InvalidLastName:
                     return Localization.GetString("InvalidLastName");
                 default:
+					Logger.LogError("Throwing ArgumentException from GetUserCreateStatus(userRegistrationStatus={UserRegistrationStatus})", userRegistrationStatus);
+			Logger.LogWarning("<<< Exiting GetUserCreateStatus(userRegistrationStatus={UserRegistrationStatus})", userRegistrationStatus);
                     throw new ArgumentException("Unknown UserCreateStatus value encountered", nameof(userRegistrationStatus));
             }
         }
@@ -869,24 +981,30 @@ namespace DotNetNuke.Entities.Users
         /// <remarks>This method does not return the membership information, it populates it inside the <see cref="UserInfo"/> object.</remarks>
         public static void GetUserMembership(UserInfo user)
         {
+			Logger.LogError(">>> Entering GetUserMembership(user={User})", user);
             int portalId = user.PortalID;
             user.PortalID = GetEffectivePortalId(portalId);
             MembershipProvider.Instance().GetUserMembership(ref user);
             FixMemberPortalId(user, portalId);
+			Logger.LogWarning("<<< Exiting GetUserMembership(user={User})", user);
         }
 
         /// <summary>Gets a set of default portal settings relative to user management.</summary>
         /// <returns>A <see cref="Hashtable"/> or the user related portal settings.</returns>
         public static Hashtable GetDefaultUserSettings()
         {
+			Logger.LogError(">>> Entering GetDefaultUserSettings()");
             var portalId = -1;
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogError("GetDefaultUserSettings(): portalSettings → {PortalSettings}", portalSettings);
+			Logger.LogError("GetDefaultUserSettings(): portalId → {PortalId}", portalId);
 
             if (portalSettings != null)
             {
                 portalId = portalSettings.PortalId;
             }
 
+			Logger.LogWarning("<<< Exiting GetDefaultUserSettings()");
             return GetUserSettings(portalId, new Hashtable());
         }
 
@@ -895,15 +1013,19 @@ namespace DotNetNuke.Entities.Users
         /// <returns>The Settings Hashtable.</returns>
         public static Hashtable GetUserSettings(int portalId)
         {
+			Logger.LogError(">>> Entering GetUserSettings(portalId={PortalId})", portalId);
             var settings = GetDefaultUserSettings();
             var masterPortalId = GetEffectivePortalId(portalId);
+			Logger.LogError("GetUserSettings(portalId={PortalId}): masterPortalId → {MasterPortalId}", portalId, masterPortalId);
             Dictionary<string, string> settingsDictionary = (portalId == Null.NullInteger)
                                                             ? HostController.Instance.GetSettingsDictionary()
                                                             : PortalController.Instance.GetPortalSettings(masterPortalId);
+															Logger.LogError("GetUserSettings(portalId={PortalId}): settings → {Settings}", portalId, settings);
             Dictionary<string, string> currentPortalSettings = null;
             if (portalId != Null.NullInteger && masterPortalId != portalId)
             {
                 currentPortalSettings = PortalController.Instance.GetPortalSettings(portalId);
+				Logger.LogError("GetUserSettings(portalId={PortalId}): currentPortalSettings → {CurrentPortalSettings}", portalId, currentPortalSettings);
             }
 
             if (settingsDictionary != null)
@@ -955,6 +1077,8 @@ namespace DotNetNuke.Entities.Users
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetUserSettings(portalId={PortalId})", portalId);
+			Logger.LogWarning("<<< Exiting GetUserSettings(portalId={PortalId},settings={Settings})", portalId, settings);
             return settings;
         }
 
@@ -963,6 +1087,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns>An ArrayList of <see cref="UserInfo"/> objects.</returns>
         public static ArrayList GetUsers(int portalId)
         {
+			Logger.LogError(">>> Entering GetUsers(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting GetUsers(portalId={PortalId})", portalId);
             return GetUsers(false, false, portalId);
         }
 
@@ -974,6 +1100,7 @@ namespace DotNetNuke.Entities.Users
         public static ArrayList GetUsers(bool includeDeleted, bool superUsersOnly, int portalId)
         {
             var totalrecords = -1;
+			Logger.LogWarning("<<< Exiting GetUsers(includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly},portalId={PortalId})", includeDeleted, superUsersOnly, portalId);
             return GetUsers(portalId, -1, -1, ref totalrecords, includeDeleted, superUsersOnly);
         }
 
@@ -1010,6 +1137,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns>An ArrayList of <see cref="UserInfo"/> objects.</returns>
         public static ArrayList GetUsersByEmail(int portalId, string emailToMatch, int pageIndex, int pageSize, ref int totalRecords)
         {
+			Logger.LogError(">>> Entering GetUsersByEmail(portalId={PortalId},emailToMatch={EmailToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords})", portalId, emailToMatch, pageIndex, pageSize, totalRecords);
+            Logger.LogWarning("<<< Exiting GetUsersByEmail(portalId={PortalId},emailToMatch={EmailToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords})", portalId, emailToMatch, pageIndex, pageSize, totalRecords);
             return GetUsersByEmail(portalId, emailToMatch, pageIndex, pageSize, ref totalRecords, false, false);
         }
 
@@ -1022,12 +1151,15 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A single <see cref="UserInfo"/> object or null if no user found.</returns>
         public static UserInfo GetUserByEmail(int portalId, string emailToMatch)
         {
+			Logger.LogError(">>> Entering GetUserByEmail(portalId={PortalId},emailToMatch={EmailToMatch})", portalId, emailToMatch);
             int uid = DataProvider.Instance().GetSingleUserByEmail(portalId, emailToMatch);
+			Logger.LogError("GetUserByEmail(portalId={PortalId},emailToMatch={EmailToMatch}): uid → {Uid}", portalId, emailToMatch, uid);
             if (uid > -1)
             {
                 return GetUserById(portalId, uid);
             }
 
+			Logger.LogWarning("<<< Exiting GetUserByEmail(portalId={PortalId},emailToMatch={EmailToMatch})", portalId, emailToMatch);
             return null;
         }
 
@@ -1058,6 +1190,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns>An ArrayList of <see cref="UserInfo"/> objects.</returns>
         public static ArrayList GetUsersByProfileProperty(int portalId, string propertyName, string propertyValue, int pageIndex, int pageSize, ref int totalRecords)
         {
+			Logger.LogError(">>> Entering GetUsersByProfileProperty(portalId={PortalId},propertyName={PropertyName},propertyValue={PropertyValue},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords})", portalId, propertyName, propertyValue, pageIndex, pageSize, totalRecords);
+            Logger.LogWarning("<<< Exiting GetUsersByProfileProperty(portalId={PortalId},propertyName={PropertyName},propertyValue={PropertyValue},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords})", portalId, propertyName, propertyValue, pageIndex, pageSize, totalRecords);
             return GetUsersByProfileProperty(portalId, propertyName, propertyValue, pageIndex, pageSize, ref totalRecords, false, false);
         }
 
@@ -1088,6 +1222,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns>An ArrayList of <see cref="UserInfo"/> objects.</returns>
         public static ArrayList GetUsersByUserName(int portalId, string userNameToMatch, int pageIndex, int pageSize, ref int totalRecords)
         {
+			Logger.LogError(">>> Entering GetUsersByUserName(portalId={PortalId},userNameToMatch={UserNameToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords})", portalId, userNameToMatch, pageIndex, pageSize, totalRecords);
+            Logger.LogWarning("<<< Exiting GetUsersByUserName(portalId={PortalId},userNameToMatch={UserNameToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords})", portalId, userNameToMatch, pageIndex, pageSize, totalRecords);
             return GetUsersByUserName(portalId, userNameToMatch, pageIndex, pageSize, ref totalRecords, false, false);
         }
 
@@ -1116,6 +1252,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns>An ArrayList of <see cref="UserInfo"/> objects.</returns>
         public static ArrayList GetUsersByDisplayName(int portalId, string nameToMatch, int pageIndex, int pageSize, ref int totalRecords, bool includeDeleted, bool superUsersOnly)
         {
+			Logger.LogError(">>> Entering GetUsersByDisplayName(portalId={PortalId},nameToMatch={NameToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, nameToMatch, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
+            Logger.LogWarning("<<< Exiting GetUsersByDisplayName(portalId={PortalId},nameToMatch={NameToMatch},pageIndex={PageIndex},pageSize={PageSize},totalRecords={TotalRecords},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, nameToMatch, pageIndex, pageSize, totalRecords, includeDeleted, superUsersOnly);
             return MembershipProvider.Instance().GetUsersByDisplayName(GetEffectivePortalId(portalId), nameToMatch, pageIndex, pageSize, ref totalRecords, includeDeleted, superUsersOnly);
         }
 
@@ -1125,8 +1263,10 @@ namespace DotNetNuke.Entities.Users
         /// <param name="mergeUser">A indicating whether to merge the basic user properties if the user already exists on the target portal.</param>
         public static void MoveUserToPortal(UserInfo user, PortalInfo portal, bool mergeUser)
         {
+			Logger.LogError(">>> Entering MoveUserToPortal(user={User},portal={Portal},mergeUser={MergeUser})", user, portal, mergeUser);
             CopyUserToPortal(user, portal, mergeUser);
             RemoveUser(user);
+			Logger.LogWarning("<<< Exiting MoveUserToPortal(user={User},portal={Portal},mergeUser={MergeUser})", user, portal, mergeUser);
         }
 
         /// <summary>
@@ -1140,8 +1280,10 @@ namespace DotNetNuke.Entities.Users
         /// </remarks>
         public static void RemoveDeletedUsers(int portalId)
         {
+			Logger.LogError(">>> Entering RemoveDeletedUsers(portalId={PortalId})", portalId);
             var arrUsers = GetDeletedUsers(portalId);
 
+			Logger.LogError("RemoveDeletedUsers(portalId={PortalId}): arrUsers → {ArrUsers}", portalId, arrUsers);
             foreach (UserInfo objUser in arrUsers)
             {
                 if (objUser.IsDeleted)
@@ -1149,6 +1291,7 @@ namespace DotNetNuke.Entities.Users
                     RemoveUser(objUser);
                 }
             }
+			Logger.LogWarning("<<< Exiting RemoveDeletedUsers(portalId={PortalId})", portalId);
         }
 
         /// <summary>
@@ -1171,25 +1314,34 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A value indicating whether the user removal was successful.</returns>
         public static bool RemoveUser(IEventLogger eventLogger, UserInfo user)
         {
+			Logger.LogError(">>> Entering RemoveUser(user={User})", user);
             int portalId = user.PortalID;
             user.PortalID = GetEffectivePortalId(portalId);
 
             var retValue = MembershipProvider.Instance().RemoveUser(user);
+			Logger.LogError("RemoveUser(user={User}): retValue → {RetValue}", user, retValue);
+			Logger.LogError("RemoveUser(eventLogger={EventLogger},user={User}): retValue → {RetValue}", eventLogger, user, retValue);
 
             if (retValue)
             {
                 var portalSettings = PortalController.Instance.GetCurrentSettings();
+				Logger.LogError("RemoveUser(user={User}): portalSettings → {PortalSettings}", user, portalSettings);
+				Logger.LogError("RemoveUser(eventLogger={EventLogger},user={User}): portalSettings → {PortalSettings}", eventLogger, user, portalSettings);
 
                 eventLogger.AddLog("Username", user.Username, portalSettings, user.UserID, EventLogType.USER_REMOVED);
 
                 IPortalInfo portal = PortalController.Instance.GetPortal(user.PortalID);
+				Logger.LogError("RemoveUser(user={User}): portal → {Portal}", user, portal);
                 var portalGroup = PortalGroupController.Instance.GetPortalGroups()
                     .SingleOrDefault(p => p.PortalGroupId == portal.PortalGroupId);
+					Logger.LogError("RemoveUser(eventLogger={EventLogger},user={User}): portal → {Portal}", eventLogger, user, portal);
                 if (portalGroup != null)
                 {
                     var portalsInGroup = PortalGroupController.Instance.GetPortalsByGroup(portalGroup.PortalGroupId);
+					Logger.LogError("RemoveUser(user={User}): portalsInGroup → {PortalsInGroup}", user, portalsInGroup);
                     foreach (IPortalInfo portalInGroup in portalsInGroup)
                     {
+						Logger.LogError("RemoveUser(eventLogger={EventLogger},user={User}): portalsInGroup → {PortalsInGroup}", eventLogger, user, portalsInGroup);
                         ClearPortalAndUserCache(user, portalInGroup.PortalId);
                     }
                 }
@@ -1204,6 +1356,7 @@ namespace DotNetNuke.Entities.Users
             // Reset PortalId
             FixMemberPortalId(user, portalId);
 
+			Logger.LogWarning("<<< Exiting RemoveUser(eventLogger={EventLogger},user={User})", eventLogger, user);
             return retValue;
         }
 
@@ -1214,13 +1367,17 @@ namespace DotNetNuke.Entities.Users
         /// <remarks>This method can only be used by admins or superusers (hosts) who do not need to supply an "old" password.</remarks>
         public static bool ResetAndChangePassword(UserInfo user, string newPassword)
         {
+			Logger.LogError(">>> Entering ResetAndChangePassword(user={User},newPassword=<redacted>)", user);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogError("ResetAndChangePassword(user={User},newPassword=<redacted>): portalSettings → {PortalSettings}", user, portalSettings);
             if (GetCurrentUserInternal().IsInRole(portalSettings.AdministratorRoleName))
             {
                 string resetPassword = ResetPassword(user, string.Empty);
                 return ChangePassword(user, resetPassword, newPassword);
             }
 
+			Logger.LogWarning("<<< Exiting ResetAndChangePassword(user={User},newPassword=<redacted>)", user);
+			Logger.LogWarning("<<< Exiting ResetAndChangePassword(user={User},oldPassword=<redacted>,newPassword=<redacted>)", user);
             return false;
         }
 
@@ -1250,6 +1407,7 @@ namespace DotNetNuke.Entities.Users
         /// <exception cref="ConfigurationErrorsException"> is thrown when password reset is not enabled in the configuration.</exception>
         public static string ResetPassword(UserInfo user, string passwordAnswer)
         {
+			Logger.LogError(">>> Entering ResetPassword(user={User},passwordAnswer=<redacted>)", user);
             if (MembershipProviderConfig.PasswordResetEnabled)
             {
                 user.Membership.Password = MembershipProvider.Instance().ResetPassword(user, passwordAnswer);
@@ -1257,6 +1415,8 @@ namespace DotNetNuke.Entities.Users
             else
             {
                 // Throw a configuration exception as password reset is not enabled
+				Logger.LogError("Throwing ConfigurationErrorsException from ResetPassword(user={User},passwordAnswer=<redacted>)", user);
+			Logger.LogWarning("<<< Exiting ResetPassword(user={User},passwordAnswer=<redacted>)", user);
                 throw new ConfigurationErrorsException("Password Reset is not enabled");
             }
 
@@ -1268,7 +1428,9 @@ namespace DotNetNuke.Entities.Users
         /// <remarks>This method does not return the new token, it updates it inside the <see cref="UserInfo"/> object provided.</remarks>
         public static void ResetPasswordToken(UserInfo user)
         {
+			Logger.LogError(">>> Entering ResetPasswordToken(user={User})", user);
             ResetPasswordToken(user, false);
+			Logger.LogWarning("<<< Exiting ResetPasswordToken(user={User})", user);
         }
 
         /// <summary>Resets the user password reset token.</summary>
@@ -1277,11 +1439,16 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A value indicating whether the notification email was sent or true if 'sendEmail' was false.</returns>
         public static bool ResetPasswordToken(UserInfo user, bool sendEmail)
         {
+			Logger.LogError(">>> Entering ResetPasswordToken(user={User},sendEmail={SendEmail})", user, sendEmail);
             var settings = new MembershipPasswordSettings(user.PortalID);
             var expiry = DateTime.Now.AddMinutes(settings.ResetLinkValidity);
+			Logger.LogError("ResetPasswordToken(user={User},sendEmail={SendEmail}): settings → {Settings}", user, sendEmail, settings);
             if (user.PasswordResetExpiration < DateTime.Now)
             {
+				Logger.LogError("ResetPasswordToken(user={User},sendEmail={SendEmail}): expiry → {Expiry}", user, sendEmail, expiry);
                 user.PasswordResetExpiration = expiry;
+				Logger.LogDebug("ResetPasswordToken(user={User},sendEmail={SendEmail}): user.PasswordResetExpiration → {Arg2}", user, sendEmail, user.PasswordResetExpiration);
+				Logger.LogWarning("<<< Exiting ResetPasswordToken(user={User})", user);
                 user.PasswordResetToken = Guid.NewGuid();
                 UpdateUser(user.PortalID, user);
             }
@@ -1297,6 +1464,7 @@ namespace DotNetNuke.Entities.Users
                 return Mail.SendMail(user, MessageType.PasswordReminder, portalSettings) == string.Empty;
             }
 
+			Logger.LogWarning("<<< Exiting ResetPasswordToken(user={User},sendEmail={SendEmail})", user, sendEmail);
             return true;
         }
 
@@ -1306,6 +1474,7 @@ namespace DotNetNuke.Entities.Users
         /// <remarks>This method does not return anything, it updates the reset token and the token expiration directly in the provided <see cref="UserInfo"/> object.</remarks>
         public static void ResetPasswordToken(UserInfo user, int minutesValid)
         {
+			Logger.LogError(">>> Entering ResetPasswordToken(user={User},minutesValid={MinutesValid})", user, minutesValid);
             user.PasswordResetExpiration = DateTime.Now.AddMinutes(minutesValid);
             user.PasswordResetToken = Guid.NewGuid();
             UpdateUser(user.PortalID, user);
@@ -1335,11 +1504,14 @@ namespace DotNetNuke.Entities.Users
         /// </remarks>
         public static bool RestoreUser(IEventLogger eventLogger, IPermissionDefinitionService permissionDefinitionService, ref UserInfo user)
         {
+			Logger.LogError(">>> Entering RestoreUser(user={User})", user);
             int portalId = user.PortalID;
             user.PortalID = GetEffectivePortalId(portalId);
 
             // Restore the User
             var retValue = MembershipProvider.Instance().RestoreUser(user);
+			Logger.LogError("RestoreUser(user={User}): retValue → {RetValue}", user, retValue);
+			Logger.LogError("RestoreUser(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},user={User}): retValue → {RetValue}", eventLogger, permissionDefinitionService, user, retValue);
 
             if (retValue)
             {
@@ -1348,6 +1520,8 @@ namespace DotNetNuke.Entities.Users
 
                 // Obtain PortalSettings from Current Context
                 var portalSettings = PortalController.Instance.GetCurrentSettings();
+				Logger.LogError("RestoreUser(user={User}): portalSettings → {PortalSettings}", user, portalSettings);
+				Logger.LogError("RestoreUser(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},user={User}): portalSettings → {PortalSettings}", eventLogger, permissionDefinitionService, user, portalSettings);
 
                 // Log event
                 eventLogger.AddLog("Username", user.Username, portalSettings, user.UserID, EventLogType.USER_RESTORED);
@@ -1359,6 +1533,7 @@ namespace DotNetNuke.Entities.Users
             // Reset PortalId
             FixMemberPortalId(user, portalId);
             UpdateUser(eventLogger, portalId, GetUserById(portalId, user.UserID));
+			Logger.LogWarning("<<< Exiting RestoreUser(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},user={User})", eventLogger, permissionDefinitionService, user);
             return retValue;
         }
 
@@ -1367,6 +1542,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A string representing the settings key for the given portal.</returns>
         public static string SettingsKey(int portalId)
         {
+			Logger.LogError(">>> Entering SettingsKey(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting SettingsKey(portalId={PortalId})", portalId);
             return "UserSettings|" + portalId;
         }
 
@@ -1385,12 +1562,16 @@ namespace DotNetNuke.Entities.Users
         /// <remarks>A user can be locked in some situations as when the user attempted too many invalid passwords.</remarks>
         public static bool UnLockUser(IEventLogger eventLogger, UserInfo user)
         {
+			Logger.LogError(">>> Entering UnLockUser(user={User})", user);
             int portalId = user.PortalID;
             user.PortalID = GetEffectivePortalId(portalId);
 
             var retValue = MembershipProvider.Instance().UnLockUser(user);
+			Logger.LogError("UnLockUser(user={User}): retValue → {RetValue}", user, retValue);
+			Logger.LogError("UnLockUser(eventLogger={EventLogger},user={User}): retValue → {RetValue}", eventLogger, user, retValue);
             DataCache.ClearUserCache(portalId, user.Username);
             UpdateUser(eventLogger, portalId, GetUserById(portalId, user.UserID));
+			Logger.LogWarning("<<< Exiting UnLockUser(eventLogger={EventLogger},user={User})", eventLogger, user);
             return retValue;
         }
 
@@ -1441,7 +1622,14 @@ namespace DotNetNuke.Entities.Users
         /// <param name="sendNotification">Whether to send notification to the user about the update (i.e. a notification if the user was approved).</param>
         public static void UpdateUser(IEventLogger eventLogger, int portalId, UserInfo user, bool loggedAction, bool sendNotification)
         {
+			Logger.LogError(">>> Entering UpdateUser(portalId={PortalId},user={User})", portalId, user);
+            Logger.LogError(">>> Entering UpdateUser(eventLogger={EventLogger},portalId={PortalId},user={User},loggedAction={LoggedAction})", eventLogger, portalId, user, loggedAction);
+            Logger.LogError(">>> Entering UpdateUser(portalId={PortalId},user={User},loggedAction={LoggedAction},sendNotification={SendNotification})", portalId, user, loggedAction, sendNotification);
+            Logger.LogError(">>> Entering UpdateUser(eventLogger={EventLogger},portalId={PortalId},user={User},loggedAction={LoggedAction},sendNotification={SendNotification})", eventLogger, portalId, user, loggedAction, sendNotification);
             UpdateUser(eventLogger, portalId, user, loggedAction, sendNotification, true);
+			Logger.LogError(">>> Entering UpdateUser(portalId={PortalId},user={User},loggedAction={LoggedAction})", portalId, user, loggedAction);
+        Logger.LogError(">>> Entering UpdateUser(eventLogger={EventLogger},portalId={PortalId},user={User})", eventLogger, portalId, user);
+			Logger.LogWarning("<<< Exiting UpdateUser(eventLogger={EventLogger},portalId={PortalId},user={User},loggedAction={LoggedAction},sendNotification={SendNotification},clearCache={ClearCache})", eventLogger, portalId, user, loggedAction, sendNotification, clearCache);
         }
 
         /// <summary>Validates a User's credentials against the Data Store, and sets the Forms Authentication Ticket.</summary>
@@ -1458,12 +1646,15 @@ namespace DotNetNuke.Entities.Users
         /// <returns>The <see cref="UserInfo"/> object representing a successful login.</returns>
         public static UserInfo UserLogin(int portalId, string username, string password, string verificationCode, string portalName, string ip, ref UserLoginStatus loginStatus, bool createPersistentCookie)
         {
+			Logger.LogError(">>> Entering UserLogin(portalId={PortalId},username={Username},password=<redacted>,verificationCode={VerificationCode},portalName={PortalName},ip={Ip},loginStatus={LoginStatus},createPersistentCookie=<redacted>)", portalId, username, verificationCode, portalName, ip, loginStatus);
             portalId = GetEffectivePortalId(portalId);
 
+			Logger.LogError("UserLogin(portalId={PortalId},username={Username},password=<redacted>,verificationCode={VerificationCode},portalName={PortalName},ip={Ip},loginStatus={LoginStatus},createPersistentCookie=<redacted>): portalId → {PortalId1}", portalId, username, verificationCode, portalName, ip, loginStatus, portalId);
             loginStatus = UserLoginStatus.LOGIN_FAILURE;
 
             // Validate the user
             var objUser = ValidateUser(portalId, username, password, verificationCode, portalName, ip, ref loginStatus);
+			Logger.LogError("UserLogin(portalId={PortalId},username={Username},password=<redacted>,verificationCode={VerificationCode},portalName={PortalName},ip={Ip},loginStatus={LoginStatus},createPersistentCookie=<redacted>): objUser → {ObjUser}", portalId, username, verificationCode, portalName, ip, loginStatus, objUser);
             if (objUser != null)
             {
                 // Call UserLogin overload
@@ -1475,6 +1666,7 @@ namespace DotNetNuke.Entities.Users
             }
 
             // return the User object
+			Logger.LogWarning("<<< Exiting UserLogin(portalId={PortalId},username={Username},password=<redacted>,verificationCode={VerificationCode},portalName={PortalName},ip={Ip},loginStatus={LoginStatus},createPersistentCookie=<redacted>)", portalId, username, verificationCode, portalName, ip, loginStatus);
             return objUser;
         }
 
@@ -1509,8 +1701,10 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A value indicating whether the password is valid.</returns>
         public static bool ValidatePassword(string password)
         {
+			Logger.LogError(">>> Entering ValidatePassword(password=<redacted>)");
             // Valid Length
             var isValid = password.Length >= MembershipProviderConfig.MinPasswordLength;
+			Logger.LogError("ValidatePassword(password=<redacted>): isValid → {IsValid}", isValid);
 
             // Validate NonAlphaChars
             var rx = Globals.NonAlphanumericCharacters;
@@ -1525,6 +1719,7 @@ namespace DotNetNuke.Entities.Users
                 isValid = Regex.IsMatch(password, MembershipProviderConfig.PasswordStrengthRegularExpression);
             }
 
+			Logger.LogWarning("<<< Exiting ValidatePassword(password=<redacted>)");
             return isValid;
         }
 
@@ -1540,6 +1735,10 @@ namespace DotNetNuke.Entities.Users
         /// <returns>The <see cref="UserInfo"/> object representing a valid user.</returns>
         public static UserInfo ValidateUser(int portalId, string username, string password, string verificationCode, string portalName, string ip, ref UserLoginStatus loginStatus)
         {
+			Logger.LogError(">>> Entering ValidateUser(portalId={PortalId},username={Username},password=<redacted>,verificationCode={VerificationCode},portalName={PortalName},ip={Ip},loginStatus={LoginStatus})", portalId, username, verificationCode, portalName, ip, loginStatus);
+            Logger.LogWarning("<<< Exiting ValidateUser(portalId={PortalId},username={Username},password=<redacted>,verificationCode={VerificationCode},portalName={PortalName},ip={Ip},loginStatus={LoginStatus})", portalId, username, verificationCode, portalName, ip, loginStatus);
+			Logger.LogWarning("<<< Exiting ValidateUser(portalId={PortalId},username={Username},password=<redacted>,authType={AuthType},verificationCode={VerificationCode},portalName={PortalName},ip={Ip},loginStatus={LoginStatus})", portalId, username, authType, verificationCode, portalName, ip, loginStatus);
+			Logger.LogWarning("<<< Exiting ValidateUser(objUser={ObjUser},portalId={PortalId},ignoreExpiring={IgnoreExpiring})", objUser, portalId, ignoreExpiring);
             return ValidateUser(portalId, username, password, "DNN", verificationCode, portalName, ip, ref loginStatus);
         }
 
@@ -1654,13 +1853,20 @@ namespace DotNetNuke.Entities.Users
         /// <exception cref="DotNetNuke.Entities.Users.UserDoesNotExistException">Thrown when the user does not exist.</exception>
         public static void VerifyUser(ICryptographyProvider cryptographyProvider, string verificationCode)
         {
+			Logger.LogError(">>> Entering VerifyUser(verificationCode={VerificationCode})", verificationCode);
             Requires.NotNullOrEmpty("verificationCode", verificationCode);
 
             var decryptString = cryptographyProvider.DecryptParameter(verificationCode, Config.GetDecryptionkey(), cryptographyProvider.EncryptParameterAlgorithmName);
+			Logger.LogError("VerifyUser(verificationCode={VerificationCode}): decryptString → {DecryptString}", verificationCode, decryptString);
+			Logger.LogError("VerifyUser(cryptographyProvider={CryptographyProvider},verificationCode={VerificationCode}): decryptString → {DecryptString}", cryptographyProvider, verificationCode, decryptString);
             var strings = decryptString.Split('-');
 
+			Logger.LogError("VerifyUser(verificationCode={VerificationCode}): strings → {Strings}", verificationCode, strings);
             if (strings.Length != 2)
             {
+				Logger.LogError("VerifyUser(cryptographyProvider={CryptographyProvider},verificationCode={VerificationCode}): strings → {Strings}", cryptographyProvider, verificationCode, strings);
+				Logger.LogError("Throwing InvalidVerificationCodeException from VerifyUser(verificationCode={VerificationCode})", verificationCode);
+			Logger.LogError("Throwing InvalidVerificationCodeException from VerifyUser(cryptographyProvider={CryptographyProvider},verificationCode={VerificationCode})", cryptographyProvider, verificationCode);
                 throw new InvalidVerificationCodeException();
             }
 
@@ -1672,14 +1878,20 @@ namespace DotNetNuke.Entities.Users
             }
 
             var user = int.TryParse(userIdString, out var userId) ? GetUserById(portalId, userId) : GetUserByMembershipUserKey(portalId, userIdString);
+			Logger.LogError("VerifyUser(verificationCode={VerificationCode}): user → {User}", verificationCode, user);
+			Logger.LogError("VerifyUser(cryptographyProvider={CryptographyProvider},verificationCode={VerificationCode}): user → {User}", cryptographyProvider, verificationCode, user);
 
             if (user == null)
             {
+				Logger.LogError("Throwing UserDoesNotExistException from VerifyUser(verificationCode={VerificationCode})", verificationCode);
+				Logger.LogError("Throwing UserDoesNotExistException from VerifyUser(cryptographyProvider={CryptographyProvider},verificationCode={VerificationCode})", cryptographyProvider, verificationCode);
                 throw new UserDoesNotExistException();
             }
 
             if (user.Membership.Approved)
             {
+				Logger.LogError("Throwing UserAlreadyVerifiedException from VerifyUser(verificationCode={VerificationCode})", verificationCode);
+				Logger.LogError("Throwing UserAlreadyVerifiedException from VerifyUser(cryptographyProvider={CryptographyProvider},verificationCode={VerificationCode})", cryptographyProvider, verificationCode);
                 throw new UserAlreadyVerifiedException();
             }
 
@@ -1692,6 +1904,7 @@ namespace DotNetNuke.Entities.Users
             user.Membership.Approved = true;
             UpdateUser(portalId, user);
             ApproveUser(user);
+			Logger.LogWarning("<<< Exiting VerifyUser(cryptographyProvider={CryptographyProvider},verificationCode={VerificationCode})", cryptographyProvider, verificationCode);
         }
 
         /// <summary>Returns an absolute URL for the user profile image while removing that of the deleted and super users.</summary>
@@ -1711,18 +1924,23 @@ namespace DotNetNuke.Entities.Users
         {
             var userId = user != null && user.UserID > 0 && !user.IsDeleted && (showSuperUsers || !user.IsSuperUser) ? user.UserID : 0;
             var relativePath = Instance.GetUserProfilePictureUrl(portalId, userId, width, height);
+			Logger.LogWarning("<<< Exiting GetProfileAvatarAbsoluteUrl(portalId={PortalId},user={User},width={Width},height={Height},showSuperUsers={ShowSuperUsers})", portalId, user, width, height, showSuperUsers);
             return GetAbsoluteUrl(portalId, relativePath);
         }
 
         /// <inheritdoc />
         public UserInfo GetUser(int portalId, int userId)
         {
+			Logger.LogError(">>> Entering GetUser(portalId={PortalId},userId={UserId})", portalId, userId);
+            Logger.LogWarning("<<< Exiting GetUser(portalId={PortalId},userId={UserId})", portalId, userId);
             return GetUserById(portalId, userId);
         }
 
         /// <inheritdoc />
         public UserInfo GetUserByDisplayname(int portalId, string displayName)
         {
+			Logger.LogError(">>> Entering GetUserByDisplayname(portalId={PortalId},displayName={DisplayName})", portalId, displayName);
+            Logger.LogWarning("<<< Exiting GetUserByDisplayname(portalId={PortalId},displayName={DisplayName})", portalId, displayName);
             return MembershipProvider.Instance().GetUserByDisplayName(PortalController.GetEffectivePortalId(portalId), displayName);
         }
 
@@ -1741,6 +1959,7 @@ namespace DotNetNuke.Entities.Users
             string propertyNames,
             string propertyValues)
         {
+				Logger.LogWarning("<<< Exiting GetUsersAdvancedSearch(portalId={PortalId},userId={UserId},filterUserId={FilterUserId},filterRoleId={FilterRoleId},relationTypeId={RelationTypeId},isAdmin={IsAdmin},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending},propertyNames={PropertyNames},propertyValues={PropertyValues})", portalId, userId, filterUserId, filterRoleId, relationTypeId, isAdmin, pageIndex, pageSize, sortColumn, sortAscending, propertyNames, propertyValues);
             return MembershipProvider.Instance().GetUsersAdvancedSearch(
                 PortalController.GetEffectivePortalId(portalId),
                 userId,
@@ -1779,28 +1998,37 @@ namespace DotNetNuke.Entities.Users
         /// <inheritdoc />
         public string GetUserProfilePictureUrl(int userId, int width, int height)
         {
+			Logger.LogError(">>> Entering GetUserProfilePictureUrl(userId={UserId},width={Width},height={Height})", userId, width, height);
             var url = $"/DnnImageHandler.ashx?mode=profilepic&userId={userId}&h={width}&w={height}";
 
+			Logger.LogError("GetUserProfilePictureUrl(userId={UserId},width={Width},height={Height}): url → {Url}", userId, width, height, url);
             var childPortalAlias = GetChildPortalAlias();
+			Logger.LogError("GetUserProfilePictureUrl(userId={UserId},width={Width},height={Height}): childPortalAlias → {ChildPortalAlias}", userId, width, height, childPortalAlias);
             var cdv = GetProfilePictureCdv(userId);
+			Logger.LogError("GetUserProfilePictureUrl(userId={UserId},width={Width},height={Height}): cdv → {Cdv}", userId, width, height, cdv);
 
+			Logger.LogWarning("<<< Exiting GetUserProfilePictureUrl(userId={UserId},width={Width},height={Height})", userId, width, height);
             return childPortalAlias.StartsWith(Globals.ApplicationPath, StringComparison.OrdinalIgnoreCase)
                 ? childPortalAlias + url + cdv
+			Logger.LogWarning("<<< Exiting GetUserProfilePictureUrl(portalId={PortalId},userId={UserId},width={Width},height={Height})", portalId, userId, width, height);
                 : Globals.ApplicationPath + childPortalAlias + url + cdv;
         }
 
         /// <inheritdoc />
         public bool IsValidUserName(string userName)
         {
+			Logger.LogError(">>> Entering IsValidUserName(userName={UserName})", userName);
             char[] unallowedAscii = HostController.Instance.GetString("UsernameUnallowedCharacters", Globals.USERNAME_UNALLOWED_ASCII).ToCharArray();
 
             // if the httpcontext is null, then use the default minimum length
             var usernameMinLength = Globals.glbUserNameMinLength;
+			Logger.LogError("IsValidUserName(userName={UserName}): usernameMinLength → {UsernameMinLength}", userName, usernameMinLength);
             if (HttpContext.Current != null)
             {
                 usernameMinLength = PortalController.GetPortalSettingAsInteger("Security_UserNameMinLength", this.PortalId, usernameMinLength);
             }
 
+			Logger.LogWarning("<<< Exiting IsValidUserName(userName={UserName})", userName);
             return userName.Length >= usernameMinLength &&
                         userName == userName.Trim() &&
                         userName.All(ch => ch >= ' ') &&
@@ -1823,14 +2051,18 @@ namespace DotNetNuke.Entities.Users
         /// <summary>Update all the users display names.</summary>
         public void UpdateDisplayNames()
         {
+			Logger.LogError(">>> Entering UpdateDisplayNames()");
             int portalId = GetEffectivePortalId(this.PortalId);
 
+			Logger.LogError("UpdateDisplayNames(): portalId → {PortalId}", portalId);
             var arrUsers = GetUsers(this.PortalId);
+			Logger.LogError("UpdateDisplayNames(): arrUsers → {ArrUsers}", arrUsers);
             foreach (UserInfo objUser in arrUsers)
             {
                 objUser.UpdateDisplayName(this.DisplayFormat);
                 UpdateUser(portalId, objUser);
             }
+			Logger.LogWarning("<<< Exiting UpdateDisplayNames()");
         }
 
         /// <inheritdoc />
@@ -2078,10 +2310,12 @@ namespace DotNetNuke.Entities.Users
             var originalPortalId = user.PortalID;
             portalId = GetEffectivePortalId(portalId);
             user.PortalID = portalId;
+			Logger.LogDebug("UpdateUser(eventLogger={EventLogger},portalId={PortalId},user={User},loggedAction={LoggedAction},sendNotification={SendNotification},clearCache={ClearCache}): user.PortalID → {Arg6}", eventLogger, portalId, user, loggedAction, sendNotification, clearCache, user.PortalID);
 
             // clear the cache so that can get original info from database.
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.UserProfileCacheKey, portalId, user.Username));
             var oldUser = MembershipProvider.Instance().GetUser(user.PortalID, user.UserID);
+			Logger.LogError("UpdateUser(eventLogger={EventLogger},portalId={PortalId},user={User},loggedAction={LoggedAction},sendNotification={SendNotification},clearCache={ClearCache}): oldUser → {OldUser}", eventLogger, portalId, user, loggedAction, sendNotification, clearCache, oldUser);
             var oldProfile = oldUser.Profile; // access the profile property to reload data from database.
 
             // Update the User
@@ -2090,6 +2324,7 @@ namespace DotNetNuke.Entities.Users
             {
                 // if the HttpContext is null, then get portal settings by portal id.
                 IPortalSettings portalSettings = null;
+				Logger.LogError("UpdateUser(eventLogger={EventLogger},portalId={PortalId},user={User},loggedAction={LoggedAction},sendNotification={SendNotification},clearCache={ClearCache}): portalSettings → {PortalSettings}", eventLogger, portalId, user, loggedAction, sendNotification, clearCache, portalSettings);
                 if (HttpContext.Current != null)
                 {
                     portalSettings = PortalController.Instance.GetCurrentSettings();
@@ -2126,24 +2361,30 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A new instance of the <see cref="UserController"/> class.</returns>
         protected override Func<IUserController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new UserController();
         }
 
         private static void ClearPortalAndUserCache(UserInfo user, int portalId)
         {
+			Logger.LogError(">>> Entering ClearPortalAndUserCache(user={User},portalId={PortalId})", user, portalId);
             DeleteUserFolder(user, portalId);
             DataCache.ClearPortalCache(portalId, false);
             DataCache.ClearUserCache(portalId, user.Username);
+			Logger.LogWarning("<<< Exiting ClearPortalAndUserCache(user={User},portalId={PortalId})", user, portalId);
         }
 
         private static void AddEventLog(int portalId, string username, int userId, string portalName, string ip, UserLoginStatus loginStatus)
         {
+			Logger.LogError(">>> Entering AddEventLog(portalId={PortalId},username={Username},userId={UserId},portalName={PortalName},ip={Ip},loginStatus={LoginStatus})", portalId, username, userId, portalName, ip, loginStatus);
             // initialize log record
             var objSecurity = PortalSecurity.Instance;
             var log = new LogInfo
             {
                 LogTypeKey = loginStatus.ToString(),
                 LogPortalID = portalId,
+			Logger.LogWarning("<<< Exiting AddEventLog(portalId={PortalId},username={Username},userId={UserId},portalName={PortalName},ip={Ip},loginStatus={LoginStatus})", portalId, username, userId, portalName, ip, loginStatus);
                 LogPortalName = portalName,
     #pragma warning disable CS0618 // Type or member is obsolete
                 LogUserName = objSecurity.InputFilter(username, PortalSecurity.FilterFlag.NoScripting | PortalSecurity.FilterFlag.NoAngleBrackets | PortalSecurity.FilterFlag.NoMarkup),
@@ -2158,6 +2399,7 @@ namespace DotNetNuke.Entities.Users
 
         private static void AutoAssignUsersToPortalRoles(UserInfo user, int portalId)
         {
+			Logger.LogError(">>> Entering AutoAssignUsersToPortalRoles(user={User},portalId={PortalId})", user, portalId);
             foreach (var role in RoleController.Instance.GetRoles(portalId, role => role.AutoAssignment && role.Status == RoleStatus.Approved))
             {
                 RoleController.Instance.AddUserRole(portalId, user.UserID, role.RoleID, RoleStatus.Approved, false, Null.NullDate, Null.NullDate);
@@ -2165,12 +2407,15 @@ namespace DotNetNuke.Entities.Users
 
             // Clear the roles cache - so the usercount is correct
             RoleController.Instance.ClearRoleCache(portalId);
+			Logger.LogWarning("<<< Exiting AutoAssignUsersToPortalRoles(user={User},portalId={PortalId})", user, portalId);
         }
 
         private static void AutoAssignUsersToRoles(UserInfo user, int portalId)
         {
+			Logger.LogError(">>> Entering AutoAssignUsersToRoles(user={User},portalId={PortalId})", user, portalId);
             var thisPortal = PortalController.Instance.GetPortal(portalId);
 
+			Logger.LogError("AutoAssignUsersToRoles(user={User},portalId={PortalId}): thisPortal → {ThisPortal}", user, portalId, thisPortal);
             if (IsMemberOfPortalGroup(portalId))
             {
                 foreach (var portal in PortalGroupController.Instance.GetPortalsByGroup(thisPortal.PortalGroupID))
@@ -2178,6 +2423,7 @@ namespace DotNetNuke.Entities.Users
                     if (!user.Membership.Approved && portal.UserRegistration == (int)Globals.PortalRegistrationType.VerifiedRegistration)
                     {
                         var role = RoleController.Instance.GetRole(portal.PortalID, r => r.RoleName == "Unverified Users");
+						Logger.LogError("AutoAssignUsersToRoles(user={User},portalId={PortalId}): role → {Role}", user, portalId, role);
                         RoleController.Instance.AddUserRole(portal.PortalID, user.UserID, role.RoleID, RoleStatus.Approved, false, Null.NullDate, Null.NullDate);
                     }
                     else
@@ -2198,11 +2444,13 @@ namespace DotNetNuke.Entities.Users
                     AutoAssignUsersToPortalRoles(user, portalId);
                 }
             }
+			Logger.LogWarning("<<< Exiting AutoAssignUsersToRoles(user={User},portalId={PortalId})", user, portalId);
         }
 
         // TODO - Handle Portal Groups
         private static void DeleteUserPermissions(UserInfo user)
         {
+			Logger.LogError(">>> Entering DeleteUserPermissions(user={User})", user);
             FolderPermissionController.DeleteFolderPermissionsByUser(user);
 
             // Delete Module Permissions
@@ -2210,14 +2458,18 @@ namespace DotNetNuke.Entities.Users
 
             // Delete Tab Permissions
             TabPermissionController.DeleteTabPermissionsByUser(user);
+			Logger.LogWarning("<<< Exiting DeleteUserPermissions(user={User})", user);
         }
 
         private static void RestoreUserPermissions(IPermissionDefinitionService permissionDefinitionService, UserInfo user)
         {
+			Logger.LogError(">>> Entering RestoreUserPermissions(permissionDefinitionService={PermissionDefinitionService},user={User})", permissionDefinitionService, user);
             // restore user's folder permission
             var userFolderPath = PathUtils.GetUserFolderPathInternal(user);
+			Logger.LogError("RestoreUserPermissions(permissionDefinitionService={PermissionDefinitionService},user={User}): userFolderPath → {UserFolderPath}", permissionDefinitionService, user, userFolderPath);
             var portalId = user.IsSuperUser ? Null.NullInteger : user.PortalID;
             var userFolder = FolderManager.Instance.GetFolder(portalId, userFolderPath);
+			Logger.LogError("RestoreUserPermissions(permissionDefinitionService={PermissionDefinitionService},user={User}): userFolder → {UserFolder}", permissionDefinitionService, user, userFolder);
 
             if (userFolder != null)
             {
@@ -2228,6 +2480,7 @@ namespace DotNetNuke.Entities.Users
                             || permission.PermissionKey.Equals("BROWSE", StringComparison.OrdinalIgnoreCase))
                     {
                         var folderPermission = new FolderPermissionInfo(permission) { AllowAccess = true, };
+						Logger.LogError("RestoreUserPermissions(permissionDefinitionService={PermissionDefinitionService},user={User}): folderPermission → {FolderPermission}", permissionDefinitionService, user, folderPermission);
                         ((IPermissionInfo)folderPermission).RoleId = int.Parse(Globals.glbRoleNothing, CultureInfo.InvariantCulture);
                         ((IPermissionInfo)folderPermission).UserId = user.UserID;
                         ((IFolderPermissionInfo)folderPermission).FolderId = userFolder.FolderID;
@@ -2238,18 +2491,23 @@ namespace DotNetNuke.Entities.Users
 
                 FolderPermissionController.SaveFolderPermissions((FolderInfo)userFolder);
             }
+			Logger.LogWarning("<<< Exiting RestoreUserPermissions(permissionDefinitionService={PermissionDefinitionService},user={User})", permissionDefinitionService, user);
         }
 
         private static void FixMemberPortalId(UserInfo user, int portalId)
         {
+			Logger.LogError(">>> Entering FixMemberPortalId(user={User},portalId={PortalId})", user, portalId);
             if (user != null)
             {
                 user.PortalID = portalId;
+				Logger.LogDebug("FixMemberPortalId(user={User},portalId={PortalId}): user.PortalID → {Arg2}", user, portalId, user.PortalID);
             }
+			Logger.LogWarning("<<< Exiting FixMemberPortalId(user={User},portalId={PortalId})", user, portalId);
         }
 
         private static UserInfo GetCurrentUserInternal()
         {
+			Logger.LogError(">>> Entering GetCurrentUserInternal()");
             UserInfo user;
             if (HttpContext.Current == null)
             {
@@ -2259,9 +2517,12 @@ namespace DotNetNuke.Entities.Users
                 }
 
                 var portalSettings = PortalController.Instance.GetCurrentSettings();
+				Logger.LogError("GetCurrentUserInternal(): portalSettings → {PortalSettings}", portalSettings);
                 if (portalSettings != null)
                 {
                     user = GetCachedUser(portalSettings.PortalId, Thread.CurrentPrincipal.Identity.Name);
+					Logger.LogError("GetCurrentUserInternal(): user → {User}", user);
+					Logger.LogDebug("GetCurrentUserInternal(): user → {User}", user);
                     return user ?? new UserInfo();
                 }
 
@@ -2269,19 +2530,26 @@ namespace DotNetNuke.Entities.Users
             }
 
             user = (UserInfo)HttpContext.Current.Items["UserInfo"];
+			Logger.LogWarning("<<< Exiting GetCurrentUserInternal()");
             return user ?? new UserInfo();
         }
 
         private static int GetEffectivePortalId(int portalId)
         {
+			Logger.LogError(">>> Entering GetEffectivePortalId(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting GetEffectivePortalId(portalId={PortalId})", portalId);
             return PortalController.GetEffectivePortalId(portalId);
         }
 
         private static object GetUserCountByPortalCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogError(">>> Entering GetUserCountByPortalCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var portalId = (int)cacheItemArgs.ParamList[0];
             var portalUserCount = MembershipProvider.Instance().GetUserCountByPortal(portalId);
+			Logger.LogError("GetUserCountByPortalCallBack(cacheItemArgs={CacheItemArgs}): portalUserCount → {PortalUserCount}", cacheItemArgs, portalUserCount);
+			Logger.LogError("GetUserCountByPortalCallBack(cacheItemArgs={CacheItemArgs}): portalId → {PortalId}", cacheItemArgs, portalId);
             DataCache.SetCache(cacheItemArgs.CacheKey, portalUserCount);
+			Logger.LogWarning("<<< Exiting GetUserCountByPortalCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return portalUserCount;
         }
 
@@ -2298,11 +2566,14 @@ namespace DotNetNuke.Entities.Users
 
         private static bool IsMemberOfPortalGroup(int portalId)
         {
+			Logger.LogError(">>> Entering IsMemberOfPortalGroup(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting IsMemberOfPortalGroup(portalId={PortalId})", portalId);
             return PortalController.IsMemberOfPortalGroup(portalId);
         }
 
         private static void MergeUserProfileProperties(UserInfo userMergeFrom, UserInfo userMergeTo)
         {
+			Logger.LogError(">>> Entering MergeUserProfileProperties(userMergeFrom={UserMergeFrom},userMergeTo={UserMergeTo})", userMergeFrom, userMergeTo);
             foreach (ProfilePropertyDefinition property in userMergeFrom.Profile.ProfileProperties)
             {
                 if (string.IsNullOrEmpty(userMergeTo.Profile.GetPropertyValue(property.PropertyName)))
@@ -2310,36 +2581,46 @@ namespace DotNetNuke.Entities.Users
                     userMergeTo.Profile.SetProfileProperty(property.PropertyName, property.PropertyValue);
                 }
             }
+			Logger.LogWarning("<<< Exiting MergeUserProfileProperties(userMergeFrom={UserMergeFrom},userMergeTo={UserMergeTo})", userMergeFrom, userMergeTo);
         }
 
         private static void MergeUserProperties(UserInfo userMergeFrom, UserInfo userMergeTo)
         {
+			Logger.LogError(">>> Entering MergeUserProperties(userMergeFrom={UserMergeFrom},userMergeTo={UserMergeTo})", userMergeFrom, userMergeTo);
             if (string.IsNullOrEmpty(userMergeTo.DisplayName))
             {
                 userMergeTo.DisplayName = userMergeFrom.DisplayName;
+				Logger.LogDebug("MergeUserProperties(userMergeFrom={UserMergeFrom},userMergeTo={UserMergeTo}): userMergeTo.DisplayName → {Arg2}", userMergeFrom, userMergeTo, userMergeTo.DisplayName);
             }
 
             if (string.IsNullOrEmpty(userMergeTo.Email))
             {
                 userMergeTo.Email = userMergeFrom.Email;
+				Logger.LogDebug("MergeUserProperties(userMergeFrom={UserMergeFrom},userMergeTo={UserMergeTo}): userMergeTo.Email → {Arg2}", userMergeFrom, userMergeTo, userMergeTo.Email);
             }
 
             if (string.IsNullOrEmpty(userMergeTo.FirstName))
             {
                 userMergeTo.FirstName = userMergeFrom.FirstName;
+				Logger.LogDebug("MergeUserProperties(userMergeFrom={UserMergeFrom},userMergeTo={UserMergeTo}): userMergeTo.FirstName → {Arg2}", userMergeFrom, userMergeTo, userMergeTo.FirstName);
             }
 
             if (string.IsNullOrEmpty(userMergeTo.LastName))
             {
                 userMergeTo.LastName = userMergeFrom.LastName;
+				Logger.LogDebug("MergeUserProperties(userMergeFrom={UserMergeFrom},userMergeTo={UserMergeTo}): userMergeTo.LastName → {Arg2}", userMergeFrom, userMergeTo, userMergeTo.LastName);
             }
+			Logger.LogWarning("<<< Exiting MergeUserProperties(userMergeFrom={UserMergeFrom},userMergeTo={UserMergeTo})", userMergeFrom, userMergeTo);
         }
 
         private static void SendDeleteEmailNotifications(UserInfo user, PortalSettings portalSettings)
         {
+			Logger.LogError(">>> Entering SendDeleteEmailNotifications(user={User},portalSettings={PortalSettings})", user, portalSettings);
             var message = new Message();
             message.FromUserID = portalSettings.AdministratorId;
+			Logger.LogDebug("SendDeleteEmailNotifications(user={User},portalSettings={PortalSettings}): message.FromUserID → {Arg2}", user, portalSettings, message.FromUserID);
             message.ToUserID = portalSettings.AdministratorId;
+			Logger.LogDebug("SendDeleteEmailNotifications(user={User},portalSettings={PortalSettings}): message.ToUserID → {Arg2}", user, portalSettings, message.ToUserID);
             message.Subject = Localization.GetSystemMessage(
                 user.Profile.PreferredLocale,
                 portalSettings,
@@ -2349,6 +2630,7 @@ namespace DotNetNuke.Entities.Users
                 null,
                 string.Empty,
                 portalSettings.AdministratorId);
+				Logger.LogError("SendDeleteEmailNotifications(user={User},portalSettings={PortalSettings}): message → {Message}", user, portalSettings, message);
             message.Body = Localization.GetSystemMessage(
                 user.Profile.PreferredLocale,
                 portalSettings,
@@ -2359,41 +2641,54 @@ namespace DotNetNuke.Entities.Users
                 string.Empty,
                 portalSettings.AdministratorId);
             message.Status = MessageStatusType.Unread;
+			Logger.LogDebug("SendDeleteEmailNotifications(user={User},portalSettings={PortalSettings}): message.Status → {Arg2}", user, portalSettings, message.Status);
             Mail.SendEmail(portalSettings.Email, portalSettings.Email, message.Subject, message.Body);
+			Logger.LogWarning("<<< Exiting SendDeleteEmailNotifications(user={User},portalSettings={PortalSettings})", user, portalSettings);
         }
 
         private static string GetChildPortalAlias()
         {
+			Logger.LogError(">>> Entering GetChildPortalAlias()");
             var settings = PortalSettings.Current;
             IPortalAliasInfo alias = settings.PortalAlias;
             var currentAlias = alias.HttpAlias;
             var index = currentAlias.IndexOf('/');
             var childPortalAlias = index > 0 ? "/" + currentAlias.Substring(index + 1) : string.Empty;
+			Logger.LogError("GetChildPortalAlias(): childPortalAlias → {ChildPortalAlias}", childPortalAlias);
+			Logger.LogWarning("<<< Exiting GetChildPortalAlias()");
             return childPortalAlias;
         }
 
         private static string GetProfilePictureCdv(int userId)
         {
+			Logger.LogError(">>> Entering GetProfilePictureCdv(userId={UserId})", userId);
             var settings = PortalController.Instance.GetCurrentSettings();
             var userInfo = GetUserById(settings.PortalId, userId);
+			Logger.LogError("GetProfilePictureCdv(userId={UserId}): settings → {Settings}", userId, settings);
             if (userInfo?.Profile == null)
             {
+				Logger.LogError("GetProfilePictureCdv(userId={UserId}): userInfo → {UserInfo}", userId, userInfo);
                 return string.Empty;
             }
 
             var cdv = string.Empty;
+			Logger.LogError("GetProfilePictureCdv(userId={UserId}): cdv → {Cdv}", userId, cdv);
             var photoProperty = userInfo.Profile.GetProperty("Photo");
+			Logger.LogError("GetProfilePictureCdv(userId={UserId}): photoProperty → {PhotoProperty}", userId, photoProperty);
 
             int photoFileId;
             if (int.TryParse(photoProperty?.PropertyValue, out photoFileId))
             {
                 var photoFile = FileManager.Instance.GetFile(photoFileId);
+				Logger.LogError("GetProfilePictureCdv(userId={UserId}): photoFile → {PhotoFile}", userId, photoFile);
                 if (photoFile != null)
                 {
                     cdv = "&cdv=" + photoFile.LastModifiedOnDate.Ticks;
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetProfilePictureCdv(userId={UserId})", userId);
+			Logger.LogWarning("<<< Exiting GetProfilePictureCdv(portalId={PortalId},userId={UserId})", portalId, userId);
             return cdv;
         }
 
@@ -2427,19 +2722,24 @@ namespace DotNetNuke.Entities.Users
         /// <param name="portalId">The portal id that contains the user folder to delete.</param>
         private static void DeleteUserFolder(UserInfo user, int portalId)
         {
+			Logger.LogError(">>> Entering DeleteUserFolder(user={User},portalId={PortalId})", user, portalId);
             var userFolderPath = PathUtils.GetUserFolderPathInternal(user);
             var folderPortalId = user.IsSuperUser ? Null.NullInteger : portalId;
+			Logger.LogError("DeleteUserFolder(user={User},portalId={PortalId}): userFolderPath → {UserFolderPath}", user, portalId, userFolderPath);
             var userFolder = FolderManager.Instance.GetFolder(folderPortalId, userFolderPath);
+			Logger.LogError("DeleteUserFolder(user={User},portalId={PortalId}): userFolder → {UserFolder}", user, portalId, userFolder);
             if (userFolder != null)
             {
                 FolderManager.Instance.Synchronize(folderPortalId, userFolderPath, true, true);
                 var notDeletedSubfolders = new List<IFolderInfo>();
+				Logger.LogError("DeleteUserFolder(user={User},portalId={PortalId}): notDeletedSubfolders → {NotDeletedSubfolders}", user, portalId, notDeletedSubfolders);
                 FolderManager.Instance.DeleteFolder(userFolder, notDeletedSubfolders);
 
                 if (notDeletedSubfolders.Count == 0)
                 {
                     // try to remove the parent folder if there is no other users use this folder.
                     var parentFolder = FolderManager.Instance.GetFolder(userFolder.ParentID);
+					Logger.LogError("DeleteUserFolder(user={User},portalId={PortalId}): parentFolder → {ParentFolder}", user, portalId, parentFolder);
                     FolderManager.Instance.Synchronize(folderPortalId, parentFolder.FolderPath, true, true);
                     if (parentFolder != null && !FolderManager.Instance.GetFolders(parentFolder).Any())
                     {
@@ -2449,6 +2749,7 @@ namespace DotNetNuke.Entities.Users
                         {
                             // try to remove the root folder if there is no other users use this folder.
                             var rootFolder = FolderManager.Instance.GetFolder(parentFolder.ParentID);
+							Logger.LogError("DeleteUserFolder(user={User},portalId={PortalId}): rootFolder → {RootFolder}", user, portalId, rootFolder);
                             FolderManager.Instance.Synchronize(folderPortalId, rootFolder.FolderPath, true, true);
                             if (rootFolder != null && !FolderManager.Instance.GetFolders(rootFolder).Any())
                             {
@@ -2458,6 +2759,7 @@ namespace DotNetNuke.Entities.Users
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting DeleteUserFolder(user={User},portalId={PortalId})", user, portalId);
         }
 
         /// <summary>Returns an absolute url given a relative url.</summary>
@@ -2466,19 +2768,25 @@ namespace DotNetNuke.Entities.Users
         /// <returns>absolute url.</returns>
         private static string GetAbsoluteUrl(int portalId, string relativeUrl)
         {
+			Logger.LogError(">>> Entering GetAbsoluteUrl(portalId={PortalId},relativeUrl={RelativeUrl})", portalId, relativeUrl);
             if (relativeUrl.Contains("://"))
             {
                 return relativeUrl;
             }
 
             var portalAlias = PortalAliasController.Instance.GetPortalAliasesByPortalId(portalId).First(p => p.IsPrimary);
+			Logger.LogError("GetAbsoluteUrl(portalId={PortalId},relativeUrl={RelativeUrl}): portalAlias → {PortalAlias}", portalId, relativeUrl, portalAlias);
             var domainName = GetDomainName(portalAlias);
+			Logger.LogError("GetAbsoluteUrl(portalId={PortalId},relativeUrl={RelativeUrl}): domainName → {DomainName}", portalId, relativeUrl, domainName);
+			Logger.LogWarning("<<< Exiting GetAbsoluteUrl(portalId={PortalId},relativeUrl={RelativeUrl})", portalId, relativeUrl);
             return Globals.AddHTTP(domainName + relativeUrl);
         }
 
         private static string GetDomainName(PortalAliasInfo portalAlias)
         {
+			Logger.LogError(">>> Entering GetDomainName(portalAlias={PortalAlias})", portalAlias);
             var httpAlias = portalAlias.HTTPAlias;
+			Logger.LogWarning("<<< Exiting GetDomainName(portalAlias={PortalAlias})", portalAlias);
             return httpAlias.IndexOf("/", StringComparison.InvariantCulture) != -1 ?
                 httpAlias.Substring(0, httpAlias.IndexOf("/", StringComparison.InvariantCulture)) :
                 httpAlias;
@@ -2486,9 +2794,13 @@ namespace DotNetNuke.Entities.Users
 
         private static UserInfo GetUserByMembershipUserKey(int portalId, string membershipUserKey)
         {
+			Logger.LogError(">>> Entering GetUserByMembershipUserKey(portalId={PortalId},membershipUserKey={MembershipUserKey})", portalId, membershipUserKey);
             var masterPortalId = GetEffectivePortalId(portalId);
             var user = MembershipProvider.Instance().GetUserByProviderUserKey(masterPortalId, membershipUserKey);
+			Logger.LogError("GetUserByMembershipUserKey(portalId={PortalId},membershipUserKey={MembershipUserKey}): user → {User}", portalId, membershipUserKey, user);
+			Logger.LogError("GetUserByMembershipUserKey(portalId={PortalId},membershipUserKey={MembershipUserKey}): masterPortalId → {MasterPortalId}", portalId, membershipUserKey, masterPortalId);
             FixMemberPortalId(user, portalId);
+			Logger.LogWarning("<<< Exiting GetUserByMembershipUserKey(portalId={PortalId},membershipUserKey={MembershipUserKey})", portalId, membershipUserKey);
             return user;
         }
     }

@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 /// <reference name="MicrosoftAjax.js" />
 /// <reference name="dnn.js" assembly="DotNetNuke.WebUtility" />
 
@@ -23,6 +24,7 @@ dnn.scripts.ScriptBatchRequest.prototype =
 {
 	load: function()
 	{
+		logger.error('>>> Entering load()', { "event.action": "load" });
 		var ary = [];
 		for (var i=0; i<this.ref.length; i++)
 		{
@@ -39,15 +41,18 @@ dnn.scripts.ScriptBatchRequest.prototype =
 	
 	asyncLoaded: function(sr)
 	{
+		logger.error(`>>> Entering asyncLoaded(sr=${sr})`, { "event.action": "asyncLoaded", "logrite.sr": sr });
 		if (sr.status == 'complete')	//if loaded add it
 			this.numComplete +=1;
 		
 		if (this.numComplete == this.numToComplete)	//if all loaded
 			this.asyncComplete();
+			logger.warn(`<<< Exiting asyncLoaded(sr=${sr})`, { "event.action": "asyncLoaded", "logrite.sr": sr });
 	},
 	
 	asyncComplete: function()
 	{
+		logger.error('>>> Entering asyncComplete()', { "event.action": "asyncComplete" });
 		for (var i=0; i<this.inline.length; i++)	//load inline scripts (these are sync)
 			dnn.dom.loadScript(null, this.inline[i]);
 		
@@ -55,11 +60,13 @@ dnn.scripts.ScriptBatchRequest.prototype =
 			this.callBack(this);
 		
 		this.disposeRequests();
+		logger.warn('<<< Exiting asyncComplete()', { "event.action": "asyncComplete" });
 	},
 	
 	
 	disposeRequests: function()
 	{
+		logger.error('>>> Entering disposeRequests()', { "event.action": "disposeRequests" });
 		for (var i=0; i<this.requests.length; i++)
 			this.requests[i].dispose();	
 	}

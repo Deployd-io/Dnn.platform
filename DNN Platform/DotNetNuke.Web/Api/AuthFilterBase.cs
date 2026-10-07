@@ -16,6 +16,7 @@ namespace DotNetNuke.Web.Api
     /// <summary>A base class for implementing a Web API authorization filter.</summary>
     public abstract class AuthFilterBase : IAuthorizationFilter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AuthFilterBase));
         /// <summary>Gets a value indicating whether more than one instance of the indicated attribute can be specified for a single program element.</summary>
         public abstract bool AllowMultiple { get; }
 
@@ -55,14 +56,17 @@ namespace DotNetNuke.Web.Api
         /// <param name="actionContext">The action context.</param>
         protected virtual void OnAuthorization(HttpActionContext actionContext)
         {
+			Logger.LogError(">>> Entering OnAuthorization(actionContext={ActionContext})", actionContext);
             Requires.NotNull("actionContext", actionContext);
 
             const string failureMessage = "Authorization has been denied for this request.";
             var authFilterContext = new AuthFilterContext(actionContext, failureMessage);
+			Logger.LogError("OnAuthorization(actionContext={ActionContext}): authFilterContext → {AuthFilterContext}", actionContext, authFilterContext);
             if (!this.IsAuthorized(authFilterContext))
             {
                 authFilterContext.HandleUnauthorizedRequest();
             }
+			Logger.LogWarning("<<< Exiting OnAuthorization(actionContext={ActionContext})", actionContext);
         }
     }
 }

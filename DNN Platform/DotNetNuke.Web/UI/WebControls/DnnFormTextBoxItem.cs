@@ -18,6 +18,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A text box control.</summary>
     public class DnnFormTextBoxItem : DnnFormItemBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFormTextBoxItem));
         private TextBox textBox;
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormTextBoxItem"/> class.</summary>
@@ -25,6 +26,8 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnFormTextBoxItem()
             : this(null, null)
         {
+		Logger.LogError(">>> Entering DnnFormTextBoxItem()");
+        Logger.LogWarning("<<< Exiting DnnFormTextBoxItem()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormTextBoxItem"/> class.</summary>
@@ -70,8 +73,11 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override WebControl CreateControlInternal(Control container)
         {
+			Logger.LogError(">>> Entering CreateControlInternal(container={Container})", container);
             this.textBox = new TextBox { ID = this.ID + "_TextBox" };
 
+			Logger.LogDebug("CreateControlInternal(container={Container}): this.textBox → {Arg1}", container, this.textBox);
+			Logger.LogDebug("CreateControlInternal(container={Container}): textBox → {TextBox}", container, textBox);
             this.textBox.Rows = this.Rows;
             this.textBox.Columns = this.Columns;
             this.textBox.TextMode = this.TextMode;
@@ -94,23 +100,28 @@ namespace DotNetNuke.Web.UI.WebControls
 
             container.Controls.Add(this.textBox);
 
+			Logger.LogWarning("<<< Exiting CreateControlInternal(container={Container})", container);
             return this.textBox;
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (this.TextMode == TextBoxMode.Password && !this.ClearContentInPasswordMode)
             {
                 this.textBox.Attributes.Add("value", Convert.ToString(this.Value, CultureInfo.InvariantCulture));
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private void TextChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering TextChanged(sender={Sender},e={E})", sender, e);
             this.UpdateDataSource(this.Value, this.textBox.Text, this.DataField);
+			Logger.LogWarning("<<< Exiting TextChanged(sender={Sender},e={E})", sender, e);
         }
     }
 }

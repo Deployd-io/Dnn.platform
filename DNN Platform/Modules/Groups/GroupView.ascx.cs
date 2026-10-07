@@ -25,7 +25,9 @@ namespace DotNetNuke.Modules.Groups
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+			eventLogger.LogError(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
             RoleInfo role = RoleController.Instance.GetRole(this.PortalId, r => r.SecurityMode != SecurityMode.SecurityRole && r.RoleID == this.GroupId);
+			eventLogger.LogError("Page_Load(sender={Sender},e={E}): role → {Role}", sender, e, role);
             if (role == null && this.GroupId > 0)
             {
                 UI.Skins.Skin.AddModuleMessage(this, Localization.GetString("GroupIdNotFound", Constants.SharedResourcesPath), ModuleMessage.ModuleMessageType.YellowWarning);
@@ -35,6 +37,7 @@ namespace DotNetNuke.Modules.Groups
             {
                 role = new RoleInfo();
                 role.RoleID = -1;
+				eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): role.RoleID → {Arg2}", sender, e, role.RoleID);
                 role.RoleName = Localization.GetString("Sample_RoleName", this.LocalResourceFile);
                 role.Description = Localization.GetString("Sample_RoleDescription", this.LocalResourceFile);
             }
@@ -48,6 +51,7 @@ namespace DotNetNuke.Modules.Groups
                 var resxPath = Constants.SharedResourcesPath;
 
                 var template = this.GroupViewTemplate;
+				eventLogger.LogError("Page_Load(sender={Sender},e={E}): template → {Template}", sender, e, template);
                 template = template.Replace("{resx:posts}", Localization.GetString("posts", resxPath));
                 template = template.Replace("{resx:members}", Localization.GetString("members", resxPath));
                 template = template.Replace("{resx:photos}", Localization.GetString("photos", resxPath));
@@ -61,10 +65,12 @@ namespace DotNetNuke.Modules.Groups
                 template = template.Replace("[GroupViewTabId]", this.GroupViewTabId.ToString());
 
                 var groupParser = new GroupViewParser(this.PortalSettings, role, this.UserInfo, template, this.TabId);
+				eventLogger.LogError("Page_Load(sender={Sender},e={E}): groupParser → {GroupParser}", sender, e, groupParser);
                 groupParser.GroupEditUrl = this.GetEditUrl();
 
                 this.litOutput.Text = groupParser.ParseView();
             }
+			eventLogger.LogWarning("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
         }
     }
 }

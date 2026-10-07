@@ -12,6 +12,7 @@ namespace Dnn.PersonaBar.Library
     /// <summary>Extends the HttpRequestMessage collection.</summary>
     public static class HttpRequestMessageExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HttpRequestMessageExtensions));
         /// <summary>
         /// Returns a dictionary of QueryStrings that's easier to work with
         /// than GetQueryNameValuePairs KevValuePairs collection.
@@ -32,19 +33,23 @@ namespace Dnn.PersonaBar.Library
         /// <returns>The query string value or <see langword="null"/>.</returns>
         public static string GetQueryString(this HttpRequestMessage request, string key)
         {
+			Logger.LogError(">>> Entering GetQueryString(request={Request},key={Key})", request, key);
             ////IEnumerable<KeyValuePair<string,string>> - right!
             var queryStrings = request.GetQueryNameValuePairs();
+			Logger.LogError("GetQueryString(request={Request},key={Key}): queryStrings → {QueryStrings}", request, key, queryStrings);
             if (queryStrings == null)
             {
                 return null;
             }
 
             var match = queryStrings.FirstOrDefault(kv => string.Equals(kv.Key, key, StringComparison.OrdinalIgnoreCase));
+			Logger.LogError("GetQueryString(request={Request},key={Key}): match → {Match}", request, key, match);
             if (string.IsNullOrEmpty(match.Value))
             {
                 return null;
             }
 
+			Logger.LogWarning("<<< Exiting GetQueryString(request={Request},key={Key})", request, key);
             return match.Value;
         }
 
@@ -54,14 +59,17 @@ namespace Dnn.PersonaBar.Library
         /// <returns>The query string value or <c>-1</c>.</returns>
         public static int GetQueryStringAsInteger(this HttpRequestMessage request, string key)
         {
+			Logger.LogError(">>> Entering GetQueryStringAsInteger(request={Request},key={Key})", request, key);
             ////IEnumerable<KeyValuePair<string,string>> - right!
             var value = request.GetQueryString(key);
+			Logger.LogError("GetQueryStringAsInteger(request={Request},key={Key}): value → {Value}", request, key, value);
             int intValue;
             if (!string.IsNullOrEmpty(value) && int.TryParse(value, out intValue))
             {
                 return intValue;
             }
 
+			Logger.LogWarning("<<< Exiting GetQueryStringAsInteger(request={Request},key={Key})", request, key);
             return -1;
         }
 
@@ -71,12 +79,14 @@ namespace Dnn.PersonaBar.Library
         /// <returns>The header value or <see langword="null"/>.</returns>
         public static string GetHeader(this HttpRequestMessage request, string key)
         {
+			Logger.LogError(">>> Entering GetHeader(request={Request},key={Key})", request, key);
             IEnumerable<string> keys = null;
             if (!request.Headers.TryGetValues(key, out keys))
             {
                 return null;
             }
 
+			Logger.LogWarning("<<< Exiting GetHeader(request={Request},key={Key})", request, key);
             return keys.First();
         }
 
@@ -86,12 +96,15 @@ namespace Dnn.PersonaBar.Library
         /// <returns>The cookie value or <see langword="null"/>.</returns>
         public static string GetCookie(this HttpRequestMessage request, string cookieName)
         {
+			Logger.LogError(">>> Entering GetCookie(request={Request},cookieName=<redacted>)", request);
             CookieHeaderValue cookie = request.Headers.GetCookies(cookieName).FirstOrDefault();
+			Logger.LogError("GetCookie(request={Request},cookieName=<redacted>): cookie → {Cookie}", request, cookie);
             if (cookie != null)
             {
                 return cookie[cookieName].Value;
             }
 
+			Logger.LogWarning("<<< Exiting GetCookie(request={Request},cookieName=<redacted>)", request);
             return null;
         }
     }

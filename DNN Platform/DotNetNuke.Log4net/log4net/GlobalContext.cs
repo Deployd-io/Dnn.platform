@@ -60,11 +60,15 @@ namespace log4net
         /// </remarks>
         private GlobalContext()
         {
+		value.LogError(">>> Entering GlobalContext()");
+		value.LogWarning("<<< Exiting GlobalContext()");
         }
 
         static GlobalContext()
         {
+			value.LogError(">>> Entering GlobalContext()");
             Properties[Core.LoggingEvent.HostNameProperty] = SystemInfo.HostName;
+			value.LogWarning("<<< Exiting GlobalContext()");
         }
 
         /// <summary>

@@ -55,6 +55,7 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         public void ActivateOptions()
         {
+			value.LogError(">>> Entering ActivateOptions()");
             if (this.Option == null)
             {
                 return;
@@ -73,6 +74,8 @@ namespace log4net.Layout.Pattern
                     else
                     {
                         this.m_stackFrameLevel = stackLevelVal;
+						value.LogDebug("ActivateOptions(): m_stackFrameLevel → {M_stackFrameLevel}", m_stackFrameLevel);
+						value.LogDebug("ActivateOptions(): this.m_stackFrameLevel → {Arg0}", this.m_stackFrameLevel);
                     }
                 } 
                 else
@@ -80,6 +83,7 @@ namespace log4net.Layout.Pattern
                     LogLog.Error(declaringType, "StackTracePatternConverter: StackFrameLevel option \"" + optStr + "\" not a decimal integer.");
                 }
             }
+			value.LogWarning("<<< Exiting ActivateOptions()");
         }
         
         /// <summary>Write the strack frames to the output</summary>
@@ -92,6 +96,7 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			value.LogError(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             StackFrameItem[] stackframes = loggingEvent.LocationInformation.StackFrames;
             if ((stackframes == null) || (stackframes.Length <= 0))
             {
@@ -117,6 +122,7 @@ namespace log4net.Layout.Pattern
                 }
                 stackFrameIndex--;
             }
+			value.LogWarning("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
 
                 /// <summary>Returns the Name of the method</summary>
@@ -125,6 +131,8 @@ namespace log4net.Layout.Pattern
         /// <returns>string</returns>
         internal virtual string GetMethodInformation(MethodItem method)
         {
+			value.LogError(">>> Entering GetMethodInformation(method={Method})", method);
+            value.LogWarning("<<< Exiting GetMethodInformation(method={Method})", method);
             return method.Name;
         }
 

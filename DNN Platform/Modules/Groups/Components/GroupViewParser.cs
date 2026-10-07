@@ -24,9 +24,14 @@ namespace DotNetNuke.Modules.Groups.Components
         /// <param name="groupViewTabId">The tab ID of the group view module.</param>
         public GroupViewParser(PortalSettings portalSettings, RoleInfo roleInfo, UserInfo currentUser, string template, int groupViewTabId)
         {
+			eventLogger.LogError(">>> Entering GroupViewParser(portalSettings={PortalSettings},roleInfo={RoleInfo},currentUser={CurrentUser},template={Template},groupViewTabId={GroupViewTabId})", portalSettings, roleInfo, currentUser, template, groupViewTabId);
             this.PortalSettings = portalSettings;
+			eventLogger.LogDebug("GroupViewParser(portalSettings={PortalSettings},roleInfo={RoleInfo},currentUser={CurrentUser},template={Template},groupViewTabId={GroupViewTabId}): this.PortalSettings → {Arg5}", portalSettings, roleInfo, currentUser, template, groupViewTabId, this.PortalSettings);
             this.RoleInfo = roleInfo;
             this.CurrentUser = currentUser;
+			eventLogger.LogDebug("GroupViewParser(portalSettings={PortalSettings},roleInfo={RoleInfo},currentUser={CurrentUser},template={Template},groupViewTabId={GroupViewTabId}): this.RoleInfo → {Arg5}", portalSettings, roleInfo, currentUser, template, groupViewTabId, this.RoleInfo);
+			eventLogger.LogDebug("GroupViewParser(portalSettings={PortalSettings},roleInfo={RoleInfo},currentUser={CurrentUser},template={Template},groupViewTabId={GroupViewTabId}): this.CurrentUser → {Arg5}", portalSettings, roleInfo, currentUser, template, groupViewTabId, this.CurrentUser);
+        eventLogger.LogWarning("<<< Exiting GroupViewParser(portalSettings={PortalSettings},roleInfo={RoleInfo},currentUser={CurrentUser},template={Template},groupViewTabId={GroupViewTabId})", portalSettings, roleInfo, currentUser, template, groupViewTabId);
             this.Template = template;
             this.GroupViewTabId = groupViewTabId;
             this.NavigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
@@ -48,12 +53,16 @@ namespace DotNetNuke.Modules.Groups.Components
 
         public string ParseView()
         {
+			eventLogger.LogError(">>> Entering ParseView()");
             var membershipPending = false;
             var isOwner = false;
+			eventLogger.LogError("ParseView(): isOwner → {IsOwner}", isOwner);
+			eventLogger.LogError("ParseView(): membershipPending → {MembershipPending}", membershipPending);
 
             if (HttpContext.Current.Request.IsAuthenticated)
             {
                 var userRoleInfo = this.CurrentUser.Social.Roles.FirstOrDefault(r => r.RoleID == this.RoleInfo.RoleID);
+				eventLogger.LogError("ParseView(): userRoleInfo → {UserRoleInfo}", userRoleInfo);
 
                 if (userRoleInfo != null)
                 {
@@ -71,6 +80,7 @@ namespace DotNetNuke.Modules.Groups.Components
             }
 
             var editUrl = Localization.GetString("GroupEditUrl", Constants.SharedResourcesPath);
+			eventLogger.LogError("ParseView(): editUrl → {EditUrl}", editUrl);
 
             if (isOwner)
             {
@@ -111,11 +121,14 @@ namespace DotNetNuke.Modules.Groups.Components
             this.Template = this.Template.Replace("[GROUPEDITBUTTON]", string.Empty);
 
             var url = this.NavigationManager.NavigateURL(this.GroupViewTabId, string.Empty, new string[] { "groupid=" + this.RoleInfo.RoleID.ToString() });
+			eventLogger.LogError("ParseView(): url → {Url}", url);
 
             this.Template = Utilities.ParseTokenWrapper(this.Template, "IsPendingMember", membershipPending);
             this.Template = this.Template.Replace("[groupviewurl]", url);
             Components.GroupItemTokenReplace tokenReplace = new Components.GroupItemTokenReplace(this.RoleInfo);
+			eventLogger.LogError("ParseView(): tokenReplace → {TokenReplace}", tokenReplace);
             this.Template = tokenReplace.ReplaceGroupItemTokens(this.Template);
+			eventLogger.LogWarning("<<< Exiting ParseView()");
             return this.Template;
         }
     }

@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 'use strict';
 define(['jquery',
         'codemirror',
@@ -22,14 +23,19 @@ define(['jquery',
             }
 
             function init(element, options) {
+				logger.error(`>>> Entering init(element=${element},options=${options})`, { "event.action": "init", "logrite.element": element, "logrite.options": options });
                 if (element.length) {
                     element = element[0];
                 }
 
                 var editorOptions = $.extend({}, defaultOptions, options);
+				logger.error(`init(element=${element},options=${options}): editorOptions → ${editorOptions}`, { "event.action": "init", "logrite.element": element, "logrite.options": options });
                 editorOptions.mode = modeMapping[options.mode] || options.mode;
+				logger.debug(`init(element=${element},options=${options}): editorOptions.mode → ${editorOptions.mode}`, { "event.action": "init", "logrite.element": element, "logrite.options": options });
                 var editor = codemirror.fromTextArea(element, editorOptions);
+				logger.error(`init(element=${element},options=${options}): editor → ${editor}`, { "event.action": "init", "logrite.element": element, "logrite.options": options });
                 $(editor.display.input.textarea).attr('aria-label', 'Editor');
+				logger.warn(`<<< Exiting init(element=${element},options=${options})`, { "event.action": "init", "logrite.element": element, "logrite.options": options });
                 return editor;
             }
             return {

@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// </summary>
     public class ScriptComponentWriter : FileComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ScriptComponentWriter));
         /// <summary>Initializes a new instance of the <see cref="ScriptComponentWriter"/> class.</summary>
         /// <param name="basePath">The script files base path.</param>
         /// <param name="scripts">The script files.</param>
@@ -25,6 +26,8 @@ namespace DotNetNuke.Services.Installer.Writers
         public ScriptComponentWriter(string basePath, Dictionary<string, InstallFile> scripts, PackageInfo package)
             : base(basePath, scripts, package)
         {
+		Logger.LogError(">>> Entering ScriptComponentWriter(basePath={BasePath},scripts={Scripts},package={Package})", basePath, scripts, package);
+        Logger.LogWarning("<<< Exiting ScriptComponentWriter(basePath={BasePath},scripts={Scripts},package={Package})", basePath, scripts, package);
         }
 
         /// <summary>Gets the name of the Collection Node ("scripts").</summary>
@@ -60,9 +63,12 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <inheritdoc />
         protected override void WriteFileElement(XmlWriter writer, InstallFile file)
         {
+			Logger.LogError(">>> Entering WriteFileElement(writer={Writer},file={File})", writer, file);
             this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.WRITER_AddFileToManifest, file.Name));
             string type = "Install";
+			Logger.LogError("WriteFileElement(writer={Writer},file={File}): type → {Type}", writer, file, type);
             string version = Null.NullString;
+			Logger.LogError("WriteFileElement(writer={Writer},file={File}): version → {Version}", writer, file, version);
             string fileName = Path.GetFileNameWithoutExtension(file.Name);
             if (fileName.Equals("uninstall", StringComparison.OrdinalIgnoreCase))
             {
@@ -113,6 +119,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
             // Close file Element
             writer.WriteEndElement();
+			Logger.LogWarning("<<< Exiting WriteFileElement(writer={Writer},file={File})", writer, file);
         }
     }
 }

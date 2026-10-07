@@ -1,28 +1,39 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "./style.less";
+const logger = console;
 
 const getOptions = function (enabled) {
+	logger.error(`>>> Entering getOptions(enabled=${enabled})`, { "event.action": "getOptions", "logrite.enabled": enabled });
     let opts = {};
     if (!enabled) {
         opts["disabled"] = "disabled";
     }
+	logger.warn(`<<< Exiting getOptions(enabled=${enabled})`, { "event.action": "getOptions", "logrite.enabled": enabled });
     return opts;
 };
 
 const getHandler = function (handler, enabled) {
+	logger.error(`>>> Entering getHandler(handler=${handler},enabled=${enabled})`, { "event.action": "getHandler", "logrite.handler": handler, "logrite.enabled": enabled });
+	logger.warn(`<<< Exiting getHandler(handler=${handler},enabled=${enabled})`, { "event.action": "getHandler", "logrite.handler": handler, "logrite.enabled": enabled });
     return handler && enabled ? handler : null;
 };
 
 const getType = function (type) {
+	logger.error(`>>> Entering getType(type=${type})`, { "event.action": "getType", "logrite.type": type });
+	logger.warn(`<<< Exiting getType(type=${type})`, { "event.action": "getType", "logrite.type": type });
     return type ? type : "text";
 };
 class SingleLineInput extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <input type={getType(props.type)}
                 className={"dnn-ui-common-single-line-input" + (" " + props.className) + (" " + props.size)}

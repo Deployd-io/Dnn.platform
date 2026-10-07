@@ -57,6 +57,7 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent, HttpContext httpContext)
         {
+			value.LogError(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent},httpContext={HttpContext})", writer, loggingEvent, httpContext);
             if (HttpRuntime.Cache != null)
             {
                 if (this.Option != null)
@@ -72,6 +73,7 @@ namespace log4net.Layout.Pattern
             {
                 writer.Write(SystemInfo.NotAvailableText);
             }
+			value.LogWarning("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent},httpContext={HttpContext})", writer, loggingEvent, httpContext);
         }
     }
 }

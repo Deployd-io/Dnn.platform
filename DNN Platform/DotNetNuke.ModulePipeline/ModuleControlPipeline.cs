@@ -26,19 +26,25 @@ namespace DotNetNuke.ModulePipeline
         /// <param name="factories">The control factories.</param>
         public ModuleControlPipeline(IEnumerable<IModuleControlFactory> factories)
         {
+			TraceLogger.LogError(">>> Entering ModuleControlPipeline(factories={Factories})", factories);
             this.factories = factories.OrderByDescending(f => f.Priority).ToArray();
+			TraceLogger.LogDebug("ModuleControlPipeline(factories={Factories}): factories → {Factories1}", factories, factories);
+        TraceLogger.LogWarning("<<< Exiting ModuleControlPipeline(factories={Factories})", factories);
         }
 
         /// <inheritdoc />
         public Control LoadModuleControl(TemplateControl containerControl, ModuleInfo moduleConfiguration, string controlKey, string controlSrc)
         {
+			TraceLogger.LogError(">>> Entering LoadModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlKey={ControlKey},controlSrc={ControlSrc})", containerControl, moduleConfiguration, controlKey, controlSrc);
             if (TraceLogger.IsDebugEnabled)
             {
                 TraceLogger.Debug($"ModuleControlFactory.LoadModuleControl Start (TabId:{moduleConfiguration.TabID},ModuleId:{moduleConfiguration.ModuleID}): ModuleControlSource:{moduleConfiguration.ModuleControl.ControlSrc}");
             }
 
             Control control = null;
+			TraceLogger.LogError("LoadModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlKey={ControlKey},controlSrc={ControlSrc}): control → {Control}", containerControl, moduleConfiguration, controlKey, controlSrc, control);
             IModuleControlFactory controlFactory = this.GetModuleControlFactory(moduleConfiguration, controlSrc);
+			TraceLogger.LogError("LoadModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlKey={ControlKey},controlSrc={ControlSrc}): controlFactory → {ControlFactory}", containerControl, moduleConfiguration, controlKey, controlSrc, controlFactory);
 
             if (controlFactory != null)
             {
@@ -64,6 +70,8 @@ namespace DotNetNuke.ModulePipeline
                 TraceLogger.Debug($"ModuleControlFactory.LoadModuleControl End (TabId:{moduleConfiguration.TabID},ModuleId:{moduleConfiguration.ModuleID}): ModuleControlSource:{moduleConfiguration.ModuleControl.ControlSrc}");
             }
 
+			TraceLogger.LogWarning("<<< Exiting LoadModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlKey={ControlKey},controlSrc={ControlSrc})", containerControl, moduleConfiguration, controlKey, controlSrc);
+			TraceLogger.LogWarning("<<< Exiting LoadModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration})", containerControl, moduleConfiguration);
             return control;
         }
 
@@ -108,13 +116,16 @@ namespace DotNetNuke.ModulePipeline
         /// <inheritdoc />
         public Control LoadSettingsControl(TemplateControl containerControl, ModuleInfo moduleConfiguration, string controlSrc)
         {
+			TraceLogger.LogError(">>> Entering LoadSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", containerControl, moduleConfiguration, controlSrc);
             if (TraceLogger.IsDebugEnabled)
             {
                 TraceLogger.Debug($"ModuleControlFactory.LoadSettingsControl Start (TabId:{moduleConfiguration.TabID},ModuleId:{moduleConfiguration.ModuleID}): ModuleControlSource:{moduleConfiguration.ModuleControl.ControlSrc}");
             }
 
             Control control = null;
+			TraceLogger.LogError("LoadSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc}): control → {Control}", containerControl, moduleConfiguration, controlSrc, control);
             IModuleControlFactory controlFactory = this.GetModuleControlFactory(moduleConfiguration, controlSrc);
+			TraceLogger.LogError("LoadSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc}): controlFactory → {ControlFactory}", containerControl, moduleConfiguration, controlSrc, controlFactory);
 
             if (controlFactory != null)
             {
@@ -126,6 +137,7 @@ namespace DotNetNuke.ModulePipeline
             if (control != null)
             {
                 var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(controlSrc);
+				TraceLogger.LogError("LoadSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc}): fileNameWithoutExtension → {FileNameWithoutExtension}", containerControl, moduleConfiguration, controlSrc, fileNameWithoutExtension);
                 if (fileNameWithoutExtension != null)
                 {
                     control.ID = fileNameWithoutExtension.Replace('.', '-');
@@ -144,26 +156,34 @@ namespace DotNetNuke.ModulePipeline
                 TraceLogger.Debug($"ModuleControlFactory.LoadSettingsControl End (TabId:{moduleConfiguration.TabID},ModuleId:{moduleConfiguration.ModuleID}): ModuleControlSource:{moduleConfiguration.ModuleControl.ControlSrc}");
             }
 
+			TraceLogger.LogWarning("<<< Exiting LoadSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", containerControl, moduleConfiguration, controlSrc);
             return control;
         }
 
         /// <inheritdoc />
         public Control CreateCachedControl(string cachedContent, ModuleInfo moduleConfiguration)
         {
+			TraceLogger.LogError(">>> Entering CreateCachedControl(cachedContent={CachedContent},moduleConfiguration={ModuleConfiguration})", cachedContent, moduleConfiguration);
             var moduleControl = new CachedModuleControl(cachedContent);
             moduleControl.ModuleContext.Configuration = moduleConfiguration;
+			TraceLogger.LogError("CreateCachedControl(cachedContent={CachedContent},moduleConfiguration={ModuleConfiguration}): moduleControl → {ModuleControl}", cachedContent, moduleConfiguration, moduleControl);
+			TraceLogger.LogWarning("<<< Exiting CreateCachedControl(cachedContent={CachedContent},moduleConfiguration={ModuleConfiguration})", cachedContent, moduleConfiguration);
             return moduleControl;
         }
 
         /// <inheritdoc />
         public Control CreateModuleControl(ModuleInfo moduleConfiguration)
         {
+			TraceLogger.LogError(">>> Entering CreateModuleControl(moduleConfiguration={ModuleConfiguration})", moduleConfiguration);
             IModuleControlFactory factory = this.GetModuleControlFactory(moduleConfiguration, moduleConfiguration.ModuleControl.ControlSrc);
+			TraceLogger.LogError("CreateModuleControl(moduleConfiguration={ModuleConfiguration}): factory → {Factory}", moduleConfiguration, factory);
+			TraceLogger.LogWarning("<<< Exiting CreateModuleControl(moduleConfiguration={ModuleConfiguration})", moduleConfiguration);
             return factory.CreateModuleControl(moduleConfiguration);
         }
 
         private IModuleControlFactory GetModuleControlFactory(ModuleInfo moduleConfiguration, string controlSrc)
         {
+			TraceLogger.LogError(">>> Entering GetModuleControlFactory(moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", moduleConfiguration, controlSrc);
             var length = this.factories.Length;
 
             for (var i = 0; i < length; i++)
@@ -177,6 +197,8 @@ namespace DotNetNuke.ModulePipeline
             }
 
             // The following exception should never be thrown, as the default factory should always be able to create a control
+			TraceLogger.LogError("Throwing NotSupportedException from GetModuleControlFactory(moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", moduleConfiguration, controlSrc);
+			TraceLogger.LogWarning("<<< Exiting GetModuleControlFactory(moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", moduleConfiguration, controlSrc);
             throw new NotSupportedException($"No module control factory found for module {moduleConfiguration.ModuleID} with control source {controlSrc}");
         }
     }

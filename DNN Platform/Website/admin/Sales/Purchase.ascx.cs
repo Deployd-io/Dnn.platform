@@ -25,26 +25,33 @@ namespace DotNetNuke.Modules.Admin.Sales
     [DnnDeprecated(10, 0, 2, "No replacement")]
     public partial class Purchase : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Purchase.ascx));
         private readonly INavigationManager navigationManager;
         private int roleID = -1;
 
         /// <summary>Initializes a new instance of the <see cref="Purchase"/> class.</summary>
         public Purchase()
         {
+			Logger.LogError(">>> Entering Purchase()");
             this.navigationManager = this.DependencyProvider.GetRequiredService<INavigationManager>();
+			Logger.LogDebug("Purchase(): navigationManager → {NavigationManager}", navigationManager);
+        Logger.LogWarning("<<< Exiting Purchase()");
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.InitializeComponent();
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdPurchase.Click += this.CmdPurchase_Click;
@@ -58,6 +65,7 @@ namespace DotNetNuke.Modules.Admin.Sales
                 if (this.Request.QueryString["RoleID"] != null)
                 {
                     this.roleID = int.Parse(this.Request.QueryString["RoleID"]);
+					Logger.LogDebug("OnLoad(e={E}): roleID → {RoleID}", e, roleID);
                 }
 
                 if (this.Page.IsPostBack == false)
@@ -65,6 +73,7 @@ namespace DotNetNuke.Modules.Admin.Sales
                     if (this.roleID != -1)
                     {
                         RoleInfo objRole = RoleController.Instance.GetRole(this.PortalSettings.PortalId, r => r.RoleID == this.roleID);
+						Logger.LogError("OnLoad(e={E}): objRole → {ObjRole}", e, objRole);
 
                         if (objRole.RoleID != -1)
                         {
@@ -92,7 +101,9 @@ namespace DotNetNuke.Modules.Admin.Sales
                             if (!Null.IsNull(objRole.BillingFrequency))
                             {
                                 var ctlEntry = new ListController();
+								Logger.LogError("OnLoad(e={E}): ctlEntry → {CtlEntry}", e, ctlEntry);
                                 ListEntryInfo entry = ctlEntry.GetListEntryInfo("Frequency", objRole.BillingFrequency);
+								Logger.LogError("OnLoad(e={E}): entry → {Entry}", e, entry);
                                 this.lblFrequency.Text = entry.Text;
                             }
 
@@ -124,13 +135,17 @@ namespace DotNetNuke.Modules.Admin.Sales
                 if (this.roleID == this.PortalSettings.AdministratorRoleId)
                 {
                     strCurrency = Host.HostCurrency;
+					Logger.LogError("OnLoad(e={E}): strCurrency → {StrCurrency}", e, strCurrency);
                 }
                 else
                 {
                     strCurrency = this.PortalSettings.Currency;
+					Logger.LogDebug("OnLoad(e={E}): strCurrency → {StrCurrency}", e, strCurrency);
                 }
 
                 dblTotal = Convert.ToDouble(this.lblFee.Text) * Convert.ToDouble(this.txtUnits.Text);
+				Logger.LogError("OnLoad(e={E}): dblTotal → {DblTotal}", e, dblTotal);
+				Logger.LogDebug("OnLoad(e={E}): dblTotal → {DblTotal}", e, dblTotal);
                 this.lblTotal.Text = dblTotal.ToString("#.##");
 
                 this.lblFeeCurrency.Text = strCurrency;
@@ -138,25 +153,34 @@ namespace DotNetNuke.Modules.Admin.Sales
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         private void InitializeComponent()
         {
+		Logger.LogError(">>> Entering InitializeComponent()");
+        Logger.LogWarning("<<< Exiting InitializeComponent()");
         }
 
         private void CmdPurchase_Click(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering CmdPurchase_Click(sender={Sender},e={E})", sender, e);
             try
             {
                 string strPaymentProcessor = string.Empty;
+				Logger.LogError("CmdPurchase_Click(sender={Sender},e={E}): strPaymentProcessor → {StrPaymentProcessor}", sender, e, strPaymentProcessor);
                 string strProcessorUserId = string.Empty;
+				Logger.LogError("CmdPurchase_Click(sender={Sender},e={E}): strProcessorUserId → {StrProcessorUserId}", sender, e, strProcessorUserId);
                 string strProcessorPassword = string.Empty;
+				Logger.LogError("CmdPurchase_Click(sender={Sender},e={E}): strProcessorPassword → {StrProcessorPassword}", sender, e, strProcessorPassword);
 
                 if (this.Page.IsValid)
                 {
                     PortalInfo objPortalInfo = PortalController.Instance.GetPortal(this.PortalSettings.PortalId);
+					Logger.LogError("CmdPurchase_Click(sender={Sender},e={E}): objPortalInfo → {ObjPortalInfo}", sender, e, objPortalInfo);
                     if (objPortalInfo != null)
                     {
                         strPaymentProcessor = objPortalInfo.PaymentProcessor;
@@ -189,30 +213,41 @@ namespace DotNetNuke.Modules.Admin.Sales
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in CmdPurchase_Click(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting CmdPurchase_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdCancel_Click(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering CmdCancel_Click(sender={Sender},e={E})", sender, e);
             try
             {
                 this.Response.Redirect(Convert.ToString(this.ViewState["UrlReferrer"]), true);
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in CmdCancel_Click(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting CmdCancel_Click(sender={Sender},e={E})", sender, e);
         }
 
         private double ConvertCurrency(string amount, string fromCurrency, string toCurrency)
         {
+			Logger.LogError(">>> Entering ConvertCurrency(amount={Amount},fromCurrency={FromCurrency},toCurrency={ToCurrency})", amount, fromCurrency, toCurrency);
+            var __logStart = System.Diagnostics.Stopwatch.StartNew();
             string strPost = "Amount=" + amount + "&From=" + fromCurrency + "&To=" + toCurrency;
             double retValue = 0;
             try
             {
                 var objRequest = Globals.GetExternalRequest("http://www.xe.com/ucc/convert.cgi");
+				Logger.LogError("ConvertCurrency(amount={Amount},fromCurrency={FromCurrency},toCurrency={ToCurrency}): objRequest → {ObjRequest}", amount, fromCurrency, toCurrency, objRequest);
+				Logger.LogDebug("ConvertCurrency(amount={Amount},fromCurrency={FromCurrency},toCurrency={ToCurrency}): objRequest.ContentLength → {Arg3}", amount, fromCurrency, toCurrency, objRequest.ContentLength);
+				Logger.LogDebug("ConvertCurrency(amount={Amount},fromCurrency={FromCurrency},toCurrency={ToCurrency}): objRequest.ContentType → {Arg3}", amount, fromCurrency, toCurrency, objRequest.ContentType);
                 objRequest.Method = "POST";
+				Logger.LogDebug("ConvertCurrency(amount={Amount},fromCurrency={FromCurrency},toCurrency={ToCurrency}): objRequest.Method → {Arg3}", amount, fromCurrency, toCurrency, objRequest.Method);
                 objRequest.ContentLength = strPost.Length;
                 objRequest.ContentType = "application/x-www-form-urlencoded";
 
@@ -223,6 +258,7 @@ namespace DotNetNuke.Modules.Admin.Sales
                 }
 
                 var objResponse = (HttpWebResponse)objRequest.GetResponse();
+				Logger.LogError("ConvertCurrency(amount={Amount},fromCurrency={FromCurrency},toCurrency={ToCurrency}): objResponse → {ObjResponse}", amount, fromCurrency, toCurrency, objResponse);
                 using (var sr = new StreamReader(objResponse.GetResponseStream()))
                 {
                     string strResponse = sr.ReadToEnd();
@@ -234,9 +270,12 @@ namespace DotNetNuke.Modules.Admin.Sales
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in ConvertCurrency(amount={Amount},fromCurrency={FromCurrency},toCurrency={ToCurrency}): {Arg3}", amount, fromCurrency, toCurrency, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
 
+			Logger.LogError("ConvertCurrency(amount,fromCurrency,toCurrency)={Amount},{FromCurrency},{ToCurrency}: external service call took {Arg3} ms", amount, fromCurrency, toCurrency, __logStart.ElapsedMilliseconds);
+			Logger.LogWarning("<<< Exiting ConvertCurrency(amount={Amount},fromCurrency={FromCurrency},toCurrency={ToCurrency})", amount, fromCurrency, toCurrency);
             return retValue;
         }
     }

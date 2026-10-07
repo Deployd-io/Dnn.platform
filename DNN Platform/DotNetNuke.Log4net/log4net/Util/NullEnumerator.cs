@@ -42,6 +42,8 @@ namespace log4net.Util
         /// </remarks>
         private NullEnumerator()
         {
+		value.LogError(">>> Entering NullEnumerator()");
+        value.LogWarning("<<< Exiting NullEnumerator()");
         }
 
         /// <summary>Get the singleton instance of the <see cref="NullEnumerator" />.</summary>
@@ -86,6 +88,8 @@ namespace log4net.Util
         /// </remarks>
         public bool MoveNext()
         {
+			value.LogError(">>> Entering MoveNext()");
+			value.LogWarning("<<< Exiting MoveNext()");
             return false;
         }
   
@@ -97,6 +101,8 @@ namespace log4net.Util
         /// </remarks>
         public void Reset() 
         {
+		value.LogError(">>> Entering Reset()");
+        value.LogWarning("<<< Exiting Reset()");
         }
 
         /// <summary>The singleton instance of the <see cref="NullEnumerator" />.</summary>

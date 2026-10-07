@@ -19,6 +19,7 @@ namespace Dnn.PersonaBar.Library.Dto
     [DataContract]
     public partial class UserSettings : Dictionary<string, object>, IXmlSerializable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserSettings));
         [IgnoreDataMember]
         public bool ExpandPersonaBar
         {
@@ -36,12 +37,15 @@ namespace Dnn.PersonaBar.Library.Dto
         /// <inheritdoc />
         public XmlSchema GetSchema()
         {
+			Logger.LogError(">>> Entering GetSchema()");
+			Logger.LogWarning("<<< Exiting GetSchema()");
             return null;
         }
 
         /// <inheritdoc />
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogError(">>> Entering ReadXml(reader={Reader})", reader);
             bool wasEmpty = reader.IsEmptyElement;
             reader.Read();
 
@@ -55,6 +59,7 @@ namespace Dnn.PersonaBar.Library.Dto
                 case "data":
                     this.ReadSettings(reader);
                     break;
+			Logger.LogWarning("<<< Exiting ReadXml(reader={Reader})", reader);
                 default:
 #pragma warning disable CS0618 // Type or member is obsolete
                     this.ReadLegacySettings(reader);
@@ -66,28 +71,35 @@ namespace Dnn.PersonaBar.Library.Dto
         /// <inheritdoc />
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteXml(writer={Writer})", writer);
             writer.WriteStartElement("data");
             writer.WriteCData(Json.Serialize(this));
             writer.WriteEndElement();
+			Logger.LogWarning("<<< Exiting WriteXml(writer={Writer})", writer);
         }
 
         private void ReadSettings(XmlReader reader)
         {
+			Logger.LogError(">>> Entering ReadSettings(reader={Reader})", reader);
             reader.ReadStartElement("data");
 
             var settingsData = reader.ReadContentAsString();
+			Logger.LogError("ReadSettings(reader={Reader}): settingsData → {SettingsData}", reader, settingsData);
             var settings = Json.Deserialize<IDictionary<string, object>>(settingsData);
+			Logger.LogError("ReadSettings(reader={Reader}): settings → {Settings}", reader, settings);
             foreach (var key in settings.Keys)
             {
                 this[key] = settings[key];
             }
 
             reader.ReadEndElement();
+			Logger.LogWarning("<<< Exiting ReadSettings(reader={Reader})", reader);
         }
 
         [DnnDeprecated(9, 2, 1, "The method add for backward compatible, should remove this in future release.")]
         private partial void ReadLegacySettings(XmlReader reader)
         {
+			Logger.LogError(">>> Entering ReadLegacySettings(reader={Reader})", reader);
             while (!reader.EOF && reader.NodeType != XmlNodeType.EndElement)
             {
                 if (reader.NodeType != XmlNodeType.Element)
@@ -99,6 +111,7 @@ namespace Dnn.PersonaBar.Library.Dto
                 reader.ReadStartElement();
 
                 var settingValue = string.Empty;
+				Logger.LogError("ReadLegacySettings(reader={Reader}): settingValue → {SettingValue}", reader, settingValue);
                 if (reader.NodeType == XmlNodeType.Text)
                 {
                     settingValue = reader.ReadContentAsString();
@@ -143,6 +156,7 @@ namespace Dnn.PersonaBar.Library.Dto
                     reader.ReadEndElement();
                 }
             }
+			Logger.LogWarning("<<< Exiting ReadLegacySettings(reader={Reader})", reader);
         }
     }
 }

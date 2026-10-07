@@ -14,9 +14,11 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:MultiLineTextEditControl runat=server></{0}:MultiLineTextEditControl>")]
     public class MultiLineTextEditControl : TextEditControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MultiLineTextEditControl));
         /// <inheritdoc />
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderEditMode(writer={Writer})", writer);
             string propValue = Convert.ToString(this.Value, CultureInfo.InvariantCulture);
             this.ControlStyle.AddAttributesToRender(writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Name, this.UniqueID);
@@ -25,6 +27,7 @@ namespace DotNetNuke.UI.WebControls
             writer.RenderBeginTag(HtmlTextWriterTag.Textarea);
             writer.Write(propValue);
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
     }
 }

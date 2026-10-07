@@ -7,21 +7,29 @@ import PackageInformation from "../common/BasicPackageInformation";
 import Localization from "localization";
 import utilities from "utils";
 import styles from "./style.module.less";
+const logger = console;
 class DeleteExtension extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
     onToggleDeleteFiles() {
+		logger.error('>>> Entering onToggleDeleteFiles()', { "event.action": "onToggleDeleteFiles" });
         this.props.dispatch(ExtensionActions.toggleDeleteFiles());
+		logger.warn('<<< Exiting onToggleDeleteFiles()', { "event.action": "onToggleDeleteFiles" });
     }
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         this.props.dispatch(VisiblePanelActions.selectPanel(0));
         this.props.dispatch(ExtensionActions.setPackageBeingDeleted({}, -1)); //clear
         if (this.props.deleteExtensionFiles) {
             this.onToggleDeleteFiles();
+			logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
         }
     }
     onDelete() {
+		logger.error('>>> Entering onDelete()', { "event.action": "onDelete" });
         const {props} = this;
         utilities.utilities.confirm(
             Localization.get("DeleteExtension.Warning").replace("{0}", props.extensionBeingDeleted.friendlyName),
@@ -34,9 +42,11 @@ class DeleteExtension extends Component {
             });
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         const { extensionBeingDeleted } = props;
         const version = extensionBeingDeleted.version ? extensionBeingDeleted.version.split(".") : [0, 0, 0];
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.DeleteExtension}>
                 <PersonaBarPageHeader title={Localization.get("DeleteExtension.Action").replace("{0}", extensionBeingDeleted.friendlyName)} />
@@ -86,6 +96,8 @@ DeleteExtension.defaultProps = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         selectedInstalledPackageType: state.extension.selectedInstalledPackageType,
         extensionBeingDeleted: state.extension.extensionBeingDeleted,

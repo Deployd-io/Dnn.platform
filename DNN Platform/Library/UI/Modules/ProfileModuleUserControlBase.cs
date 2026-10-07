@@ -17,9 +17,11 @@ namespace DotNetNuke.UI.Modules
 
     public abstract class ProfileModuleUserControlBase : ModuleUserControlBase, IProfileModule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ProfileModuleUserControlBase));
         /// <summary>Initializes a new instance of the <see cref="ProfileModuleUserControlBase"/> class.</summary>
         public ProfileModuleUserControlBase()
         {
+			Logger.LogError(">>> Entering ProfileModuleUserControlBase()");
             this.NavigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
         }
 
@@ -55,6 +57,7 @@ namespace DotNetNuke.UI.Modules
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             if (string.IsNullOrEmpty(this.Request.Params["UserId"]) &&
                             (this.ModuleContext.PortalSettings.ActiveTab.TabID == this.ModuleContext.PortalSettings.UserTabId
                                 || this.ModuleContext.PortalSettings.ActiveTab.ParentId == this.ModuleContext.PortalSettings.UserTabId))
@@ -69,15 +72,18 @@ namespace DotNetNuke.UI.Modules
                 }
                 catch (ThreadAbortException)
                 {
+					Logger.LogError("Exception in OnInit(e={E}): {Arg1}", e, ThreadAbortException.Message);
                     Thread.ResetAbort();
                 }
             }
 
             base.OnInit(e);
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         private string GetRedirectUrl()
         {
+			Logger.LogError(">>> Entering GetRedirectUrl()");
             // redirect user to default page if not specific the home tab, do this action to prevent loop redirect.
             var homeTabId = this.ModuleContext.PortalSettings.HomeTabId;
             string redirectUrl;
@@ -85,6 +91,7 @@ namespace DotNetNuke.UI.Modules
             if (homeTabId > Null.NullInteger)
             {
                 redirectUrl = TestableGlobals.Instance.NavigateURL(homeTabId);
+				Logger.LogError("GetRedirectUrl(): redirectUrl → {RedirectUrl}", redirectUrl);
             }
             else
             {
@@ -92,6 +99,7 @@ namespace DotNetNuke.UI.Modules
                               "/" + Globals.glbDefaultPage;
             }
 
+			Logger.LogWarning("<<< Exiting GetRedirectUrl()");
             return redirectUrl;
         }
     }

@@ -1,26 +1,35 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "./style.less";
+const logger = console;
 
 const getOpts = function (enabled) {
+	logger.error(`>>> Entering getOpts(enabled=${enabled})`, { "event.action": "getOpts", "logrite.enabled": enabled });
     let opts = {};
     if (!enabled) {
         opts["disabled"] = "disabled";
     }
+	logger.warn(`<<< Exiting getOpts(enabled=${enabled})`, { "event.action": "getOpts", "logrite.enabled": enabled });
     return opts;
 };
 
 const getHandler = function (handler, enabled) {
+	logger.error(`>>> Entering getHandler(handler=${handler},enabled=${enabled})`, { "event.action": "getHandler", "logrite.handler": handler, "logrite.enabled": enabled });
+	logger.warn(`<<< Exiting getHandler(handler=${handler},enabled=${enabled})`, { "event.action": "getHandler", "logrite.handler": handler, "logrite.enabled": enabled });
     return handler && enabled ? handler : null;
 };
 
 class MultiLineInput extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <textarea className={"dnn-ui-common-multi-line-input" + (" " + props.className)}
                 id={props.id}

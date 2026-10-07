@@ -19,11 +19,16 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			eventLogger.LogError(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
             var invalidFolders = new List<string>();
+			eventLogger.LogError("Execute(): invalidFolders → {InvalidFolders}", invalidFolders);
+			eventLogger.LogError("Execute(): result → {Result}", result);
             var investigatefiles = Utility.FindUnexpectedExtensions(invalidFolders).ToList();
             if (investigatefiles.Count > 0)
             {
+				eventLogger.LogError("Execute(): investigatefiles → {Investigatefiles}", investigatefiles);
+				eventLogger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                 result.Severity = SeverityEnum.Failure;
                 foreach (var filename in investigatefiles)
                 {
@@ -38,9 +43,11 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             if (invalidFolders.Count > 0)
             {
                 var folders = string.Join(string.Empty, invalidFolders.Select(f => $"<p>{f}</p>").ToArray());
+				eventLogger.LogError("Execute(): folders → {Folders}", folders);
                 result.Notes.Add($"<p>The following folders are inaccessible due to permission restrictions:</p>{folders}");
             }
 
+			eventLogger.LogWarning("<<< Exiting Execute()");
             return result;
         }
     }

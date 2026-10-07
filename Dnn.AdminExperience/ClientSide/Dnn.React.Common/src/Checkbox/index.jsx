@@ -2,41 +2,52 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Label from "../Label";
 import "./style.less";
+const logger = console;
 
 export default class Checkbox extends Component {
 
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = { checked: props.value ? props.value : false };
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`, { "event.action": "constructor", "logrite.props": props });
         this.id = "checkbox-" + Math.random() + Date.now();
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         if (this.props.value !== prevProps.value) {
             this.setState({
                 checked: this.props.value
             });
+			logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         }
     }
 
     onClick() {
+		logger.error('>>> Entering onClick()', { "event.action": "onClick" });
         if (typeof this.props.onChange === "function" && this.props.enabled) {
             this.setState({
                 checked: !this.state.checked
             }, () => {
                 this.props.onChange(this.state.checked);
             });
+			logger.warn('<<< Exiting onClick()', { "event.action": "onClick" });
         }
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const className = "checkbox";
         let label = this.props.label || "";
+		logger.error(`render(): label → ${label}`, { "event.action": "render" });
         const {props} = this;
         const checkBoxStyle = {
             width: props.size,
             height: props.size
         };
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={"dnn-checkbox-container " + (props.labelPlace ? "align-" + props.labelPlace : "") + (!this.props.enabled ? " disabled" : "")}>
                 {(!!label && props.labelPlace === "left") &&

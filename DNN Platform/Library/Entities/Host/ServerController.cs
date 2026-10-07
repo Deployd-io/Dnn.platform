@@ -41,6 +41,8 @@ namespace DotNetNuke.Entities.Host
                 foreach (ServerInfo server in GetEnabledServers())
                 {
                     uniqueServers[server.ServerName] = server.IISAppName;
+					Logger.LogError(">>> Entering GetEnabledServers()");
+					Logger.LogWarning("<<< Exiting GetEnabledServers()");
                 }
 
                 return uniqueServers.Count < GetEnabledServers().Count;
@@ -49,17 +51,22 @@ namespace DotNetNuke.Entities.Host
 
         public static void ClearCachedServers()
         {
+			Logger.LogError(">>> Entering ClearCachedServers()");
             DataCache.RemoveCache(CacheKey);
+			Logger.LogWarning("<<< Exiting ClearCachedServers()");
         }
 
         public static void DeleteServer(int serverID)
         {
+			Logger.LogError(">>> Entering DeleteServer(serverID={ServerID})", serverID);
             DataProvider.Instance().DeleteServer(serverID);
             ClearCachedServers();
+			Logger.LogWarning("<<< Exiting DeleteServer(serverID={ServerID})", serverID);
         }
 
         public static List<ServerInfo> GetEnabledServers()
         {
+			Logger.LogError(">>> Entering GetEnabledServers()");
             return GetServers()?.Where(i => i.Enabled).ToList() ?? new List<ServerInfo>();
         }
 
@@ -70,6 +77,8 @@ namespace DotNetNuke.Entities.Host
         /// <returns>A list of servers with activity within the specified minutes.</returns>
         public static List<ServerInfo> GetEnabledServersWithActivity(int lastMinutes = 10)
         {
+			Logger.LogError(">>> Entering GetEnabledServersWithActivity(lastMinutes={LastMinutes})", lastMinutes);
+            Logger.LogWarning("<<< Exiting GetEnabledServersWithActivity(lastMinutes={LastMinutes})", lastMinutes);
             return GetServersNoCache()
                 .Where(i => i.Enabled == true && DateTime.Now.Subtract(i.LastActivityDate).TotalMinutes <= lastMinutes)
                 .OrderByDescending(i => i.LastActivityDate)
@@ -83,6 +92,8 @@ namespace DotNetNuke.Entities.Host
         /// <returns>A list of servers with no activity for the specified minutes. Defaults to 24 hours.</returns>
         public static List<ServerInfo> GetInActiveServers(int lastMinutes = 1440)
         {
+			Logger.LogError(">>> Entering GetInActiveServers(lastMinutes={LastMinutes})", lastMinutes);
+            Logger.LogWarning("<<< Exiting GetInActiveServers(lastMinutes={LastMinutes})", lastMinutes);
             return GetServersNoCache()
                 .Where(i => DateTime.Now.Subtract(i.LastActivityDate).TotalMinutes > lastMinutes && i.ServerName != Environment.MachineName)
                 .OrderByDescending(i => i.LastActivityDate)
@@ -91,6 +102,7 @@ namespace DotNetNuke.Entities.Host
 
         public static string GetExecutingServerName()
         {
+			Logger.LogError(">>> Entering GetExecutingServerName()");
             string executingServerName = Globals.ServerName;
             if (UseAppName)
             {
@@ -98,11 +110,13 @@ namespace DotNetNuke.Entities.Host
             }
 
             Logger.Debug("GetExecutingServerName:" + executingServerName);
+			Logger.LogWarning("<<< Exiting GetExecutingServerName()");
             return executingServerName;
         }
 
         public static string GetServerName(ServerInfo webServer)
         {
+			Logger.LogError(">>> Entering GetServerName(webServer={WebServer})", webServer);
             string serverName = webServer.ServerName;
             if (UseAppName)
             {
@@ -110,6 +124,7 @@ namespace DotNetNuke.Entities.Host
             }
 
             Logger.Debug("GetServerName:" + serverName);
+			Logger.LogWarning("<<< Exiting GetServerName(webServer={WebServer})", webServer);
             return serverName;
         }
 
@@ -124,6 +139,7 @@ namespace DotNetNuke.Entities.Host
         /// <returns>A list of servers.</returns>
         public static List<ServerInfo> GetServers(IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering GetServers()");
             return CBO.GetCachedObject<List<ServerInfo>>(
                 hostSettings,
                 new CacheItemArgs(CacheKey, CacheTimeout, CachePriority),
@@ -132,15 +148,21 @@ namespace DotNetNuke.Entities.Host
 
         public static void UpdateServer(ServerInfo server)
         {
+			Logger.LogError(">>> Entering UpdateServer(server={Server})", server);
             DataProvider.Instance().UpdateServer(server.ServerID, server.Url, server.UniqueId, server.Enabled, server.ServerGroup);
             ClearCachedServers();
+			Logger.LogWarning("<<< Exiting UpdateServer(server={Server})", server);
         }
 
         public static void UpdateServerActivity(ServerInfo server)
         {
+			Logger.LogError(">>> Entering UpdateServerActivity(server={Server})", server);
             var allServers = GetServers();
             var existServer = allServers.FirstOrDefault(s => s.ServerName == server.ServerName && s.IISAppName == server.IISAppName);
+			Logger.LogError("UpdateServerActivity(server={Server}): existServer → {ExistServer}", server, existServer);
+			Logger.LogDebug("UpdateServerActivity(server={Server}): server.ServerID → {Arg1}", server, server.ServerID);
             var serverId = DataProvider.Instance().UpdateServerActivity(server.ServerName, server.IISAppName, server.CreatedDate, server.LastActivityDate, server.PingFailureCount, server.Enabled);
+			Logger.LogError("UpdateServerActivity(server={Server}): serverId → {ServerId}", server, serverId);
 
             server.ServerID = serverId;
             if (existServer == null
@@ -162,40 +184,54 @@ namespace DotNetNuke.Entities.Host
                 existServer.LastActivityDate = server.LastActivityDate;
                 existServer.Enabled = server.Enabled;
                 DataCache.SetCache(ServerController.CacheKey, allServers);
+				Logger.LogError(">>> Entering GetServerUniqueId()");
+				Logger.LogWarning("<<< Exiting GetServerUniqueId()");
             }
 
             // log the server info
             var log = new LogInfo();
+			Logger.LogError("UpdateServerActivity(server={Server}): log → {Log}", server, log);
             log.AddProperty(existServer != null ? "Server Updated" : "Add New Server", server.ServerName);
             log.AddProperty("IISAppName", server.IISAppName);
             log.AddProperty("Last Activity Date", server.LastActivityDate.ToString(CultureInfo.InvariantCulture));
             log.LogTypeKey = existServer != null ? nameof(EventLogType.WEBSERVER_UPDATED)
                                         : nameof(EventLogType.WEBSERVER_CREATED);
             LogController.Instance.AddLog(log);
+			Logger.LogWarning("<<< Exiting UpdateServerActivity(server={Server})", server);
         }
 
         public static IServerWebRequestAdapter GetServerWebRequestAdapter()
         {
+			Logger.LogError(">>> Entering GetServerWebRequestAdapter()");
             var adapterConfig = HostController.Instance.GetString("WebServer_ServerRequestAdapter", DefaultUrlAdapter);
             var adapterType = Reflection.CreateType(adapterConfig);
+			Logger.LogError("GetServerWebRequestAdapter(): adapterType → {AdapterType}", adapterType);
+			Logger.LogError("GetServerWebRequestAdapter(): adapterConfig → {AdapterConfig}", adapterConfig);
+			Logger.LogWarning("<<< Exiting GetServerWebRequestAdapter()");
             return Reflection.CreateInstance(adapterType) as IServerWebRequestAdapter;
         }
 
         private static List<ServerInfo> GetServersNoCache()
         {
+			Logger.LogError(">>> Entering GetServersNoCache()");
+            Logger.LogWarning("<<< Exiting GetServersNoCache()");
             return CBO.FillCollection<ServerInfo>(DataProvider.GetServers());
         }
 
         private static object GetServersCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogError(">>> Entering GetServersCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
+            Logger.LogWarning("<<< Exiting GetServersCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return CBO.FillCollection<ServerInfo>(DataProvider.GetServers());
         }
 
         private static string GetServerUrl()
         {
+			Logger.LogError(">>> Entering GetServerUrl()");
             try
             {
                 var adpapter = GetServerWebRequestAdapter();
+				Logger.LogError("GetServerUrl(): adpapter → {Adpapter}", adpapter);
                 if (adpapter == null)
                 {
                     return string.Empty;
@@ -206,15 +242,18 @@ namespace DotNetNuke.Entities.Host
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogWarning("<<< Exiting GetServerUrl()");
                 return string.Empty;
             }
         }
 
         private static string GetServerUniqueId()
         {
+			Logger.LogError(">>> Entering GetServerUniqueId()");
             try
             {
                 var adpapter = GetServerWebRequestAdapter();
+				Logger.LogError("GetServerUniqueId(): adpapter → {Adpapter}", adpapter);
                 if (adpapter == null)
                 {
                     return string.Empty;
@@ -225,6 +264,7 @@ namespace DotNetNuke.Entities.Host
             catch (Exception ex)
             {
                 Logger.Error(ex);
+			Logger.LogWarning("<<< Exiting GetServerUniqueId()");
                 return string.Empty;
             }
         }

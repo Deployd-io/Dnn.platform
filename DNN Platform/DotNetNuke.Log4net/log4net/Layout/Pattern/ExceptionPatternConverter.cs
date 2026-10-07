@@ -48,6 +48,7 @@ namespace log4net.Layout.Pattern
         /// </summary>
         public ExceptionPatternConverter()
         {
+			value.LogError(">>> Entering ExceptionPatternConverter()");
             // This converter handles the exception
             this.IgnoresException = false;
         }
@@ -93,12 +94,14 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			value.LogError(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             if (loggingEvent.ExceptionObject != null && this.Option != null && this.Option.Length > 0)
             {
                 switch (this.Option.ToLower())
                 {
                     case "message":
                         WriteObject(writer, loggingEvent.Repository, loggingEvent.ExceptionObject.Message);
+			value.LogWarning("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
                         break;
 #if !NETCF						
                     case "source":

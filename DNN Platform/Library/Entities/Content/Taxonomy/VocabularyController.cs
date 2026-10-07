@@ -20,6 +20,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
     /// <seealso cref="TermController"/>
     public class VocabularyController(IDataService dataService, IHostSettings hostSettings) : IVocabularyController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(VocabularyController));
         private const int CacheTimeOut = 20;
         private readonly IDataService dataService = dataService ?? Util.GetDataService();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
@@ -29,6 +30,8 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         public VocabularyController()
             : this(null, null)
         {
+		Logger.LogError(">>> Entering VocabularyController()");
+        Logger.LogWarning("<<< Exiting VocabularyController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="VocabularyController"/> class.</summary>
@@ -42,6 +45,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <inheritdoc />
         public int AddVocabulary(Vocabulary vocabulary)
         {
+			Logger.LogError(">>> Entering AddVocabulary(vocabulary={Vocabulary})", vocabulary);
             // Argument Contract
             Requires.NotNull("vocabulary", vocabulary);
             Requires.PropertyNotNullOrEmpty("vocabulary", "Name", vocabulary.Name);
@@ -52,18 +56,22 @@ namespace DotNetNuke.Entities.Content.Taxonomy
             // Refresh Cache
             DataCache.RemoveCache(DataCache.VocabularyCacheKey);
 
+			Logger.LogWarning("<<< Exiting AddVocabulary(vocabulary={Vocabulary})", vocabulary);
             return vocabulary.VocabularyId;
         }
 
         /// <inheritdoc />
         public void ClearVocabularyCache()
         {
+			Logger.LogError(">>> Entering ClearVocabularyCache()");
             DataCache.RemoveCache(DataCache.VocabularyCacheKey);
+			Logger.LogWarning("<<< Exiting ClearVocabularyCache()");
         }
 
         /// <inheritdoc />
         public void DeleteVocabulary(Vocabulary vocabulary)
         {
+			Logger.LogError(">>> Entering DeleteVocabulary(vocabulary={Vocabulary})", vocabulary);
             // Argument Contract
             Requires.NotNull("vocabulary", vocabulary);
             Requires.PropertyNotNegative("vocabulary", "VocabularyId", vocabulary.VocabularyId);
@@ -72,21 +80,25 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
             // Refresh Cache
             DataCache.RemoveCache(DataCache.VocabularyCacheKey);
+			Logger.LogWarning("<<< Exiting DeleteVocabulary(vocabulary={Vocabulary})", vocabulary);
         }
 
         /// <inheritdoc />
         public IQueryable<Vocabulary> GetVocabularies()
         {
+			Logger.LogError(">>> Entering GetVocabularies()");
             var vocabularies = CBO.GetCachedObject<List<Vocabulary>>(
                 this.hostSettings,
                 new CacheItemArgs(DataCache.VocabularyCacheKey, CacheTimeOut),
                 this.GetVocabulariesCallBack);
+			Logger.LogWarning("<<< Exiting GetVocabularies()");
             return vocabularies.AsQueryable();
         }
 
         /// <inheritdoc />
         public void UpdateVocabulary(Vocabulary vocabulary)
         {
+			Logger.LogError(">>> Entering UpdateVocabulary(vocabulary={Vocabulary})", vocabulary);
             // Argument Contract
             Requires.NotNull("vocabulary", vocabulary);
             Requires.PropertyNotNegative("vocabulary", "VocabularyId", vocabulary.VocabularyId);
@@ -96,10 +108,13 @@ namespace DotNetNuke.Entities.Content.Taxonomy
             DataCache.RemoveCache(DataCache.VocabularyCacheKey);
 
             this.dataService.UpdateVocabulary(vocabulary, UserController.Instance.GetCurrentUserInfo().UserID);
+			Logger.LogWarning("<<< Exiting UpdateVocabulary(vocabulary={Vocabulary})", vocabulary);
         }
 
         private object GetVocabulariesCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogError(">>> Entering GetVocabulariesCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
+            Logger.LogWarning("<<< Exiting GetVocabulariesCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return CBO.FillQueryable<Vocabulary>(this.dataService.GetVocabularies()).ToList();
         }
     }

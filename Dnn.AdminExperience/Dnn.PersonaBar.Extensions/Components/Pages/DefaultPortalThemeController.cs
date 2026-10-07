@@ -20,6 +20,8 @@ namespace Dnn.PersonaBar.Pages.Components
         public DefaultPortalThemeController()
             : this(null)
         {
+		eventLogger.LogError(">>> Entering DefaultPortalThemeController()");
+        eventLogger.LogWarning("<<< Exiting DefaultPortalThemeController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DefaultPortalThemeController"/> class.</summary>
@@ -27,35 +29,43 @@ namespace Dnn.PersonaBar.Pages.Components
         public DefaultPortalThemeController(IHostSettings hostSettings)
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("DefaultPortalThemeController(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
+        eventLogger.LogWarning("<<< Exiting DefaultPortalThemeController(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <inheritdoc />
         public string GetDefaultPortalContainer()
         {
+			eventLogger.LogError(">>> Entering GetDefaultPortalContainer()");
             var portalSettings = PortalSettings.Current;
             if (portalSettings == null)
             {
                 return null;
             }
 
+			eventLogger.LogWarning("<<< Exiting GetDefaultPortalContainer()");
             return PortalController.GetPortalSetting("DefaultPortalContainer", portalSettings.PortalId, this.hostSettings.DefaultPortalContainer, portalSettings.CultureCode);
         }
 
         /// <inheritdoc />
         public string GetDefaultPortalLayout()
         {
+			eventLogger.LogError(">>> Entering GetDefaultPortalLayout()");
             var portalSettings = PortalSettings.Current;
             if (portalSettings == null)
             {
                 return null;
             }
 
+			eventLogger.LogWarning("<<< Exiting GetDefaultPortalLayout()");
             return PortalController.GetPortalSetting("DefaultPortalSkin", portalSettings.PortalId, this.hostSettings.DefaultPortalSkin, portalSettings.CultureCode);
         }
 
         /// <inheritdoc />
         protected override Func<IDefaultPortalThemeController> GetFactory()
         {
+			eventLogger.LogError(">>> Entering GetFactory()");
+			eventLogger.LogWarning("<<< Exiting GetFactory()");
             return () => Globals.GetCurrentServiceProvider().GetRequiredService<IDefaultPortalThemeController>();
         }
     }

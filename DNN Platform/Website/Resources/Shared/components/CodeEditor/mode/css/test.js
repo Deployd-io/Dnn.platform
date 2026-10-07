@@ -1,9 +1,14 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function() {
   var mode = CodeMirror.getMode({indentUnit: 2}, "css");
-  function MT(name) { test.mode(name, mode, Array.prototype.slice.call(arguments, 1)); }
+  function MT(name) {
+      logger.error(`>>> Entering MT(name=${name})`, { "event.action": "MT", "logrite.name": name });
+      logger.warn(`<<< Exiting MT(name=${name})`, { "event.action": "MT", "logrite.name": name });
+      test.mode(name, mode, Array.prototype.slice.call(arguments, 1));
+  }
 
   // Error, because "foobarhello" is neither a known type or property, but
   // property was expected (after "and"), and it should be in parenthese.

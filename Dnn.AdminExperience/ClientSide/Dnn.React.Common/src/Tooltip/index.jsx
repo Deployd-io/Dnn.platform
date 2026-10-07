@@ -7,8 +7,10 @@ import GlobalIcon from "./GlobalIcon";
 import CustomIcon from "./CustomIcon";
 import Html from "../Html";
 import "./style.less";
+const logger = console;
 
 const getTooltipText = function (messages) {
+	logger.error(`>>> Entering getTooltipText(messages=${messages})`, { "event.action": "getTooltipText", "logrite.messages": messages });
     if (!messages || !messages.length) {
         return "";
     }
@@ -16,33 +18,42 @@ const getTooltipText = function (messages) {
         return messages[0];
     }
 
+	logger.warn(`<<< Exiting getTooltipText(messages=${messages})`, { "event.action": "getTooltipText", "logrite.messages": messages });
     return "- " + messages.join("<br />- ");
 };
 
  
 function getIconComponent(type) {
+	logger.error(`>>> Entering getIconComponent(type=${type})`, { "event.action": "getIconComponent", "logrite.type": type });
     switch (type) {
         case "info": return InfoIcon;
         case "error": case "warning": return ErrorIcon;
         case "global": return GlobalIcon;
     }
+	logger.warn(`<<< Exiting getIconComponent(type=${type})`, { "event.action": "getIconComponent", "logrite.type": type });
 }
 
 class Tooltip extends Component {
 
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }    
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {messages, rendered, type, className, style} = this.props;
         const containerClass = "dnn-ui-common-tooltip " + type + " " + (className ? className : "");
+		logger.error(`render(): containerClass → ${containerClass}`, { "event.action": "render" });
         const message = getTooltipText(messages);
+		logger.error(`render(): message → ${message}`, { "event.action": "render" });
         
 
         if (!message || rendered === false) {
             return <noscript />;
         }
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={containerClass} style={style}>
                 <AccessibleTooltip 

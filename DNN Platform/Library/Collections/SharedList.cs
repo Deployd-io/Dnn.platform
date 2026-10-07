@@ -11,6 +11,7 @@ namespace DotNetNuke.Collections.Internal
     /// <typeparam name="T">The type of value in the list.</typeparam>
     public class SharedList<T> : IList<T>, IDisposable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SharedList));
         private readonly List<T> list = new List<T>();
         private ILockStrategy lockStrategy;
 
@@ -26,7 +27,12 @@ namespace DotNetNuke.Collections.Internal
         /// <param name="lockStrategy">The locking strategy to use.</param>
         public SharedList(ILockStrategy lockStrategy)
         {
+			Logger.LogError(">>> Entering SharedList(lockStrategy={LockStrategy})", lockStrategy);
             this.lockStrategy = lockStrategy;
+			Logger.LogDebug("SharedList(lockStrategy={LockStrategy}): lockStrategy → {LockStrategy1}", lockStrategy, lockStrategy);
+        Logger.LogWarning("<<< Exiting SharedList(lockStrategy={LockStrategy})", lockStrategy);
+			Logger.LogError(">>> Entering SharedList(strategy={Strategy})", strategy);
+        Logger.LogWarning("<<< Exiting SharedList(strategy={Strategy})", strategy);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SharedList{T}"/> class.</summary>
@@ -94,95 +100,121 @@ namespace DotNetNuke.Collections.Internal
         /// <inheritdoc />
         public void Add(T item)
         {
+			Logger.LogError(">>> Entering Add(item={Item})", item);
             this.EnsureNotDisposed();
             this.EnsureWriteAccess();
             this.list.Add(item);
+			Logger.LogWarning("<<< Exiting Add(item={Item})", item);
         }
 
         /// <inheritdoc />
         public void Clear()
         {
+			Logger.LogError(">>> Entering Clear()");
             this.EnsureNotDisposed();
             this.EnsureWriteAccess();
             this.list.Clear();
+			Logger.LogWarning("<<< Exiting Clear()");
         }
 
         /// <inheritdoc />
         public bool Contains(T item)
         {
+			Logger.LogError(">>> Entering Contains(item={Item})", item);
             this.EnsureNotDisposed();
             this.EnsureReadAccess();
+			Logger.LogWarning("<<< Exiting Contains(item={Item})", item);
             return this.list.Contains(item);
         }
 
         /// <inheritdoc />
         public void CopyTo(T[] array, int arrayIndex)
         {
+			Logger.LogError(">>> Entering CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
             this.EnsureNotDisposed();
             this.EnsureReadAccess();
             this.list.CopyTo(array, arrayIndex);
+			Logger.LogWarning("<<< Exiting CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
         }
 
         /// <inheritdoc />
         public bool Remove(T item)
         {
+			Logger.LogError(">>> Entering Remove(item={Item})", item);
             this.EnsureNotDisposed();
             this.EnsureWriteAccess();
+			Logger.LogWarning("<<< Exiting Remove(item={Item})", item);
             return this.list.Remove(item);
         }
 
         /// <inheritdoc />
         public IEnumerator<T> GetEnumerator()
         {
+			Logger.LogError(">>> Entering GetEnumerator()");
             this.EnsureNotDisposed();
             this.EnsureReadAccess();
+			Logger.LogWarning("<<< Exiting GetEnumerator()");
             return this.list.GetEnumerator();
         }
 
         /// <inheritdoc />
         public int IndexOf(T item)
         {
+			Logger.LogError(">>> Entering IndexOf(item={Item})", item);
             this.EnsureNotDisposed();
             this.EnsureReadAccess();
+			Logger.LogWarning("<<< Exiting IndexOf(item={Item})", item);
             return this.list.IndexOf(item);
         }
 
         /// <inheritdoc />
         public void Insert(int index, T item)
         {
+			Logger.LogError(">>> Entering Insert(index={Index},item={Item})", index, item);
             this.EnsureNotDisposed();
             this.EnsureWriteAccess();
             this.list.Insert(index, item);
+			Logger.LogWarning("<<< Exiting Insert(index={Index},item={Item})", index, item);
         }
 
         /// <inheritdoc />
         public void RemoveAt(int index)
         {
+			Logger.LogError(">>> Entering RemoveAt(index={Index})", index);
             this.EnsureNotDisposed();
             this.EnsureWriteAccess();
             this.list.RemoveAt(index);
+			Logger.LogWarning("<<< Exiting RemoveAt(index={Index})", index);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogError(">>> Entering Dispose()");
             this.Dispose(true);
+			Logger.LogWarning("<<< Exiting Dispose()");
             GC.SuppressFinalize(this);
         }
 
         /// <summary>Ensures the instance is not disposed.</summary>
         public void EnsureNotDisposed()
         {
+			Logger.LogError(">>> Entering EnsureNotDisposed()");
             if (this.isDisposed)
             {
+				Logger.LogError("Throwing ObjectDisposedException from EnsureNotDisposed()");
                 throw new ObjectDisposedException("SharedList");
             }
+			Logger.LogWarning("<<< Exiting EnsureNotDisposed()");
         }
 
         /// <summary>Gets a read lock on the resource.</summary>
         /// <returns>An <see cref="ISharedCollectionLock"/> instance.</returns>
         public ISharedCollectionLock GetReadLock()
         {
+			Logger.LogError(">>> Entering GetReadLock()");
+            Logger.LogWarning("<<< Exiting GetReadLock()");
+			Logger.LogWarning("<<< Exiting GetReadLock(timeOut={TimeOut})", timeOut);
             return this.GetReadLock(TimeSpan.FromMilliseconds(-1));
         }
 
@@ -207,6 +239,9 @@ namespace DotNetNuke.Collections.Internal
         /// <returns>An <see cref="ISharedCollectionLock"/> instance.</returns>
         public ISharedCollectionLock GetWriteLock()
         {
+			Logger.LogError(">>> Entering GetWriteLock()");
+            Logger.LogWarning("<<< Exiting GetWriteLock()");
+			Logger.LogWarning("<<< Exiting GetWriteLock(timeOut={TimeOut})", timeOut);
             return this.GetWriteLock(TimeSpan.FromMilliseconds(-1));
         }
 
@@ -231,6 +266,8 @@ namespace DotNetNuke.Collections.Internal
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
         public IEnumerator GetEnumerator1()
         {
+			Logger.LogError(">>> Entering GetEnumerator1()");
+            Logger.LogWarning("<<< Exiting GetEnumerator1()");
             return this.GetEnumerator();
         }
 
@@ -244,6 +281,7 @@ namespace DotNetNuke.Collections.Internal
         /// <param name="disposing">Indicates if this instance is currently disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogError(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (!this.isDisposed)
             {
                 if (disposing)
@@ -253,25 +291,34 @@ namespace DotNetNuke.Collections.Internal
 
                 this.lockStrategy.Dispose();
                 this.lockStrategy = null;
+				Logger.LogDebug("Dispose(disposing={Disposing}): lockStrategy → {LockStrategy}", disposing, lockStrategy);
+				Logger.LogDebug("Dispose(disposing={Disposing}): this.lockStrategy → {Arg1}", disposing, this.lockStrategy);
             }
 
+			Logger.LogWarning("<<< Exiting Dispose(disposing={Disposing})", disposing);
             this.isDisposed = true;
         }
 
         private void EnsureReadAccess()
         {
+			Logger.LogError(">>> Entering EnsureReadAccess()");
             if (!this.lockStrategy.ThreadCanRead)
             {
+				Logger.LogError("Throwing ReadLockRequiredException from EnsureReadAccess()");
                 throw new ReadLockRequiredException();
             }
+			Logger.LogWarning("<<< Exiting EnsureReadAccess()");
         }
 
         private void EnsureWriteAccess()
         {
+			Logger.LogError(">>> Entering EnsureWriteAccess()");
             if (!this.lockStrategy.ThreadCanWrite)
             {
+				Logger.LogError("Throwing WriteLockRequiredException from EnsureWriteAccess()");
                 throw new WriteLockRequiredException();
             }
+			Logger.LogWarning("<<< Exiting EnsureWriteAccess()");
         }
     }
 }

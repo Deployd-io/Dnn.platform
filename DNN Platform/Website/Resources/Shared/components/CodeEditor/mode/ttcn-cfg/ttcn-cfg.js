@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -22,8 +23,10 @@
     var curPunc;
 
     function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       var ch = stream.next();
       if (ch == '"' || ch == "'") {
+		logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         state.tokenize = tokenString(ch);
         return state.tokenize(stream, state);
       }
@@ -50,15 +53,18 @@
 
       stream.eatWhile(/[\w\$_]/);
       var cur = stream.current();
+	logger.error(`tokenBase(stream=${stream},state=${state}): cur → ${cur}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       if (keywords.propertyIsEnumerable(cur)) return "keyword";
       if (fileNCtrlMaskOptions.propertyIsEnumerable(cur))
         return "negative fileNCtrlMaskOptions";
       if (externalCommands.propertyIsEnumerable(cur)) return "negative externalCommands";
 
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return "variable";
     }
 
     function tokenString(quote) {
+	logger.error(`>>> Entering tokenString(quote=${quote})`, { "event.action": "tokenString", "logrite.quote": quote });
       return function(stream, state) {
         var escaped = false, next, end = false;
         while ((next = stream.next()) != null) {
@@ -81,52 +87,67 @@
     }
 
     function Context(indented, column, type, align, prev) {
+	logger.error(`>>> Entering Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev})`, { "event.action": "Context", "logrite.indented": indented, "logrite.column": column, "logrite.type": type, "logrite.align": align, "logrite.prev": prev });
       this.indented = indented;
       this.column = column;
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): indented → ${indented}`, { "event.action": "Context", "logrite.indented": indented, "logrite.column": column, "logrite.type": type, "logrite.align": align, "logrite.prev": prev });
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): this.indented → ${this.indented}`, { "event.action": "Context", "logrite.indented": indented, "logrite.column": column, "logrite.type": type, "logrite.align": align, "logrite.prev": prev });
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): column → ${column}`, { "event.action": "Context", "logrite.indented": indented, "logrite.column": column, "logrite.type": type, "logrite.align": align, "logrite.prev": prev });
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): this.prev → ${this.prev}`, { "event.action": "Context", "logrite.indented": indented, "logrite.column": column, "logrite.type": type, "logrite.align": align, "logrite.prev": prev });
       this.type = type;
       this.align = align;
       this.prev = prev;
     }
     function pushContext(state, col, type) {
+	logger.error(`>>> Entering pushContext(state=${state},col=${col},type=${type})`, { "event.action": "pushContext", "logrite.state": state, "logrite.col": col, "logrite.type": type });
       var indent = state.indented;
       if (state.context && state.context.type == "statement")
         indent = state.context.indented;
+	logger.warn(`<<< Exiting pushContext(state=${state},col=${col},type=${type})`, { "event.action": "pushContext", "logrite.state": state, "logrite.col": col, "logrite.type": type });
       return state.context = new Context(indent, col, type, null, state.context);
     }
     function popContext(state) {
+	logger.error(`>>> Entering popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
       var t = state.context.type;
       if (t == ")" || t == "]" || t == "}")
         state.indented = state.context.indented;
+	logger.warn(`<<< Exiting popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
       return state.context = state.context.prev;
     }
 
     //Interface
     return {
       startState: function(basecolumn) {
+		logger.error(`>>> Entering startState(basecolumn=${basecolumn})`, { "event.action": "startState", "logrite.basecolumn": basecolumn });
         return {
           tokenize: null,
           context: new Context((basecolumn || 0) - indentUnit, 0, "top", false),
           indented: 0,
           startOfLine: true
         };
+		logger.warn(`<<< Exiting startState(basecolumn=${basecolumn})`, { "event.action": "startState", "logrite.basecolumn": basecolumn });
       },
 
       token: function(stream, state) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         var ctx = state.context;
         if (stream.sol()) {
           if (ctx.align == null) ctx.align = false;
           state.indented = stream.indentation();
           state.startOfLine = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.startOfLine → ${state.startOfLine}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         }
         if (stream.eatSpace()) return null;
         curPunc = null;
         var style = (state.tokenize || tokenBase)(stream, state);
+		logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if (style == "comment") return style;
         if (ctx.align == null) ctx.align = true;
 
         if ((curPunc == ";" || curPunc == ":" || curPunc == ",")
             && ctx.type == "statement"){
           popContext(state);
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         }
         else if (curPunc == "{") pushContext(state, stream.column(), "}");
         else if (curPunc == "[") pushContext(state, stream.column(), "]");
@@ -152,9 +173,11 @@
   });
 
   function words(str) {
+	logger.error(`>>> Entering words(str=${str})`, { "event.action": "words", "logrite.str": str });
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i)
       obj[words[i]] = true;
+	logger.warn(`<<< Exiting words(str=${str})`, { "event.action": "words", "logrite.str": str });
     return obj;
   }
 

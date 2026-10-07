@@ -12,9 +12,13 @@ namespace DotNetNuke.Services.FileSystem.Internal
 
     public class UserSecurityController : ServiceLocator<IUserSecurityController, UserSecurityController>, IUserSecurityController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserSecurityController));
         /// <inheritdoc />
         public bool IsHostAdminUser(int portalId)
         {
+			Logger.LogError(">>> Entering IsHostAdminUser(portalId={PortalId})", portalId);
+			Logger.LogWarning("<<< Exiting IsHostAdminUser(portalId={PortalId})", portalId);
+			Logger.LogWarning("<<< Exiting IsHostAdminUser(portalId={PortalId},userId={UserId})", portalId, userId);
             return this.IsHostAdminUser(portalId, UserController.Instance.GetCurrentUserInfo().UserID);
         }
 
@@ -33,6 +37,8 @@ namespace DotNetNuke.Services.FileSystem.Internal
         /// <inheritdoc />
         public bool HasFolderPermission(IFolderInfo folder, string permissionKey)
         {
+			Logger.LogError(">>> Entering HasFolderPermission(folder={Folder},permissionKey={PermissionKey})", folder, permissionKey);
+            Logger.LogWarning("<<< Exiting HasFolderPermission(folder={Folder},permissionKey={PermissionKey})", folder, permissionKey);
             return UserController.Instance.GetCurrentUserInfo().IsSuperUser ||
                    FolderPermissionController.HasFolderPermission(folder.FolderPermissions, permissionKey);
         }
@@ -40,6 +46,8 @@ namespace DotNetNuke.Services.FileSystem.Internal
         /// <inheritdoc />
         protected override System.Func<IUserSecurityController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new UserSecurityController();
         }
     }

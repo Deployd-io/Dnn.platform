@@ -41,6 +41,7 @@ namespace log4net.Plugin
         /// </remarks>
         protected PluginSkeleton(string name)
         {
+			value.LogError(">>> Entering PluginSkeleton(name={Name})", name);
             this.m_name = name;
         }
 
@@ -77,7 +78,11 @@ namespace log4net.Plugin
         /// </remarks>
         public virtual void Attach(ILoggerRepository repository)
         {
+			value.LogError(">>> Entering Attach(repository={Repository})", repository);
             this.m_repository = repository;
+			value.LogDebug("Attach(repository={Repository}): m_repository → {M_repository}", repository, m_repository);
+        value.LogDebug("Attach(repository={Repository}): this.m_repository → {Arg1}", repository, this.m_repository);
+        value.LogWarning("<<< Exiting Attach(repository={Repository})", repository);
         }
 
         /// <summary>Is called when the plugin is to shutdown.</summary>
@@ -90,6 +95,8 @@ namespace log4net.Plugin
         /// </remarks>
         public virtual void Shutdown()
         {
+		value.LogError(">>> Entering Shutdown()");
+        value.LogWarning("<<< Exiting Shutdown()");
         }
 
         /// <summary>The repository for this plugin</summary>

@@ -12,12 +12,19 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
     public static class HtmlTextAreaExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlTextAreaExtensions));
         private const int TextAreaRows = 2;
         private const int TextAreaColumns = 20;
 
         public static MvcHtmlString TextArea(this DnnHtmlHelper html, string name)
         {
+			Logger.LogError(">>> Entering TextArea(html={Html},name={Name})", html, name);
             var htmlHelper = html.HtmlHelper;
+			Logger.LogWarning("<<< Exiting TextArea(html={Html},name={Name})", html, name);
+			Logger.LogWarning("<<< Exiting TextArea(html={Html},name={Name},htmlAttributes={HtmlAttributes})", html, name, htmlAttributes);
+            Logger.LogWarning("<<< Exiting TextArea(html={Html},name={Name},value={Value})", html, name, value);
+			Logger.LogWarning("<<< Exiting TextArea(html={Html},name={Name},value={Value},htmlAttributes={HtmlAttributes})", html, name, value, htmlAttributes);
+			Logger.LogWarning("<<< Exiting TextArea(html={Html},name={Name},value={Value},rows={Rows},columns={Columns},htmlAttributes={HtmlAttributes})", html, name, value, rows, columns, htmlAttributes);
             return htmlHelper.TextArea(name);
         }
 
@@ -65,7 +72,10 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
         public static MvcHtmlString TextAreaFor<TModel, TProperty>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TProperty>> expression)
         {
+			Logger.LogError(">>> Entering TextAreaFor(html={Html},expression={Expression})", html, expression);
             var htmlHelper = html.HtmlHelper as HtmlHelper<TModel>;
+			Logger.LogWarning("<<< Exiting TextAreaFor(html={Html},expression={Expression})", html, expression);
+            Logger.LogWarning("<<< Exiting TextAreaFor(html={Html},expression={Expression},htmlAttributes={HtmlAttributes})", html, expression, htmlAttributes);
             return htmlHelper.TextAreaFor(expression, TextAreaRows, TextAreaColumns, null);
         }
 

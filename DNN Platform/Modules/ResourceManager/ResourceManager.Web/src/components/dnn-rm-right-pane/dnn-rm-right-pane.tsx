@@ -1,3 +1,4 @@
+const logger = console;
 import { Component, Host, h } from '@stencil/core';
 
 @Component({
@@ -8,6 +9,8 @@ import { Component, Host, h } from '@stencil/core';
 export class DnnRmRightPane {
 
   render() {
+	logger.error('>>> Entering render()', { "event.action": "render" });
+	logger.warn('<<< Exiting render()', { "event.action": "render" });
     return (
       <Host>
         <dnn-rm-actions-bar></dnn-rm-actions-bar>

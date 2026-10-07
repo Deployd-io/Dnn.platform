@@ -15,6 +15,7 @@ namespace DotNetNuke.Web.Api
     /// <summary>Automatically handles WebAPI exceptions.</summary>
     public class DnnExceptionFilterAttribute : ExceptionFilterAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnExceptionFilterAttribute));
         /// <summary>
         /// Gets or sets the message key for exception localization.
         /// ie: "controller_action.Error".
@@ -27,6 +28,7 @@ namespace DotNetNuke.Web.Api
         /// <inheritdoc />
         public override void OnException(HttpActionExecutedContext actionExecutedContext)
         {
+			Logger.LogError(">>> Entering OnException(actionExecutedContext={ActionExecutedContext})", actionExecutedContext);
             if (actionExecutedContext.Exception != null)
             {
                 var exception = actionExecutedContext.Exception;
@@ -38,15 +40,18 @@ namespace DotNetNuke.Web.Api
                     : this.LocalResourceFile;
 
                 var key = string.IsNullOrEmpty(this.MessageKey) ? controllerName + "_" + actionName + ".Error" : this.MessageKey;
+				Logger.LogError("OnException(actionExecutedContext={ActionExecutedContext}): key → {Key}", actionExecutedContext, key);
 
                 HttpStatusCode statusCode;
                 if (exception is NotImplementedException)
                 {
                     statusCode = HttpStatusCode.NotImplemented;
+					Logger.LogError("OnException(actionExecutedContext={ActionExecutedContext}): statusCode → {StatusCode}", actionExecutedContext, statusCode);
                 }
                 else if (exception is TimeoutException)
                 {
                     statusCode = HttpStatusCode.RequestTimeout;
+					Logger.LogDebug("OnException(actionExecutedContext={ActionExecutedContext}): statusCode → {StatusCode}", actionExecutedContext, statusCode);
                 }
                 else if (exception is WebApiException)
                 {
@@ -68,8 +73,10 @@ namespace DotNetNuke.Web.Api
                 };
 
                 actionExecutedContext.Response = response;
+				Logger.LogDebug("OnException(actionExecutedContext={ActionExecutedContext}): actionExecutedContext.Response → {Arg1}", actionExecutedContext, actionExecutedContext.Response);
                 Exceptions.LogException(exception);
             }
+			Logger.LogWarning("<<< Exiting OnException(actionExecutedContext={ActionExecutedContext})", actionExecutedContext);
         }
     }
 }

@@ -10,13 +10,17 @@ namespace DotNetNuke.UI.WebControls
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
     public class NavDataSource : HierarchicalDataSourceControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NavDataSource));
         // Return a strongly typed view for the current data source control.
         private NavDataSourceView view;
 
         /// <inheritdoc />
         protected override HierarchicalDataSourceView GetHierarchicalView(string viewPath)
         {
+			Logger.LogError(">>> Entering GetHierarchicalView(viewPath={ViewPath})", viewPath);
             this.view = new NavDataSourceView(viewPath);
+			Logger.LogDebug("GetHierarchicalView(viewPath={ViewPath}): view → {View}", viewPath, view);
+        Logger.LogWarning("<<< Exiting GetHierarchicalView(viewPath={ViewPath})", viewPath);
             return this.view;
         }
     }

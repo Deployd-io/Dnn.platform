@@ -16,6 +16,7 @@ namespace DotNetNuke.Modules.UrlManagement
     /// <summary>A control which displays the settings of a URL provider.</summary>
     public partial class ProviderSettings : ModuleUserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UrlProviderSettings.ascx));
         private readonly INavigationManager navigationManager;
 
         private int providerId;
@@ -24,7 +25,10 @@ namespace DotNetNuke.Modules.UrlManagement
         /// <summary>Initializes a new instance of the <see cref="ProviderSettings"/> class.</summary>
         public ProviderSettings()
         {
+			Logger.LogError(">>> Entering ProviderSettings()");
             this.navigationManager = Globals.GetCurrentServiceProvider().GetService<INavigationManager>();
+			Logger.LogDebug("ProviderSettings(): navigationManager → {NavigationManager}", navigationManager);
+        Logger.LogWarning("<<< Exiting ProviderSettings()");
         }
 
         private string DisplayMode => (this.Request.QueryString["Display"] ?? string.Empty).ToLowerInvariant();
@@ -32,12 +36,14 @@ namespace DotNetNuke.Modules.UrlManagement
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.cmdUpdate.Click += this.CmdUpdate_Click;
             this.cmdCancel.Click += this.CmdCancel_Click;
 
             this.providerId = Convert.ToInt32(this.Request.Params["ProviderId"]);
+			Logger.LogDebug("OnInit(e={E}): providerId → {ProviderId}", e, providerId);
 
             var provider = ExtensionUrlProviderController.GetModuleProviders(this.ModuleContext.PortalId)
                                 .SingleOrDefault(p => p.ProviderConfig.ExtensionUrlProviderId == this.providerId);
@@ -47,11 +53,14 @@ namespace DotNetNuke.Modules.UrlManagement
                 var settingsControlSrc = provider.ProviderConfig.SettingsControlSrc;
 
                 var settingsControl = this.Page.LoadControl(settingsControlSrc);
+				Logger.LogError("OnInit(e={E}): settingsControl → {SettingsControl}", e, settingsControl);
 
                 this.providerSettingsPlaceHolder.Controls.Add(settingsControl);
 
                 // ReSharper disable SuspiciousTypeConversion.Global
                 this.providerSettingsControl = settingsControl as IExtensionUrlProviderSettingsControl;
+				Logger.LogDebug("OnInit(e={E}): providerSettingsControl → {ProviderSettingsControl}", e, providerSettingsControl);
+				Logger.LogDebug("OnInit(e={E}): this.providerSettingsControl → {Arg1}", e, this.providerSettingsControl);
 
                 // ReSharper restore SuspiciousTypeConversion.Global
                 if (this.providerSettingsControl != null)
@@ -59,11 +68,13 @@ namespace DotNetNuke.Modules.UrlManagement
                     this.providerSettingsControl.Provider = provider.ProviderConfig;
                 }
             }
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             if (this.providerSettingsControl != null)
             {
@@ -74,15 +85,19 @@ namespace DotNetNuke.Modules.UrlManagement
             {
                 this.cmdCancel.Visible = false;
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         private void CmdCancel_Click(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering CmdCancel_Click(sender={Sender},e={E})", sender, e);
             this.Response.Redirect(this.navigationManager.NavigateURL(this.ModuleContext.PortalSettings.ActiveTab.TabID));
+			Logger.LogWarning("<<< Exiting CmdCancel_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdUpdate_Click(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering CmdUpdate_Click(sender={Sender},e={E})", sender, e);
             if (!this.Page.IsValid)
             {
                 return;
@@ -91,6 +106,7 @@ namespace DotNetNuke.Modules.UrlManagement
             if (this.providerSettingsControl != null)
             {
                 var settings = this.providerSettingsControl.SaveSettings();
+				Logger.LogError("CmdUpdate_Click(sender={Sender},e={E}): settings → {Settings}", sender, e, settings);
                 foreach (var setting in settings)
                 {
                     ExtensionUrlProviderController.SaveSetting(this.providerId, this.ModuleContext.PortalId, setting.Key, setting.Value);
@@ -101,6 +117,7 @@ namespace DotNetNuke.Modules.UrlManagement
             {
                 this.Response.Redirect(this.navigationManager.NavigateURL(this.ModuleContext.PortalSettings.ActiveTab.TabID));
             }
+			Logger.LogWarning("<<< Exiting CmdUpdate_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

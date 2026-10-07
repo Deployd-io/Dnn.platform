@@ -8,14 +8,18 @@ namespace DotNetNuke.Common.Utilities
 
     public static class DictionaryExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DictionaryExtensions));
         public static T GetValue<T>(this IDictionary bag, object key, T defaultValue)
         {
+			Logger.LogError(">>> Entering GetValue(bag={Bag},key={Key},defaultValue={DefaultValue})", bag, key, defaultValue);
             var value = bag[key] ?? defaultValue;
+			Logger.LogWarning("<<< Exiting GetValue(bag={Bag},key={Key},defaultValue={DefaultValue})", bag, key, defaultValue);
             return (T)value;
         }
 
         public static void SetValue<T>(this IDictionary bag, object key, T value, T defaultValue)
         {
+			Logger.LogError(">>> Entering SetValue(bag={Bag},key={Key},value={Value},defaultValue={DefaultValue})", bag, key, value, defaultValue);
             if (Equals(defaultValue, value))
             {
                 bag.Remove(key);
@@ -24,6 +28,7 @@ namespace DotNetNuke.Common.Utilities
             {
                 bag[key] = value;
             }
+			Logger.LogWarning("<<< Exiting SetValue(bag={Bag},key={Key},value={Value},defaultValue={DefaultValue})", bag, key, value, defaultValue);
         }
     }
 }

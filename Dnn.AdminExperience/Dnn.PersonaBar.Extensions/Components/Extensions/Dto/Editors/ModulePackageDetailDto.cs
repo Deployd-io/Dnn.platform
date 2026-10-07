@@ -16,6 +16,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     {
         public ModulePackageDetailDto()
         {
+		eventLogger.LogError(">>> Entering ModulePackageDetailDto()");
+		eventLogger.LogWarning("<<< Exiting ModulePackageDetailDto()");
         }
 
         public ModulePackageDetailDto(int portalId, PackageInfo package, DesktopModuleInfo desktopModule)
@@ -23,23 +25,34 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
         {
             this.DesktopModuleId = desktopModule.DesktopModuleID;
             this.ModuleName = desktopModule.ModuleName;
+			eventLogger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.DesktopModuleId → {Arg3}", portalId, package, desktopModule, this.DesktopModuleId);
+			eventLogger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.ModuleName → {Arg3}", portalId, package, desktopModule, this.ModuleName);
             this.FolderName = desktopModule.FolderName;
             this.BusinessController = desktopModule.BusinessControllerClass;
             this.Category = desktopModule.Category;
+			eventLogger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.FolderName → {Arg3}", portalId, package, desktopModule, this.FolderName);
+			eventLogger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.BusinessController → {Arg3}", portalId, package, desktopModule, this.BusinessController);
+			eventLogger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.Category → {Arg3}", portalId, package, desktopModule, this.Category);
             this.Dependencies = desktopModule.Dependencies;
             this.HostPermissions = desktopModule.Permissions;
             this.Portable = desktopModule.IsPortable;
             this.Searchable = desktopModule.IsSearchable;
             this.Upgradeable = desktopModule.IsUpgradeable;
             this.PremiumModule = desktopModule.IsPremium;
+			eventLogger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.Dependencies → {Arg3}", portalId, package, desktopModule, this.Dependencies);
             this.Shareable = desktopModule.Shareable;
 
             if (!desktopModule.IsAdmin)
             {
+				eventLogger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.HostPermissions → {Arg3}", portalId, package, desktopModule, this.HostPermissions);
                 var portalDesktopModules =
                     DesktopModuleController.GetPortalDesktopModulesByDesktopModuleID(desktopModule.DesktopModuleID);
                 foreach (var portalDesktopModuleInfo in portalDesktopModules)
                 {
+					eventLogger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.Portable → {Arg3}", portalId, package, desktopModule, this.Portable);
+					eventLogger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.Searchable → {Arg3}", portalId, package, desktopModule, this.Searchable);
+					eventLogger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.Upgradeable → {Arg3}", portalId, package, desktopModule, this.Upgradeable);
+					eventLogger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.PremiumModule → {Arg3}", portalId, package, desktopModule, this.PremiumModule);
                     var value = portalDesktopModuleInfo.Value;
                     this.AssignedPortals.Add(new ListItemDto { Id = value.PortalID, Name = value.PortalName });
                 }
@@ -49,6 +62,9 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
 
                 foreach (var portalInfo in allPortals)
                 {
+					eventLogger.LogError("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): assignedIds → {AssignedIds}", portalId, package, desktopModule, assignedIds);
+					eventLogger.LogError("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): allPortals → {AllPortals}", portalId, package, desktopModule, allPortals);
+					eventLogger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.Shareable → {Arg3}", portalId, package, desktopModule, this.Shareable);
                     this.UnassignedPortals.Add(new ListItemDto { Id = portalInfo.PortalID, Name = portalInfo.PortalName });
                 }
             }

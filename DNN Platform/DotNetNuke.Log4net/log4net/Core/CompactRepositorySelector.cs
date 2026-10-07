@@ -70,20 +70,26 @@ namespace log4net.Core
         /// <exception cref="ArgumentOutOfRangeException">throw if <paramref name="defaultRepositoryType"/> does not implement <see cref="ILoggerRepository"/></exception>
         public CompactRepositorySelector(Type defaultRepositoryType)
         {
+			rep.LogError(">>> Entering CompactRepositorySelector(defaultRepositoryType={DefaultRepositoryType})", defaultRepositoryType);
             if (defaultRepositoryType == null)
             {
+				rep.LogError("Throwing ArgumentNullException from CompactRepositorySelector(defaultRepositoryType={DefaultRepositoryType})", defaultRepositoryType);
                 throw new ArgumentNullException("defaultRepositoryType");
             }
 
             // Check that the type is a repository
             if (!(typeof(ILoggerRepository).IsAssignableFrom(defaultRepositoryType)))
             {
+				rep.LogError("Throwing CreateArgumentOutOfRangeException from CompactRepositorySelector(defaultRepositoryType={DefaultRepositoryType})", defaultRepositoryType);
                 throw SystemInfo.CreateArgumentOutOfRangeException("defaultRepositoryType", (object)defaultRepositoryType, "Parameter: defaultRepositoryType, Value: ["+defaultRepositoryType+"] out of range. Argument must implement the ILoggerRepository interface");
             }
 
             this.m_defaultRepositoryType = defaultRepositoryType;
+			rep.LogDebug("CompactRepositorySelector(defaultRepositoryType={DefaultRepositoryType}): m_defaultRepositoryType → {M_defaultRepositoryType}", defaultRepositoryType, m_defaultRepositoryType);
+			rep.LogDebug("CompactRepositorySelector(defaultRepositoryType={DefaultRepositoryType}): this.m_defaultRepositoryType → {Arg1}", defaultRepositoryType, this.m_defaultRepositoryType);
 
             LogLog.Debug(declaringType, "defaultRepositoryType ["+ this.m_defaultRepositoryType+"]");
+			rep.LogWarning("<<< Exiting CompactRepositorySelector(defaultRepositoryType={DefaultRepositoryType})", defaultRepositoryType);
         }
 
         /// <summary>
@@ -136,6 +142,7 @@ namespace log4net.Core
                 {
                     throw new LogException("Repository [" + repositoryName + "] is NOT defined.");
                 }
+				rep.LogWarning("<<< Exiting GetRepository(repositoryName={RepositoryName})", repositoryName);
                 return rep;
             }
         }
@@ -162,10 +169,12 @@ namespace log4net.Core
         /// </remarks>
         public ILoggerRepository CreateRepository(Assembly assembly, Type repositoryType)
         {
+			rep.LogError(">>> Entering CreateRepository(assembly={Assembly},repositoryType={RepositoryType})", assembly, repositoryType);
             // If the type is not set then use the default type
             if (repositoryType == null)
             {
                 repositoryType = this.m_defaultRepositoryType;
+				rep.LogError("CreateRepository(assembly={Assembly},repositoryType={RepositoryType}): repositoryType → {RepositoryType1}", assembly, repositoryType, repositoryType);
             }
 
             lock(this)
@@ -174,13 +183,16 @@ namespace log4net.Core
 
                 // First check that the repository does not exist
                 ILoggerRepository rep = this.m_name2repositoryMap[DefaultRepositoryName] as ILoggerRepository;
+				rep.LogError("CreateRepository(assembly={Assembly},repositoryType={RepositoryType}): rep → {Rep}", assembly, repositoryType, rep);
                 if (rep == null)
                 {
                     // Must create the repository
                     rep = this.CreateRepository(DefaultRepositoryName, repositoryType);
                 }
 
+				rep.LogWarning("<<< Exiting CreateRepository(assembly={Assembly},repositoryType={RepositoryType})", assembly, repositoryType);
                 return rep;
+			rep.LogWarning("<<< Exiting CreateRepository(repositoryName={RepositoryName},repositoryType={RepositoryType})", repositoryName, repositoryType);
             }		
         }
 
@@ -265,8 +277,10 @@ namespace log4net.Core
         /// </remarks>
         public bool ExistsRepository(string repositoryName)
         {
+			rep.LogError(">>> Entering ExistsRepository(repositoryName={RepositoryName})", repositoryName);
             lock(this)
             {
+				rep.LogWarning("<<< Exiting ExistsRepository(repositoryName={RepositoryName})", repositoryName);
                 return this.m_name2repositoryMap.ContainsKey(repositoryName);
             }
         }
@@ -282,11 +296,13 @@ namespace log4net.Core
         /// </remarks>
         public ILoggerRepository[] GetAllRepositories()
         {
+			rep.LogError(">>> Entering GetAllRepositories()");
             lock(this)
             {
                 ICollection reps = this.m_name2repositoryMap.Values;
                 ILoggerRepository[] all = new ILoggerRepository[reps.Count];
                 reps.CopyTo(all, 0);
+				rep.LogWarning("<<< Exiting GetAllRepositories()");
                 return all;
             }
         }
@@ -332,11 +348,14 @@ namespace log4net.Core
         /// </remarks>
         protected virtual void OnLoggerRepositoryCreatedEvent(ILoggerRepository repository)
         {
+			rep.LogError(">>> Entering OnLoggerRepositoryCreatedEvent(repository={Repository})", repository);
             LoggerRepositoryCreationEventHandler handler = this.m_loggerRepositoryCreatedEvent;
+			rep.LogError("OnLoggerRepositoryCreatedEvent(repository={Repository}): handler → {Handler}", repository, handler);
             if (handler != null)
             {
                 handler(this, new LoggerRepositoryCreationEventArgs(repository));
             }
+			rep.LogWarning("<<< Exiting OnLoggerRepositoryCreatedEvent(repository={Repository})", repository);
         }
     }
 }

@@ -33,6 +33,7 @@ namespace DotNetNuke.Web.DDRMenu
         public SkinObject()
             : this(null, null, null)
         {
+		eventLogger.LogWarning("<<< Exiting SkinObject(localiser={Localiser},hostSettings={HostSettings},tabController={TabController})", localiser, hostSettings, tabController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SkinObject"/> class.</summary>
@@ -41,6 +42,8 @@ namespace DotNetNuke.Web.DDRMenu
         public SkinObject(ILocaliser localiser)
             : this(localiser, null, null)
         {
+		eventLogger.LogError(">>> Entering SkinObject(localiser={Localiser})", localiser);
+        eventLogger.LogWarning("<<< Exiting SkinObject(localiser={Localiser})", localiser);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SkinObject"/> class.</summary>
@@ -49,6 +52,9 @@ namespace DotNetNuke.Web.DDRMenu
         /// <param name="tabController">The tab controller.</param>
         public SkinObject(ILocaliser localiser, IHostSettings hostSettings, ITabController tabController)
         {
+			eventLogger.LogError(">>> Entering SkinObject(localiser={Localiser},hostSettings={HostSettings},tabController={TabController})", localiser, hostSettings, tabController);
+			eventLogger.LogDebug("SkinObject(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): hostSettings → {HostSettings1}", localiser, hostSettings, tabController, hostSettings);
+			eventLogger.LogDebug("SkinObject(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): tabController → {TabController1}", localiser, hostSettings, tabController, tabController);
             this.localiser = localiser ?? Globals.GetCurrentServiceProvider().GetRequiredService<ILocaliser>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.tabController = tabController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITabController>();
@@ -81,6 +87,7 @@ namespace DotNetNuke.Web.DDRMenu
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnPreRender(e={E})", e);
             using (new DNNContext(this))
             {
                 try
@@ -120,14 +127,17 @@ namespace DotNetNuke.Web.DDRMenu
                 }
                 catch (Exception exc)
                 {
+					eventLogger.LogError("Exception in OnPreRender(e={E}): {Arg1}", e, exc.Message);
                     Exceptions.ProcessModuleLoadException(this, exc);
                 }
             }
+			eventLogger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			eventLogger.LogError(">>> Entering Render(writer={Writer})", writer);
             using (new DNNContext(this))
             {
                 try
@@ -137,9 +147,11 @@ namespace DotNetNuke.Web.DDRMenu
                 }
                 catch (Exception exc)
                 {
+					eventLogger.LogError("Exception in Render(writer={Writer}): {Arg1}", writer, exc.Message);
                     Exceptions.ProcessModuleLoadException(this, exc);
                 }
             }
+			eventLogger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

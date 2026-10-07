@@ -13,6 +13,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The CheckBoxColumnTemplate provides a Template for the CheckBoxColumn.</summary>
     public class CheckBoxColumnTemplate : ITemplate
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CheckBoxColumnTemplate));
         /// <summary>Initializes a new instance of the <see cref="CheckBoxColumnTemplate"/> class.</summary>
         public CheckBoxColumnTemplate()
             : this(ListItemType.Item)
@@ -23,6 +24,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="itemType">The list item type.</param>
         public CheckBoxColumnTemplate(ListItemType itemType)
         {
+			Logger.LogError(">>> Entering CheckBoxColumnTemplate(itemType={ItemType})", itemType);
             this.ItemType = itemType;
         }
 
@@ -80,6 +82,7 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="container">The container control.</param>
         public void InstantiateIn(Control container)
         {
+			Logger.LogError(">>> Entering InstantiateIn(container={Container})", container);
             if (!string.IsNullOrEmpty(this.Text))
             {
                 container.Controls.Add(new LiteralControl(this.Text + "<br/>"));
@@ -88,23 +91,30 @@ namespace DotNetNuke.UI.WebControls
             if (this.ItemType != ListItemType.Header || (this.ItemType == ListItemType.Header && this.HeaderCheckBox))
             {
                 var box = new CheckBox();
+				Logger.LogError("InstantiateIn(container={Container}): box → {Box}", container, box);
                 box.AutoPostBack = this.AutoPostBack;
+				Logger.LogDebug("InstantiateIn(container={Container}): box.AutoPostBack → {Arg1}", container, box.AutoPostBack);
                 box.DataBinding += this.Item_DataBinding;
                 box.CheckedChanged += this.OnCheckChanged;
                 container.Controls.Add(box);
             }
+			Logger.LogWarning("<<< Exiting InstantiateIn(container={Container})", container);
         }
 
         /// <summary>Called when the template item is Data Bound.</summary>
         private void Item_DataBinding(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering Item_DataBinding(sender={Sender},e={E})", sender, e);
             var box = (CheckBox)sender;
             var container = (DataGridItem)box.NamingContainer;
+			Logger.LogError("Item_DataBinding(sender={Sender},e={E}): box → {Box}", sender, e, box);
             if (!string.IsNullOrEmpty(this.DataField) && this.ItemType != ListItemType.Header)
             {
+				Logger.LogError("Item_DataBinding(sender={Sender},e={E}): container → {Container}", sender, e, container);
                 if (this.DesignMode)
                 {
                     box.Checked = false;
+					Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): box.Checked → {Arg2}", sender, e, box.Checked);
                 }
                 else
                 {
@@ -121,6 +131,7 @@ namespace DotNetNuke.UI.WebControls
                 if (this.DesignMode)
                 {
                     box.Enabled = false;
+					Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): box.Enabled → {Arg2}", sender, e, box.Enabled);
                 }
                 else
                 {
@@ -131,27 +142,34 @@ namespace DotNetNuke.UI.WebControls
             {
                 box.Enabled = this.Enabled;
             }
+			Logger.LogWarning("<<< Exiting Item_DataBinding(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Centralised Event that is raised whenever a check box's state is modified.</summary>
         private void OnCheckChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnCheckChanged(sender={Sender},e={E})", sender, e);
             var box = (CheckBox)sender;
             var container = (DataGridItem)box.NamingContainer;
+			Logger.LogError("OnCheckChanged(sender={Sender},e={E}): container → {Container}", sender, e, container);
+			Logger.LogError("OnCheckChanged(sender={Sender},e={E}): box → {Box}", sender, e, box);
             DNNDataGridCheckChangedEventArgs evntArgs;
             if (container.ItemIndex == Null.NullInteger)
             {
                 evntArgs = new DNNDataGridCheckChangedEventArgs(container, box.Checked, this.DataField, true);
+				Logger.LogError("OnCheckChanged(sender={Sender},e={E}): evntArgs → {EvntArgs}", sender, e, evntArgs);
             }
             else
             {
                 evntArgs = new DNNDataGridCheckChangedEventArgs(container, box.Checked, this.DataField, false);
+				Logger.LogDebug("OnCheckChanged(sender={Sender},e={E}): evntArgs → {EvntArgs}", sender, e, evntArgs);
             }
 
             if (this.CheckedChanged != null)
             {
                 this.CheckedChanged(sender, evntArgs);
             }
+			Logger.LogWarning("<<< Exiting OnCheckChanged(sender={Sender},e={E})", sender, e);
         }
     }
 }

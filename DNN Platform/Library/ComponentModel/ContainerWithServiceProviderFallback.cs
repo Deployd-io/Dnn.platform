@@ -22,8 +22,12 @@ public class ContainerWithServiceProviderFallback : IContainer
     /// <param name="serviceProvider">The service provider.</param>
     public ContainerWithServiceProviderFallback(IContainer container, IServiceProvider serviceProvider)
     {
+		Logger.LogError(">>> Entering ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider})", container, serviceProvider);
+		Logger.LogDebug("ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", container, serviceProvider, serviceProvider);
         this.container = container;
         this.serviceProvider = serviceProvider;
+		Logger.LogDebug("ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider}): this.container → {Arg2}", container, serviceProvider, this.container);
+    Logger.LogWarning("<<< Exiting ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider})", container, serviceProvider);
     }
 
     /// <inheritdoc />

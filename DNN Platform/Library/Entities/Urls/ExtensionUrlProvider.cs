@@ -16,6 +16,7 @@ namespace DotNetNuke.Entities.Urls
     [Serializable]
     public abstract class ExtensionUrlProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExtensionUrlProvider));
         public ExtensionUrlProviderInfo ProviderConfig { get; internal set; }
 
         /// <summary>
@@ -112,23 +113,29 @@ namespace DotNetNuke.Entities.Urls
         /// of the provider.</returns>
         public virtual bool AlwaysCallForRewrite(int portalId)
         {
+			Logger.LogError(">>> Entering AlwaysCallForRewrite(portalId={PortalId})", portalId);
+			Logger.LogWarning("<<< Exiting AlwaysCallForRewrite(portalId={PortalId})", portalId);
             return false;
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public string EnsureNotLeadingChar(string leading, string path)
         {
+			Logger.LogError(">>> Entering EnsureNotLeadingChar(leading={Leading},path={Path})", leading, path);
+            Logger.LogWarning("<<< Exiting EnsureNotLeadingChar(leading={Leading},path={Path})", leading, path);
             return FriendlyUrlController.EnsureNotLeadingChar(leading, path);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected string CleanNameForUrl(string urlValue, FriendlyUrlOptions options)
         {
+			Logger.LogError(">>> Entering CleanNameForUrl(urlValue={UrlValue},options={Options})", urlValue, options);
             bool changed;
             string result = options != null
                                 ? FriendlyUrlController.CleanNameForUrl(urlValue, options, out changed)
                                 : FriendlyUrlController.CleanNameForUrl(urlValue, null, out changed);
 
+			Logger.LogWarning("<<< Exiting CleanNameForUrl(urlValue={UrlValue},options={Options})", urlValue, options);
             return result;
         }
 
@@ -141,13 +148,18 @@ namespace DotNetNuke.Entities.Urls
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected string CreateQueryStringFromParameters(string[] urlParms, int skipUpToPosition)
         {
+			Logger.LogError(">>> Entering CreateQueryStringFromParameters(urlParms={UrlParms},skipUpToPosition={SkipUpToPosition})", urlParms, skipUpToPosition);
             string result = string.Empty;
             int i = 0;
+			Logger.LogError("CreateQueryStringFromParameters(urlParms={UrlParms},skipUpToPosition={SkipUpToPosition}): result → {Result}", urlParms, skipUpToPosition, result);
             bool odd = true;
+			Logger.LogError("CreateQueryStringFromParameters(urlParms={UrlParms},skipUpToPosition={SkipUpToPosition}): odd → {Odd}", urlParms, skipUpToPosition, odd);
             int size = urlParms.GetUpperBound(0) - skipUpToPosition;
+			Logger.LogError("CreateQueryStringFromParameters(urlParms={UrlParms},skipUpToPosition={SkipUpToPosition}): size → {Size}", urlParms, skipUpToPosition, size);
             if (size >= 0 && urlParms.GetUpperBound(0) >= 0)
             {
                 var qs = new StringBuilder(urlParms.GetUpperBound(0));
+				Logger.LogError("CreateQueryStringFromParameters(urlParms={UrlParms},skipUpToPosition={SkipUpToPosition}): qs → {Qs}", urlParms, skipUpToPosition, qs);
                 foreach (string urlPathPart in urlParms)
                 {
                     // skip over the parts we don't want
@@ -172,12 +184,15 @@ namespace DotNetNuke.Entities.Urls
                 result = qs.ToString();
             }
 
+			Logger.LogWarning("<<< Exiting CreateQueryStringFromParameters(urlParms={UrlParms},skipUpToPosition={SkipUpToPosition})", urlParms, skipUpToPosition);
             return result;
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected string EnsureLeadingChar(string leading, string path)
         {
+			Logger.LogError(">>> Entering EnsureLeadingChar(leading={Leading},path={Path})", leading, path);
+            Logger.LogWarning("<<< Exiting EnsureLeadingChar(leading={Leading},path={Path})", leading, path);
             return FriendlyUrlController.EnsureLeadingChar(leading, path);
         }
     }

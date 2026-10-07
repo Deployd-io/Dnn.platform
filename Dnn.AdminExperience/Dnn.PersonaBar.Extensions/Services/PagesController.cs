@@ -64,16 +64,29 @@ namespace Dnn.PersonaBar.Pages.Services
         /// <param name="templateController">The template controller.</param>
         public PagesController(INavigationManager navigationManager, IPagesController pagesController, ITemplateController templateController)
         {
+			Logger.LogError(">>> Entering PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController})", navigationManager, pagesController, templateController);
+			Logger.LogDebug("PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController}): pagesController → {PagesController1}", navigationManager, pagesController, templateController, pagesController);
+			Logger.LogDebug("PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController}): templateController → {TemplateController1}", navigationManager, pagesController, templateController, templateController);
             this.NavigationManager = navigationManager;
+			Logger.LogDebug("PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController}): this.NavigationManager → {Arg3}", navigationManager, pagesController, templateController, this.NavigationManager);
 
             this.pagesController = pagesController;
             this.themesController = ThemesController.Instance;
+			Logger.LogDebug("PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController}): this.pagesController → {Arg3}", navigationManager, pagesController, templateController, this.pagesController);
+			Logger.LogDebug("PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController}): themesController → {ThemesController}", navigationManager, pagesController, templateController, themesController);
+			Logger.LogDebug("PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController}): this.themesController → {Arg3}", navigationManager, pagesController, templateController, this.themesController);
             this.bulkPagesController = BulkPagesController.Instance;
             this.templateController = templateController;
             this.defaultPortalThemeController = DefaultPortalThemeController.Instance;
+			Logger.LogDebug("PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController}): bulkPagesController → {BulkPagesController}", navigationManager, pagesController, templateController, bulkPagesController);
+			Logger.LogDebug("PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController}): this.bulkPagesController → {Arg3}", navigationManager, pagesController, templateController, this.bulkPagesController);
 
             this.tabController = TabController.Instance;
             this.localeController = LocaleController.Instance;
+			Logger.LogDebug("PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController}): this.templateController → {Arg3}", navigationManager, pagesController, templateController, this.templateController);
+			Logger.LogDebug("PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController}): defaultPortalThemeController → {DefaultPortalThemeController}", navigationManager, pagesController, templateController, defaultPortalThemeController);
+			Logger.LogDebug("PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController}): this.defaultPortalThemeController → {Arg3}", navigationManager, pagesController, templateController, this.defaultPortalThemeController);
+        Logger.LogWarning("<<< Exiting PagesController(navigationManager={NavigationManager},pagesController={PagesController},templateController={TemplateController})", navigationManager, pagesController, templateController);
             this.securityService = SecurityService.Instance;
             this.workflowManager = WorkflowManager.Instance;
         }
@@ -88,6 +101,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [HttpGet]
         public HttpResponseMessage GetPageDetails(int pageId)
         {
+			Logger.LogError(">>> Entering GetPageDetails(pageId={PageId})", pageId);
             if (!this.securityService.CanManagePage(pageId))
             {
                 return this.GetForbiddenResponse();
@@ -96,10 +110,13 @@ namespace Dnn.PersonaBar.Pages.Services
             try
             {
                 var page = this.pagesController.GetPageSettings(pageId);
+				Logger.LogError("GetPageDetails(pageId={PageId}): page → {Page}", pageId, page);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { page, new DnnFileUploadOptions().ValidationCode });
             }
             catch (PageNotFoundException)
             {
+				Logger.LogError("Exception in GetPageDetails(pageId={PageId}): {Arg1}", pageId, PageNotFoundException.Message);
+				Logger.LogWarning("<<< Exiting GetPageDetails(pageId={PageId})", pageId);
                 return this.Request.CreateResponse(HttpStatusCode.NotFound, new { Message = "Page doesn't exists." });
             }
         }
@@ -111,11 +128,13 @@ namespace Dnn.PersonaBar.Pages.Services
         [HttpGet]
         public HttpResponseMessage GetCustomUrls(int pageId)
         {
+			Logger.LogError(">>> Entering GetCustomUrls(pageId={PageId})", pageId);
             if (!this.securityService.CanManagePage(pageId))
             {
                 return this.GetForbiddenResponse();
             }
 
+			Logger.LogWarning("<<< Exiting GetCustomUrls(pageId={PageId})", pageId);
             return this.Request.CreateResponse(HttpStatusCode.OK, this.pagesController.GetPageUrls(pageId));
         }
 
@@ -127,13 +146,16 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage CreateCustomUrl(SeoUrl dto)
         {
+			Logger.LogError(">>> Entering CreateCustomUrl(dto={Dto})", dto);
             if (!this.securityService.CanManagePage(dto.TabId))
             {
                 return this.GetForbiddenResponse();
             }
 
             var result = this.pagesController.CreateCustomUrl(dto);
+			Logger.LogError("CreateCustomUrl(dto={Dto}): result → {Result}", dto, result);
 
+			Logger.LogWarning("<<< Exiting CreateCustomUrl(dto={Dto})", dto);
             return this.Request.CreateResponse(
                 HttpStatusCode.OK,
                 new
@@ -153,13 +175,16 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage UpdateCustomUrl(SeoUrl dto)
         {
+			Logger.LogError(">>> Entering UpdateCustomUrl(dto={Dto})", dto);
             if (!this.securityService.CanManagePage(dto.TabId))
             {
                 return this.GetForbiddenResponse();
             }
 
             var result = this.pagesController.UpdateCustomUrl(dto);
+			Logger.LogError("UpdateCustomUrl(dto={Dto}): result → {Result}", dto, result);
 
+			Logger.LogWarning("<<< Exiting UpdateCustomUrl(dto={Dto})", dto);
             return this.Request.CreateResponse(HttpStatusCode.OK, new
             {
                 result.Id,
@@ -177,6 +202,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage DeleteCustomUrl(UrlIdDto dto)
         {
+			Logger.LogError(">>> Entering DeleteCustomUrl(dto={Dto})", dto);
             if (!this.securityService.CanManagePage(dto.TabId))
             {
                 return this.GetForbiddenResponse();
@@ -189,6 +215,7 @@ namespace Dnn.PersonaBar.Pages.Services
                 Success = true,
             };
 
+			Logger.LogWarning("<<< Exiting DeleteCustomUrl(dto={Dto})", dto);
             return this.Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
@@ -201,10 +228,13 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "VIEW_PAGE_LIST,VIEW")]
         public HttpResponseMessage GetPageList(int parentId = -1, string searchKey = "")
         {
+			Logger.LogError(">>> Entering GetPageList(parentId={ParentId},searchKey={SearchKey})", parentId, searchKey);
             var adminTabId = this.PortalSettings.AdminTabId;
             var tabs = TabController.GetPortalTabs(this.PortalSettings.PortalId, adminTabId, false, true, false, true);
+			Logger.LogError("GetPageList(parentId={ParentId},searchKey={SearchKey}): tabs → {Tabs}", parentId, searchKey, tabs);
             var pages = from p in this.pagesController.GetPageList(this.PortalSettings, parentId, searchKey)
                         select Converters.ConvertToPageItem<PageItem>(p, tabs);
+			Logger.LogWarning("<<< Exiting GetPageList(parentId={ParentId},searchKey={SearchKey})", parentId, searchKey);
             return this.Request.CreateResponse(HttpStatusCode.OK, pages);
         }
 
@@ -233,9 +263,11 @@ namespace Dnn.PersonaBar.Pages.Services
             int pageIndex = -1,
             int pageSize = -1)
         {
+			Logger.LogError(">>> Entering SearchPages(searchKey={SearchKey},pageType={PageType},tags={Tags},publishStatus={PublishStatus},publishDateStart={PublishDateStart},publishDateEnd={PublishDateEnd},workflowId={WorkflowId},pageIndex={PageIndex},pageSize={PageSize})", searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize);
             int totalRecords;
             var adminTabId = this.PortalSettings.AdminTabId;
             var tabs = TabController.GetPortalTabs(this.PortalSettings.PortalId, adminTabId, false, true, false, true);
+			Logger.LogError("SearchPages(searchKey={SearchKey},pageType={PageType},tags={Tags},publishStatus={PublishStatus},publishDateStart={PublishDateStart},publishDateEnd={PublishDateEnd},workflowId={WorkflowId},pageIndex={PageIndex},pageSize={PageSize}): tabs → {Tabs}", searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize, tabs);
             var pages = from p in this.pagesController.SearchPages(out totalRecords, searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize)
                         select Converters.ConvertToPageItem<PageItem>(p, tabs);
             var response = new
@@ -244,6 +276,7 @@ namespace Dnn.PersonaBar.Pages.Services
                 Results = pages,
                 TotalResults = totalRecords,
             };
+			Logger.LogWarning("<<< Exiting SearchPages(searchKey={SearchKey},pageType={PageType},tags={Tags},publishStatus={PublishStatus},publishDateStart={PublishDateStart},publishDateEnd={PublishDateEnd},workflowId={WorkflowId},pageIndex={PageIndex},pageSize={PageSize})", searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize);
             return this.Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
@@ -254,13 +287,17 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage GetPageHierarchy(int pageId)
         {
+			Logger.LogError(">>> Entering GetPageHierarchy(pageId={PageId})", pageId);
             try
             {
                 var paths = this.pagesController.GetPageHierarchy(pageId);
+				Logger.LogError("GetPageHierarchy(pageId={PageId}): paths → {Paths}", pageId, paths);
                 return this.Request.CreateResponse(HttpStatusCode.OK, paths);
             }
             catch (PageNotFoundException)
             {
+				Logger.LogError("Exception in GetPageHierarchy(pageId={PageId}): {Arg1}", pageId, PageNotFoundException.Message);
+				Logger.LogWarning("<<< Exiting GetPageHierarchy(pageId={PageId})", pageId);
                 return this.Request.CreateResponse(HttpStatusCode.NotFound);
             }
         }
@@ -273,6 +310,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage MovePage(PageMoveRequest request)
         {
+			Logger.LogError(">>> Entering MovePage(request={Request})", request);
             if (!this.securityService.CanManagePage(request.PageId)
                 || !this.securityService.CanManagePage(request.ParentId)
                 || !this.securityService.CanManagePage(request.RelatedPageId)
@@ -284,6 +322,7 @@ namespace Dnn.PersonaBar.Pages.Services
             try
             {
                 var tab = this.pagesController.MovePage(request);
+				Logger.LogError("MovePage(request={Request}): tab → {Tab}", request, tab);
                 var tabs = TabController.GetPortalTabs(
                     this.PortalSettings.PortalId,
                     Null.NullInteger,
@@ -292,14 +331,18 @@ namespace Dnn.PersonaBar.Pages.Services
                     false,
                     true);
                 var pageItem = Converters.ConvertToPageItem<PageItem>(tab, tabs);
+				Logger.LogError("MovePage(request={Request}): pageItem → {PageItem}", request, pageItem);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 0, Page = pageItem });
             }
             catch (PageNotFoundException)
             {
+				Logger.LogError("Exception in MovePage(request={Request}): {Arg1}", request, PageNotFoundException.Message);
                 return this.Request.CreateResponse(HttpStatusCode.NotFound);
             }
             catch (PageException ex)
             {
+				Logger.LogError("Exception in MovePage(request={Request}): {Arg1}", request, ex.Message);
+				Logger.LogWarning("<<< Exiting MovePage(request={Request})", request);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 1, ex.Message });
             }
         }
@@ -313,6 +356,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage DeletePage(PageItem page, [FromUri] bool hardDelete = false)
         {
+			Logger.LogError(">>> Entering DeletePage(page={Page},hardDelete={HardDelete})", page, hardDelete);
             if (!this.securityService.CanDeletePage(page.Id))
             {
                 return this.GetForbiddenResponse();
@@ -325,6 +369,8 @@ namespace Dnn.PersonaBar.Pages.Services
             }
             catch (PageNotFoundException)
             {
+				Logger.LogError("Exception in DeletePage(page={Page},hardDelete={HardDelete}): {Arg2}", page, hardDelete, PageNotFoundException.Message);
+				Logger.LogWarning("<<< Exiting DeletePage(page={Page},hardDelete={HardDelete})", page, hardDelete);
                 return this.Request.CreateResponse(HttpStatusCode.NotFound);
             }
         }
@@ -337,6 +383,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage DeletePageModule(PageModuleItem module)
         {
+			Logger.LogError(">>> Entering DeletePageModule(module={Module})", module);
             if (!this.securityService.CanManagePage(module.PageId))
             {
                 return this.GetForbiddenResponse();
@@ -349,6 +396,8 @@ namespace Dnn.PersonaBar.Pages.Services
             }
             catch (PageModuleNotFoundException)
             {
+				Logger.LogError("Exception in DeletePageModule(module={Module}): {Arg1}", module, PageModuleNotFoundException.Message);
+				Logger.LogWarning("<<< Exiting DeletePageModule(module={Module})", module);
                 return this.Request.CreateResponse(HttpStatusCode.NotFound);
             }
         }
@@ -361,12 +410,14 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage CopyThemeToDescendantPages(CopyThemeRequest copyTheme)
         {
+			Logger.LogError(">>> Entering CopyThemeToDescendantPages(copyTheme={CopyTheme})", copyTheme);
             if (!this.securityService.CanManagePage(copyTheme.PageId))
             {
                 return this.GetForbiddenResponse();
             }
 
             this.pagesController.CopyThemeToDescendantPages(copyTheme.PageId, copyTheme.Theme);
+			Logger.LogWarning("<<< Exiting CopyThemeToDescendantPages(copyTheme={CopyTheme})", copyTheme);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 0 });
         }
 
@@ -378,6 +429,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage CopyPermissionsToDescendantPages(CopyPermissionsRequest copyPermissions)
         {
+			Logger.LogError(">>> Entering CopyPermissionsToDescendantPages(copyPermissions={CopyPermissions})", copyPermissions);
             if (!this.securityService.CanAdminPage(copyPermissions.PageId))
             {
                 return this.GetForbiddenResponse();
@@ -390,10 +442,13 @@ namespace Dnn.PersonaBar.Pages.Services
             }
             catch (PageNotFoundException)
             {
+				Logger.LogError("Exception in CopyPermissionsToDescendantPages(copyPermissions={CopyPermissions}): {Arg1}", copyPermissions, PageNotFoundException.Message);
                 return this.Request.CreateResponse(HttpStatusCode.NotFound);
             }
             catch (PermissionsNotMetException)
             {
+				Logger.LogError("Exception in CopyPermissionsToDescendantPages(copyPermissions={CopyPermissions}): {Arg1}", copyPermissions, PermissionsNotMetException.Message);
+				Logger.LogWarning("<<< Exiting CopyPermissionsToDescendantPages(copyPermissions={CopyPermissions})", copyPermissions);
                 return this.Request.CreateResponse(HttpStatusCode.Forbidden);
             }
         }
@@ -404,12 +459,14 @@ namespace Dnn.PersonaBar.Pages.Services
         [HttpPost]
         public HttpResponseMessage EditModeForPage([FromUri] int id)
         {
+			Logger.LogError(">>> Entering EditModeForPage(id={Id})", id);
             if (!TabPermissionController.CanAddContentToPage(TabController.Instance.GetTab(id, this.PortalId)))
             {
                 return this.GetForbiddenResponse();
             }
 
             this.pagesController.EditModeForPage(id, this.UserInfo.UserID);
+			Logger.LogWarning("<<< Exiting EditModeForPage(id={Id})", id);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, });
         }
 
@@ -420,6 +477,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage SavePageDetails(PageSettings pageSettings)
         {
+			Logger.LogError(">>> Entering SavePageDetails(pageSettings={PageSettings})", pageSettings);
             if (!this.securityService.CanSavePageDetails(pageSettings))
             {
                 return this.GetForbiddenResponse();
@@ -429,6 +487,7 @@ namespace Dnn.PersonaBar.Pages.Services
             {
                 pageSettings.Clean();
                 var tab = this.pagesController.SavePageDetails(this.PortalSettings, pageSettings);
+				Logger.LogError("SavePageDetails(pageSettings={PageSettings}): tab → {Tab}", pageSettings, tab);
                 var tabs = TabController.GetPortalTabs(
                     this.PortalSettings.PortalId,
                     Null.NullInteger,
@@ -445,10 +504,13 @@ namespace Dnn.PersonaBar.Pages.Services
             }
             catch (PageNotFoundException)
             {
+				Logger.LogError("Exception in SavePageDetails(pageSettings={PageSettings}): {Arg1}", pageSettings, PageNotFoundException.Message);
                 return this.Request.CreateResponse(HttpStatusCode.NotFound, new { Message = "Page doesn't exists." });
             }
             catch (PageValidationException ex)
             {
+				Logger.LogError("Exception in SavePageDetails(pageSettings={PageSettings}): {Arg1}", pageSettings, ex.Message);
+				Logger.LogWarning("<<< Exiting SavePageDetails(pageSettings={PageSettings})", pageSettings);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 1, ex.Field, ex.Message });
             }
         }
@@ -459,6 +521,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [HttpGet]
         public HttpResponseMessage GetDefaultSettings(int pageId = 0)
         {
+			Logger.LogError(">>> Entering GetDefaultSettings(pageId={PageId})", pageId);
             var settings = this.pagesController.GetDefaultSettings(pageId);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { page = settings, new DnnFileUploadOptions().ValidationCode });
         }
@@ -468,7 +531,10 @@ namespace Dnn.PersonaBar.Pages.Services
         [HttpGet]
         public HttpResponseMessage GetCacheProviderList()
         {
+			Logger.LogError(">>> Entering GetCacheProviderList()");
             var providers = from p in OutputCachingProvider.GetProviderList() select p.Key;
+			Logger.LogError("GetCacheProviderList(): providers → {Providers}", providers);
+			Logger.LogWarning("<<< Exiting GetCacheProviderList()");
             return this.Request.CreateResponse(HttpStatusCode.OK, providers);
         }
 
@@ -477,14 +543,20 @@ namespace Dnn.PersonaBar.Pages.Services
         [HttpGet]
         public HttpResponseMessage GetThemes()
         {
+			Logger.LogError(">>> Entering GetThemes()");
             var themes = this.themesController.GetLayouts(this.PortalSettings, ThemeLevel.All);
 
+			Logger.LogError("GetThemes(): themes → {Themes}", themes);
             var defaultTheme = this.GetDefaultPortalTheme();
+			Logger.LogError("GetThemes(): defaultTheme → {DefaultTheme}", defaultTheme);
             var defaultPortalThemeName = defaultTheme?.ThemeName;
             var defaultPortalThemeLevel = defaultTheme?.Level;
             var defaultPortalLayout = this.defaultPortalThemeController.GetDefaultPortalLayout();
+			Logger.LogError("GetThemes(): defaultPortalLayout → {DefaultPortalLayout}", defaultPortalLayout);
             var defaultPortalContainer = this.defaultPortalThemeController.GetDefaultPortalContainer();
+			Logger.LogError("GetThemes(): defaultPortalContainer → {DefaultPortalContainer}", defaultPortalContainer);
 
+			Logger.LogWarning("<<< Exiting GetThemes()");
             return this.Request.CreateResponse(HttpStatusCode.OK, new
             {
                 themes,
@@ -502,11 +574,13 @@ namespace Dnn.PersonaBar.Pages.Services
         [HttpGet]
         public HttpResponseMessage GetThemeFiles(string themeName, ThemeLevel level)
         {
+			Logger.LogError(">>> Entering GetThemeFiles(themeName={ThemeName},level={Level})", themeName, level);
             var themeLayout = this.themesController.GetLayouts(this.PortalSettings, level)
                 .FirstOrDefault(t => t.PackageName.Equals(themeName, StringComparison.OrdinalIgnoreCase) && t.Level == level);
             var themeContainer = this.themesController.GetContainers(this.PortalSettings, level)
                 .FirstOrDefault(t => t.PackageName.Equals(themeName, StringComparison.OrdinalIgnoreCase) && t.Level == level);
 
+			Logger.LogWarning("<<< Exiting GetThemeFiles(themeName={ThemeName},level={Level})", themeName, level);
             return this.Request.CreateResponse(HttpStatusCode.OK, new
             {
                 layouts = themeLayout == null ? new List<ThemeFileInfo>() : this.themesController.GetThemeFiles(this.PortalSettings, themeLayout),
@@ -522,6 +596,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage SaveBulkPages(BulkPage bulkPage)
         {
+			Logger.LogError(">>> Entering SaveBulkPages(bulkPage={BulkPage})", bulkPage);
             if (!this.securityService.IsPageAdminUser())
             {
                 return this.GetForbiddenResponse();
@@ -531,6 +606,7 @@ namespace Dnn.PersonaBar.Pages.Services
             {
                 bulkPage.Clean();
                 var bulkPageResponse = this.bulkPagesController.AddBulkPages(bulkPage, validateOnly: false);
+				Logger.LogError("SaveBulkPages(bulkPage={BulkPage}): bulkPageResponse → {BulkPageResponse}", bulkPage, bulkPageResponse);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
                 {
@@ -540,6 +616,8 @@ namespace Dnn.PersonaBar.Pages.Services
             }
             catch (PageValidationException ex)
             {
+				Logger.LogError("Exception in SaveBulkPages(bulkPage={BulkPage}): {Arg1}", bulkPage, ex.Message);
+				Logger.LogWarning("<<< Exiting SaveBulkPages(bulkPage={BulkPage})", bulkPage);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 1, ex.Field, ex.Message });
             }
         }
@@ -552,6 +630,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage PreSaveBulkPagesValidate(BulkPage bulkPage)
         {
+			Logger.LogError(">>> Entering PreSaveBulkPagesValidate(bulkPage={BulkPage})", bulkPage);
             if (!this.securityService.IsPageAdminUser())
             {
                 return this.GetForbiddenResponse();
@@ -561,6 +640,7 @@ namespace Dnn.PersonaBar.Pages.Services
             {
                 bulkPage.Clean();
                 var bulkPageResponse = this.bulkPagesController.AddBulkPages(bulkPage, validateOnly: true);
+				Logger.LogError("PreSaveBulkPagesValidate(bulkPage={BulkPage}): bulkPageResponse → {BulkPageResponse}", bulkPage, bulkPageResponse);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
                 {
@@ -570,6 +650,8 @@ namespace Dnn.PersonaBar.Pages.Services
             }
             catch (PageValidationException ex)
             {
+				Logger.LogError("Exception in PreSaveBulkPagesValidate(bulkPage={BulkPage}): {Arg1}", bulkPage, ex.Message);
+				Logger.LogWarning("<<< Exiting PreSaveBulkPagesValidate(bulkPage={BulkPage})", bulkPage);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 1, ex.Field, ex.Message });
             }
         }
@@ -582,6 +664,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage SavePageAsTemplate(PageTemplate pageTemplate)
         {
+			Logger.LogError(">>> Entering SavePageAsTemplate(pageTemplate={PageTemplate})", pageTemplate);
             if (!this.securityService.CanExportPage(pageTemplate.TabId))
             {
                 return this.GetForbiddenResponse();
@@ -591,7 +674,9 @@ namespace Dnn.PersonaBar.Pages.Services
             {
                 pageTemplate.Clean();
                 var templateFilename = this.templateController.SaveAsTemplate(pageTemplate);
+				Logger.LogError("SavePageAsTemplate(pageTemplate={PageTemplate}): templateFilename → {TemplateFilename}", pageTemplate, templateFilename);
                 var response = string.Format(CultureInfo.CurrentCulture, Localization.GetString("ExportedMessage"), templateFilename);
+				Logger.LogError("SavePageAsTemplate(pageTemplate={PageTemplate}): response → {Response}", pageTemplate, response);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
                 {
@@ -601,6 +686,8 @@ namespace Dnn.PersonaBar.Pages.Services
             }
             catch (TemplateException ex)
             {
+				Logger.LogError("Exception in SavePageAsTemplate(pageTemplate={PageTemplate}): {Arg1}", pageTemplate, ex.Message);
+				Logger.LogWarning("<<< Exiting SavePageAsTemplate(pageTemplate={PageTemplate})", pageTemplate);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 1, ex.Message });
             }
         }
@@ -614,6 +701,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage MakePageNeutral([FromUri] int pageId)
         {
+			Logger.LogError(">>> Entering MakePageNeutral(pageId={PageId})", pageId);
             try
             {
                 if (!this.securityService.CanManagePage(pageId))
@@ -627,13 +715,16 @@ namespace Dnn.PersonaBar.Pages.Services
                 }
 
                 var defaultLocale = this.localeController.GetDefaultLocale(this.PortalId);
+				Logger.LogError("MakePageNeutral(pageId={PageId}): defaultLocale → {DefaultLocale}", pageId, defaultLocale);
                 this.tabController.ConvertTabToNeutralLanguage(this.PortalId, pageId, defaultLocale.Code, true);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, });
             }
             catch (Exception ex)
             {
                 var errorMessage = "An unexpected error occurred while trying to make this page neutral, please consult the logs for more details.";
+				Logger.LogError("MakePageNeutral(pageId={PageId}): errorMessage → {ErrorMessage}", pageId, errorMessage);
                 Logger.Error(errorMessage, ex);
+				Logger.LogWarning("<<< Exiting MakePageNeutral(pageId={PageId})", pageId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, errorMessage);
             }
         }
@@ -647,6 +738,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage MakePageTranslatable([FromUri] int pageId)
         {
+			Logger.LogError(">>> Entering MakePageTranslatable(pageId={PageId})", pageId);
             try
             {
                 if (!this.securityService.CanManagePage(pageId))
@@ -655,12 +747,14 @@ namespace Dnn.PersonaBar.Pages.Services
                 }
 
                 var currentTab = this.tabController.GetTab(pageId, this.PortalId, false);
+				Logger.LogError("MakePageTranslatable(pageId={PageId}): currentTab → {CurrentTab}", pageId, currentTab);
                 if (currentTab == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "InvalidTab");
                 }
 
                 var defaultLocale = this.localeController.GetDefaultLocale(this.PortalId);
+				Logger.LogError("MakePageTranslatable(pageId={PageId}): defaultLocale → {DefaultLocale}", pageId, defaultLocale);
                 this.tabController.LocalizeTab(currentTab, defaultLocale, true);
                 this.tabController.AddMissingLanguagesWithWarnings(this.PortalId, pageId);
                 this.tabController.ClearCache(this.PortalId);
@@ -669,7 +763,9 @@ namespace Dnn.PersonaBar.Pages.Services
             catch (Exception ex)
             {
                 var errorMessage = "An unexpected error occurred while trying to make this page translatable.";
+				Logger.LogError("MakePageTranslatable(pageId={PageId}): errorMessage → {ErrorMessage}", pageId, errorMessage);
                 Logger.Error(errorMessage, ex);
+				Logger.LogWarning("<<< Exiting MakePageTranslatable(pageId={PageId})", pageId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, errorMessage);
             }
         }
@@ -683,6 +779,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage AddMissingLanguages([FromUri] int pageId)
         {
+			Logger.LogError(">>> Entering AddMissingLanguages(pageId={PageId})", pageId);
             try
             {
                 if (!this.securityService.CanManagePage(pageId))
@@ -697,7 +794,9 @@ namespace Dnn.PersonaBar.Pages.Services
             catch (Exception ex)
             {
                 var errorMessage = "An unexpected error occurred while trying to add missing languages to this page, consult the logs for more details.";
+				Logger.LogError("AddMissingLanguages(pageId={PageId}): errorMessage → {ErrorMessage}", pageId, errorMessage);
                 Logger.Error(errorMessage, ex);
+				Logger.LogWarning("<<< Exiting AddMissingLanguages(pageId={PageId})", pageId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, errorMessage);
             }
         }
@@ -711,6 +810,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage NotifyTranslators(TranslatorsComment comment)
         {
+			Logger.LogError(">>> Entering NotifyTranslators(comment={Comment})", comment);
             try
             {
                 if (!this.securityService.CanManagePage(comment.TabId))
@@ -720,9 +820,11 @@ namespace Dnn.PersonaBar.Pages.Services
 
                 // loop through all localized version of this page
                 var currentTab = this.tabController.GetTab(comment.TabId, this.PortalId, false);
+				Logger.LogError("NotifyTranslators(comment={Comment}): currentTab → {CurrentTab}", comment, currentTab);
                 foreach (var localizedTab in currentTab.LocalizedTabs.Values)
                 {
                     var users = new Dictionary<int, UserInfo>();
+					Logger.LogError("NotifyTranslators(comment={Comment}): users → {Users}", comment, users);
 
                     // Give default translators for this language and administrators permissions
                     this.tabController.GiveTranslatorRoleEditRights(localizedTab, users);
@@ -735,12 +837,15 @@ namespace Dnn.PersonaBar.Pages.Services
                 }
 
                 var msgToUser = LocalizeString("TranslationMessageConfirmMessage.Text");
+				Logger.LogError("NotifyTranslators(comment={Comment}): msgToUser → {MsgToUser}", comment, msgToUser);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, Message = msgToUser });
             }
             catch (Exception ex)
             {
                 var errorMessage = "An unexpected error occurred while trying to notify the translators, please consult the logs for more details.";
+				Logger.LogError("NotifyTranslators(comment={Comment}): errorMessage → {ErrorMessage}", comment, errorMessage);
                 Logger.Error(errorMessage, ex);
+				Logger.LogWarning("<<< Exiting NotifyTranslators(comment={Comment})", comment);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, errorMessage);
             }
         }
@@ -755,6 +860,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [HttpGet]
         public HttpResponseMessage GetTabLocalization(int pageId)
         {
+			Logger.LogError(">>> Entering GetTabLocalization(pageId={PageId})", pageId);
             try
             {
                 if (!this.securityService.CanManagePage(pageId))
@@ -763,8 +869,11 @@ namespace Dnn.PersonaBar.Pages.Services
                 }
 
                 var currentTab = this.tabController.GetTab(pageId, this.PortalId, false);
+				Logger.LogError("GetTabLocalization(pageId={PageId}): currentTab → {CurrentTab}", pageId, currentTab);
                 var locales = new List<LocaleInfoDto>();
+				Logger.LogError("GetTabLocalization(pageId={PageId}): locales → {Locales}", pageId, locales);
                 var pages = new DnnPagesDto(locales);
+				Logger.LogError("GetTabLocalization(pageId={PageId}): pages → {Pages}", pageId, pages);
                 if (!currentTab.IsNeutralCulture)
                 {
                     pages = this.GetNonLocalizedPages(pageId);
@@ -775,7 +884,9 @@ namespace Dnn.PersonaBar.Pages.Services
             catch (Exception ex)
             {
                 var errorMessage = "An unexpected error occurrfed trying to get this page localization, consult the logs for more details.";
+				Logger.LogError("GetTabLocalization(pageId={PageId}): errorMessage → {ErrorMessage}", pageId, errorMessage);
                 Logger.Error(errorMessage, ex);
+				Logger.LogWarning("<<< Exiting GetTabLocalization(pageId={PageId})", pageId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, errorMessage);
             }
         }
@@ -789,6 +900,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage UpdateTabLocalization(DnnPagesRequest request)
         {
+			Logger.LogError(">>> Entering UpdateTabLocalization(request={Request})", request);
             try
             {
                 if (request.Pages.Any(x => x.TabId > 0 && !this.securityService.CanManagePage(x.TabId)))
@@ -802,7 +914,9 @@ namespace Dnn.PersonaBar.Pages.Services
             catch (Exception ex)
             {
                 var errorMessage = "An unexpected error occurred trying to update the page localization, please consult the logs for more details.";
+				Logger.LogError("UpdateTabLocalization(request={Request}): errorMessage → {ErrorMessage}", request, errorMessage);
                 Logger.Error(errorMessage, ex);
+				Logger.LogWarning("<<< Exiting UpdateTabLocalization(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, errorMessage);
             }
         }
@@ -816,9 +930,11 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage RestoreModule(int tabModuleId)
         {
+			Logger.LogError(">>> Entering RestoreModule(tabModuleId={TabModuleId})", tabModuleId);
             try
             {
                 var module = ModuleController.Instance.GetTabModule(tabModuleId);
+				Logger.LogError("RestoreModule(tabModuleId={TabModuleId}): module → {Module}", tabModuleId, module);
                 if (!this.securityService.CanManagePage(module.TabID))
                 {
                     return this.GetForbiddenResponse();
@@ -826,6 +942,7 @@ namespace Dnn.PersonaBar.Pages.Services
 
                 var moduleController = ModuleController.Instance;
                 var moduleInfo = moduleController.GetTabModule(tabModuleId);
+				Logger.LogError("RestoreModule(tabModuleId={TabModuleId}): moduleInfo → {ModuleInfo}", tabModuleId, moduleInfo);
                 if (moduleInfo == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "InvalidTabModule");
@@ -837,7 +954,9 @@ namespace Dnn.PersonaBar.Pages.Services
             catch (Exception ex)
             {
                 var errorMessage = "An unexpected error occurred while trying to restore the module onto that page.";
+				Logger.LogError("RestoreModule(tabModuleId={TabModuleId}): errorMessage → {ErrorMessage}", tabModuleId, errorMessage);
                 Logger.Error(errorMessage, ex);
+				Logger.LogWarning("<<< Exiting RestoreModule(tabModuleId={TabModuleId})", tabModuleId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, errorMessage);
             }
         }
@@ -851,9 +970,11 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage DeleteModule(int tabModuleId)
         {
+			Logger.LogError(">>> Entering DeleteModule(tabModuleId={TabModuleId})", tabModuleId);
             try
             {
                 var module = ModuleController.Instance.GetTabModule(tabModuleId);
+				Logger.LogError("DeleteModule(tabModuleId={TabModuleId}): module → {Module}", tabModuleId, module);
                 if (!this.securityService.CanManagePage(module.TabID))
                 {
                     return this.GetForbiddenResponse();
@@ -861,6 +982,7 @@ namespace Dnn.PersonaBar.Pages.Services
 
                 var moduleController = ModuleController.Instance;
                 var moduleInfo = moduleController.GetTabModule(tabModuleId);
+				Logger.LogError("DeleteModule(tabModuleId={TabModuleId}): moduleInfo → {ModuleInfo}", tabModuleId, moduleInfo);
                 if (moduleInfo == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "InvalidTabModule");
@@ -872,7 +994,9 @@ namespace Dnn.PersonaBar.Pages.Services
             catch (Exception ex)
             {
                 var errorMessage = "An unexpected error occurred while trying to delete the module, consult the logs for more details.";
+				Logger.LogError("DeleteModule(tabModuleId={TabModuleId}): errorMessage → {ErrorMessage}", tabModuleId, errorMessage);
                 Logger.Error(errorMessage, ex);
+				Logger.LogWarning("<<< Exiting DeleteModule(tabModuleId={TabModuleId})", tabModuleId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, errorMessage);
             }
         }
@@ -883,6 +1007,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [HttpGet]
         public HttpResponseMessage GetContentLocalizationEnabled()
         {
+			Logger.LogError(">>> Entering GetContentLocalizationEnabled()");
             try
             {
                 if (!TabPermissionController.CanManagePage())
@@ -895,7 +1020,9 @@ namespace Dnn.PersonaBar.Pages.Services
             catch (Exception ex)
             {
                 var errorMessage = "An unexpected error occurred while trying to find if content localization is enabled";
+				Logger.LogError("GetContentLocalizationEnabled(): errorMessage → {ErrorMessage}", errorMessage);
                 Logger.Error(errorMessage, ex);
+				Logger.LogWarning("<<< Exiting GetContentLocalizationEnabled()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, errorMessage);
             }
         }
@@ -908,6 +1035,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [HttpGet]
         public HttpResponseMessage GetCachedItemCount(string cacheProvider, int pageId)
         {
+			Logger.LogError(">>> Entering GetCachedItemCount(cacheProvider={CacheProvider},pageId={PageId})", cacheProvider, pageId);
             try
             {
                 if (!TabPermissionController.CanManagePage())
@@ -920,7 +1048,9 @@ namespace Dnn.PersonaBar.Pages.Services
             catch (Exception ex)
             {
                 var errorMessage = "An unexpected error occurred trying to get the cached items count, please consult the logs for more details.";
+				Logger.LogError("GetCachedItemCount(cacheProvider={CacheProvider},pageId={PageId}): errorMessage → {ErrorMessage}", cacheProvider, pageId, errorMessage);
                 Logger.Error(errorMessage, ex);
+				Logger.LogWarning("<<< Exiting GetCachedItemCount(cacheProvider={CacheProvider},pageId={PageId})", cacheProvider, pageId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, errorMessage);
             }
         }
@@ -935,6 +1065,7 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "Edit")]
         public HttpResponseMessage ClearCache([FromUri] string cacheProvider, [FromUri] int pageId)
         {
+			Logger.LogError(">>> Entering ClearCache(cacheProvider={CacheProvider},pageId={PageId})", cacheProvider, pageId);
             try
             {
                 if (!this.securityService.CanManagePage(pageId))
@@ -948,7 +1079,9 @@ namespace Dnn.PersonaBar.Pages.Services
             catch (Exception ex)
             {
                 var message = "An unexpected error occurred while trying to clear the cache for this page, see logs for more details.";
+				Logger.LogError("ClearCache(cacheProvider={CacheProvider},pageId={PageId}): message → {Message}", cacheProvider, pageId, message);
                 Logger.Error(message, ex);
+				Logger.LogWarning("<<< Exiting ClearCache(cacheProvider={CacheProvider},pageId={PageId})", cacheProvider, pageId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message);
             }
         }
@@ -960,17 +1093,23 @@ namespace Dnn.PersonaBar.Pages.Services
         [AdvancedPermission(MenuName = "Dnn.Pages", Permission = "VIEW_PAGE_LIST,VIEW")]
         public HttpResponseMessage GetWorkflows()
         {
+			Logger.LogError(">>> Entering GetWorkflows()");
             var workflows = this.workflowManager.GetWorkflows(this.PortalSettings.PortalId).Select(w => new { workflowId = w.WorkflowID, workflowName = w.WorkflowName });
+			Logger.LogError("GetWorkflows(): workflows → {Workflows}", workflows);
+			Logger.LogWarning("<<< Exiting GetWorkflows()");
             return this.Request.CreateResponse(HttpStatusCode.OK, workflows);
         }
 
         private static string LocalizeString(string key)
         {
+			Logger.LogError(">>> Entering LocalizeString(key={Key})", key);
+            Logger.LogWarning("<<< Exiting LocalizeString(key={Key})", key);
             return DotNetNuke.Services.Localization.Localization.GetString(key, LocalResourceFile);
         }
 
         private static void EnableTabVersioningAndWorkflow(TabInfo tab)
         {
+			Logger.LogError(">>> Entering EnableTabVersioningAndWorkflow(tab={Tab})", tab);
             var tabVersionSettings = TabVersionSettings.Instance;
             var tabWorkflowSettings = TabWorkflowSettings.Instance;
 
@@ -983,10 +1122,12 @@ namespace Dnn.PersonaBar.Pages.Services
             {
                 tabWorkflowSettings.SetWorkflowEnabled(tab.PortalID, tab.TabID, true);
             }
+			Logger.LogWarning("<<< Exiting EnableTabVersioningAndWorkflow(tab={Tab})", tab);
         }
 
         private static void DisableTabVersioningAndWorkflow(TabInfo tab)
         {
+			Logger.LogError(">>> Entering DisableTabVersioningAndWorkflow(tab={Tab})", tab);
             var tabVersionSettings = TabVersionSettings.Instance;
             var tabWorkflowSettings = TabWorkflowSettings.Instance;
 
@@ -999,12 +1140,15 @@ namespace Dnn.PersonaBar.Pages.Services
             {
                 tabWorkflowSettings.SetWorkflowEnabled(tab.PortalID, tab.TabID, false);
             }
+			Logger.LogWarning("<<< Exiting DisableTabVersioningAndWorkflow(tab={Tab})", tab);
         }
 
         private DnnPagesDto GetNonLocalizedPages(int tabId)
         {
+			Logger.LogError(">>> Entering GetNonLocalizedPages(tabId={TabId})", tabId);
             var currentTab = this.tabController.GetTab(tabId, this.PortalId, false);
 
+			Logger.LogError("GetNonLocalizedPages(tabId={TabId}): currentTab → {CurrentTab}", tabId, currentTab);
             // Unique id of default language page
             var uniqueId = currentTab.DefaultLanguageGuid != Null.NullGuid
                 ? currentTab.DefaultLanguageGuid
@@ -1014,9 +1158,11 @@ namespace Dnn.PersonaBar.Pages.Services
             var allPages = this.tabController.GetTabsByPortal(this.PortalId).Values.Where(
                 t => t.TabID != this.PortalSettings.AdminTabId && (Null.IsNull(t.ParentId) || t.ParentId != this.PortalSettings.AdminTabId));
             allPages = allPages.Where(t => t.IsDeleted == false);
+			Logger.LogError("GetNonLocalizedPages(tabId={TabId}): allPages → {AllPages}", tabId, allPages);
 
             // get all localized pages of current page
             var tabInfos = allPages as IList<TabInfo> ?? allPages.ToList();
+			Logger.LogError("GetNonLocalizedPages(tabId={TabId}): tabInfos → {TabInfos}", tabId, tabInfos);
             var localizedPages = tabInfos.Where(
                 t => t.DefaultLanguageGuid == uniqueId || t.UniqueId == uniqueId).OrderBy(t => t.DefaultLanguageGuid).ToList();
             Dictionary<string, TabInfo> localizedTabs = null;
@@ -1025,8 +1171,11 @@ namespace Dnn.PersonaBar.Pages.Services
             // this is a bit more involved, since we want the default language to be first.
             // also, we do not want to add any locales the user has no access to
             var locales = new List<LocaleInfoDto>();
+			Logger.LogError("GetNonLocalizedPages(tabId={TabId}): locales → {Locales}", tabId, locales);
             var localeController = new LocaleController();
+			Logger.LogError("GetNonLocalizedPages(tabId={TabId}): localeController → {LocaleController}", tabId, localeController);
             var localeDict = localeController.GetLocales(this.PortalId);
+			Logger.LogError("GetNonLocalizedPages(tabId={TabId}): localeDict → {LocaleDict}", tabId, localeDict);
             if (localeDict.Count == 0)
             {
                 locales.Add(new LocaleInfoDto(string.Empty));
@@ -1041,6 +1190,7 @@ namespace Dnn.PersonaBar.Pages.Services
                 else if (localizedPages.Count == 1 && localizedPages.First().CultureCode != this.PortalSettings.DefaultLanguage)
                 {
                     var first = localizedPages.First();
+					Logger.LogError("GetNonLocalizedPages(tabId={TabId}): first → {First}", tabId, first);
                     locales.Add(new LocaleInfoDto(first.CultureCode));
                 }
                 else
@@ -1055,6 +1205,7 @@ namespace Dnn.PersonaBar.Pages.Services
                     if (currentTab.CultureCode == this.PortalSettings.DefaultLanguage)
                     {
                         localizedTabs = currentTab.LocalizedTabs;
+						Logger.LogError("GetNonLocalizedPages(tabId={TabId}): localizedTabs → {LocalizedTabs}", tabId, localizedTabs);
                     }
                     else
                     {
@@ -1091,6 +1242,7 @@ namespace Dnn.PersonaBar.Pages.Services
             {
                 var localTabInfo = tabInfo;
                 var dnnPage = dnnPages.Page(localTabInfo.CultureCode);
+				Logger.LogError("GetNonLocalizedPages(tabId={TabId}): dnnPage → {DnnPage}", tabId, dnnPage);
                 if (!TabPermissionController.CanViewPage(tabInfo))
                 {
                     dnnPages.RemoveLocale(localTabInfo.CultureCode);
@@ -1099,7 +1251,11 @@ namespace Dnn.PersonaBar.Pages.Services
                 }
 
                 dnnPage.TabId = localTabInfo.TabID;
+				Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnPage.TabId → {Arg1}", tabId, dnnPage.TabId);
+				Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnPage.Title → {Arg1}", tabId, dnnPage.Title);
+				Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnPage.Description → {Arg1}", tabId, dnnPage.Description);
                 dnnPage.TabName = localTabInfo.TabName;
+				Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnPage.TabName → {Arg1}", tabId, dnnPage.TabName);
                 dnnPage.Title = localTabInfo.Title;
                 dnnPage.Description = localTabInfo.Description;
                 dnnPage.Path = localTabInfo.TabPath.Substring(0, localTabInfo.TabPath.LastIndexOf("//", StringComparison.Ordinal)).Replace("//", string.Empty);
@@ -1107,24 +1263,31 @@ namespace Dnn.PersonaBar.Pages.Services
                 dnnPage.CanAdminPage = TabPermissionController.CanAdminPage(tabInfo);
                 dnnPage.CanViewPage = TabPermissionController.CanViewPage(tabInfo);
                 dnnPage.LocalResourceFile = LocalResourceFile;
+				Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnPage.LocalResourceFile → {Arg1}", tabId, dnnPage.LocalResourceFile);
                 dnnPage.PageUrl = this.NavigationManager.NavigateURL(localTabInfo.TabID, false, this.PortalSettings, string.Empty, localTabInfo.CultureCode);
                 dnnPage.IsSpecial = TabController.IsSpecialTab(localTabInfo.TabID, localTabInfo.PortalID);
 
                 // calculate position in the form of 1.3.2...
                 var siblingTabs = tabInfos.Where(t => (t.ParentId == localTabInfo.ParentId && t.CultureCode == localTabInfo.CultureCode) || t.CultureCode == null).OrderBy(t => t.TabOrder).ToList();
+				Logger.LogError("GetNonLocalizedPages(tabId={TabId}): siblingTabs → {SiblingTabs}", tabId, siblingTabs);
                 dnnPage.Position = (siblingTabs.IndexOf(localTabInfo) + 1).ToString(CultureInfo.InvariantCulture);
                 var parentTabId = localTabInfo.ParentId;
+				Logger.LogError("GetNonLocalizedPages(tabId={TabId}): parentTabId → {ParentTabId}", tabId, parentTabId);
                 while (parentTabId > 0)
                 {
                     var parentTab = tabInfos.Single(t => t.TabID == parentTabId);
+					Logger.LogError("GetNonLocalizedPages(tabId={TabId}): parentTab → {ParentTab}", tabId, parentTab);
                     var id = parentTabId;
+					Logger.LogError("GetNonLocalizedPages(tabId={TabId}): id → {Id}", tabId, id);
                     siblingTabs = tabInfos.Where(t => (t.ParentId == id && t.CultureCode == localTabInfo.CultureCode) || t.CultureCode == null).OrderBy(t => t.TabOrder).ToList();
                     dnnPage.Position = (siblingTabs.IndexOf(localTabInfo) + 1).ToString(CultureInfo.InvariantCulture) + "." + dnnPage.Position;
                     parentTabId = parentTab.ParentId;
                 }
 
                 dnnPage.DefaultLanguageGuid = localTabInfo.DefaultLanguageGuid;
+				Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnPage.DefaultLanguageGuid → {Arg1}", tabId, dnnPage.DefaultLanguageGuid);
                 dnnPage.IsTranslated = localTabInfo.IsTranslated;
+				Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnPage.IsTranslated → {Arg1}", tabId, dnnPage.IsTranslated);
                 dnnPage.IsPublished = this.tabController.IsTabPublished(localTabInfo);
 
                 // generate modules information
@@ -1134,41 +1297,57 @@ namespace Dnn.PersonaBar.Pages.Services
                     var guid = moduleInfo.DefaultLanguageGuid == Null.NullGuid ? moduleInfo.UniqueId : moduleInfo.DefaultLanguageGuid;
 
                     var dnnModules = dnnPages.Module(guid); // modules of each language
+					Logger.LogError("GetNonLocalizedPages(tabId={TabId}): dnnModules → {DnnModules}", tabId, dnnModules);
                     var dnnModule = dnnModules.Module(localTabInfo.CultureCode);
+					Logger.LogError("GetNonLocalizedPages(tabId={TabId}): dnnModule → {DnnModule}", tabId, dnnModule);
 
                     // detect error : 2 modules with same uniqueId on the same page
                     dnnModule.LocalResourceFile = LocalResourceFile;
+					Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnModule.LocalResourceFile → {Arg1}", tabId, dnnModule.LocalResourceFile);
                     if (dnnModule.TabModuleId > 0)
                     {
                         dnnModule.ErrorDuplicateModule = true;
+						Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnModule.ErrorDuplicateModule → {Arg1}", tabId, dnnModule.ErrorDuplicateModule);
                         dnnPages.ErrorExists = true;
+						Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnPages.ErrorExists → {Arg1}", tabId, dnnPages.ErrorExists);
                         continue;
                     }
 
                     dnnModule.ModuleTitle = moduleInfo.ModuleTitle;
+					Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnModule.ModuleTitle → {Arg1}", tabId, dnnModule.ModuleTitle);
+					Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnModule.TabId → {Arg1}", tabId, dnnModule.TabId);
+					Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnModule.TabModuleId → {Arg1}", tabId, dnnModule.TabModuleId);
+					Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnModule.ModuleId → {Arg1}", tabId, dnnModule.ModuleId);
                     dnnModule.DefaultLanguageGuid = moduleInfo.DefaultLanguageGuid;
+					Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnModule.DefaultLanguageGuid → {Arg1}", tabId, dnnModule.DefaultLanguageGuid);
                     dnnModule.TabId = localTabInfo.TabID;
                     dnnModule.TabModuleId = moduleInfo.TabModuleID;
                     dnnModule.ModuleId = moduleInfo.ModuleID;
                     dnnModule.CanAdminModule = ModulePermissionController.CanAdminModule(moduleInfo);
                     dnnModule.CanViewModule = ModulePermissionController.CanViewModule(moduleInfo);
                     dnnModule.IsDeleted = moduleInfo.IsDeleted;
+					Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnModule.IsDeleted → {Arg1}", tabId, dnnModule.IsDeleted);
                     if (moduleInfo.DefaultLanguageGuid != Null.NullGuid)
                     {
                         var defaultLanguageModule = moduleController.GetModuleByUniqueID(moduleInfo.DefaultLanguageGuid);
+						Logger.LogError("GetNonLocalizedPages(tabId={TabId}): defaultLanguageModule → {DefaultLanguageModule}", tabId, defaultLanguageModule);
                         if (defaultLanguageModule != null)
                         {
                             dnnModule.DefaultModuleId = defaultLanguageModule.ModuleID;
+							Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnModule.DefaultModuleId → {Arg1}", tabId, dnnModule.DefaultModuleId);
                             if (defaultLanguageModule.ParentTab.UniqueId != moduleInfo.ParentTab.DefaultLanguageGuid)
                             {
                                 dnnModule.DefaultTabName = defaultLanguageModule.ParentTab.TabName;
+								Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnModule.DefaultTabName → {Arg1}", tabId, dnnModule.DefaultTabName);
                             }
                         }
                     }
 
                     dnnModule.SetModuleInfoHelp();
                     dnnModule.IsTranslated = moduleInfo.IsTranslated;
+					Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnModule.IsTranslated → {Arg1}", tabId, dnnModule.IsTranslated);
                     dnnModule.IsLocalized = moduleInfo.IsLocalized;
+					Logger.LogDebug("GetNonLocalizedPages(tabId={TabId}): dnnModule.IsLocalized → {Arg1}", tabId, dnnModule.IsLocalized);
 
                     dnnModule.IsShared = this.tabController.GetTabsByModuleID(moduleInfo.ModuleID).Values.Count(t => t.CultureCode == moduleInfo.CultureCode) > 1;
 
@@ -1187,24 +1366,31 @@ namespace Dnn.PersonaBar.Pages.Services
 
         private void SaveNonLocalizedPages(DnnPagesRequest pages)
         {
+			Logger.LogError(">>> Entering SaveNonLocalizedPages(pages={Pages})", pages);
             // check all pages
             foreach (var page in pages.Pages)
             {
                 var tabInfo = this.tabController.GetTab(page.TabId, this.PortalId, true);
+				Logger.LogError("SaveNonLocalizedPages(pages={Pages}): tabInfo → {TabInfo}", pages, tabInfo);
                 if (tabInfo != null &&
                     (tabInfo.TabName != page.TabName ||
                      tabInfo.Title != page.Title ||
                      tabInfo.Description != page.Description))
                 {
                     tabInfo.TabName = page.TabName;
+					Logger.LogDebug("SaveNonLocalizedPages(pages={Pages}): tabInfo.TabName → {Arg1}", pages, tabInfo.TabName);
+					Logger.LogDebug("SaveNonLocalizedPages(pages={Pages}): tabInfo.Description → {Arg1}", pages, tabInfo.Description);
                     tabInfo.Title = page.Title;
+					Logger.LogDebug("SaveNonLocalizedPages(pages={Pages}): tabInfo.Title → {Arg1}", pages, tabInfo.Title);
                     tabInfo.Description = page.Description;
                     this.tabController.UpdateTab(tabInfo);
                 }
             }
 
             var tabsToPublish = new List<TabInfo>();
+			Logger.LogError("SaveNonLocalizedPages(pages={Pages}): tabsToPublish → {TabsToPublish}", pages, tabsToPublish);
             var moduleTranslateOverrides = new Dictionary<int, bool>();
+			Logger.LogError("SaveNonLocalizedPages(pages={Pages}): moduleTranslateOverrides → {ModuleTranslateOverrides}", pages, moduleTranslateOverrides);
             var moduleController = ModuleController.Instance;
 
             // manage all actions we need to take for all modules on all pages
@@ -1213,11 +1399,13 @@ namespace Dnn.PersonaBar.Pages.Services
                 foreach (var moduleDto in modulesCollection.Modules)
                 {
                     var tabModule = moduleController.GetTabModule(moduleDto.TabModuleId);
+					Logger.LogError("SaveNonLocalizedPages(pages={Pages}): tabModule → {TabModule}", pages, tabModule);
                     if (tabModule != null)
                     {
                         if (tabModule.ModuleTitle != moduleDto.ModuleTitle)
                         {
                             tabModule.ModuleTitle = moduleDto.ModuleTitle;
+							Logger.LogDebug("SaveNonLocalizedPages(pages={Pages}): tabModule.ModuleTitle → {Arg1}", pages, tabModule.ModuleTitle);
                             moduleController.UpdateModule(tabModule);
                         }
 
@@ -1225,6 +1413,7 @@ namespace Dnn.PersonaBar.Pages.Services
                             tabModule.IsLocalized != moduleDto.IsLocalized)
                         {
                             var locale = this.localeController.GetLocale(tabModule.CultureCode);
+							Logger.LogError("SaveNonLocalizedPages(pages={Pages}): locale → {Locale}", pages, locale);
                             if (moduleDto.IsLocalized)
                             {
                                 moduleController.LocalizeModule(tabModule, locale);
@@ -1251,7 +1440,9 @@ namespace Dnn.PersonaBar.Pages.Services
                             if (moduleToCopyFrom.ModuleId > 0)
                             {
                                 var toTabInfo = this.GetLocalizedTab(moduleToCopyFrom.TabId, moduleDto.CultureCode);
+								Logger.LogError("SaveNonLocalizedPages(pages={Pages}): toTabInfo → {ToTabInfo}", pages, toTabInfo);
                                 var miCopy = moduleController.GetTabModule(moduleToCopyFrom.TabModuleId);
+								Logger.LogError("SaveNonLocalizedPages(pages={Pages}): miCopy → {MiCopy}", pages, miCopy);
                                 if (miCopy.DefaultLanguageGuid == Null.NullGuid)
                                 {
                                     // default
@@ -1259,11 +1450,13 @@ namespace Dnn.PersonaBar.Pages.Services
                                     moduleController.CopyModule(miCopy, toTabInfo, Null.NullString, true);
                                     EnableTabVersioningAndWorkflow(toTabInfo);
                                     var localizedModule = moduleController.GetModule(miCopy.ModuleID, toTabInfo.TabID, false);
+									Logger.LogError("SaveNonLocalizedPages(pages={Pages}): localizedModule → {LocalizedModule}", pages, localizedModule);
                                     moduleController.LocalizeModule(localizedModule, LocaleController.Instance.GetLocale(localizedModule.CultureCode));
                                 }
                                 else
                                 {
                                     var miCopyDefault = moduleController.GetModuleByUniqueID(miCopy.DefaultLanguageGuid);
+									Logger.LogError("SaveNonLocalizedPages(pages={Pages}): miCopyDefault → {MiCopyDefault}", pages, miCopyDefault);
                                     moduleController.CopyModule(miCopyDefault, toTabInfo, Null.NullString, true);
                                 }
 
@@ -1271,14 +1464,17 @@ namespace Dnn.PersonaBar.Pages.Services
                                 {
                                     // default language
                                     var miDefault = moduleController.GetModule(miCopy.ModuleID, pages.Pages.First().TabId, false);
+									Logger.LogError("SaveNonLocalizedPages(pages={Pages}): miDefault → {MiDefault}", pages, miDefault);
                                     foreach (var page in pages.Pages.Skip(1))
                                     {
                                         var moduleInfo = moduleController.GetModule(miCopy.ModuleID, page.TabId, false);
+										Logger.LogError("SaveNonLocalizedPages(pages={Pages}): moduleInfo → {ModuleInfo}", pages, moduleInfo);
                                         if (moduleInfo != null)
                                         {
                                             if (miDefault != null)
                                             {
                                                 moduleInfo.DefaultLanguageGuid = miDefault.UniqueId;
+												Logger.LogDebug("SaveNonLocalizedPages(pages={Pages}): moduleInfo.DefaultLanguageGuid → {Arg1}", pages, moduleInfo.DefaultLanguageGuid);
                                             }
 
                                             moduleController.UpdateModule(moduleInfo);
@@ -1299,6 +1495,7 @@ namespace Dnn.PersonaBar.Pages.Services
                 if (tabInfo != null)
                 {
                     var moduleTranslateOverride = false;
+					Logger.LogError("SaveNonLocalizedPages(pages={Pages}): moduleTranslateOverride → {ModuleTranslateOverride}", pages, moduleTranslateOverride);
                     if (!tabInfo.IsDefaultLanguage)
                     {
                         if (tabInfo.IsTranslated != page.IsTranslated)
@@ -1348,6 +1545,7 @@ namespace Dnn.PersonaBar.Pages.Services
 
             // manage translated status of tab. In order to do that, we need to check if all modules on the page are translated
             var tabTranslatedStatus = true;
+			Logger.LogError("SaveNonLocalizedPages(pages={Pages}): tabTranslatedStatus → {TabTranslatedStatus}", pages, tabTranslatedStatus);
             foreach (var page in pages.Pages)
             {
                 var tabInfo = this.tabController.GetTab(page.TabId, this.PortalId, true);
@@ -1364,13 +1562,17 @@ namespace Dnn.PersonaBar.Pages.Services
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting SaveNonLocalizedPages(pages={Pages})", pages);
         }
 
         private void AddTranslationSubmittedNotification(TabInfo tabInfo, UserInfo translator, string comment)
         {
+			Logger.LogError(">>> Entering AddTranslationSubmittedNotification(tabInfo={TabInfo},translator={Translator},comment={Comment})", tabInfo, translator, comment);
             var notificationsController = NotificationsController.Instance;
             var notificationType = notificationsController.GetNotificationType("TranslationSubmitted");
+			Logger.LogError("AddTranslationSubmittedNotification(tabInfo={TabInfo},translator={Translator},comment={Comment}): notificationType → {NotificationType}", tabInfo, translator, comment, notificationType);
             var subject = LocalizeString("NewContentMessage.Subject");
+			Logger.LogError("AddTranslationSubmittedNotification(tabInfo={TabInfo},translator={Translator},comment={Comment}): subject → {Subject}", tabInfo, translator, comment, subject);
             var body = string.Format(
                 CultureInfo.CurrentCulture,
                 LocalizeString("NewContentMessage.Body"),
@@ -1379,6 +1581,7 @@ namespace Dnn.PersonaBar.Pages.Services
                 comment);
 
             var sender = UserController.GetUserById(this.PortalSettings.PortalId, this.PortalSettings.AdministratorId);
+			Logger.LogError("AddTranslationSubmittedNotification(tabInfo={TabInfo},translator={Translator},comment={Comment}): sender → {Sender}", tabInfo, translator, comment, sender);
             var notification = new Notification
             {
                 NotificationTypeID = notificationType.NotificationTypeId,
@@ -1389,29 +1592,38 @@ namespace Dnn.PersonaBar.Pages.Services
             };
 
             notificationsController.SendNotification(notification, this.PortalSettings.PortalId, null, new List<UserInfo> { translator });
+			Logger.LogWarning("<<< Exiting AddTranslationSubmittedNotification(tabInfo={TabInfo},translator={Translator},comment={Comment})", tabInfo, translator, comment);
         }
 
         private HttpResponseMessage GetForbiddenResponse()
         {
+			Logger.LogError(">>> Entering GetForbiddenResponse()");
+            Logger.LogWarning("<<< Exiting GetForbiddenResponse()");
             return this.Request.CreateResponse(HttpStatusCode.Forbidden, new { Message = "The user is not allowed to access this method." });
         }
 
         private ThemeFileInfo GetDefaultPortalTheme()
         {
+			Logger.LogError(">>> Entering GetDefaultPortalTheme()");
             var layoutSrc = this.defaultPortalThemeController.GetDefaultPortalLayout();
+			Logger.LogError("GetDefaultPortalTheme(): layoutSrc → {LayoutSrc}", layoutSrc);
             if (string.IsNullOrWhiteSpace(layoutSrc))
             {
                 return null;
             }
 
             var layout = this.themesController.GetThemeFile(PortalSettings.Current, layoutSrc, ThemeType.Skin);
+			Logger.LogError("GetDefaultPortalTheme(): layout → {Layout}", layout);
+			Logger.LogWarning("<<< Exiting GetDefaultPortalTheme()");
             return layout;
         }
 
         private TabInfo GetLocalizedTab(int tabId, string cultureCode)
         {
+			Logger.LogError(">>> Entering GetLocalizedTab(tabId={TabId},cultureCode={CultureCode})", tabId, cultureCode);
             var currentTab = this.tabController.GetTab(tabId, this.PortalId, false);
 
+			Logger.LogError("GetLocalizedTab(tabId={TabId},cultureCode={CultureCode}): currentTab → {CurrentTab}", tabId, cultureCode, currentTab);
             // Unique id of default language page
             var uniqueId = currentTab.DefaultLanguageGuid != Null.NullGuid
                 ? currentTab.DefaultLanguageGuid
@@ -1421,9 +1633,12 @@ namespace Dnn.PersonaBar.Pages.Services
             var allPages = this.tabController.GetTabsByPortal(this.PortalId).Values.Where(
                 t => t.TabID != this.PortalSettings.AdminTabId && (Null.IsNull(t.ParentId) || t.ParentId != this.PortalSettings.AdminTabId));
             allPages = allPages.Where(t => t.IsDeleted == false);
+			Logger.LogError("GetLocalizedTab(tabId={TabId},cultureCode={CultureCode}): allPages → {AllPages}", tabId, cultureCode, allPages);
 
             // get all localized pages of current page
             var tabInfos = allPages as IList<TabInfo> ?? allPages.ToList();
+			Logger.LogError("GetLocalizedTab(tabId={TabId},cultureCode={CultureCode}): tabInfos → {TabInfos}", tabId, cultureCode, tabInfos);
+			Logger.LogWarning("<<< Exiting GetLocalizedTab(tabId={TabId},cultureCode={CultureCode})", tabId, cultureCode);
             return tabInfos.SingleOrDefault(t => (t.DefaultLanguageGuid == uniqueId || t.UniqueId == uniqueId) && t.CultureCode == cultureCode);
         }
     }

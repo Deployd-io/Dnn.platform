@@ -70,8 +70,11 @@ namespace log4net.Repository.Hierarchy
         protected Logger(string name) 
         {
 #if NETCF || NETSTANDARD1_3
+			value.LogError(">>> Entering Logger(name={Name})", name);
             // NETCF: String.Intern causes Native Exception
             m_name = name;
+			value.LogWarning("<<< Exiting Logger(name={Name})", name);
+			value.LogDebug("Logger(name={Name}): m_name → {M_name}", name, m_name);
 #else
             this.m_name = string.Intern(name);
 #endif
@@ -191,8 +194,10 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public virtual void AddAppender(IAppender newAppender) 
         {
+			value.LogError(">>> Entering AddAppender(newAppender={NewAppender})", newAppender);
             if (newAppender == null)
             {
+				value.LogError("Throwing ArgumentNullException from AddAppender(newAppender={NewAppender})", newAppender);
                 throw new ArgumentNullException("newAppender");
             }
 
@@ -202,6 +207,7 @@ namespace log4net.Repository.Hierarchy
                 if (this.m_appenderAttachedImpl == null) 
                 {
                     this.m_appenderAttachedImpl = new AppenderAttachedImpl();
+					value.LogDebug("AddAppender(newAppender={NewAppender}): m_appenderAttachedImpl → {M_appenderAttachedImpl}", newAppender, m_appenderAttachedImpl);
                 }
 
                 this.m_appenderAttachedImpl.AddAppender(newAppender);
@@ -210,6 +216,7 @@ namespace log4net.Repository.Hierarchy
             {
                 this.m_appenderLock.ReleaseWriterLock();
             }
+			value.LogWarning("<<< Exiting AddAppender(newAppender={NewAppender})", newAppender);
         }
 
         /// <summary>
@@ -257,6 +264,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public virtual IAppender GetAppender(string name) 
         {
+			value.LogError(">>> Entering GetAppender(name={Name})", name);
             this.m_appenderLock.AcquireReaderLock();
             try
             {
@@ -265,6 +273,7 @@ namespace log4net.Repository.Hierarchy
                     return null;
                 }
 
+				value.LogWarning("<<< Exiting GetAppender(name={Name})", name);
                 return this.m_appenderAttachedImpl.GetAppender(name);
             }
             finally
@@ -284,6 +293,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public virtual void RemoveAllAppenders() 
         {
+			value.LogError(">>> Entering RemoveAllAppenders()");
             this.m_appenderLock.AcquireWriterLock();
             try
             {
@@ -291,12 +301,15 @@ namespace log4net.Repository.Hierarchy
                 {
                     this.m_appenderAttachedImpl.RemoveAllAppenders();
                     this.m_appenderAttachedImpl = null;
+					value.LogDebug("RemoveAllAppenders(): m_appenderAttachedImpl → {M_appenderAttachedImpl}", m_appenderAttachedImpl);
+					value.LogDebug("RemoveAllAppenders(): this.m_appenderAttachedImpl → {Arg0}", this.m_appenderAttachedImpl);
                 }
             }
             finally
             {
                 this.m_appenderLock.ReleaseWriterLock();
             }
+			value.LogWarning("<<< Exiting RemoveAllAppenders()");
         }
 
         /// <summary>Remove the appender passed as parameter form the list of appenders.</summary>
@@ -312,6 +325,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public virtual IAppender RemoveAppender(IAppender appender) 
         {
+			value.LogError(">>> Entering RemoveAppender(appender={Appender})", appender);
             this.m_appenderLock.AcquireWriterLock();
             try
             {
@@ -324,6 +338,8 @@ namespace log4net.Repository.Hierarchy
             {
                 this.m_appenderLock.ReleaseWriterLock();
             }
+			value.LogWarning("<<< Exiting RemoveAppender(appender={Appender})", appender);
+			value.LogWarning("<<< Exiting RemoveAppender(name={Name})", name);
             return null;
         }
 
@@ -386,6 +402,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public virtual void Log(Type callerStackBoundaryDeclaringType, Level level, object message, Exception exception) 
         {
+			value.LogError(">>> Entering Log(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},level={Level},message={Message},exception={Exception})", callerStackBoundaryDeclaringType, level, message, exception);
             try
             {
                 if (this.IsEnabledFor(level))
@@ -403,6 +420,7 @@ namespace log4net.Repository.Hierarchy
                 log4net.Util.LogLog.Error(declaringType, "Exception while logging");
             }
 #endif
+		value.LogWarning("<<< Exiting Log(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},level={Level},message={Message},exception={Exception})", callerStackBoundaryDeclaringType, level, message, exception);
         }
 
         /// <summary>
@@ -420,6 +438,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public virtual void Log(LoggingEvent logEvent)
         {
+			value.LogError(">>> Entering Log(logEvent={LogEvent})", logEvent);
             try
             {
                 if (logEvent != null)
@@ -440,6 +459,7 @@ namespace log4net.Repository.Hierarchy
                 log4net.Util.LogLog.Error(declaringType, "Exception while logging");
             }
 #endif
+		value.LogWarning("<<< Exiting Log(logEvent={LogEvent})", logEvent);
         }
 
         /// <summary>Checks if this logger is enabled for a given <see cref="Level"/> passed as parameter.</summary>
@@ -457,6 +477,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public virtual bool IsEnabledFor(Level level)
         {
+			value.LogError(">>> Entering IsEnabledFor(level={Level})", level);
             try
             {
                 if (level != null)
@@ -471,6 +492,7 @@ namespace log4net.Repository.Hierarchy
             catch (Exception ex)
             {
                 LogLog.Error(declaringType, "Exception while logging", ex);
+			value.LogWarning("<<< Exiting IsEnabledFor(level={Level})", level);
             }
 #if !NET_2_0 && !MONO_2_0 && !MONO_3_5 && !MONO_4_0 && !NETSTANDARD
             catch
@@ -515,8 +537,10 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected virtual void CallAppenders(LoggingEvent loggingEvent) 
         {
+			value.LogError(">>> Entering CallAppenders(loggingEvent={LoggingEvent})", loggingEvent);
             if (loggingEvent == null)
             {
+				value.LogError("Throwing ArgumentNullException from CallAppenders(loggingEvent={LoggingEvent})", loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
             }
 
@@ -564,6 +588,8 @@ namespace log4net.Repository.Hierarchy
                 try
                 {
                     LogLog.Debug(declaringType, "    Current AppDomain context information: ");
+			value.LogError("Exception in CallAppenders(loggingEvent={LoggingEvent}): {Arg1}", loggingEvent, SecurityException.Message);
+			value.LogWarning("<<< Exiting CallAppenders(loggingEvent={LoggingEvent})", loggingEvent);
                     LogLog.Debug(declaringType, "       BaseDirectory   : " + SystemInfo.ApplicationBaseDirectory);
 #if !NETCF && !NETSTANDARD1_3
                     LogLog.Debug(declaringType, "       FriendlyName    : " + AppDomain.CurrentDomain.FriendlyName);
@@ -585,6 +611,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public virtual void CloseNestedAppenders() 
         {
+			value.LogError(">>> Entering CloseNestedAppenders()");
             this.m_appenderLock.AcquireWriterLock();
             try
             {
@@ -604,6 +631,7 @@ namespace log4net.Repository.Hierarchy
             {
                 this.m_appenderLock.ReleaseWriterLock();
             }
+			value.LogWarning("<<< Exiting CloseNestedAppenders()");
         }
 
         /// <summary>This is the most generic printing method. This generic form is intended to be used by wrappers</summary>
@@ -618,10 +646,12 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public virtual void Log(Level level, object message, Exception exception) 
         {
+			value.LogError(">>> Entering Log(level={Level},message={Message},exception={Exception})", level, message, exception);
             if (this.IsEnabledFor(level))
             {
                 this.ForcedLog(declaringType, level, message, exception);
             }
+			value.LogWarning("<<< Exiting Log(level={Level},message={Message},exception={Exception})", level, message, exception);
         }
 
         /// <summary>Creates a new logging event and logs the event without further checks.</summary>
@@ -638,7 +668,9 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected virtual void ForcedLog(Type callerStackBoundaryDeclaringType, Level level, object message, Exception exception) 
         {
+			value.LogError(">>> Entering ForcedLog(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},level={Level},message={Message},exception={Exception})", callerStackBoundaryDeclaringType, level, message, exception);
             this.CallAppenders(new LoggingEvent(callerStackBoundaryDeclaringType, this.Hierarchy, this.Name, level, message, exception));
+			value.LogWarning("<<< Exiting ForcedLog(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},level={Level},message={Message},exception={Exception})", callerStackBoundaryDeclaringType, level, message, exception);
         }
 
         /// <summary>Creates a new logging event and logs the event without further checks.</summary>
@@ -650,12 +682,14 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         protected virtual void ForcedLog(LoggingEvent logEvent) 
         {
+			value.LogError(">>> Entering ForcedLog(logEvent={LogEvent})", logEvent);
             // The logging event may not have been created by this logger
             // the Repository may not be correctly set on the event. This
             // is required for the appenders to correctly lookup renderers etc...
             logEvent.EnsureRepository(this.Hierarchy);
 
             this.CallAppenders(logEvent);
+			value.LogWarning("<<< Exiting ForcedLog(logEvent={LogEvent})", logEvent);
         }
 
         /// <summary>The fully qualified type of the Logger class.</summary>

@@ -39,6 +39,8 @@ namespace DotNetNuke.Services.Log.EventLog
         public LogController()
             : this(null)
         {
+		Logger.LogError(">>> Entering LogController()");
+        Logger.LogWarning("<<< Exiting LogController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="LogController"/> class.</summary>
@@ -46,11 +48,14 @@ namespace DotNetNuke.Services.Log.EventLog
         public LogController(IApplicationStatusInfo appStatus)
         {
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("LogController(appStatus={AppStatus}): appStatus → {AppStatus1}", appStatus, appStatus);
+        Logger.LogWarning("<<< Exiting LogController(appStatus={AppStatus})", appStatus);
         }
 
         /// <inheritdoc />
         public void AddLog(LogInfo logInfo)
         {
+			Logger.LogError(">>> Entering AddLog(logInfo={LogInfo})", logInfo);
             ILogInfo theLogInfo = logInfo;
             if (this.appStatus.Status == UpgradeStatus.Install)
             {
@@ -61,7 +66,9 @@ namespace DotNetNuke.Services.Log.EventLog
                 try
                 {
                     logInfo.LogCreateDate = DateTime.Now;
+					Logger.LogDebug("AddLog(logInfo={LogInfo}): logInfo.LogCreateDate → {Arg1}", logInfo, logInfo.LogCreateDate);
                     logInfo.LogServerName = Globals.ServerName;
+					Logger.LogDebug("AddLog(logInfo={LogInfo}): logInfo.LogServerName → {Arg1}", logInfo, logInfo.LogServerName);
                     if (string.IsNullOrEmpty(logInfo.LogServerName))
                     {
                         logInfo.LogServerName = "NA";
@@ -130,6 +137,7 @@ namespace DotNetNuke.Services.Log.EventLog
                         }
                         catch (Exception)
                         {
+							Logger.LogError("Exception in AddLog(logInfo={LogInfo}): {Arg1}", logInfo, Exception.Message);
                             if (this.appStatus.Status != UpgradeStatus.Upgrade)
                             {
                                 // this may catch exceptions during upgrade because the old logging provider has problem in it.
@@ -145,15 +153,18 @@ namespace DotNetNuke.Services.Log.EventLog
                     AddLogToFile(logInfo);
                 }
             }
+			Logger.LogWarning("<<< Exiting AddLog(logInfo={LogInfo})", logInfo);
         }
 
         /// <inheritdoc />
         public void AddLogType(string configFile, string fallbackConfigFile)
         {
+			Logger.LogError(">>> Entering AddLogType(configFile={ConfigFile},fallbackConfigFile={FallbackConfigFile})", configFile, fallbackConfigFile);
             var xmlDoc = new XmlDocument { XmlResolver = null };
             try
             {
                 using var xmlReader = XmlReader.Create(configFile, new XmlReaderSettings { XmlResolver = null, });
+				Logger.LogError("AddLogType(configFile={ConfigFile},fallbackConfigFile={FallbackConfigFile}): xmlReader → {XmlReader}", configFile, fallbackConfigFile, xmlReader);
                 xmlDoc.Load(xmlReader);
             }
             catch (FileNotFoundException exc)
@@ -164,6 +175,7 @@ namespace DotNetNuke.Services.Log.EventLog
             }
 
             var logType = xmlDoc.SelectNodes("/LogConfig/LogTypes/LogType");
+			Logger.LogError("AddLogType(configFile={ConfigFile},fallbackConfigFile={FallbackConfigFile}): logType → {LogType}", configFile, fallbackConfigFile, logType);
             if (logType != null)
             {
                 foreach (XmlNode typeInfo in logType)
@@ -184,6 +196,7 @@ namespace DotNetNuke.Services.Log.EventLog
             }
 
             var logTypeConfig = xmlDoc.SelectNodes("/LogConfig/LogTypeConfig");
+			Logger.LogError("AddLogType(configFile={ConfigFile},fallbackConfigFile={FallbackConfigFile}): logTypeConfig → {LogTypeConfig}", configFile, fallbackConfigFile, logTypeConfig);
             if (logTypeConfig != null)
             {
                 foreach (XmlNode typeConfigInfo in logTypeConfig)
@@ -207,11 +220,13 @@ namespace DotNetNuke.Services.Log.EventLog
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting AddLogType(configFile={ConfigFile},fallbackConfigFile={FallbackConfigFile})", configFile, fallbackConfigFile);
         }
 
         /// <inheritdoc />
         public void AddLogType(LogTypeInfo logType)
         {
+			Logger.LogError(">>> Entering AddLogType(logType={LogType})", logType);
             ILogTypeInfo theLogType = logType;
             LoggingProvider.Instance()
                 .AddLogType(
@@ -220,11 +235,13 @@ namespace DotNetNuke.Services.Log.EventLog
                     theLogType.LogTypeDescription,
                     theLogType.LogTypeCssClass,
                     theLogType.LogTypeOwner);
+					Logger.LogWarning("<<< Exiting AddLogType(logType={LogType})", logType);
         }
 
         /// <inheritdoc />
         public void AddLogTypeConfigInfo(LogTypeConfigInfo logTypeConfig)
         {
+			Logger.LogError(">>> Entering AddLogTypeConfigInfo(logTypeConfig={LogTypeConfig})", logTypeConfig);
             ILogTypeConfigInfo theLogTypeConfig = logTypeConfig;
             LoggingProvider.Instance().AddLogTypeConfigInfo(
                 theLogTypeConfig.Id,
@@ -239,48 +256,63 @@ namespace DotNetNuke.Services.Log.EventLog
                 Convert.ToString((int)logTypeConfig.NotificationThresholdTimeType, CultureInfo.InvariantCulture),
                 theLogTypeConfig.MailFromAddress,
                 theLogTypeConfig.MailToAddress);
+				Logger.LogWarning("<<< Exiting AddLogTypeConfigInfo(logTypeConfig={LogTypeConfig})", logTypeConfig);
         }
 
         /// <inheritdoc />
         public void ClearLog()
         {
+			Logger.LogError(">>> Entering ClearLog()");
             LoggingProvider.Instance().ClearLog();
+			Logger.LogWarning("<<< Exiting ClearLog()");
         }
 
         /// <inheritdoc />
         public void DeleteLog(LogInfo logInfo)
         {
+			Logger.LogError(">>> Entering DeleteLog(logInfo={LogInfo})", logInfo);
             LoggingProvider.Instance().DeleteLog(logInfo);
+			Logger.LogWarning("<<< Exiting DeleteLog(logInfo={LogInfo})", logInfo);
         }
 
         /// <inheritdoc />
         public virtual void DeleteLogType(LogTypeInfo logType)
         {
+			Logger.LogError(">>> Entering DeleteLogType(logType={LogType})", logType);
             LoggingProvider.Instance().DeleteLogType(logType.LogTypeKey);
+			Logger.LogWarning("<<< Exiting DeleteLogType(logType={LogType})", logType);
         }
 
         /// <inheritdoc />
         public virtual void DeleteLogTypeConfigInfo(LogTypeConfigInfo logTypeConfig)
         {
+			Logger.LogError(">>> Entering DeleteLogTypeConfigInfo(logTypeConfig={LogTypeConfig})", logTypeConfig);
             ILogTypeConfigInfo theLogTypeConfig = logTypeConfig;
             LoggingProvider.Instance().DeleteLogTypeConfigInfo(theLogTypeConfig.Id);
+			Logger.LogWarning("<<< Exiting DeleteLogTypeConfigInfo(logTypeConfig={LogTypeConfig})", logTypeConfig);
         }
 
         /// <inheritdoc />
         public virtual List<LogInfo> GetLogs(int portalID, string logType, int pageSize, int pageIndex, ref int totalRecords)
         {
+			Logger.LogError(">>> Entering GetLogs(portalID={PortalID},logType={LogType},pageSize={PageSize},pageIndex={PageIndex},totalRecords={TotalRecords})", portalID, logType, pageSize, pageIndex, totalRecords);
+            Logger.LogWarning("<<< Exiting GetLogs(portalID={PortalID},logType={LogType},pageSize={PageSize},pageIndex={PageIndex},totalRecords={TotalRecords})", portalID, logType, pageSize, pageIndex, totalRecords);
             return LoggingProvider.Instance().GetLogs(portalID, logType, pageSize, pageIndex, ref totalRecords);
         }
 
         /// <inheritdoc />
         public virtual ArrayList GetLogTypeConfigInfo()
         {
+			Logger.LogError(">>> Entering GetLogTypeConfigInfo()");
+            Logger.LogWarning("<<< Exiting GetLogTypeConfigInfo()");
             return LoggingProvider.Instance().GetLogTypeConfigInfo();
         }
 
         /// <inheritdoc />
         public virtual LogTypeConfigInfo GetLogTypeConfigInfoByID(string id)
         {
+			Logger.LogError(">>> Entering GetLogTypeConfigInfoByID(id={Id})", id);
+            Logger.LogWarning("<<< Exiting GetLogTypeConfigInfoByID(id={Id})", id);
             return LoggingProvider.Instance().GetLogTypeConfigInfoByID(id);
         }
 
@@ -294,6 +326,8 @@ namespace DotNetNuke.Services.Log.EventLog
         [Obsolete("Deprecated in DotNetNuke 9.8.0. Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogService.GetLog()' instead. Scheduled for removal in v11.0.0.")]
         public virtual object GetSingleLog(LogInfo log, LoggingProvider.ReturnType returnType)
         {
+			Logger.LogError(">>> Entering GetSingleLog(log={Log},returnType={ReturnType})", log, returnType);
+            Logger.LogWarning("<<< Exiting GetSingleLog(log={Log},returnType={ReturnType})", log, returnType);
             return LoggingProvider.Instance().GetSingleLog(log, returnType);
         }
 
@@ -306,12 +340,15 @@ namespace DotNetNuke.Services.Log.EventLog
         /// <inheritdoc />
         public void PurgeLogBuffer()
         {
+			Logger.LogError(">>> Entering PurgeLogBuffer()");
             LoggingProvider.Instance().PurgeLogBuffer();
+			Logger.LogWarning("<<< Exiting PurgeLogBuffer()");
         }
 
         /// <inheritdoc />
         public virtual void UpdateLogTypeConfigInfo(LogTypeConfigInfo logTypeConfig)
         {
+			Logger.LogError(">>> Entering UpdateLogTypeConfigInfo(logTypeConfig={LogTypeConfig})", logTypeConfig);
             ILogTypeConfigInfo theLogTypeConfig = logTypeConfig;
             LoggingProvider.Instance().UpdateLogTypeConfigInfo(
                 theLogTypeConfig.Id,
@@ -326,11 +363,13 @@ namespace DotNetNuke.Services.Log.EventLog
                 Convert.ToString((int)logTypeConfig.NotificationThresholdTimeType, CultureInfo.InvariantCulture),
                 theLogTypeConfig.MailFromAddress,
                 theLogTypeConfig.MailToAddress);
+				Logger.LogWarning("<<< Exiting UpdateLogTypeConfigInfo(logTypeConfig={LogTypeConfig})", logTypeConfig);
         }
 
         /// <inheritdoc />
         public virtual void UpdateLogType(LogTypeInfo logType)
         {
+			Logger.LogError(">>> Entering UpdateLogType(logType={LogType})", logType);
             ILogTypeInfo theLogType = logType;
             LoggingProvider.Instance()
                 .UpdateLogType(
@@ -339,19 +378,24 @@ namespace DotNetNuke.Services.Log.EventLog
                     theLogType.LogTypeDescription,
                     theLogType.LogTypeCssClass,
                     theLogType.LogTypeOwner);
+					Logger.LogWarning("<<< Exiting UpdateLogType(logType={LogType})", logType);
         }
 
         /// <inheritdoc />
         protected override Func<ILogController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<ILogController>;
         }
 
         private static void AddLogToFile(LogInfo logInfo)
         {
+			Logger.LogError(">>> Entering AddLogToFile(logInfo={LogInfo})", logInfo);
             try
             {
                 var f = Globals.HostMapPath + @"\Logs\LogFailures.xml.resources";
+				Logger.LogError("AddLogToFile(logInfo={LogInfo}): f → {F}", logInfo, f);
                 WriteLog(f, logInfo.Serialize());
             }
 
@@ -360,10 +404,12 @@ namespace DotNetNuke.Services.Log.EventLog
             {
                 Logger.Error(exc);
             }
+			Logger.LogWarning("<<< Exiting AddLogToFile(logInfo={LogInfo})", logInfo);
         }
 
         private static void RaiseError(string filePath, string header, string message)
         {
+			Logger.LogError(">>> Entering RaiseError(filePath={FilePath},header={Header},message={Message})", filePath, header, message);
             Logger.ErrorFormat(CultureInfo.InvariantCulture, "filePath={0}, header={1}, message={2}", filePath, header, message);
 
             if (HttpContext.Current != null)
@@ -374,28 +420,36 @@ namespace DotNetNuke.Services.Log.EventLog
                 HtmlUtils.WriteFooter(response);
                 response.End();
             }
+			Logger.LogWarning("<<< Exiting RaiseError(filePath={FilePath},header={Header},message={Message})", filePath, header, message);
         }
 
         private static void WriteToStreamWriter(FileStream fs, string message)
         {
+			Logger.LogError(">>> Entering WriteToStreamWriter(fs={Fs},message={Message})", fs, message);
             using var sw = new StreamWriter(fs, Encoding.UTF8);
             var fileLength = fs.Length;
+			Logger.LogError("WriteToStreamWriter(fs={Fs},message={Message}): sw → {Sw}", fs, message, sw);
             if (fileLength > 0)
             {
                 fs.Position = fileLength - 9;
+				Logger.LogDebug("WriteToStreamWriter(fs={Fs},message={Message}): fs.Position → {Arg2}", fs, message, fs.Position);
             }
             else
             {
                 message = "<logs>" + message;
+				Logger.LogError("WriteToStreamWriter(fs={Fs},message={Message}): message → {Message1}", fs, message, message);
             }
 
             sw.WriteLine(message + "</logs>");
             sw.Flush();
+			Logger.LogWarning("<<< Exiting WriteToStreamWriter(fs={Fs},message={Message})", fs, message);
         }
 
         private static void WriteLog(string filePath, string message)
         {
+			Logger.LogError(">>> Entering WriteLog(filePath={FilePath},message={Message})", filePath, message);
             FileStream fs = null;
+			Logger.LogError("WriteLog(filePath={FilePath},message={Message}): fs → {Fs}", filePath, message, fs);
             if (!LockLog.TryEnterWriteLock(WriterLockTimeout))
             {
                 return;
@@ -433,10 +487,12 @@ namespace DotNetNuke.Services.Log.EventLog
             }
             catch (UnauthorizedAccessException)
             {
+				Logger.LogError("Exception in WriteLog(filePath={FilePath},message={Message}): {Arg2}", filePath, message, UnauthorizedAccessException.Message);
                 RaiseError(filePath, "Unauthorized Access Error", "The Windows User Account listed below must have Read/Write Privileges for the website path.");
             }
             catch (DirectoryNotFoundException exc)
             {
+				Logger.LogError("Exception in WriteLog(filePath={FilePath},message={Message}): {Arg2}", filePath, message, exc.Message);
                 RaiseError(filePath, "Directory Not Found Error", exc.Message);
             }
             catch (PathTooLongException exc)
@@ -464,6 +520,7 @@ namespace DotNetNuke.Services.Log.EventLog
 
                 LockLog.ExitWriteLock();
             }
+			Logger.LogWarning("<<< Exiting WriteLog(filePath={FilePath},message={Message})", filePath, message);
         }
     }
 }

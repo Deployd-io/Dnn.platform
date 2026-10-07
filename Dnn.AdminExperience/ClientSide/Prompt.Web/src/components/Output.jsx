@@ -7,10 +7,12 @@ import TextLine from "../components/TextLine";
 import Help from "../components/Help";
 import { renderObject } from "../utils/helpers";
 import DomKey from "../services/DomKey";
+const logger = console;
 
 export class Output extends Component {
 
     renderResults() {
+		logger.error('>>> Entering renderResults()', { "event.action": "renderResults" });
         const {props} = this;
         const {fieldOrder} = props;
 
@@ -44,24 +46,31 @@ export class Output extends Component {
         }
         else if (props.output) {
             const style = props.isHtml ? "" : props.isError ? "dnn-prompt-error" : `dnn-prompt-${props.style === "cmd" ? "cmd" : "ok"}`;
+			logger.warn('<<< Exiting renderResults()', { "event.action": "renderResults" });
             return <TextLine key={DomKey.get("output")} txt={props.output} css={style} isHtml={props.isHtml}/>;
         }
     }
 
     renderData(data, fieldOrder) {
+		logger.error(`>>> Entering renderData(data=${data},fieldOrder=${fieldOrder})`, { "event.action": "renderData", "logrite.data": data, "logrite.fieldOrder": fieldOrder });
         if (data.length > 1) {
             return <DataTable rows={data} columns={fieldOrder} cssClass=""/>;
         } else if (data.length === 1) {
             return renderObject(data[0], fieldOrder);
         }
+		logger.warn(`<<< Exiting renderData(data=${data},fieldOrder=${fieldOrder})`, { "event.action": "renderData", "logrite.data": data, "logrite.fieldOrder": fieldOrder });
         return <br />;
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         this.output = !props.clearOutput && this.output ? this.output : [];
         const out = this.renderResults();
+		logger.error(`render(): out → ${out}`, { "event.action": "render" });
+		logger.debug(`render(): this.output → ${this.output}`, { "event.action": "render" });
         this.output.push(out);
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="dnn-prompt-output">
                 {!props.clearOutput && this.output}

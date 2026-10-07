@@ -6,6 +6,7 @@ import { CommonUsersActions } from "../../../actions";
 import utilities from "utils";
 import { Button, SingleLineInputWithError, GridSystem, GridCell } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 const blankChangePassword = {
@@ -16,6 +17,7 @@ const blankChangePassword = {
 class ChangePassword extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             changePassword: Object.assign({}, blankChangePassword),
             errors: {
@@ -25,18 +27,24 @@ class ChangePassword extends Component {
             },
             confirmPassword: ""
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
     componentWillMount() {
+		logger.error('>>> Entering componentWillMount()', { "event.action": "componentWillMount" });
         let {changePassword} = this.state;
         changePassword.userId = this.props.userId;
+		logger.debug(`componentWillMount(): changePassword.userId → ${changePassword.userId}`, { "event.action": "componentWillMount" });
         changePassword.password = "";
+		logger.warn('<<< Exiting componentWillMount()', { "event.action": "componentWillMount" });
         this.setState({
             changePassword
         });
     }
     componentWillReceiveProps(newProps) {
+		logger.error(`>>> Entering componentWillReceiveProps(newProps=${newProps})`, { "event.action": "componentWillReceiveProps", "logrite.newProps": newProps });
         this.clear(() => {
             let {changePassword} = this.state;
+			logger.warn(`<<< Exiting componentWillReceiveProps(newProps=${newProps})`, { "event.action": "componentWillReceiveProps", "logrite.newProps": newProps });
             changePassword.userId = newProps.userId;
             this.setState({
                 changePassword
@@ -60,10 +68,12 @@ class ChangePassword extends Component {
         }
     }
     save() {
+		logger.error('>>> Entering save()', { "event.action": "save" });
         if (this.validateForm()) {
             this.props.dispatch(CommonUsersActions.changePassword(this.state.changePassword, () => {
                 this.cancel();
                 utilities.notify(Localization.get("ChangeSuccessful"), 3000);
+				logger.warn('<<< Exiting save()', { "event.action": "save" });
             }));
         }
     }
@@ -92,6 +102,7 @@ class ChangePassword extends Component {
         return valid;
     }
     clear(callback) {
+		logger.error(`>>> Entering clear(callback=${callback})`, { "event.action": "clear", "logrite.callback": callback });
         this.setState({
             changePassword: Object.assign({}, blankChangePassword),
             confirmPassword: "",
@@ -103,16 +114,20 @@ class ChangePassword extends Component {
         }, () => {
             if (typeof callback === "function") {
                 callback();
+				logger.warn(`<<< Exiting clear(callback=${callback})`, { "event.action": "clear", "logrite.callback": callback });
             }
         });
     }
     cancel() {
+		logger.error('>>> Entering cancel()', { "event.action": "cancel" });
         this.clear();
         if (typeof this.props.onCancel === "function")
             this.props.onCancel();
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let {state} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return this.props.visible && <div className="dnn-user-change-password">
             <GridCell className="do-not-close">
                 <GridCell>
@@ -158,6 +173,8 @@ ChangePassword.defaultProps = {
     visible: true
 };
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         userDetails: state.users.userDetails
     };

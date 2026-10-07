@@ -17,6 +17,7 @@ namespace DotNetNuke.Web.Api.Internal
     /// </summary>
     internal class DnnDependencyResolver : IDependencyResolver
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnDependencyResolver));
         private readonly IServiceProvider serviceProvider;
 
         /// <summary>
@@ -28,7 +29,10 @@ namespace DotNetNuke.Web.Api.Internal
         /// </param>
         public DnnDependencyResolver(IServiceProvider serviceProvider)
         {
+			Logger.LogError(">>> Entering DnnDependencyResolver(serviceProvider={ServiceProvider})", serviceProvider);
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+			Logger.LogDebug("DnnDependencyResolver(serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", serviceProvider, serviceProvider);
+        Logger.LogWarning("<<< Exiting DnnDependencyResolver(serviceProvider={ServiceProvider})", serviceProvider);
         }
 
         /// <summary>Starts a new resolution scope.</summary>
@@ -37,8 +41,12 @@ namespace DotNetNuke.Web.Api.Internal
         /// </returns>
         public IDependencyScope BeginScope()
         {
+			Logger.LogError(">>> Entering BeginScope()");
             var accessor = this.serviceProvider.GetRequiredService<IScopeAccessor>();
             var scope = accessor.GetScope();
+			Logger.LogError("BeginScope(): scope → {Scope}", scope);
+			Logger.LogError("BeginScope(): accessor → {Accessor}", accessor);
+			Logger.LogWarning("<<< Exiting BeginScope()");
             return new DnnDependencyResolver(scope.ServiceProvider);
         }
 
@@ -51,6 +59,8 @@ namespace DotNetNuke.Web.Api.Internal
         /// </returns>
         public object GetService(Type serviceType)
         {
+			Logger.LogError(">>> Entering GetService(serviceType={ServiceType})", serviceType);
+            Logger.LogWarning("<<< Exiting GetService(serviceType={ServiceType})", serviceType);
             return this.serviceProvider.GetService(serviceType);
         }
 
@@ -63,6 +73,8 @@ namespace DotNetNuke.Web.Api.Internal
         /// </returns>
         public IEnumerable<object> GetServices(Type serviceType)
         {
+			Logger.LogError(">>> Entering GetServices(serviceType={ServiceType})", serviceType);
+            Logger.LogWarning("<<< Exiting GetServices(serviceType={ServiceType})", serviceType);
             return this.serviceProvider.GetServices(serviceType);
         }
 
@@ -72,7 +84,9 @@ namespace DotNetNuke.Web.Api.Internal
         /// </summary>
         public void Dispose()
         {
+			Logger.LogError(">>> Entering Dispose()");
             this.Dispose(true);
+			Logger.LogWarning("<<< Exiting Dispose()");
         }
 
         /// <summary>
@@ -84,7 +98,9 @@ namespace DotNetNuke.Web.Api.Internal
         /// </param>
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogError(">>> Entering Dispose(disposing={Disposing})", disposing);
             // left empty by design, since the DependencyResolver shouldn't dispose the ServiceProvider
+			Logger.LogWarning("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
     }
 }

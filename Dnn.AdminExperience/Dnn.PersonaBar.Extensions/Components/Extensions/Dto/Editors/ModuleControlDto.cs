@@ -16,13 +16,20 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
 
         public ModuleControlDto(ModuleControlInfo moduleControl)
         {
+			eventLogger.LogError(">>> Entering ModuleControlDto(moduleControl={ModuleControl})", moduleControl);
             this.Id = moduleControl.ModuleControlID;
+			eventLogger.LogWarning("<<< Exiting ModuleControlDto(moduleControl={ModuleControl})", moduleControl);
+			eventLogger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Id → {Arg1}", moduleControl, this.Id);
             this.DefinitionId = moduleControl.ModuleDefID;
             this.Key = moduleControl.ControlKey;
+			eventLogger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.DefinitionId → {Arg1}", moduleControl, this.DefinitionId);
+			eventLogger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Key → {Arg1}", moduleControl, this.Key);
             this.Title = moduleControl.ControlTitle;
             this.Source = moduleControl.ControlSrc;
             this.Type = moduleControl.ControlType;
             this.Order = moduleControl.ViewOrder;
+			eventLogger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Title → {Arg1}", moduleControl, this.Title);
+			eventLogger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Source → {Arg1}", moduleControl, this.Source);
             this.Icon = moduleControl.IconFile;
             this.HelpUrl = moduleControl.HelpURL;
             this.SupportPopups = moduleControl.SupportsPopUps;
@@ -64,6 +71,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
 
         public ModuleControlInfo ToModuleControlInfo()
         {
+			eventLogger.LogError(">>> Entering ToModuleControlInfo()");
+			eventLogger.LogWarning("<<< Exiting ToModuleControlInfo()");
             return new ModuleControlInfo
             {
                 ModuleControlID = this.Id,

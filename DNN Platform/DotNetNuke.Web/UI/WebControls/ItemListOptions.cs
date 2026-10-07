@@ -14,6 +14,7 @@ namespace DotNetNuke.Web.UI.WebControls
     [DataContract]
     public class ItemListOptions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ItemListOptions));
         /// <summary>Gets or sets the title of the sort ascending button.</summary>
         [DataMember(Name = "sortAscendingButtonTitle")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
@@ -95,7 +96,9 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <summary>Initializes a new instance of the <see cref="ItemListOptions"/> class.</summary>
         public ItemListOptions()
         {
+			Logger.LogError(">>> Entering ItemListOptions()");
             // all the resources are located under the Website\App_GlobalResources\SharedResources.resx
+			Logger.LogWarning("<<< Exiting ItemListOptions()");
             this.SortAscendingButtonTitle = Localization.GetString("DropDownList.SortAscendingButtonTitle", Localization.SharedResourceFile);
             this.UnsortedOrderButtonTooltip = Localization.GetString("DropDownList.UnsortedOrderButtonTooltip", Localization.SharedResourceFile);
             this.SortAscendingButtonTooltip = Localization.GetString("DropDownList.SortAscendingButtonTooltip", Localization.SharedResourceFile);

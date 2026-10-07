@@ -13,21 +13,26 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Provides support for validating the input from an HTML form.</summary>
     public static class HtmlValidationExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlValidationExtensions));
         // Validate
 
         /// <summary>Retrieves the validation metadata for the specified model and applies each rule to the data field.</summary>
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="modelName">The name of the property or model object that is being validated.</param><exception cref="System.ArgumentNullException">The <paramref name="modelName"/> parameter is null.</exception>
         public static void Validate(this DnnHtmlHelper html, string modelName)
         {
+			Logger.LogError(">>> Entering Validate(html={Html},modelName={ModelName})", html, modelName);
             html.HtmlHelper.Validate(modelName);
+			Logger.LogWarning("<<< Exiting Validate(html={Html},modelName={ModelName})", html, modelName);
         }
 
         /// <summary>Retrieves the validation metadata for the specified model and applies each rule to the data field.</summary>
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the properties to render.</param><typeparam name="TModel">The type of the model.</typeparam><typeparam name="TProperty">The type of the property.</typeparam>
         public static void ValidateFor<TModel, TProperty>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TProperty>> expression)
         {
+			Logger.LogError(">>> Entering ValidateFor(html={Html},expression={Expression})", html, expression);
             var htmlHelper = html.HtmlHelper as HtmlHelper<TModel>;
             htmlHelper.ValidateFor(expression);
+			Logger.LogWarning("<<< Exiting ValidateFor(html={Html},expression={Expression})", html, expression);
         }
 
         // ValidationMessage
@@ -40,6 +45,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="modelName">The name of the property or model object that is being validated.</param>
         public static MvcHtmlString ValidationMessage(this DnnHtmlHelper html, string modelName)
         {
+			Logger.LogError(">>> Entering ValidationMessage(html={Html},modelName={ModelName})", html, modelName);
+            Logger.LogWarning("<<< Exiting ValidationMessage(html={Html},modelName={ModelName})", html, modelName);
             return html.HtmlHelper.ValidationMessage(modelName);
         }
 
@@ -106,7 +113,10 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the properties to render.</param><typeparam name="TModel">The type of the model.</typeparam><typeparam name="TProperty">The type of the property.</typeparam>
         public static MvcHtmlString ValidationMessageFor<TModel, TProperty>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TProperty>> expression)
         {
+			Logger.LogError(">>> Entering ValidationMessageFor(html={Html},expression={Expression})", html, expression);
             var htmlHelper = html.HtmlHelper as HtmlHelper<TModel>;
+			Logger.LogWarning("<<< Exiting ValidationMessageFor(html={Html},expression={Expression})", html, expression);
+            Logger.LogWarning("<<< Exiting ValidationMessageFor(html={Html},expression={Expression},validationMessage={ValidationMessage})", html, expression, validationMessage);
             return htmlHelper.ValidationMessageFor(expression);
         }
 
@@ -156,6 +166,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param>
         public static MvcHtmlString ValidationSummary(this DnnHtmlHelper html)
         {
+			Logger.LogError(">>> Entering ValidationSummary(html={Html})", html);
+            Logger.LogWarning("<<< Exiting ValidationSummary(html={Html})", html);
             return html.HtmlHelper.ValidationSummary();
         }
 

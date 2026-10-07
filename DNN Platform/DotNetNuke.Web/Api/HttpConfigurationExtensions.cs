@@ -14,6 +14,7 @@ namespace DotNetNuke.Web.Api
     /// <summary>Extension methods for <see cref="HttpConfiguration"/>.</summary>
     public static class HttpConfigurationExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HttpConfigurationExtensions));
         private const string Key = "TabAndModuleInfoProvider";
 
         /// <summary>Adds the <paramref name="tabAndModuleInfoProvider"/> to the <see cref="HttpConfiguration.Properties"/>.</summary>
@@ -21,16 +22,20 @@ namespace DotNetNuke.Web.Api
         /// <param name="tabAndModuleInfoProvider">The provider to add.</param>
         public static void AddTabAndModuleInfoProvider(this HttpConfiguration configuration, ITabAndModuleInfoProvider tabAndModuleInfoProvider)
         {
+			Logger.LogError(">>> Entering AddTabAndModuleInfoProvider(configuration={Configuration},tabAndModuleInfoProvider={TabAndModuleInfoProvider})", configuration, tabAndModuleInfoProvider);
             Requires.NotNull("configuration", configuration);
             Requires.NotNull("tabAndModuleInfoProvider", tabAndModuleInfoProvider);
 
             if (configuration.Properties.GetOrAdd(Key, InitValue) is not ConcurrentQueue<ITabAndModuleInfoProvider> providers)
             {
                 providers = new ConcurrentQueue<ITabAndModuleInfoProvider>();
+				Logger.LogError("AddTabAndModuleInfoProvider(configuration={Configuration},tabAndModuleInfoProvider={TabAndModuleInfoProvider}): providers → {Providers}", configuration, tabAndModuleInfoProvider, providers);
+				Logger.LogDebug("AddTabAndModuleInfoProvider(configuration={Configuration},tabAndModuleInfoProvider={TabAndModuleInfoProvider}): providers → {Providers}", configuration, tabAndModuleInfoProvider, providers);
                 configuration.Properties[Key] = providers;
             }
 
             providers.Enqueue(tabAndModuleInfoProvider);
+			Logger.LogWarning("<<< Exiting AddTabAndModuleInfoProvider(configuration={Configuration},tabAndModuleInfoProvider={TabAndModuleInfoProvider})", configuration, tabAndModuleInfoProvider);
         }
 
         /// <summary>Get the <see cref="ITabAndModuleInfoProvider"/> instances registered with the <paramref name="configuration"/>.</summary>
@@ -38,6 +43,7 @@ namespace DotNetNuke.Web.Api
         /// <returns>A sequence of <see cref="ITabAndModuleInfoProvider"/> instances.</returns>
         public static IEnumerable<ITabAndModuleInfoProvider> GetTabAndModuleInfoProviders(this HttpConfiguration configuration)
         {
+			Logger.LogError(">>> Entering GetTabAndModuleInfoProviders(configuration={Configuration})", configuration);
             Requires.NotNull("configuration", configuration);
 
             if (configuration.Properties.GetOrAdd(Key, InitValue) is not ConcurrentQueue<ITabAndModuleInfoProvider> providers)
@@ -46,11 +52,14 @@ namespace DotNetNuke.Web.Api
                 return [];
             }
 
+			Logger.LogWarning("<<< Exiting GetTabAndModuleInfoProviders(configuration={Configuration})", configuration);
             return providers.ToArray();
         }
 
         private static object InitValue(object? o)
         {
+			Logger.LogError(">>> Entering InitValue(o={O})", o);
+            Logger.LogWarning("<<< Exiting InitValue(o={O})", o);
             return new ConcurrentQueue<ITabAndModuleInfoProvider>();
         }
     }

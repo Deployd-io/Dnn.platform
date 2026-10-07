@@ -5,6 +5,7 @@ import Localization from "localization";
 import PackageCard from "./PackageCard";
 import PackageCardOverlay from "./PackageCardOverlay";
 import Html from "../Html";
+const logger = console;
 
 import { SvgIcons } from "@dnnsoftware/dnn-react-common";
 
@@ -14,7 +15,9 @@ class PackagesList extends Component {
     }
 
     renderTooltipMessage(description) {
+		logger.error(`>>> Entering renderTooltipMessage(description=${description})`, { "event.action": "renderTooltipMessage", "logrite.description": description });
         if (description) {
+			logger.warn(`<<< Exiting renderTooltipMessage(description=${description})`, { "event.action": "renderTooltipMessage", "logrite.description": description });
             return (
                 "<div><div style='text-transform: uppercase;font-weight: 700;padding: 20px 20px 15px 20px;color: #000'>" +
                 Localization.get("PackageDescription") +
@@ -28,6 +31,7 @@ class PackagesList extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
         if (props.importPackages && props.importPackages.length > 0) {
             return <div className="package-cards">

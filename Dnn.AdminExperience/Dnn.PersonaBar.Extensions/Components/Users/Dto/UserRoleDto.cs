@@ -46,6 +46,7 @@ namespace Dnn.PersonaBar.Users.Components.Dto
 
         public static UserRoleDto FromRoleInfo(PortalSettings portalSettings, UserRoleInfo userRole)
         {
+			eventLogger.LogError(">>> Entering FromRoleInfo(portalSettings={PortalSettings},userRole={UserRole})", portalSettings, userRole);
             if (userRole == null)
             {
                 return null;
@@ -68,6 +69,8 @@ namespace Dnn.PersonaBar.Users.Components.Dto
 
         public UserRoleInfo ToUserRoleInfo()
         {
+			eventLogger.LogError(">>> Entering ToUserRoleInfo()");
+			eventLogger.LogWarning("<<< Exiting ToUserRoleInfo()");
             return new UserRoleInfo()
             {
                 UserRoleID = this.Id,
@@ -82,6 +85,8 @@ namespace Dnn.PersonaBar.Users.Components.Dto
 
         internal static bool AllowExpiredRole(PortalSettings portalSettings, int userId, int roleId)
         {
+			eventLogger.LogError(">>> Entering AllowExpiredRole(portalSettings={PortalSettings},userId={UserId},roleId={RoleId})", portalSettings, userId, roleId);
+            eventLogger.LogWarning("<<< Exiting AllowExpiredRole(portalSettings={PortalSettings},userId={UserId},roleId={RoleId})", portalSettings, userId, roleId);
             return userId != portalSettings.AdministratorId || roleId != portalSettings.AdministratorRoleId;
         }
     }

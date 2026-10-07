@@ -18,15 +18,18 @@ namespace DotNetNuke.Services.ModuleCache
         /// <param name="objScheduleHistoryItem">The schedule history item.</param>
         public PurgeModuleCache(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogError(">>> Entering PurgeModuleCache(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             this.ScheduleHistoryItem = objScheduleHistoryItem; // REQUIRED
         }
 
         /// <inheritdoc />
         public override void DoWork()
         {
+			Logger.LogError(">>> Entering DoWork()");
             try
             {
                 var portals = PortalController.Instance.GetPortals();
+				Logger.LogError("DoWork(): portals → {Portals}", portals);
                 foreach (KeyValuePair<string, ModuleCachingProvider> kvp in ModuleCachingProvider.GetProviderList())
                 {
                     try
@@ -48,6 +51,7 @@ namespace DotNetNuke.Services.ModuleCache
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in DoWork(): {Arg0}", exc.Message);
                 this.ScheduleHistoryItem.Succeeded = false; // REQUIRED
 
                 this.ScheduleHistoryItem.AddLogNote($"Purging Module cache task failed: {exc}.");
@@ -58,6 +62,7 @@ namespace DotNetNuke.Services.ModuleCache
                 // log the exception
                 Exceptions.Exceptions.LogException(exc); // OPTIONAL
             }
+			Logger.LogWarning("<<< Exiting DoWork()");
         }
     }
 }

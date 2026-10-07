@@ -64,15 +64,20 @@ namespace DotNetNuke.Services.Search.Internals
         /// <param name="appStatus">The application status.</param>
         public LuceneControllerImpl(IHostSettingsService hostSettingsService, IApplicationStatusInfo appStatus)
         {
+			Logger.LogError(">>> Entering LuceneControllerImpl(hostSettingsService={HostSettingsService},appStatus={AppStatus})", hostSettingsService, appStatus);
             var folder = hostSettingsService.GetString(Constants.SearchIndexFolderKey, DefaultSearchFolder);
+			Logger.LogError("LuceneControllerImpl(hostSettingsService={HostSettingsService},appStatus={AppStatus}): folder → {Folder}", hostSettingsService, appStatus, folder);
             if (string.IsNullOrEmpty(folder))
             {
                 folder = DefaultSearchFolder;
             }
 
+			Logger.LogWarning("<<< Exiting LuceneControllerImpl(hostSettingsService={HostSettingsService},appStatus={AppStatus})", hostSettingsService, appStatus);
             this.IndexFolder = Path.Combine(appStatus.ApplicationMapPath, folder);
             this.readerTimeSpan = TimeSpan.FromSeconds(hostSettingsService.GetDouble(Constants.SearchReaderRefreshTimeKey, DefaultRereadTimeSpan.TotalSeconds));
+			Logger.LogDebug("LuceneControllerImpl(hostSettingsService={HostSettingsService},appStatus={AppStatus}): readerTimeSpan → {ReaderTimeSpan}", hostSettingsService, appStatus, readerTimeSpan);
             this.searchRetryTimes = hostSettingsService.GetInteger(Constants.SearchRetryTimesKey, DefaultSearchRetryTimes);
+			Logger.LogDebug("LuceneControllerImpl(hostSettingsService={HostSettingsService},appStatus={AppStatus}): searchRetryTimes → {SearchRetryTimes}", hostSettingsService, appStatus, searchRetryTimes);
         }
 
         internal string IndexFolder { get; private set; }
@@ -151,12 +156,14 @@ namespace DotNetNuke.Services.Search.Internals
         /// <inheritdoc />
         public LuceneResults Search(LuceneSearchContext searchContext)
         {
+			Logger.LogError(">>> Entering Search(searchContext={SearchContext})", searchContext);
             Requires.NotNull("LuceneQuery", searchContext.LuceneQuery);
             Requires.NotNull("LuceneQuery.Query", searchContext.LuceneQuery.Query);
             Requires.PropertyNotEqualTo("LuceneQuery", "PageSize", searchContext.LuceneQuery.PageSize, 0);
             Requires.PropertyNotEqualTo("LuceneQuery", "PageIndex", searchContext.LuceneQuery.PageIndex, 0);
 
             var luceneResults = new LuceneResults();
+			Logger.LogError("Search(searchContext={SearchContext}): luceneResults → {LuceneResults}", searchContext, luceneResults);
 
             // validate whether index folder exists and contains index files, otherwise return null.
             if (!this.ValidateIndexFolder())
@@ -166,6 +173,7 @@ namespace DotNetNuke.Services.Search.Internals
 
             var highlighter = this.FastHighlighter;
             var fieldQuery = highlighter.GetFieldQuery(searchContext.LuceneQuery.Query);
+			Logger.LogError("Search(searchContext={SearchContext}): fieldQuery → {FieldQuery}", searchContext, fieldQuery);
 
             var maxResults = searchContext.LuceneQuery.PageIndex * searchContext.LuceneQuery.PageSize;
             var minResults = maxResults - searchContext.LuceneQuery.PageSize + 1;
@@ -175,6 +183,7 @@ namespace DotNetNuke.Services.Search.Internals
                 try
                 {
                     var searcher = this.GetSearcher();
+					Logger.LogError("Search(searchContext={SearchContext}): searcher → {Searcher}", searchContext, searcher);
                     var searchSecurityTrimmer = new SearchSecurityTrimmer(new SearchSecurityTrimmerContext
                     {
                         Searcher = searcher,
@@ -188,6 +197,7 @@ namespace DotNetNuke.Services.Search.Internals
                     if (Logger.IsDebugEnabled)
                     {
                         var sb = GetSearcResultExplanation(searchContext.LuceneQuery, searchSecurityTrimmer.ScoreDocs, searcher);
+						Logger.LogError("Search(searchContext={SearchContext}): sb → {Sb}", searchContext, sb);
                         Logger.Trace(sb);
                     }
 
@@ -214,6 +224,7 @@ namespace DotNetNuke.Services.Search.Internals
                 }
                 catch (Exception ex) when (ex is IOException or AlreadyClosedException)
                 {
+					Logger.LogError("Exception in Search(searchContext={SearchContext}): {Arg1}", searchContext, ex.Message);
                     this.DisposeReaders();
                     this.DisposeWriter(false);
 
@@ -228,12 +239,14 @@ namespace DotNetNuke.Services.Search.Internals
                 }
             }
 
+			Logger.LogWarning("<<< Exiting Search(searchContext={SearchContext})", searchContext);
             return luceneResults;
         }
 
         /// <inheritdoc />
         public void Add(Document doc)
         {
+			Logger.LogError(">>> Entering Add(doc={Doc})", doc);
             Requires.NotNull("searchDocument", doc);
             if (doc.GetFields().Count > 0)
             {
@@ -243,6 +256,7 @@ namespace DotNetNuke.Services.Search.Internals
                 }
                 catch (OutOfMemoryException)
                 {
+					Logger.LogError("Exception in Add(doc={Doc}): {Arg1}", doc, OutOfMemoryException.Message);
                     lock (this.writerLock)
                     {
                         // as suggested by Lucene's doc
@@ -251,18 +265,22 @@ namespace DotNetNuke.Services.Search.Internals
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting Add(doc={Doc})", doc);
         }
 
         /// <inheritdoc />
         public void Delete(Query query)
         {
+			Logger.LogError(">>> Entering Delete(query={Query})");
             Requires.NotNull("luceneQuery", query);
             this.Writer.DeleteDocuments(query);
+			Logger.LogWarning("<<< Exiting Delete(query={Query})");
         }
 
         /// <inheritdoc />
         public void Commit()
         {
+			Logger.LogError(">>> Entering Commit()");
             if (this.writer != null)
             {
                 lock (this.writerLock)
@@ -275,6 +293,7 @@ namespace DotNetNuke.Services.Search.Internals
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting Commit()");
         }
 
         /// <inheritdoc />
@@ -302,42 +321,57 @@ namespace DotNetNuke.Services.Search.Internals
                 return true;
             }
 
+			Logger.LogWarning("<<< Exiting OptimizeSearchIndex(doWait={DoWait})", doWait);
             return false;
         }
 
         /// <inheritdoc />
         public bool HasDeletions()
         {
+			Logger.LogError(">>> Entering HasDeletions()");
             this.CheckDisposed();
             var searcher = this.GetSearcher();
+			Logger.LogError("HasDeletions(): searcher → {Searcher}", searcher);
+			Logger.LogWarning("<<< Exiting HasDeletions()");
             return searcher.IndexReader.HasDeletions;
         }
 
         /// <inheritdoc />
         public int MaxDocsCount()
         {
+			Logger.LogError(">>> Entering MaxDocsCount()");
             this.CheckDisposed();
             var searcher = this.GetSearcher();
+			Logger.LogError("MaxDocsCount(): searcher → {Searcher}", searcher);
+			Logger.LogWarning("<<< Exiting MaxDocsCount()");
             return searcher.IndexReader.MaxDoc;
         }
 
         /// <inheritdoc />
         public int SearchbleDocsCount()
         {
+			Logger.LogError(">>> Entering SearchbleDocsCount()");
             this.CheckDisposed();
             var searcher = this.GetSearcher();
+			Logger.LogError("SearchbleDocsCount(): searcher → {Searcher}", searcher);
+			Logger.LogWarning("<<< Exiting SearchbleDocsCount()");
             return searcher.IndexReader.NumDocs();
         }
 
         /// <inheritdoc />
         public SearchStatistics GetSearchStatistics()
         {
+			Logger.LogError(">>> Entering GetSearchStatistics()");
             this.CheckDisposed();
             var searcher = this.GetSearcher();
+			Logger.LogError("GetSearchStatistics(): searcher → {Searcher}", searcher);
 
             var files = System.IO.Directory.GetFiles(this.IndexFolder, "*.*");
+			Logger.LogError("GetSearchStatistics(): files → {Files}", files);
             var size = files.Select(name => new FileInfo(name)).Select(fInfo => fInfo.Length).Sum();
+			Logger.LogError("GetSearchStatistics(): size → {Size}", size);
 
+			Logger.LogWarning("<<< Exiting GetSearchStatistics()");
             return new SearchStatistics
             {
                 // Hack: seems that NumDocs/MaxDoc are buggy and return incorrect/swapped values
@@ -352,27 +386,34 @@ namespace DotNetNuke.Services.Search.Internals
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogError(">>> Entering Dispose()");
             var status = Interlocked.CompareExchange(ref this.isDisposed, DISPOSED, UNDISPOSED);
+			Logger.LogError("Dispose(): status → {Status}", status);
             if (status == UNDISPOSED)
             {
                 this.DisposeWriter();
                 this.DisposeReaders();
             }
+			Logger.LogWarning("<<< Exiting Dispose()");
         }
 
         /// <inheritdoc />
         public Analyzer GetCustomAnalyzer()
         {
+			Logger.LogError(">>> Entering GetCustomAnalyzer()");
             var analyzer = DataCache.GetCache<Analyzer>("Search_CustomAnalyzer");
+			Logger.LogError("GetCustomAnalyzer(): analyzer → {Analyzer}", analyzer);
             if (analyzer == null)
             {
                 var customAnalyzerType = HostController.Instance.GetString("Search_CustomAnalyzer", string.Empty);
+				Logger.LogError("GetCustomAnalyzer(): customAnalyzerType → {CustomAnalyzerType}", customAnalyzerType);
 
                 if (!string.IsNullOrEmpty(customAnalyzerType))
                 {
                     try
                     {
                         var analyzerType = Reflection.CreateType(customAnalyzerType);
+						Logger.LogError("GetCustomAnalyzer(): analyzerType → {AnalyzerType}", analyzerType);
 
                         // If parameterless ctor exists, use that; if not, pass the Lucene Version.
                         if (analyzerType?.GetConstructor(Type.EmptyTypes) != null)
@@ -386,6 +427,7 @@ namespace DotNetNuke.Services.Search.Internals
 
                         if (analyzer == null)
                         {
+							Logger.LogError("Throwing ArgumentException from GetCustomAnalyzer()");
                             throw new ArgumentException(string.Format(
                                 CultureInfo.CurrentCulture,
                                 Localization.GetExceptionMessage("InvalidAnalyzerClass", "The class '{0}' cannot be created because it's invalid or is not an analyzer, will use default analyzer."),
@@ -402,12 +444,14 @@ namespace DotNetNuke.Services.Search.Internals
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetCustomAnalyzer()");
             return analyzer;
         }
 
         // made internal to be used in unit tests only; otherwise could be made private
         internal IndexSearcher GetSearcher()
         {
+			Logger.LogError(">>> Entering GetSearcher()");
             if (this.reader == null || this.MustRereadIndex)
             {
                 this.CheckValidIndexFolder();
@@ -415,13 +459,16 @@ namespace DotNetNuke.Services.Search.Internals
                 this.InstantiateReader();
             }
 
+			Logger.LogWarning("<<< Exiting GetSearcher()");
             return this.reader.GetSearcher();
         }
 
         private static StringBuilder GetSearcResultExplanation(LuceneQuery luceneQuery, IEnumerable<ScoreDoc> scoreDocs, IndexSearcher searcher)
         {
+			Logger.LogError(">>> Entering GetSearcResultExplanation(luceneQuery={LuceneQuery},scoreDocs={ScoreDocs},searcher={Searcher})", luceneQuery, scoreDocs, searcher);
             var sb = new StringBuilder();
             sb.AppendLine("Query: " + luceneQuery.Query.ToString());
+			Logger.LogError("GetSearcResultExplanation(luceneQuery={LuceneQuery},scoreDocs={ScoreDocs},searcher={Searcher}): sb → {Sb}", luceneQuery, scoreDocs, searcher, sb);
             foreach (var match in scoreDocs)
             {
                 var explanation = searcher.Explain(luceneQuery.Query, match.Doc);
@@ -431,6 +478,7 @@ namespace DotNetNuke.Services.Search.Internals
                 sb.AppendLine(explanation.ToString());
             }
 
+			Logger.LogWarning("<<< Exiting GetSearcResultExplanation(luceneQuery={LuceneQuery},scoreDocs={ScoreDocs},searcher={Searcher})", luceneQuery, scoreDocs, searcher);
             return sb;
         }
 
@@ -441,6 +489,7 @@ namespace DotNetNuke.Services.Search.Internals
             {
                 s = HttpUtility.HtmlEncode(s).Replace(HighlightPreTag, HtmlPreTag).Replace(HighlightPostTag, HtmlPostTag);
             }
+			Logger.LogError(">>> Entering GetHighlightedText(highlighter={Highlighter},fieldQuery={FieldQuery},searcher={Searcher},match={Match},tag={Tag},length={Length})", highlighter, fieldQuery, searcher, match, tag, length);
 
             return s;
         }
@@ -457,26 +506,34 @@ namespace DotNetNuke.Services.Search.Internals
                 {
                     displayScore = match.Substring(beginPos + 1, endPos - beginPos - 1);
                 }
+				Logger.LogError(">>> Entering GetDisplayScoreFromMatch(match={Match})", match);
+            Logger.LogError("GetDisplayScoreFromMatch(match={Match}): displayScore → {DisplayScore}", match, displayScore);
             }
 
+			        Logger.LogWarning("<<< Exiting GetDisplayScoreFromMatch(match={Match})", match);
             return displayScore;
         }
 
         private void CheckDisposed()
         {
+			Logger.LogError(">>> Entering CheckDisposed()");
             if (Thread.VolatileRead(ref this.isDisposed) == DISPOSED)
             {
+				Logger.LogError("Throwing ObjectDisposedException from CheckDisposed()");
                 throw new ObjectDisposedException(Localization.GetExceptionMessage("LuceneControlerIsDisposed", "LuceneController is disposed and cannot be used anymore"));
             }
+			Logger.LogWarning("<<< Exiting CheckDisposed()");
         }
 
         private void InstantiateReader()
         {
+			Logger.LogError(">>> Entering InstantiateReader()");
             IndexSearcher searcher;
             if (this.idxReader != null)
             {
                 // use the Reopen() method for better near-realtime when the _writer isn't null
                 var newReader = this.idxReader.Reopen();
+				Logger.LogError("InstantiateReader(): newReader → {NewReader}", newReader);
                 if (this.idxReader != newReader)
                 {
                     ////_idxReader.Dispose(); -- will get disposed upon disposing the searcher
@@ -484,6 +541,7 @@ namespace DotNetNuke.Services.Search.Internals
                 }
 
                 searcher = new IndexSearcher(this.idxReader);
+				Logger.LogError("InstantiateReader(): searcher → {Searcher}", searcher);
             }
             else
             {
@@ -493,7 +551,9 @@ namespace DotNetNuke.Services.Search.Internals
             }
 
             var reader = new CachedReader(searcher);
+			Logger.LogError("InstantiateReader(): reader → {Reader}", reader);
             var cutoffTime = DateTime.Now - TimeSpan.FromSeconds(this.readerTimeSpan.TotalSeconds * 10);
+			Logger.LogError("InstantiateReader(): cutoffTime → {CutoffTime}", cutoffTime);
             lock (((ICollection)this.oldReaders).SyncRoot)
             {
                 this.CheckDisposed();
@@ -501,43 +561,59 @@ namespace DotNetNuke.Services.Search.Internals
                 this.oldReaders.Add(reader);
                 Interlocked.Exchange(ref this.reader, reader);
             }
+			Logger.LogWarning("<<< Exiting InstantiateReader()");
         }
 
         private void UpdateLastAccessTimes()
         {
+			Logger.LogError(">>> Entering UpdateLastAccessTimes()");
             this.lastReadTimeUtc = DateTime.UtcNow;
+			Logger.LogDebug("UpdateLastAccessTimes(): this.lastReadTimeUtc → {Arg0}", this.lastReadTimeUtc);
             if (System.IO.Directory.Exists(this.IndexFolder))
             {
+				Logger.LogDebug("UpdateLastAccessTimes(): lastReadTimeUtc → {LastReadTimeUtc}", lastReadTimeUtc);
                 this.lastDirModifyTimeUtc = System.IO.Directory.GetLastWriteTimeUtc(this.IndexFolder);
+				Logger.LogDebug("UpdateLastAccessTimes(): lastDirModifyTimeUtc → {LastDirModifyTimeUtc}", lastDirModifyTimeUtc);
             }
+			Logger.LogWarning("<<< Exiting UpdateLastAccessTimes()");
         }
 
         private void RescheduleAccessTimes()
         {
+			Logger.LogError(">>> Entering RescheduleAccessTimes()");
             // forces re-opening the reader within 30 seconds from now (used mainly by commit)
             var now = DateTime.UtcNow;
             if (this.readerTimeSpan > DefaultRereadTimeSpan && now - this.lastReadTimeUtc > DefaultRereadTimeSpan)
             {
+				Logger.LogWarning("<<< Exiting RescheduleAccessTimes()");
                 this.lastReadTimeUtc = now - this.readerTimeSpan - DefaultRereadTimeSpan;
+				Logger.LogDebug("RescheduleAccessTimes(): lastReadTimeUtc → {LastReadTimeUtc}", lastReadTimeUtc);
+				Logger.LogDebug("RescheduleAccessTimes(): this.lastReadTimeUtc → {Arg0}", this.lastReadTimeUtc);
             }
         }
 
         private void CheckValidIndexFolder()
         {
+			Logger.LogError(">>> Entering CheckValidIndexFolder()");
             if (!this.ValidateIndexFolder())
             {
+				Logger.LogError("Throwing SearchIndexEmptyException from CheckValidIndexFolder()");
                 throw new SearchIndexEmptyException(Localization.GetExceptionMessage("SearchIndexingDirectoryNoValid", "Search indexing directory is either empty or does not exist"));
             }
+			Logger.LogWarning("<<< Exiting CheckValidIndexFolder()");
         }
 
         private bool ValidateIndexFolder()
         {
+			Logger.LogError(">>> Entering ValidateIndexFolder()");
+            Logger.LogWarning("<<< Exiting ValidateIndexFolder()");
             return System.IO.Directory.Exists(this.IndexFolder) &&
                    System.IO.Directory.GetFiles(this.IndexFolder, "*.*").Length > 0;
         }
 
         private void DisposeWriter(bool commit = true)
         {
+			Logger.LogError(">>> Entering DisposeWriter(commit={Commit})", commit);
             if (this.writer != null)
             {
                 lock (this.writerLock)
@@ -546,6 +622,8 @@ namespace DotNetNuke.Services.Search.Internals
                     {
                         this.idxReader.Dispose();
                         this.idxReader = null;
+						Logger.LogDebug("DisposeWriter(commit={Commit}): idxReader → {IdxReader}", commit, idxReader);
+						Logger.LogDebug("DisposeWriter(commit={Commit}): this.idxReader → {Arg1}", commit, this.idxReader);
 
                         if (commit)
                         {
@@ -554,13 +632,17 @@ namespace DotNetNuke.Services.Search.Internals
 
                         this.writer.Dispose();
                         this.writer = null;
+						Logger.LogDebug("DisposeWriter(commit={Commit}): writer → {Writer}", commit, writer);
+						Logger.LogDebug("DisposeWriter(commit={Commit}): this.writer → {Arg1}", commit, this.writer);
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting DisposeWriter(commit={Commit})", commit);
         }
 
         private void DisposeReaders()
         {
+			Logger.LogError(">>> Entering DisposeReaders()");
             lock (((ICollection)this.oldReaders).SyncRoot)
             {
                 foreach (var rdr in this.oldReaders)
@@ -569,7 +651,10 @@ namespace DotNetNuke.Services.Search.Internals
                 }
 
                 this.oldReaders.Clear();
+				Logger.LogWarning("<<< Exiting DisposeReaders()");
                 this.reader = null;
+				Logger.LogDebug("DisposeReaders(): reader → {Reader}", reader);
+				Logger.LogDebug("DisposeReaders(): this.reader → {Arg0}", this.reader);
             }
         }
 
@@ -579,7 +664,11 @@ namespace DotNetNuke.Services.Search.Internals
 
             public CachedReader(IndexSearcher searcher)
             {
+				Logger.LogError(">>> Entering CachedReader(searcher={Searcher})", searcher);
                 this.searcher = searcher;
+				Logger.LogDebug("CachedReader(searcher={Searcher}): this.searcher → {Arg1}", searcher, this.searcher);
+				Logger.LogDebug("CachedReader(searcher={Searcher}): searcher → {Searcher1}", searcher, searcher);
+            Logger.LogWarning("<<< Exiting CachedReader(searcher={Searcher})", searcher);
                 this.UpdateLastUsed();
             }
 
@@ -599,6 +688,7 @@ namespace DotNetNuke.Services.Search.Internals
 
             private void UpdateLastUsed()
             {
+				Logger.LogError(">>> Entering UpdateLastUsed()");
                 this.LastUsed = DateTime.Now;
             }
         }

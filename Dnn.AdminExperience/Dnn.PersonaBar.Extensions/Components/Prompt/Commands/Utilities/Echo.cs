@@ -18,11 +18,13 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Utilities
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             if (this.Args.Length > 1)
             {
                 return new ConsoleResultModel(this.Args[1]);
             }
 
+			eventLogger.LogWarning("<<< Exiting Run()");
             return new ConsoleErrorResultModel(this.LocalizeString("Prompt_Echo_Nothing"));
         }
     }

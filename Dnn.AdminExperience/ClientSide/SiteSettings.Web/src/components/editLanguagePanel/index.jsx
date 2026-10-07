@@ -8,14 +8,18 @@ import resx from "resources";
 import ResourceList from "./resourceList";
 import utilities from "utils";
 import "./style.less";
+const logger = console;
 
 function alreadyAChildTerm(childFolders, compareValue) {
+	logger.error(`>>> Entering alreadyAChildTerm(childFolders=${childFolders},compareValue=${compareValue})`, { "event.action": "alreadyAChildTerm", "logrite.childFolders": childFolders, "logrite.compareValue": compareValue });
+	logger.warn(`<<< Exiting alreadyAChildTerm(childFolders=${childFolders},compareValue=${compareValue})`, { "event.action": "alreadyAChildTerm", "logrite.childFolders": childFolders, "logrite.compareValue": compareValue });
     return childFolders.find((cf) => {
         return cf.NewValue === compareValue;
     });
 }
 
 function findParent(parentList, item) {
+	logger.error(`>>> Entering findParent(parentList=${parentList},item=${item})`, { "event.action": "findParent", "logrite.parentList": parentList, "logrite.item": item });
     if (!parentList || !item) {
         return;
     }
@@ -30,9 +34,11 @@ function findParent(parentList, item) {
             findParent(listItem.ChildFolders, item);
         }
     });
+	logger.warn(`<<< Exiting findParent(parentList=${parentList},item=${item})`, { "event.action": "findParent", "logrite.parentList": parentList, "logrite.item": item });
 }
 
 function generateList(list) {
+	logger.error(`>>> Entering generateList(list=${list})`, { "event.action": "generateList", "logrite.list": list });
     let _list = [];
     if (!list) {
         return;
@@ -51,30 +57,41 @@ function generateList(list) {
 class EditLanguagePanel extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             selectedMode: utilities.settings.isHost ? "System" : "Portal",
             highlightPendingTranslations: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
     refreshFileList() {
+		logger.error('>>> Entering refreshFileList()', { "event.action": "refreshFileList" });
         this.props.dispatch(LanguageEditorActions.getRootResourcesFolder(this.props.portalId, this.state.selectedMode));
+		logger.warn('<<< Exiting refreshFileList()', { "event.action": "refreshFileList" });
     }
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this.refreshFileList();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     backToSiteSettings() {
+		logger.error('>>> Entering backToSiteSettings()', { "event.action": "backToSiteSettings" });
         this.props.dispatch(VisiblePanelActions.selectPanel(0));
+		logger.warn('<<< Exiting backToSiteSettings()', { "event.action": "backToSiteSettings" });
     }
     getChildFolders(folder, callback) {
+		logger.error(`>>> Entering getChildFolders(folder=${folder},callback=${callback})`, { "event.action": "getChildFolders", "logrite.folder": folder, "logrite.callback": callback });
         let _folder = folder !== "_" ? folder : "";
         this.props.dispatch(LanguageEditorActions.getSubRootResources(_folder, () => {
             if (callback) {
                 callback();
+				logger.warn(`<<< Exiting getChildFolders(folder=${folder},callback=${callback})`, { "event.action": "getChildFolders", "logrite.folder": folder, "logrite.callback": callback });
             }
         }));
     }
     getResxEntries(resxFile, callback) {
+		logger.error(`>>> Entering getResxEntries(resxFile=${resxFile},callback=${callback})`, { "event.action": "getResxEntries", "logrite.resxFile": resxFile, "logrite.callback": callback });
         const { props } = this;
         props.dispatch(LanguageEditorActions.getResxEntries({
             resourceFile: resxFile.replace("_/", ""),
@@ -83,20 +100,26 @@ class EditLanguagePanel extends Component {
             portalId: props.portalId,
             locale: props.languageBeingEdited.Code
         }, callback));
+		logger.warn(`<<< Exiting getResxEntries(resxFile=${resxFile},callback=${callback})`, { "event.action": "getResxEntries", "logrite.resxFile": resxFile, "logrite.callback": callback });
     }
     onSelectMode(value) {
+		logger.error(`>>> Entering onSelectMode(value=${value})`, { "event.action": "onSelectMode", "logrite.value": value });
         this.setState({
             selectedMode: value
         }, () => {
             if (this.props.resxBeingEdited !== "") {
                 this.getResxEntries(this.props.resxBeingEdited);
+				logger.warn(`<<< Exiting onSelectMode(value=${value})`, { "event.action": "onSelectMode", "logrite.value": value });
             }
         });
     }
     onResxChange(updatedList) {
+		logger.error(`>>> Entering onResxChange(updatedList=${updatedList})`, { "event.action": "onResxChange", "logrite.updatedList": updatedList });
         this.props.dispatch(LanguageEditorActions.updateResxEntry(updatedList));
+		logger.warn(`<<< Exiting onResxChange(updatedList=${updatedList})`, { "event.action": "onResxChange", "logrite.updatedList": updatedList });
     }
     onSaveTranslations() {
+		logger.error('>>> Entering onSaveTranslations()', { "event.action": "onSaveTranslations" });
         const {props} = this;
         const payload = {
             Mode: this.state.selectedMode,
@@ -114,15 +137,19 @@ class EditLanguagePanel extends Component {
 
         props.dispatch(LanguageEditorActions.saveTranslations(payload, (data) => {
             utilities.utilities.notify(data.Message);
+			logger.warn('<<< Exiting onSaveTranslations()', { "event.action": "onSaveTranslations" });
         }));
     }
     onHighlightPendingTranslations() {
+		logger.error('>>> Entering onHighlightPendingTranslations()', { "event.action": "onHighlightPendingTranslations" });
         this.setState({
             highlightPendingTranslations: !this.state.highlightPendingTranslations
         });
+		logger.warn('<<< Exiting onHighlightPendingTranslations()', { "event.action": "onHighlightPendingTranslations" });
     }
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
         const ModeOptions = [
             {
@@ -139,6 +166,7 @@ class EditLanguagePanel extends Component {
             }
         ];
         const { languageBeingEdited } = props, languageFolders = generateList(props.languageFolders.concat(props.languageFiles), this.state.selectedMode === "System");
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <PersonaBarPageBody
                 className="edit-language-panel"
@@ -181,6 +209,8 @@ EditLanguagePanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         languageBeingEdited: state.languageEditor.languageBeingEdited,
         portalName: state.siteInfo.settings && state.siteInfo.settings.PortalName,

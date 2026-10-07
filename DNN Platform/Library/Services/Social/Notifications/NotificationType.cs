@@ -21,6 +21,7 @@ namespace DotNetNuke.Services.Social.Notifications
     [Serializable]
     public class NotificationType : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NotificationType));
         private int notificationTypeId = -1;
         private int desktopModuleId = -1;
 
@@ -92,12 +93,14 @@ namespace DotNetNuke.Services.Social.Notifications
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.NotificationTypeId = Convert.ToInt32(dr["NotificationTypeID"], CultureInfo.InvariantCulture);
             this.Name = dr["Name"].ToString();
             this.Description = Null.SetNullString(dr["Description"]);
             var timeToLive = Null.SetNullInteger(dr["TTL"]);
             if (timeToLive != Null.NullInteger)
             {
+				Logger.LogError("Fill(dr={Dr}): timeToLive → {TimeToLive}", dr, timeToLive);
                 this.TimeToLive = new TimeSpan(0, timeToLive, 0);
             }
 
@@ -106,6 +109,7 @@ namespace DotNetNuke.Services.Social.Notifications
 
             // add audit column data
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

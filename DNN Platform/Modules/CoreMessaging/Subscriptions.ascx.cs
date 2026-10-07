@@ -35,6 +35,7 @@ namespace DotNetNuke.Modules.CoreMessaging
     public partial class Subscriptions(IClientResourceController clientResourceController, IServicesFramework servicesFramework, IHostSettings hostSettings)
         : UserControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Subscriptions.ascx));
         private const string SharedResources = "~/DesktopModules/CoreMessaging/App_LocalResources/SharedResources.resx";
         private readonly IClientResourceController clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
         private readonly IServicesFramework servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
@@ -45,6 +46,8 @@ namespace DotNetNuke.Modules.CoreMessaging
         public Subscriptions()
             : this(null, null, null)
         {
+		Logger.LogError(">>> Entering Subscriptions()");
+        Logger.LogWarning("<<< Exiting Subscriptions()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="Subscriptions"/> class.</summary>
@@ -81,7 +84,9 @@ namespace DotNetNuke.Modules.CoreMessaging
         /// <returns>The settings formatted as a JSON string.</returns>
         public string GetSettingsAsJson()
         {
+			Logger.LogError(">>> Entering GetSettingsAsJson()");
             var settings = GetModuleSettings(PortalSettings.Current, this.ModuleConfiguration, Null.NullInteger);
+			Logger.LogError("GetSettingsAsJson(): settings → {Settings}", settings);
             foreach (DictionaryEntry entry in this.GetViewSettings())
             {
                 if (settings.ContainsKey(entry.Key))
@@ -94,6 +99,7 @@ namespace DotNetNuke.Modules.CoreMessaging
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetSettingsAsJson()");
             return settings.ToJson();
         }
 
@@ -102,12 +108,15 @@ namespace DotNetNuke.Modules.CoreMessaging
         /// <returns>The localized value for the provided key.</returns>
         protected string LocalizeString(string key)
         {
+			Logger.LogError(">>> Entering LocalizeString(key={Key})", key);
+            Logger.LogWarning("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, this.LocalResourceFile);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.servicesFramework.RequestAjaxAntiForgerySupport();
@@ -123,10 +132,12 @@ namespace DotNetNuke.Modules.CoreMessaging
             {
                 this.Response.Redirect(Globals.AccessDeniedURL(), false);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         private static Hashtable GetModuleSettings(PortalSettings portalSettings, ModuleInfo moduleInfo, int uniqueId)
         {
+			Logger.LogError(">>> Entering GetModuleSettings(portalSettings={PortalSettings},moduleInfo={ModuleInfo},uniqueId={UniqueId})", portalSettings, moduleInfo, uniqueId);
             var usePopup =
                 portalSettings.EnablePopUps &&
                 portalSettings.LoginTabId == Null.NullInteger &&
@@ -147,8 +158,11 @@ namespace DotNetNuke.Modules.CoreMessaging
             var moduleId = moduleInfo?.ModuleID ?? Null.NullInteger;
 
             var moduleSettings = moduleInfo != null ? moduleInfo.ModuleSettings : new Hashtable();
+			Logger.LogError("GetModuleSettings(portalSettings={PortalSettings},moduleInfo={ModuleInfo},uniqueId={UniqueId}): moduleSettings → {ModuleSettings}", portalSettings, moduleInfo, uniqueId, moduleSettings);
 
             var debug = false;
+			Logger.LogWarning("<<< Exiting GetModuleSettings(portalSettings={PortalSettings},moduleInfo={ModuleInfo},uniqueId={UniqueId})", portalSettings, moduleInfo, uniqueId);
+			Logger.LogError("GetModuleSettings(portalSettings={PortalSettings},moduleInfo={ModuleInfo},uniqueId={UniqueId}): debug → {Debug}", portalSettings, moduleInfo, uniqueId, debug);
 
 #if DEBUG
             debug = true;
@@ -183,11 +197,14 @@ namespace DotNetNuke.Modules.CoreMessaging
 
         private static string GetHistoryNavigationKey(string moduleName)
         {
+			Logger.LogError(">>> Entering GetHistoryNavigationKey(moduleName={ModuleName})", moduleName);
+            Logger.LogWarning("<<< Exiting GetHistoryNavigationKey(moduleName={ModuleName})", moduleName);
             return HttpContext.Current.Server.HtmlEncode(moduleName.ToLowerInvariant().Replace(" ", string.Empty));
         }
 
         private static TimeSpan GetSessionTimeout()
         {
+			Logger.LogError(">>> Entering GetSessionTimeout()");
             try
             {
                 if (WebConfigurationManager.GetSection("system.web/sessionState") is SessionStateSection sessionSection)
@@ -197,11 +214,13 @@ namespace DotNetNuke.Modules.CoreMessaging
             }
             catch
             {
+				Logger.LogError("Exception in GetSessionTimeout(): {Arg0}", ex.Message);
                 // FIXME(cbond): The default configuration doesn't actually let us see this data
                 // FIXME(cbond): It's too annoying seeing this fill the Event Log, we need to add the permission to web.config
                 ////Exceptions.LogException(ex);
             }
 
+			Logger.LogWarning("<<< Exiting GetSessionTimeout()");
             return TimeSpan.FromMinutes(25);
         }
 
@@ -216,11 +235,14 @@ namespace DotNetNuke.Modules.CoreMessaging
 
         private static string GetLoginUrl(PortalSettings portalSettings)
         {
+			Logger.LogError(">>> Entering GetLoginUrl(portalSettings={PortalSettings})", portalSettings);
             var returnUrl = HttpContext.Current.Request.RawUrl;
 
+			Logger.LogError("GetLoginUrl(portalSettings={PortalSettings}): returnUrl → {ReturnUrl}", portalSettings, returnUrl);
             if (portalSettings.UserId < 1)
             {
                 var indexOf = returnUrl.IndexOf("?returnurl=", StringComparison.InvariantCultureIgnoreCase);
+				Logger.LogError("GetLoginUrl(portalSettings={PortalSettings}): indexOf → {IndexOf}", portalSettings, indexOf);
                 if (indexOf >= 0)
                 {
                     returnUrl = returnUrl.Substring(0, indexOf);
@@ -229,6 +251,7 @@ namespace DotNetNuke.Modules.CoreMessaging
                 returnUrl = Common.Globals.LoginURL(HttpUtility.UrlEncode(returnUrl), true);
             }
 
+			Logger.LogWarning("<<< Exiting GetLoginUrl(portalSettings={PortalSettings})", portalSettings);
             return returnUrl;
         }
 
@@ -238,10 +261,13 @@ namespace DotNetNuke.Modules.CoreMessaging
         /// </summary>
         private Hashtable GetViewSettings()
         {
+			Logger.LogError(">>> Entering GetViewSettings()");
             var portalSettings = PortalSettings.Current;
             var userPreferenceController = UserPreferencesController.Instance;
             var user = UserController.GetUserById(this.hostSettings, portalSettings.PortalId, portalSettings.UserId);
+			Logger.LogError("GetViewSettings(): user → {User}", user);
             UserPreference userPreference = null;
+			Logger.LogError("GetViewSettings(): userPreference → {UserPreference}", userPreference);
             if (user != null)
             {
                 userPreference = userPreferenceController.GetUserPreference(user);
@@ -250,6 +276,7 @@ namespace DotNetNuke.Modules.CoreMessaging
             const int notifyFrequency = 2;
             const int messageFrequency = 0;
 
+			Logger.LogWarning("<<< Exiting GetViewSettings()");
             return new Hashtable
                    {
                        { "moduleScope", $"#{this.ScopeWrapper.ClientID}" },

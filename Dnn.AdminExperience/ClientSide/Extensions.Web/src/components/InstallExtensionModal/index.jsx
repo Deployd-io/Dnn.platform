@@ -11,10 +11,12 @@ import Localization from "localization";
 import utilities from "utils";
 import FileUpload from "./FileUpload";
 import styles from "./style.module.less";
+const logger = console;
 
 class InstallExtensionModal extends Component {
     constructor(props) {
         super();
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             package: null,
             wizardStep: 0,
@@ -22,12 +24,15 @@ class InstallExtensionModal extends Component {
             selectedLegacyType: null,
             isPortalPackage: props.isPortalPackage
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     onPackageChange(event) {
+		logger.error(`>>> Entering onPackageChange(event=${event})`, { "event.action": "onPackageChange", "logrite.event": event });
         const files = event.target.files;
 
         if (files && files.length > 0) {
+			logger.warn(`<<< Exiting onPackageChange(event=${event})`, { "event.action": "onPackageChange", "logrite.event": event });
             this.setState({
                 package: files[0]
             });
@@ -35,11 +40,14 @@ class InstallExtensionModal extends Component {
     }
 
     goToStep(wizardStep) {
+		logger.error(`>>> Entering goToStep(wizardStep=${wizardStep})`, { "event.action": "goToStep", "logrite.wizardStep": wizardStep });
         const { props } = this;
         props.dispatch(InstallationActions.navigateWizard(wizardStep));
+		logger.warn(`<<< Exiting goToStep(wizardStep=${wizardStep})`, { "event.action": "goToStep", "logrite.wizardStep": wizardStep });
     }
 
     parsePackage(file, callback, errorCallback) {
+		logger.error(`>>> Entering parsePackage(file=${file},callback=${callback},errorCallback=${errorCallback})`, { "event.action": "parsePackage", "logrite.file": file, "logrite.callback": callback, "logrite.errorCallback": errorCallback });
         if (!file) {
             utilities.utilities.notifyError(Localization.get("InstallExtension_EmptyPackage.Error"));
             return;
@@ -72,17 +80,23 @@ class InstallExtensionModal extends Component {
                 }
             }));
         });
+		logger.warn(`<<< Exiting parsePackage(file=${file},callback=${callback},errorCallback=${errorCallback})`, { "event.action": "parsePackage", "logrite.file": file, "logrite.callback": callback, "logrite.errorCallback": errorCallback });
     }
 
     goToReleaseNotes() {
+		logger.error('>>> Entering goToReleaseNotes()', { "event.action": "goToReleaseNotes" });
         this.goToStep(2);
+		logger.warn('<<< Exiting goToReleaseNotes()', { "event.action": "goToReleaseNotes" });
     }
 
     goToLicense() {
+		logger.error('>>> Entering goToLicense()', { "event.action": "goToLicense" });
         this.goToStep(3);
+		logger.warn('<<< Exiting goToLicense()', { "event.action": "goToLicense" });
     }
 
     installPackage() {
+		logger.error('>>> Entering installPackage()', { "event.action": "installPackage" });
         const { props } = this;
         this.setState({
             installingPackage: true
@@ -100,17 +114,21 @@ class InstallExtensionModal extends Component {
                     installingPackage: false
                 });
                 this.goToStep(4);
+				logger.warn('<<< Exiting installPackage()', { "event.action": "installPackage" });
             }));
         }
     }
 
     onCheckRepairInstall(value) {
+		logger.error(`>>> Entering onCheckRepairInstall(value=${value})`, { "event.action": "onCheckRepairInstall", "logrite.value": value });
         this.setState({
             repairInstallChecked: value
         });
+		logger.warn(`<<< Exiting onCheckRepairInstall(value=${value})`, { "event.action": "onCheckRepairInstall", "logrite.value": value });
     }
 
     cancelInstall() {
+		logger.error('>>> Entering cancelInstall()', { "event.action": "cancelInstall" });
         const { props } = this;
         props.dispatch(InstallationActions.clearParsedInstallationPackage());
         props.dispatch(InstallationActions.notInstallingAvailablePackage());
@@ -120,20 +138,25 @@ class InstallExtensionModal extends Component {
 
         if (props.backToReferrerFunc) {
             props.backToReferrerFunc();
+			logger.warn('<<< Exiting cancelInstall()', { "event.action": "cancelInstall" });
         }
     }
 
     getResxFromLegacyType() {
+		logger.error('>>> Entering getResxFromLegacyType()', { "event.action": "getResxFromLegacyType" });
         if (this.state.selectedLegacyType === "Skin") {
             return Localization.get("CatalogSkin");
         } else {
+			logger.warn('<<< Exiting getResxFromLegacyType()', { "event.action": "getResxFromLegacyType" });
             return Localization.get("Container");
         }
     }
 
     getPackageInformationStep() {
+		logger.error('>>> Entering getPackageInformationStep()', { "event.action": "getPackageInformationStep" });
         const { props } = this;
         const parsedInstallationPackageCopy = utilities.utilities.getObjectCopy(props.parsedInstallationPackage);
+		logger.error(`getPackageInformationStep(): parsedInstallationPackageCopy → ${parsedInstallationPackageCopy}`, { "event.action": "getPackageInformationStep" });
         let parsedInstallationPackage = this.state.selectedLegacyType ?
             Object.assign(parsedInstallationPackageCopy, {
                 packageType: this.getResxFromLegacyType(),
@@ -143,6 +166,7 @@ class InstallExtensionModal extends Component {
             })
             : parsedInstallationPackageCopy;
         if (parsedInstallationPackage) {
+			logger.warn('<<< Exiting getPackageInformationStep()', { "event.action": "getPackageInformationStep" });
             return <PackageInformation
                 extensionBeingEdited={parsedInstallationPackage}
                 validationMapped={false}
@@ -155,6 +179,7 @@ class InstallExtensionModal extends Component {
     }
 
     endInstallation() {
+		logger.error('>>> Entering endInstallation()', { "event.action": "endInstallation" });
         const { props } = this;
         if (props.installingAvailablePackage) {
             props.dispatch(PaginationActions.loadTab(0, () => {
@@ -168,9 +193,11 @@ class InstallExtensionModal extends Component {
             }
             if (props.parsedInstallationPackage.packageType && props.parsedInstallationPackage.packageType !== props.selectedInstalledPackageType) {
                 const _packageType = (props.parsedInstallationPackage && props.parsedInstallationPackage.packageType) ? props.parsedInstallationPackage.packageType : "Module";
+				logger.error(`endInstallation(): _packageType → ${_packageType}`, { "event.action": "endInstallation" });
                 props.dispatch(ExtensionActions.getInstalledPackages(_packageType));
             } else if (this.state.selectedLegacyType) {
                 props.dispatch(ExtensionActions.getInstalledPackages(this.state.selectedLegacyType));
+				logger.warn('<<< Exiting endInstallation()', { "event.action": "endInstallation" });
             }
             else if (props.selectedInstalledPackageType) {
                 props.dispatch(ExtensionActions.getInstalledPackages(props.selectedInstalledPackageType));
@@ -180,50 +207,66 @@ class InstallExtensionModal extends Component {
         this.cancelInstall();
     }
     onToggleLicenseAccept() {
+		logger.error('>>> Entering onToggleLicenseAccept()', { "event.action": "onToggleLicenseAccept" });
         this.props.dispatch(InstallationActions.toggleAcceptLicense(!this.props.licenseAccepted));
+		logger.warn('<<< Exiting onToggleLicenseAccept()', { "event.action": "onToggleLicenseAccept" });
     }
     toggleViewLog(value) {
+		logger.error(`>>> Entering toggleViewLog(value=${value})`, { "event.action": "toggleViewLog", "logrite.value": value });
         this.props.dispatch(InstallationActions.setViewingLog(value));
+		logger.warn(`<<< Exiting toggleViewLog(value=${value})`, { "event.action": "toggleViewLog", "logrite.value": value });
     }
     clearParsedInstallationPackage() {
+		logger.error('>>> Entering clearParsedInstallationPackage()', { "event.action": "clearParsedInstallationPackage" });
         this.setAlreadyInstalled(false);
         this.props.dispatch(InstallationActions.clearParsedInstallationPackage());
+		logger.warn('<<< Exiting clearParsedInstallationPackage()', { "event.action": "clearParsedInstallationPackage" });
     }
     cancelInstallationOnUpload() {
+		logger.error('>>> Entering cancelInstallationOnUpload()', { "event.action": "cancelInstallationOnUpload" });
         this.clearParsedInstallationPackage();
         this.props.onCancel();
         this.props.dispatch(InstallationActions.toggleAcceptLicense(false));
 
         if (this.props.backToReferrerFunc) {
             this.props.backToReferrerFunc();
+			logger.warn('<<< Exiting cancelInstallationOnUpload()', { "event.action": "cancelInstallationOnUpload" });
         }
     }
     onSelectLegacyType(value) {
+		logger.error(`>>> Entering onSelectLegacyType(value=${value})`, { "event.action": "onSelectLegacyType", "logrite.value": value });
         this.setState({
             selectedLegacyType: value
         });
+		logger.warn(`<<< Exiting onSelectLegacyType(value=${value})`, { "event.action": "onSelectLegacyType", "logrite.value": value });
     }
     setAlreadyInstalled(value, nextStepIfFalse) {
+		logger.error(`>>> Entering setAlreadyInstalled(value=${value},nextStepIfFalse=${nextStepIfFalse})`, { "event.action": "setAlreadyInstalled", "logrite.value": value, "logrite.nextStepIfFalse": nextStepIfFalse });
         this.setState({
             alreadyInstalled: value
         });
         if (nextStepIfFalse && !value) {
             this.goToStep(1);
+			logger.warn(`<<< Exiting setAlreadyInstalled(value=${value},nextStepIfFalse=${nextStepIfFalse})`, { "event.action": "setAlreadyInstalled", "logrite.value": value, "logrite.nextStepIfFalse": nextStepIfFalse });
         }
     }
     getSelectedLegacyTypeIsInstalled() {
+		logger.error('>>> Entering getSelectedLegacyTypeIsInstalled()', { "event.action": "getSelectedLegacyTypeIsInstalled" });
         if (this.state.selectedLegacyType === "Skin") {
             return this.props.parsedInstallationPackage && this.props.parsedInstallationPackage.legacySkinInstalled;
         }
         if (this.state.selectedLegacyType === "Container") {
+			logger.warn('<<< Exiting getSelectedLegacyTypeIsInstalled()', { "event.action": "getSelectedLegacyTypeIsInstalled" });
             return this.props.parsedInstallationPackage && this.props.parsedInstallationPackage.legacyContainerInstalled;
         }
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
         const { wizardStep } = props,
             legacyInstalled = (props.parsedInstallationPackage && (props.parsedInstallationPackage.legacySkinInstalled || props.parsedInstallationPackage.legacyContainerInstalled)),
             legacyTypeIsInstalled = this.getSelectedLegacyTypeIsInstalled();
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.installExtensionModal}>
                 <PersonaBarPageHeader title={Localization.get("ExtensionInstall.Action")} />
@@ -314,6 +357,8 @@ InstallExtensionModal.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         parsedInstallationPackage: state.installation.parsedInstallationPackage,
         selectedInstalledPackageType: state.extension.selectedInstalledPackageType,

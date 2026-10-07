@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -18,8 +19,10 @@ CodeMirror.defineMode("q",function(config){
       E=/[|/&^!+:\\\-*%$=~#;@><,?_\'\"\[\(\]\)\s{}]/;
   function buildRE(w){return new RegExp("^("+w.join("|")+")$");}
   function tokenBase(stream,state){
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     var sol=stream.sol(),c=stream.next();
     curPunc=null;
+	logger.error(`tokenBase(stream=${stream},state=${state}): sol → ${sol}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     if(sol)
       if(c=="/")
         return(state.tokenize=tokenLineComment)(stream,state);
@@ -69,7 +72,11 @@ CodeMirror.defineMode("q",function(config){
       state.tokenize=tokenBase;
     return"comment";
   }
-  function tokenCommentToEOF(stream){return stream.skipToEnd(),"comment";}
+  function tokenCommentToEOF(stream){
+      logger.error(`>>> Entering tokenCommentToEOF(stream=${stream})`, { "event.action": "tokenCommentToEOF", "logrite.stream": stream });
+      logger.warn(`<<< Exiting tokenCommentToEOF(stream=${stream})`, { "event.action": "tokenCommentToEOF", "logrite.stream": stream });
+      return stream.skipToEnd(),"comment";
+  }
   function tokenString(stream,state){
     var escaped=false,next,end=false;
     while((next=stream.next())){
@@ -79,8 +86,16 @@ CodeMirror.defineMode("q",function(config){
     if(end)state.tokenize=tokenBase;
     return"string";
   }
-  function pushContext(state,type,col){state.context={prev:state.context,indent:state.indent,col:col,type:type};}
-  function popContext(state){state.indent=state.context.indent;state.context=state.context.prev;}
+  function pushContext(state,type,col){
+      logger.error(`>>> Entering pushContext(state=${state},type=${type},col=${col})`, { "event.action": "pushContext", "logrite.state": state, "logrite.type": type, "logrite.col": col });
+      logger.warn(`<<< Exiting pushContext(state=${state},type=${type},col=${col})`, { "event.action": "pushContext", "logrite.state": state, "logrite.type": type, "logrite.col": col });
+      state.context={prev:state.context,indent:state.indent,col:col,type:type};
+  }
+  function popContext(state){
+      logger.error(`>>> Entering popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
+      logger.warn(`<<< Exiting popContext(state=${state})`, { "event.action": "popContext", "logrite.state": state });
+      state.indent=state.context.indent;state.context=state.context.prev;
+  }
   return{
     startState:function(){
       return{tokenize:tokenBase,

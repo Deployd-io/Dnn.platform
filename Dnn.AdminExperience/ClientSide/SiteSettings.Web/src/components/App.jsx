@@ -16,6 +16,7 @@ import EditLanguagePanel from "./editLanguagePanel";
 import SiteLanguageSelector from "./siteLanguageSelector";
 import utilities from "utils";
 import resx from "../resources";
+const logger = console;
 
 const Pages = {
     Default: 0,
@@ -30,6 +31,7 @@ const Pages = {
 class App extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             portalId: utilities.settings.portalId,
             cultureCode: utilities.settings.cultureCode,
@@ -39,13 +41,17 @@ class App extends Component {
             bodyShowing: true
         };
         this.changePortalId = this.changePortalId.bind(this);
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
         this.changeCultureCode = this.changeCultureCode.bind(this);
         this.changePortalIdCultureCode = this.changePortalIdCultureCode.bind(this);
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     backToReferrer(callback) {
+		logger.error(`>>> Entering backToReferrer(callback=${callback})`, { "event.action": "backToReferrer", "logrite.callback": callback });
         if (typeof callback === "function") {
             callback();
+			logger.warn(`<<< Exiting backToReferrer(callback=${callback})`, { "event.action": "backToReferrer", "logrite.callback": callback });
         }
         this.setState({
             referrer: "",
@@ -55,6 +61,7 @@ class App extends Component {
     }
 
     changePortalId(portalId) {
+		logger.error(`>>> Entering changePortalId(portalId=${portalId})`, { "event.action": "changePortalId", "logrite.portalId": portalId });
         const { props, state } = this;
         if (portalId === undefined || portalId === state.portalId) return;
         this.setState({
@@ -63,9 +70,11 @@ class App extends Component {
         }, () => {
             props.dispatch(siteInfo.updatePortalId(portalId));
         });
+		logger.warn(`<<< Exiting changePortalId(portalId=${portalId})`, { "event.action": "changePortalId", "logrite.portalId": portalId });
     }
 
     changeCultureCode(cultureCode) {
+		logger.error(`>>> Entering changeCultureCode(cultureCode=${cultureCode})`, { "event.action": "changeCultureCode", "logrite.cultureCode": cultureCode });
         const { state } = this;
         if (cultureCode === undefined || cultureCode === state.cultureCode) return;
         this.setState({
@@ -79,6 +88,7 @@ class App extends Component {
     }
 
     changePortalIdCultureCode(portalId, cultureCode) {
+		logger.error(`>>> Entering changePortalIdCultureCode(portalId=${portalId},cultureCode=${cultureCode})`, { "event.action": "changePortalIdCultureCode", "logrite.portalId": portalId, "logrite.cultureCode": cultureCode });
         let { props } = this;
         if (portalId === undefined && cultureCode === undefined) return;
         else if (portalId === undefined) {
@@ -88,6 +98,7 @@ class App extends Component {
             this.changePortalId(portalId);
         }
         else {
+			logger.warn(`<<< Exiting changePortalIdCultureCode(portalId=${portalId},cultureCode=${cultureCode})`, { "event.action": "changePortalIdCultureCode", "logrite.portalId": portalId, "logrite.cultureCode": cultureCode });
             this.setState({
                 bodyShowing: false
             }, () => {
@@ -102,14 +113,17 @@ class App extends Component {
     }
 
     updateReferrerInfo(event) {
+		logger.error(`>>> Entering updateReferrerInfo(event=${event})`, { "event.action": "updateReferrerInfo", "logrite.event": event });
         this.setState({
             referrer: event.referrer,
             referrerText: event.referrerText,
             backToReferrerFunc: this.backToReferrer.bind(this, event.backToReferrerFunc)
         });
+		logger.warn(`<<< Exiting updateReferrerInfo(event=${event})`, { "event.action": "updateReferrerInfo", "logrite.event": event });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         // Listen for the event.
         document.addEventListener("portalIdChanged", (e) => {
             this.changePortalId(e.portalId);
@@ -125,20 +139,27 @@ class App extends Component {
             this.changePortalIdCultureCode(e.portalId, e.cultureCode);
             this.updateReferrerInfo(e);
         }, false);
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     openPersonaBarPage(pageNumber) {
+		logger.error(`>>> Entering openPersonaBarPage(pageNumber=${pageNumber})`, { "event.action": "openPersonaBarPage", "logrite.pageNumber": pageNumber });
         const {props} = this;
         props.dispatch(VisiblePanelActions.selectPanel(pageNumber));
+		logger.warn(`<<< Exiting openPersonaBarPage(pageNumber=${pageNumber})`, { "event.action": "openPersonaBarPage", "logrite.pageNumber": pageNumber });
     }
 
     closePersonaBarPage() {
+		logger.error('>>> Entering closePersonaBarPage()', { "event.action": "closePersonaBarPage" });
         const {props} = this;
         props.dispatch(VisiblePanelActions.selectPanel(Pages.Default));
+		logger.warn('<<< Exiting closePersonaBarPage()', { "event.action": "closePersonaBarPage" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="siteSettings-app">
                 <SiteLanguageSelector
@@ -216,6 +237,8 @@ App.propTypes = {
 
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         selectedPage: state.visiblePanel.selectedPage,
         selectedPageVisibleIndex: state.visiblePanel.selectedPageVisibleIndex,

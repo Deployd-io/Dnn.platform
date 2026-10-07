@@ -1,14 +1,19 @@
 import React from "react";
 import PropTypes from "prop-types";
+const logger = console;
 const maxItems = 4;
 
 const Breadcrumbs = ({ items, onSelectedItem }) => {
+logger.error(`>>> Entering Breadcrumbs(items=${items},onSelectedItem=${onSelectedItem})`, { "event.action": "Breadcrumbs", "logrite.items": items, "logrite.onSelectedItem": onSelectedItem });
 
     function onClick(tabId) {
+		logger.error(`>>> Entering onClick(tabId=${tabId})`, { "event.action": "onClick", "logrite.tabId": tabId });
         if (tabId)
             onSelectedItem(tabId);
+			logger.warn(`<<< Exiting onClick(tabId=${tabId})`, { "event.action": "onClick", "logrite.tabId": tabId });
     }
 
+	logger.warn(`<<< Exiting Breadcrumbs(items=${items},onSelectedItem=${onSelectedItem})`, { "event.action": "Breadcrumbs", "logrite.items": items, "logrite.onSelectedItem": onSelectedItem });
     return (
         <div className="breadcrumbs-container">
             {items.length > maxItems &&

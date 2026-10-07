@@ -20,10 +20,13 @@ namespace Dnn.PersonaBar.TaskScheduler.Components.Prompt.Models
         public TaskModel(ScheduleItem item)
             : base(item)
         {
+			eventLogger.LogError(">>> Entering TaskModel(item={Item})", item);
             this.NextStart = item.NextStart.ToPromptLongDateString();
             this.CatchUp = item.CatchUpEnabled;
+			eventLogger.LogDebug("TaskModel(item={Item}): this.CatchUp → {Arg1}", item, this.CatchUp);
             this.Created = item.CreatedOnDate.ToPromptLongDateString();
             this.StartDate = item.ScheduleStartDate.ToPromptLongDateString();
+			eventLogger.LogWarning("<<< Exiting TaskModel(item={Item})", item);
             this.TypeName = item.TypeFullName;
         }
 

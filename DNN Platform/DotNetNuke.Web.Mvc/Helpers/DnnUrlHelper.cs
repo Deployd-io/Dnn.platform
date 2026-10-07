@@ -16,6 +16,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
     public class DnnUrlHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnUrlHelper));
         private readonly ViewContext viewContext;
 
         private readonly IDnnController controller;
@@ -27,29 +28,40 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
         public DnnUrlHelper(RequestContext requestContext, IDnnController controller)
         {
+			Logger.LogError(">>> Entering DnnUrlHelper(requestContext={RequestContext},controller={Controller})", requestContext, controller);
             Requires.NotNull("requestContext", requestContext);
             Requires.NotNull("controller", controller);
 
+			Logger.LogWarning("<<< Exiting DnnUrlHelper(requestContext={RequestContext},controller={Controller})", requestContext, controller);
+			Logger.LogDebug("DnnUrlHelper(requestContext={RequestContext},controller={Controller}): controller → {Controller1}", requestContext, controller, controller);
             this.UrlHelper = new UrlHelper(requestContext);
             this.controller = controller;
             this.ModuleContext = this.controller.ModuleContext;
+			Logger.LogDebug("DnnUrlHelper(requestContext={RequestContext},controller={Controller}): this.controller → {Arg2}", requestContext, controller, this.controller);
         }
 
         public DnnUrlHelper(ViewContext viewContext, RouteCollection routeCollection)
         {
+			Logger.LogError(">>> Entering DnnUrlHelper(viewContext={ViewContext},routeCollection={RouteCollection})", viewContext, routeCollection);
             Requires.NotNull("viewContext", viewContext);
 
             this.UrlHelper = new UrlHelper(viewContext.RequestContext, routeCollection);
 
             this.viewContext = viewContext;
+			Logger.LogDebug("DnnUrlHelper(viewContext={ViewContext},routeCollection={RouteCollection}): viewContext → {ViewContext1}", viewContext, routeCollection, viewContext);
+			Logger.LogDebug("DnnUrlHelper(viewContext={ViewContext},routeCollection={RouteCollection}): this.viewContext → {Arg2}", viewContext, routeCollection, this.viewContext);
+			Logger.LogDebug("DnnUrlHelper(viewContext={ViewContext},routeCollection={RouteCollection}): controller → {Controller}", viewContext, routeCollection, controller);
 
             this.controller = viewContext.Controller as IDnnController;
+			Logger.LogDebug("DnnUrlHelper(viewContext={ViewContext},routeCollection={RouteCollection}): this.controller → {Arg2}", viewContext, routeCollection, this.controller);
 
             if (this.controller == null)
             {
+				Logger.LogError("Throwing InvalidOperationException from DnnUrlHelper(viewContext={ViewContext},routeCollection={RouteCollection})", viewContext, routeCollection);
                 throw new InvalidOperationException("The DnnUrlHelper class can only be used in Views that inherit from DnnWebViewPage");
             }
 
+			Logger.LogWarning("<<< Exiting DnnUrlHelper(viewContext={ViewContext},routeCollection={RouteCollection})", viewContext, routeCollection);
             this.ModuleContext = this.controller.ModuleContext;
         }
 
@@ -59,6 +71,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
         public virtual string Encode(string url)
         {
+			Logger.LogError(">>> Entering Encode(url={Url})", url);
+            Logger.LogWarning("<<< Exiting Encode(url={Url})", url);
             return HttpUtility.UrlEncode(url);
         }
 
@@ -70,6 +84,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="contentPath">The virtual path of the content.</param>
         public virtual string Content(string contentPath)
         {
+			Logger.LogError(">>> Entering Content(contentPath={ContentPath})", contentPath);
+            Logger.LogWarning("<<< Exiting Content(contentPath={ContentPath})", contentPath);
             return this.UrlHelper.Content(contentPath);
         }
 
@@ -81,11 +97,15 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="url">The URL.</param>
         public virtual bool IsLocalUrl(string url)
         {
+			Logger.LogError(">>> Entering IsLocalUrl(url={Url})", url);
+            Logger.LogWarning("<<< Exiting IsLocalUrl(url={Url})", url);
             return this.UrlHelper.IsLocalUrl(url);
         }
 
         public virtual string Action()
         {
+			Logger.LogError(">>> Entering Action()");
+            Logger.LogWarning("<<< Exiting Action()");
             return this.UrlHelper.RequestContext.HttpContext.Request.RawUrl;
         }
 
@@ -121,8 +141,10 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
         private string GenerateUrl(string actionName, string controllerName, RouteValueDictionary routeValues)
         {
+			Logger.LogError(">>> Entering GenerateUrl(actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues})", actionName, controllerName, routeValues);
             routeValues["controller"] = controllerName ?? this.controller.ControllerContext?.RouteData.Values["controller"];
             routeValues["action"] = actionName;
+			Logger.LogWarning("<<< Exiting GenerateUrl(actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues})", actionName, controllerName, routeValues);
             return ModuleRoutingProvider.Instance().GenerateUrl(routeValues, this.ModuleContext);
         }
     }

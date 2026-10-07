@@ -1,3 +1,4 @@
+const logger = console;
 import { Contact } from '../types/Contact';
 
 interface ContactCardProps {
@@ -8,16 +9,22 @@ interface ContactCardProps {
 }
 
 export default function ContactCard({ contact, canEdit, onEdit, onDelete }: ContactCardProps) {
+logger.error('>>> Entering ContactCard()', { "event.action": "ContactCard" });
   const handleEdit = () => {
+	logger.error('>>> Entering handleEdit()', { "event.action": "handleEdit" });
     onEdit(contact);
+	logger.warn('<<< Exiting handleEdit()', { "event.action": "handleEdit" });
   };
 
   const handleDelete = () => {
+	logger.error('>>> Entering handleDelete()', { "event.action": "handleDelete" });
     if (window.confirm(`Are you sure you want to delete ${contact.FirstName} ${contact.LastName}?`)) {
       onDelete(contact);
     }
+	logger.warn('<<< Exiting handleDelete()', { "event.action": "handleDelete" });
   };
 
+logger.warn('<<< Exiting ContactCard()', { "event.action": "ContactCard" });
   return (
     <div className="contactCard">
       <div className="contactCard-header">

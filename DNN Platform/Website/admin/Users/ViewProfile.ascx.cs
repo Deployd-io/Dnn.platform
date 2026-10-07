@@ -18,12 +18,15 @@ namespace DotNetNuke.Modules.Admin.Users
     /// <summary>A control which displays a user's profile.</summary>
     public partial class ViewProfile : UserModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ViewProfile.ascx));
         private readonly ICryptographyProvider cryptographyProvider;
 
         /// <summary>Initializes a new instance of the <see cref="ViewProfile"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Use overload with ICryptographyProvider. Scheduled for removal in v12.0.0.")]
         public ViewProfile()
         {
+		Logger.LogError(">>> Entering ViewProfile()");
+        Logger.LogWarning("<<< Exiting ViewProfile()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ViewProfile"/> class.</summary>
@@ -32,6 +35,8 @@ namespace DotNetNuke.Modules.Admin.Users
         public ViewProfile(ICryptographyProvider cryptographyProvider)
             : this(cryptographyProvider, null, null)
         {
+		Logger.LogError(">>> Entering ViewProfile(cryptographyProvider={CryptographyProvider})", cryptographyProvider);
+        Logger.LogWarning("<<< Exiting ViewProfile(cryptographyProvider={CryptographyProvider})", cryptographyProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ViewProfile"/> class.</summary>
@@ -42,26 +47,32 @@ namespace DotNetNuke.Modules.Admin.Users
             : base(listController, hostSettings)
         {
             this.cryptographyProvider = cryptographyProvider ?? this.DependencyProvider.GetRequiredService<ICryptographyProvider>();
+			Logger.LogDebug("ViewProfile(cryptographyProvider={CryptographyProvider},listController={ListController},hostSettings={HostSettings}): cryptographyProvider → {CryptographyProvider1}", cryptographyProvider, listController, hostSettings, cryptographyProvider);
+        Logger.LogWarning("<<< Exiting ViewProfile(cryptographyProvider={CryptographyProvider},listController={ListController},hostSettings={HostSettings})", cryptographyProvider, listController, hostSettings);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.UserId = Null.NullInteger;
             if (this.Context.Request.QueryString["userticket"] != null)
             {
                 this.UserId = int.Parse(UrlUtils.DecryptParameter(this.cryptographyProvider, this.Context.Request.QueryString["userticket"]));
+				Logger.LogDebug("OnInit(e={E}): this.UserId → {Arg1}", e, this.UserId);
             }
 
             this.ctlProfile.ID = "Profile";
             this.ctlProfile.UserId = this.UserId;
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -79,8 +90,10 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

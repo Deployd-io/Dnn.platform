@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 // Initialize data globally to reduce memory consumption
 var num_loaded = 0;
 var aff_loading = false;
@@ -14,7 +15,9 @@ CodeMirror.defineMode("spell-checker", function(config, parserConfig) {
 		var xhr_aff = new XMLHttpRequest();
 		xhr_aff.open("GET", "https://cdn.jsdelivr.net/codemirror.spell-checker/latest/en_US.aff", true);
 		xhr_aff.onload = function (e) {
+			logger.error(`>>> Entering onload(e=${e})`, { "event.action": "onload", "logrite.e": e });
 			if (xhr_aff.readyState === 4 && xhr_aff.status === 200) {
+				logger.warn(`<<< Exiting onload(e=${e})`, { "event.action": "onload", "logrite.e": e });
 				aff_data = xhr_aff.responseText;
 				num_loaded++;
 				

@@ -1,4 +1,5 @@
-﻿
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+
 dnn.controls.DNNInputText=function(multiLine)
 {if(multiLine)
 this.control=document.createElement('textarea');else

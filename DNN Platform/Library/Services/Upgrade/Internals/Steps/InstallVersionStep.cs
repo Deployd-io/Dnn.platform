@@ -20,10 +20,14 @@ namespace DotNetNuke.Services.Upgrade.Internals.Steps
         /// <inheritdoc />
         public override void Execute()
         {
+			Logger.LogError(">>> Entering Execute()");
             this.Percentage = 0;
             this.Status = StepStatus.Running;
+			Logger.LogDebug("Execute(): this.Percentage → {Arg0}", this.Percentage);
+			Logger.LogDebug("Execute(): this.Status → {Arg0}", this.Status);
 
             var databaseVersion = DataProvider.Instance().GetInstallVersion();
+			Logger.LogError("Execute(): databaseVersion → {DatabaseVersion}", databaseVersion);
 
             string strError = Config.UpdateInstallVersion(databaseVersion);
 
@@ -32,6 +36,7 @@ namespace DotNetNuke.Services.Upgrade.Internals.Steps
                 this.Errors.Add(Localization.GetString("InstallVersion", this.LocalInstallResourceFile) + ": " + strError);
                 Logger.TraceFormat(CultureInfo.InvariantCulture, "Adding InstallVersion : {0}", strError);
             }
+			Logger.LogWarning("<<< Exiting Execute()");
 
             this.Status = this.Errors.Count > 0 ? StepStatus.Retry : StepStatus.Done;
         }

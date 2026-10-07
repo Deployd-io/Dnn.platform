@@ -10,6 +10,7 @@ namespace DotNetNuke.Entities.Modules.Prompt
 
     public class PromptModuleInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PromptModuleInfo));
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
         [SuppressMessage("Microsoft.Design", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Breaking change")]
 #pragma warning disable CS3008 // Identifier beginning with an underscore is not CLS-compliant
@@ -38,6 +39,7 @@ namespace DotNetNuke.Entities.Modules.Prompt
 
         public static PromptModuleInfo FromDnnModuleInfo(ModuleInfo dnnModule, bool? deleted = null)
         {
+			Logger.LogError(">>> Entering FromDnnModuleInfo(dnnModule={DnnModule},deleted={Deleted})", dnnModule, deleted);
             var mim = new PromptModuleInfo
             {
                 ModuleId = dnnModule.ModuleID,
@@ -50,16 +52,20 @@ namespace DotNetNuke.Entities.Modules.Prompt
 
             // assign command links
             mim.__ModuleId = $"get-module {mim.ModuleId}";
+			Logger.LogDebug("FromDnnModuleInfo(dnnModule={DnnModule},deleted={Deleted}): mim.__ModuleId → {Arg2}", dnnModule, deleted, mim.__ModuleId);
             mim.__ModuleName = $"list-modules --name '{mim.ModuleName}' --all";
+			Logger.LogDebug("FromDnnModuleInfo(dnnModule={DnnModule},deleted={Deleted}): mim.__ModuleName → {Arg2}", dnnModule, deleted, mim.__ModuleName);
 
             // get a list of all pages this module is added to
             var addedTo = ModuleController.Instance.GetTabModulesByModule(mim.ModuleId);
+			Logger.LogError("FromDnnModuleInfo(dnnModule={DnnModule},deleted={Deleted}): addedTo → {AddedTo}", dnnModule, deleted, addedTo);
             if (deleted.HasValue)
             {
                 addedTo = addedTo.Where(x => x.IsDeleted == deleted.Value).ToList();
             }
 
             var sbAddedTo = new StringBuilder();
+			Logger.LogError("FromDnnModuleInfo(dnnModule={DnnModule},deleted={Deleted}): sbAddedTo → {SbAddedTo}", dnnModule, deleted, sbAddedTo);
             foreach (var modInfo in addedTo)
             {
                 if (sbAddedTo.Length > 0)
@@ -71,6 +77,7 @@ namespace DotNetNuke.Entities.Modules.Prompt
             }
 
             mim.AddedToPages = sbAddedTo.ToString();
+			Logger.LogWarning("<<< Exiting FromDnnModuleInfo(dnnModule={DnnModule},deleted={Deleted})", dnnModule, deleted);
             return mim;
         }
     }

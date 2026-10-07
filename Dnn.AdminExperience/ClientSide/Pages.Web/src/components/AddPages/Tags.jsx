@@ -1,12 +1,15 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Localization from "../../localization";
+const logger = console;
 import { Label, Tags } from "@dnnsoftware/dnn-react-common";
 
 class PageTags extends Component {
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <div className="input-group">
             <Label label={Localization.get("Tags")} />
             <Tags

@@ -57,6 +57,8 @@ namespace DotNetNuke.Framework
         protected PageBase(IPortalController portalController, IApplicationStatusInfo appStatus, IHostSettings hostSettings)
             : this(portalController, appStatus, hostSettings, null)
         {
+		Logger.LogError(">>> Entering PageBase(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings})", portalController, appStatus, hostSettings);
+        Logger.LogWarning("<<< Exiting PageBase(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings})", portalController, appStatus, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PageBase"/> class.</summary>
@@ -66,7 +68,9 @@ namespace DotNetNuke.Framework
         /// <param name="userController">The user controller.</param>
         protected PageBase(IPortalController portalController, IApplicationStatusInfo appStatus, IHostSettings hostSettings, IUserController userController)
         {
+			Logger.LogError(">>> Entering PageBase(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},userController={UserController})", portalController, appStatus, hostSettings, userController);
             this.PortalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogWarning("<<< Exiting PageBase(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},userController={UserController})", portalController, appStatus, hostSettings, userController);
             this.AppStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.HostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.UserController = userController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IUserController>();
@@ -167,6 +171,8 @@ namespace DotNetNuke.Framework
         {
             if (affectedControls == null)
             {
+				Logger.LogError(">>> Entering RemoveKeyAttribute(affectedControls={AffectedControls})", affectedControls);
+				Logger.LogWarning("<<< Exiting RemoveKeyAttribute(affectedControls={AffectedControls})", affectedControls);
                 return;
             }
 
@@ -176,6 +182,7 @@ namespace DotNetNuke.Framework
                 var ac = (AttributeCollection)affectedControls[i];
                 ac.Remove(Localization.KeyName);
                 ac.Remove(IconController.IconKeyName);
+				Logger.LogError("RemoveKeyAttribute(affectedControls={AffectedControls}): ac → {Ac}", affectedControls, ac);
                 ac.Remove(IconController.IconSizeName);
                 ac.Remove(IconController.IconStyleName);
             }
@@ -188,10 +195,13 @@ namespace DotNetNuke.Framework
         /// <returns>A string containing the key for the specified control or null if a key attribute wasn't found.</returns>
         internal static string GetControlAttribute(Control control, ArrayList affectedControls, string attributeName)
         {
+			Logger.LogError(">>> Entering GetControlAttribute(control={Control},affectedControls={AffectedControls},attributeName={AttributeName})", control, affectedControls, attributeName);
             AttributeCollection attributeCollection = null;
             string key = null;
+			Logger.LogError("GetControlAttribute(control={Control},affectedControls={AffectedControls},attributeName={AttributeName}): attributeCollection → {AttributeCollection}", control, affectedControls, attributeName, attributeCollection);
             if (!(control is LiteralControl))
             {
+				Logger.LogError("GetControlAttribute(control={Control},affectedControls={AffectedControls},attributeName={AttributeName}): key → {Key}", control, affectedControls, attributeName, key);
                 if (control is WebControl webControl)
                 {
                     attributeCollection = webControl.Attributes;
@@ -214,7 +224,9 @@ namespace DotNetNuke.Framework
                         else
                         {
                             var controlType = control.GetType();
+							Logger.LogError("GetControlAttribute(control={Control},affectedControls={AffectedControls},attributeName={AttributeName}): controlType → {ControlType}", control, affectedControls, attributeName, controlType);
                             var attributeProperty = controlType.GetProperty("Attributes", typeof(AttributeCollection));
+							Logger.LogError("GetControlAttribute(control={Control},affectedControls={AffectedControls},attributeName={AttributeName}): attributeProperty → {AttributeProperty}", control, affectedControls, attributeName, attributeProperty);
                             if (attributeProperty != null)
                             {
                                 attributeCollection = (AttributeCollection)attributeProperty.GetValue(control, null);
@@ -230,6 +242,7 @@ namespace DotNetNuke.Framework
                 affectedControls.Add(attributeCollection);
             }
 
+			Logger.LogWarning("<<< Exiting GetControlAttribute(control={Control},affectedControls={AffectedControls},attributeName={AttributeName})", control, affectedControls, attributeName);
             return key;
         }
 
@@ -240,6 +253,7 @@ namespace DotNetNuke.Framework
         /// <param name="resourceFileRoot">Root Resource File.</param>
         internal void ProcessControl(Control control, ArrayList affectedControls, bool includeChildren, string resourceFileRoot)
         {
+			Logger.LogError(">>> Entering ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot})", control, affectedControls, includeChildren, resourceFileRoot);
             if (!control.Visible)
             {
                 return;
@@ -247,10 +261,12 @@ namespace DotNetNuke.Framework
 
             // Perform the substitution if a key was found
             var key = GetControlAttribute(control, affectedControls, Localization.KeyName);
+			Logger.LogError("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): key → {Key}", control, affectedControls, includeChildren, resourceFileRoot, key);
             if (!string.IsNullOrEmpty(key))
             {
                 // Translation starts here ....
                 var value = Localization.GetString(key, resourceFileRoot);
+				Logger.LogError("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): value → {Value}", control, affectedControls, includeChildren, resourceFileRoot, value);
                 this.LocalizeControl(control, value);
             }
 
@@ -290,8 +306,11 @@ namespace DotNetNuke.Framework
                 if (string.IsNullOrEmpty(image.ImageUrl))
                 {
                     var iconKey = GetControlAttribute(control, affectedControls, IconController.IconKeyName);
+					Logger.LogError("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): iconKey → {IconKey}", control, affectedControls, includeChildren, resourceFileRoot, iconKey);
                     var iconSize = GetControlAttribute(control, affectedControls, IconController.IconSizeName);
+					Logger.LogError("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): iconSize → {IconSize}", control, affectedControls, includeChildren, resourceFileRoot, iconSize);
                     var iconStyle = GetControlAttribute(control, affectedControls, IconController.IconStyleName);
+					Logger.LogError("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): iconStyle → {IconStyle}", control, affectedControls, includeChildren, resourceFileRoot, iconStyle);
                     image.ImageUrl = IconController.IconURL(iconKey, iconSize, iconStyle);
                 }
             }
@@ -349,10 +368,12 @@ namespace DotNetNuke.Framework
             {
                 // Cache results from reflection calls for performance
                 var pi = control.GetType().GetProperty("LocalResourceFile");
+				Logger.LogError("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): pi → {Pi}", control, affectedControls, includeChildren, resourceFileRoot, pi);
                 if (pi != null)
                 {
                     // Attempt to get property value
                     var pv = pi.GetValue(control, null);
+					Logger.LogError("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): pv → {Pv}", control, affectedControls, includeChildren, resourceFileRoot, pv);
 
                     // If controls has a LocalResourceFile property use this, otherwise pass the resource file root
                     this.IterateControls(control.Controls, affectedControls, pv == null ? resourceFileRoot : pv.ToString());
@@ -368,19 +389,23 @@ namespace DotNetNuke.Framework
                 // Get Resource File Root from Controls LocalResourceFile Property
                 this.IterateControls(control.Controls, affectedControls, objModuleControl.LocalResourceFile);
             }
+			Logger.LogWarning("<<< Exiting ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot})", control, affectedControls, includeChildren, resourceFileRoot);
         }
 
         protected virtual void RegisterAjaxScript()
         {
+			Logger.LogError(">>> Entering RegisterAjaxScript()");
             if (ServicesFrameworkInternal.Instance.IsAjaxScriptSupportRequired)
             {
                 ServicesFrameworkInternal.Instance.RegisterAjaxScript(this.Page);
             }
+			Logger.LogWarning("<<< Exiting RegisterAjaxScript()");
         }
 
         /// <inheritdoc />
         protected override void OnError(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnError(e={E})", e);
             base.OnError(e);
             Exception exc = this.Server.GetLastError();
             Logger.Fatal("An error has occurred while loading page.", exc);
@@ -410,6 +435,7 @@ namespace DotNetNuke.Framework
                 }
                 catch (Exception)
                 {
+					Logger.LogError("Exception in OnError(e={E}): {Arg1}", e, Exception.Message);
                     HttpContext.Current.Response.Clear();
                     var errorMessage = Localization.GetString("NoSitesForThisInstallation.Error", Localization.GlobalResourceFile);
                     HttpContext.Current.Server.Transfer($"~/ErrorPage.aspx?status=503&error={HttpUtility.UrlEncode(errorMessage)}");
@@ -418,12 +444,15 @@ namespace DotNetNuke.Framework
 
             strURL = this.GetErrorUrl(strURL, exc);
             Exceptions.ProcessPageLoadException(exc, strURL);
+			Logger.LogWarning("<<< Exiting OnError(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             var isInstallPage = HttpContext.Current.Request.Url.LocalPath.ToLowerInvariant().Contains("installwizard.aspx");
+			Logger.LogError("OnInit(e={E}): isInstallPage → {IsInstallPage}", e, isInstallPage);
             if (ScriptManager.GetCurrent(this) == null)
             {
                 AJAX.AddScriptManager(this, !isInstallPage);
@@ -438,11 +467,13 @@ namespace DotNetNuke.Framework
             this.ViewStateUserKey = this.UserController.GetCurrentUserInfo().Username;
 
             base.OnInit(e);
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             // Because we have delayed registration of the jQuery script,
@@ -471,11 +502,13 @@ namespace DotNetNuke.Framework
             }
 
             this.RegisterAjaxScript();
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering Render(writer={Writer})", writer);
             this.LogDnnTrace("PageBase.Render", "Start", $"{this.Page.Request.Url.AbsoluteUri}");
 
             this.IterateControls(this.Controls, this.localizedControls, this.LocalResourceFile);
@@ -484,46 +517,58 @@ namespace DotNetNuke.Framework
             base.Render(writer);
 
             this.LogDnnTrace("PageBase.Render", "End", $"{this.Page.Request.Url.AbsoluteUri}");
+			Logger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
 
         private string GetErrorUrl(string url, Exception exc, bool hideContent = true)
         {
+			Logger.LogError(">>> Entering GetErrorUrl(url={Url},exc={Exc},hideContent={HideContent})", url, exc, hideContent);
             var separator = url.IndexOf('?') == -1 ? '?' : '&';
+			Logger.LogError("GetErrorUrl(url={Url},exc={Exc},hideContent={HideContent}): separator → {Separator}", url, exc, hideContent, separator);
             if (this.Request.QueryString["error"] != null)
             {
                 return $"{url}{separator}error=terminate";
             }
 
             var user = this.UserController.GetCurrentUserInfo();
+			Logger.LogError("GetErrorUrl(url={Url},exc={Exc},hideContent={HideContent}): user → {User}", url, exc, hideContent, user);
             var errorMessage = exc == null || user is not { IsSuperUser: true }
                     ? "An unexpected error has occurred"
                     : exc.Message;
             url = $"{url}{separator}error={WebUtility.UrlEncode(errorMessage)}";
+			Logger.LogError("GetErrorUrl(url={Url},exc={Exc},hideContent={HideContent}): url → {Url1}", url, exc, hideContent, url);
             if (!Globals.IsAdminControl() && hideContent)
             {
                 return $"{url}&content=0";
             }
 
+			Logger.LogWarning("<<< Exiting GetErrorUrl(url={Url},exc={Exc},hideContent={HideContent})", url, exc, hideContent);
             return url;
         }
 
         private bool IsViewStateFailure(Exception e)
         {
+			Logger.LogError(">>> Entering IsViewStateFailure(e={E})", e);
+            Logger.LogWarning("<<< Exiting IsViewStateFailure(e={E})", e);
             return !this.User.Identity.IsAuthenticated && e?.InnerException is ViewStateException;
         }
 
         private void IterateControls(ControlCollection controls, ArrayList affectedControls, string resourceFileRoot)
         {
+			Logger.LogError(">>> Entering IterateControls(controls={Controls},affectedControls={AffectedControls},resourceFileRoot={ResourceFileRoot})", controls, affectedControls, resourceFileRoot);
             foreach (Control c in controls)
             {
                 this.ProcessControl(c, affectedControls, true, resourceFileRoot);
                 this.LogDnnTrace("PageBase.IterateControls", "Info", $"ControlId: {c.ID}");
             }
+			Logger.LogWarning("<<< Exiting IterateControls(controls={Controls},affectedControls={AffectedControls},resourceFileRoot={ResourceFileRoot})", controls, affectedControls, resourceFileRoot);
         }
 
         private void LogDnnTrace(string origin, string action, string message)
         {
+			Logger.LogError(">>> Entering LogDnnTrace(origin={Origin},action={Action},message={Message})", origin, action, message);
             var tabId = -1;
+			Logger.LogError("LogDnnTrace(origin={Origin},action={Action},message={Message}): tabId → {TabId}", origin, action, message, tabId);
             if (this.PortalSettings?.ActiveTab != null)
             {
                 tabId = this.PortalSettings.ActiveTab.TabID;
@@ -533,10 +578,12 @@ namespace DotNetNuke.Framework
             {
                 this.traceLogger.Debug($"{origin} {action} (TabId:{tabId},{message})");
             }
+			Logger.LogWarning("<<< Exiting LogDnnTrace(origin={Origin},action={Action},message={Message})", origin, action, message);
         }
 
         private void LocalizeControl(Control control, string value)
         {
+			Logger.LogError(">>> Entering LocalizeControl(control={Control},value={Value})", control, value);
             if (string.IsNullOrEmpty(value))
             {
                 return;
@@ -545,19 +592,23 @@ namespace DotNetNuke.Framework
             if (control is BaseValidator validator)
             {
                 validator.ErrorMessage = value;
+				Logger.LogDebug("LocalizeControl(control={Control},value={Value}): validator.ErrorMessage → {Arg2}", control, value, validator.ErrorMessage);
                 validator.Text = value;
+				Logger.LogDebug("LocalizeControl(control={Control},value={Value}): validator.Text → {Arg2}", control, value, validator.Text);
                 return;
             }
 
             if (control is Label label)
             {
                 label.Text = value;
+				Logger.LogDebug("LocalizeControl(control={Control},value={Value}): label.Text → {Arg2}", control, value, label.Text);
                 return;
             }
 
             if (control is LinkButton linkButton)
             {
                 var imgMatches = LinkItemMatchRegex.Matches(value);
+				Logger.LogError("LocalizeControl(control={Control},value={Value}): imgMatches → {ImgMatches}", control, value, imgMatches);
                 foreach (Match match in imgMatches)
                 {
                     if (match.Groups[match.Groups.Count - 2].Value.IndexOf("~", StringComparison.Ordinal) == -1)
@@ -566,13 +617,17 @@ namespace DotNetNuke.Framework
                     }
 
                     var resolvedUrl = this.Page.ResolveUrl(match.Groups[match.Groups.Count - 2].Value);
+					Logger.LogError("LocalizeControl(control={Control},value={Value}): resolvedUrl → {ResolvedUrl}", control, value, resolvedUrl);
                     value = value.Replace(match.Groups[match.Groups.Count - 2].Value, resolvedUrl);
+					Logger.LogError("LocalizeControl(control={Control},value={Value}): value → {Value1}", control, value, value);
                 }
 
                 linkButton.Text = value;
+				Logger.LogDebug("LocalizeControl(control={Control},value={Value}): linkButton.Text → {Arg2}", control, value, linkButton.Text);
                 if (string.IsNullOrEmpty(linkButton.ToolTip))
                 {
                     linkButton.ToolTip = value;
+					Logger.LogDebug("LocalizeControl(control={Control},value={Value}): linkButton.ToolTip → {Arg2}", control, value, linkButton.ToolTip);
                 }
 
                 return;
@@ -581,12 +636,14 @@ namespace DotNetNuke.Framework
             if (control is HyperLink hyperLink)
             {
                 hyperLink.Text = value;
+				Logger.LogDebug("LocalizeControl(control={Control},value={Value}): hyperLink.Text → {Arg2}", control, value, hyperLink.Text);
                 return;
             }
 
             if (control is Button button)
             {
                 button.Text = value;
+				Logger.LogDebug("LocalizeControl(control={Control},value={Value}): button.Text → {Arg2}", control, value, button.Text);
                 return;
             }
 
@@ -599,26 +656,32 @@ namespace DotNetNuke.Framework
             if (control is HtmlImage htmlImage)
             {
                 htmlImage.Alt = value;
+				Logger.LogDebug("LocalizeControl(control={Control},value={Value}): htmlImage.Alt → {Arg2}", control, value, htmlImage.Alt);
                 return;
             }
 
             if (control is CheckBox checkBox)
             {
                 checkBox.Text = value;
+				Logger.LogDebug("LocalizeControl(control={Control},value={Value}): checkBox.Text → {Arg2}", control, value, checkBox.Text);
                 return;
             }
 
             if (control is Image image)
             {
                 image.AlternateText = value;
+				Logger.LogDebug("LocalizeControl(control={Control},value={Value}): image.AlternateText → {Arg2}", control, value, image.AlternateText);
                 image.ToolTip = value;
+				Logger.LogDebug("LocalizeControl(control={Control},value={Value}): image.ToolTip → {Arg2}", control, value, image.ToolTip);
                 return;
             }
 
             if (control is TextBox textBox)
             {
                 textBox.ToolTip = value;
+				Logger.LogDebug("LocalizeControl(control={Control},value={Value}): textBox.ToolTip → {Arg2}", control, value, textBox.ToolTip);
             }
+			Logger.LogWarning("<<< Exiting LocalizeControl(control={Control},value={Value})", control, value);
         }
     }
 }

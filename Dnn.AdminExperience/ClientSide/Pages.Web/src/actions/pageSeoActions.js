@@ -2,8 +2,11 @@ import PageSeoService from "../services/pageSeoService";
 import { pageSeoTypes as ActionTypes } from "../constants/actionTypes";
 import pageActionTypes from "../constants/actionTypes/pageActionTypes";
 import utils from "../utils";
+const logger = console;
 const pageSeoActions = {
     openNewForm() {
+		logger.error('>>> Entering openNewForm()', { "event.action": "openNewForm" });
+		logger.warn('<<< Exiting openNewForm()', { "event.action": "openNewForm" });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SEO_OPEN_NEW_FORM
@@ -11,6 +14,8 @@ const pageSeoActions = {
         };
     },
     closeNewForm() {
+		logger.error('>>> Entering closeNewForm()', { "event.action": "closeNewForm" });
+		logger.warn('<<< Exiting closeNewForm()', { "event.action": "closeNewForm" });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SEO_CLOSE_NEW_FORM
@@ -18,6 +23,8 @@ const pageSeoActions = {
         };
     },
     openEditForm(url) {
+		logger.error(`>>> Entering openEditForm(url=${url})`, { "event.action": "openEditForm", "logrite.url": url });
+		logger.warn(`<<< Exiting openEditForm(url=${url})`, { "event.action": "openEditForm", "logrite.url": url });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SEO_OPEN_EDIT_FORM,
@@ -28,6 +35,8 @@ const pageSeoActions = {
         };
     },
     closeEditForm() {
+		logger.error('>>> Entering closeEditForm()', { "event.action": "closeEditForm" });
+		logger.warn('<<< Exiting closeEditForm()', { "event.action": "closeEditForm" });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SEO_CLOSE_EDIT_FORM
@@ -35,6 +44,8 @@ const pageSeoActions = {
         };
     },
     change(key, value) {
+		logger.error(`>>> Entering change(key=${key},value=${value})`, { "event.action": "change", "logrite.key": key, "logrite.value": value });
+		logger.warn(`<<< Exiting change(key=${key},value=${value})`, { "event.action": "change", "logrite.key": key, "logrite.value": value });
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SEO_CHANGE_URL,
@@ -46,6 +57,8 @@ const pageSeoActions = {
         };
     },
     addUrl(url, primaryAliasId) {
+		logger.error(`>>> Entering addUrl(url=${url},primaryAliasId=${primaryAliasId})`, { "event.action": "addUrl", "logrite.url": url, "logrite.primaryAliasId": primaryAliasId });
+		logger.warn(`<<< Exiting addUrl(url=${url},primaryAliasId=${primaryAliasId})`, { "event.action": "addUrl", "logrite.url": url, "logrite.primaryAliasId": primaryAliasId });
         return (dispatch, getState) => {
             dispatch({
                 type: ActionTypes.SEO_ADD_URL
@@ -88,6 +101,7 @@ const pageSeoActions = {
                     });
                 });
             }).catch((error) => {
+				logger.error(`Exception in addUrl(url=${url},primaryAliasId=${primaryAliasId}): (no error binding)`, { "event.action": "addUrl", "event.category": "process", "logrite.url": url, "logrite.primaryAliasId": primaryAliasId });
                 dispatch({
                     type: ActionTypes.ERROR_SEO_ADDING_URL,
                     data: { error }
@@ -96,6 +110,8 @@ const pageSeoActions = {
         };
     },
     saveUrl(url, primaryAliasId) {
+		logger.error(`>>> Entering saveUrl(url=${url},primaryAliasId=${primaryAliasId})`, { "event.action": "saveUrl", "logrite.url": url, "logrite.primaryAliasId": primaryAliasId });
+		logger.warn(`<<< Exiting saveUrl(url=${url},primaryAliasId=${primaryAliasId})`, { "event.action": "saveUrl", "logrite.url": url, "logrite.primaryAliasId": primaryAliasId });
         return (dispatch, getState) => {
             dispatch({
                 type: ActionTypes.SEO_SAVE_URL
@@ -126,6 +142,7 @@ const pageSeoActions = {
                     });
                 });
             }).catch((error) => {
+				logger.error(`Exception in saveUrl(url=${url},primaryAliasId=${primaryAliasId}): (no error binding)`, { "event.action": "saveUrl", "event.category": "process", "logrite.url": url, "logrite.primaryAliasId": primaryAliasId });
                 dispatch({
                     type: ActionTypes.ERROR_SEO_SAVING_URL,
                     data: { error: error.ErrorMessage }
@@ -134,6 +151,8 @@ const pageSeoActions = {
         };
     },
     deleteUrl(url) {
+		logger.error(`>>> Entering deleteUrl(url=${url})`, { "event.action": "deleteUrl", "logrite.url": url });
+		logger.warn(`<<< Exiting deleteUrl(url=${url})`, { "event.action": "deleteUrl", "logrite.url": url });
         return (dispatch, getState) => {
             dispatch({
                 type: ActionTypes.SEO_DELETE_URL
@@ -163,6 +182,7 @@ const pageSeoActions = {
                     });
                 });                
             }).catch((error) => {
+				logger.error(`Exception in deleteUrl(url=${url}): (no error binding)`, { "event.action": "deleteUrl", "event.category": "process", "logrite.url": url });
                 dispatch({
                     type: ActionTypes.ERROR_SEO_DELETING_URL,
                     data: { error: error.ErrorMessage }

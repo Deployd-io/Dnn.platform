@@ -11,6 +11,7 @@ import postcssBanner from "postcss-banner";
 import chokidar from "chokidar";
 import bs from "browser-sync";
 import packageJson from "./package.json";
+const logger = console;
 import { glob, globSync } from "glob";
 import { Zip } from 'zip-lib';
 
@@ -66,11 +67,14 @@ const copyFiles: StaticFileConfig[] = [
 
 /** Normalizes a path (windows vs linux, etc.) */
 function normalizePath(filePath: string): string {
+logger.error(`>>> Entering normalizePath(filePath=${filePath})`, { "event.action": "normalizePath", "logrite.filePath": filePath });
+logger.warn(`<<< Exiting normalizePath(filePath=${filePath})`, { "event.action": "normalizePath", "logrite.filePath": filePath });
   return path.resolve(filePath).replace(/\\/g, "/");
 }
 
 /** Copies files while preserving folder structure */
 function copyFilesPreservingStructure(copyConfig: StaticFileConfig[]): void {
+logger.error(`>>> Entering copyFilesPreservingStructure(copyConfig=${copyConfig})`, { "event.action": "copyFilesPreservingStructure", "logrite.copyConfig": copyConfig });
   copyConfig.forEach(entry => {
     console.log(`Copying files from ${entry.src} to ${entry.dest}...`);
     
@@ -82,20 +86,24 @@ function copyFilesPreservingStructure(copyConfig: StaticFileConfig[]): void {
         console.log(`Copied ${file} → ${destFile}`);
     });
   });
+logger.warn(`<<< Exiting copyFilesPreservingStructure(copyConfig=${copyConfig})`, { "event.action": "copyFilesPreservingStructure", "logrite.copyConfig": copyConfig });
 }
 
 /** Helper function to ensure directories exist */
 function ensureDirectoryExists(filePath: string): void {
+logger.error(`>>> Entering ensureDirectoryExists(filePath=${filePath})`, { "event.action": "ensureDirectoryExists", "logrite.filePath": filePath });
   console.log("Creating directory: ", filePath);
   const dir = path.dirname(filePath);
   console.log("Directory: ", dir);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
+	logger.warn(`<<< Exiting ensureDirectoryExists(filePath=${filePath})`, { "event.action": "ensureDirectoryExists", "logrite.filePath": filePath });
   }
 }
 
 /** Compile SCSS to CSS with sourcemaps */
 async function buildScss(input: string, output: string): Promise<void> {
+logger.error(`>>> Entering buildScss(input=${input},output=${output})`, { "event.action": "buildScss", "logrite.input": input, "logrite.output": output });
   try {
     const result = await sass.compileAsync(
         input,
@@ -138,11 +146,13 @@ async function buildScss(input: string, output: string): Promise<void> {
     }
   } catch (error) {
     console.error(`Error compiling SCSS for ${input}:`, error);
+	logger.warn(`<<< Exiting buildScss(input=${input},output=${output})`, { "event.action": "buildScss", "logrite.input": input, "logrite.output": output });
   }
 }
   
 /** Bundle TypeScript/JavaScript with esbuild */
 async function buildJs(input: string, output: string): Promise<void> {
+logger.error(`>>> Entering buildJs(input=${input},output=${output})`, { "event.action": "buildJs", "logrite.input": input, "logrite.output": output });
   try {
     ensureDirectoryExists(output);
     await esbuild.build({
@@ -157,11 +167,13 @@ async function buildJs(input: string, output: string): Promise<void> {
     console.log(`JS written to: ${output}`);
   } catch (error) {
     console.error(`Error bundling JS for ${input}:`, error);
+	logger.warn(`<<< Exiting buildJs(input=${input},output=${output})`, { "event.action": "buildJs", "logrite.input": input, "logrite.output": output });
   }
 }
 
 /** Process all files */
 async function buildAll(firstRun = true): Promise<void> {
+logger.error(`>>> Entering buildAll(firstRun=${firstRun})`, { "event.action": "buildAll", "logrite.firstRun": firstRun });
   for (const { input, output } of transpiledFiles) {
       if (input.endsWith(".scss")) {
           await buildScss(input, output);
@@ -172,12 +184,14 @@ async function buildAll(firstRun = true): Promise<void> {
 
   if (firstRun){
     copyFilesPreservingStructure(copyFiles);
+	logger.warn(`<<< Exiting buildAll(firstRun=${firstRun})`, { "event.action": "buildAll", "logrite.firstRun": firstRun });
   }
 }
 
 
 /** Watch for changes (optional) */
 function watchFiles(): void {
+logger.error('>>> Entering watchFiles()', { "event.action": "watchFiles" });
   const watcher = chokidar.watch([
     ...globSync(['*.ascx', '*.txt', '*.png']),
     "./src",
@@ -208,10 +222,12 @@ function watchFiles(): void {
       ],
       injectChanges: true,
       middleware: function (_req, res, next) {
+		logger.error(`>>> Entering middleware(_req=${_req},res=${res},next=${next})`, { "event.action": "middleware", "logrite._req": _req, "logrite.res": res, "logrite.next": next });
         res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
         res.setHeader("Pragma", "no-cache");
         res.setHeader("Expires", "0");
         next();
+		logger.warn(`<<< Exiting middleware(_req=${_req},res=${res},next=${next})`, { "event.action": "middleware", "logrite._req": _req, "logrite.res": res, "logrite.next": next });
       }
     });
   }
@@ -219,26 +235,32 @@ function watchFiles(): void {
       console.log(`File ${filePath} changed (${event}). Rebuilding...`);
       await buildAll(false);
       const isStaticFile = copyFiles.some(entry => globSync(entry.src).includes(filePath));
+	logger.error(`watchFiles(): isStaticFile → ${isStaticFile}`, { "event.action": "watchFiles" });
       if (isStaticFile) {
         copyFilesPreservingStructure(copyFiles);
       }
       browserSync.reload();
   });
+logger.warn('<<< Exiting watchFiles()', { "event.action": "watchFiles" });
 }
 
 function deleteDirectoryWithRetry(path: string, retries = 5, delay = 1000) {
+logger.error(`>>> Entering deleteDirectoryWithRetry(path=${path},retries=${retries},delay=${delay})`, { "event.action": "deleteDirectoryWithRetry", "logrite.path": path, "logrite.retries": retries, "logrite.delay": delay });
   try {
       fs.rmSync(path, { recursive: true, force: true });
   } catch (err: any) {
+	logger.error(`Exception in deleteDirectoryWithRetry(path=${path},retries=${retries},delay=${delay}): ${(err as Error).message}`, err, { "event.action": "deleteDirectoryWithRetry", "event.category": "process", "logrite.path": path, "logrite.retries": retries, "logrite.delay": delay });
       if (retries > 0 && err.code === 'EBUSY') {
           setTimeout(() => deleteDirectoryWithRetry(path, retries - 1, delay + 1000), delay);
       } else {
+		logger.warn(`<<< Exiting deleteDirectoryWithRetry(path=${path},retries=${retries},delay=${delay})`, { "event.action": "deleteDirectoryWithRetry", "logrite.path": path, "logrite.retries": retries, "logrite.delay": delay });
           throw err; // Rethrow the error if retries are exhausted or it's another error
       }
   }
 }
 
 function ensureEmptyDirectory(dirPath: string): void {
+logger.error(`>>> Entering ensureEmptyDirectory(dirPath=${dirPath})`, { "event.action": "ensureEmptyDirectory", "logrite.dirPath": dirPath });
   // Ensure that the directory exists
   if (!fs.existsSync(dirPath)) {
       // Directory does not exist, create it
@@ -248,9 +270,11 @@ function ensureEmptyDirectory(dirPath: string): void {
 
   // Directory exists, empty it
   const files = fs.readdirSync(dirPath);
+logger.error(`ensureEmptyDirectory(dirPath=${dirPath}): files → ${files}`, { "event.action": "ensureEmptyDirectory", "logrite.dirPath": dirPath });
 
   for (const file of files) {
       const currentPath = path.join(dirPath, file);
+	logger.error(`ensureEmptyDirectory(dirPath=${dirPath}): currentPath → ${currentPath}`, { "event.action": "ensureEmptyDirectory", "logrite.dirPath": dirPath });
       if (fs.lstatSync(currentPath).isDirectory()) {
           // Recursive call for directories
           ensureEmptyDirectory(currentPath);
@@ -261,24 +285,30 @@ function ensureEmptyDirectory(dirPath: string): void {
           fs.unlinkSync(currentPath);
       }
   }
+logger.warn(`<<< Exiting ensureEmptyDirectory(dirPath=${dirPath})`, { "event.action": "ensureEmptyDirectory", "logrite.dirPath": dirPath });
 }
 
 /** Copies a file to a certain path. */
 function copyFileToPath(src: string, dest: string): void {
+logger.error(`>>> Entering copyFileToPath(src=${src},dest=${dest})`, { "event.action": "copyFileToPath", "logrite.src": src, "logrite.dest": dest });
   // Ensure that the destination directory exists
   const dir = path.dirname(dest);
+logger.error(`copyFileToPath(src=${src},dest=${dest}): dir → ${dir}`, { "event.action": "copyFileToPath", "logrite.src": src, "logrite.dest": dest });
   if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
   }
 
   // Now that we know the directory exists, copy the file
   fs.copyFileSync(src, dest);
+logger.warn(`<<< Exiting copyFileToPath(src=${src},dest=${dest})`, { "event.action": "copyFileToPath", "logrite.src": src, "logrite.dest": dest });
 }
 
 /** Package files */
 async function packageFiles(): Promise<void> {
+logger.error('>>> Entering packageFiles()', { "event.action": "packageFiles" });
   const artifactsDir = "./artifacts";
   ensureEmptyDirectory(artifactsDir);
+logger.error(`packageFiles(): artifactsDir → ${artifactsDir}`, { "event.action": "packageFiles" });
   const stagingDir = `${artifactsDir}/staging`;
   ensureEmptyDirectory(stagingDir);
   
@@ -303,6 +333,7 @@ async function packageFiles(): Promise<void> {
       copyFileToPath(skinResource, targetPath);
   });
   let zip = new Zip();
+logger.error(`packageFiles(): zip → ${zip}`, { "event.action": "packageFiles" });
   zip.addFolder(`${stagingDir}/skinResources`);
   await zip.archive(`${stagingDir}/skin.zip`)
   deleteDirectoryWithRetry(`${stagingDir}/skinResources`);
@@ -339,7 +370,9 @@ async function packageFiles(): Promise<void> {
   );
   rootResources.forEach((rootResource) => {
       const relativePath = path.relative(skinDist, rootResource).replace(/\\/g, '/');
+	logger.error(`packageFiles(): relativePath → ${relativePath}`, { "event.action": "packageFiles" });
       const targetPath = path.resolve(`${stagingDir}/${relativePath}`);
+	logger.error(`packageFiles(): targetPath → ${targetPath}`, { "event.action": "packageFiles" });
       copyFileToPath(rootResource, targetPath);
   });
   console.log("Root files packaged.");
@@ -357,6 +390,7 @@ async function packageFiles(): Promise<void> {
   // Copy package to Install/Skin
   console.log("Copying package to Install/Skin...");
   var skinInstallPath = "../../../Website/Install/Skin/";
+logger.error(`packageFiles(): skinInstallPath → ${skinInstallPath}`, { "event.action": "packageFiles" });
   console.log(`Copying ${packageName} to ${skinInstallPath}`);
   var destinationPath = `${skinInstallPath}/${packageName}`
   ensureDirectoryExists(destinationPath);
@@ -365,6 +399,7 @@ async function packageFiles(): Promise<void> {
       destinationPath);
   deleteDirectoryWithRetry(artifactsDir);
   console.log(`Package copied to ${skinInstallPath}/${packageName}.`);
+logger.warn('<<< Exiting packageFiles()', { "event.action": "packageFiles" });
 }
 
 // THE FUN STARTS HERE - MAIN ENTRY POINT

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -48,10 +49,13 @@ CodeMirror.defineMode('mllike', function(_config, parserConfig) {
   }
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.next();
 
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     if (ch === '"') {
       state.tokenize = tokenString;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       return state.tokenize(stream, state);
     }
     if (ch === '(') {
@@ -117,7 +121,11 @@ CodeMirror.defineMode('mllike', function(_config, parserConfig) {
   }
 
   return {
-    startState: function() {return {tokenize: tokenBase, commentLevel: 0};},
+    startState: function() {
+        logger.error('>>> Entering startState()', { "event.action": "startState" });
+        logger.warn('<<< Exiting startState()', { "event.action": "startState" });
+        return {tokenize: tokenBase, commentLevel: 0};
+    },
     token: function(stream, state) {
       if (stream.eatSpace()) return null;
       return state.tokenize(stream, state);

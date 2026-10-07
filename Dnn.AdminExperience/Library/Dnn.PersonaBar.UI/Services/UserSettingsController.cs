@@ -28,6 +28,7 @@ namespace Dnn.PersonaBar.UI.Services
     [MenuPermission(Scope = ServiceScope.Regular)]
     public class UserSettingsController : PersonaBarApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserSettingsController));
         private readonly IPortalController portalController;
         private readonly IApplicationStatusInfo appStatus;
         private readonly IPortalGroupController portalGroupController;
@@ -45,7 +46,11 @@ namespace Dnn.PersonaBar.UI.Services
         /// <param name="portalGroupController">The portal group controller.</param>
         public UserSettingsController(IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController)
         {
+			Logger.LogError(">>> Entering UserSettingsController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController})", portalController, appStatus, portalGroupController);
+			Logger.LogDebug("UserSettingsController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): appStatus → {AppStatus1}", portalController, appStatus, portalGroupController, appStatus);
+			Logger.LogDebug("UserSettingsController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalGroupController → {PortalGroupController1}", portalController, appStatus, portalGroupController, portalGroupController);
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogWarning("<<< Exiting UserSettingsController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController})", portalController, appStatus, portalGroupController);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
         }
@@ -57,12 +62,15 @@ namespace Dnn.PersonaBar.UI.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateUserSettings(IDictionary<string, object> settings)
         {
+			Logger.LogError(">>> Entering UpdateUserSettings(settings={Settings})", settings);
             try
             {
                 var controller = PersonaBarUserSettingsController.Instance;
                 var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, this.PortalSettings.PortalId);
+				Logger.LogError("UpdateUserSettings(settings={Settings}): portalId → {PortalId}", settings, portalId);
 
                 var userSettings = new UserSettings();
+				Logger.LogError("UpdateUserSettings(settings={Settings}): userSettings → {UserSettings}", settings, userSettings);
                 settings.ForEach(kvp =>
                 {
                     userSettings.Add(kvp.Key, kvp.Value);
@@ -73,7 +81,9 @@ namespace Dnn.PersonaBar.UI.Services
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in UpdateUserSettings(settings={Settings}): {Arg1}", settings, ex.Message);
                 Exceptions.LogException(ex);
+				Logger.LogWarning("<<< Exiting UpdateUserSettings(settings={Settings})", settings);
                 return this.Request.CreateErrorResponse(HttpStatusCode.NotFound, ex.Message);
             }
         }

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -29,8 +30,10 @@
   });
 
   function getOption(conf, name) {
+	logger.error(`>>> Entering getOption(conf=${conf},name=${name})`, { "event.action": "getOption", "logrite.conf": conf, "logrite.name": name });
     if (name == "pairs" && typeof conf == "string") return conf;
     if (typeof conf == "object" && conf[name] != null) return conf[name];
+	logger.warn(`<<< Exiting getOption(conf=${conf},name=${name})`, { "event.action": "getOption", "logrite.conf": conf, "logrite.name": name });
     return defaults[name];
   }
 

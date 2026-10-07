@@ -9,17 +9,22 @@ import { TextOverflowWrapper } from "@dnnsoftware/dnn-react-common";
 import SvgIcon from "../../SvgIcon";
 import utils from "utils";
 import "./style.less";
+const logger = console;
 
 let canEdit = false;
 
 class Theme extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {};
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
         canEdit = utils.params.settings.isHost || utils.params.settings.isAdmin || (utils.params.settings.permissions && utils.params.settings.permissions.EDIT === true);
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     selectedAsSite() {
+		logger.error('>>> Entering selectedAsSite()', { "event.action": "selectedAsSite" });
         const {props} = this;
         let theme = props.theme;
         let currentTheme = props.currentTheme;
@@ -27,12 +32,14 @@ class Theme extends Component {
             return currentTheme.SiteLayout.themeName === theme.packageName
                     && currentTheme.SiteLayout.level === theme.level;
         } else {
+			logger.warn('<<< Exiting selectedAsSite()', { "event.action": "selectedAsSite" });
             return currentTheme.SiteContainer.themeName === theme.packageName
                     && currentTheme.SiteContainer.level === theme.level;
         }
     }
 
     getClassName() {
+		logger.error('>>> Entering getClassName()', { "event.action": "getClassName" });
         const {props} = this;
         let theme = props.theme;
         let className = theme.type === 0 ? "theme-skin" : "theme-container";
@@ -41,36 +48,44 @@ class Theme extends Component {
             className += " selected";
         }
 
+		logger.warn('<<< Exiting getClassName()', { "event.action": "getClassName" });
         return className;
     }
 
     applyDefaultTheme() {
+		logger.error('>>> Entering applyDefaultTheme()', { "event.action": "applyDefaultTheme" });
         const {props} = this;
         let theme = props.theme;
 
         utils.utilities.confirm(Localization.get("ApplyConfirm"), Localization.get("Confirm"), Localization.get("Cancel"), function () {
             props.dispatch(ThemeActions.applyDefaultTheme(theme.packageName, theme.level));
         });
+		logger.warn('<<< Exiting applyDefaultTheme()', { "event.action": "applyDefaultTheme" });
     }
 
     deleteTheme() {
+		logger.error('>>> Entering deleteTheme()', { "event.action": "deleteTheme" });
         const {props} = this;
         let theme = props.theme;
 
         utils.utilities.confirm(Localization.get("DeleteConfirm"), Localization.get("Confirm"), Localization.get("Cancel"), function () {
             props.dispatch(ThemeActions.deleteTheme(theme));
         });
+		logger.warn('<<< Exiting deleteTheme()', { "event.action": "deleteTheme" });
     }
 
     previewTheme() {
+		logger.error('>>> Entering previewTheme()', { "event.action": "previewTheme" });
         const {props} = this;
         let theme = props.theme;
 
         let previewUrl = utils.params.settings.previewUrl;
         window.open(previewUrl + "?SkinSrc=" + theme.defaultThemeFile);
+		logger.warn('<<< Exiting previewTheme()', { "event.action": "previewTheme" });
     }
 
     renderActions() {
+		logger.error('>>> Entering renderActions()', { "event.action": "renderActions" });
         const {props} = this;
         let theme = props.theme;
 
@@ -79,6 +94,7 @@ class Theme extends Component {
         }
 
         let isHost = utils.params.settings.isHost;
+		logger.warn('<<< Exiting renderActions()', { "event.action": "renderActions" });
         return <span className="actions">
             <ul>
                 <li onClick={this.previewTheme.bind(this) } title={Localization.get("PreviewTheme") }><SvgIcon name="View" /></li>
@@ -89,11 +105,13 @@ class Theme extends Component {
     }
 
     renderThumbnail() {
+		logger.error('>>> Entering renderThumbnail()', { "event.action": "renderThumbnail" });
         const {props} = this;
 
         let theme = props.theme;
         let className = "thumbnail" + (theme.thumbnail ? "" : " empty");
 
+		logger.warn('<<< Exiting renderThumbnail()', { "event.action": "renderThumbnail" });
         return <span className={className}>
             {theme.thumbnail ? <img src={theme.thumbnail} alt={theme.packageName} /> : <SvgIcon name="EmptyThumbnail" />}
             {this.renderActions() }
@@ -101,8 +119,10 @@ class Theme extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={this.getClassName() }>
                 {this.renderThumbnail() }
@@ -119,6 +139,8 @@ Theme.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         currentTheme: state.theme.currentTheme
     };

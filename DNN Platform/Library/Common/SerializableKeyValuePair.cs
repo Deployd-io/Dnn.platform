@@ -11,12 +11,16 @@ namespace DotNetNuke.Common
     [DataContract]
     public class SerializableKeyValuePair<TKey, TValue>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SerializableKeyValuePair));
         /// <summary>Initializes a new instance of the <see cref="SerializableKeyValuePair{TKey, TValue}"/> class.</summary>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
         public SerializableKeyValuePair(TKey key, TValue value)
         {
+			Logger.LogError(">>> Entering SerializableKeyValuePair(key={Key},value={Value})", key, value);
             this.Key = key;
+			Logger.LogDebug("SerializableKeyValuePair(key={Key},value={Value}): this.Key → {Arg2}", key, value, this.Key);
+        Logger.LogWarning("<<< Exiting SerializableKeyValuePair(key={Key},value={Value})", key, value);
             this.Value = value;
         }
 
@@ -29,6 +33,8 @@ namespace DotNetNuke.Common
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogError(">>> Entering ToString()");
+            Logger.LogWarning("<<< Exiting ToString()");
             return Json.Serialize(this);
         }
     }

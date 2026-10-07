@@ -23,6 +23,7 @@ namespace DotNetNuke.Entities.Profile
     [Serializable]
     public class ProfilePropertyDefinition : BaseEntityInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ProfilePropertyDefinition));
         private int dataType = Null.NullInteger;
         private string defaultValue;
         private UserVisibilityMode defaultVisibility = UserVisibilityMode.AdminOnly;
@@ -48,7 +49,11 @@ namespace DotNetNuke.Entities.Profile
         /// <summary>Initializes a new instance of the <see cref="ProfilePropertyDefinition"/> class.</summary>
         public ProfilePropertyDefinition()
         {
+			Logger.LogError(">>> Entering ProfilePropertyDefinition()");
             this.PropertyDefinitionId = Null.NullInteger;
+			Logger.LogDebug("ProfilePropertyDefinition(): this.PropertyDefinitionId → {Arg0}", this.PropertyDefinitionId);
+        Logger.LogDebug("ProfilePropertyDefinition(portalId={PortalId}): PortalId → {PortalId1}", portalId, PortalId);
+        Logger.LogWarning("<<< Exiting ProfilePropertyDefinition()");
             this.PortalId = PortalController.Instance.GetCurrentSettings().PortalId;
         }
 
@@ -56,7 +61,10 @@ namespace DotNetNuke.Entities.Profile
         /// <param name="portalId">The portal ID.</param>
         public ProfilePropertyDefinition(int portalId)
         {
+			Logger.LogError(">>> Entering ProfilePropertyDefinition(portalId={PortalId})", portalId);
             this.PropertyDefinitionId = Null.NullInteger;
+			Logger.LogWarning("<<< Exiting ProfilePropertyDefinition(portalId={PortalId})", portalId);
+			Logger.LogDebug("ProfilePropertyDefinition(portalId={PortalId}): this.PropertyDefinitionId → {Arg1}", portalId, this.PropertyDefinitionId);
             this.PortalId = portalId;
         }
 
@@ -418,6 +426,7 @@ namespace DotNetNuke.Entities.Profile
         /// <summary>Clears the IsDirty Flag.</summary>
         public void ClearIsDirty()
         {
+			Logger.LogError(">>> Entering ClearIsDirty()");
             this.IsDirty = false;
         }
 
@@ -425,6 +434,7 @@ namespace DotNetNuke.Entities.Profile
         /// <returns>A ProfilePropertyDefinition.</returns>
         public ProfilePropertyDefinition Clone()
         {
+			Logger.LogError(">>> Entering Clone()");
             var clone = new ProfilePropertyDefinition(this.PortalId)
             {
                 DataType = this.DataType,
@@ -445,6 +455,7 @@ namespace DotNetNuke.Entities.Profile
                 Deleted = this.Deleted,
             };
             clone.ClearIsDirty();
+			Logger.LogWarning("<<< Exiting Clone()");
             return clone;
         }
     }

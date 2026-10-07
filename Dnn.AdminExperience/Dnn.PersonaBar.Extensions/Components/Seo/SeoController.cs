@@ -24,20 +24,28 @@ namespace Dnn.PersonaBar.Seo.Components
         /// <param name="applicationStatusInfo">Application status info.</param>
         public SeoController(IApplicationStatusInfo applicationStatusInfo)
         {
+			eventLogger.LogError(">>> Entering SeoController(applicationStatusInfo={ApplicationStatusInfo})", applicationStatusInfo);
             this.applicationStatusInfo = applicationStatusInfo;
+			eventLogger.LogDebug("SeoController(applicationStatusInfo={ApplicationStatusInfo}): this.applicationStatusInfo → {Arg1}", applicationStatusInfo, this.applicationStatusInfo);
+        eventLogger.LogWarning("<<< Exiting SeoController(applicationStatusInfo={ApplicationStatusInfo})", applicationStatusInfo);
             this.portalSettings = PortalSettings.Current;
         }
 
         public IEnumerable<SitemapProvider> GetSitemapProviders()
         {
+			eventLogger.LogError(">>> Entering GetSitemapProviders()");
             var builder = new SitemapBuilder(this.portalSettings);
+			eventLogger.LogError("GetSitemapProviders(): builder → {Builder}", builder);
+			eventLogger.LogWarning("<<< Exiting GetSitemapProviders()");
             return builder.Providers;
         }
 
         public void ResetCache()
         {
+			eventLogger.LogError(">>> Entering ResetCache()");
             var cacheFolder = new DirectoryInfo(this.portalSettings.HomeSystemDirectoryMapPath + "sitemap\\");
 
+			eventLogger.LogError("ResetCache(): cacheFolder → {CacheFolder}", cacheFolder);
             if (cacheFolder.Exists)
             {
                 foreach (var file in cacheFolder.GetFiles("sitemap*.xml"))
@@ -45,12 +53,15 @@ namespace Dnn.PersonaBar.Seo.Components
                     file.Delete();
                 }
             }
+			eventLogger.LogWarning("<<< Exiting ResetCache()");
         }
 
         public string GetSearchEngineSubmissionUrl(string searchEngine)
         {
+			eventLogger.LogError(">>> Entering GetSearchEngineSubmissionUrl(searchEngine={SearchEngine})", searchEngine);
             var url = string.Empty;
 
+			eventLogger.LogError("GetSearchEngineSubmissionUrl(searchEngine={SearchEngine}): url → {Url}", searchEngine, url);
             switch (searchEngine.ToUpperInvariant().Trim())
             {
                 case "GOOGLE":
@@ -81,17 +92,20 @@ namespace Dnn.PersonaBar.Seo.Components
                     break;
             }
 
+			eventLogger.LogWarning("<<< Exiting GetSearchEngineSubmissionUrl(searchEngine={SearchEngine})", searchEngine);
             return url;
         }
 
         public void CreateVerification(string verification)
         {
+			eventLogger.LogError(">>> Entering CreateVerification(verification={Verification})", verification);
             if (string.IsNullOrEmpty(verification) || !verification.EndsWith(".html", StringComparison.Ordinal))
             {
                 return;
             }
 
             var verificationPath = Path.Combine(this.applicationStatusInfo.ApplicationMapPath, Path.GetFileName(verification));
+			eventLogger.LogError("CreateVerification(verification={Verification}): verificationPath → {VerificationPath}", verification, verificationPath);
             if (File.Exists(verificationPath))
             {
                 return;
@@ -103,10 +117,12 @@ namespace Dnn.PersonaBar.Seo.Components
 
             // write SiteMap verification file
             var objStream = File.CreateText(verificationPath);
+			eventLogger.LogError("CreateVerification(verification={Verification}): objStream → {ObjStream}", verification, objStream);
             objStream.WriteLine("Google SiteMap Verification File");
             objStream.WriteLine(" - " + Globals.AddHTTP(portalAlias) + @"/SiteMap.aspx");
             objStream.WriteLine(" - " + UserController.Instance.GetCurrentUserInfo().DisplayName);
             objStream.Close();
+			eventLogger.LogWarning("<<< Exiting CreateVerification(verification={Verification})", verification);
         }
     }
 }

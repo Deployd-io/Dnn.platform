@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -23,8 +24,11 @@ CodeMirror.defineMode("clojure", function (options) {
     var NORMAL_INDENT_UNIT = options.indentUnit || 2;
 
     function makeKeywords(str) {
+		logger.error(`>>> Entering makeKeywords(str=${str})`, { "event.action": "makeKeywords", "logrite.str": str });
         var obj = {}, words = str.split(" ");
         for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+		logger.error(`makeKeywords(str=${str}): obj → ${obj}`, { "event.action": "makeKeywords", "logrite.str": str });
+		logger.warn(`<<< Exiting makeKeywords(str=${str})`, { "event.action": "makeKeywords", "logrite.str": str });
         return obj;
     }
 
@@ -63,20 +67,27 @@ CodeMirror.defineMode("clojure", function (options) {
     };
 
     function stateStack(indent, type, prev) { // represents a state stack object
+		logger.error(`>>> Entering stateStack(indent=${indent},type=${type},prev=${prev})`, { "event.action": "stateStack", "logrite.indent": indent, "logrite.type": type, "logrite.prev": prev });
         this.indent = indent;
         this.type = type;
         this.prev = prev;
+		logger.debug(`stateStack(indent=${indent},type=${type},prev=${prev}): this.prev → ${this.prev}`, { "event.action": "stateStack", "logrite.indent": indent, "logrite.type": type, "logrite.prev": prev });
     }
 
     function pushStack(state, indent, type) {
+		logger.error(`>>> Entering pushStack(state=${state},indent=${indent},type=${type})`, { "event.action": "pushStack", "logrite.state": state, "logrite.indent": indent, "logrite.type": type });
         state.indentStack = new stateStack(indent, type, state.indentStack);
+		logger.warn(`<<< Exiting pushStack(state=${state},indent=${indent},type=${type})`, { "event.action": "pushStack", "logrite.state": state, "logrite.indent": indent, "logrite.type": type });
     }
 
     function popStack(state) {
+		logger.error(`>>> Entering popStack(state=${state})`, { "event.action": "popStack", "logrite.state": state });
         state.indentStack = state.indentStack.prev;
+		logger.warn(`<<< Exiting popStack(state=${state})`, { "event.action": "popStack", "logrite.state": state });
     }
 
     function isNumber(ch, stream){
+		logger.error(`>>> Entering isNumber(ch=${ch},stream=${stream})`, { "event.action": "isNumber", "logrite.ch": ch, "logrite.stream": stream });
         // hex
         if ( ch === '0' && stream.eat(/x/i) ) {
             stream.eatWhile(tests.hex);
@@ -89,6 +100,7 @@ CodeMirror.defineMode("clojure", function (options) {
           ch = stream.next();
         }
 
+		logger.error(`isNumber(ch=${ch},stream=${stream}): ch → ${ch}`, { "event.action": "isNumber", "logrite.ch": ch, "logrite.stream": stream });
         if ( tests.digit.test(ch) ) {
             stream.eat(ch);
             stream.eatWhile(tests.digit);
@@ -111,28 +123,34 @@ CodeMirror.defineMode("clojure", function (options) {
 
     // Eat character that starts after backslash \
     function eatCharacter(stream) {
+		logger.error(`>>> Entering eatCharacter(stream=${stream})`, { "event.action": "eatCharacter", "logrite.stream": stream });
         var first = stream.next();
         // Read special literals: backspace, newline, space, return.
         // Just read all lowercase letters.
         if (first && first.match(/[a-z]/) && stream.match(/[a-z]+/, true)) {
+			logger.error(`eatCharacter(stream=${stream}): first → ${first}`, { "event.action": "eatCharacter", "logrite.stream": stream });
             return;
         }
         // Read unicode character: \u1000 \uA0a1
         if (first === "u") {
             stream.match(/[0-9a-z]{4}/i, true);
         }
+		logger.warn(`<<< Exiting eatCharacter(stream=${stream})`, { "event.action": "eatCharacter", "logrite.stream": stream });
     }
 
     return {
         startState: function () {
+			logger.error('>>> Entering startState()', { "event.action": "startState" });
             return {
                 indentStack: null,
                 indentation: 0,
                 mode: false
             };
+			logger.warn('<<< Exiting startState()', { "event.action": "startState" });
         },
 
         token: function (stream, state) {
+			logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
             if (state.indentStack == null && stream.sol()) {
                 // update indentation, but only if indentStack is empty
                 state.indentation = stream.indentation();
@@ -151,6 +169,7 @@ CodeMirror.defineMode("clojure", function (options) {
                         if (next == "\"" && !escaped) {
 
                             state.mode = false;
+							logger.debug(`token(stream=${stream},state=${state}): state.mode → ${state.mode}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
                             break;
                         }
                         escaped = !escaped && next == "\\";
@@ -159,6 +178,7 @@ CodeMirror.defineMode("clojure", function (options) {
                     break;
                 default: // default parsing mode
                     var ch = stream.next();
+					logger.error(`token(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
 
                     if (ch == "\"") {
                         state.mode = "string";
@@ -175,6 +195,7 @@ CodeMirror.defineMode("clojure", function (options) {
                         returnType = NUMBER;
                     } else if (ch == "(" || ch == "[" || ch == "{" ) {
                         var keyWord = '', indentTemp = stream.column(), letter;
+						logger.error(`token(stream=${stream},state=${state}): keyWord → ${keyWord}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
                         /**
                         Either
                         (indent-word ..
@@ -222,6 +243,7 @@ CodeMirror.defineMode("clojure", function (options) {
                             returnType = ATOM;
                         } else {
                           returnType = VAR;
+						logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
                         }
                     }
             }
@@ -230,7 +252,9 @@ CodeMirror.defineMode("clojure", function (options) {
         },
 
         indent: function (state) {
+			logger.error(`>>> Entering indent(state=${state})`, { "event.action": "indent", "logrite.state": state });
             if (state.indentStack == null) return state.indentation;
+			logger.warn(`<<< Exiting indent(state=${state})`, { "event.action": "indent", "logrite.state": state });
             return state.indentStack.indent;
         },
 

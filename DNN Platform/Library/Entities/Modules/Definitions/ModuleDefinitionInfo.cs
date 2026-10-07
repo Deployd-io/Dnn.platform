@@ -18,14 +18,18 @@ namespace DotNetNuke.Entities.Modules.Definitions
     [Serializable]
     public class ModuleDefinitionInfo : IXmlSerializable, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleDefinitionInfo));
         private Dictionary<string, ModuleControlInfo> moduleControls;
         private string definitionName;
 
         /// <summary>Initializes a new instance of the <see cref="ModuleDefinitionInfo"/> class.</summary>
         public ModuleDefinitionInfo()
         {
+			Logger.LogError(">>> Entering ModuleDefinitionInfo()");
             this.Permissions = new Dictionary<string, PermissionInfo>();
             this.DesktopModuleID = Null.NullInteger;
+			Logger.LogDebug("ModuleDefinitionInfo(): this.DesktopModuleID → {Arg0}", this.DesktopModuleID);
+        Logger.LogWarning("<<< Exiting ModuleDefinitionInfo()");
             this.ModuleDefID = Null.NullInteger;
         }
 
@@ -94,6 +98,7 @@ namespace DotNetNuke.Entities.Modules.Definitions
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.ModuleDefID = Null.SetNullInteger(dr["ModuleDefID"]);
             this.DesktopModuleID = Null.SetNullInteger(dr["DesktopModuleID"]);
             this.DefaultCacheTime = Null.SetNullInteger(dr["DefaultCacheTime"]);
@@ -102,11 +107,14 @@ namespace DotNetNuke.Entities.Modules.Definitions
             {
                 this.DefinitionName = Null.SetNullString(dr["DefinitionName"]);
             }
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <inheritdoc />
         public XmlSchema GetSchema()
         {
+			Logger.LogError(">>> Entering GetSchema()");
+			Logger.LogWarning("<<< Exiting GetSchema()");
             return null;
         }
 
@@ -114,6 +122,7 @@ namespace DotNetNuke.Entities.Modules.Definitions
         /// <param name="reader">The XmlReader to use.</param>
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogError(">>> Entering ReadXml(reader={Reader})", reader);
             while (reader.Read())
             {
                 if (reader.NodeType == XmlNodeType.EndElement)
@@ -163,12 +172,14 @@ namespace DotNetNuke.Entities.Modules.Definitions
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting ReadXml(reader={Reader})", reader);
         }
 
         /// <summary>Writes a ModuleDefinitionInfo to an XmlWriter.</summary>
         /// <param name="writer">The XmlWriter to use.</param>
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteXml(writer={Writer})", writer);
             // Write start of main elements
             writer.WriteStartElement("moduleDefinition");
 
@@ -191,26 +202,33 @@ namespace DotNetNuke.Entities.Modules.Definitions
 
             // Write end of main element
             writer.WriteEndElement();
+			Logger.LogWarning("<<< Exiting WriteXml(writer={Writer})", writer);
         }
 
         public void LoadControls()
         {
+			Logger.LogError(">>> Entering LoadControls()");
             this.moduleControls = this.ModuleDefID > Null.NullInteger ? ModuleControlController.GetModuleControlsByModuleDefinitionID(this.ModuleDefID) : new Dictionary<string, ModuleControlInfo>();
+			Logger.LogDebug("LoadControls(): moduleControls → {ModuleControls}", moduleControls);
+        Logger.LogWarning("<<< Exiting LoadControls()");
         }
 
         /// <summary>Reads the ModuleControls from an XmlReader.</summary>
         /// <param name="reader">The XmlReader to use.</param>
         private void ReadModuleControls(XmlReader reader)
         {
+			Logger.LogError(">>> Entering ReadModuleControls(reader={Reader})", reader);
             reader.ReadStartElement("moduleControls");
             do
             {
                 reader.ReadStartElement("moduleControl");
                 var moduleControl = new ModuleControlInfo();
+				Logger.LogError("ReadModuleControls(reader={Reader}): moduleControl → {ModuleControl}", reader, moduleControl);
                 moduleControl.ReadXml(reader);
                 this.ModuleControls.Add(moduleControl.ControlKey, moduleControl);
             }
             while (reader.ReadToNextSibling("moduleControl"));
+			Logger.LogWarning("<<< Exiting ReadModuleControls(reader={Reader})", reader);
         }
     }
 }

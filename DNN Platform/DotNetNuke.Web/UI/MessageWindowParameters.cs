@@ -9,6 +9,7 @@ namespace DotNetNuke.Web.UI
     /// <summary>Information about a message displayed in a window.</summary>
     public class MessageWindowParameters
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MessageWindowParameters));
         private string message = string.Empty;
         private string title = string.Empty;
         private Unit windowHeight = Unit.Pixel(175);
@@ -18,7 +19,9 @@ namespace DotNetNuke.Web.UI
         /// <param name="message">The message.</param>
         public MessageWindowParameters(string message)
         {
+			Logger.LogError(">>> Entering MessageWindowParameters(message={Message})", message);
             this.message = message;
+			Logger.LogWarning("<<< Exiting MessageWindowParameters(message={Message},title={Title})", message, title);
         }
 
         /// <summary>Initializes a new instance of the <see cref="MessageWindowParameters"/> class.</summary>
@@ -26,7 +29,9 @@ namespace DotNetNuke.Web.UI
         /// <param name="title">The title.</param>
         public MessageWindowParameters(string message, string title)
         {
+			Logger.LogError(">>> Entering MessageWindowParameters(message={Message},title={Title})", message, title);
             this.message = message;
+			Logger.LogDebug("MessageWindowParameters(message={Message},title={Title}): this.message → {Arg2}", message, title, this.message);
             this.title = title;
         }
 
@@ -37,7 +42,11 @@ namespace DotNetNuke.Web.UI
         /// <param name="windowHeight">The window height (in a format that can be parsed by <see cref="Unit.Parse(string)" />).</param>
         public MessageWindowParameters(string message, string title, string windowWidth, string windowHeight)
         {
+			Logger.LogError(">>> Entering MessageWindowParameters(message={Message},title={Title},windowWidth={WindowWidth},windowHeight={WindowHeight})", message, title, windowWidth, windowHeight);
+			Logger.LogDebug("MessageWindowParameters(message={Message},title={Title},windowWidth={WindowWidth},windowHeight={WindowHeight}): this.title → {Arg4}", message, title, windowWidth, windowHeight, this.title);
             this.message = message;
+			Logger.LogWarning("<<< Exiting MessageWindowParameters(message={Message},title={Title},windowWidth={WindowWidth},windowHeight={WindowHeight})", message, title, windowWidth, windowHeight);
+			Logger.LogDebug("MessageWindowParameters(message={Message},title={Title},windowWidth={WindowWidth},windowHeight={WindowHeight}): this.message → {Arg4}", message, title, windowWidth, windowHeight, this.message);
             this.title = title;
             this.windowWidth = Unit.Parse(windowWidth, CultureInfo.InvariantCulture);
             this.windowHeight = Unit.Parse(windowHeight, CultureInfo.InvariantCulture);

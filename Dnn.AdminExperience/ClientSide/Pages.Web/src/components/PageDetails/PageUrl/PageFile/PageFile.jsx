@@ -6,16 +6,20 @@ import utils from "../../../../utils";
 import { FileUpload, GridSystem, GridCell } from "@dnnsoftware/dnn-react-common";
 import PageUrlCommons from "../PageUrlCommons/PageUrlCommons";
 import Localization from "../../../../localization";
+const logger = console;
 
 class PageFile extends Component {
 
     onFileSelect(selectedFile) {
+		logger.error(`>>> Entering onFileSelect(selectedFile=${selectedFile})`, { "event.action": "onFileSelect", "logrite.selectedFile": selectedFile });
         this.props.onChangeField("fileIdRedirection", selectedFile.fileId);
         this.props.onChangeField("fileFolderPathRedirection", selectedFile.folderPath);
         this.props.onChangeField("fileNameRedirection", selectedFile.fileName);
+		logger.warn(`<<< Exiting onFileSelect(selectedFile=${selectedFile})`, { "event.action": "onFileSelect", "logrite.selectedFile": selectedFile });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {page} = this.props;
         const utilities = {
             utilities: utils.getUtilities()
@@ -27,6 +31,7 @@ class PageFile extends Component {
             fileName: page.fileNameRedirection
         } : null;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.pageFile}>
                 <GridSystem>
@@ -74,6 +79,8 @@ PageFile.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return ({page: state.pages.selectedPage});
 };
 

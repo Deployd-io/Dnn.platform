@@ -46,10 +46,13 @@ namespace log4net.Util
         /// </remarks>
         public QuietTextWriter(TextWriter writer, IErrorHandler errorHandler) : base(writer)
         {
+			value.LogError(">>> Entering QuietTextWriter(writer={Writer},errorHandler={ErrorHandler})", writer, errorHandler);
             if (errorHandler == null)
             {
+				value.LogError("Throwing ArgumentNullException from QuietTextWriter(writer={Writer},errorHandler={ErrorHandler})", writer, errorHandler);
                 throw new ArgumentNullException("errorHandler");
             }
+			value.LogWarning("<<< Exiting QuietTextWriter(writer={Writer},errorHandler={ErrorHandler})", writer, errorHandler);
 
             this.ErrorHandler = errorHandler;
         }
@@ -109,6 +112,7 @@ namespace log4net.Util
             {
                 this.m_errorHandler.Error("Failed to write [" + value + "].", e, ErrorCode.WriteFailure);
             }
+			value.LogWarning("<<< Exiting Write(buffer={Buffer},index={Index},count={Count})", buffer, index, count);
         }
     
         /// <summary>Writes a buffer to the underlying writer</summary>
@@ -122,12 +126,14 @@ namespace log4net.Util
         /// </remarks>
         public override void Write(char[] buffer, int index, int count) 
         {
+			value.LogError(">>> Entering Write(buffer={Buffer},index={Index},count={Count})", buffer, index, count);
             try 
             {
                 base.Write(buffer, index, count);
             } 
             catch(Exception e) 
             {
+				value.LogError("Exception in Write(buffer={Buffer},index={Index},count={Count}): {Arg3}", buffer, index, count, e.Message);
                 this.m_errorHandler.Error("Failed to write buffer.", e, ErrorCode.WriteFailure);
             }
         }
@@ -141,14 +147,17 @@ namespace log4net.Util
         /// </remarks>
         public override void Write(string value) 
         {
+			value.LogError(">>> Entering Write(value={Value})", value);
             try 
             {
                 base.Write(value);
             } 
             catch(Exception e) 
             {
+				value.LogError("Exception in Write(value={Value}): {Arg1}", value, e.Message);
                 this.m_errorHandler.Error("Failed to write [" + value + "].", e, ErrorCode.WriteFailure);
             }
+			value.LogWarning("<<< Exiting Write(value={Value})", value);
         }
 
         /// <summary>Closes the underlying output writer.</summary>
@@ -159,7 +168,9 @@ namespace log4net.Util
         /// </remarks>
         public override void Close()
         {
+			value.LogError(">>> Entering Close()");
             this.m_closed = true;
+			value.LogDebug("Close(): this.m_closed → {Arg0}", this.m_closed);
             base.Close();
         }
 

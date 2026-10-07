@@ -14,6 +14,7 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The SkinControlInstaller installs SkinControl (SkinObject) Components to a DotNetNuke site.</summary>
     public class SkinControlInstaller : ComponentInstallerBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinControlInstaller));
         private SkinControlInfo installedSkinControl;
         private SkinControlInfo skinControl;
 
@@ -31,15 +32,19 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <remarks>In the case of Modules this is not neccessary.</remarks>
         public override void Commit()
         {
+		Logger.LogError(">>> Entering Commit()");
+        Logger.LogWarning("<<< Exiting Commit()");
         }
 
         /// <summary>The Install method installs the Module component.</summary>
         public override void Install()
         {
+			Logger.LogError(">>> Entering Install()");
             try
             {
                 // Attempt to get the SkinControl
                 this.installedSkinControl = SkinControlController.GetSkinControlByKey(this.skinControl.ControlKey);
+				Logger.LogDebug("Install(): installedSkinControl → {InstalledSkinControl}", installedSkinControl);
 
                 if (this.installedSkinControl != null)
                 {
@@ -51,25 +56,30 @@ namespace DotNetNuke.Services.Installer.Installers
                 this.skinControl.SkinControlID = SkinControlController.SaveSkinControl(this.skinControl);
 
                 this.Completed = true;
+				Logger.LogDebug("Install(): this.Completed → {Arg0}", this.Completed);
                 this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.MODULE_Registered, this.skinControl.ControlKey));
             }
             catch (Exception ex)
             {
                 this.Log.AddFailure(ex);
             }
+			Logger.LogWarning("<<< Exiting Install()");
         }
 
         /// <summary>The ReadManifest method reads the manifest file for the SkinControl component.</summary>
         /// <param name="manifestNav">The XPath navigator for the Skin Control section of the manifest.</param>
         public override void ReadManifest(XPathNavigator manifestNav)
         {
+			Logger.LogError(">>> Entering ReadManifest(manifestNav={ManifestNav})", manifestNav);
             // Load the SkinControl from the manifest
             this.skinControl = CBO.DeserializeObject<SkinControlInfo>(new StringReader(manifestNav.InnerXml));
+			Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): skinControl → {SkinControl}", manifestNav, skinControl);
 
             if (this.Log.Valid)
             {
                 this.Log.AddInfo(Util.MODULE_ReadSuccess);
             }
+			Logger.LogWarning("<<< Exiting ReadManifest(manifestNav={ManifestNav})", manifestNav);
         }
 
         /// <summary>
@@ -78,6 +88,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// </summary>
         public override void Rollback()
         {
+			Logger.LogError(">>> Entering Rollback()");
             // If Temp SkinControl exists then we need to update the DataStore with this
             if (this.installedSkinControl == null)
             {
@@ -89,21 +100,26 @@ namespace DotNetNuke.Services.Installer.Installers
                 // Temp SkinControl - Rollback to Temp
                 SkinControlController.SaveSkinControl(this.installedSkinControl);
             }
+			Logger.LogWarning("<<< Exiting Rollback()");
         }
 
         /// <summary>The UnInstall method uninstalls the SkinControl component.</summary>
         public override void UnInstall()
         {
+			Logger.LogError(">>> Entering UnInstall()");
             this.DeleteSkinControl();
+			Logger.LogWarning("<<< Exiting UnInstall()");
         }
 
         /// <summary>The DeleteSkinControl method deletes the SkinControl from the data Store.</summary>
         private void DeleteSkinControl()
         {
+			Logger.LogError(">>> Entering DeleteSkinControl()");
             try
             {
                 // Attempt to get the SkinControl
                 SkinControlInfo skinControl = SkinControlController.GetSkinControlByPackageID(this.Package.PackageID);
+				Logger.LogError("DeleteSkinControl(): skinControl → {SkinControl}", skinControl);
                 if (skinControl != null)
                 {
                     SkinControlController.DeleteSkinControl(skinControl);
@@ -115,6 +131,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 this.Log.AddFailure(ex);
             }
+			Logger.LogWarning("<<< Exiting DeleteSkinControl()");
         }
     }
 }

@@ -46,13 +46,19 @@ namespace DotNetNuke.Entities.Controllers
         /// <param name="portalController">The portal controller.</param>
         public HostController(IEventLogger eventLogger, Lazy<IPortalController> portalController)
         {
+			Logger.LogError(">>> Entering HostController(eventLogger={EventLogger},portalController={PortalController})", eventLogger, portalController);
+			Logger.LogDebug("HostController(eventLogger={EventLogger},portalController={PortalController}): portalController → {PortalController1}", eventLogger, portalController, portalController);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			Logger.LogWarning("<<< Exiting HostController(eventLogger={EventLogger},portalController={PortalController})", eventLogger, portalController);
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<Lazy<IPortalController>>();
         }
 
         /// <inheritdoc cref="IHostSettingsService.GetBoolean(string)" />
         public bool GetBoolean(string key)
         {
+			Logger.LogError(">>> Entering GetBoolean(key={Key})", key);
+			Logger.LogWarning("<<< Exiting GetBoolean(key={Key})", key);
+			Logger.LogWarning("<<< Exiting GetBoolean(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return this.GetBoolean(key, Null.NullBoolean);
         }
 
@@ -93,6 +99,9 @@ namespace DotNetNuke.Entities.Controllers
         /// <inheritdoc cref="IHostSettingsService.GetDouble(string)" />
         public double GetDouble(string key)
         {
+			Logger.LogError(">>> Entering GetDouble(key={Key})", key);
+			Logger.LogWarning("<<< Exiting GetDouble(key={Key})", key);
+			Logger.LogWarning("<<< Exiting GetDouble(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return this.GetDouble(key, Null.NullDouble);
         }
 
@@ -113,6 +122,9 @@ namespace DotNetNuke.Entities.Controllers
         /// <inheritdoc cref="IHostSettingsService.GetInteger(string)" />
         public int GetInteger(string key)
         {
+			Logger.LogError(">>> Entering GetInteger(key={Key})", key);
+			Logger.LogWarning("<<< Exiting GetInteger(key={Key})", key);
+			Logger.LogWarning("<<< Exiting GetInteger(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return this.GetInteger(key, Null.NullInteger);
         }
 
@@ -153,17 +165,25 @@ namespace DotNetNuke.Entities.Controllers
         /// <inheritdoc cref="IHostSettingsService.GetEncryptedString" />
         public string GetEncryptedString(string key, string passPhrase)
         {
+			Logger.LogError(">>> Entering GetEncryptedString(key={Key},passPhrase=<redacted>)", key);
             Requires.NotNullOrEmpty("key", key);
             Requires.NotNullOrEmpty("passPhrase", passPhrase);
             var cipherText = this.GetString(key);
+			Logger.LogError("GetEncryptedString(key={Key},passPhrase=<redacted>): cipherText → {CipherText}", key, cipherText);
             var algorithmName = this.GetString(CryptographyUtils.GetAlgorithmNameSettingKey(key));
+			Logger.LogError("GetEncryptedString(key={Key},passPhrase=<redacted>): algorithmName → {AlgorithmName}", key, algorithmName);
             var algorithm = string.IsNullOrWhiteSpace(algorithmName) ? HashAlgorithmName.SHA1 : new HashAlgorithmName(algorithmName);
+			Logger.LogError("GetEncryptedString(key={Key},passPhrase=<redacted>): algorithm → {Algorithm}", key, algorithm);
+			Logger.LogWarning("<<< Exiting GetEncryptedString(key={Key},passPhrase=<redacted>)", key);
             return Security.FIPSCompliant.DecryptAES(algorithm, cipherText, passPhrase, HostSettings.GetHostGuid(this));
         }
 
         /// <inheritdoc cref="IHostSettingsService.GetString(string)" />
         public string GetString(string key)
         {
+			Logger.LogError(">>> Entering GetString(key={Key})", key);
+			Logger.LogWarning("<<< Exiting GetString(key={Key})", key);
+			Logger.LogWarning("<<< Exiting GetString(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return this.GetString(key, string.Empty);
         }
 
@@ -195,18 +215,26 @@ namespace DotNetNuke.Entities.Controllers
         /// <inheritdoc />
         public void Update(IConfigurationSetting config)
         {
+			Logger.LogError(">>> Entering Update(config={Config})", config);
             this.Update(config, true);
+			Logger.LogWarning("<<< Exiting Update(config={Config})", config);
         }
 
         /// <inheritdoc />
         public void Update(IConfigurationSetting config, bool clearCache)
         {
+			Logger.LogError(">>> Entering Update(config={Config},clearCache={ClearCache})", config, clearCache);
             try
             {
+				Logger.LogWarning("<<< Exiting Update(config={Config})", config);
                 var dbProvider = DataProvider.Instance();
+				Logger.LogError("Update(config={Config},clearCache={ClearCache}): dbProvider → {DbProvider}", config, clearCache, dbProvider);
                 var userId = UserController.Instance.GetCurrentUserInfo().UserID;
+				Logger.LogError("Update(config={Config},clearCache={ClearCache}): userId → {UserId}", config, clearCache, userId);
                 var portalSettings = PortalController.Instance.GetCurrentSettings();
+				Logger.LogError("Update(config={Config},clearCache={ClearCache}): portalSettings → {PortalSettings}", config, clearCache, portalSettings);
                 var settings = GetSettingsFromDatabase();
+				Logger.LogError("Update(config={Config},clearCache={ClearCache}): settings → {Settings}", config, clearCache, settings);
                 if (settings.ContainsKey(config.Key))
                 {
                     if (settings.TryGetValue(config.Key, out var currentConfig) && currentConfig?.Value != config.Value)
@@ -233,6 +261,7 @@ namespace DotNetNuke.Entities.Controllers
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in Update(config={Config},clearCache={ClearCache}): {Arg2}", config, clearCache, ex.Message);
                 Exceptions.LogException(ex);
             }
 
@@ -240,12 +269,16 @@ namespace DotNetNuke.Entities.Controllers
             {
                 DataCache.RemoveCache(DataCache.HostSettingsCacheKey);
             }
+			Logger.LogWarning("<<< Exiting Update(config={Config},clearCache={ClearCache})", config, clearCache);
         }
 
         /// <inheritdoc cref="IHostSettingsService.Update(string,string,bool)" />
         public void Update(string key, string value, bool clearCache)
         {
+			Logger.LogError(">>> Entering Update(key={Key},value={Value},clearCache={ClearCache})", key, value, clearCache);
             ((IHostSettingsService)this).Update(new ConfigurationSetting { Key = key, Value = value }, clearCache);
+			Logger.LogWarning("<<< Exiting Update(key={Key},value={Value},clearCache={ClearCache})", key, value, clearCache);
+			Logger.LogError(">>> Entering Update(key={Key},value={Value})", key, value);
         }
 
         /// <inheritdoc cref="IHostSettingsService.Update(string,string)" />
@@ -257,25 +290,31 @@ namespace DotNetNuke.Entities.Controllers
         /// <inheritdoc cref="IHostSettingsService.UpdateEncryptedString" />
         public void UpdateEncryptedString(string key, string value, string passPhrase)
         {
+			Logger.LogError(">>> Entering UpdateEncryptedString(key={Key},value={Value},passPhrase=<redacted>)", key, value);
             Requires.NotNullOrEmpty("key", key);
             Requires.PropertyNotNull("value", value);
             Requires.NotNullOrEmpty("passPhrase", passPhrase);
             var cipherText = Security.FIPSCompliant.EncryptAES(HashAlgorithmName.SHA512, value, passPhrase, HostSettings.GetHostGuid(this));
+			Logger.LogError("UpdateEncryptedString(key={Key},value={Value},passPhrase=<redacted>): cipherText → {CipherText}", key, value, cipherText);
             this.Update(key, cipherText);
             this.Update(CryptographyUtils.GetAlgorithmNameSettingKey(key), HashAlgorithmName.SHA512.Name);
+			Logger.LogWarning("<<< Exiting UpdateEncryptedString(key={Key},value={Value},passPhrase=<redacted>)", key, value);
         }
 
         /// <inheritdoc cref="IHostSettingsService.IncrementCrmVersion" />
         public void IncrementCrmVersion(bool includeOverridingPortals)
         {
+			Logger.LogError(">>> Entering IncrementCrmVersion(includeOverridingPortals={IncludeOverridingPortals})", includeOverridingPortals);
             var currentVersion = HostSettings.GetCrmVersion(this);
             var newVersion = currentVersion + 1;
+			Logger.LogError("IncrementCrmVersion(includeOverridingPortals={IncludeOverridingPortals}): currentVersion → {CurrentVersion}", includeOverridingPortals, currentVersion);
             this.Update(ClientResourceSettings.VersionKey, newVersion.ToString(CultureInfo.InvariantCulture), true);
 
             if (includeOverridingPortals)
             {
                 PortalController.IncrementOverridingPortalsCrmVersion(this.portalController.Value);
             }
+			Logger.LogWarning("<<< Exiting IncrementCrmVersion(includeOverridingPortals={IncludeOverridingPortals})", includeOverridingPortals);
         }
 
         /// <summary>Gets all settings from the database.</summary>
@@ -319,6 +358,8 @@ namespace DotNetNuke.Entities.Controllers
 
         private static object GetSettingsDictionaryCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogError(">>> Entering GetSettingsDictionaryCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
+            Logger.LogWarning("<<< Exiting GetSettingsDictionaryCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return GetSettingsFromDatabase();
         }
     }

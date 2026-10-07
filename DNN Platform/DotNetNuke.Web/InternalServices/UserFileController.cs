@@ -31,6 +31,9 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage GetItems()
         {
+			Logger.LogError(">>> Entering GetItems()");
+			Logger.LogWarning("<<< Exiting GetItems()");
+			Logger.LogWarning("<<< Exiting GetItems(fileExtensions={FileExtensions})", fileExtensions);
             return this.GetItems(null);
         }
 
@@ -76,11 +79,15 @@ namespace DotNetNuke.Web.InternalServices
 
         private static string GetModifiedTime(DateTime dateTime)
         {
+			Logger.LogError(">>> Entering GetModifiedTime(dateTime={DateTime})", dateTime);
+            Logger.LogWarning("<<< Exiting GetModifiedTime(dateTime={DateTime})", dateTime);
             return string.Format(CultureInfo.CurrentCulture, "{0:MMM} {0:dd}, {0:yyyy} at {0:t}", dateTime);
         }
 
         private static string GetTypeName(IFileInfo file)
         {
+			Logger.LogError(">>> Entering GetTypeName(file={File})", file);
+            Logger.LogWarning("<<< Exiting GetTypeName(file={File})", file);
             return file.ContentType == null
                        ? string.Empty
                        : (file.ContentType.StartsWith("image/", StringComparison.Ordinal)
@@ -90,43 +97,55 @@ namespace DotNetNuke.Web.InternalServices
 
         private static bool IsImageFile(string relativePath)
         {
+			Logger.LogError(">>> Entering IsImageFile(relativePath={RelativePath})", relativePath);
             var extension = relativePath.Substring(relativePath.LastIndexOf(".", StringComparison.Ordinal) + 1);
+			Logger.LogError("IsImageFile(relativePath={RelativePath}): extension → {Extension}", relativePath, extension);
+			Logger.LogWarning("<<< Exiting IsImageFile(relativePath={RelativePath})", relativePath);
             return ImageExtensions.Contains(extension);
         }
 
         private static string GetFileSize(int sizeInBytes)
         {
+			Logger.LogError(">>> Entering GetFileSize(sizeInBytes={SizeInBytes})", sizeInBytes);
             var size = sizeInBytes / 1024;
             var biggerThanAMegabyte = size > 1024;
+			Logger.LogError("GetFileSize(sizeInBytes={SizeInBytes}): size → {Size}", sizeInBytes, size);
             if (biggerThanAMegabyte)
             {
                 size = size / 1024;
             }
 
+			Logger.LogWarning("<<< Exiting GetFileSize(sizeInBytes={SizeInBytes})", sizeInBytes);
             return size.ToString(CultureInfo.InvariantCulture) + (biggerThanAMegabyte ? "Mb" : "k");
         }
 
         private string GetThumbUrl(IFileInfo file)
         {
+			Logger.LogError(">>> Entering GetThumbUrl(file={File})", file);
             if (IsImageFile(file.RelativePath))
             {
                 return FileManager.Instance.GetUrl(file);
             }
 
             var fileIcon = IconController.IconURL("Ext" + file.Extension, "32x32");
+			Logger.LogError("GetThumbUrl(file={File}): fileIcon → {FileIcon}", file, fileIcon);
             if (!System.IO.File.Exists(this.Request.GetHttpContext().Server.MapPath(fileIcon)))
             {
                 fileIcon = IconController.IconURL("File", "32x32");
             }
 
+			Logger.LogWarning("<<< Exiting GetThumbUrl(file={File})", file);
             return fileIcon;
         }
 
         private List<object> GetChildren(IFolderInfo folder, ICollection<string> extensions)
         {
+			Logger.LogError(">>> Entering GetChildren(folder={Folder},extensions={Extensions})", folder, extensions);
             var everything = new List<object>();
 
+			Logger.LogError("GetChildren(folder={Folder},extensions={Extensions}): everything → {Everything}", folder, extensions, everything);
             var folders = this.folderManager.GetFolders(folder);
+			Logger.LogError("GetChildren(folder={Folder},extensions={Extensions}): folders → {Folders}", folder, extensions, folders);
 
             foreach (var currentFolder in folders)
             {
@@ -145,6 +164,7 @@ namespace DotNetNuke.Web.InternalServices
             }
 
             var files = this.folderManager.GetFiles(folder);
+			Logger.LogError("GetChildren(folder={Folder},extensions={Extensions}): files → {Files}", folder, extensions, files);
 
             foreach (var file in files)
             {
@@ -166,6 +186,7 @@ namespace DotNetNuke.Web.InternalServices
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetChildren(folder={Folder},extensions={Extensions})", folder, extensions);
             return everything;
         }
     }

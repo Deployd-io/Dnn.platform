@@ -21,13 +21,17 @@ namespace DotNetNuke.Services.Authentication
         protected AuthenticationConfig(int portalID)
             : base(portalID)
         {
+			Logger.LogError(">>> Entering AuthenticationConfig(portalID={PortalID})", portalID);
             this.UseCaptcha = Null.NullBoolean;
             this.Enabled = true;
+			Logger.LogDebug("AuthenticationConfig(portalID={PortalID}): this.UseCaptcha → {Arg1}", portalID, this.UseCaptcha);
             try
             {
+				Logger.LogDebug("AuthenticationConfig(portalID={PortalID}): this.Enabled → {Arg1}", portalID, this.Enabled);
                 string setting = Null.NullString;
                 if (PortalController.Instance.GetPortalSettings(portalID).TryGetValue("DNN_Enabled", out setting))
                 {
+					Logger.LogError("AuthenticationConfig(portalID={PortalID}): setting → {Setting}", portalID, setting);
                     this.Enabled = bool.Parse(setting);
                 }
 
@@ -41,6 +45,7 @@ namespace DotNetNuke.Services.Authentication
             {
                 Logger.Error(ex);
             }
+			Logger.LogWarning("<<< Exiting AuthenticationConfig(portalID={PortalID})", portalID);
         }
 
         public bool Enabled { get; set; }
@@ -49,28 +54,35 @@ namespace DotNetNuke.Services.Authentication
 
         public static void ClearConfig(int portalId)
         {
+			Logger.LogError(">>> Entering ClearConfig(portalId={PortalId})", portalId);
             string key = CACHEKEY + "_" + portalId;
+			Logger.LogWarning("<<< Exiting ClearConfig(portalId={PortalId})", portalId);
             DataCache.RemoveCache(key);
         }
 
         public static AuthenticationConfig GetConfig(int portalId)
         {
+			Logger.LogError(">>> Entering GetConfig(portalId={PortalId})", portalId);
             string key = CACHEKEY + "_" + portalId;
             var config = (AuthenticationConfig)DataCache.GetCache(key);
             if (config == null)
             {
                 config = new AuthenticationConfig(portalId);
+				Logger.LogError("GetConfig(portalId={PortalId}): config → {Config}", portalId, config);
                 DataCache.SetCache(key, config);
             }
 
+			Logger.LogWarning("<<< Exiting GetConfig(portalId={PortalId})", portalId);
             return config;
         }
 
         public static void UpdateConfig(AuthenticationConfig config)
         {
+			Logger.LogError(">>> Entering UpdateConfig(config={Config})", config);
             PortalController.UpdatePortalSetting(config.PortalID, "DNN_Enabled", config.Enabled.ToString());
             PortalController.UpdatePortalSetting(config.PortalID, "DNN_UseCaptcha", config.UseCaptcha.ToString());
             ClearConfig(config.PortalID);
+			Logger.LogWarning("<<< Exiting UpdateConfig(config={Config})", config);
         }
     }
 }

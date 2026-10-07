@@ -49,6 +49,8 @@ namespace DotNetNuke.Web.Api.Internal
         public ServicesRoutingManager(IServiceProvider serviceProvider, IPortalAliasService portalAliasService)
             : this(serviceProvider, portalAliasService, RouteTable.Routes)
         {
+		Logger.LogError(">>> Entering ServicesRoutingManager(serviceProvider={ServiceProvider},portalAliasService={PortalAliasService})", serviceProvider, portalAliasService);
+        Logger.LogWarning("<<< Exiting ServicesRoutingManager(serviceProvider={ServiceProvider},portalAliasService={PortalAliasService})", serviceProvider, portalAliasService);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ServicesRoutingManager"/> class.</summary>
@@ -57,10 +59,16 @@ namespace DotNetNuke.Web.Api.Internal
         /// <param name="routes">The route collection.</param>
         internal ServicesRoutingManager(IServiceProvider serviceProvider, IPortalAliasService portalAliasService, RouteCollection routes)
         {
+			Logger.LogError(">>> Entering ServicesRoutingManager(serviceProvider={ServiceProvider},portalAliasService={PortalAliasService},routes={Routes})", serviceProvider, portalAliasService, routes);
+			Logger.LogDebug("ServicesRoutingManager(serviceProvider={ServiceProvider},portalAliasService={PortalAliasService},routes={Routes}): routes → {Routes1}", serviceProvider, portalAliasService, routes, routes);
             this.serviceProvider = serviceProvider;
+			Logger.LogWarning("<<< Exiting ServicesRoutingManager(serviceProvider={ServiceProvider},portalAliasService={PortalAliasService},routes={Routes})", serviceProvider, portalAliasService, routes);
+			Logger.LogDebug("ServicesRoutingManager(serviceProvider={ServiceProvider},portalAliasService={PortalAliasService},routes={Routes}): this.serviceProvider → {Arg3}", serviceProvider, portalAliasService, routes, this.serviceProvider);
             this.routes = routes;
             portalAliasService ??= Globals.GetCurrentServiceProvider().GetRequiredService<IPortalAliasService>();
             this.portalAliasRouteManager = new PortalAliasRouteManager(portalAliasService);
+			Logger.LogDebug("ServicesRoutingManager(serviceProvider={ServiceProvider},portalAliasService={PortalAliasService},routes={Routes}): this.routes → {Arg3}", serviceProvider, portalAliasService, routes, this.routes);
+			Logger.LogDebug("ServicesRoutingManager(serviceProvider={ServiceProvider},portalAliasService={PortalAliasService},routes={Routes}): portalAliasRouteManager → {PortalAliasRouteManager}", serviceProvider, portalAliasService, routes, portalAliasRouteManager);
             this.TypeLocator = new TypeLocator();
         }
 
@@ -70,8 +78,10 @@ namespace DotNetNuke.Web.Api.Internal
         /// <inheritdoc />
         public IList<Route> MapHttpRoute(string moduleFolderName, string routeName, string url, object defaults, object constraints, string[] namespaces)
         {
+			Logger.LogError(">>> Entering MapHttpRoute(moduleFolderName={ModuleFolderName},routeName={RouteName},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces})", moduleFolderName, routeName, url, defaults, constraints, namespaces);
             if (namespaces == null || namespaces.Length == 0 || string.IsNullOrEmpty(namespaces[0]))
             {
+				Logger.LogError("Throwing ArgumentException from MapHttpRoute(moduleFolderName={ModuleFolderName},routeName={RouteName},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces})", moduleFolderName, routeName, url, defaults, constraints, namespaces);
                 throw new ArgumentException(Localization.GetExceptionMessage(
                     "ArgumentCannotBeNullOrEmpty",
                     "The argument '{0}' cannot be null or empty.",
@@ -81,15 +91,21 @@ namespace DotNetNuke.Web.Api.Internal
             Requires.NotNullOrEmpty("moduleFolderName", moduleFolderName);
 
             url = url.Trim('/', '\\');
+			Logger.LogError("MapHttpRoute(moduleFolderName={ModuleFolderName},routeName={RouteName},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces}): url → {Url1}", moduleFolderName, routeName, url, defaults, constraints, namespaces, url);
 
             var prefixCounts = this.portalAliasRouteManager.GetRoutePrefixCounts();
+			Logger.LogError("MapHttpRoute(moduleFolderName={ModuleFolderName},routeName={RouteName},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces}): prefixCounts → {PrefixCounts}", moduleFolderName, routeName, url, defaults, constraints, namespaces, prefixCounts);
             var mappedRoutes = new List<Route>();
+			Logger.LogError("MapHttpRoute(moduleFolderName={ModuleFolderName},routeName={RouteName},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces}): mappedRoutes → {MappedRoutes}", moduleFolderName, routeName, url, defaults, constraints, namespaces, mappedRoutes);
 
             foreach (var count in prefixCounts)
             {
                 var fullRouteName = this.portalAliasRouteManager.GetRouteName(moduleFolderName, routeName, count);
+				Logger.LogError("MapHttpRoute(moduleFolderName={ModuleFolderName},routeName={RouteName},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces}): fullRouteName → {FullRouteName}", moduleFolderName, routeName, url, defaults, constraints, namespaces, fullRouteName);
                 var routeUrl = this.portalAliasRouteManager.GetRouteUrl(moduleFolderName, url, count);
+				Logger.LogError("MapHttpRoute(moduleFolderName={ModuleFolderName},routeName={RouteName},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces}): routeUrl → {RouteUrl}", moduleFolderName, routeName, url, defaults, constraints, namespaces, routeUrl);
                 var route = this.MapHttpRouteWithNamespace(fullRouteName, routeUrl, defaults, constraints, namespaces);
+				Logger.LogError("MapHttpRoute(moduleFolderName={ModuleFolderName},routeName={RouteName},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces}): route → {Route}", moduleFolderName, routeName, url, defaults, constraints, namespaces, route);
                 mappedRoutes.Add(route);
                 if (Logger.IsTraceEnabled)
                 {
@@ -98,12 +114,16 @@ namespace DotNetNuke.Web.Api.Internal
 
                 // compatible with old service path: DesktopModules/{namespace}/API/{controller}/{action}.
                 var oldRouteName = $"{fullRouteName}-old";
+			Logger.LogWarning("<<< Exiting MapHttpRoute(moduleFolderName={ModuleFolderName},routeName={RouteName},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces})", moduleFolderName, routeName, url, defaults, constraints, namespaces);
+				Logger.LogError("MapHttpRoute(moduleFolderName={ModuleFolderName},routeName={RouteName},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces}): oldRouteName → {OldRouteName}", moduleFolderName, routeName, url, defaults, constraints, namespaces, oldRouteName);
 
 #pragma warning disable CS0618 // Type or member is obsolete
                 var oldRouteUrl = PortalAliasRouteManager.GetOldRouteUrl(moduleFolderName, url, count);
 #pragma warning restore CS0618 // Type or member is obsolete
+Logger.LogError("MapHttpRoute(moduleFolderName={ModuleFolderName},routeName={RouteName},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces}): oldRouteUrl → {OldRouteUrl}", moduleFolderName, routeName, url, defaults, constraints, namespaces, oldRouteUrl);
 
                 var oldRoute = this.MapHttpRouteWithNamespace(oldRouteName, oldRouteUrl, defaults, constraints, namespaces);
+				Logger.LogError("MapHttpRoute(moduleFolderName={ModuleFolderName},routeName={RouteName},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces}): oldRoute → {OldRoute}", moduleFolderName, routeName, url, defaults, constraints, namespaces, oldRoute);
                 mappedRoutes.Add(oldRoute);
                 if (Logger.IsTraceEnabled)
                 {
@@ -129,6 +149,7 @@ namespace DotNetNuke.Web.Api.Internal
         /// <inheritdoc />
         public void RegisterRoutes()
         {
+			Logger.LogError(">>> Entering RegisterRoutes()");
             // register routes is ONLY called from within DNN application initialization
             // which is well protected from races
             // allowing us to not worry about multi-threading threats here
@@ -144,6 +165,7 @@ namespace DotNetNuke.Web.Api.Internal
 
                 // this must run after all other auth message handlers
                 var handler = new WebFormsAuthMessageHandler();
+				Logger.LogError("RegisterRoutes(): handler → {Handler}", handler);
                 GlobalConfiguration.Configuration.MessageHandlers.Add(handler);
                 DnnAuthorizeAttribute.AppendToDefaultAuthTypes(handler.AuthScheme);
 
@@ -163,6 +185,7 @@ namespace DotNetNuke.Web.Api.Internal
                 // replace the default action filter provider with our own
                 GlobalConfiguration.Configuration.Services.Add(typeof(IFilterProvider), Globals.DependencyProvider.GetRequiredService<IFilterProvider>());
                 var defaultProvider = GlobalConfiguration.Configuration.Services.GetFilterProviders().Where(x => x is ActionDescriptorFilterProvider);
+				Logger.LogError("RegisterRoutes(): defaultProvider → {DefaultProvider}", defaultProvider);
                 GlobalConfiguration.Configuration.Services.Remove(typeof(IFilterProvider), defaultProvider);
 
                 // add standard tab and module id provider
@@ -176,6 +199,7 @@ namespace DotNetNuke.Web.Api.Internal
             }
 
             Logger.TraceFormat(CultureInfo.InvariantCulture, "Registered a total of {0} routes", this.routes.Count);
+			Logger.LogWarning("<<< Exiting RegisterRoutes()");
         }
 
         /// <summary>Determines whether the given <paramref name="type"/> is a valid <see cref="IServiceRouteMapper"/>.</summary>
@@ -183,36 +207,45 @@ namespace DotNetNuke.Web.Api.Internal
         /// <returns><see langword="true"/> if the <paramref name="type"/> is an accessible concrete class, otherwise <see langword="false"/>.</returns>
         internal static bool IsValidServiceRouteMapper(Type type)
         {
+			Logger.LogError(">>> Entering IsValidServiceRouteMapper(type={Type})", type);
+            Logger.LogWarning("<<< Exiting IsValidServiceRouteMapper(type={Type})", type);
             return type is { IsClass: true, IsAbstract: false, IsVisible: true, } && typeof(IServiceRouteMapper).IsAssignableFrom(type);
         }
 
         private static bool IsTracingEnabled()
         {
+			Logger.LogError(">>> Entering IsTracingEnabled()");
             var configValue = Config.GetSetting("EnableServicesFrameworkTracing");
 
+			Logger.LogError("IsTracingEnabled(): configValue → {ConfigValue}", configValue);
             if (!string.IsNullOrEmpty(configValue))
             {
                 return Convert.ToBoolean(configValue);
             }
 
+			Logger.LogWarning("<<< Exiting IsTracingEnabled()");
             return false;
         }
 
         private static void RegisterSystemRoutes()
         {
+			Logger.LogError(">>> Entering RegisterSystemRoutes()");
             ////_routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+			Logger.LogWarning("<<< Exiting RegisterSystemRoutes()");
         }
 
         private void RegisterAuthenticationHandlers()
         {
             // authentication message handlers from web.config file
             var authSvcCfg = AuthServicesConfiguration.GetConfig();
+			Logger.LogError("RegisterAuthenticationHandlers(): authSvcCfg → {AuthSvcCfg}", authSvcCfg);
             if (authSvcCfg?.MessageHandlers is not { Count: > 0 })
             {
                 return;
             }
 
             var registeredSchemes = new List<string>();
+			Logger.LogError("RegisterAuthenticationHandlers(): registeredSchemes → {RegisteredSchemes}", registeredSchemes);
             foreach (var handlerEntry in authSvcCfg.MessageHandlers.Cast<MessageHandlerEntry>())
             {
                 if (!handlerEntry.Enabled)
@@ -224,12 +257,15 @@ namespace DotNetNuke.Web.Api.Internal
                 try
                 {
                     var type = Reflection.CreateType(handlerEntry.ClassName, false);
+					Logger.LogError("RegisterAuthenticationHandlers(): type → {Type}", type);
                     if (ActivatorUtilities.CreateInstance(this.serviceProvider, type, handlerEntry.DefaultInclude, handlerEntry.ForceSsl) is not AuthMessageHandlerBase handler)
                     {
+						Logger.LogError("Throwing InvalidAuthHandlerException from RegisterAuthenticationHandlers()");
                         throw new InvalidAuthHandlerException("The handler is not a descendant of AuthMessageHandlerBase abstract class");
                     }
 
                     var schemeName = handler.AuthScheme.ToUpperInvariant();
+					Logger.LogError("RegisterAuthenticationHandlers(): schemeName → {SchemeName}", schemeName);
                     if (registeredSchemes.Contains(schemeName))
                     {
                         Logger.Trace($"The following handler scheme '{handlerEntry.ClassName}' is already added and will be skipped");
@@ -256,14 +292,17 @@ namespace DotNetNuke.Web.Api.Internal
                     Logger.Error("Cannot instantiate/activate instance of " + handlerEntry.ClassName + Environment.NewLine + ex);
                 }
             }
+			Logger.LogWarning("<<< Exiting RegisterAuthenticationHandlers()");
         }
 
         private void LocateServicesAndMapRoutes()
         {
+			Logger.LogError(">>> Entering LocateServicesAndMapRoutes()");
             RegisterSystemRoutes();
             this.ClearCachedRouteData();
 
             using var serviceScope = Globals.DependencyProvider.CreateScope();
+			Logger.LogError("LocateServicesAndMapRoutes(): serviceScope → {ServiceScope}", serviceScope);
             foreach (var routeMapper in this.GetServiceRouteMappers(serviceScope.ServiceProvider))
             {
                 try
@@ -275,24 +314,30 @@ namespace DotNetNuke.Web.Api.Internal
                     Logger.ErrorFormat(CultureInfo.InvariantCulture, "{0}.RegisterRoutes threw an exception.  {1}\r\n{2}", routeMapper.GetType().FullName, e.Message, e.StackTrace);
                 }
             }
+			Logger.LogWarning("<<< Exiting LocateServicesAndMapRoutes()");
         }
 
         private void ClearCachedRouteData()
         {
+			Logger.LogError(">>> Entering ClearCachedRouteData()");
             this.portalAliasRouteManager.ClearCachedData();
+			Logger.LogWarning("<<< Exiting ClearCachedRouteData()");
         }
 
         private IEnumerable<IServiceRouteMapper> GetServiceRouteMappers(IServiceProvider scopedServiceProvider)
         {
+			Logger.LogError(">>> Entering GetServiceRouteMappers(scopedServiceProvider={ScopedServiceProvider})", scopedServiceProvider);
             foreach (var routeMapperType in this.GetAllServiceRouteMapperTypes())
             {
                 IServiceRouteMapper routeMapper;
                 try
                 {
                     routeMapper = ActivatorUtilities.CreateInstance(scopedServiceProvider, routeMapperType) as IServiceRouteMapper;
+					Logger.LogError("GetServiceRouteMappers(scopedServiceProvider={ScopedServiceProvider}): routeMapper → {RouteMapper}", scopedServiceProvider, routeMapper);
                 }
                 catch (Exception e)
                 {
+					Logger.LogDebug("GetServiceRouteMappers(scopedServiceProvider={ScopedServiceProvider}): routeMapper → {RouteMapper}", scopedServiceProvider, routeMapper);
                     Logger.ErrorFormat(CultureInfo.InvariantCulture, "Unable to create {0} while registering service routes.  {1}", routeMapperType.FullName, e.Message);
                     routeMapper = null;
                 }
@@ -302,16 +347,21 @@ namespace DotNetNuke.Web.Api.Internal
                     yield return routeMapper;
                 }
             }
+			Logger.LogWarning("<<< Exiting GetServiceRouteMappers(scopedServiceProvider={ScopedServiceProvider})", scopedServiceProvider);
         }
 
         private IEnumerable<Type> GetAllServiceRouteMapperTypes()
         {
+			Logger.LogError(">>> Entering GetAllServiceRouteMapperTypes()");
+            Logger.LogWarning("<<< Exiting GetAllServiceRouteMapperTypes()");
             return this.TypeLocator.GetAllMatchingTypes(IsValidServiceRouteMapper);
         }
 
         private Route MapHttpRouteWithNamespace(string name, string url, object defaults, object constraints, string[] namespaces)
         {
+			Logger.LogError(">>> Entering MapHttpRouteWithNamespace(name={Name},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces})", name, url, defaults, constraints, namespaces);
             var route = this.routes.MapHttpRoute(name, url, defaults, constraints);
+			Logger.LogError("MapHttpRouteWithNamespace(name={Name},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces}): route → {Route}", name, url, defaults, constraints, namespaces, route);
             if (route.DataTokens == null)
             {
                 route.DataTokens = new RouteValueDictionary();
@@ -319,6 +369,7 @@ namespace DotNetNuke.Web.Api.Internal
 
             route.SetNameSpaces(namespaces);
             route.SetName(name);
+			Logger.LogWarning("<<< Exiting MapHttpRouteWithNamespace(name={Name},url={Url},defaults={Defaults},constraints={Constraints},namespaces={Namespaces})", name, url, defaults, constraints, namespaces);
             return route;
         }
     }

@@ -28,6 +28,8 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         public PathResolver(string manifestFolder)
             : this(null, manifestFolder)
         {
+		eventLogger.LogError(">>> Entering PathResolver(manifestFolder={ManifestFolder})", manifestFolder);
+        eventLogger.LogWarning("<<< Exiting PathResolver(manifestFolder={ManifestFolder})", manifestFolder);
         }
 
         /// <summary>To which folder is the path relative to.</summary>
@@ -58,6 +60,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>A resolved path.</returns>
         public string Resolve(string path, params RelativeTo[] roots)
         {
+			eventLogger.LogError(">>> Entering Resolve(path={Path},roots={Roots})", path, roots);
             var context = DNNContext.Current;
 
             var mappings = new Dictionary<string, RelativeTo>
@@ -75,6 +78,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 if (path.StartsWith(key, StringComparison.InvariantCultureIgnoreCase))
                 {
                     path = path.Substring(key.Length);
+					eventLogger.LogError("Resolve(path={Path},roots={Roots}): path → {Path1}", path, roots, path);
                     roots = [mappings[key],];
                     break;
                 }
@@ -90,10 +94,12 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 foreach (var root in roots)
                 {
                     string resolvedPath = null;
+					eventLogger.LogError("Resolve(path={Path},roots={Roots}): resolvedPath → {ResolvedPath}", path, roots, resolvedPath);
                     switch (root)
                     {
                         case RelativeTo.Container:
                             var container = context.HostControl;
+							eventLogger.LogError("Resolve(path={Path},roots={Roots}): container → {Container}", path, roots, container);
                             while (container != null && container is not UI.Containers.Container)
                             {
                                 container = container.Parent;
@@ -128,10 +134,14 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                     if (!string.IsNullOrEmpty(resolvedPath))
                     {
                         var sep = resolvedPath.LastIndexOf('/');
+						eventLogger.LogError("Resolve(path={Path},roots={Roots}): sep → {Sep}", path, roots, sep);
                         var dirName = resolvedPath.Substring(0, sep + 1);
+						eventLogger.LogError("Resolve(path={Path},roots={Roots}): dirName → {DirName}", path, roots, dirName);
                         var fileName = resolvedPath.Substring(sep + 1);
+						eventLogger.LogError("Resolve(path={Path},roots={Roots}): fileName → {FileName}", path, roots, fileName);
 
                         var mappedDir = HttpContext.Current.Server.MapPath(dirName);
+						eventLogger.LogError("Resolve(path={Path},roots={Roots}): mappedDir → {MappedDir}", path, roots, mappedDir);
                         mappedDir = mappedDir.Remove(mappedDir.Length - 1);
                         if (Directory.Exists(mappedDir))
                         {
@@ -141,6 +151,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                             }
 
                             var matches = Directory.GetFileSystemEntries(mappedDir, fileName);
+							eventLogger.LogError("Resolve(path={Path},roots={Roots}): matches → {Matches}", path, roots, matches);
                             if (matches.Length > 0)
                             {
                                 resolvedPath = (dirName + Path.GetFileName(matches[0])).Replace('\\', '/');
@@ -151,6 +162,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting Resolve(path={Path},roots={Roots})", path, roots);
             return path;
         }
     }

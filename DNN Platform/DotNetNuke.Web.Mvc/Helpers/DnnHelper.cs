@@ -56,6 +56,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public DnnHelper(IClientResourceController clientResourceController, IApplicationStatusInfo appStatus, IEventLogger eventLogger, ViewContext viewContext, IViewDataContainer viewDataContainer)
             : this(clientResourceController, appStatus, eventLogger, viewContext, viewDataContainer, RouteTable.Routes)
         {
+		eventLogger.LogError(">>> Entering DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},viewContext={ViewContext},viewDataContainer={ViewDataContainer})", clientResourceController, appStatus, eventLogger, viewContext, viewDataContainer);
+        eventLogger.LogWarning("<<< Exiting DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},viewContext={ViewContext},viewDataContainer={ViewDataContainer})", clientResourceController, appStatus, eventLogger, viewContext, viewDataContainer);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnHelper"/> class.</summary>
@@ -66,6 +68,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public DnnHelper(ViewContext viewContext, IViewDataContainer viewDataContainer, RouteCollection routeCollection)
             : this(null, null, null, new HtmlHelper(viewContext, viewDataContainer, routeCollection))
         {
+		eventLogger.LogError(">>> Entering DnnHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},routeCollection={RouteCollection})", viewContext, viewDataContainer, routeCollection);
+        eventLogger.LogWarning("<<< Exiting DnnHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},routeCollection={RouteCollection})", viewContext, viewDataContainer, routeCollection);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnHelper"/> class.</summary>
@@ -78,6 +82,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public DnnHelper(IClientResourceController clientResourceController, IApplicationStatusInfo appStatus, IEventLogger eventLogger, ViewContext viewContext, IViewDataContainer viewDataContainer, RouteCollection routeCollection)
             : this(clientResourceController, appStatus, eventLogger, new HtmlHelper(viewContext, viewDataContainer, routeCollection))
         {
+		eventLogger.LogError(">>> Entering DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},viewContext={ViewContext},viewDataContainer={ViewDataContainer},routeCollection={RouteCollection})", clientResourceController, appStatus, eventLogger, viewContext, viewDataContainer, routeCollection);
+        eventLogger.LogWarning("<<< Exiting DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},viewContext={ViewContext},viewDataContainer={ViewDataContainer},routeCollection={RouteCollection})", clientResourceController, appStatus, eventLogger, viewContext, viewDataContainer, routeCollection);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnHelper"/> class.</summary>
@@ -98,17 +104,24 @@ namespace DotNetNuke.Web.Mvc.Helpers
         {
             this.clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			eventLogger.LogDebug("DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},htmlHelper={HtmlHelper}): appStatus → {AppStatus1}", clientResourceController, appStatus, eventLogger, htmlHelper, appStatus);
+			eventLogger.LogDebug("DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},htmlHelper={HtmlHelper}): clientResourceController → {ClientResourceController1}", clientResourceController, appStatus, eventLogger, htmlHelper, clientResourceController);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},htmlHelper={HtmlHelper}): eventLogger → {EventLogger1}", clientResourceController, appStatus, eventLogger, htmlHelper, eventLogger);
             this.HtmlHelper = htmlHelper;
 
             if (htmlHelper.ViewContext.Controller is not IDnnController controller)
             {
+				eventLogger.LogDebug("DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},htmlHelper={HtmlHelper}): this.HtmlHelper → {Arg4}", clientResourceController, appStatus, eventLogger, htmlHelper, this.HtmlHelper);
+				eventLogger.LogError("Throwing InvalidOperationException from DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},htmlHelper={HtmlHelper})", clientResourceController, appStatus, eventLogger, htmlHelper);
                 throw new InvalidOperationException("The DnnHelper class can only be used in Views that inherit from DnnWebViewPage");
             }
 
             this.DnnPage = controller.DnnPage;
+			eventLogger.LogDebug("DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},htmlHelper={HtmlHelper}): this.DnnPage → {Arg4}", clientResourceController, appStatus, eventLogger, htmlHelper, this.DnnPage);
 
             this.ModuleContext = controller.ModuleContext;
+			eventLogger.LogDebug("DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},htmlHelper={HtmlHelper}): this.ModuleContext → {Arg4}", clientResourceController, appStatus, eventLogger, htmlHelper, this.ModuleContext);
             this.LocalResourceFile = controller.LocalResourceFile;
         }
 
@@ -140,6 +153,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
         public string LocalizeString(string key)
         {
+			eventLogger.LogError(">>> Entering LocalizeString(key={Key})", key);
+            eventLogger.LogWarning("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, this.LocalResourceFile);
         }
 
@@ -147,7 +162,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="filePath">The relative file path to the CSS resource.</param>
         public void DnnCssInclude(string filePath)
         {
+			eventLogger.LogError(">>> Entering DnnCssInclude(filePath={FilePath})", filePath);
             this.clientResourceController.RegisterStylesheet(filePath);
+			eventLogger.LogWarning("<<< Exiting DnnCssInclude(filePath={FilePath})", filePath);
         }
 
         /// <summary>Requests that a CSS file be registered on the client browser. Defaults to rendering in the page header.</summary>
@@ -156,6 +173,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public void DnnCssInclude(string filePath, int priority)
         {
             this.clientResourceController.RegisterStylesheet(filePath, (Abstractions.ClientResources.FileOrder.Css)priority);
+			eventLogger.LogError(">>> Entering DnnCssInclude(filePath={FilePath},priority={Priority})", filePath, priority);
+			eventLogger.LogWarning("<<< Exiting DnnCssInclude(filePath={FilePath},priority={Priority})", filePath, priority);
         }
 
         /// <summary>Requests that a CSS file be registered on the client browser. Defaults to rendering in the page header.</summary>
@@ -172,10 +191,13 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="provider">The provider name to be used to render the CSS file on the page.</param>
         public void DnnCssInclude(string filePath, int priority, string provider)
         {
+			eventLogger.LogError(">>> Entering DnnCssInclude(filePath={FilePath},priority={Priority},provider={Provider})", filePath, priority, provider);
             this.clientResourceController.CreateStylesheet(filePath)
                 .SetPriority(priority)
                 .SetProvider(provider)
                 .Register();
+				eventLogger.LogWarning("<<< Exiting DnnCssInclude(filePath={FilePath},priority={Priority},provider={Provider})", filePath, priority, provider);
+        eventLogger.LogWarning("<<< Exiting DnnCssInclude(filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version})", filePath, priority, provider, name, version);
         }
 
         /// <summary>Requests that a CSS file be registered on the client browser. Allows for overriding the default provider.</summary>
@@ -186,6 +208,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="version">Version nr of framework.</param>
         public void DnnCssInclude(string filePath, int priority, string provider, string name, string version)
         {
+			eventLogger.LogError(">>> Entering DnnCssInclude(filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version})", filePath, priority, provider, name, version);
             this.clientResourceController.CreateStylesheet(filePath)
                 .SetPriority(priority)
                 .SetProvider(provider)
@@ -197,7 +220,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="filePath">The relative file path to the JavaScript resource.</param>
         public void DnnJsInclude(string filePath)
         {
+			eventLogger.LogError(">>> Entering DnnJsInclude(filePath={FilePath})", filePath);
             this.clientResourceController.RegisterScript(filePath);
+			eventLogger.LogWarning("<<< Exiting DnnJsInclude(filePath={FilePath})", filePath);
         }
 
         /// <summary>Requests that a JavaScript file be registered on the client browser.</summary>
@@ -206,6 +231,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public void DnnJsInclude(string filePath, int priority)
         {
             this.clientResourceController.RegisterScript(filePath, (Abstractions.ClientResources.FileOrder.Js)priority);
+			eventLogger.LogError(">>> Entering DnnJsInclude(filePath={FilePath},priority={Priority})", filePath, priority);
+			eventLogger.LogWarning("<<< Exiting DnnJsInclude(filePath={FilePath},priority={Priority})", filePath, priority);
         }
 
         /// <summary>Requests that a JavaScript file be registered on the client browser.</summary>
@@ -222,10 +249,13 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="provider">The name of the provider responsible for rendering the script output.</param>
         public void DnnJsInclude(string filePath, int priority, string provider)
         {
+			eventLogger.LogError(">>> Entering DnnJsInclude(filePath={FilePath},priority={Priority},provider={Provider})", filePath, priority, provider);
             this.clientResourceController.CreateScript(filePath)
                 .SetPriority(priority)
                 .SetProvider(provider)
                 .Register();
+				eventLogger.LogWarning("<<< Exiting DnnJsInclude(filePath={FilePath},priority={Priority},provider={Provider})", filePath, priority, provider);
+        eventLogger.LogWarning("<<< Exiting DnnJsInclude(filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version})", filePath, priority, provider, name, version);
         }
 
         /// <summary>Requests that a JavaScript file be registered on the client browser.</summary>
@@ -236,6 +266,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="version">Version nr of framework.</param>
         public void DnnJsInclude(string filePath, int priority, string provider, string name, string version)
         {
+			eventLogger.LogError(">>> Entering DnnJsInclude(filePath={FilePath},priority={Priority},provider={Provider},name={Name},version={Version})", filePath, priority, provider, name, version);
             this.clientResourceController.CreateStylesheet(filePath)
                 .SetPriority(priority)
                 .SetProvider(provider)
@@ -248,7 +279,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void JavaScriptLibraryInclude(string name)
         {
+			eventLogger.LogError(">>> Entering JavaScriptLibraryInclude(name={Name})", name);
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.PortalSettings, name);
+			eventLogger.LogWarning("<<< Exiting JavaScriptLibraryInclude(name={Name})", name);
         }
 
         /// <summary>Requests that a script from a JavaScript Library be registered on the client browser.</summary>
@@ -257,7 +290,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void JavaScriptLibraryInclude(string name, Version version)
         {
+			eventLogger.LogError(">>> Entering JavaScriptLibraryInclude(name={Name},version={Version})", name, version);
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.PortalSettings, name, version);
+			eventLogger.LogWarning("<<< Exiting JavaScriptLibraryInclude(name={Name},version={Version})", name, version);
         }
 
         /// <summary>Requests that a script from a JavaScript Library be registered on the client browser.</summary>
@@ -273,7 +308,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void JavaScriptLibraryInclude(string name, Version version, SpecificVersion specificVersion)
         {
+			eventLogger.LogError(">>> Entering JavaScriptLibraryInclude(name={Name},version={Version},specificVersion={SpecificVersion})", name, version, specificVersion);
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.PortalSettings, name, version, specificVersion);
+			eventLogger.LogWarning("<<< Exiting JavaScriptLibraryInclude(name={Name},version={Version},specificVersion={SpecificVersion})", name, version, specificVersion);
         }
     }
 }

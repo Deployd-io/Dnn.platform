@@ -29,6 +29,7 @@ namespace DotNetNuke.Services.SystemHealth
         /// </remarks>
         public WebServerMonitor(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogError(">>> Entering WebServerMonitor(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             this.ScheduleHistoryItem = objScheduleHistoryItem;
         }
 
@@ -56,6 +57,7 @@ namespace DotNetNuke.Services.SystemHealth
                 Logger.ErrorFormat(CultureInfo.InvariantCulture, "Error in WebServerMonitor: {0}. {1}", exc.Message, exc.StackTrace);
                 Exceptions.LogException(exc);
             }
+			Logger.LogWarning("<<< Exiting DoWork()");
         }
 
         private static void UpdateCurrentServerActivity()
@@ -64,19 +66,25 @@ namespace DotNetNuke.Services.SystemHealth
 
             // Creating a new ServerInfo object, by default points it at the current server
             var currentServer = new ServerInfo();
+			Logger.LogError("UpdateCurrentServerActivity(): currentServer → {CurrentServer}", currentServer);
             ServerController.UpdateServerActivity(currentServer);
 
             Logger.Info("Finished UpdateCurrentServerActivity");
+			Logger.LogWarning("<<< Exiting UpdateCurrentServerActivity()");
         }
 
         private static void DisableServersWithoutRecentActivity()
         {
+			Logger.LogError(">>> Entering DisableServersWithoutRecentActivity()");
             var serversWithActivity = ServerController.GetEnabledServersWithActivity();
             var newServer = serversWithActivity.FirstOrDefault();
+			Logger.LogError("DisableServersWithoutRecentActivity(): newServer → {NewServer}", newServer);
+			Logger.LogError("DisableServersWithoutRecentActivity(): serversWithActivity → {ServersWithActivity}", serversWithActivity);
 
             foreach (var s in ServerController.GetInActiveServers(10))
             {
                 s.Enabled = false;
+				Logger.LogDebug("DisableServersWithoutRecentActivity(): s.Enabled → {Arg0}", s.Enabled);
                 ServerController.UpdateServerActivity(s);
 
                 // Update the schedules that were running on that server, that may never have been loaded
@@ -85,13 +93,16 @@ namespace DotNetNuke.Services.SystemHealth
                     SchedulingController.ReplaceServer(s, newServer);
                 }
             }
+			Logger.LogWarning("<<< Exiting DisableServersWithoutRecentActivity()");
         }
 
         private static void RemoveInActiveServers()
         {
             Logger.Info("Starting RemoveInActiveServers");
             var serversWithActivity = ServerController.GetEnabledServersWithActivity();
+			Logger.LogError("RemoveInActiveServers(): serversWithActivity → {ServersWithActivity}", serversWithActivity);
             var newServer = serversWithActivity.FirstOrDefault();
+			Logger.LogError("RemoveInActiveServers(): newServer → {NewServer}", newServer);
 
             foreach (var s in ServerController.GetInActiveServers(1440))
             {
@@ -105,6 +116,7 @@ namespace DotNetNuke.Services.SystemHealth
             }
 
             Logger.Info("Finished RemoveInActiveServers");
+			Logger.LogWarning("<<< Exiting RemoveInActiveServers()");
         }
     }
 }

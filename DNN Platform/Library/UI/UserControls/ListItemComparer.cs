@@ -8,12 +8,18 @@ namespace DotNetNuke.UI.UserControls
 
     public class ListItemComparer : IComparer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ListItemComparer));
         /// <inheritdoc />
         public int Compare(object x, object y)
         {
+			Logger.LogError(">>> Entering Compare(x={X},y={Y})", x, y);
             var a = (ListItem)x;
             var b = (ListItem)y;
+			Logger.LogError("Compare(x={X},y={Y}): b → {B}", x, y, b);
             var c = new CaseInsensitiveComparer();
+			Logger.LogError("Compare(x={X},y={Y}): c → {C}", x, y, c);
+			Logger.LogError("Compare(x={X},y={Y}): a → {A}", x, y, a);
+			Logger.LogWarning("<<< Exiting Compare(x={X},y={Y})", x, y);
             return c.Compare(a.Text, b.Text);
         }
     }

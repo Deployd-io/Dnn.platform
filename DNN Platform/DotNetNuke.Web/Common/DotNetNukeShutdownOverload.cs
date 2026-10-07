@@ -30,6 +30,7 @@ namespace DotNetNuke.Web.Common.Internal
         /// <param name="appStatus">The application status.</param>
         internal static void InitializeFcnSettings(IApplicationStatusInfo appStatus)
         {
+			Logger.LogError(">>> Entering InitializeFcnSettings(appStatus={AppStatus})", appStatus);
             // any error/message logged below should be informational only
             try
             {
@@ -54,6 +55,7 @@ namespace DotNetNuke.Web.Common.Internal
                     Logger.Info("FCNMode = " + fcnVal + " (Modes: NotSet/Default=0, Disabled=1, Single=2)");
 
                     var dirMonCompletion = typeof(HttpRuntime).Assembly.GetType("System.Web.DirMonCompletion");
+					Logger.LogError("InitializeFcnSettings(appStatus={AppStatus}): dirMonCompletion → {DirMonCompletion}", appStatus, dirMonCompletion);
                     var dirMonCount = (int)dirMonCompletion.InvokeMember(
                         "_activeDirMonCompletions",
                         BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.GetField,
@@ -74,10 +76,12 @@ namespace DotNetNuke.Web.Common.Internal
             {
                 Logger.Info(e);
             }
+			Logger.LogWarning("<<< Exiting InitializeFcnSettings(appStatus={AppStatus})", appStatus);
         }
 
         private static void AddSiteFilesMonitoring(IApplicationStatusInfo appStatus, bool handleShutdowns)
         {
+			Logger.LogError(">>> Entering AddSiteFilesMonitoring(appStatus={AppStatus},handleShutdowns={HandleShutdowns})", appStatus, handleShutdowns);
             if (binOrRootWatcher == null)
             {
                 lock (typeof(Initialize))
@@ -87,19 +91,25 @@ namespace DotNetNuke.Web.Common.Internal
                         try
                         {
                             DotNetNukeShutdownOverload.handleShutdowns = handleShutdowns;
+							Logger.LogDebug("AddSiteFilesMonitoring(appStatus={AppStatus},handleShutdowns={HandleShutdowns}): DotNetNukeShutdownOverload.handleShutdowns → {Arg2}", appStatus, handleShutdowns, DotNetNukeShutdownOverload.handleShutdowns);
                             if (DotNetNukeShutdownOverload.handleShutdowns)
                             {
                                 shutDownDelayTimer = new Timer(InitiateShutdown);
+								Logger.LogError("AddSiteFilesMonitoring(appStatus={AppStatus},handleShutdowns={HandleShutdowns}): shutDownDelayTimer → {ShutDownDelayTimer}", appStatus, handleShutdowns, shutDownDelayTimer);
+								Logger.LogDebug("AddSiteFilesMonitoring(appStatus={AppStatus},handleShutdowns={HandleShutdowns}): shutDownDelayTimer → {ShutDownDelayTimer}", appStatus, handleShutdowns, shutDownDelayTimer);
                             }
 
                             binFolder = Path.Combine(appStatus.ApplicationMapPath, "bin").ToLowerInvariant();
+							Logger.LogDebug("AddSiteFilesMonitoring(appStatus={AppStatus},handleShutdowns={HandleShutdowns}): binFolder → {BinFolder}", appStatus, handleShutdowns, binFolder);
                             binOrRootWatcher = new FileSystemWatcher
                             {
+								Logger.LogError("AddSiteFilesMonitoring(appStatus={AppStatus},handleShutdowns={HandleShutdowns}): binFolder → {BinFolder}", appStatus, handleShutdowns, binFolder);
                                 Filter = "*.*",
                                 Path = handleShutdowns ? binFolder : appStatus.ApplicationMapPath,
                                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
                                 IncludeSubdirectories = true,
                             };
+							Logger.LogDebug("AddSiteFilesMonitoring(appStatus={AppStatus},handleShutdowns={HandleShutdowns}): binOrRootWatcher → {BinOrRootWatcher}", appStatus, handleShutdowns, binOrRootWatcher);
 
                             binOrRootWatcher.Created += WatcherOnCreated;
                             binOrRootWatcher.Deleted += WatcherOnDeleted;
@@ -109,6 +119,7 @@ namespace DotNetNuke.Web.Common.Internal
 
                             // begin watching;
                             binOrRootWatcher.EnableRaisingEvents = true;
+							Logger.LogDebug("AddSiteFilesMonitoring(appStatus={AppStatus},handleShutdowns={HandleShutdowns}): binOrRootWatcher.EnableRaisingEvents → {Arg2}", appStatus, handleShutdowns, binOrRootWatcher.EnableRaisingEvents);
                             Logger.Trace("Added watcher for: " + binOrRootWatcher.Path + @"\" + binOrRootWatcher.Filter);
                         }
                         catch (Exception ex)
@@ -118,10 +129,12 @@ namespace DotNetNuke.Web.Common.Internal
                     }
                 }
             }
+			Logger.LogWarning("<<< Exiting AddSiteFilesMonitoring(appStatus={AppStatus},handleShutdowns={HandleShutdowns})", appStatus, handleShutdowns);
         }
 
         private static void InitiateShutdown(object state)
         {
+			Logger.LogError(">>> Entering InitiateShutdown(state={State})", state);
             if (!handleShutdowns)
             {
                 return;
@@ -134,24 +147,30 @@ namespace DotNetNuke.Web.Common.Internal
             catch (Exception ex)
             {
                 shutdownInprogress = false;
+				Logger.LogDebug("InitiateShutdown(state={State}): shutdownInprogress → {ShutdownInprogress}", state, shutdownInprogress);
                 Logger.Error(ex);
             }
+			Logger.LogWarning("<<< Exiting InitiateShutdown(state={State})", state);
         }
 
         private static void ShceduleShutdown()
         {
+			Logger.LogError(">>> Entering ShceduleShutdown()");
             // no need for locking; worst case is timer extended a bit more
             if (handleShutdowns && !shutdownInprogress)
             {
                 shutdownInprogress = true;
+				Logger.LogDebug("ShceduleShutdown(): shutdownInprogress → {ShutdownInprogress}", shutdownInprogress);
 
                 // delay for a very short period
                 shutDownDelayTimer.Change(1500, Timeout.Infinite);
             }
+			Logger.LogWarning("<<< Exiting ShceduleShutdown()");
         }
 
         private static void WatcherOnChanged(object sender, FileSystemEventArgs e)
         {
+			Logger.LogError(">>> Entering WatcherOnChanged(sender={Sender},e={E})", sender, e);
             if (Logger.IsInfoEnabled && !e.FullPath.EndsWith(".log.resources", StringComparison.OrdinalIgnoreCase))
             {
                 Logger.Info($"Watcher Activity: {e.ChangeType}. Path: {e.FullPath}");
@@ -161,10 +180,12 @@ namespace DotNetNuke.Web.Common.Internal
             {
                 ShceduleShutdown();
             }
+			Logger.LogWarning("<<< Exiting WatcherOnChanged(sender={Sender},e={E})", sender, e);
         }
 
         private static void WatcherOnCreated(object sender, FileSystemEventArgs e)
         {
+			Logger.LogError(">>> Entering WatcherOnCreated(sender={Sender},e={E})", sender, e);
             if (Logger.IsInfoEnabled && !e.FullPath.EndsWith(".log.resources", StringComparison.OrdinalIgnoreCase))
             {
                 Logger.Info($"Watcher Activity: {e.ChangeType}. Path: {e.FullPath}");
@@ -174,10 +195,12 @@ namespace DotNetNuke.Web.Common.Internal
             {
                 ShceduleShutdown();
             }
+			Logger.LogWarning("<<< Exiting WatcherOnCreated(sender={Sender},e={E})", sender, e);
         }
 
         private static void WatcherOnRenamed(object sender, RenamedEventArgs e)
         {
+			Logger.LogError(">>> Entering WatcherOnRenamed(sender={Sender},e={E})", sender, e);
             if (Logger.IsInfoEnabled && !e.FullPath.EndsWith(".log.resources", StringComparison.OrdinalIgnoreCase))
             {
                 Logger.Info($"Watcher Activity: {e.ChangeType}. New Path: {e.FullPath}. Old Path: {e.OldFullPath}");
@@ -187,10 +210,12 @@ namespace DotNetNuke.Web.Common.Internal
             {
                 ShceduleShutdown();
             }
+			Logger.LogWarning("<<< Exiting WatcherOnRenamed(sender={Sender},e={E})", sender, e);
         }
 
         private static void WatcherOnDeleted(object sender, FileSystemEventArgs e)
         {
+			Logger.LogError(">>> Entering WatcherOnDeleted(sender={Sender},e={E})", sender, e);
             if (Logger.IsInfoEnabled && !e.FullPath.EndsWith(".log.resources", StringComparison.OrdinalIgnoreCase))
             {
                 Logger.Info($"Watcher Activity: {e.ChangeType}. Path: {e.FullPath}");
@@ -200,14 +225,17 @@ namespace DotNetNuke.Web.Common.Internal
             {
                 ShceduleShutdown();
             }
+			Logger.LogWarning("<<< Exiting WatcherOnDeleted(sender={Sender},e={E})", sender, e);
         }
 
         private static void WatcherOnError(object sender, ErrorEventArgs e)
         {
+			Logger.LogError(">>> Entering WatcherOnError(sender={Sender},e={E})", sender, e);
             if (Logger.IsInfoEnabled)
             {
                 Logger.Info("Watcher Activity: N/A. Error: " + e.GetException());
             }
+			Logger.LogWarning("<<< Exiting WatcherOnError(sender={Sender},e={E})", sender, e);
         }
     }
 }

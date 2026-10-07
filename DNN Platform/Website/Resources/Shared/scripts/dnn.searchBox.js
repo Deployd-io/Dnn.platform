@@ -1,8 +1,13 @@
-﻿(function ($, window) {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+(function ($, window) {
 
     $.dnnSearchBox = function (options, element) {
+		logger.error(`>>> Entering dnnSearchBox(options=${options},element=${element})`, { "event.action": "dnnSearchBox", "logrite.options": options });
         this.$el = $(element);
         this._init(options);
+		logger.warn(`<<< Exiting dnnSearchBox(options=${options},element=${element})`, { "event.action": "dnnSearchBox", "logrite.options": options });
+		logger.error(`>>> Entering dnnSearchBox(options=${options})`, { "event.action": "dnnSearchBox", "logrite.options": options });
+		logger.warn(`<<< Exiting dnnSearchBox(options=${options})`, { "event.action": "dnnSearchBox", "logrite.options": options });
     };
 
     $.dnnSearchBox.defaults = {
@@ -28,16 +33,23 @@
 
     $.dnnSearchBox.prototype = {
         _init: function (options) {
+			logger.error(`>>> Entering _init(options=${options})`, { "event.action": "_init", "logrite.options": options });
             this.options = $.extend(true, {}, $.dnnSearchBox.defaults, options);
             this._generateTemplate();
+			logger.debug(`_init(options=${options}): options → ${options}`, { "event.action": "_init", "logrite.options": options });
             this._attachEvents();
+			logger.warn(`<<< Exiting _init(options=${options})`, { "event.action": "_init", "logrite.options": options });
         },
 
         _generateTemplate: function () {
+			logger.error('>>> Entering _generateTemplate()', { "event.action": "_generateTemplate" });
             var originalVal = this.$el.val();
             var markup = '<div class="dnnSearchBox">';
+			logger.error(`_generateTemplate(): originalVal → ${originalVal}`, { "event.action": "_generateTemplate" });
+			logger.error(`_generateTemplate(): markup → ${markup}`, { "event.action": "_generateTemplate" });
             var advancedEnabled = this.options.showAdvanced && this.options.advancedId && $('#' + this.options.advancedId).length;
             if (advancedEnabled) {
+				logger.error(`_generateTemplate(): advancedEnabled → ${advancedEnabled}`, { "event.action": "_generateTemplate" });
                 markup += '<span class="dnnSearchBox_advanced_query"></span><a class="dnnSearchBoxClearAdvanced"></a>';
             }
             markup += '<input id="' + this.options.id + '_input" type="text" autocomplete="off" aria-label="Search" />' +
@@ -58,27 +70,34 @@
             this.$el.hide();
             this.$wrap = $(markup).insertAfter(this.$el);
             var wrapWidth = this.$wrap.width();
+			logger.error(`_generateTemplate(): wrapWidth → ${wrapWidth}`, { "event.action": "_generateTemplate" });
             this.realInput = $('#' + this.options.id + '_input');
 
             this.realInput.val(originalVal);
 
             var realInputRight = 50;
             var advancedDropdown = $('.dnnSearchBox_advanced_dropdown', this.$wrap);
+			logger.error(`_generateTemplate(): advancedDropdown → ${advancedDropdown}`, { "event.action": "_generateTemplate" });
             var advancedForm = $('#' + this.options.advancedId);
+			logger.error(`_generateTemplate(): advancedForm → ${advancedForm}`, { "event.action": "_generateTemplate" });
             if (advancedEnabled) {
                 advancedForm.appendTo(advancedDropdown);
                 var w = $('.dnnSearchBox_advanced', this.$wrap).width();
+				logger.error(`_generateTemplate(): w → ${w}`, { "event.action": "_generateTemplate" });
                 var w2 = $('.dnnSearchBox_advanced_query', this.$wrap).width();
+				logger.error(`_generateTemplate(): w2 → ${w2}`, { "event.action": "_generateTemplate" });
                 realInputRight = w + w2 + 50;
                 $('.dnnSearchBox_advanced_query', this.$wrap).hide();
             }
             this.realInput.css({ right: realInputRight, width: wrapWidth - realInputRight - 8 });
             if (originalVal) {
                 this.realInput.next().addClass('dnnShow').css({ right: realInputRight - 15});
+				logger.warn('<<< Exiting _generateTemplate()', { "event.action": "_generateTemplate" });
             }
         },    
 
         _makeUrl: function (param, service) {
+			logger.error(`>>> Entering _makeUrl(param=${param},service=${service})`, { "event.action": "_makeUrl", "logrite.param": param, "logrite.service": service });
             var url = this.options.previewUrl ? this.options.previewUrl :
                     service ? service.getServiceRoot('internalservices') + 'searchService/preview' : null;
             if (!url) return null;
@@ -93,16 +112,19 @@
             if (urlAppend.length) {
                 url += url.indexOf('?') === -1 ? '?' : '&';
                 url += urlAppend.join('&');
+				logger.warn(`<<< Exiting _makeUrl(param=${param},service=${service})`, { "event.action": "_makeUrl", "logrite.param": param, "logrite.service": service });
             }
             return url;
         },
 
         _generatePreviewTemplate: function (keyword, data) {
+			logger.error(`>>> Entering _generatePreviewTemplate(keyword=${keyword},data=${data})`, { "event.action": "_generatePreviewTemplate", "logrite.keyword": keyword, "logrite.data": data });
             var preview = $('.dnnSearchBox_preview', this.$wrap);
             if (preview.length)
                 preview.remove();
 
             var markup = '<ul class="dnnSearchBox_preview">';
+			logger.error(`_generatePreviewTemplate(keyword=${keyword},data=${data}): markup → ${markup}`, { "event.action": "_generatePreviewTemplate", "logrite.keyword": keyword, "logrite.data": data });
             if (data && data.length) {                
 
                 for (var i = 0; i < data.length; i++) {
@@ -145,13 +167,16 @@
 
             //attach see more
             var searchBtn = $('.dnnSearchButton', this.$wrap);
+			logger.error(`_generatePreviewTemplate(keyword=${keyword},data=${data}): searchBtn → ${searchBtn}`, { "event.action": "_generatePreviewTemplate", "logrite.keyword": keyword, "logrite.data": data });
             $('.dnnSearchBox_preview_more', this.$wrap).on('click', function () {
                 searchBtn.triggerHandler('click');
+				logger.warn(`<<< Exiting _generatePreviewTemplate(keyword=${keyword},data=${data})`, { "event.action": "_generatePreviewTemplate", "logrite.keyword": keyword, "logrite.data": data });
                 return false;
             });
         },
 
         _search: function (val) {
+			logger.error(`>>> Entering _search(val=${val})`, { "event.action": "_search", "logrite.val": val });
             if (this.options.searchFunction && typeof this.options.searchFunction == 'function') {
                 var params = {};
                 params[this.options.searchQueryParamName] = encodeURIComponent(val);
@@ -162,19 +187,24 @@
                 urlAppend.push([this.options.searchFiltersParamName, ''].join('='));
 
                 this.options.searchFunction(val, urlAppend);
+				logger.warn(`<<< Exiting _search(val=${val})`, { "event.action": "_search", "logrite.val": val });
             }
         },
         
         _ignoreKeyCodes: [9, 13, 16, 17, 18, 19, 20, 27, 33, 34, 35, 36, 37, 38, 39, 40, 45],
 
         _attachEvents: function () {
+			logger.error('>>> Entering _attachEvents()', { "event.action": "_attachEvents" });
             var self = this;
             var realInput = this.realInput;
             var clearTextBtn = $('a.dnnSearchBoxClearText', this.$wrap);
+			logger.error(`_attachEvents(): clearTextBtn → ${clearTextBtn}`, { "event.action": "_attachEvents" });
             var advanced = $('.dnnSearchBox_advanced', this.$wrap);
+			logger.error(`_attachEvents(): advanced → ${advanced}`, { "event.action": "_attachEvents" });
 
             // placeholder stuff
             var placeholderSupported = ('placeholder' in document.createElement('input'));
+			logger.error(`_attachEvents(): placeholderSupported → ${placeholderSupported}`, { "event.action": "_attachEvents" });
             if (placeholderSupported)
                 realInput.attr('placeholder', this.options.defaultText);
             else {
@@ -224,12 +254,16 @@
                                     url: url,
                                     beforeSend: service ? service.setModuleHeaders : null,
                                     success: function (result) {
+										logger.error(`>>> Entering success(result=${result})`, { "event.action": "success", "logrite.result": result });
                                         if (result)
                                             self._generatePreviewTemplate(val, result);
+											logger.warn(`<<< Exiting success(result=${result})`, { "event.action": "success", "logrite.result": result });
                                     },
                                     error: function (jqXhr, textStatus, errorThrown) {
+										logger.error(`>>> Entering error(jqXhr=${jqXhr},textStatus=${textStatus},errorThrown=${errorThrown})`, { "event.action": "error", "logrite.jqXhr": jqXhr, "logrite.textStatus": textStatus, "logrite.errorThrown": errorThrown });
                                         if ($.isFunction(self.options.previewOnError)) {
                                             self.options.previewOnError(jqXhr, textStatus, errorThrown);
+											logger.warn(`<<< Exiting error(jqXhr=${jqXhr},textStatus=${textStatus},errorThrown=${errorThrown})`, { "event.action": "error", "logrite.jqXhr": jqXhr, "logrite.textStatus": textStatus, "logrite.errorThrown": errorThrown });
                                         }
                                     },
                                     type: 'GET',
@@ -278,7 +312,9 @@
 
             if (this.options.showAdvanced) {
                 var advancedLabel = $('.dnnSearchBox_advanced_label', advanced);
+				logger.error(`_attachEvents(): advancedLabel → ${advancedLabel}`, { "event.action": "_attachEvents" });
                 var advancedContent = $('.dnnSearchBox_advanced_dropdown', advanced);
+				logger.error(`_attachEvents(): advancedContent → ${advancedContent}`, { "event.action": "_attachEvents" });
 
                 advancedLabel.on('click', function () {
                     advancedLabel.toggleClass('dnnExpanded');
@@ -317,6 +353,7 @@
                 var val = realInput.val();
                 if (val) {
                     self._search(val);
+					logger.warn('<<< Exiting _attachEvents()', { "event.action": "_attachEvents" });
                 }
                 return false;
             });
@@ -326,6 +363,7 @@
     $.fn.dnnSearchBox = function (options) {
         var instance = $.data(this, 'dnnSearchBox');
 
+		logger.error(`dnnSearchBox(options=${options}): instance → ${instance}`, { "event.action": "dnnSearchBox", "logrite.options": options });
         if (instance) {
             instance._init();
         }

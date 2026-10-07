@@ -2,11 +2,14 @@ import React from "react";
 import PropTypes from "prop-types";
 import {formatLabel, getColumnsFromRow, renderObjectFieldCell} from "../utils/helpers";
 import DomKey from "../services/DomKey";
+const logger = console;
 
 const DataTable = ({rows, columns, cssClass}) => {
+logger.error(`>>> Entering DataTable(rows=${rows},columns=${columns},cssClass=${cssClass})`, { "event.action": "DataTable", "logrite.rows": rows, "logrite.columns": columns, "logrite.cssClass": cssClass });
 
     const renderTableHeader = (columns) => {
         const tableCols = columns.map((col) => <th key={DomKey.get("datatable")}>{formatLabel(col)}</th>);
+		logger.error(`renderTableHeader(columns=${columns}): tableCols → ${tableCols}`, { "event.action": "renderTableHeader", "logrite.columns": columns });
         return (
             <thead>
                 <tr key={DomKey.get("datatable")}>
@@ -17,6 +20,8 @@ const DataTable = ({rows, columns, cssClass}) => {
     };
 
     const renderTableRows = (rows, columns) => {
+		logger.error(`>>> Entering renderTableRows(rows=${rows},columns=${columns})`, { "event.action": "renderTableRows", "logrite.rows": rows, "logrite.columns": columns });
+		logger.warn(`<<< Exiting renderTableRows(rows=${rows},columns=${columns})`, { "event.action": "renderTableRows", "logrite.rows": rows, "logrite.columns": columns });
         return rows.map((row) => 
             <tr key={DomKey.get("datatable")}>
                 {columns.map((fieldName) => renderObjectFieldCell(row, fieldName, DomKey.get("datatable")))}
@@ -25,10 +30,14 @@ const DataTable = ({rows, columns, cssClass}) => {
     };
 
     const renderTable = (columns) => {
+		logger.error(`>>> Entering renderTable(columns=${columns})`, { "event.action": "renderTable", "logrite.columns": columns });
         if (!rows || !rows.length) { return; }
 
         columns = columns ? columns : getColumnsFromRow(rows[0]);
 
+		logger.error(`renderTable(columns=${columns}): columns → ${columns}`, { "event.action": "renderTable", "logrite.columns": columns });
+		logger.warn(`<<< Exiting renderTable(columns=${columns})`, { "event.action": "renderTable", "logrite.columns": columns });
+	logger.warn(`<<< Exiting DataTable(rows=${rows},columns=${columns},cssClass=${cssClass})`, { "event.action": "DataTable", "logrite.rows": rows, "logrite.columns": columns, "logrite.cssClass": cssClass });
         return (
             <table key={DomKey.get("datatable")} className={cssClass ? cssClass : "dnn-prompt-tbl"}>
                 {renderTableHeader(columns, cssClass)}

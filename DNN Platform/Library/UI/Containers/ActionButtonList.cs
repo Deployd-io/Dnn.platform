@@ -30,6 +30,8 @@ namespace DotNetNuke.UI.Containers
         public ActionButtonList()
             : this(null)
         {
+		eventLogger.LogError(">>> Entering ActionButtonList()");
+        eventLogger.LogWarning("<<< Exiting ActionButtonList()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ActionButtonList"/> class.</summary>
@@ -37,6 +39,8 @@ namespace DotNetNuke.UI.Containers
         public ActionButtonList(IEventLogger eventLogger)
         {
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("ActionButtonList(eventLogger={EventLogger}): eventLogger → {EventLogger1}", eventLogger, eventLogger);
+        eventLogger.LogWarning("<<< Exiting ActionButtonList(eventLogger={EventLogger})", eventLogger);
         }
 
         /// <inheritdoc />
@@ -83,13 +87,16 @@ namespace DotNetNuke.UI.Containers
         /// <param name="e">The event arguments.</param>
         protected virtual void OnAction(ActionEventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnAction(e={E})", e);
             this.Action?.Invoke(this, e);
+			eventLogger.LogWarning("<<< Exiting OnAction(e={E})", e);
         }
 
         /// <summary>OnLoad runs when the control is loaded into the Control Tree.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             if (this.ModuleControl == null)
             {
@@ -102,9 +109,17 @@ namespace DotNetNuke.UI.Containers
                 {
                     // Create a new ActionCommandButton
                     var actionButton = new ActionCommandButton();
+					eventLogger.LogError("OnLoad(e={E}): actionButton → {ActionButton}", e, actionButton);
 
                     // Set all the properties
                     actionButton.ModuleAction = action;
+					eventLogger.LogDebug("OnLoad(e={E}): actionButton.ModuleAction → {Arg1}", e, actionButton.ModuleAction);
+					eventLogger.LogDebug("OnLoad(e={E}): actionButton.ModuleControl → {Arg1}", e, actionButton.ModuleControl);
+					eventLogger.LogDebug("OnLoad(e={E}): actionButton.CommandName → {Arg1}", e, actionButton.CommandName);
+					eventLogger.LogDebug("OnLoad(e={E}): actionButton.CssClass → {Arg1}", e, actionButton.CssClass);
+					eventLogger.LogDebug("OnLoad(e={E}): actionButton.DisplayLink → {Arg1}", e, actionButton.DisplayLink);
+					eventLogger.LogDebug("OnLoad(e={E}): actionButton.DisplayIcon → {Arg1}", e, actionButton.DisplayIcon);
+					eventLogger.LogDebug("OnLoad(e={E}): actionButton.ImageUrl → {Arg1}", e, actionButton.ImageUrl);
                     actionButton.ModuleControl = this.ModuleControl;
                     actionButton.CommandName = this.CommandName;
                     actionButton.CssClass = this.CssClass;
@@ -122,12 +137,15 @@ namespace DotNetNuke.UI.Containers
             }
 
             this.Visible = this.Controls.Count > 0;
+			eventLogger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>ActionButtonClick handles the Action event of the contained ActionCommandButton(s).</summary>
         private void ActionButtonClick(object sender, ActionEventArgs e)
         {
+			eventLogger.LogError(">>> Entering ActionButtonClick(sender={Sender},e={E})", sender, e);
             this.OnAction(e);
+			eventLogger.LogWarning("<<< Exiting ActionButtonClick(sender={Sender},e={E})", sender, e);
         }
     }
 }

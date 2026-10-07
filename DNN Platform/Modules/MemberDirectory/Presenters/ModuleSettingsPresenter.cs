@@ -17,16 +17,20 @@ namespace DotNetNuke.Modules.MemberDirectory.Presenters
     [DnnDeprecated(9, 2, 0, "Replace WebFormsMvp and DotNetNuke.Web.Mvp with MVC or SPA patterns instead")]
     public partial class ModuleSettingsPresenter : ModuleSettingsPresenter<ISettingsView<MemberDirectorySettingsModel>, MemberDirectorySettingsModel>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleSettingsPresenter));
         /// <summary>Initializes a new instance of the <see cref="ModuleSettingsPresenter"/> class.</summary>
         /// <param name="view">The settings view.</param>
         public ModuleSettingsPresenter(ISettingsView<MemberDirectorySettingsModel> view)
             : base(view)
         {
+		Logger.LogError(">>> Entering ModuleSettingsPresenter(view={View})", view);
+        Logger.LogWarning("<<< Exiting ModuleSettingsPresenter(view={View})", view);
         }
 
         /// <inheritdoc />
         protected override void OnLoad()
         {
+			Logger.LogError(">>> Entering OnLoad()");
             base.OnLoad();
 
             this.View.Model.Groups = RoleController.Instance.GetRoles(this.PortalId, r => r.Status == RoleStatus.Approved);
@@ -36,14 +40,19 @@ namespace DotNetNuke.Modules.MemberDirectory.Presenters
             foreach (ProfilePropertyDefinition definition in ProfileController.GetPropertyDefinitionsByPortal(this.PortalId))
             {
                 var controller = new ListController();
+				Logger.LogError("OnLoad(): controller → {Controller}", controller);
                 ListEntryInfo textType = controller.GetListEntryInfo("DataType", "Text");
+				Logger.LogError("OnLoad(): textType → {TextType}", textType);
                 ListEntryInfo regionType = controller.GetListEntryInfo("DataType", "Region");
+				Logger.LogError("OnLoad(): regionType → {RegionType}", regionType);
                 ListEntryInfo countryType = controller.GetListEntryInfo("DataType", "Country");
+				Logger.LogError("OnLoad(): countryType → {CountryType}", countryType);
                 if (definition.DataType == textType.EntryID || definition.DataType == regionType.EntryID || definition.DataType == countryType.EntryID)
                 {
                     this.View.Model.ProfileProperties.Add(definition);
                 }
             }
+			Logger.LogWarning("<<< Exiting OnLoad()");
         }
     }
 }

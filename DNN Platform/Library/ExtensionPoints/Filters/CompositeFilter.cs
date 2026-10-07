@@ -9,23 +9,32 @@ namespace DotNetNuke.ExtensionPoints.Filters
 
     public class CompositeFilter : IExtensionPointFilter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CompositeFilter));
         private readonly List<IExtensionPointFilter> filters;
 
         /// <summary>Initializes a new instance of the <see cref="CompositeFilter"/> class.</summary>
         public CompositeFilter()
         {
+			Logger.LogError(">>> Entering CompositeFilter()");
             this.filters = [];
+			Logger.LogDebug("CompositeFilter(): filters → {Filters}", filters);
+        Logger.LogDebug("CompositeFilter(): this.filters → {Arg0}", this.filters);
+        Logger.LogWarning("<<< Exiting CompositeFilter()");
         }
 
         public CompositeFilter And(IExtensionPointFilter filter)
         {
+			Logger.LogError(">>> Entering And(filter={Filter})", filter);
             this.filters.Add(filter);
+			Logger.LogWarning("<<< Exiting And(filter={Filter})", filter);
             return this;
         }
 
         /// <inheritdoc />
         public bool Condition(IExtensionPointData m)
         {
+			Logger.LogError(">>> Entering Condition(m={M})", m);
+			Logger.LogWarning("<<< Exiting Condition(m={M})", m);
             return this.filters.All(f => f.Condition(m));
         }
     }

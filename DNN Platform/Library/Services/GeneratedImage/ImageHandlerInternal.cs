@@ -28,6 +28,7 @@ namespace DotNetNuke.Services.GeneratedImage
 
     internal class ImageHandlerInternal
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImageHandlerInternal));
         private static TimeSpan defaultClientCacheExpiration = new TimeSpan(0, 10, 0);
 
         private readonly IEventLogger eventLogger;
@@ -39,11 +40,17 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <param name="eventLogger">The event logger.</param>
         public ImageHandlerInternal(IEventLogger eventLogger)
         {
+			Logger.LogError(">>> Entering ImageHandlerInternal(eventLogger={EventLogger})", eventLogger);
             this.eventLogger = eventLogger;
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger}): this.eventLogger → {Arg1}", eventLogger, this.eventLogger);
 
             this.ContentType = ImageFormat.Jpeg;
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger}): this.ContentType → {Arg1}", eventLogger, this.ContentType);
             this.ImageCompression = 95;
             this.ImageTransforms = new List<ImageTransform>();
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger}): this.ImageCompression → {Arg1}", eventLogger, this.ImageCompression);
+        Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger},imageStore={ImageStore},now={Now}): now → {Now1}", eventLogger, imageStore, now, now);
+        Logger.LogWarning("<<< Exiting ImageHandlerInternal(eventLogger={EventLogger})", eventLogger);
             this.AllowStandalone = false;
         }
 
@@ -55,6 +62,7 @@ namespace DotNetNuke.Services.GeneratedImage
             : this(eventLogger)
         {
             this.imageStore = imageStore;
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger},imageStore={ImageStore},now={Now}): this.imageStore → {Arg3}", eventLogger, imageStore, now, this.imageStore);
             this.now = now;
         }
 
@@ -131,6 +139,7 @@ namespace DotNetNuke.Services.GeneratedImage
 
         public void HandleImageRequest(HttpContextBase context, Func<NameValueCollection, ImageInfo> imageGenCallback, string uniqueIdStringSeed)
         {
+			Logger.LogError(">>> Entering HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed})", context, imageGenCallback, uniqueIdStringSeed);
             context.Response.Clear();
 
             string ipAddress = UserRequestIPAddressController.Instance.GetUserRequestIPAddress(context.Request);
@@ -146,7 +155,9 @@ namespace DotNetNuke.Services.GeneratedImage
                         LogTypeKey = nameof(EventLogType.ADMIN_ALERT),
                     };
                     logInfo.LogUserId = PortalSettings.Current.UserId;
+					Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): logInfo.LogUserId → {Arg3}", context, imageGenCallback, uniqueIdStringSeed, logInfo.LogUserId);
                     logInfo.LogPortalId = PortalSettings.Current.PortalId;
+					Logger.LogDebug("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): logInfo.LogPortalId → {Arg3}", context, imageGenCallback, uniqueIdStringSeed, logInfo.LogPortalId);
                     logInfo.AddProperty("DnnImageHandler", Message);
                     logInfo.AddProperty("IP", ipAddress);
                     this.eventLogger.AddLog(logInfo);
@@ -164,6 +175,7 @@ namespace DotNetNuke.Services.GeneratedImage
                 !context.Request.UrlReferrer.Host.Equals(context.Request.Url.Host, StringComparison.OrdinalIgnoreCase))
             {
                 bool allowed = false;
+				Logger.LogError("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): allowed → {Allowed}", context, imageGenCallback, uniqueIdStringSeed, allowed);
                 string allowedDomains = string.Empty;
                 foreach (string allowedDomain in this.AllowedDomains)
                 {
@@ -189,6 +201,7 @@ namespace DotNetNuke.Services.GeneratedImage
                         logInfo.LogUserId = PortalSettings.Current.UserId;
                         logInfo.LogPortalId = PortalSettings.Current.PortalId;
                         logInfo.AddProperty("DnnImageHandler", message);
+			Logger.LogWarning("<<< Exiting HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed})", context, imageGenCallback, uniqueIdStringSeed);
                         logInfo.AddProperty("IP", ipAddress);
 
 #pragma warning disable CA1507 // Use nameof in place of string
@@ -207,18 +220,22 @@ namespace DotNetNuke.Services.GeneratedImage
 
             // Generate Image
             var imageMethodData = imageGenCallback(context.Request.QueryString);
+			Logger.LogError("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): imageMethodData → {ImageMethodData}", context, imageGenCallback, uniqueIdStringSeed, imageMethodData);
 
             context.Response.ContentType = GetImageMimeType(this.ContentType);
             if (imageMethodData == null)
             {
+				Logger.LogError("Throwing InvalidOperationException from HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed})", context, imageGenCallback, uniqueIdStringSeed);
                 throw new InvalidOperationException("The DnnImageHandler cannot return null.");
             }
 
             if (imageMethodData.IsEmptyImage)
             {
                 using var imageOutputBuffer = new MemoryStream();
+				Logger.LogError("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): imageOutputBuffer → {ImageOutputBuffer}", context, imageGenCallback, uniqueIdStringSeed, imageOutputBuffer);
                 this.RenderImage(imageMethodData.Image, imageOutputBuffer);
                 var buffer = imageOutputBuffer.GetBuffer();
+				Logger.LogError("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): buffer → {Buffer}", context, imageGenCallback, uniqueIdStringSeed, buffer);
                 context.Response.OutputStream.Write(buffer, 0, buffer.Length);
                 context.Response.End();
                 return;
@@ -227,8 +244,11 @@ namespace DotNetNuke.Services.GeneratedImage
             string cacheId = this.GetUniqueIDString(context, uniqueIdStringSeed);
 
             var userId = -1;
+			Logger.LogError("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): userId → {UserId}", context, imageGenCallback, uniqueIdStringSeed, userId);
             var cacheCleared = false;
+			Logger.LogError("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): cacheCleared → {CacheCleared}", context, imageGenCallback, uniqueIdStringSeed, cacheCleared);
             var isProfilePic = "profilepic".Equals(context.Request.QueryString["mode"], StringComparison.OrdinalIgnoreCase);
+			Logger.LogError("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): isProfilePic → {IsProfilePic}", context, imageGenCallback, uniqueIdStringSeed, isProfilePic);
             if (isProfilePic)
             {
                 if (int.TryParse(context.Request.QueryString["userId"], out userId))
@@ -246,7 +266,9 @@ namespace DotNetNuke.Services.GeneratedImage
                 {
                     var provider = CultureInfo.InvariantCulture;
                     var lastMod = DateTime.ParseExact(context.Request.Headers["If-Modified-Since"], "r", provider).ToLocalTime();
+					Logger.LogError("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): lastMod → {LastMod}", context, imageGenCallback, uniqueIdStringSeed, lastMod);
                     var etag = context.Request.Headers["If-None-Match"];
+					Logger.LogError("HandleImageRequest(context={Context},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed}): etag → {Etag}", context, imageGenCallback, uniqueIdStringSeed, etag);
                     if (lastMod + this.ClientCacheExpiration > this.DateTime_Now && etag == cacheId)
                     {
                         context.Response.StatusCode = 304;
@@ -357,8 +379,10 @@ namespace DotNetNuke.Services.GeneratedImage
 
         internal static string GetImageMimeType(ImageFormat format)
         {
+			Logger.LogError(">>> Entering GetImageMimeType(format={Format})", format);
             string mimeType = "image/x-unknown";
 
+			Logger.LogError("GetImageMimeType(format={Format}): mimeType → {MimeType}", format, mimeType);
             if (format.Equals(ImageFormat.Gif))
             {
                 mimeType = "image/gif";
@@ -384,19 +408,24 @@ namespace DotNetNuke.Services.GeneratedImage
                 mimeType = "image/x-icon";
             }
 
+			Logger.LogWarning("<<< Exiting GetImageMimeType(format={Format})", format);
             return mimeType;
         }
 
         private static string GetIDFromBytes(byte[] buffer)
         {
+			Logger.LogError(">>> Entering GetIDFromBytes(buffer={Buffer})", buffer);
             using var hasher = CryptographyUtils.CreateSHA256();
             byte[] result = hasher.ComputeHash(buffer);
+			Logger.LogError("GetIDFromBytes(buffer={Buffer}): hasher → {Hasher}", buffer, hasher);
             var sb = new StringBuilder();
+			Logger.LogError("GetIDFromBytes(buffer={Buffer}): sb → {Sb}", buffer, sb);
             foreach (var b in result)
             {
                 sb.Append(b.ToString("X2", CultureInfo.InvariantCulture));
             }
 
+			Logger.LogWarning("<<< Exiting GetIDFromBytes(buffer={Buffer})", buffer);
             return sb.ToString();
         }
 
@@ -405,30 +434,42 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <returns>ImageCodecInfo.</returns>
         private static ImageCodecInfo GetEncoderInfo(string mimeType)
         {
+			Logger.LogError(">>> Entering GetEncoderInfo(mimeType={MimeType})", mimeType);
             var encoders = ImageCodecInfo.GetImageEncoders();
             var e = encoders.FirstOrDefault(x => x.MimeType == mimeType);
+			Logger.LogError("GetEncoderInfo(mimeType={MimeType}): e → {E}", mimeType, e);
+			Logger.LogError("GetEncoderInfo(mimeType={MimeType}): encoders → {Encoders}", mimeType, encoders);
+			Logger.LogWarning("<<< Exiting GetEncoderInfo(mimeType={MimeType})", mimeType);
             return e;
         }
 
         private static bool IsPicVisibleToCurrentUser(int profileUserId)
         {
+			Logger.LogError(">>> Entering IsPicVisibleToCurrentUser(profileUserId={ProfileUserId})", profileUserId);
             var settings = PortalController.Instance.GetCurrentSettings();
             var profileUser = UserController.Instance.GetUser(settings.PortalId, profileUserId);
+			Logger.LogError("IsPicVisibleToCurrentUser(profileUserId={ProfileUserId}): profileUser → {ProfileUser}", profileUserId, profileUser);
+			Logger.LogError("IsPicVisibleToCurrentUser(profileUserId={ProfileUserId}): settings → {Settings}", profileUserId, settings);
 
             var photoProperty = profileUser?.Profile.GetProperty("Photo");
+			Logger.LogError("IsPicVisibleToCurrentUser(profileUserId={ProfileUserId}): photoProperty → {PhotoProperty}", profileUserId, photoProperty);
             if (photoProperty == null)
             {
                 return false;
             }
 
             var currentUser = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogError("IsPicVisibleToCurrentUser(profileUserId={ProfileUserId}): currentUser → {CurrentUser}", profileUserId, currentUser);
+			Logger.LogWarning("<<< Exiting IsPicVisibleToCurrentUser(profileUserId={ProfileUserId})", profileUserId);
             return ProfilePropertyAccess.CheckAccessLevel(settings, photoProperty, currentUser, profileUser);
         }
 
         private string GetUniqueIDString(HttpContextBase context, string uniqueIdStringSeed)
         {
+			Logger.LogError(">>> Entering GetUniqueIDString(context={Context},uniqueIdStringSeed={UniqueIdStringSeed})", context, uniqueIdStringSeed);
             var builder = new StringBuilder();
             builder.Append(uniqueIdStringSeed);
+			Logger.LogError("GetUniqueIDString(context={Context},uniqueIdStringSeed={UniqueIdStringSeed}): builder → {Builder}", context, uniqueIdStringSeed, builder);
             foreach (var key in context.Request.QueryString.AllKeys.OrderBy(k => k))
             {
                 builder.Append(key);
@@ -440,11 +481,13 @@ namespace DotNetNuke.Services.GeneratedImage
                 builder.Append(tran.UniqueString);
             }
 
+			Logger.LogWarning("<<< Exiting GetUniqueIDString(context={Context},uniqueIdStringSeed={UniqueIdStringSeed})", context, uniqueIdStringSeed);
             return GetIDFromBytes(Encoding.ASCII.GetBytes(builder.ToString()));
         }
 
         private Image GetImageThroughTransforms(Image image)
         {
+			Logger.LogError(">>> Entering GetImageThroughTransforms(image={Image})", image);
             try
             {
                 Image temp = image;
@@ -454,19 +497,23 @@ namespace DotNetNuke.Services.GeneratedImage
                     temp = tran.ProcessImage(temp);
                 }
 
+				Logger.LogWarning("<<< Exiting GetImageThroughTransforms(image={Image})", image);
                 return temp;
             }
             finally
             {
                 image?.Dispose();
+			Logger.LogWarning("<<< Exiting GetImageThroughTransforms(buffer={Buffer})", buffer);
             }
         }
 
         // Clear the user image disk cache if userid is found in clear list and is within ClientCacheExpiration time.
         private bool ClearDiskImageCacheIfNecessary(int userId, int portalId, string cacheId)
         {
+			Logger.LogError(">>> Entering ClearDiskImageCacheIfNecessary(userId={UserId},portalId={PortalId},cacheId={CacheId})", userId, portalId, cacheId);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.UserIdListToClearDiskImageCacheKey, portalId);
             Dictionary<int, DateTime> userIds;
+			Logger.LogError("ClearDiskImageCacheIfNecessary(userId={UserId},portalId={PortalId},cacheId={CacheId}): cacheKey → {CacheKey}", userId, portalId, cacheId, cacheKey);
             if ((userIds = DataCache.GetCache<Dictionary<int, DateTime>>(cacheKey)) == null || !userIds.ContainsKey(userId))
             {
                 return false;
@@ -484,6 +531,7 @@ namespace DotNetNuke.Services.GeneratedImage
             // Remove the userId from the clear list when timespan is > ClientCacheExpiration.
             userIds.Remove(userId);
             DataCache.SetCache(cacheKey, userIds);
+			Logger.LogWarning("<<< Exiting ClearDiskImageCacheIfNecessary(userId={UserId},portalId={PortalId},cacheId={CacheId})", userId, portalId, cacheId);
             return true;
         }
 
@@ -497,11 +545,13 @@ namespace DotNetNuke.Services.GeneratedImage
 
         private void RenderImage(Image image, Stream outStream)
         {
+			Logger.LogError(">>> Entering RenderImage(image={Image},outStream={OutStream})", image, outStream);
             try
             {
                 if (this.ContentType == ImageFormat.Gif)
                 {
                     var quantizer = new OctreeQuantizer(255, 8);
+					Logger.LogError("RenderImage(image={Image},outStream={OutStream}): quantizer → {Quantizer}", image, outStream, quantizer);
                     using (var quantized = quantizer.Quantize(image))
                     {
                         quantized.Save(outStream, ImageFormat.Gif);
@@ -514,6 +564,7 @@ namespace DotNetNuke.Services.GeneratedImage
                         Param = { [0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, this.ImageCompression) },
                     };
                     var ici = GetEncoderInfo(GetImageMimeType(this.ContentType));
+					Logger.LogError("RenderImage(image={Image},outStream={OutStream}): ici → {Ici}", image, outStream, ici);
                     image?.Save(outStream, ici, eps);
                 }
             }
@@ -521,6 +572,7 @@ namespace DotNetNuke.Services.GeneratedImage
             {
                 image?.Dispose();
             }
+			Logger.LogWarning("<<< Exiting RenderImage(image={Image},outStream={OutStream})", image, outStream);
         }
     }
 }

@@ -54,12 +54,15 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state) 
         {
+			value.LogError(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             try 
             {
                 if (this.Option != null && this.Option.Length > 0)
                 {
                     // Lookup the environment variable
                     string envValue = Environment.GetEnvironmentVariable(this.Option);
+			value.LogWarning("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
+					value.LogError("Convert(writer={Writer},state={State}): envValue → {EnvValue}", writer, state, envValue);
 
 #if NET_2_0 || NETSTANDARD2_0
                     // If we didn't see it for the process, try a user level variable.

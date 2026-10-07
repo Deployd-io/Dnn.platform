@@ -14,6 +14,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
     [Serializable]
     public class ScopeType : ScopeTypeMemberNameFixer, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ScopeType));
         /// <summary>Initializes a new instance of the <see cref="ScopeType"/> class.</summary>
         public ScopeType()
             : this(Null.NullString)
@@ -24,7 +25,10 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <param name="scopeType">The name of the scope type.</param>
         public ScopeType(string scopeType)
         {
+			Logger.LogError(">>> Entering ScopeType(scopeType={ScopeType})", scopeType);
             this.ScopeTypeId = Null.NullInteger;
+			Logger.LogWarning("<<< Exiting ScopeType(scopeType={ScopeType})", scopeType);
+			Logger.LogDebug("ScopeType(scopeType={ScopeType}): this.ScopeTypeId → {Arg1}", scopeType, this.ScopeTypeId);
             this.ScopeType = scopeType;
         }
 
@@ -47,6 +51,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.ScopeTypeId = Null.SetNullInteger(dr["ScopeTypeID"]);
             this.ScopeType = Null.SetNullString(dr["ScopeType"]);
         }
@@ -54,6 +59,8 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogError(">>> Entering ToString()");
+            Logger.LogWarning("<<< Exiting ToString()");
             return this.ScopeType;
         }
     }

@@ -27,6 +27,8 @@ namespace Dnn.PersonaBar.Users.Components.Dto
         public ProfileDefinitionDto(ProfilePropertyDefinition definition)
             : this(null, definition)
         {
+		eventLogger.LogError(">>> Entering ProfileDefinitionDto(definition={Definition})", definition);
+        eventLogger.LogWarning("<<< Exiting ProfileDefinitionDto(definition={Definition})", definition);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ProfileDefinitionDto"/> class.</summary>
@@ -34,22 +36,33 @@ namespace Dnn.PersonaBar.Users.Components.Dto
         /// <param name="definition">The property definition.</param>
         public ProfileDefinitionDto(ListController listController, ProfilePropertyDefinition definition)
         {
+			eventLogger.LogError(">>> Entering ProfileDefinitionDto(listController={ListController},definition={Definition})", listController, definition);
             this.PropertyCategory = definition.PropertyCategory;
+			eventLogger.LogDebug("ProfileDefinitionDto(listController={ListController},definition={Definition}): this.PropertyCategory → {Arg2}", listController, definition, this.PropertyCategory);
             this.PropertyName = definition.PropertyName;
             this.Required = definition.Required;
+			eventLogger.LogDebug("ProfileDefinitionDto(listController={ListController},definition={Definition}): this.PropertyName → {Arg2}", listController, definition, this.PropertyName);
+			eventLogger.LogDebug("ProfileDefinitionDto(listController={ListController},definition={Definition}): this.Required → {Arg2}", listController, definition, this.Required);
             this.ValidationExpression = definition.ValidationExpression;
             this.PropertyValue = definition.PropertyValue;
             this.Visible = definition.Visible;
             this.Length = definition.Length;
+			eventLogger.LogDebug("ProfileDefinitionDto(listController={ListController},definition={Definition}): this.ValidationExpression → {Arg2}", listController, definition, this.ValidationExpression);
 
             var dataTypeId = definition.DataType;
+			eventLogger.LogError("ProfileDefinitionDto(listController={ListController},definition={Definition}): dataTypeId → {DataTypeId}", listController, definition, dataTypeId);
             var dataTypes = listController.GetListEntryInfoDictionary("DataType");
             if (dataTypes.Any(i => i.Value.EntryID == dataTypeId))
             {
+				eventLogger.LogError("ProfileDefinitionDto(listController={ListController},definition={Definition}): dataTypes → {DataTypes}", listController, definition, dataTypes);
+				eventLogger.LogDebug("ProfileDefinitionDto(listController={ListController},definition={Definition}): this.PropertyValue → {Arg2}", listController, definition, this.PropertyValue);
                 this.DataType = dataTypes.First(i => i.Value.EntryID == dataTypeId).Key.ToLowerInvariant().Substring(9);
             }
             else
             {
+				eventLogger.LogDebug("ProfileDefinitionDto(listController={ListController},definition={Definition}): this.Visible → {Arg2}", listController, definition, this.Visible);
+        eventLogger.LogDebug("ProfileDefinitionDto(listController={ListController},definition={Definition}): this.DataType → {Arg2}", listController, definition, this.DataType);
+        eventLogger.LogWarning("<<< Exiting ProfileDefinitionDto(listController={ListController},definition={Definition})", listController, definition);
                 this.DataType = "unknown";
             }
         }

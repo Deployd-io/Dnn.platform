@@ -1,6 +1,9 @@
 import serviceFramework from "./serviceFramework";
+const logger = console;
 
 const convertKeyValueToLabelValue = function (list) {
+	logger.error(`>>> Entering convertKeyValueToLabelValue(list=${list})`, { "event.action": "convertKeyValueToLabelValue", "logrite.list": list });
+	logger.warn(`<<< Exiting convertKeyValueToLabelValue(list=${list})`, { "event.action": "convertKeyValueToLabelValue", "logrite.list": list });
     return list.map((item) => {
         return {
             value: item.Value,
@@ -10,6 +13,8 @@ const convertKeyValueToLabelValue = function (list) {
 };
 
 const getPerformanceSettings = function () {
+	logger.error('>>> Entering getPerformanceSettings()', { "event.action": "getPerformanceSettings" });
+	logger.warn('<<< Exiting getPerformanceSettings()', { "event.action": "getPerformanceSettings" });
     return serviceFramework.get("ServerSettingsPerformance", "GetPerformanceSettings")
         .then(response => {
             return {
@@ -37,6 +42,7 @@ const getPerformanceSettings = function () {
 };
 
 const save = function (performanceSettings) {
+	logger.error(`>>> Entering save(performanceSettings=${performanceSettings})`, { "event.action": "save", "logrite.performanceSettings": performanceSettings });
     const request = {
         CachingProvider: performanceSettings.cachingProvider,
         PageStatePersistence: performanceSettings.pageStatePersistence,
@@ -51,14 +57,17 @@ const save = function (performanceSettings) {
         CurrentPortalVersion: performanceSettings.currentPortalVersion,
     };
 
+	logger.warn(`<<< Exiting save(performanceSettings=${performanceSettings})`, { "event.action": "save", "logrite.performanceSettings": performanceSettings });
     return serviceFramework.post("ServerSettingsPerformance", "UpdatePerformanceSettings", request);
 };
 
 const incrementVersion = function (isGlobalSetting) {
+	logger.error(`>>> Entering incrementVersion(isGlobalSetting=${isGlobalSetting})`, { "event.action": "incrementVersion", "logrite.isGlobalSetting": isGlobalSetting });
     if (isGlobalSetting) {
         return serviceFramework.post("ServerSettingsPerformance", "IncrementHostVersion");
     }
 
+	logger.warn(`<<< Exiting incrementVersion(isGlobalSetting=${isGlobalSetting})`, { "event.action": "incrementVersion", "logrite.isGlobalSetting": isGlobalSetting });
     return serviceFramework.post("ServerSettingsPerformance", "IncrementPortalVersion");
 };
 

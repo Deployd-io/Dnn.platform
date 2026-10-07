@@ -27,6 +27,7 @@ namespace Dnn.PersonaBar.UI.Components.Installers
     /// <summary>Installer for persona bar menus.</summary>
     public class PersonaBarMenuInstaller(IHostSettings hostSettings, IPortalController portalController) : ComponentInstallerBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PersonaBarMenuInstaller));
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
         private readonly IPortalController portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
         private readonly List<MenuItem> menuItems = [];
@@ -41,6 +42,8 @@ namespace Dnn.PersonaBar.UI.Components.Installers
         public PersonaBarMenuInstaller()
             : this(null, null)
         {
+		Logger.LogError(">>> Entering PersonaBarMenuInstaller()");
+        Logger.LogWarning("<<< Exiting PersonaBarMenuInstaller()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PersonaBarMenuInstaller"/> class.</summary>
@@ -54,11 +57,14 @@ namespace Dnn.PersonaBar.UI.Components.Installers
         /// <inheritdoc />
         public override void Commit()
         {
+		Logger.LogError(">>> Entering Commit()");
+        Logger.LogWarning("<<< Exiting Commit()");
         }
 
         /// <inheritdoc />
         public override void Install()
         {
+			Logger.LogError(">>> Entering Install()");
             try
             {
                 this.SaveMenuItems();
@@ -79,13 +85,16 @@ namespace Dnn.PersonaBar.UI.Components.Installers
             }
             catch (Exception ex)
             {
+				Logger.LogDebug("Install(): this.Completed → {Arg0}", this.Completed);
                 this.Log.AddFailure(ex);
             }
+			Logger.LogWarning("<<< Exiting Install()");
         }
 
         /// <inheritdoc />
         public override void ReadManifest(XPathNavigator manifestNav)
         {
+			Logger.LogError(">>> Entering ReadManifest(manifestNav={ManifestNav})", manifestNav);
             foreach (XPathNavigator navigator in manifestNav.Select("menu"))
             {
                 this.ReadMenuItemsFromManifest(navigator);
@@ -100,23 +109,30 @@ namespace Dnn.PersonaBar.UI.Components.Installers
             {
                 this.ReadPermissionsFromManifest(navigator);
             }
+			Logger.LogWarning("<<< Exiting ReadManifest(manifestNav={ManifestNav})", manifestNav);
         }
 
         /// <inheritdoc />
         public override void Rollback()
         {
+			Logger.LogError(">>> Entering Rollback()");
             this.DeleteMenus();
+			Logger.LogWarning("<<< Exiting Rollback()");
         }
 
         /// <inheritdoc />
         public override void UnInstall()
         {
+			Logger.LogError(">>> Entering UnInstall()");
             this.DeleteMenus();
+			Logger.LogWarning("<<< Exiting UnInstall()");
         }
 
         private static void SaveMenuPermission(IHostSettings hostSettings, IPortalController portalController, MenuItem menuItem, string roleName)
         {
+			Logger.LogError(">>> Entering SaveMenuPermission(hostSettings={HostSettings},portalController={PortalController},menuItem={MenuItem},roleName={RoleName})", hostSettings, portalController, menuItem, roleName);
             var portals = PortalController.Instance.GetPortals();
+			Logger.LogError("SaveMenuPermission(hostSettings={HostSettings},portalController={PortalController},menuItem={MenuItem},roleName={RoleName}): portals → {Portals}", hostSettings, portalController, menuItem, roleName, portals);
             foreach (IPortalInfo portal in portals)
             {
                 var portalId = portal.PortalId;
@@ -127,15 +143,18 @@ namespace Dnn.PersonaBar.UI.Components.Installers
                     MenuPermissionController.SaveMenuDefaultPermissions(hostSettings, portalController, portalId, menuItem, roleName);
                 }
             }
+			Logger.LogWarning("<<< Exiting SaveMenuPermission(hostSettings={HostSettings},portalController={PortalController},menuItem={MenuItem},roleName={RoleName})", hostSettings, portalController, menuItem, roleName);
         }
 
         private void SaveMenuItems()
         {
+			Logger.LogError(">>> Entering SaveMenuItems()");
             foreach (var menuItem in this.menuItems.Where(x => !string.IsNullOrEmpty(x.Identifier) && !string.IsNullOrEmpty(x.ModuleName)))
             {
                 if (this.parentMaps.TryGetValue(menuItem.Identifier, out var parentId))
                 {
                     var parentItem = PersonaBarRepository.Instance.GetMenuItem(parentId);
+					Logger.LogError("SaveMenuItems(): parentItem → {ParentItem}", parentItem);
                     if (parentItem != null)
                     {
                         menuItem.ParentId = parentItem.MenuId;
@@ -144,14 +163,17 @@ namespace Dnn.PersonaBar.UI.Components.Installers
 
                 PersonaBarRepository.Instance.SaveMenuItem(menuItem);
             }
+			Logger.LogWarning("<<< Exiting SaveMenuItems()");
         }
 
         private void SaveMenuExtensions()
         {
+			Logger.LogError(">>> Entering SaveMenuExtensions()");
             foreach (var extension in this.extensions)
             {
                 var menuIdentifier = this.extensionMenus[extension.Identifier];
                 var menu = PersonaBarRepository.Instance.GetMenuItem(menuIdentifier);
+				Logger.LogError("SaveMenuExtensions(): menu → {Menu}", menu);
                 if (menu != null)
                 {
                     extension.MenuId = menu.MenuId;
@@ -159,10 +181,12 @@ namespace Dnn.PersonaBar.UI.Components.Installers
                     PersonaBarExtensionRepository.Instance.SaveExtension(extension);
                 }
             }
+			Logger.LogWarning("<<< Exiting SaveMenuExtensions()");
         }
 
         private void SavePermissionDefinitions()
         {
+			Logger.LogError(">>> Entering SavePermissionDefinitions()");
             if (this.menuItems.Count == 0)
             {
                 return;
@@ -172,6 +196,7 @@ namespace Dnn.PersonaBar.UI.Components.Installers
             {
                 var identifier = definition.Identifier;
                 var menu = this.menuItems.FirstOrDefault(m => string.IsNullOrEmpty(identifier) || m.Identifier == identifier);
+				Logger.LogError("SavePermissionDefinitions(): menu → {Menu}", menu);
                 if (menu?.MenuId <= 0)
                 {
                     menu = PersonaBarRepository.Instance.GetMenuItem(identifier);
@@ -182,10 +207,12 @@ namespace Dnn.PersonaBar.UI.Components.Installers
                     MenuPermissionController.SavePersonaBarPermission(menu.MenuId, definition.Key, definition.Name);
                 }
             }
+			Logger.LogWarning("<<< Exiting SavePermissionDefinitions()");
         }
 
         private void ReadMenuItemsFromManifest(XPathNavigator menuNavigator)
         {
+			Logger.LogError(">>> Entering ReadMenuItemsFromManifest(menuNavigator={MenuNavigator})", menuNavigator);
             var menuItem = new MenuItem()
             {
                 Identifier = Util.ReadElement(menuNavigator, "identifier"),
@@ -204,22 +231,26 @@ namespace Dnn.PersonaBar.UI.Components.Installers
             };
 
             var parent = Util.ReadElement(menuNavigator, "parent", string.Empty);
+			Logger.LogError("ReadMenuItemsFromManifest(menuNavigator={MenuNavigator}): parent → {Parent}", menuNavigator, parent);
             if (!string.IsNullOrEmpty(parent))
             {
                 this.parentMaps.Add(menuItem.Identifier, parent);
             }
 
             var defaultPermissions = Util.ReadElement(menuNavigator, "defaultPermissions", string.Empty);
+			Logger.LogError("ReadMenuItemsFromManifest(menuNavigator={MenuNavigator}): defaultPermissions → {DefaultPermissions}", menuNavigator, defaultPermissions);
             if (!string.IsNullOrEmpty(defaultPermissions))
             {
                 this.menuRoles.Add(menuItem.Identifier, defaultPermissions);
             }
 
             this.menuItems.Add(menuItem);
+			Logger.LogWarning("<<< Exiting ReadMenuItemsFromManifest(menuNavigator={MenuNavigator})", menuNavigator);
         }
 
         private void ReadExtensionsFromManifest(XPathNavigator menuNavigator)
         {
+			Logger.LogError(">>> Entering ReadExtensionsFromManifest(menuNavigator={MenuNavigator})", menuNavigator);
             var extension = new PersonaBarExtension()
             {
                 Identifier = Util.ReadElement(menuNavigator, "identifier"),
@@ -233,10 +264,12 @@ namespace Dnn.PersonaBar.UI.Components.Installers
 
             this.extensions.Add(extension);
             this.extensionMenus.Add(extension.Identifier, Util.ReadElement(menuNavigator, "menu"));
+			Logger.LogWarning("<<< Exiting ReadExtensionsFromManifest(menuNavigator={MenuNavigator})", menuNavigator);
         }
 
         private void ReadPermissionsFromManifest(XPathNavigator menuNavigator)
         {
+			Logger.LogError(">>> Entering ReadPermissionsFromManifest(menuNavigator={MenuNavigator})", menuNavigator);
             var permission = new PermissionDefinition
             {
                 Identifier = Util.ReadElement(menuNavigator, "identifier"),
@@ -245,19 +278,23 @@ namespace Dnn.PersonaBar.UI.Components.Installers
             };
 
             this.permissionDefinitions.Add(permission);
+			Logger.LogWarning("<<< Exiting ReadPermissionsFromManifest(menuNavigator={MenuNavigator})", menuNavigator);
         }
 
         private void SaveMenuPermissions(MenuItem menuItem)
         {
+			Logger.LogError(">>> Entering SaveMenuPermissions(menuItem={MenuItem})", menuItem);
             if (!this.menuRoles.TryGetValue(menuItem.Identifier, out var role))
             {
                 return;
             }
 
             var defaultPermissions = role.Split(',');
+			Logger.LogError("SaveMenuPermissions(menuItem={MenuItem}): defaultPermissions → {DefaultPermissions}", menuItem, defaultPermissions);
             if (menuItem.MenuId <= 0)
             {
                 menuItem = PersonaBarRepository.Instance.GetMenuItem(menuItem.Identifier);
+				Logger.LogError("SaveMenuPermissions(menuItem={MenuItem}): menuItem → {MenuItem1}", menuItem, menuItem);
             }
 
             PersonaBarRepository.Instance.GetMenuDefaultPermissions(menuItem.MenuId);
@@ -270,10 +307,12 @@ namespace Dnn.PersonaBar.UI.Components.Installers
                     SaveMenuPermission(this.hostSettings, this.portalController, menuItem, roleName.Trim());
                 }
             }
+			Logger.LogWarning("<<< Exiting SaveMenuPermissions(menuItem={MenuItem})", menuItem);
         }
 
         private void DeleteMenus()
         {
+			Logger.LogError(">>> Entering DeleteMenus()");
             try
             {
                 foreach (var menuItem in this.menuItems)
@@ -284,6 +323,7 @@ namespace Dnn.PersonaBar.UI.Components.Installers
             catch (Exception ex)
             {
                 this.Log.AddFailure(ex);
+			Logger.LogWarning("<<< Exiting DeleteMenus()");
                 throw;
             }
         }

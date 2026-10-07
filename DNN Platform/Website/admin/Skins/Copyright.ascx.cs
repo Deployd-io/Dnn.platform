@@ -11,6 +11,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin/theme object which displays the site's copyright statement.</summary>
     public partial class Copyright : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Copyright.ascx));
         private const string MyFileName = "Copyright.ascx";
 
         public string CssClass { get; set; }
@@ -18,6 +19,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             if (!string.IsNullOrEmpty(this.CssClass))
             {
@@ -36,6 +38,7 @@ namespace DotNetNuke.UI.Skins.Controls
                     DateTime.Now.Year,
                     this.PortalSettings.PortalName);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

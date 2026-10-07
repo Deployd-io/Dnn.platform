@@ -6,9 +6,12 @@ namespace DotNetNuke.Security.Permissions
 {
     public class CorePermissionProvider : PermissionProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CorePermissionProvider));
         /// <inheritdoc />
         public override bool SupportsFullControl()
         {
+			Logger.LogError(">>> Entering SupportsFullControl()");
+			Logger.LogWarning("<<< Exiting SupportsFullControl()");
             return false;
         }
     }

@@ -18,6 +18,7 @@ namespace Dnn.PersonaBar.Security.Attributes
         /// <inheritdoc />
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+			eventLogger.LogError(">>> Entering IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             var propertyName = validationContext.DisplayName;
 
             if (string.IsNullOrWhiteSpace(value.ToString()))
@@ -26,12 +27,14 @@ namespace Dnn.PersonaBar.Security.Attributes
             }
 
             var allAuthProviders = new SecurityController().GetAuthenticationProviders();
+			eventLogger.LogError("IsValid(value={Value},validationContext={ValidationContext}): allAuthProviders → {AllAuthProviders}", value, validationContext, allAuthProviders);
 
             if (!allAuthProviders.Contains(value))
             {
                 return new ValidationResult(string.Format(CultureInfo.CurrentCulture, Localization.GetString(Constants.NotValid, Constants.LocalResourcesFile), propertyName, value.ToString()));
             }
 
+			eventLogger.LogWarning("<<< Exiting IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             return ValidationResult.Success;
         }
     }

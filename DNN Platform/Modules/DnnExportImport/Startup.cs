@@ -19,9 +19,11 @@ namespace Dnn.ExportImport
     /// <summary>Register services from Export/Import module.</summary>
     public class Startup : IDnnStartup
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Startup));
         /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services)
         {
+			Logger.LogError(">>> Entering ConfigureServices(services={Services})", services);
             services.AddTransient<IEntitiesController, EntitiesController>();
             services.AddTransient<ISettingsController, SettingsController>();
             services.AddTransient<ExportImportEngine>();
@@ -32,6 +34,7 @@ namespace Dnn.ExportImport
             var portableServiceTypes = new TypeLocator().GetAllMatchingTypes(
                 t => t is { IsClass: true, IsAbstract: false, IsVisible: true, } && typeof(BasePortableService).IsAssignableFrom(t));
             services.TryAddEnumerable(portableServiceTypes.Select(type => ServiceDescriptor.Transient(typeof(BasePortableService), type)));
+			Logger.LogWarning("<<< Exiting ConfigureServices(services={Services})", services);
         }
     }
 }

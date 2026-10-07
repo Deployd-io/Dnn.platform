@@ -29,6 +29,7 @@ namespace DotNetNuke.Modules.Admin.Modules
     /// <summary>The view for the global export module action.</summary>
     public partial class Export : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Export.ascx));
         private readonly IBusinessControllerProvider businessControllerProvider;
         private readonly INavigationManager navigationManager;
         private readonly IHostSettings hostSettings;
@@ -50,6 +51,8 @@ namespace DotNetNuke.Modules.Admin.Modules
         public Export(IBusinessControllerProvider businessControllerProvider, INavigationManager navigationManager)
             : this(businessControllerProvider, navigationManager, null)
         {
+		Logger.LogError(">>> Entering Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager})", businessControllerProvider, navigationManager);
+        Logger.LogWarning("<<< Exiting Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager})", businessControllerProvider, navigationManager);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Export"/> class.</summary>
@@ -58,7 +61,11 @@ namespace DotNetNuke.Modules.Admin.Modules
         /// <param name="hostSettings">The host settings.</param>
         public Export(IBusinessControllerProvider businessControllerProvider, INavigationManager navigationManager, IHostSettings hostSettings)
         {
+			Logger.LogError(">>> Entering Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager},hostSettings={HostSettings})", businessControllerProvider, navigationManager, hostSettings);
+			Logger.LogDebug("Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager},hostSettings={HostSettings}): navigationManager → {NavigationManager1}", businessControllerProvider, navigationManager, hostSettings, navigationManager);
+			Logger.LogDebug("Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager},hostSettings={HostSettings}): hostSettings → {HostSettings1}", businessControllerProvider, navigationManager, hostSettings, hostSettings);
             this.businessControllerProvider = businessControllerProvider ?? this.DependencyProvider.GetRequiredService<IBusinessControllerProvider>();
+			Logger.LogWarning("<<< Exiting Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager},hostSettings={HostSettings})", businessControllerProvider, navigationManager, hostSettings);
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
             this.hostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
         }
@@ -76,6 +83,7 @@ namespace DotNetNuke.Modules.Admin.Modules
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (this.Request.QueryString["moduleid"] != null)
@@ -87,11 +95,13 @@ namespace DotNetNuke.Modules.Admin.Modules
             {
                 this.Response.Redirect(Globals.AccessDeniedURL(), true);
             }
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdExport.Click += this.OnExportClick;
@@ -117,15 +127,19 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         protected void OnExportClick(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnExportClick(sender={Sender},e={E})", sender, e);
             try
             {
                 IFolderInfo folder = null;
+				Logger.LogError("OnExportClick(sender={Sender},e={E}): folder → {Folder}", sender, e, folder);
                 if (this.cboFolders.SelectedItem != null && !string.IsNullOrEmpty(this.txtFile.Text))
                 {
                     folder = FolderManager.Instance.GetFolder(this.cboFolders.SelectedItemValueAsInt);
@@ -134,7 +148,9 @@ namespace DotNetNuke.Modules.Admin.Modules
                 if (folder != null)
                 {
                     var strFile = $"content.{CleanName(this.Module.DesktopModule.ModuleName)}.{CleanName(this.txtFile.Text)}.export";
+					Logger.LogError("OnExportClick(sender={Sender},e={E}): strFile → {StrFile}", sender, e, strFile);
                     var strMessage = this.ExportModule(this.moduleId, strFile, folder);
+					Logger.LogError("OnExportClick(sender={Sender},e={E}): strMessage → {StrMessage}", sender, e, strMessage);
                     if (string.IsNullOrEmpty(strMessage))
                     {
                         this.Response.Redirect(this.ReturnURL, true);
@@ -151,14 +167,18 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnExportClick(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnExportClick(sender={Sender},e={E})", sender, e);
         }
 
         private static string CleanName(string name)
         {
+			Logger.LogError(">>> Entering CleanName(name={Name})", name);
             var strName = name;
             const string strBadChars = ". ~`!@#$%^&*()-_+={[}]|\\:;<,>?/\"'";
+			Logger.LogError("CleanName(name={Name}): strName → {StrName}", name, strName);
 
             int intCounter;
             for (intCounter = 0; intCounter <= strBadChars.Length - 1; intCounter++)
@@ -166,12 +186,15 @@ namespace DotNetNuke.Modules.Admin.Modules
                 strName = strName.Replace(strBadChars.Substring(intCounter, 1), string.Empty);
             }
 
+			Logger.LogWarning("<<< Exiting CleanName(name={Name})", name);
             return strName;
         }
 
         private string ExportModule(int moduleID, string fileName, IFolderInfo folder)
         {
+			Logger.LogError(">>> Entering ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder})", moduleID, fileName, folder);
             var strMessage = string.Empty;
+			Logger.LogError("ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder}): strMessage → {StrMessage}", moduleID, fileName, folder, strMessage);
             if (this.Module != null)
             {
                 if (!string.IsNullOrEmpty(this.Module.DesktopModule.BusinessControllerClass) && this.Module.DesktopModule.IsPortable)
@@ -179,27 +202,35 @@ namespace DotNetNuke.Modules.Admin.Modules
                     try
                     {
                         var businessControllerType = Reflection.CreateType(this.Module.DesktopModule.BusinessControllerClass);
+						Logger.LogError("ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder}): businessControllerType → {BusinessControllerType}", moduleID, fileName, folder, businessControllerType);
 
                         // Double-check
                         if (typeof(IPortable).IsAssignableFrom(businessControllerType))
                         {
                             XmlDocument moduleXml = new XmlDocument { XmlResolver = null };
                             XmlNode moduleNode = ModuleController.SerializeModule(this.businessControllerProvider, this.hostSettings, moduleXml, this.Module, true);
+							Logger.LogError("ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder}): moduleNode → {ModuleNode}", moduleID, fileName, folder, moduleNode);
 
                             // add attributes to XML document
                             XmlAttribute typeAttribute = moduleXml.CreateAttribute("type");
+							Logger.LogError("ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder}): typeAttribute → {TypeAttribute}", moduleID, fileName, folder, typeAttribute);
                             typeAttribute.Value = CleanName(this.Module.DesktopModule.ModuleName);
                             moduleNode.Attributes.Append(typeAttribute);
 
                             XmlAttribute versionAttribute = moduleXml.CreateAttribute("version");
+							Logger.LogError("ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder}): versionAttribute → {VersionAttribute}", moduleID, fileName, folder, versionAttribute);
                             versionAttribute.Value = this.Module.DesktopModule.Version;
+							Logger.LogDebug("ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder}): versionAttribute.Value → {Arg3}", moduleID, fileName, folder, versionAttribute.Value);
                             moduleNode.Attributes.Append(versionAttribute);
 
                             // Create content from XmlNode
                             StringWriter sw = new StringWriter();
+							Logger.LogError("ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder}): sw → {Sw}", moduleID, fileName, folder, sw);
                             XmlTextWriter xw = new XmlTextWriter(sw);
+							Logger.LogError("ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder}): xw → {Xw}", moduleID, fileName, folder, xw);
                             moduleNode.WriteTo(xw);
                             var content = sw.ToString();
+							Logger.LogError("ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder}): content → {Content}", moduleID, fileName, folder, content);
                             if (!string.IsNullOrEmpty(content))
                             {
                                 // remove invalid chars in content -> DNN 26810: Handled by ModuleController.SerializeModule
@@ -213,6 +244,7 @@ namespace DotNetNuke.Modules.Admin.Modules
                                 {
                                     // add file to Files table
                                     using var fileContent = new MemoryStream(Encoding.UTF8.GetBytes(content));
+									Logger.LogError("ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder}): fileContent → {FileContent}", moduleID, fileName, folder, fileContent);
                                     Services.FileSystem.FileManager.Instance.AddFile(folder, fileName, fileContent, true, true, "application/octet-stream");
                                 }
                                 else
@@ -232,6 +264,7 @@ namespace DotNetNuke.Modules.Admin.Modules
                     }
                     catch (Exception ex)
                     {
+						Logger.LogError("Exception in ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder}): {Arg3}", moduleID, fileName, folder, ex.Message);
                         if (ex is InvalidFileExtensionException || ex is PermissionsNotMetException || ex is InvalidFilenameException)
                         {
                             strMessage = ex.Message;
@@ -248,6 +281,7 @@ namespace DotNetNuke.Modules.Admin.Modules
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ExportModule(moduleID={ModuleID},fileName={FileName},folder={Folder})", moduleID, fileName, folder);
             return strMessage;
         }
     }

@@ -1,14 +1,19 @@
 import ActionTypes from "../constants/actionTypes/templateActionTypes";
+const logger = console;
 
 function changeField(state, field, value) {
+	logger.error(`>>> Entering changeField(state=${state},field=${field},value=${value})`, { "event.action": "changeField", "logrite.state": state, "logrite.field": field, "logrite.value": value });
     const template = {
         ...state.template
     };  
     template[field] = value;
+	logger.warn(`<<< Exiting changeField(state=${state},field=${field},value=${value})`, { "event.action": "changeField", "logrite.state": state, "logrite.field": field, "logrite.value": value });
     return template;
 }
 
 function getEmptyTemplateModel() {
+	logger.error('>>> Entering getEmptyTemplateModel()', { "event.action": "getEmptyTemplateModel" });
+	logger.warn('<<< Exiting getEmptyTemplateModel()', { "event.action": "getEmptyTemplateModel" });
     return {
         name: "",
         description: "",

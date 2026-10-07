@@ -62,6 +62,7 @@ namespace log4net.Layout.Pattern
         /// <seealso cref="DatePatternConverter"/>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			value.LogError(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             try 
             {
                 this.m_dateFormatter.FormatDate(loggingEvent.TimeStampUtc, writer);
@@ -70,6 +71,7 @@ namespace log4net.Layout.Pattern
             {
                 LogLog.Error(declaringType, "Error occurred while converting date.", ex);
             }
+			value.LogWarning("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
 
         /// <summary>The fully qualified type of the UtcDatePatternConverter class.</summary>

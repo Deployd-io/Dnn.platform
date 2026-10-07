@@ -7,19 +7,23 @@ import PageNameInput from "./PageNameInput";
 import DisplayInMenu from "./DisplayInMenu";
 import EnableScheduling from "./EnableScheduling";
 import Template from "./Template";
+const logger = console;
 
 class PageDetailsFooter extends Component {
 
     onChangeField(key, event) {
+		logger.error(`>>> Entering onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
         const {onChangeField} = this.props;
         if (event.value) {
             onChangeField(key, event.value);
         } else {
             onChangeField(key, event.target.value);
+			logger.warn(`<<< Exiting onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
         }        
     }
 
     onChangeValue(key, value) {
+		logger.error(`>>> Entering onChangeValue(key=${key},value=${value})`, { "event.action": "onChangeValue", "logrite.key": key, "logrite.value": value });
         const {onChangeField} = this.props;
 
         switch (key) {
@@ -27,15 +31,19 @@ class PageDetailsFooter extends Component {
             case "endDate":
                 // the DatePicker returns strings, but we need dates
                 value = new Date(value);
+				logger.error(`onChangeValue(key=${key},value=${value}): value → ${value}`, { "event.action": "onChangeValue", "logrite.key": key, "logrite.value": value });
                 break;
         }
 
         onChangeField(key, value);
+		logger.warn(`<<< Exiting onChangeValue(key=${key},value=${value})`, { "event.action": "onChangeValue", "logrite.key": key, "logrite.value": value });
     }
 
     getLeftColumnComponents(normalPage, pageType, includeTemplates) {
+		logger.error(`>>> Entering getLeftColumnComponents(normalPage=${normalPage},pageType=${pageType},includeTemplates=${includeTemplates})`, { "event.action": "getLeftColumnComponents", "logrite.normalPage": normalPage, "logrite.pageType": pageType, "logrite.includeTemplates": includeTemplates });
         const {page, errors} = this.props;
         let defaultLeftColumnComponents;
+		logger.debug(`getLeftColumnComponents(normalPage=${normalPage},pageType=${pageType},includeTemplates=${includeTemplates}): errors → ${errors}`, { "event.action": "getLeftColumnComponents", "logrite.normalPage": normalPage, "logrite.pageType": pageType, "logrite.includeTemplates": includeTemplates });
         if (!normalPage) {
             defaultLeftColumnComponents = [<PageNameInput key={page.tabId} pageName={page.name}
                 errors={errors}
@@ -64,6 +72,7 @@ class PageDetailsFooter extends Component {
     }
 
     insertElementsInArray(array, elements) {
+		logger.error(`>>> Entering insertElementsInArray(array=${array},elements=${elements})`, { "event.action": "insertElementsInArray", "logrite.array": array, "logrite.elements": elements });
         for (let i = 0; i < elements.length; i++) {
             let index = this.getInteger(elements[i].order);
             const Component = elements[i].component;
@@ -73,21 +82,25 @@ class PageDetailsFooter extends Component {
             if (index || index === 0) {
                 index = Math.min(array.length, Math.max(0, index));
                 array.splice(index, 0, instance);
+				logger.warn(`<<< Exiting insertElementsInArray(array=${array},elements=${elements})`, { "event.action": "insertElementsInArray", "logrite.array": array, "logrite.elements": elements });
             }            
         }
     }
 
     getInteger(value) {
+		logger.error(`>>> Entering getInteger(value=${value})`, { "event.action": "getInteger", "logrite.value": value });
         if (value === 0) {
             return 0;
         }
         if (value) {
             return parseInt(value.toString());
         }
+		logger.warn(`<<< Exiting getInteger(value=${value})`, { "event.action": "getInteger", "logrite.value": value });
         return value;
     }  
 
     getRightColumnComponents(normalPage, pageType) {
+		logger.error(`>>> Entering getRightColumnComponents(normalPage=${normalPage},pageType=${pageType})`, { "event.action": "getRightColumnComponents", "logrite.normalPage": normalPage, "logrite.pageType": pageType });
         const {page} = this.props;
         const defaultRightColumnComponents = !normalPage ? 
             [<DisplayInMenu key={"displayInMenu" + page.tabId} includeInMenu={page.includeInMenu}
@@ -115,6 +128,7 @@ class PageDetailsFooter extends Component {
     }
     
     getNewSections(normalPage, pageType) {
+		logger.error(`>>> Entering getNewSections(normalPage=${normalPage},pageType=${pageType})`, { "event.action": "getNewSections", "logrite.normalPage": normalPage, "logrite.pageType": pageType });
         const additionalComponents = this.props.components.filter(
             function (component) {
                 return component.newSection && (component.pageType === pageType || component.pageType === "all");
@@ -126,10 +140,14 @@ class PageDetailsFooter extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {page} = this.props;
         const normalPage = page.pageType === "normal";
+		logger.error(`render(): normalPage → ${normalPage}`, { "event.action": "render" });
         const componentsInNewSection= this.getNewSections(normalPage, page.pageType);
+		logger.error(`render(): componentsInNewSection → ${componentsInNewSection}`, { "event.action": "render" });
         const includeTemplates = componentsInNewSection.length === 0;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.pageDetailsFooter}>                
                 <GridSystem>
@@ -155,6 +173,8 @@ PageDetailsFooter.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         page:state.pages.selectedPage
     };

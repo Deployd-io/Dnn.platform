@@ -13,22 +13,29 @@ namespace DotNetNuke.Entities.Tabs
 
     public class TabChangeSettings : ServiceLocator<ITabChangeSettings, TabChangeSettings>, ITabChangeSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabChangeSettings));
         /// <inheritdoc />
         public bool IsChangeControlEnabled(int portalId, int tabId)
         {
+			Logger.LogError(">>> Entering IsChangeControlEnabled(portalId={PortalId},tabId={TabId})", portalId, tabId);
             if (portalId == Null.NullInteger)
             {
                 return false;
             }
 
             var isVersioningEnabled = TabVersionSettings.Instance.IsVersioningEnabled(portalId, tabId);
+			Logger.LogError("IsChangeControlEnabled(portalId={PortalId},tabId={TabId}): isVersioningEnabled → {IsVersioningEnabled}", portalId, tabId, isVersioningEnabled);
             var isWorkflowEnable = TabWorkflowSettings.Instance.IsWorkflowEnabled(portalId, tabId);
+			Logger.LogError("IsChangeControlEnabled(portalId={PortalId},tabId={TabId}): isWorkflowEnable → {IsWorkflowEnable}", portalId, tabId, isWorkflowEnable);
+			Logger.LogWarning("<<< Exiting IsChangeControlEnabled(portalId={PortalId},tabId={TabId})", portalId, tabId);
             return isVersioningEnabled || isWorkflowEnable;
         }
 
         /// <inheritdoc />
         public ChangeControlState GetChangeControlState(int portalId, int tabId)
         {
+			Logger.LogError(">>> Entering GetChangeControlState(portalId={PortalId},tabId={TabId})", portalId, tabId);
+			Logger.LogWarning("<<< Exiting GetChangeControlState(portalId={PortalId},tabId={TabId})", portalId, tabId);
             return new ChangeControlState
             {
                 PortalId = portalId,
@@ -41,6 +48,8 @@ namespace DotNetNuke.Entities.Tabs
         /// <inheritdoc />
         protected override Func<ITabChangeSettings> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new TabChangeSettings();
         }
     }

@@ -87,6 +87,8 @@ namespace log4net.Appender
         /// </remarks>
         public RemotingAppender()
         {
+		value.LogError(">>> Entering RemotingAppender()");
+        value.LogWarning("<<< Exiting RemotingAppender()");
         }
 
         /// <summary>
@@ -128,12 +130,16 @@ namespace log4net.Appender
 #endif
         public override void ActivateOptions() 
         {
+			value.LogError(">>> Entering ActivateOptions()");
             base.ActivateOptions();
 
             IDictionary channelProperties = new Hashtable(); 
+			value.LogError("ActivateOptions(): channelProperties → {ChannelProperties}", channelProperties);
             channelProperties["typeFilterLevel"] = "Full";
 
+			value.LogWarning("<<< Exiting ActivateOptions()");
             this.m_sinkObj = (IRemoteLoggingSink)Activator.GetObject(typeof(IRemoteLoggingSink), this.m_sinkUrl, channelProperties);
+			value.LogDebug("ActivateOptions(): m_sinkObj → {M_sinkObj}", m_sinkObj);
         }
 
         /// <summary>Send the contents of the buffer to the remote sink.</summary>
@@ -154,6 +160,7 @@ namespace log4net.Appender
         /// <param name="events">The events to send.</param>
         protected override void SendBuffer(LoggingEvent[] events)
         {
+			value.LogError(">>> Entering SendBuffer(events={Events})", events);
             // Setup for an async send
             this.BeginAsyncSend();
 
@@ -165,6 +172,7 @@ namespace log4net.Appender
 
                 this.ErrorHandler.Error("RemotingAppender [" + this.Name + "] failed to ThreadPool.QueueUserWorkItem logging events in SendBuffer.");
             }
+			value.LogWarning("<<< Exiting SendBuffer(events={Events})", events);
         }
 
         /// <summary>Override base class close.</summary>
@@ -186,6 +194,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void OnClose()
         {
+			value.LogError(">>> Entering OnClose()");
             base.OnClose();
 
             // Wait for the work queue to become empty before closing, timeout 30 seconds
@@ -193,6 +202,7 @@ namespace log4net.Appender
             {
                 this.ErrorHandler.Error("RemotingAppender [" + this.Name + "] failed to send all queued events before close, in OnClose.");
             }
+			value.LogWarning("<<< Exiting OnClose()");
         }
 
         /// <summary>Flushes any buffered log data.</summary>
@@ -200,29 +210,35 @@ namespace log4net.Appender
         /// <returns><c>True</c> if all logging events were flushed successfully, else <c>false</c>.</returns>
         public override bool Flush(int millisecondsTimeout)
         {
+			value.LogError(">>> Entering Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
             base.Flush();
+			value.LogWarning("<<< Exiting Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
             return this.m_workQueueEmptyEvent.WaitOne(millisecondsTimeout, false);
         }
 
         /// <summary>A work item is being queued into the thread pool</summary>
         private void BeginAsyncSend()
         {
+			value.LogError(">>> Entering BeginAsyncSend()");
             // The work queue is not empty
             this.m_workQueueEmptyEvent.Reset();
 
             // Increment the queued count
             Interlocked.Increment(ref this.m_queuedCallbackCount);
+			value.LogWarning("<<< Exiting BeginAsyncSend()");
         }
 
         /// <summary>A work item from the thread pool has completed</summary>
         private void EndAsyncSend()
         {
+			value.LogError(">>> Entering EndAsyncSend()");
             // Decrement the queued count
             if (Interlocked.Decrement(ref this.m_queuedCallbackCount) <= 0)
             {
                 // If the work queue is empty then set the event
                 this.m_workQueueEmptyEvent.Set();
             }
+			value.LogWarning("<<< Exiting EndAsyncSend()");
         }
 
         /// <summary>Send the contents of the buffer to the remote sink.</summary>
@@ -234,6 +250,7 @@ namespace log4net.Appender
         /// <param name="state">the logging events to send</param>
         private void SendBufferCallback(object state)
         {
+			value.LogError(">>> Entering SendBufferCallback(state={State})", state);
             try
             {
                 LoggingEvent[] events = (LoggingEvent[])state;
@@ -243,12 +260,14 @@ namespace log4net.Appender
             }
             catch(Exception ex)
             {
+				value.LogError("Exception in SendBufferCallback(state={State}): {Arg1}", state, ex.Message);
                 this.ErrorHandler.Error("Failed in SendBufferCallback", ex);
             }
             finally
             {
                 this.EndAsyncSend();
             }
+			value.LogWarning("<<< Exiting SendBufferCallback(state={State})", state);
         }
 
         /// <summary>The URL of the remote sink.</summary>

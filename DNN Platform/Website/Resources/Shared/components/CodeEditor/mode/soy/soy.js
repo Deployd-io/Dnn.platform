@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -27,12 +28,16 @@
     };
 
     function last(array) {
+	logger.error(`>>> Entering last(array=${array})`, { "event.action": "last", "logrite.array": array });
+	logger.warn(`<<< Exiting last(array=${array})`, { "event.action": "last", "logrite.array": array });
       return array[array.length - 1];
     }
 
     function tokenUntil(stream, state, untilRegExp) {
+	logger.error(`>>> Entering tokenUntil(stream=${stream},state=${state},untilRegExp=${untilRegExp})`, { "event.action": "tokenUntil", "logrite.stream": stream, "logrite.state": state, "logrite.untilRegExp": untilRegExp });
       var oldString = stream.string;
       var match = untilRegExp.exec(oldString.substr(stream.pos));
+	logger.error(`tokenUntil(stream=${stream},state=${state},untilRegExp=${untilRegExp}): match → ${match}`, { "event.action": "tokenUntil", "logrite.stream": stream, "logrite.state": state, "logrite.untilRegExp": untilRegExp });
       if (match) {
         // We don't use backUp because it backs up just the position, not the state.
         // This uses an undocumented API.
@@ -42,11 +47,13 @@
         return state.localMode.token(stream, state.localState);
       });
       stream.string = oldString;
+	logger.error(`tokenUntil(stream=${stream},state=${state},untilRegExp=${untilRegExp}): result → ${result}`, { "event.action": "tokenUntil", "logrite.stream": stream, "logrite.state": state, "logrite.untilRegExp": untilRegExp });
       return result;
     }
 
     return {
       startState: function() {
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
         return {
           kind: [],
           kindTag: [],
@@ -55,9 +62,11 @@
           localMode: modes.html,
           localState: CodeMirror.startState(modes.html)
         };
+		logger.warn('<<< Exiting startState()', { "event.action": "startState" });
       },
 
       copyState: function(state) {
+		logger.error(`>>> Entering copyState(state=${state})`, { "event.action": "copyState", "logrite.state": state });
         return {
           tag: state.tag, // Last seen Soy tag.
           kind: state.kind.concat([]), // Values of kind="" attributes.
@@ -67,9 +76,11 @@
           localMode: state.localMode,
           localState: CodeMirror.copyState(state.localMode, state.localState)
         };
+		logger.warn(`<<< Exiting copyState(state=${state})`, { "event.action": "copyState", "logrite.state": state });
       },
 
       token: function(stream, state) {
+		logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         var match;
 
         switch (last(state.soyState)) {
@@ -85,6 +96,7 @@
             if (stream.match(/^}/)) {
               state.indent -= 2 * config.indentUnit;
               state.soyState.pop();
+			logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
               return "variable-2";
             }
             stream.next();
@@ -161,6 +173,7 @@
       },
 
       indent: function(state, textAfter) {
+		logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
         var indent = state.indent, top = last(state.soyState);
         if (top == "comment") return CodeMirror.Pass;
 
@@ -174,10 +187,12 @@
         }
         if (indent && state.localMode.indent)
           indent += state.localMode.indent(state.localState, textAfter);
+		logger.warn(`<<< Exiting indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
         return indent;
       },
 
       innerMode: function(state) {
+		logger.error(`>>> Entering innerMode(state=${state})`, { "event.action": "innerMode", "logrite.state": state });
         if (state.soyState.length && last(state.soyState) != "literal") return null;
         else return {state: state.localState, mode: state.localMode};
       },

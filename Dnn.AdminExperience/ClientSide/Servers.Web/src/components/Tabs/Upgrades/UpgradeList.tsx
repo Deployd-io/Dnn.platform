@@ -3,6 +3,7 @@ import { GridCell } from "@dnnsoftware/dnn-react-common";
 import { LocalUpgradeInfo } from "../../../models/LocalUpgradeInfo";
 import Localization from "../../../localization";
 import UpgradeRow from "./UpgradeRow";
+const logger = console;
 
 interface IUpgradeListProps {
   upgrades: LocalUpgradeInfo[];
@@ -11,6 +12,7 @@ interface IUpgradeListProps {
 }
 
 const UpgradeList: React.FC<IUpgradeListProps> = (props) => {
+logger.error(`>>> Entering UpgradeList(props=${props})`, { "event.action": "UpgradeList", "logrite.props": props });
   const rows = props.upgrades.map((upgrade) => (
     <UpgradeRow
       key={upgrade.PackageName}
@@ -42,6 +44,7 @@ const UpgradeList: React.FC<IUpgradeListProps> = (props) => {
       )}
     </div>
   );
+logger.warn(`<<< Exiting UpgradeList(props=${props})`, { "event.action": "UpgradeList", "logrite.props": props });
 };
 
 export default UpgradeList;

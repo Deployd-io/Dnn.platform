@@ -56,6 +56,8 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public ConversionNotSupportedException()
         {
+		value.LogError(">>> Entering ConversionNotSupportedException()");
+        value.LogWarning("<<< Exiting ConversionNotSupportedException()");
         }
 
         /// <summary>
@@ -70,6 +72,8 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public ConversionNotSupportedException(String message) : base(message) 
         {
+		value.LogError(">>> Entering ConversionNotSupportedException(message={Message})", message);
+        value.LogWarning("<<< Exiting ConversionNotSupportedException(message={Message})", message);
         }
         
         /// <summary>
@@ -85,6 +89,8 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public ConversionNotSupportedException(String message, Exception innerException) : base(message, innerException) 
         {
+		value.LogError(">>> Entering ConversionNotSupportedException(message={Message},innerException={InnerException})", message, innerException);
+        value.LogWarning("<<< Exiting ConversionNotSupportedException(message={Message},innerException={InnerException})", message, innerException);
         }
 
 #if !NETCF && !NETSTANDARD1_3
@@ -101,6 +107,8 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         protected ConversionNotSupportedException(SerializationInfo info, StreamingContext context) : base(info, context) 
         {
+		value.LogError(">>> Entering ConversionNotSupportedException(info={Info},context={Context})", info, context);
+        value.LogWarning("<<< Exiting ConversionNotSupportedException(info={Info},context={Context})", info, context);
         }
 #endif
 
@@ -117,6 +125,9 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public static ConversionNotSupportedException Create(Type destinationType, object sourceValue)
         {
+			value.LogError(">>> Entering Create(destinationType={DestinationType},sourceValue={SourceValue})", destinationType, sourceValue);
+            value.LogWarning("<<< Exiting Create(destinationType={DestinationType},sourceValue={SourceValue})", destinationType, sourceValue);
+			value.LogWarning("<<< Exiting Create(destinationType={DestinationType},sourceValue={SourceValue},innerException={InnerException})", destinationType, sourceValue, innerException);
             return Create(destinationType, sourceValue, null);
         }
 

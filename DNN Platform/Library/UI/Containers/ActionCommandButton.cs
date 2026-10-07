@@ -28,6 +28,8 @@ namespace DotNetNuke.UI.Containers
         public ActionCommandButton()
             : this(null)
         {
+		eventLogger.LogError(">>> Entering ActionCommandButton()");
+        eventLogger.LogWarning("<<< Exiting ActionCommandButton()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ActionCommandButton"/> class.</summary>
@@ -35,6 +37,8 @@ namespace DotNetNuke.UI.Containers
         public ActionCommandButton(IEventLogger eventLogger)
         {
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("ActionCommandButton(eventLogger={EventLogger}): eventLogger → {EventLogger1}", eventLogger, eventLogger);
+        eventLogger.LogWarning("<<< Exiting ActionCommandButton(eventLogger={EventLogger})", eventLogger);
         }
 
         /// <inheritdoc />
@@ -59,11 +63,14 @@ namespace DotNetNuke.UI.Containers
         /// <summary>CreateChildControls builds the control tree.</summary>
         protected override void CreateChildControls()
         {
+			eventLogger.LogError(">>> Entering CreateChildControls()");
             // Call base class method to ensure Control Tree is built
             base.CreateChildControls();
 
+			eventLogger.LogWarning("<<< Exiting CreateChildControls()");
             // Set Causes Validation and Enables ViewState to false
             this.CausesValidation = false;
+			eventLogger.LogDebug("CreateChildControls(): this.CausesValidation → {Arg0}", this.CausesValidation);
             this.EnableViewState = false;
         }
 
@@ -71,29 +78,35 @@ namespace DotNetNuke.UI.Containers
         /// <param name="e">The event arguments.</param>
         protected virtual void OnAction(ActionEventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnAction(e={E})", e);
             this.Action?.Invoke(this, e);
+			eventLogger.LogWarning("<<< Exiting OnAction(e={E})", e);
         }
 
         /// <summary>OnButtonClick runs when the underlying CommandButton is clicked.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnButtonClick(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnButtonClick(e={E})", e);
             base.OnButtonClick(e);
             if (!this.ActionManager.ProcessAction(this.ModuleAction))
             {
                 this.OnAction(new ActionEventArgs(this.ModuleAction, this.ModuleControl.ModuleContext.Configuration));
             }
+			eventLogger.LogWarning("<<< Exiting OnButtonClick(e={E})", e);
         }
 
         /// <summary>OnPreRender runs when just before the Render phase of the Page Lifecycle.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (this.ModuleAction != null && this.ActionManager.IsVisible(this.ModuleAction))
             {
                 this.Text = this.ModuleAction.Title;
+				eventLogger.LogDebug("OnPreRender(e={E}): this.Text → {Arg1}", e, this.Text);
                 this.CommandArgument = this.ModuleAction.ID.ToString(CultureInfo.InvariantCulture);
 
                 if (this.DisplayIcon && (!string.IsNullOrEmpty(this.ModuleAction.Icon) || !string.IsNullOrEmpty(this.ImageUrl)))
@@ -110,6 +123,7 @@ namespace DotNetNuke.UI.Containers
                         }
                         else
                         {
+							eventLogger.LogDebug("OnPreRender(e={E}): this.ImageUrl → {Arg1}", e, this.ImageUrl);
                             this.ImageUrl = "~/images/" + this.ModuleAction.Icon;
                         }
                     }
@@ -119,7 +133,9 @@ namespace DotNetNuke.UI.Containers
             }
             else
             {
+				eventLogger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
                 this.Visible = false;
+				eventLogger.LogDebug("OnPreRender(e={E}): this.Visible → {Arg1}", e, this.Visible);
             }
         }
     }

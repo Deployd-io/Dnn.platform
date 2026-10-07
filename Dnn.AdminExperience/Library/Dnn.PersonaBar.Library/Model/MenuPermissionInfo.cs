@@ -17,6 +17,7 @@ namespace Dnn.PersonaBar.Library.Model
     [Serializable]
     public class MenuPermissionInfo : PermissionInfoBase, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MenuPermissionInfo));
         private int menuId;
 
         // local property declarations
@@ -25,8 +26,14 @@ namespace Dnn.PersonaBar.Library.Model
         /// <summary>Initializes a new instance of the <see cref="MenuPermissionInfo"/> class.</summary>
         public MenuPermissionInfo()
         {
+			Logger.LogError(">>> Entering MenuPermissionInfo()");
             this.menuPermissionId = Null.NullInteger;
+			Logger.LogDebug("MenuPermissionInfo(): this.menuPermissionId → {Arg0}", this.menuPermissionId);
+        Logger.LogDebug("MenuPermissionInfo(permission={Permission}): PermissionName → {PermissionName}", permission, PermissionName);
             this.menuId = Null.NullInteger;
+			Logger.LogDebug("MenuPermissionInfo(permission={Permission}): this.PermissionKey → {Arg1}", permission, this.PermissionKey);
+        Logger.LogWarning("<<< Exiting MenuPermissionInfo(permission={Permission})", permission);
+			Logger.LogWarning("<<< Exiting MenuPermissionInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="MenuPermissionInfo"/> class.</summary>
@@ -36,6 +43,7 @@ namespace Dnn.PersonaBar.Library.Model
         {
             ((IPermissionInfo)this).ModuleDefId = Null.NullInteger;
             this.PermissionCode = "PERSONABAR_MENU";
+			Logger.LogDebug("MenuPermissionInfo(permission={Permission}): this.PermissionCode → {Arg1}", permission, this.PermissionCode);
             ((IPermissionInfo)this).PermissionId = permission.PermissionId;
             this.PermissionKey = permission.PermissionKey;
             this.PermissionName = permission.PermissionName;
@@ -76,7 +84,9 @@ namespace Dnn.PersonaBar.Library.Model
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.FillInternal(dr);
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
             this.MenuPermissionId = Null.SetNullInteger(dr["MenuPermissionId"]);
             this.MenuId = Null.SetNullInteger(dr["MenuId"]);
             this.PortalId = Null.SetNullInteger(dr["PortalId"]);
@@ -107,6 +117,7 @@ namespace Dnn.PersonaBar.Library.Model
         /// </remarks>
         public bool Equals(IPermissionInfo other)
         {
+			Logger.LogError(">>> Entering Equals(other={Other})", other);
             if (ReferenceEquals(null, other))
             {
                 return false;
@@ -125,6 +136,7 @@ namespace Dnn.PersonaBar.Library.Model
             return (this.AllowAccess == other.AllowAccess) &&
                    (this.MenuId == menuPermission.MenuId) &&
                    (((IPermissionInfo)this).RoleId == other.RoleId) &&
+			Logger.LogWarning("<<< Exiting Equals(obj={Obj})", obj);
                    (((IPermissionInfo)this).PermissionId == other.PermissionId);
         }
 
@@ -161,8 +173,10 @@ namespace Dnn.PersonaBar.Library.Model
         /// <inheritdoc />
         public override int GetHashCode()
         {
+			Logger.LogError(">>> Entering GetHashCode()");
             unchecked
             {
+				Logger.LogWarning("<<< Exiting GetHashCode()");
                 return (this.menuId * 397) ^ this.menuPermissionId;
             }
         }

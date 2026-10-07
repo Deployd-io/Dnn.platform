@@ -10,6 +10,7 @@ namespace DotNetNuke.Web.Common
     /// <summary>An <see cref="IServiceProvider"/> implementation which wraps a provider that can be replaced or set after initialization.</summary>
     public class LazyServiceProvider : IServiceProvider, INotifyPropertyChanged
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LazyServiceProvider));
         private IServiceProvider serviceProvider;
 
         /// <inheritdoc />
@@ -18,6 +19,8 @@ namespace DotNetNuke.Web.Common
         /// <inheritdoc />
         public object GetService(Type serviceType)
         {
+			Logger.LogError(">>> Entering GetService(serviceType={ServiceType})", serviceType);
+            Logger.LogWarning("<<< Exiting GetService(serviceType={ServiceType})", serviceType);
             return this.serviceProvider?.GetService(serviceType);
         }
 
@@ -25,7 +28,11 @@ namespace DotNetNuke.Web.Common
         /// <param name="serviceProvider">The service provider.</param>
         internal void SetProvider(IServiceProvider serviceProvider)
         {
+			Logger.LogError(">>> Entering SetProvider(serviceProvider={ServiceProvider})", serviceProvider);
             this.serviceProvider = serviceProvider;
+			Logger.LogDebug("SetProvider(serviceProvider={ServiceProvider}): this.serviceProvider → {Arg1}", serviceProvider, this.serviceProvider);
+			Logger.LogDebug("SetProvider(serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", serviceProvider, serviceProvider);
+        Logger.LogWarning("<<< Exiting SetProvider(serviceProvider={ServiceProvider})", serviceProvider);
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(serviceProvider)));
         }
     }

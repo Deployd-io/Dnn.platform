@@ -6,21 +6,28 @@ import Localization from "localization";
 import AssignedSelector from "./AssignedSelector";
 import ModuleDefinitions from "./ModuleDefinitions";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 
 class Module extends Component {
     onClickOnPortal(index, type) {
+		logger.error(`>>> Entering onClickOnPortal(index=${index},type=${type})`, { "event.action": "onClickOnPortal", "logrite.index": index, "logrite.type": type });
         const { props } = this;
         let _extensionBeingEdited = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+		logger.error(`onClickOnPortal(index=${index},type=${type}): _extensionBeingEdited → ${_extensionBeingEdited}`, { "event.action": "onClickOnPortal", "logrite.index": index, "logrite.type": type });
         _extensionBeingEdited[type].value[index].selected = !_extensionBeingEdited[type].value[index].selected;
 
         props.onAssignedPortalsChange(type, _extensionBeingEdited[type].value);
+		logger.warn(`<<< Exiting onClickOnPortal(index=${index},type=${type})`, { "event.action": "onClickOnPortal", "logrite.index": index, "logrite.type": type });
     }
     moveItemsLeft() {
+		logger.error('>>> Entering moveItemsLeft()', { "event.action": "moveItemsLeft" });
         const { props } = this;
         let assignedPortals = JSON.parse(JSON.stringify(props.extensionBeingEdited.assignedPortals.value));
+		logger.error(`moveItemsLeft(): assignedPortals → ${assignedPortals}`, { "event.action": "moveItemsLeft" });
         let unassignedPortals = JSON.parse(JSON.stringify(props.extensionBeingEdited.unassignedPortals.value));
+		logger.error(`moveItemsLeft(): unassignedPortals → ${unassignedPortals}`, { "event.action": "moveItemsLeft" });
         let itemsToStay = [], itemsToMove = [];
         let selectedCount = 0;
         assignedPortals.forEach((portal) => {
@@ -37,12 +44,16 @@ class Module extends Component {
             props.onAssignedPortalsChange("unassignedPortals", unassignedPortals.concat(itemsToMove), () => {
                 props.onAssignedPortalsChange("assignedPortals", itemsToStay);
             });
+			logger.warn('<<< Exiting moveItemsLeft()', { "event.action": "moveItemsLeft" });
         }
     }
     moveItemsRight() {
+		logger.error('>>> Entering moveItemsRight()', { "event.action": "moveItemsRight" });
         const { props } = this;
         let unassignedPortals = JSON.parse(JSON.stringify(props.extensionBeingEdited.unassignedPortals.value));
+		logger.error(`moveItemsRight(): unassignedPortals → ${unassignedPortals}`, { "event.action": "moveItemsRight" });
         let assignedPortals = JSON.parse(JSON.stringify(props.extensionBeingEdited.assignedPortals.value));
+		logger.error(`moveItemsRight(): assignedPortals → ${assignedPortals}`, { "event.action": "moveItemsRight" });
         let itemsToStay = [], itemsToMove = [];
         let selectedCount = 0;
         unassignedPortals.forEach((portal) => {
@@ -59,11 +70,14 @@ class Module extends Component {
             props.onAssignedPortalsChange("assignedPortals", assignedPortals.concat(itemsToMove), () => {
                 props.onAssignedPortalsChange("unassignedPortals", itemsToStay);
             });
+			logger.warn('<<< Exiting moveItemsRight()', { "event.action": "moveItemsRight" });
         }
     }
     moveAll(direction) {
+		logger.error(`>>> Entering moveAll(direction=${direction})`, { "event.action": "moveAll", "logrite.direction": direction });
         const { props} = this;
         let assignedPortals = JSON.parse(JSON.stringify(props.extensionBeingEdited.assignedPortals.value));
+		logger.error(`moveAll(direction=${direction}): assignedPortals → ${assignedPortals}`, { "event.action": "moveAll", "logrite.direction": direction });
         let unassignedPortals = JSON.parse(JSON.stringify(props.extensionBeingEdited.unassignedPortals.value));
         switch (direction) {
             case "right":
@@ -75,6 +89,7 @@ class Module extends Component {
                 props.onAssignedPortalsChange("unassignedPortals", unassignedPortals.concat(assignedPortals), () => {
                     props.onAssignedPortalsChange("assignedPortals", []);
                 });
+				logger.warn(`<<< Exiting moveAll(direction=${direction})`, { "event.action": "moveAll", "logrite.direction": direction });
                 break;
         }
     }
@@ -84,8 +99,11 @@ class Module extends Component {
     }
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         let { extensionBeingEdited } = props;
+		logger.debug(`render(): extensionBeingEdited → ${extensionBeingEdited}`, { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.editModule + (props.className ? " " + props.className : "")}>
                 <GridSystem className="with-right-border top-half">
@@ -256,6 +274,8 @@ Module.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         extensionBeingEdited: state.extension.extensionBeingEdited,
         extensionBeingEditedIndex: state.extension.extensionBeingEditedIndex,

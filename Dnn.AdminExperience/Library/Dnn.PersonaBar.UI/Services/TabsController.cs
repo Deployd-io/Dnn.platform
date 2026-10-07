@@ -49,6 +49,7 @@ namespace Dnn.PersonaBar.UI.Services
         [HttpGet]
         public HttpResponseMessage GetPortalTabs(int portalId, string cultureCode, bool isMultiLanguage = false, bool excludeAdminTabs = true, string roles = "", bool disabledNotSelectable = false, int sortOrder = 0, int selectedTabId = -1, string validateTab = "", bool includeHostPages = false, bool includeDisabled = false, bool includeDeleted = false, bool includeDeletedChildren = true)
         {
+			Logger.LogError(">>> Entering GetPortalTabs(portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},excludeAdminTabs={ExcludeAdminTabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},selectedTabId={SelectedTabId},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted},includeDeletedChildren={IncludeDeletedChildren})", portalId, cultureCode, isMultiLanguage, excludeAdminTabs, roles, disabledNotSelectable, sortOrder, selectedTabId, validateTab, includeHostPages, includeDisabled, includeDeleted, includeDeletedChildren);
             try
             {
                 if (!this.UserInfo.IsSuperUser && portalId != this.PortalId && portalId > -1)
@@ -82,6 +83,7 @@ namespace Dnn.PersonaBar.UI.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetPortalTabs(portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},excludeAdminTabs={ExcludeAdminTabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},selectedTabId={SelectedTabId},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted},includeDeletedChildren={IncludeDeletedChildren})", portalId, cultureCode, isMultiLanguage, excludeAdminTabs, roles, disabledNotSelectable, sortOrder, selectedTabId, validateTab, includeHostPages, includeDisabled, includeDeleted, includeDeletedChildren);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -100,6 +102,7 @@ namespace Dnn.PersonaBar.UI.Services
         [HttpGet]
         public HttpResponseMessage SearchPortalTabs(string searchText, int portalId, string roles = "", bool disabledNotSelectable = false, int sortOrder = 0, string validateTab = "", bool includeHostPages = false, bool includeDisabled = false, bool includeDeleted = false)
         {
+			Logger.LogError(">>> Entering SearchPortalTabs(searchText={SearchText},portalId={PortalId},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted})", searchText, portalId, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeleted);
             try
             {
                 var response = new
@@ -114,6 +117,7 @@ namespace Dnn.PersonaBar.UI.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting SearchPortalTabs(searchText={SearchText},portalId={PortalId},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted})", searchText, portalId, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeleted);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -127,6 +131,7 @@ namespace Dnn.PersonaBar.UI.Services
         [HttpGet]
         public HttpResponseMessage GetPortalTab(int portalId, int tabId, string cultureCode)
         {
+			Logger.LogError(">>> Entering GetPortalTab(portalId={PortalId},tabId={TabId},cultureCode={CultureCode})", portalId, tabId, cultureCode);
             try
             {
                 var response = new
@@ -140,6 +145,7 @@ namespace Dnn.PersonaBar.UI.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetPortalTab(portalId={PortalId},tabId={TabId},cultureCode={CultureCode})", portalId, tabId, cultureCode);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -160,6 +166,7 @@ namespace Dnn.PersonaBar.UI.Services
         [HttpGet]
         public HttpResponseMessage GetTabsDescendants(int portalId, int parentId, string cultureCode, bool isMultiLanguage = false, string roles = "", bool disabledNotSelectable = false, int sortOrder = 0, string validateTab = "", bool includeHostPages = false, bool includeDisabled = false, bool includeDeletedChildren = true)
         {
+			Logger.LogError(">>> Entering GetTabsDescendants(portalId={PortalId},parentId={ParentId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeletedChildren={IncludeDeletedChildren})", portalId, parentId, cultureCode, isMultiLanguage, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeletedChildren);
             try
             {
                 var response = new
@@ -185,6 +192,7 @@ namespace Dnn.PersonaBar.UI.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogWarning("<<< Exiting GetTabsDescendants(portalId={PortalId},parentId={ParentId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeletedChildren={IncludeDeletedChildren})", portalId, parentId, cultureCode, isMultiLanguage, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeletedChildren);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

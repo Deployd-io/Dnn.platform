@@ -2,13 +2,17 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import ReactSlider from "react-slider";
 import "./style.less";
+const logger = console;
 
 export default class NumberSlider extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const minimum = this.props.min;
         const maximum = this.props.max;
         let step = this.props.step || 1;
@@ -17,6 +21,7 @@ export default class NumberSlider extends Component {
 
         const className = "slider-container" + (this.props.withMinMax ? " with-min-max": "");
         
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={className}>
                 {this.props.withMinMax && <span>{minimum}</span>}

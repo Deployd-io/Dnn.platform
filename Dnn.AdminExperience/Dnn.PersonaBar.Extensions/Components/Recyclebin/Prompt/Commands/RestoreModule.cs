@@ -32,6 +32,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.ModuleId = this.GetFlagValue(FlagId, "Module Id", -1, true, true, true);
             this.PageId = this.GetFlagValue(FlagPageId, "Page Id", -1, true, false, true);
         }
@@ -39,7 +40,10 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             var restored = RecyclebinController.Instance.RestoreModule(this.ModuleId, this.PageId, out var message);
+			eventLogger.LogError("Run(): restored → {Restored}", restored);
+			eventLogger.LogWarning("<<< Exiting Run()");
             return !restored
                 ? new ConsoleErrorResultModel(message)
                 : new ConsoleResultModel(

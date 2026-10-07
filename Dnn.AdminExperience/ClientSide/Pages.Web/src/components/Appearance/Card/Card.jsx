@@ -3,14 +3,19 @@ import PropTypes from "prop-types";
 import { TextOverflowWrapper } from "@dnnsoftware/dnn-react-common";
 import styles from "./style.module.less";
 import localization from "../../../localization";
+const logger = console;
 
 class Card extends Component {
 
     onClick() {
+		logger.error('>>> Entering onClick()', { "event.action": "onClick" });
         this.props.onClick(this.props.cardId);
+		logger.warn('<<< Exiting onClick()', { "event.action": "onClick" });
     }
 
     getNoImageIcon() {
+		logger.error('>>> Entering getNoImageIcon()', { "event.action": "getNoImageIcon" });
+		logger.warn('<<< Exiting getNoImageIcon()', { "event.action": "getNoImageIcon" });
         return <svg version="1.1" x="0px" y="0px" viewBox="0 0 2048 2048">
             <g>
                 <rect x="255.2" y="254.3" width="480.1" height="523.2"/>
@@ -22,6 +27,8 @@ class Card extends Component {
     }
 
     getCheckMarkIcon() {
+		logger.error('>>> Entering getCheckMarkIcon()', { "event.action": "getCheckMarkIcon" });
+		logger.warn('<<< Exiting getCheckMarkIcon()', { "event.action": "getCheckMarkIcon" });
         return <svg version="1.1" x="0px" y="0px" viewBox="0 0 2048 2048">
             <g>
                 <polygon points="1524.4,714.3 1417,606.9 868,1155.8 657.8,945.6 550.4,1053 868,1370.7 975.5,1263.3 975.5,1263.3"/>
@@ -30,9 +37,11 @@ class Card extends Component {
     }
 
     getImageComponent() {
+		logger.error('>>> Entering getImageComponent()', { "event.action": "getImageComponent" });
         const {image, selected, hoverText, label, isSiteDefault  } = this.props;
         const className = "card-image" + (image ? "" : " no-image") + (isSiteDefault ? " site-default" : "");
 
+		logger.warn('<<< Exiting getImageComponent()', { "event.action": "getImageComponent" });
         return <span className={className} onClick={this.onClick.bind(this) } >
             {image ? <img src={image} alt={label} /> : this.getNoImageIcon() }
             {selected && <span className={(isSiteDefault ? "checkmark site-default" : "checkmark") }>{this.getCheckMarkIcon() }</span>}
@@ -41,9 +50,11 @@ class Card extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { selected, size, isSiteDefault } = this.props;
         const className = styles.moduleContainer + (selected ? " selected" : "") + " " + size;
         const maxWidth = size === "big" ? 168 : 100;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={className}>
                 {this.getImageComponent() }

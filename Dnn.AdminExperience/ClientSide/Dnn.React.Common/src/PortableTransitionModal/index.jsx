@@ -5,11 +5,13 @@ import TransitionModal from "./TransitionModal";
 import TransitionModalContent from "./TransitionModalContent";
 
 import "./style.less";
+const logger = console;
 
 
 class PortableTransitionModal extends Component {
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let childrenWithProps = false;
         if (this.props.children) {
             childrenWithProps = React.Children.map(this.props.children,
@@ -34,6 +36,7 @@ class PortableTransitionModal extends Component {
             showOkButton={this.props.showOkButton}
             okButtonText={this.props.okButtonText}
         />;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <Portal portalId={this.props.portalId} className={this.props.className}>
             <TransitionModal onCloseModal={this.props.onClose}>
                 {content}

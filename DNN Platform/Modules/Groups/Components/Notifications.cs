@@ -27,10 +27,16 @@ namespace DotNetNuke.Modules.Groups.Components
         public Notifications()
             : this(null)
         {
+		eventLogger.LogError(">>> Entering Notifications()");
+        eventLogger.LogWarning("<<< Exiting Notifications()");
         }
 
         internal virtual Notification AddGroupNotification(string notificationTypeName, int tabId, int moduleId, RoleInfo group, UserInfo initiatingUser, IList<RoleInfo> moderators)
         {
+			eventLogger.LogError(">>> Entering AddGroupNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser},moderators={Moderators})", notificationTypeName, tabId, moduleId, group, initiatingUser, moderators);
+            eventLogger.LogWarning("<<< Exiting AddGroupNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser},moderators={Moderators})", notificationTypeName, tabId, moduleId, group, initiatingUser, moderators);
+			eventLogger.LogWarning("<<< Exiting AddGroupNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser},moderators={Moderators},recipient={Recipient})", notificationTypeName, tabId, moduleId, group, initiatingUser, moderators, recipient);
+			eventLogger.LogWarning("<<< Exiting AddGroupNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser},moderators={Moderators},recipients={Recipients})", notificationTypeName, tabId, moduleId, group, initiatingUser, moderators, recipients);
             return this.AddGroupNotification(notificationTypeName, tabId, moduleId, group, initiatingUser, moderators, null as UserInfo);
         }
 
@@ -70,12 +76,17 @@ namespace DotNetNuke.Modules.Groups.Components
 
         internal virtual Notification AddGroupOwnerNotification(string notificationTypeName, int tabId, int moduleId, RoleInfo group, UserInfo initiatingUser)
         {
+			eventLogger.LogError(">>> Entering AddGroupOwnerNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser})", notificationTypeName, tabId, moduleId, group, initiatingUser);
             var notificationType = NotificationsController.Instance.GetNotificationType(notificationTypeName);
 
+			eventLogger.LogError("AddGroupOwnerNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser}): notificationType → {NotificationType}", notificationTypeName, tabId, moduleId, group, initiatingUser, notificationType);
             var tokenReplace = new GroupItemTokenReplace(group);
+			eventLogger.LogError("AddGroupOwnerNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser}): tokenReplace → {TokenReplace}", notificationTypeName, tabId, moduleId, group, initiatingUser, tokenReplace);
 
             var subject = Localization.GetString(notificationTypeName + ".Subject", Constants.SharedResourcesPath);
+			eventLogger.LogError("AddGroupOwnerNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser}): subject → {Subject}", notificationTypeName, tabId, moduleId, group, initiatingUser, subject);
             var body = Localization.GetString(notificationTypeName + ".Body", Constants.SharedResourcesPath);
+			eventLogger.LogError("AddGroupOwnerNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser}): body → {Body}", notificationTypeName, tabId, moduleId, group, initiatingUser, body);
             subject = subject.Replace("[DisplayName]", initiatingUser.DisplayName);
             subject = subject.Replace("[ProfileUrl]", Globals.UserProfileURL(initiatingUser.UserID));
             subject = tokenReplace.ReplaceGroupItemTokens(subject);
@@ -83,12 +94,15 @@ namespace DotNetNuke.Modules.Groups.Components
             body = body.Replace("[ProfileUrl]", Globals.UserProfileURL(initiatingUser.UserID));
             body = tokenReplace.ReplaceGroupItemTokens(body);
             var roleCreator = UserController.GetUserById(this.hostSettings, group.PortalID, group.CreatedByUserID);
+			eventLogger.LogError("AddGroupOwnerNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser}): roleCreator → {RoleCreator}", notificationTypeName, tabId, moduleId, group, initiatingUser, roleCreator);
 
             var roleOwners = new List<UserInfo>();
+			eventLogger.LogError("AddGroupOwnerNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser}): roleOwners → {RoleOwners}", notificationTypeName, tabId, moduleId, group, initiatingUser, roleOwners);
 
             foreach (UserInfo userInfo in RoleController.Instance.GetUsersByRole(group.PortalID, group.RoleName))
             {
                 var userRoleInfo = RoleController.Instance.GetUserRole(group.PortalID, userInfo.UserID, group.RoleID);
+				eventLogger.LogError("AddGroupOwnerNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser}): userRoleInfo → {UserRoleInfo}", notificationTypeName, tabId, moduleId, group, initiatingUser, userRoleInfo);
                 if (userRoleInfo.IsOwner && userRoleInfo.UserID != group.CreatedByUserID)
                 {
                     roleOwners.Add(UserController.GetUserById(this.hostSettings, group.PortalID, userRoleInfo.UserID));
@@ -109,17 +123,23 @@ namespace DotNetNuke.Modules.Groups.Components
             };
             NotificationsController.Instance.SendNotification(notification, initiatingUser.PortalID, null, roleOwners);
 
+			eventLogger.LogWarning("<<< Exiting AddGroupOwnerNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},initiatingUser={InitiatingUser})", notificationTypeName, tabId, moduleId, group, initiatingUser);
             return notification;
         }
 
         internal virtual Notification AddMemberNotification(string notificationTypeName, int tabId, int moduleId, RoleInfo group, UserInfo sender, UserInfo recipient)
         {
+			eventLogger.LogError(">>> Entering AddMemberNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},sender={Sender},recipient={Recipient})", notificationTypeName, tabId, moduleId, group, sender, recipient);
             var notificationType = NotificationsController.Instance.GetNotificationType(notificationTypeName);
 
+			eventLogger.LogError("AddMemberNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},sender={Sender},recipient={Recipient}): notificationType → {NotificationType}", notificationTypeName, tabId, moduleId, group, sender, recipient, notificationType);
             var subject = Localization.GetString(notificationTypeName + ".Subject", Constants.SharedResourcesPath);
+			eventLogger.LogError("AddMemberNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},sender={Sender},recipient={Recipient}): subject → {Subject}", notificationTypeName, tabId, moduleId, group, sender, recipient, subject);
 
             var body = Localization.GetString(notificationTypeName + ".Body", Constants.SharedResourcesPath);
+			eventLogger.LogError("AddMemberNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},sender={Sender},recipient={Recipient}): body → {Body}", notificationTypeName, tabId, moduleId, group, sender, recipient, body);
             var tokenReplace = new GroupItemTokenReplace(group);
+			eventLogger.LogError("AddMemberNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},sender={Sender},recipient={Recipient}): tokenReplace → {TokenReplace}", notificationTypeName, tabId, moduleId, group, sender, recipient, tokenReplace);
             subject = subject.Replace("[DisplayName]", recipient.DisplayName);
             subject = subject.Replace("[ProfileUrl]", Globals.UserProfileURL(recipient.UserID));
             subject = tokenReplace.ReplaceGroupItemTokens(subject);
@@ -139,6 +159,7 @@ namespace DotNetNuke.Modules.Groups.Components
             };
             NotificationsController.Instance.SendNotification(notification, recipient.PortalID, null, new List<UserInfo> { recipient });
 
+			eventLogger.LogWarning("<<< Exiting AddMemberNotification(notificationTypeName={NotificationTypeName},tabId={TabId},moduleId={ModuleId},group={Group},sender={Sender},recipient={Recipient})", notificationTypeName, tabId, moduleId, group, sender, recipient);
             return notification;
         }
     }

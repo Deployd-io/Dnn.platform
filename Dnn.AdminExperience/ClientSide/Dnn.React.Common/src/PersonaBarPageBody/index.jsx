@@ -3,8 +3,11 @@ import PropTypes from "prop-types";
 import GridCell from "../GridCell";
 import BackToLink from "../BackToLink";
 import "./style.less";
+const logger = console;
 
 function getClassNameIfExists(value) {
+	logger.error(`>>> Entering getClassNameIfExists(value=${value})`, { "event.action": "getClassNameIfExists", "logrite.value": value });
+	logger.warn(`<<< Exiting getClassNameIfExists(value=${value})`, { "event.action": "getClassNameIfExists", "logrite.value": value });
     return value
         ? " " + value
         : "";

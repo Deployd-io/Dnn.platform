@@ -26,6 +26,7 @@ namespace Dnn.Modules.ResourceManager.Components
     /// <summary>Provides services to manage items.</summary>
     public class ItemsManager : ServiceLocator<IItemsManager, ItemsManager>, IItemsManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ItemsManager));
         private const int MaxDescriptionLength = 500;
         private readonly IRoleController roleController;
         private readonly IFileManager fileManager;
@@ -35,15 +36,23 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <summary>Initializes a new instance of the <see cref="ItemsManager"/> class.</summary>
         public ItemsManager()
         {
+			Logger.LogError(">>> Entering ItemsManager()");
             this.roleController = RoleController.Instance;
+			Logger.LogDebug("ItemsManager(): this.roleController → {Arg0}", this.roleController);
             this.fileManager = FileManager.Instance;
             this.assetManager = AssetManager.Instance;
+			Logger.LogDebug("ItemsManager(): fileManager → {FileManager}", fileManager);
+			Logger.LogDebug("ItemsManager(): this.fileManager → {Arg0}", this.fileManager);
+        Logger.LogWarning("<<< Exiting ItemsManager()");
             this.permissionsManager = PermissionsManager.Instance;
         }
 
         /// <inheritdoc />
         public ContentPage GetFolderContent(int folderId, int startIndex, int numItems, string sorting, int moduleMode)
         {
+			Logger.LogError(">>> Entering GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sorting={Sorting},moduleMode={ModuleMode})", folderId, startIndex, numItems, sorting, moduleMode);
+			Logger.LogWarning("<<< Exiting GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sorting={Sorting},moduleMode={ModuleMode})", folderId, startIndex, numItems, sorting, moduleMode);
+			Logger.LogWarning("<<< Exiting GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sorting={Sorting},sortingOrder={SortingOrder},moduleMode={ModuleMode})", folderId, startIndex, numItems, sorting, sortingOrder, moduleMode);
             return this.GetFolderContent(folderId, startIndex, numItems, sorting, "Ascending", moduleMode);
         }
 
@@ -74,51 +83,65 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <inheritdoc />
         public Stream GetFileContent(int fileId, out string fileName, out string contentType)
         {
+			Logger.LogError(">>> Entering GetFileContent(fileId={FileId})", fileId);
             var file = this.fileManager.GetFile(fileId, true);
 
+			Logger.LogError("GetFileContent(fileId={FileId}): file → {File}", fileId, file);
             if (!this.permissionsManager.HasGetFileContentPermission(file.FolderId))
             {
+				Logger.LogError("Throwing FolderPermissionNotMetException from GetFileContent(fileId={FileId})", fileId);
                 throw new FolderPermissionNotMetException(LocalizationHelper.GetString(Constants.UserHasNoPermissionToDownloadKey));
             }
 
             var content = this.fileManager.GetFileContent(file);
+			Logger.LogError("GetFileContent(fileId={FileId}): content → {Content}", fileId, content);
             fileName = file.FileName;
+			Logger.LogDebug("GetFileContent(fileId={FileId}): fileName → {FileName}", fileId, fileName);
             contentType = file.ContentType;
+			Logger.LogDebug("GetFileContent(fileId={FileId}): contentType → {ContentType}", fileId, contentType);
 
             EventManager.Instance.OnFileDownloaded(new FileDownloadedEventArgs
             {
                 FileInfo = file,
                 UserId = UserController.Instance.GetCurrentUserInfo().UserID,
             });
+			Logger.LogWarning("<<< Exiting GetFileContent(fileId={FileId})", fileId);
             return content;
         }
 
         /// <inheritdoc />
         public IFolderInfo CreateNewFolder(string folderName, int parentFolderId, int folderMappingId, string mappedName, int moduleMode)
         {
+			Logger.LogError(">>> Entering CreateNewFolder(folderName={FolderName},parentFolderId={ParentFolderId},folderMappingId=<redacted>,mappedName={MappedName},moduleMode={ModuleMode})", folderName, parentFolderId, mappedName, moduleMode);
             if (!this.permissionsManager.HasAddFoldersPermission(moduleMode, parentFolderId))
             {
+				Logger.LogError("Throwing FolderPermissionNotMetException from CreateNewFolder(folderName={FolderName},parentFolderId={ParentFolderId},folderMappingId=<redacted>,mappedName={MappedName},moduleMode={ModuleMode})", folderName, parentFolderId, mappedName, moduleMode);
                 throw new FolderPermissionNotMetException(LocalizationHelper.GetString(Constants.UserHasNoPermissionToAddFoldersKey));
             }
 
+			Logger.LogWarning("<<< Exiting CreateNewFolder(folderName={FolderName},parentFolderId={ParentFolderId},folderMappingId=<redacted>,mappedName={MappedName},moduleMode={ModuleMode})", folderName, parentFolderId, mappedName, moduleMode);
             return AssetManager.Instance.CreateFolder(folderName, parentFolderId, folderMappingId, mappedName);
         }
 
         /// <inheritdoc />
         public void SaveFileDetails(IFileInfo file, FileDetailsRequest fileDetails)
         {
+			Logger.LogError(">>> Entering SaveFileDetails(file={File},fileDetails={FileDetails})", file, fileDetails);
             var propertyChanged = false;
 
+			Logger.LogError("SaveFileDetails(file={File},fileDetails={FileDetails}): propertyChanged → {PropertyChanged}", file, fileDetails, propertyChanged);
             this.assetManager.RenameFile(file.FileId, fileDetails.FileName);
             if (file.Title != fileDetails.Title)
             {
                 file.Title = fileDetails.Title;
+				Logger.LogDebug("SaveFileDetails(file={File},fileDetails={FileDetails}): file.Title → {Arg2}", file, fileDetails, file.Title);
                 propertyChanged = true;
             }
 
             if (file.Description != fileDetails.Description)
             {
                 file.Description = fileDetails.Description;
+				Logger.LogDebug("SaveFileDetails(file={File},fileDetails={FileDetails}): file.Description → {Arg2}", file, fileDetails, file.Description);
                 if (!string.IsNullOrEmpty(file.Description) && file.Description.Length > MaxDescriptionLength)
                 {
                     file.Description = file.Description.Substring(0, MaxDescriptionLength);
@@ -131,11 +154,13 @@ namespace Dnn.Modules.ResourceManager.Components
             {
                 FileManager.Instance.UpdateFile(file);
             }
+			Logger.LogWarning("<<< Exiting SaveFileDetails(file={File},fileDetails={FileDetails})", file, fileDetails);
         }
 
         /// <inheritdoc />
         public void SaveFolderDetails(IFolderInfo folder, FolderDetailsRequest folderDetails)
         {
+			Logger.LogError(">>> Entering SaveFolderDetails(folder={Folder},folderDetails={FolderDetails})", folder, folderDetails);
             if (!string.IsNullOrWhiteSpace(folderDetails.FolderName))
             {
                 this.assetManager.RenameFolder(folderDetails.FolderId, folderDetails.FolderName);
@@ -145,12 +170,15 @@ namespace Dnn.Modules.ResourceManager.Components
             folder.FolderPermissions.AddRange(folderDetails.Permissions.RolePermissions.AsFolderPermissions(folderDetails.FolderId));
             folder.FolderPermissions.AddRange(folderDetails.Permissions.UserPermissions.AsFolderPermissions(folderDetails.FolderId));
             FolderManager.Instance.UpdateFolder(folder);
+			Logger.LogWarning("<<< Exiting SaveFolderDetails(folder={Folder},folderDetails={FolderDetails})", folder, folderDetails);
         }
 
         /// <inheritdoc />
         public void DeleteFile(int fileId, int moduleMode, int groupId)
         {
+			Logger.LogError(">>> Entering DeleteFile(fileId={FileId},moduleMode={ModuleMode},groupId={GroupId})", fileId, moduleMode, groupId);
             var file = FileManager.Instance.GetFile(fileId);
+			Logger.LogError("DeleteFile(fileId={FileId},moduleMode={ModuleMode},groupId={GroupId}): file → {File}", fileId, moduleMode, groupId, file);
             if (file == null)
             {
                 return;
@@ -158,6 +186,7 @@ namespace Dnn.Modules.ResourceManager.Components
 
             if (moduleMode == (int)Constants.ModuleModes.Group && this.IsGroupIcon(file))
             {
+				Logger.LogError("Throwing FolderPermissionNotMetException from DeleteFile(fileId={FileId},moduleMode={ModuleMode},groupId={GroupId})", fileId, moduleMode, groupId);
                 throw new FolderPermissionNotMetException(LocalizationHelper.GetString(Constants.GroupIconCantBeDeletedKey));
             }
 
@@ -167,12 +196,15 @@ namespace Dnn.Modules.ResourceManager.Components
             }
 
             AssetManager.Instance.DeleteFile(fileId);
+			Logger.LogWarning("<<< Exiting DeleteFile(fileId={FileId},moduleMode={ModuleMode},groupId={GroupId})", fileId, moduleMode, groupId);
         }
 
         /// <inheritdoc />
         public void DeleteFolder(int folderId, bool unlinkAllowedStatus, int moduleMode)
         {
+			Logger.LogError(">>> Entering DeleteFolder(folderId={FolderId},unlinkAllowedStatus={UnlinkAllowedStatus},moduleMode={ModuleMode})", folderId, unlinkAllowedStatus, moduleMode);
             var folder = FolderManager.Instance.GetFolder(folderId);
+			Logger.LogError("DeleteFolder(folderId={FolderId},unlinkAllowedStatus={UnlinkAllowedStatus},moduleMode={ModuleMode}): folder → {Folder}", folderId, unlinkAllowedStatus, moduleMode, folder);
             if (folder == null)
             {
                 return;
@@ -180,18 +212,24 @@ namespace Dnn.Modules.ResourceManager.Components
 
             if (!this.permissionsManager.HasDeletePermission(moduleMode, folderId))
             {
+				Logger.LogError("Throwing FolderPermissionNotMetException from DeleteFolder(folderId={FolderId},unlinkAllowedStatus={UnlinkAllowedStatus},moduleMode={ModuleMode})", folderId, unlinkAllowedStatus, moduleMode);
                 throw new FolderPermissionNotMetException(LocalizationHelper.GetString("UserHasNoPermissionToDeleteFolder.Error"));
             }
 
             var nonDeletedSubfolders = new List<IFolderInfo>();
+			Logger.LogError("DeleteFolder(folderId={FolderId},unlinkAllowedStatus={UnlinkAllowedStatus},moduleMode={ModuleMode}): nonDeletedSubfolders → {NonDeletedSubfolders}", folderId, unlinkAllowedStatus, moduleMode, nonDeletedSubfolders);
             AssetManager.Instance.DeleteFolder(folderId, unlinkAllowedStatus, nonDeletedSubfolders);
+			Logger.LogWarning("<<< Exiting DeleteFolder(folderId={FolderId},unlinkAllowedStatus={UnlinkAllowedStatus},moduleMode={ModuleMode})", folderId, unlinkAllowedStatus, moduleMode);
         }
 
         /// <inheritdoc />
         public void MoveFile(int sourceFileId, int destinationFolderId, int moduleMode, int groupId)
         {
+			Logger.LogError(">>> Entering MoveFile(sourceFileId={SourceFileId},destinationFolderId={DestinationFolderId},moduleMode={ModuleMode},groupId={GroupId})", sourceFileId, destinationFolderId, moduleMode, groupId);
             var file = FileManager.Instance.GetFile(sourceFileId);
             var destinationFolder = FolderManager.Instance.GetFolder(destinationFolderId);
+			Logger.LogError("MoveFile(sourceFileId={SourceFileId},destinationFolderId={DestinationFolderId},moduleMode={ModuleMode},groupId={GroupId}): destinationFolder → {DestinationFolder}", sourceFileId, destinationFolderId, moduleMode, groupId, destinationFolder);
+			Logger.LogError("MoveFile(sourceFileId={SourceFileId},destinationFolderId={DestinationFolderId},moduleMode={ModuleMode},groupId={GroupId}): file → {File}", sourceFileId, destinationFolderId, moduleMode, groupId, file);
 
             if (file == null || destinationFolder == null)
             {
@@ -200,6 +238,7 @@ namespace Dnn.Modules.ResourceManager.Components
 
             if (!this.permissionsManager.HasDeletePermission(moduleMode, file.FolderId))
             {
+				Logger.LogError("Throwing FolderPermissionNotMetException from MoveFile(sourceFileId={SourceFileId},destinationFolderId={DestinationFolderId},moduleMode={ModuleMode},groupId={GroupId})", sourceFileId, destinationFolderId, moduleMode, groupId);
                 throw new FolderPermissionNotMetException(LocalizationHelper.GetString("UserHasNoPermissionToDeleteFolder.Error"));
             }
 
@@ -209,14 +248,19 @@ namespace Dnn.Modules.ResourceManager.Components
             }
 
             FileManager.Instance.MoveFile(file, destinationFolder);
+			Logger.LogWarning("<<< Exiting MoveFile(sourceFileId={SourceFileId},destinationFolderId={DestinationFolderId},moduleMode={ModuleMode},groupId={GroupId})", sourceFileId, destinationFolderId, moduleMode, groupId);
         }
 
         /// <inheritdoc />
         public void MoveFolder(int sourceFolderId, int destinationFolderId, int moduleMode, int groupId)
         {
+			Logger.LogError(">>> Entering MoveFolder(sourceFolderId={SourceFolderId},destinationFolderId={DestinationFolderId},moduleMode={ModuleMode},groupId={GroupId})", sourceFolderId, destinationFolderId, moduleMode, groupId);
             var sourceFolder = FolderManager.Instance.GetFolder(sourceFolderId);
             var sourceFolderParent = FolderManager.Instance.GetFolder(sourceFolder.ParentID);
+			Logger.LogError("MoveFolder(sourceFolderId={SourceFolderId},destinationFolderId={DestinationFolderId},moduleMode={ModuleMode},groupId={GroupId}): sourceFolderParent → {SourceFolderParent}", sourceFolderId, destinationFolderId, moduleMode, groupId, sourceFolderParent);
             var destinationFolder = FolderManager.Instance.GetFolder(destinationFolderId);
+			Logger.LogError("MoveFolder(sourceFolderId={SourceFolderId},destinationFolderId={DestinationFolderId},moduleMode={ModuleMode},groupId={GroupId}): destinationFolder → {DestinationFolder}", sourceFolderId, destinationFolderId, moduleMode, groupId, destinationFolder);
+			Logger.LogError("MoveFolder(sourceFolderId={SourceFolderId},destinationFolderId={DestinationFolderId},moduleMode={ModuleMode},groupId={GroupId}): sourceFolder → {SourceFolder}", sourceFolderId, destinationFolderId, moduleMode, groupId, sourceFolder);
 
             if (sourceFolder == null || destinationFolder == null || sourceFolderParent == null)
             {
@@ -227,6 +271,7 @@ namespace Dnn.Modules.ResourceManager.Components
                 !this.permissionsManager.HasDeletePermission(moduleMode, sourceFolderId) ||
                 !this.permissionsManager.HasDeletePermission(moduleMode, sourceFolderParent.FolderID))
             {
+				Logger.LogError("Throwing FolderPermissionNotMetException from MoveFolder(sourceFolderId={SourceFolderId},destinationFolderId={DestinationFolderId},moduleMode={ModuleMode},groupId={GroupId})", sourceFolderId, destinationFolderId, moduleMode, groupId);
                 throw new FolderPermissionNotMetException(LocalizationHelper.GetString("UserHasNoPermissionToDeleteFolder.Error"));
             }
 
@@ -238,17 +283,22 @@ namespace Dnn.Modules.ResourceManager.Components
             }
 
             FolderManager.Instance.MoveFolder(sourceFolder, destinationFolder);
+			Logger.LogWarning("<<< Exiting MoveFolder(sourceFolderId={SourceFolderId},destinationFolderId={DestinationFolderId},moduleMode={ModuleMode},groupId={GroupId})", sourceFolderId, destinationFolderId, moduleMode, groupId);
         }
 
         /// <inheritdoc />
         protected override Func<IItemsManager> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new ItemsManager();
         }
 
         private bool IsGroupIcon(IFileInfo file)
         {
+			Logger.LogError(">>> Entering IsGroupIcon(file={File})", file);
             var groupId = Utils.GetFolderGroupId(file.FolderId);
+			Logger.LogError("IsGroupIcon(file={File}): groupId → {GroupId}", file, groupId);
             if (groupId < 0)
             {
                 return false;
@@ -256,6 +306,8 @@ namespace Dnn.Modules.ResourceManager.Components
 
             var portalId = PortalSettings.Current.PortalId;
             var role = this.roleController.GetRoleById(portalId, groupId);
+			Logger.LogError("IsGroupIcon(file={File}): role → {Role}", file, role);
+			Logger.LogWarning("<<< Exiting IsGroupIcon(file={File})", file);
             return role?.IconFile?.Substring(7) == file.FileId.ToString();
         }
     }

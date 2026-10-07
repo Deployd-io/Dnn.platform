@@ -5,17 +5,22 @@ import styles from "./style.module.less";
 import { SingleLineInputWithError, InputGroup } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../../../localization";
 import PageUrlCommons from "../PageUrlCommons/PageUrlCommons";
+const logger = console;
 
 class PageExternalUrl extends Component {
 
     onChangeField(key, event) {
+		logger.error(`>>> Entering onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
         const {onChangeField} = this.props;
         onChangeField(key, event.target.value);
+		logger.warn(`<<< Exiting onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {page} = this.props;
         
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.pageExternalUrl}>
                 <InputGroup>
@@ -40,6 +45,8 @@ PageExternalUrl.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return ({page : state.pages.selectedPage});
 };
 

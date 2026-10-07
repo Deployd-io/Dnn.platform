@@ -30,7 +30,9 @@ namespace DotNetNuke.Modules.Journal
         [IFrameSupportedValidateAntiForgeryToken]
         public HttpResponseMessage UploadFile()
         {
+			Logger.LogError(">>> Entering UploadFile()");
             var statuses = new List<FilesStatus>();
+			Logger.LogError("UploadFile(): statuses → {Statuses}", statuses);
             try
             {
                 // todo can we eliminate the HttpContext here
@@ -41,17 +43,22 @@ namespace DotNetNuke.Modules.Journal
                 Logger.Error(exc);
             }
 
+			Logger.LogWarning("<<< Exiting UploadFile()");
             return IframeSafeJson(statuses);
         }
 
         private static bool IsImageExtension(string extension)
         {
+			Logger.LogError(">>> Entering IsImageExtension(extension={Extension})", extension);
+            Logger.LogWarning("<<< Exiting IsImageExtension(extension={Extension})", extension);
             return ImageExtensions.Contains(extension);
         }
 
         private static HttpResponseMessage IframeSafeJson(List<FilesStatus> statuses)
         {
+			Logger.LogError(">>> Entering IframeSafeJson(statuses={Statuses})", statuses);
             // return json but label it as plain text
+			Logger.LogWarning("<<< Exiting IframeSafeJson(statuses={Statuses})", statuses);
             return new HttpResponseMessage
             {
                 Content = new StringContent(JsonConvert.SerializeObject(statuses)),
@@ -61,6 +68,7 @@ namespace DotNetNuke.Modules.Journal
         // Upload entire file
         private void UploadWholeFile(HttpContextBase context, ICollection<FilesStatus> statuses)
         {
+			Logger.LogError(">>> Entering UploadWholeFile(context={Context},statuses={Statuses})", context, statuses);
             for (var i = 0; i < context.Request.Files.Count; i++)
             {
                 var file = context.Request.Files[i];
@@ -70,6 +78,7 @@ namespace DotNetNuke.Modules.Journal
                 }
 
                 var fileName = Path.GetFileName(file.FileName);
+				Logger.LogError("UploadWholeFile(context={Context},statuses={Statuses}): fileName → {FileName}", context, statuses, fileName);
 
                 // fix any filename issues that would cause double escaping exceptions
                 if (IsImageExtension(Path.GetExtension(fileName)))
@@ -80,7 +89,9 @@ namespace DotNetNuke.Modules.Journal
                 try
                 {
                     var fileInfo = JournalController.Instance.SaveJourmalFile(this.ActiveModule, this.UserInfo, fileName, file.InputStream);
+					Logger.LogError("UploadWholeFile(context={Context},statuses={Statuses}): fileInfo → {FileInfo}", context, statuses, fileInfo);
                     var fileIcon = Entities.Icons.IconController.IconURL("Ext" + fileInfo.Extension, "32x32");
+					Logger.LogError("UploadWholeFile(context={Context},statuses={Statuses}): fileIcon → {FileIcon}", context, statuses, fileIcon);
                     if (!File.Exists(context.Server.MapPath(fileIcon)))
                     {
                         fileIcon = Entities.Icons.IconController.IconURL("File", "32x32");
@@ -102,6 +113,7 @@ namespace DotNetNuke.Modules.Journal
                 }
                 catch (InvalidFileExtensionException)
                 {
+					Logger.LogError("Exception in UploadWholeFile(context={Context},statuses={Statuses}): {Arg2}", context, statuses, InvalidFileExtensionException.Message);
                     statuses.Add(new FilesStatus
                     {
                         success = false,
@@ -110,6 +122,7 @@ namespace DotNetNuke.Modules.Journal
                     });
                 }
             }
+			Logger.LogWarning("<<< Exiting UploadWholeFile(context={Context},statuses={Statuses})", context, statuses);
         }
     }
 }

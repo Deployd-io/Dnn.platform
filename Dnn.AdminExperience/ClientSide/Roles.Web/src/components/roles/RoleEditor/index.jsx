@@ -6,6 +6,7 @@ import util from "../../../utils";
 import resx from "../../../resources";
 import { Dropdown as Select, GridSystem as Grid, Switch, Button, SingleLineInputWithError, MultiLineInput, Label }  from "@dnnsoftware/dnn-react-common";
 import RoleGroupEditor from "./RoleGroupEditor";
+const logger = console;
 import {
     roles as RolesActions
 } from "../../../actions";
@@ -13,6 +14,7 @@ import {
 class RolesEditor extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         let roleDetails = Object.assign({}, props.roleDetails);
         this.state = {
             roleDetails: props.roleId !== -1 ? roleDetails : {
@@ -35,9 +37,11 @@ class RolesEditor extends Component {
             createGroupVisible: false
         };
         this.submitted = false;
+		logger.error(`constructor(props=${props}): roleDetails → ${roleDetails}`, { "event.action": "constructor", "logrite.props": props });
     }
 
     getValue(selectKey) {
+		logger.error(`>>> Entering getValue(selectKey=${selectKey})`, { "event.action": "getValue", "logrite.selectKey": selectKey });
         const { state } = this;
         switch (selectKey) {
             case "RoleGroup":
@@ -53,9 +57,11 @@ class RolesEditor extends Component {
             default:
                 break;
         }
+		logger.warn(`<<< Exiting getValue(selectKey=${selectKey})`, { "event.action": "getValue", "logrite.selectKey": selectKey });
     }
 
     onDropDownChange(key, option) {
+		logger.error(`>>> Entering onDropDownChange(key=${key},option=${option})`, { "event.action": "onDropDownChange", "logrite.key": key, "logrite.option": option });
         if (key === "groupId" && option.value === -3) {
             let createGroupVisible = true;
             this.setState({
@@ -63,11 +69,15 @@ class RolesEditor extends Component {
             });
         }
         this.performChange(key, option.value);
+		logger.warn(`<<< Exiting onDropDownChange(key=${key},option=${option})`, { "event.action": "onDropDownChange", "logrite.key": key, "logrite.option": option });
     }
     onTextChange(key, event) {
+		logger.error(`>>> Entering onTextChange(key=${key},event=${event})`, { "event.action": "onTextChange", "logrite.key": key, "logrite.event": event });
         this.performChange(key, event.target.value);
+		logger.warn(`<<< Exiting onTextChange(key=${key},event=${event})`, { "event.action": "onTextChange", "logrite.key": key, "logrite.event": event });
     }
     performChange(key, value) {
+		logger.error(`>>> Entering performChange(key=${key},value=${value})`, { "event.action": "performChange", "logrite.key": key, "logrite.value": value });
         if (key !== "assignToUsers") {
             let { roleDetails } = this.state;
             roleDetails[key] = value;
@@ -82,21 +92,27 @@ class RolesEditor extends Component {
         }
         let { state } = this;
         state.formModified = true;
+		logger.debug(`performChange(key=${key},value=${value}): state.formModified → ${state.formModified}`, { "event.action": "performChange", "logrite.key": key, "logrite.value": value });
         this.setState({
             state
         }, () => {
             this.validateForm();
         });
+		logger.warn(`<<< Exiting performChange(key=${key},value=${value})`, { "event.action": "performChange", "logrite.key": key, "logrite.value": value });
     }
 
     onSwitchToggle(key, status) {
+		logger.error(`>>> Entering onSwitchToggle(key=${key},status=${status})`, { "event.action": "onSwitchToggle", "logrite.key": key, "logrite.status": status });
         this.performChange(key, status);
+		logger.warn(`<<< Exiting onSwitchToggle(key=${key},status=${status})`, { "event.action": "onSwitchToggle", "logrite.key": key, "logrite.status": status });
     }
     addUpdateRoleDetails(event) {
+		logger.error(`>>> Entering addUpdateRoleDetails(event=${event})`, { "event.action": "addUpdateRoleDetails", "logrite.event": event });
         event.preventDefault();
         const { props, state } = this;
         this.submitted = true;
         if (!this.validateForm()) {
+			logger.debug(`addUpdateRoleDetails(event=${event}): this.submitted → ${this.submitted}`, { "event.action": "addUpdateRoleDetails", "logrite.event": event });
             return;
         }
 
@@ -107,6 +123,7 @@ class RolesEditor extends Component {
             }
 
             let successMsg = resx.get("RoleAdded.Message");
+			logger.error(`addUpdateRoleDetails(event=${event}): successMsg → ${successMsg}`, { "event.action": "addUpdateRoleDetails", "logrite.event": event });
             let errorMsg = resx.get("RoleAdded.Error");
             if (props.roleId > 0) {
                 successMsg = resx.get("RoleUpdated.Message");
@@ -122,6 +139,7 @@ class RolesEditor extends Component {
         else {
             props.Collapse(event);
         }
+		logger.warn(`<<< Exiting addUpdateRoleDetails(event=${event})`, { "event.action": "addUpdateRoleDetails", "logrite.event": event });
     }
 
     validateForm() {
@@ -139,13 +157,16 @@ class RolesEditor extends Component {
         return valid;
     }
     refreshRolesListIfRequired() {
+		logger.error('>>> Entering refreshRolesListIfRequired()', { "event.action": "refreshRolesListIfRequired" });
         const { props, state } = this;
         let group = props.roleGroups.find(group => group.id === state.groupId);
         if (group !== undefined && group.rolesCount <= 1) {
             props.refreshRolesList();
+			logger.warn('<<< Exiting refreshRolesListIfRequired()', { "event.action": "refreshRolesListIfRequired" });
         }
     }
     deleteRole(event) {
+		logger.error(`>>> Entering deleteRole(event=${event})`, { "event.action": "deleteRole", "logrite.event": event });
         let { roleDetails } = this.state;
         const { props } = this;
         if (props.roleId > 0) {
@@ -158,9 +179,11 @@ class RolesEditor extends Component {
         }
         else {
             util.utilities.notify(resx.get("DeleteInconsistency.Error"));
+			logger.warn(`<<< Exiting deleteRole(event=${event})`, { "event.action": "deleteRole", "logrite.event": event });
         }
     }
     getRoleGroupOptions() {
+		logger.error('>>> Entering getRoleGroupOptions()', { "event.action": "getRoleGroupOptions" });
         let groupOptions = this.props.roleGroupOptions;
         groupOptions = groupOptions.filter(group => {
             return group.value !== -2;
@@ -168,6 +191,7 @@ class RolesEditor extends Component {
         groupOptions = [{
             label: <span className="do-not-close">{resx.get("lblNewGroup")}</span>, value: -3
         }].concat(groupOptions);
+		logger.warn('<<< Exiting getRoleGroupOptions()', { "event.action": "getRoleGroupOptions" });
         return groupOptions;
     }
     CloseCreateGroup() {
@@ -189,6 +213,7 @@ class RolesEditor extends Component {
     }
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         let { state, props } = this;
         const columnOne = <div key="editor-container-columnOne" className="editor-container">
             <div className="editor-row divider" style={{marginTop:"-3rem"}}>
@@ -352,6 +377,7 @@ class RolesEditor extends Component {
         children.push(columnOne);
         children.push(columnTwo);
          
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="role-details-editor">
                 <Grid numberOfColumns={2}>{children}</Grid>
@@ -396,6 +422,8 @@ RolesEditor.propTypes = {
     rsvpLink: PropTypes.string
 };
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         roleGroups: state.roles.roleGroups,
         rsvpLink: state.roles.rsvpLink

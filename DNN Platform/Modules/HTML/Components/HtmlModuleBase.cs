@@ -12,9 +12,11 @@ namespace DotNetNuke.Modules.Html.Components
     using DotNetNuke.Entities.Modules;
 
     using Microsoft.Extensions.DependencyInjection;
+	using Microsoft.Extensions.Logging;
 
     public class HtmlModuleBase : PortalModuleBase
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private HtmlModuleSettings settings;
 
         /// <summary>Initializes a new instance of the <see cref="HtmlModuleBase"/> class.</summary>
@@ -22,6 +24,8 @@ namespace DotNetNuke.Modules.Html.Components
         public HtmlModuleBase()
             : this(null)
         {
+		_logger.LogError(">>> Entering HtmlModuleBase()");
+        _logger.LogWarning("<<< Exiting HtmlModuleBase()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="HtmlModuleBase"/> class.</summary>

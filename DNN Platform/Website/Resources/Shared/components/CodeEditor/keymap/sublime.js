@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -22,13 +23,17 @@
 
   // This is not exactly Sublime's algorithm. I couldn't make heads or tails of that.
   function findPosSubword(doc, start, dir) {
+	logger.error(`>>> Entering findPosSubword(doc=${doc},start=${start},dir=${dir})`, { "event.action": "findPosSubword", "logrite.doc": doc, "logrite.start": start, "logrite.dir": dir });
     if (dir < 0 && start.ch == 0) return doc.clipPos(Pos(start.line - 1));
     var line = doc.getLine(start.line);
+	logger.error(`findPosSubword(doc=${doc},start=${start},dir=${dir}): line → ${line}`, { "event.action": "findPosSubword", "logrite.doc": doc, "logrite.start": start, "logrite.dir": dir });
     if (dir > 0 && start.ch >= line.length) return doc.clipPos(Pos(start.line + 1, 0));
     var state = "start", type;
     for (var pos = start.ch, e = dir < 0 ? 0 : line.length, i = 0; pos != e; pos += dir, i++) {
       var next = line.charAt(dir < 0 ? pos - 1 : pos);
+	logger.error(`findPosSubword(doc=${doc},start=${start},dir=${dir}): next → ${next}`, { "event.action": "findPosSubword", "logrite.doc": doc, "logrite.start": start, "logrite.dir": dir });
       var cat = next != "_" && CodeMirror.isWordChar(next) ? "w" : "o";
+	logger.error(`findPosSubword(doc=${doc},start=${start},dir=${dir}): cat → ${cat}`, { "event.action": "findPosSubword", "logrite.doc": doc, "logrite.start": start, "logrite.dir": dir });
       if (cat == "w" && next.toUpperCase() == next) cat = "W";
       if (state == "start") {
         if (cat != "o") { state = "in"; type = cat; }
@@ -40,10 +45,12 @@
         }
       }
     }
+	logger.warn(`<<< Exiting findPosSubword(doc=${doc},start=${start},dir=${dir})`, { "event.action": "findPosSubword", "logrite.doc": doc, "logrite.start": start, "logrite.dir": dir });
     return Pos(start.line, pos);
   }
 
   function moveSubword(cm, dir) {
+	logger.error(`>>> Entering moveSubword(cm=${cm},dir=${dir})`, { "event.action": "moveSubword", "logrite.cm": cm, "logrite.dir": dir });
     cm.extendSelectionsBy(function(range) {
       if (cm.display.shift || cm.doc.extend || range.empty())
         return findPosSubword(cm.doc, range.head, dir);
@@ -108,6 +115,7 @@
   map["Shift-" + ctrl + "K"] = "deleteLine";
 
   function insertLine(cm, above) {
+	logger.error(`>>> Entering insertLine(cm=${cm},above=${above})`, { "event.action": "insertLine", "logrite.cm": cm, "logrite.above": above });
     cm.operation(function() {
       var len = cm.listSelections().length, newSelection = [], last = -1;
       for (var i = 0; i < len; i++) {
@@ -121,6 +129,7 @@
       }
       cm.setSelections(newSelection);
     });
+	logger.warn(`<<< Exiting insertLine(cm=${cm},above=${above})`, { "event.action": "insertLine", "logrite.cm": cm, "logrite.above": above });
   }
 
   cmds[map[ctrl + "Enter"] = "insertLineAfter"] = function(cm) { insertLine(cm, false); };
@@ -128,9 +137,11 @@
   cmds[map["Shift-" + ctrl + "Enter"] = "insertLineBefore"] = function(cm) { insertLine(cm, true); };
 
   function wordAt(cm, pos) {
+	logger.error(`>>> Entering wordAt(cm=${cm},pos=${pos})`, { "event.action": "wordAt", "logrite.cm": cm, "logrite.pos": pos });
     var start = pos.ch, end = start, line = cm.getLine(pos.line);
     while (start && CodeMirror.isWordChar(line.charAt(start - 1))) --start;
     while (end < line.length && CodeMirror.isWordChar(line.charAt(end))) ++end;
+	logger.warn(`<<< Exiting wordAt(cm=${cm},pos=${pos})`, { "event.action": "wordAt", "logrite.cm": cm, "logrite.pos": pos });
     return {from: Pos(pos.line, start), to: Pos(pos.line, end), word: line.slice(start, end)};
   }
 
@@ -160,13 +171,17 @@
 
   var mirror = "(){}[]";
   function selectBetweenBrackets(cm) {
+	logger.error(`>>> Entering selectBetweenBrackets(cm=${cm})`, { "event.action": "selectBetweenBrackets", "logrite.cm": cm });
     var pos = cm.getCursor(), opening = cm.scanForBracket(pos, -1);
     if (!opening) return;
+	logger.error(`selectBetweenBrackets(cm=${cm}): pos → ${pos}`, { "event.action": "selectBetweenBrackets", "logrite.cm": cm });
     for (;;) {
       var closing = cm.scanForBracket(pos, 1);
+	logger.error(`selectBetweenBrackets(cm=${cm}): closing → ${closing}`, { "event.action": "selectBetweenBrackets", "logrite.cm": cm });
       if (!closing) return;
       if (closing.ch == mirror.charAt(mirror.indexOf(opening.ch) + 1)) {
         cm.setSelection(Pos(opening.pos.line, opening.pos.ch + 1), closing.pos, false);
+		logger.warn(`<<< Exiting selectBetweenBrackets(cm=${cm})`, { "event.action": "selectBetweenBrackets", "logrite.cm": cm });
         return true;
       }
       pos = Pos(closing.pos.line, closing.pos.ch + 1);
@@ -287,6 +302,7 @@
   map[ctrl + "T"] = "transposeChars";
 
   function sortLines(cm, caseSensitive) {
+	logger.error(`>>> Entering sortLines(cm=${cm},caseSensitive=${caseSensitive})`, { "event.action": "sortLines", "logrite.cm": cm, "logrite.caseSensitive": caseSensitive });
     var ranges = cm.listSelections(), toSort = [], selected;
     for (var i = 0; i < ranges.length; i++) {
       var range = ranges[i];
@@ -318,6 +334,7 @@
       }
       if (selected) cm.setSelections(ranges, 0);
     });
+	logger.warn(`<<< Exiting sortLines(cm=${cm},caseSensitive=${caseSensitive})`, { "event.action": "sortLines", "logrite.cm": cm, "logrite.caseSensitive": caseSensitive });
   }
 
   cmds[map["F9"] = "sortLines"] = function(cm) { sortLines(cm, true); };
@@ -391,6 +408,7 @@
   var cK = ctrl + "K ";
 
   function modifyWordOrSelection(cm, mod) {
+	logger.error(`>>> Entering modifyWordOrSelection(cm=${cm},mod=${mod})`, { "event.action": "modifyWordOrSelection", "logrite.cm": cm, "logrite.mod": mod });
     cm.operation(function() {
       var ranges = cm.listSelections(), indices = [], replacements = [];
       for (var i = 0; i < ranges.length; i++) {
@@ -405,6 +423,7 @@
         var word = wordAt(cm, range.head);
         at = word.from;
         cm.replaceRange(mod(word.word), word.from, word.to);
+		logger.warn(`<<< Exiting modifyWordOrSelection(cm=${cm},mod=${mod})`, { "event.action": "modifyWordOrSelection", "logrite.cm": cm, "logrite.mod": mod });
       }
     });
   }
@@ -498,21 +517,27 @@
   };
 
   function getTarget(cm) {
+	logger.error(`>>> Entering getTarget(cm=${cm})`, { "event.action": "getTarget", "logrite.cm": cm });
     var from = cm.getCursor("from"), to = cm.getCursor("to");
     if (CodeMirror.cmpPos(from, to) == 0) {
       var word = wordAt(cm, from);
+	logger.error(`getTarget(cm=${cm}): word → ${word}`, { "event.action": "getTarget", "logrite.cm": cm });
       if (!word.word) return;
       from = word.from;
       to = word.to;
     }
+	logger.warn(`<<< Exiting getTarget(cm=${cm})`, { "event.action": "getTarget", "logrite.cm": cm });
     return {from: from, to: to, query: cm.getRange(from, to), word: word};
   }
 
   function findAndGoTo(cm, forward) {
+	logger.error(`>>> Entering findAndGoTo(cm=${cm},forward=${forward})`, { "event.action": "findAndGoTo", "logrite.cm": cm, "logrite.forward": forward });
     var target = getTarget(cm);
     if (!target) return;
+	logger.error(`findAndGoTo(cm=${cm},forward=${forward}): target → ${target}`, { "event.action": "findAndGoTo", "logrite.cm": cm, "logrite.forward": forward });
     var query = target.query;
     var cur = cm.getSearchCursor(query, forward ? target.to : target.from);
+	logger.error(`findAndGoTo(cm=${cm},forward=${forward}): cur → ${cur}`, { "event.action": "findAndGoTo", "logrite.cm": cm, "logrite.forward": forward });
 
     if (forward ? cur.findNext() : cur.findPrevious()) {
       cm.setSelection(cur.from(), cur.to());

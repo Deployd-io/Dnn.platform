@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.Installer.Dependencies
     /// <summary>The TypeDependency determines whether the dependent type is installed.</summary>
     public class TypeDependency : DependencyBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TypeDependency));
         private string missingDependentType = string.Empty;
         private string dependentTypes;
 
@@ -51,6 +52,7 @@ namespace DotNetNuke.Services.Installer.Dependencies
         /// <inheritdoc />
         public override void ReadManifest(XPathNavigator dependencyNav)
         {
+			Logger.LogError(">>> Entering ReadManifest(dependencyNav={DependencyNav})", dependencyNav);
             this.dependentTypes = dependencyNav.Value;
         }
     }

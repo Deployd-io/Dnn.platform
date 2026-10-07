@@ -1,7 +1,10 @@
-﻿(function ($) {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+(function ($) {
 	$.fn.dnnControlPanel = function (options) {
+		logger.error(`>>> Entering dnnControlPanel(options=${options})`, { "event.action": "dnnControlPanel", "logrite.options": options });
 		var opts = $.extend({}, $.fn.dnnControlPanel.defaultOptions, options),
         $wrap = this;
+		logger.error(`dnnControlPanel(options=${options}): opts → ${opts}`, { "event.action": "dnnControlPanel", "logrite.options": options });
 
 		return $wrap.each(function () {
 
@@ -27,11 +30,15 @@
 			}
 
 			$.fn.dnnControlPanel.show = function () {
+				logger.error('>>> Entering show()', { "event.action": "show" });
 				$controlPanel.parents(opts.controlPanelWrapper).slideDown();
+				logger.warn('<<< Exiting show()', { "event.action": "show" });
 			}
 
 			$.fn.dnnControlPanel.hide = function () {
+				logger.error('>>> Entering hide()', { "event.action": "hide" });
 				$controlPanel.parents(opts.controlPanelWrapper).slideUp();
+				logger.warn('<<< Exiting hide()', { "event.action": "hide" });
 			}
 
 
@@ -40,14 +47,18 @@
                 $controlPanel = $(this);
 
 			function EnableHide() {
+				logger.error('>>> Entering EnableHide()', { "event.action": "EnableHide" });
 				if (!forceShow) canHide = true;
+				logger.warn('<<< Exiting EnableHide()', { "event.action": "EnableHide" });
 			}
 
 			function megaHoverOver() {
+				logger.error('>>> Entering megaHoverOver()', { "event.action": "megaHoverOver" });
 				hideAll();
 				var menuSelector = $(this).parent().find(opts.menuBorderSelector);
 				if (!$.support.cssFloat && menuSelector.prev("iframe").length == 0) {
 					var mask = $("<iframe frameborder=\"0\"></iframe>");
+					logger.error(`megaHoverOver(): mask → ${mask}`, { "event.action": "megaHoverOver" });
 					menuSelector.before(mask);
 					mask.css({
 						position: "absolute"
@@ -59,13 +70,16 @@
 					});
 				}
 				menuSelector.stop().fadeTo('fast', 1).show(); //Find sub and fade it in
+				logger.error(`megaHoverOver(): menuSelector → ${menuSelector}`, { "event.action": "megaHoverOver" });
 			}
 
 			function hideAll() {
+				logger.error('>>> Entering hideAll()', { "event.action": "hideAll" });
 				$controlPanel.find(opts.menuBorderSelector).stop().fadeTo('fast', 0, function () { //Fade to 0 opacity
 					if (!$.support.cssFloat) $(this).prev("iframe").remove();
 					$(this).hide();  //after fading, hide it
 				});
+				logger.warn('<<< Exiting hideAll()', { "event.action": "hideAll" });
 			}
 
 			//Set custom configurations
@@ -85,7 +99,9 @@
 				over: function () { return; }, // function = onMouseOver callback (REQUIRED)
 				timeout: 300, // number = milliseconds delay before onMouseOut
 				out: function () {
+					logger.error('>>> Entering out()', { "event.action": "out" });
 					if (canHide) hideAll();
+					logger.warn('<<< Exiting out()', { "event.action": "out" });
 				} // function = onMouseOut callback (REQUIRED)
 			};
 
@@ -143,6 +159,7 @@
 			});
 
 		});
+		logger.warn(`<<< Exiting dnnControlPanel(options=${options})`, { "event.action": "dnnControlPanel", "logrite.options": options });
 	};
 
 	$.fn.dnnControlPanel.defaultOptions = {

@@ -25,10 +25,12 @@ using DotNetNuke.Services.Mail.OAuth;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
+using Microsoft.Extensions.Logging;
 
 /// <inheritdoc />
 public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private readonly IHostSettingsService hostSettingsService;
     private readonly IPortalAliasService portalAliasService;
     private readonly IPortalController portalController;
@@ -53,6 +55,8 @@ public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
     public ExchangeOnlineOAuthProvider(IHostSettingsService hostSettingsService, IPortalAliasService portalAliasService, IHostSettings hostSettings, IPortalController portalController)
         : this(hostSettingsService, portalAliasService, hostSettings, portalController, null)
     {
+	_logger.LogError(">>> Entering ExchangeOnlineOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController})", hostSettingsService, portalAliasService, hostSettings, portalController);
+	_logger.LogWarning("<<< Exiting ExchangeOnlineOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController},cryptographyProvider={CryptographyProvider})", hostSettingsService, portalAliasService, hostSettings, portalController, cryptographyProvider);
     }
 
     /// <summary>Initializes a new instance of the <see cref="ExchangeOnlineOAuthProvider"/> class.</summary>
@@ -63,10 +67,16 @@ public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
     /// <param name="cryptographyProvider">The cryptography provider.</param>
     public ExchangeOnlineOAuthProvider(IHostSettingsService hostSettingsService, IPortalAliasService portalAliasService, IHostSettings hostSettings, IPortalController portalController, ICryptographyProvider cryptographyProvider)
     {
+		_logger.LogError(">>> Entering ExchangeOnlineOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController},cryptographyProvider={CryptographyProvider})", hostSettingsService, portalAliasService, hostSettings, portalController, cryptographyProvider);
+		_logger.LogDebug("ExchangeOnlineOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController},cryptographyProvider={CryptographyProvider}): portalAliasService → {PortalAliasService1}", hostSettingsService, portalAliasService, hostSettings, portalController, cryptographyProvider, portalAliasService);
+		_logger.LogDebug("ExchangeOnlineOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController},cryptographyProvider={CryptographyProvider}): hostSettings → {HostSettings1}", hostSettingsService, portalAliasService, hostSettings, portalController, cryptographyProvider, hostSettings);
         this.hostSettingsService = hostSettingsService;
+		_logger.LogWarning("<<< Exiting ExchangeOnlineOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController},cryptographyProvider={CryptographyProvider})", hostSettingsService, portalAliasService, hostSettings, portalController, cryptographyProvider);
+		_logger.LogDebug("ExchangeOnlineOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController},cryptographyProvider={CryptographyProvider}): this.hostSettingsService → {Arg5}", hostSettingsService, portalAliasService, hostSettings, portalController, cryptographyProvider, this.hostSettingsService);
         this.portalAliasService = portalAliasService;
         this.hostSettings = hostSettings ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<IHostSettings>() ?? new HostSettings(hostSettingsService);
         this.portalController = portalController ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<IPortalController>();
+		_logger.LogDebug("ExchangeOnlineOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController},cryptographyProvider={CryptographyProvider}): this.portalAliasService → {Arg5}", hostSettingsService, portalAliasService, hostSettings, portalController, cryptographyProvider, this.portalAliasService);
         this.cryptographyProvider = cryptographyProvider ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<ICryptographyProvider>();
     }
 
@@ -79,35 +89,46 @@ public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
     /// <inheritdoc />
     public bool IsAuthorized(int portalId)
     {
+		_logger.LogError(">>> Entering IsAuthorized(portalId={PortalId})", portalId);
         var clientApplication = CreateClientApplication(this, this.hostSettingsService, this.hostSettings, this.portalController, portalId);
+		_logger.LogError("IsAuthorized(portalId={PortalId}): clientApplication → {ClientApplication}", portalId, clientApplication);
         if (clientApplication == null)
         {
             return false;
         }
 
         var accounts = clientApplication.GetAccountsAsync().Result;
+		_logger.LogError("IsAuthorized(portalId={PortalId}): accounts → {Accounts}", portalId, accounts);
 
+		_logger.LogWarning("<<< Exiting IsAuthorized(portalId={PortalId})", portalId);
         return accounts?.Any() ?? false;
     }
 
     /// <inheritdoc />
     public async Task<bool> IsAuthorizedAsync(int portalId, CancellationToken cancellationToken = default)
     {
+		_logger.LogError(">>> Entering IsAuthorizedAsync(portalId={PortalId},cancellationToken=<redacted>)", portalId);
         var clientApplication = CreateClientApplication(this, this.hostSettingsService, this.hostSettings, this.portalController, portalId);
+		_logger.LogError("IsAuthorizedAsync(portalId={PortalId},cancellationToken=<redacted>): clientApplication → {ClientApplication}", portalId, clientApplication);
         if (clientApplication == null)
         {
             return false;
         }
 
         var accounts = await clientApplication.GetAccountsAsync(cancellationToken);
+		_logger.LogError("IsAuthorizedAsync(portalId={PortalId},cancellationToken=<redacted>): accounts → {Accounts}", portalId, accounts);
+		_logger.LogWarning("<<< Exiting IsAuthorizedAsync(portalId={PortalId},cancellationToken=<redacted>)", portalId);
         return accounts?.Any() ?? false;
     }
 
     /// <inheritdoc />
     public string GetAuthorizeUrl(int portalId)
     {
+		_logger.LogError(">>> Entering GetAuthorizeUrl(portalId={PortalId})", portalId);
         var clientId = this.GetSetting(portalId, Constants.ClientIdSettingName);
         var clientSecret = this.GetSetting(portalId, Constants.ClientSecretSettingName);
+		_logger.LogError("GetAuthorizeUrl(portalId={PortalId}): clientSecret → {ClientSecret}", portalId, clientSecret);
+		_logger.LogError("GetAuthorizeUrl(portalId={PortalId}): clientId → {ClientId}", portalId, clientId);
 
         if (string.IsNullOrWhiteSpace(clientId)
             || string.IsNullOrWhiteSpace(clientSecret))
@@ -116,31 +137,40 @@ public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
         }
 
         var portalSettings = new PortalSettings(portalId == Null.NullInteger ? this.hostSettings.HostPortalId : portalId);
+		_logger.LogError("GetAuthorizeUrl(portalId={PortalId}): portalSettings → {PortalSettings}", portalId, portalSettings);
         var portalAlias = this.portalAliasService.GetPortalAliasesByPortalId(portalId == Null.NullInteger ? this.hostSettings.HostPortalId : portalId)
             .OrderByDescending(a => a.IsPrimary)
             .First();
         var sslEnabled = portalSettings.SSLEnabled && portalSettings.SSLSetup == SiteSslSetup.On;
 
         var siteUrl = $"{(sslEnabled ? "https" : "http")}://{portalAlias.HttpAlias}";
+		_logger.LogError("GetAuthorizeUrl(portalId={PortalId}): siteUrl → {SiteUrl}", portalId, siteUrl);
 
+		_logger.LogWarning("<<< Exiting GetAuthorizeUrl(portalId={PortalId})", portalId);
         return string.Format(Constants.CallbackUrl, siteUrl, portalId);
     }
 
     /// <inheritdoc />
     public IList<SmtpOAuthSetting> GetSettings(int portalId)
     {
+		_logger.LogError(">>> Entering GetSettings(portalId={PortalId})", portalId);
+        _logger.LogWarning("<<< Exiting GetSettings(portalId={PortalId})", portalId);
         return portalId > Null.NullInteger ? this.GetSettingsFromPortal(portalId) : this.GetSettingsFromHost();
     }
 
     /// <inheritdoc />
     public bool UpdateSettings(int portalId, IDictionary<string, string> settings, out IList<string> errorMessages)
     {
+		_logger.LogError(">>> Entering UpdateSettings(portalId={PortalId},settings={Settings})", portalId, settings);
         errorMessages = new List<string>();
         bool changed;
+		_logger.LogDebug("UpdateSettings(portalId={PortalId},settings={Settings}): errorMessages → {ErrorMessages}", portalId, settings, errorMessages);
+		_logger.LogError("UpdateSettings(portalId={PortalId},settings={Settings}): errorMessages → {ErrorMessages}", portalId, settings, errorMessages);
 
         if (portalId == Null.NullInteger)
         {
             changed = this.UpdateHostSettings(settings);
+			_logger.LogError("UpdateSettings(portalId={PortalId},settings={Settings}): changed → {Changed}", portalId, settings, changed);
         }
         else
         {
@@ -152,50 +182,68 @@ public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
             this.DeleteSetting(portalId, Constants.AuthenticationSettingName);
         }
 
+		_logger.LogWarning("<<< Exiting UpdateSettings(portalId={PortalId},settings={Settings})", portalId, settings);
         return changed;
     }
 
     /// <inheritdoc />
     public void Authorize(int portalId, IOAuth2SmtpClient smtpClient)
     {
+		_logger.LogError(">>> Entering Authorize(portalId={PortalId},smtpClient={SmtpClient})", portalId, smtpClient);
         if (!this.IsAuthorized(portalId))
         {
             return;
         }
 
         var clientApplication = CreateClientApplication(this, this.hostSettingsService, this.hostSettings, this.portalController, portalId);
+		_logger.LogError("Authorize(portalId={PortalId},smtpClient={SmtpClient}): clientApplication → {ClientApplication}", portalId, smtpClient, clientApplication);
         var account = clientApplication.GetAccountsAsync().Result.First();
+		_logger.LogError("Authorize(portalId={PortalId},smtpClient={SmtpClient}): account → {Account}", portalId, smtpClient, account);
         var scopes = GetAuthenticationScopes();
+		_logger.LogError("Authorize(portalId={PortalId},smtpClient={SmtpClient}): scopes → {Scopes}", portalId, smtpClient, scopes);
         var result = clientApplication.AcquireTokenSilent(scopes, account).ExecuteAsync().Result;
+		_logger.LogError("Authorize(portalId={PortalId},smtpClient={SmtpClient}): result → {Result}", portalId, smtpClient, result);
         if (result != null)
         {
             var username = result.Account.Username;
+			_logger.LogError("Authorize(portalId={PortalId},smtpClient={SmtpClient}): username → {Username}", portalId, smtpClient, username);
             var accessToken = result.AccessToken;
 
             smtpClient.Authenticate(username, accessToken);
         }
+		_logger.LogWarning("<<< Exiting Authorize(portalId={PortalId},smtpClient={SmtpClient})", portalId, smtpClient);
     }
 
     /// <inheritdoc />
     public async Task AuthorizeAsync(int portalId, IOAuth2SmtpClient smtpClient, CancellationToken cancellationToken = default)
     {
+		_logger.LogError(">>> Entering AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>)", portalId, smtpClient);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!await this.IsAuthorizedAsync(portalId, cancellationToken))
         {
             return;
         }
 
         var clientApplication = CreateClientApplication(this, this.hostSettingsService, this.hostSettings, this.portalController, portalId);
+		_logger.LogError("AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>): clientApplication → {ClientApplication}", portalId, smtpClient, clientApplication);
         var accounts = await clientApplication.GetAccountsAsync(cancellationToken);
+		_logger.LogError("AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>): accounts → {Accounts}", portalId, smtpClient, accounts);
         var account = accounts.First();
+		_logger.LogError("AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>): account → {Account}", portalId, smtpClient, account);
         var scopes = GetAuthenticationScopes();
+		_logger.LogError("AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>): scopes → {Scopes}", portalId, smtpClient, scopes);
         var result = await clientApplication.AcquireTokenSilent(scopes, account).ExecuteAsync(cancellationToken);
+		_logger.LogError("AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>): result → {Result}", portalId, smtpClient, result);
         if (result != null)
         {
             var username = result.Account.Username;
+			_logger.LogError("AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>): username → {Username}", portalId, smtpClient, username);
             var accessToken = result.AccessToken;
 
             await smtpClient.AuthenticateAsync(username, accessToken, cancellationToken);
+			_logger.LogError("AuthorizeAsync(portalId,smtpClient,cancellationToken)={PortalId},{SmtpClient},<redacted>: external service call took {Arg3} ms", portalId, smtpClient, __logStart.ElapsedMilliseconds);
         }
+		_logger.LogWarning("<<< Exiting AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>)", portalId, smtpClient);
     }
 
     /// <summary>Create the authentication client application.</summary>
@@ -207,6 +255,9 @@ public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
     /// <returns>The client application.</returns>
     internal static ConfidentialClientApplication CreateClientApplication(ISmtpOAuthController smtpOAuthController, IHostSettingsService hostSettingsService, IHostSettings hostSettings, IPortalController portalController, int portalId)
     {
+		_logger.LogError(">>> Entering CreateClientApplication(smtpOAuthController={SmtpOAuthController},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController},portalId={PortalId})", smtpOAuthController, hostSettingsService, hostSettings, portalController, portalId);
+		_logger.LogWarning("<<< Exiting CreateClientApplication(smtpOAuthController={SmtpOAuthController},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController},portalId={PortalId})", smtpOAuthController, hostSettingsService, hostSettings, portalController, portalId);
+		_logger.LogWarning("<<< Exiting CreateClientApplication(authProvider={AuthProvider},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController},portalId={PortalId})", authProvider, hostSettingsService, hostSettings, portalController, portalId);
         return CreateClientApplication(smtpOAuthController.GetOAuthProvider(Constants.Name), hostSettingsService, hostSettings, portalController, portalId);
     }
 
@@ -255,21 +306,29 @@ public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
 
     private IList<SmtpOAuthSetting> GetSettingsFromPortal(int portalId)
     {
+		_logger.LogError(">>> Entering GetSettingsFromPortal(portalId={PortalId})", portalId);
         var portalSettings = PortalController.Instance.GetPortalSettings(portalId);
+		_logger.LogError("GetSettingsFromPortal(portalId={PortalId}): portalSettings → {PortalSettings}", portalId, portalSettings);
         if (portalSettings == null)
         {
+			_logger.LogError("Throwing ArgumentException from GetSettingsFromPortal(portalId={PortalId})", portalId);
             throw new ArgumentException("Invalid portal Id.");
         }
 
         var tenantId = portalSettings.GetValueOrDefault(Constants.TenantIdSettingName, string.Empty);
+		_logger.LogError("GetSettingsFromPortal(portalId={PortalId}): tenantId → {TenantId}", portalId, tenantId);
         var clientId = portalSettings.GetValueOrDefault(Constants.ClientIdSettingName, string.Empty);
+		_logger.LogError("GetSettingsFromPortal(portalId={PortalId}): clientId → {ClientId}", portalId, clientId);
         var clientSecret = portalSettings.GetValueOrDefault(Constants.ClientSecretSettingName, string.Empty);
+		_logger.LogError("GetSettingsFromPortal(portalId={PortalId}): clientSecret → {ClientSecret}", portalId, clientSecret);
         if (!string.IsNullOrWhiteSpace(clientSecret))
         {
             var algorithmName = portalSettings.GetValueOrDefault(Constants.ClientSecretEncryptionAlgorithm, string.Empty);
+			_logger.LogError("GetSettingsFromPortal(portalId={PortalId}): algorithmName → {AlgorithmName}", portalId, algorithmName);
             if (!string.IsNullOrWhiteSpace(algorithmName))
             {
                 var initializationVector = portalSettings.GetValueOrDefault(Constants.ClientSecretInitializationVector, string.Empty);
+				_logger.LogError("GetSettingsFromPortal(portalId={PortalId}): initializationVector → {InitializationVector}", portalId, initializationVector);
                 clientSecret = this.cryptographyProvider.DecryptString(clientSecret, Config.GetDecryptionkey(), algorithmName, initializationVector);
             }
             else
@@ -312,15 +371,21 @@ public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
 
     private IList<SmtpOAuthSetting> GetSettingsFromHost()
     {
+		_logger.LogError(">>> Entering GetSettingsFromHost()");
         var tenantId = this.hostSettingsService.GetString(Constants.TenantIdSettingName, string.Empty);
         var clientId = this.hostSettingsService.GetString(Constants.ClientIdSettingName, string.Empty);
+		_logger.LogError("GetSettingsFromHost(): clientId → {ClientId}", clientId);
+		_logger.LogError("GetSettingsFromHost(): tenantId → {TenantId}", tenantId);
         var clientSecret = this.hostSettingsService.GetString(Constants.ClientSecretSettingName, string.Empty);
         if (!string.IsNullOrWhiteSpace(clientSecret))
         {
+			_logger.LogError("GetSettingsFromHost(): clientSecret → {ClientSecret}", clientSecret);
             var algorithmName = this.hostSettingsService.GetString(Constants.ClientSecretEncryptionAlgorithm, string.Empty);
+			_logger.LogError("GetSettingsFromHost(): algorithmName → {AlgorithmName}", algorithmName);
             if (!string.IsNullOrWhiteSpace(algorithmName))
             {
                 var initializationVector = this.hostSettingsService.GetString(Constants.ClientSecretInitializationVector, string.Empty);
+				_logger.LogError("GetSettingsFromHost(): initializationVector → {InitializationVector}", initializationVector);
                 clientSecret = this.cryptographyProvider.DecryptString(clientSecret, Config.GetDecryptionkey(), algorithmName, initializationVector);
             }
             else
@@ -363,12 +428,18 @@ public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
 
     private bool UpdateHostSettings(IDictionary<string, string> settings)
     {
+		_logger.LogError(">>> Entering UpdateHostSettings(settings={Settings})", settings);
         var tenantId = this.GetSetting(Null.NullInteger, Constants.TenantIdSettingName);
         var clientId = this.GetSetting(Null.NullInteger, Constants.ClientIdSettingName);
+		_logger.LogError("UpdateHostSettings(settings={Settings}): clientId → {ClientId}", settings, clientId);
         var clientSecret = this.GetSetting(Null.NullInteger, Constants.ClientSecretSettingName);
+		_logger.LogError("UpdateHostSettings(settings={Settings}): clientSecret → {ClientSecret}", settings, clientSecret);
         var clientSecretEncryptionAlgorithm = this.GetSetting(Null.NullInteger, Constants.ClientSecretEncryptionAlgorithm);
+		_logger.LogError("UpdateHostSettings(settings={Settings}): clientSecretEncryptionAlgorithm → {ClientSecretEncryptionAlgorithm}", settings, clientSecretEncryptionAlgorithm);
+		_logger.LogError("UpdateHostSettings(settings={Settings}): tenantId → {TenantId}", settings, tenantId);
 
         var changed = false;
+		_logger.LogError("UpdateHostSettings(settings={Settings}): changed → {Changed}", settings, changed);
         if (settings.ContainsKey(Constants.TenantIdSettingName) && settings[Constants.TenantIdSettingName] != tenantId)
         {
             this.hostSettingsService.Update(Constants.TenantIdSettingName, settings[Constants.TenantIdSettingName], false);
@@ -398,17 +469,24 @@ public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
             DataCache.ClearCache();
         }
 
+		_logger.LogWarning("<<< Exiting UpdateHostSettings(settings={Settings})", settings);
         return changed;
     }
 
     private bool UpdatePortalSettings(int portalId, IDictionary<string, string> settings)
     {
+		_logger.LogError(">>> Entering UpdatePortalSettings(portalId={PortalId},settings={Settings})", portalId, settings);
         var tenantId = this.GetSetting(portalId, Constants.TenantIdSettingName);
         var clientId = this.GetSetting(portalId, Constants.ClientIdSettingName);
+		_logger.LogError("UpdatePortalSettings(portalId={PortalId},settings={Settings}): clientId → {ClientId}", portalId, settings, clientId);
         var clientSecret = this.GetSetting(portalId, Constants.ClientSecretSettingName);
+		_logger.LogError("UpdatePortalSettings(portalId={PortalId},settings={Settings}): clientSecret → {ClientSecret}", portalId, settings, clientSecret);
         var clientSecretEncryptionAlgorithm = this.GetSetting(portalId, Constants.ClientSecretEncryptionAlgorithm);
+		_logger.LogError("UpdatePortalSettings(portalId={PortalId},settings={Settings}): clientSecretEncryptionAlgorithm → {ClientSecretEncryptionAlgorithm}", portalId, settings, clientSecretEncryptionAlgorithm);
+		_logger.LogError("UpdatePortalSettings(portalId={PortalId},settings={Settings}): tenantId → {TenantId}", portalId, settings, tenantId);
 
         var changed = false;
+		_logger.LogError("UpdatePortalSettings(portalId={PortalId},settings={Settings}): changed → {Changed}", portalId, settings, changed);
         if (settings.ContainsKey(Constants.TenantIdSettingName) && settings[Constants.TenantIdSettingName] != tenantId)
         {
             PortalController.UpdatePortalSetting(this.portalController, portalId, Constants.TenantIdSettingName, settings[Constants.TenantIdSettingName], false);
@@ -438,19 +516,25 @@ public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
             DataCache.ClearPortalCache(portalId, false);
         }
 
+		_logger.LogWarning("<<< Exiting UpdatePortalSettings(portalId={PortalId},settings={Settings})", portalId, settings);
         return changed;
     }
 
     private string GetSetting(int portalId, string settingName)
     {
+		_logger.LogError(">>> Entering GetSetting(portalId={PortalId},settingName={SettingName})", portalId, settingName);
         var settings = this.GetSettings(portalId);
         var setting = settings.FirstOrDefault(i => i.Name == settingName);
+		_logger.LogError("GetSetting(portalId={PortalId},settingName={SettingName}): setting → {Setting}", portalId, settingName, setting);
+		_logger.LogError("GetSetting(portalId={PortalId},settingName={SettingName}): settings → {Settings}", portalId, settingName, settings);
 
+		_logger.LogWarning("<<< Exiting GetSetting(portalId={PortalId},settingName={SettingName})", portalId, settingName);
         return setting?.Value ?? string.Empty;
     }
 
     private void DeleteSetting(int portalId, string settingName)
     {
+		_logger.LogError(">>> Entering DeleteSetting(portalId={PortalId},settingName={SettingName})", portalId, settingName);
         if (portalId == Null.NullInteger)
         {
             this.hostSettingsService.Update(settingName, string.Empty, false);
@@ -459,5 +543,6 @@ public class ExchangeOnlineOAuthProvider : ISmtpOAuthProvider
         {
             PortalController.UpdatePortalSetting(this.portalController, portalId, settingName, string.Empty, false);
         }
+		_logger.LogWarning("<<< Exiting DeleteSetting(portalId={PortalId},settingName={SettingName})", portalId, settingName);
     }
 }

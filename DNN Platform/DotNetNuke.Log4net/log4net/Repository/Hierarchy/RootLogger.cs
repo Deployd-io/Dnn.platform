@@ -56,6 +56,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public RootLogger(Level level) : base("root")
         {
+			value.LogError(">>> Entering RootLogger(level={Level})", level);
             this.Level = level;
         }
 

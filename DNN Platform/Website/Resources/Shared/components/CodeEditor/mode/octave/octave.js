@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -13,6 +14,8 @@
 
 CodeMirror.defineMode("octave", function() {
   function wordRegexp(words) {
+	logger.error(`>>> Entering wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
+	logger.warn(`<<< Exiting wordRegexp(words=${words})`, { "event.action": "wordRegexp", "logrite.words": words });
     return new RegExp("^((" + words.join(")|(") + "))\\b");
   }
 
@@ -44,19 +47,24 @@ CodeMirror.defineMode("octave", function() {
 
   // tokenizers
   function tokenTranspose(stream, state) {
+	logger.error(`>>> Entering tokenTranspose(stream=${stream},state=${state})`, { "event.action": "tokenTranspose", "logrite.stream": stream, "logrite.state": state });
     if (!stream.sol() && stream.peek() === '\'') {
       stream.next();
       state.tokenize = tokenBase;
+	logger.debug(`tokenTranspose(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenTranspose", "logrite.stream": stream, "logrite.state": state });
       return 'operator';
     }
     state.tokenize = tokenBase;
+	logger.warn(`<<< Exiting tokenTranspose(stream=${stream},state=${state})`, { "event.action": "tokenTranspose", "logrite.stream": stream, "logrite.state": state });
     return tokenBase(stream, state);
   }
 
 
   function tokenComment(stream, state) {
+	logger.error(`>>> Entering tokenComment(stream=${stream},state=${state})`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
     if (stream.match(/^.*%}/)) {
       state.tokenize = tokenBase;
+	logger.warn(`<<< Exiting tokenComment(stream=${stream},state=${state})`, { "event.action": "tokenComment", "logrite.stream": stream, "logrite.state": state });
       return 'comment';
     };
     stream.skipToEnd();
@@ -64,12 +72,14 @@ CodeMirror.defineMode("octave", function() {
   }
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     // whitespaces
     if (stream.eatSpace()) return null;
 
     // Handle one line Comments
     if (stream.match('%{')){
       state.tokenize = tokenComment;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       stream.skipToEnd();
       return 'comment';
     }
@@ -83,6 +93,7 @@ CodeMirror.defineMode("octave", function() {
     if (stream.match(/^[0-9\.+-]/, false)) {
       if (stream.match(/^[+-]?0x[0-9a-fA-F]+[ij]?/)) {
         stream.tokenize = tokenBase;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): stream.tokenize → ${stream.tokenize}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
         return 'number'; };
       if (stream.match(/^[+-]?\d*\.\d+([EeDd][+-]?\d+)?[ij]?/)) { return 'number'; };
       if (stream.match(/^[+-]?\d+([EeDd][+-]?\d+)?[ij]?/)) { return 'number'; };
@@ -91,6 +102,7 @@ CodeMirror.defineMode("octave", function() {
 
     // Handle Strings
     if (stream.match(/^"([^"]|(""))*"/)) { return 'string'; } ;
+	logger.warn(`<<< Exiting tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     if (stream.match(/^'([^']|(''))*'/)) { return 'string'; } ;
 
     // Handle words
@@ -115,15 +127,20 @@ CodeMirror.defineMode("octave", function() {
 
   return {
     startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         tokenize: tokenBase
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
 
     token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       var style = state.tokenize(stream, state);
       if (style === 'number' || style === 'variable'){
+		logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         state.tokenize = tokenTranspose;
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       }
       return style;
     }

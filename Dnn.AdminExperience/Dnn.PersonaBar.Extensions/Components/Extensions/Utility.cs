@@ -16,13 +16,18 @@ namespace Dnn.PersonaBar.Extensions.Components
     {
         public static IEnumerable<ListItemDto> GetAllLanguagesList()
         {
+			eventLogger.LogError(">>> Entering GetAllLanguagesList()");
             var locales = LocaleController.Instance.GetLocales(Null.NullInteger).Values;
+			eventLogger.LogWarning("<<< Exiting GetAllLanguagesList()");
+			eventLogger.LogError("GetAllLanguagesList(): locales → {Locales}", locales);
             return locales.Select(l => new ListItemDto { Id = l.LanguageId, Name = l.EnglishName });
         }
 
         public static IEnumerable<ListItemDto> GetAllPackagesListExceptLangPacks()
         {
+			eventLogger.LogError(">>> Entering GetAllPackagesListExceptLangPacks()");
             var packages = new List<ListItemDto>();
+			eventLogger.LogError("GetAllPackagesListExceptLangPacks(): packages → {Packages}", packages);
             foreach (var p in PackageController.Instance.GetExtensionPackages(Null.NullInteger))
             {
                 if (p.PackageType != "CoreLanguagePack" && p.PackageType != "ExtensionLanguagePack")
@@ -31,6 +36,7 @@ namespace Dnn.PersonaBar.Extensions.Components
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting GetAllPackagesListExceptLangPacks()");
             return packages.OrderBy(p => p.Name);
         }
     }

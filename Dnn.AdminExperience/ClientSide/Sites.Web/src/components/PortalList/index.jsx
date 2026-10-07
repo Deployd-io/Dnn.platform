@@ -15,9 +15,11 @@ import {
     CommonPortalListActions
 } from "dnn-sites-common-actions";
 import styles from "./style.module.less";
+const logger = console;
 
 class PortalList extends Component {
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const { props } = this;
         props.dispatch(
             CommonPortalListActions.loadPortals({
@@ -27,11 +29,14 @@ class PortalList extends Component {
                 pageSize: props.pagination.pageSize
             })
         );
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     loadMore(event) {
+		logger.error(`>>> Entering loadMore(event=${event})`, { "event.action": "loadMore", "logrite.event": event });
         if (event) {
             event.preventDefault();
+			logger.warn(`<<< Exiting loadMore(event=${event})`, { "event.action": "loadMore", "logrite.event": event });
         }
         const { props } = this;
         props.dispatch(
@@ -51,7 +56,9 @@ class PortalList extends Component {
         );
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.sitesPortalList}>
                 <PersonaBarPageHeader title={Localization.get("Sites")}>
@@ -93,6 +100,8 @@ PortalList.propTypes = {
     totalCount: PropTypes.number,
 };
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         portals: state.portal.portals,
         totalCount: state.portal.totalCount,

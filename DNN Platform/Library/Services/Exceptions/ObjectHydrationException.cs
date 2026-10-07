@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.Exceptions
 
     public class ObjectHydrationException : BasePortalException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ObjectHydrationException));
         private List<string> columns;
         private Type type;
 
@@ -19,6 +20,11 @@ namespace DotNetNuke.Services.Exceptions
         public ObjectHydrationException(string message, Exception innerException)
             : base(message, innerException)
         {
+		Logger.LogError(">>> Entering ObjectHydrationException(message={Message},innerException={InnerException})", message, innerException);
+		Logger.LogError(">>> Entering ObjectHydrationException(message={Message},innerException={InnerException},type={Type},dr={Dr})", message, innerException, type, dr);
+		Logger.LogWarning("<<< Exiting ObjectHydrationException(message={Message},innerException={InnerException},type={Type},dr={Dr})", message, innerException, type, dr);
+		Logger.LogDebug("ObjectHydrationException(message={Message},innerException={InnerException},type={Type},dr={Dr}): type → {Type1}", message, innerException, type, dr, type);
+		Logger.LogWarning("<<< Exiting ObjectHydrationException(message={Message},innerException={InnerException})", message, innerException);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ObjectHydrationException"/> class.</summary>
@@ -30,9 +36,11 @@ namespace DotNetNuke.Services.Exceptions
             : base(message, innerException)
         {
             this.type = type;
+			Logger.LogDebug("ObjectHydrationException(message={Message},innerException={InnerException},type={Type},dr={Dr}): this.type → {Arg4}", message, innerException, type, dr, this.type);
             this.columns = new List<string>();
             foreach (DataRow row in dr.GetSchemaTable().Rows)
             {
+				Logger.LogDebug("ObjectHydrationException(message={Message},innerException={InnerException},type={Type},dr={Dr}): columns → {Columns}", message, innerException, type, dr, columns);
                 this.columns.Add(row["ColumnName"].ToString());
             }
         }

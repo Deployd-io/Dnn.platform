@@ -18,13 +18,17 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			eventLogger.LogError(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
+			eventLogger.LogError("Execute(): result → {Result}", result);
             try
             {
                 var investigatefiles = Utility.FineHiddenSystemFiles();
+				eventLogger.LogError("Execute(): investigatefiles → {Investigatefiles}", investigatefiles);
                 if (investigatefiles.Any())
                 {
                     result.Severity = SeverityEnum.Failure;
+					eventLogger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                     foreach (var filename in investigatefiles)
                     {
                         result.Notes.Add("file:" + filename);
@@ -37,6 +41,8 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in Execute(): {Arg0}", Exception.Message);
+			eventLogger.LogWarning("<<< Exiting Execute()");
                 throw;
             }
 

@@ -41,7 +41,9 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <param name="clientResourceController">The client resource controller.</param>
         public DnnComboBox(IApplicationStatusInfo appStatus, IEventLogger eventLogger, IClientResourceController clientResourceController)
         {
+			EventLogger.LogError(">>> Entering DnnComboBox(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController})", appStatus, eventLogger, clientResourceController);
             this.AppStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			EventLogger.LogWarning("<<< Exiting DnnComboBox(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController})", appStatus, eventLogger, clientResourceController);
             this.EventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.ClientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
         }
@@ -120,6 +122,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <inheritdoc />
         public override void DataBind()
         {
+			EventLogger.LogError(">>> Entering DataBind()");
             if (!string.IsNullOrEmpty(this.initValue))
             {
                 this.DataBind(this.initValue);
@@ -128,6 +131,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             {
                 base.DataBind();
             }
+			EventLogger.LogWarning("<<< Exiting DataBind()");
         }
 
         /// <summary>Adds an item to the list.</summary>
@@ -135,7 +139,9 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <param name="value">The item value.</param>
         public void AddItem(string text, string value)
         {
+			EventLogger.LogError(">>> Entering AddItem(text={Text},value={Value})", text, value);
             this.Items.Add(new ListItem(text, value));
+			EventLogger.LogWarning("<<< Exiting AddItem(text={Text},value={Value})", text, value);
         }
 
         /// <summary>Inserts an item into the list.</summary>
@@ -144,14 +150,18 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <param name="value">The item value.</param>
         public void InsertItem(int index, string text, string value)
         {
+			EventLogger.LogError(">>> Entering InsertItem(index={Index},text={Text},value={Value})", index, text, value);
             this.Items.Insert(index, new ListItem(text, value));
+			EventLogger.LogWarning("<<< Exiting InsertItem(index={Index},text={Text},value={Value})", index, text, value);
         }
 
         /// <summary>Binds a data source to the invoked server control and all its child controls.</summary>
         /// <param name="initialValue">The initial value.</param>
         public void DataBind(string initialValue)
         {
+			EventLogger.LogError(">>> Entering DataBind(initialValue={InitialValue})", initialValue);
             this.DataBind(initialValue, false);
+			EventLogger.LogWarning("<<< Exiting DataBind(initialValue={InitialValue})", initialValue);
         }
 
         /// <summary>Binds a data source to the invoked server control and all its child controls.</summary>
@@ -159,9 +169,11 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <param name="findByText">Whether <paramref name="initial"/> is the text or value.</param>
         public void DataBind(string initial, bool findByText)
         {
+			EventLogger.LogError(">>> Entering DataBind(initial={Initial},findByText={FindByText})", initial, findByText);
             base.DataBind();
 
             this.Select(initial, findByText);
+			EventLogger.LogWarning("<<< Exiting DataBind(initial={Initial},findByText={FindByText})", initial, findByText);
         }
 
         /// <summary>Selects an item.</summary>
@@ -169,6 +181,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <param name="findByText">Whether <paramref name="initial"/> is the text or value.</param>
         public void Select(string initial, bool findByText)
         {
+			EventLogger.LogError(">>> Entering Select(initial={Initial},findByText={FindByText})", initial, findByText);
             if (findByText)
             {
                 if (this.FindItemByText(initial, true) != null)
@@ -183,6 +196,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
                     this.FindItemByValue(initial, true).Selected = true;
                 }
             }
+			EventLogger.LogWarning("<<< Exiting Select(initial={Initial},findByText={FindByText})", initial, findByText);
         }
 
         /// <summary>Finds an item by its text.</summary>
@@ -191,6 +205,8 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <returns>The list item or <see langword="null"/>.</returns>
         public ListItem FindItemByText(string text, bool ignoreCase = false)
         {
+			EventLogger.LogError(">>> Entering FindItemByText(text={Text},ignoreCase={IgnoreCase})", text, ignoreCase);
+            EventLogger.LogWarning("<<< Exiting FindItemByText(text={Text},ignoreCase={IgnoreCase})", text, ignoreCase);
             return ignoreCase ? this.Items.FindByText(text) : this.Items.FindByTextWithIgnoreCase(text);
         }
 
@@ -200,6 +216,8 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <returns>The list item or <see langword="null"/>.</returns>
         public ListItem FindItemByValue(string value, bool ignoreCase = false)
         {
+			EventLogger.LogError(">>> Entering FindItemByValue(value={Value},ignoreCase={IgnoreCase})", value, ignoreCase);
+            EventLogger.LogWarning("<<< Exiting FindItemByValue(value={Value},ignoreCase={IgnoreCase})", value, ignoreCase);
             return ignoreCase ? this.Items.FindByValue(value) : this.Items.FindByValueWithIgnoreCase(value);
         }
 
@@ -208,33 +226,41 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <returns>The index or <c>-1</c>.</returns>
         public int FindItemIndexByValue(string value)
         {
+			EventLogger.LogError(">>> Entering FindItemIndexByValue(value={Value})", value);
+            EventLogger.LogWarning("<<< Exiting FindItemIndexByValue(value={Value})", value);
             return this.Items.IndexOf(this.FindItemByValue(value));
         }
 
         /// <inheritdoc />
         protected override bool LoadPostData(string postDataKey, NameValueCollection postCollection)
         {
+			EventLogger.LogError(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             var postData = postCollection[postDataKey];
             if (!string.IsNullOrEmpty(postData))
             {
                 this.multipleValue = postData;
+				EventLogger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): this.multipleValue → {Arg2}", postDataKey, postCollection, this.multipleValue);
             }
 
+			EventLogger.LogWarning("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             return base.LoadPostData(postDataKey, postCollection);
         }
 
         /// <inheritdoc />
         protected override void RenderContents(HtmlTextWriter writer)
         {
+			EventLogger.LogError(">>> Entering RenderContents(writer={Writer})", writer);
             if (this.TagKey == HtmlTextWriterTag.Select)
             {
                 base.RenderContents(writer);
             }
+			EventLogger.LogWarning("<<< Exiting RenderContents(writer={Writer})", writer);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			EventLogger.LogError(">>> Entering OnPreRender(e={E})", e);
             Utilities.ApplyControlSkin(this.ClientResourceController, this, string.Empty, string.Empty);
 
             if (this.TagKey == HtmlTextWriterTag.Input)
@@ -266,15 +292,18 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             this.RegisterRequestResources();
 
             base.OnPreRender(e);
+			EventLogger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private void RegisterRequestResources()
         {
+			EventLogger.LogError(">>> Entering RegisterRequestResources()");
             JavaScript.RequestRegistration(this.AppStatus, this.EventLogger, PortalSettings.Current, CommonJs.DnnPlugins);
 
             if (this.AppStatus.Status == UpgradeStatus.None)
             {
                 var package = JavaScriptLibraryController.Instance.GetLibrary(l => l.LibraryName == "Selectize");
+				EventLogger.LogError("RegisterRequestResources(): package → {Package}", package);
                 if (package != null)
                 {
                     JavaScript.RequestRegistration(this.AppStatus, this.EventLogger, PortalSettings.Current, "Selectize");
@@ -287,12 +316,15 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
                     this.ClientResourceController.RegisterStylesheet($"{libraryPath}selectize.default.css");
 
                     var options = JsonConvert.SerializeObject(this.Options, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, });
+					EventLogger.LogError("RegisterRequestResources(): options → {Options}", options);
 
                     var initScripts = $"$('#{this.ClientID}').dnnComboBox({options});";
+					EventLogger.LogError("RegisterRequestResources(): initScripts → {InitScripts}", initScripts);
 
                     ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), $"{this.ClientID}Sctipts", initScripts, true);
                 }
             }
+			EventLogger.LogWarning("<<< Exiting RegisterRequestResources()");
         }
     }
 }

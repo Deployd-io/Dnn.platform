@@ -6,6 +6,7 @@ import { InputGroup, PagePicker, Label } from "@dnnsoftware/dnn-react-common";
 import utils from "../../../../utils";
 import Localization from "../../../../localization";
 import PageUrlCommons from "../PageUrlCommons/PageUrlCommons";
+const logger = console;
 
 const PageToTestParameters = {
     portalId: -2,
@@ -20,15 +21,21 @@ const PageToTestParameters = {
 class PageExisting extends Component {
 
     onChangePage(value) {
+		logger.error(`>>> Entering onChangePage(value=${value})`, { "event.action": "onChangePage", "logrite.value": value });
         const {onChangeField} = this.props;
         onChangeField("existingTabRedirection", parseInt(value) === -1 ? "" : value);
+		logger.warn(`<<< Exiting onChangePage(value=${value})`, { "event.action": "onChangePage", "logrite.value": value });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {page} = this.props;
         const serviceFramework = utils.getServiceFramework();
+		logger.error(`render(): serviceFramework → ${serviceFramework}`, { "event.action": "render" });
         const noneSpecifiedText = "<" + Localization.get("NoneSpecified") + ">";
+		logger.error(`render(): noneSpecifiedText → ${noneSpecifiedText}`, { "event.action": "render" });
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={styles.pageExisting}>
                 <InputGroup>
@@ -58,6 +65,8 @@ PageExisting.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return ({page : state.pages.selectedPage});
 };
 

@@ -20,7 +20,10 @@ namespace Dnn.EditBar.UI.Helpers
         /// <returns>Returns true if current user has a edit permission on the page or is admin of some module in the page. Otherwise, returns false.</returns>
         public static bool IsPageEditor(int tabId, PortalSettings portalSettings)
         {
+			eventLogger.LogError(">>> Entering IsPageEditor(tabId={TabId},portalSettings={PortalSettings})", tabId, portalSettings);
             var tabPermissions = TabPermissionController.GetTabPermissions(tabId, portalSettings.PortalId);
+			eventLogger.LogError("IsPageEditor(tabId={TabId},portalSettings={PortalSettings}): tabPermissions → {TabPermissions}", tabId, portalSettings, tabPermissions);
+			eventLogger.LogWarning("<<< Exiting IsPageEditor(tabId={TabId},portalSettings={PortalSettings})", tabId, portalSettings);
             return TabPermissionController.HasTabPermission(tabPermissions, "EDIT,CONTENT,MANAGE")
                 || IsModuleAdmin(portalSettings, TabController.Instance.GetTab(tabId, portalSettings.PortalId));
         }
@@ -29,6 +32,8 @@ namespace Dnn.EditBar.UI.Helpers
         /// <returns>Returns true if current user has any admin permission. Otherwise returns false.</returns>
         public static bool IsPageAdmin()
         {
+			eventLogger.LogError(">>> Entering IsPageAdmin()");
+			eventLogger.LogWarning("<<< Exiting IsPageAdmin()");
             return TabPermissionController.CanAddContentToPage() || TabPermissionController.CanAddPage() || TabPermissionController.CanAdminPage() || TabPermissionController.CanCopyPage() ||
                 TabPermissionController.CanDeletePage() || TabPermissionController.CanExportPage() || TabPermissionController.CanImportPage() || TabPermissionController.CanManagePage();
         }
@@ -38,6 +43,9 @@ namespace Dnn.EditBar.UI.Helpers
         /// <returns>Returns true if current user has admin permission over some module in the current page. Otherwise, returns false.</returns>
         public static bool IsModuleAdmin(PortalSettings portalSettings)
         {
+			eventLogger.LogError(">>> Entering IsModuleAdmin(portalSettings={PortalSettings})", portalSettings);
+			eventLogger.LogWarning("<<< Exiting IsModuleAdmin(portalSettings={PortalSettings})", portalSettings);
+			eventLogger.LogWarning("<<< Exiting IsModuleAdmin(portalSettings={PortalSettings},tab={Tab})", portalSettings, tab);
             return IsModuleAdmin(portalSettings, portalSettings.ActiveTab);
         }
 

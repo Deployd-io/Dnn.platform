@@ -11,6 +11,7 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <summary>Initializes a new instance of the <see cref="ToolbarGroup" /> class.</summary>
         public ToolbarGroup()
         {
+			eventLogger.LogError(">>> Entering ToolbarGroup()");
             this.items = new List<string>();
         }
 

@@ -73,17 +73,28 @@ namespace log4net.Repository
         /// </remarks>
         protected LoggerRepositorySkeleton(PropertiesDictionary properties)
         {
+			log.ErrorFormat(">>> Entering LoggerRepositorySkeleton(properties={0})", properties);
             this.m_properties = properties;
+			log.WarnFormat("<<< Exiting LoggerRepositorySkeleton(properties={0})", properties);
+			log.DebugFormat("LoggerRepositorySkeleton(properties={0}): this.m_properties → {1}", properties, this.m_properties);
+			log.DebugFormat("LoggerRepositorySkeleton(properties={0}): m_properties → {1}", properties, m_properties);
             this.m_rendererMap = new RendererMap();
             this.m_pluginMap = new PluginMap(this);
+			log.DebugFormat("LoggerRepositorySkeleton(properties={0}): m_rendererMap → {1}", properties, m_rendererMap);
+			log.DebugFormat("LoggerRepositorySkeleton(properties={0}): m_pluginMap → {1}", properties, m_pluginMap);
             this.m_levelMap = new LevelMap();
             this.m_configurationMessages = EmptyCollection.Instance;
+			log.DebugFormat("LoggerRepositorySkeleton(properties={0}): m_levelMap → {1}", properties, m_levelMap);
+			log.DebugFormat("LoggerRepositorySkeleton(properties={0}): m_configurationMessages → {1}", properties, m_configurationMessages);
+			log.DebugFormat("LoggerRepositorySkeleton(properties={0}): this.m_configurationMessages → {1}", properties, this.m_configurationMessages);
             this.m_configured = false;
 
             this.AddBuiltinLevels();
+			log.DebugFormat("LoggerRepositorySkeleton(properties={0}): this.m_configured → {1}", properties, this.m_configured);
 
             // Don't disable any levels by default.
             this.m_threshold = Level.All;
+			log.DebugFormat("LoggerRepositorySkeleton(properties={0}): m_threshold → {1}", properties, m_threshold);
         }
 
         /// <summary>The name of the repository</summary>
@@ -224,6 +235,7 @@ namespace log4net.Repository
         /// </remarks>
         public virtual void Shutdown() 
         {
+			log.ErrorFormat(">>> Entering Shutdown()");
             // Shutdown attached plugins
             foreach(IPlugin plugin in this.PluginMap.AllPlugins)
             {
@@ -232,6 +244,7 @@ namespace log4net.Repository
 
             // Notify listeners
             this.OnShutdown(null);
+			log.WarnFormat("<<< Exiting Shutdown()");
         }
 
         /// <summary>Reset the repositories configuration to a default state</summary>
@@ -250,18 +263,23 @@ namespace log4net.Repository
         /// </remarks>
         public virtual void ResetConfiguration() 
         {
+			log.ErrorFormat(">>> Entering ResetConfiguration()");
             // Clear internal data structures
             this.m_rendererMap.Clear();
             this.m_levelMap.Clear();
             this.m_configurationMessages = EmptyCollection.Instance;
+			log.DebugFormat("ResetConfiguration(): m_configurationMessages → {0}", m_configurationMessages);
+			log.DebugFormat("ResetConfiguration(): this.m_configurationMessages → {0}", this.m_configurationMessages);
 
             // Add the predefined levels to the map
             this.AddBuiltinLevels();
 
             this.Configured = false;
+			log.DebugFormat("ResetConfiguration(): this.Configured → {0}", this.Configured);
 
             // Notify listeners
             this.OnConfigurationReset(null);
+			log.WarnFormat("<<< Exiting ResetConfiguration()");
         }
 
         /// <summary>Log the logEvent through this repository.</summary>
@@ -381,6 +399,7 @@ namespace log4net.Repository
 
         private void AddBuiltinLevels()
         {
+			log.ErrorFormat(">>> Entering AddBuiltinLevels()");
             // Add the predefined levels to the map
             this.m_levelMap.Add(Level.Off);
 
@@ -408,6 +427,7 @@ namespace log4net.Repository
             this.m_levelMap.Add(Level.Finest);
 
             this.m_levelMap.Add(Level.All);
+			log.WarnFormat("<<< Exiting AddBuiltinLevels()");
         }
 
         /// <summary>Adds an object renderer for a specific class. </summary>
@@ -420,8 +440,10 @@ namespace log4net.Repository
         /// </remarks>
         public virtual void AddRenderer(Type typeToRender, IObjectRenderer rendererInstance) 
         {
+			log.ErrorFormat(">>> Entering AddRenderer(typeToRender={0},rendererInstance={1})", typeToRender, rendererInstance);
             if (typeToRender == null)
             {
+				log.ErrorFormat("Throwing ArgumentNullException from AddRenderer(typeToRender={0},rendererInstance={1})", typeToRender, rendererInstance);
                 throw new ArgumentNullException("typeToRender");
             }
             if (rendererInstance == null)
@@ -430,6 +452,7 @@ namespace log4net.Repository
             }
 
             this.m_rendererMap.Put(typeToRender, rendererInstance);
+			log.WarnFormat("<<< Exiting AddRenderer(typeToRender={0},rendererInstance={1})", typeToRender, rendererInstance);
         }
 
         /// <summary>Notify the registered listeners that the repository is shutting down</summary>
@@ -441,6 +464,7 @@ namespace log4net.Repository
         /// </remarks>
         protected virtual void OnShutdown(EventArgs e)
         {
+			log.ErrorFormat(">>> Entering OnShutdown(e={0})", e);
             if (e == null)
             {
                 e = EventArgs.Empty;
@@ -451,6 +475,7 @@ namespace log4net.Repository
             {
                 handler(this, e);
             }
+			log.WarnFormat("<<< Exiting OnShutdown(e={0})", e);
         }
 
         /// <summary>Notify the registered listeners that the repository has had its configuration reset</summary>
@@ -462,6 +487,7 @@ namespace log4net.Repository
         /// </remarks>
         protected virtual void OnConfigurationReset(EventArgs e)
         {
+			log.ErrorFormat(">>> Entering OnConfigurationReset(e={0})", e);
             if (e == null)
             {
                 e = EventArgs.Empty;
@@ -472,6 +498,7 @@ namespace log4net.Repository
             {
                 handler(this, e);
             }
+			log.WarnFormat("<<< Exiting OnConfigurationReset(e={0})", e);
         }
 
         /// <summary>Notify the registered listeners that the repository has had its configuration changed</summary>
@@ -483,6 +510,7 @@ namespace log4net.Repository
         /// </remarks>
         protected virtual void OnConfigurationChanged(EventArgs e)
         {
+			log.ErrorFormat(">>> Entering OnConfigurationChanged(e={0})", e);
             if (e == null)
             {
                 e = EventArgs.Empty;
@@ -493,6 +521,7 @@ namespace log4net.Repository
             {
                 handler(this, e);
             }
+			log.WarnFormat("<<< Exiting OnConfigurationChanged(e={0})", e);
         }
 
         /// <summary>Raise a configuration changed event on this repository</summary>
@@ -505,11 +534,14 @@ namespace log4net.Repository
         /// </remarks>
         public void RaiseConfigurationChanged(EventArgs e)
         {
+			log.ErrorFormat(">>> Entering RaiseConfigurationChanged(e={0})", e);
             this.OnConfigurationChanged(e);
+			log.WarnFormat("<<< Exiting RaiseConfigurationChanged(e={0})", e);
         }
 
         private static int GetWaitTime(DateTime startTimeUtc, int millisecondsTimeout)
         {
+			log.ErrorFormat(">>> Entering GetWaitTime(startTimeUtc={0},millisecondsTimeout={1})", startTimeUtc, millisecondsTimeout);
             if (millisecondsTimeout == Timeout.Infinite)
             {
                 return Timeout.Infinite;
@@ -521,12 +553,15 @@ namespace log4net.Repository
             }
 
             int elapsedMilliseconds = (int)(DateTime.UtcNow - startTimeUtc).TotalMilliseconds;
+			log.ErrorFormat("GetWaitTime(startTimeUtc={0},millisecondsTimeout={1}): elapsedMilliseconds → {2}", startTimeUtc, millisecondsTimeout, elapsedMilliseconds);
             int timeout = millisecondsTimeout - elapsedMilliseconds;
+			log.ErrorFormat("GetWaitTime(startTimeUtc={0},millisecondsTimeout={1}): timeout → {2}", startTimeUtc, millisecondsTimeout, timeout);
             if (timeout < 0)
             {
                 timeout = 0;
             }
 
+			log.WarnFormat("<<< Exiting GetWaitTime(startTimeUtc={0},millisecondsTimeout={1})", startTimeUtc, millisecondsTimeout);
             return timeout;
         }
 
@@ -536,13 +571,16 @@ namespace log4net.Repository
         /// <returns><c>True</c> if all logging events were flushed successfully, else <c>false</c>.</returns>
         public bool Flush(int millisecondsTimeout)
         {
+			log.ErrorFormat(">>> Entering Flush(millisecondsTimeout={0})", millisecondsTimeout);
             if (millisecondsTimeout < -1)
             {
+				log.ErrorFormat("Throwing ArgumentOutOfRangeException from Flush(millisecondsTimeout={0})", millisecondsTimeout);
                 throw new ArgumentOutOfRangeException("millisecondsTimeout", "Timeout must be -1 (Timeout.Infinite) or non-negative");
             }
 
             // Assume success until one of the appenders fails
             bool result = true;
+			log.ErrorFormat("Flush(millisecondsTimeout={0}): result → {1}", millisecondsTimeout, result);
 
             // Use DateTime.UtcNow rather than a System.Diagnostics.Stopwatch for compatibility with .NET 1.x
             DateTime startTimeUtc = DateTime.UtcNow;
@@ -559,6 +597,7 @@ namespace log4net.Repository
                 if (appender is Appender.BufferingAppenderSkeleton)
                 {
                     int timeout = GetWaitTime(startTimeUtc, millisecondsTimeout);
+					log.ErrorFormat("Flush(millisecondsTimeout={0}): timeout → {1}", millisecondsTimeout, timeout);
                     if (!flushable.Flush(timeout))
                     {
                         result = false;
@@ -585,6 +624,7 @@ namespace log4net.Repository
                 }
             }
 
+			log.WarnFormat("<<< Exiting Flush(millisecondsTimeout={0})", millisecondsTimeout);
             return result;
         }
     }

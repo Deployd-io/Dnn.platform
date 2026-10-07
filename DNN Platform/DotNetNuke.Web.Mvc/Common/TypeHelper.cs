@@ -8,6 +8,7 @@ namespace DotNetNuke.Web.Mvc.Common
 
     public static class TypeHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TypeHelper));
         /// <summary>
         /// Given an object of anonymous type, add each property as a key and associated with its value to a dictionary.
         ///
@@ -18,8 +19,10 @@ namespace DotNetNuke.Web.Mvc.Common
         /// <returns>The route value dictionary containing each property from <paramref name="value"/>.</returns>
         public static RouteValueDictionary ObjectToDictionary(object value)
         {
+			Logger.LogError(">>> Entering ObjectToDictionary(value={Value})", value);
             RouteValueDictionary dictionary = new RouteValueDictionary();
 
+			Logger.LogError("ObjectToDictionary(value={Value}): dictionary → {Dictionary}", value, dictionary);
             if (value != null)
             {
                 foreach (PropertyHelper helper in PropertyHelper.GetProperties(value))
@@ -28,6 +31,7 @@ namespace DotNetNuke.Web.Mvc.Common
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ObjectToDictionary(value={Value})", value);
             return dictionary;
         }
     }

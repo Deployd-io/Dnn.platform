@@ -11,16 +11,23 @@ namespace DotNetNuke.Services.Search.Entities
     [Serializable]
     public class SearchQuery
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchQuery));
         /// <summary>Initializes a new instance of the <see cref="SearchQuery"/> class.</summary>
         public SearchQuery()
         {
+			Logger.LogError(">>> Entering SearchQuery()");
             this.Tags = [];
+			Logger.LogDebug("SearchQuery(): this.Tags → {Arg0}", this.Tags);
             this.PortalIds = [];
             this.SearchTypeIds = [];
+			Logger.LogDebug("SearchQuery(): this.PortalIds → {Arg0}", this.PortalIds);
+			Logger.LogDebug("SearchQuery(): this.SearchTypeIds → {Arg0}", this.SearchTypeIds);
             this.ModuleDefIds = [];
             this.TitleSnippetLength = 60;
             this.BodySnippetLength = 100;
             this.PageSize = 10;
+			Logger.LogDebug("SearchQuery(): this.ModuleDefIds → {Arg0}", this.ModuleDefIds);
+			Logger.LogDebug("SearchQuery(): this.TitleSnippetLength → {Arg0}", this.TitleSnippetLength);
             this.PageIndex = 1;
             this.SearchContext = new Dictionary<string, string>();
             this.CustomKeywords = new Dictionary<string, string>();

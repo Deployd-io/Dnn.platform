@@ -8,6 +8,7 @@ namespace DotNetNuke.Entities.Modules
     /// <summary>The ProfileUserControlBase class defines a custom base class for the profile Control.</summary>
     public class ProfileUserControlBase : UserModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ProfileUserControlBase));
         public event EventHandler ProfileUpdated;
 
         public event EventHandler ProfileUpdateCompleted;
@@ -16,20 +17,24 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="e">The event arguments.</param>
         public void OnProfileUpdateCompleted(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnProfileUpdateCompleted(e={E})", e);
             if (this.ProfileUpdateCompleted != null)
             {
                 this.ProfileUpdateCompleted(this, e);
             }
+			Logger.LogWarning("<<< Exiting OnProfileUpdateCompleted(e={E})", e);
         }
 
         /// <summary>Raises the <see cref="ProfileUpdated"/> Event.</summary>
         /// <param name="e">The event arguments.</param>
         public void OnProfileUpdated(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnProfileUpdated(e={E})", e);
             if (this.ProfileUpdated != null)
             {
                 this.ProfileUpdated(this, e);
             }
+			Logger.LogWarning("<<< Exiting OnProfileUpdated(e={E})", e);
         }
     }
 }

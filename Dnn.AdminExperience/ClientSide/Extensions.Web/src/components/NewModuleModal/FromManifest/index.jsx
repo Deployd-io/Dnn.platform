@@ -5,14 +5,17 @@ import FolderDropdown from "../common/FolderDropdown";
 import { validationMapNewModule, valueMapNewModule } from "../common/helperFunctions";
 import Localization from "localization";
 import styles from "./style.module.less";
+const logger = console;
 
 const dropdownStyle = { width: "100%", marginBottom: 64 };
 function getValidateRequired(key) {
+	logger.error(`>>> Entering getValidateRequired(key=${key})`, { "event.action": "getValidateRequired", "logrite.key": key });
     switch (key) {
         case "moduleFolder":
         case "manifest":
             return true;
         default:
+			logger.warn(`<<< Exiting getValidateRequired(key=${key})`, { "event.action": "getValidateRequired", "logrite.key": key });
             return false;
     }
 }
@@ -30,18 +33,24 @@ const emptyNewModule = {
 class FromManifest extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             newModule: validationMapNewModule(emptyNewModule, getValidateRequired),
             triedToSave: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         this.props.retrieveOwnerAndModuleFolders();
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
     UNSAFE_componentWillReceiveProps(props) {
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
         if (props.moduleFiles.length > 0) {
             let { newModule } = this.state;
             newModule.manifest.value = props.moduleFiles[0].value;
+			logger.warn(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.props": props });
             newModule.manifest.error = false;
 
             this.setState({
@@ -51,6 +60,7 @@ class FromManifest extends Component {
     }
 
     onFolderSelect(key, option) {
+		logger.error(`>>> Entering onFolderSelect(key=${key},option=${option})`, { "event.action": "onFolderSelect", "logrite.key": key, "logrite.option": option });
         const { props, state } = this;
         let {newModule, triedToSave} = this.state;
         if (key === "ownerFolder") {
@@ -59,6 +69,7 @@ class FromManifest extends Component {
             newModule.moduleFolder.value = "";
             newModule.moduleFolder.error = true;
             triedToSave = false;
+			logger.debug(`onFolderSelect(key=${key},option=${option}): triedToSave → ${triedToSave}`, { "event.action": "onFolderSelect", "logrite.key": key, "logrite.option": option });
             props.onSelectOwnerFolder(option.value);
         }
         if (key === "moduleFolder" && option.value !== "") {
@@ -73,6 +84,7 @@ class FromManifest extends Component {
         }
         if (newModule[key].required) {
             newModule[key].error = !option.value;
+			logger.warn(`<<< Exiting onFolderSelect(key=${key},option=${option})`, { "event.action": "onFolderSelect", "logrite.key": key, "logrite.option": option });
         }
         newModule[key].value = option.value;
         this.setState({
@@ -94,6 +106,7 @@ class FromManifest extends Component {
     }
 
     validateFields() {
+		logger.error('>>> Entering validateFields()', { "event.action": "validateFields" });
         let {newModule} = this.state;
         let errorCount = 0;
         Object.keys(newModule).forEach((key) => {
@@ -106,10 +119,12 @@ class FromManifest extends Component {
             newModule,
             triedToSave
         });
+		logger.warn('<<< Exiting validateFields()', { "event.action": "validateFields" });
         return errorCount === 0;
     }
 
     onCreateNewModule() {
+		logger.error('>>> Entering onCreateNewModule()', { "event.action": "onCreateNewModule" });
         let {state, props} = this;
         let triedToSave = true;
         if (!this.validateFields()) {
@@ -119,8 +134,10 @@ class FromManifest extends Component {
             triedToSave
         });
         props.onCreateNewModule(valueMapNewModule(state.newModule));
+		logger.warn('<<< Exiting onCreateNewModule()', { "event.action": "onCreateNewModule" });
     }
     onAddedNewFolder(data, type) {
+		logger.error(`>>> Entering onAddedNewFolder(data=${data},type=${type})`, { "event.action": "onAddedNewFolder", "logrite.data": data, "logrite.type": type });
         let {newModule} = this.state;
         if (type === "ownerFolder") {
             newModule.ownerFolder.value = data.ownerFolder;
@@ -134,6 +151,7 @@ class FromManifest extends Component {
             newModule.moduleFolder.value = data.moduleFolder;
             newModule.moduleFolder.error = false;
             newModule.manifest.value = "";
+			logger.warn(`<<< Exiting onAddedNewFolder(data=${data},type=${type})`, { "event.action": "onAddedNewFolder", "logrite.data": data, "logrite.type": type });
             newModule.manifest.error = true;
             this.setState({
                 triedToSave: false
@@ -145,6 +163,7 @@ class FromManifest extends Component {
     }
 
     onAddNewFolder(value, type, callback) {
+		logger.error(`>>> Entering onAddNewFolder(value=${value},type=${type},callback=${callback})`, { "event.action": "onAddNewFolder", "logrite.value": value, "logrite.type": type, "logrite.callback": callback });
         const { newModule } = this.state;
         let payload = {
             moduleFolder: type === "ownerFolder" ? "" : newModule.moduleFolder.value,
@@ -153,9 +172,12 @@ class FromManifest extends Component {
         payload[type] = value;
 
         this.props.onAddNewFolder(payload, type, callback);
+		logger.warn(`<<< Exiting onAddNewFolder(value=${value},type=${type},callback=${callback})`, { "event.action": "onAddNewFolder", "logrite.value": value, "logrite.type": type, "logrite.callback": callback });
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <GridCell className={styles.fromManifest + " extension-form"} style={{ padding: 0 }}>
                 <GridSystem className="with-right-border top-half">

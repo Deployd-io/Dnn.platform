@@ -1,20 +1,27 @@
 import React, { Component } from "react";
 import ContentLoadWrapper from "./index";
+const logger = console;
 import { TableEmptyState } from "../SvgIcons";
 
 class MyContentLoadWrapper extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = { loaded: false };    
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         setTimeout(function () {
             this.setState({ loaded: true });
         }.bind(this), 2000);
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <ContentLoadWrapper
                 loadComplete={this.state.loaded}

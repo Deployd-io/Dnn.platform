@@ -108,6 +108,8 @@ namespace log4net.Util
         /// <returns></returns>
         public override string ToString()
         {
+			value.LogError(">>> Entering ToString()");
+            value.LogWarning("<<< Exiting ToString()");
             return this.Prefix + this.Source.Name + ": " + this.Message;
         }
 
@@ -118,12 +120,20 @@ namespace log4net.Util
         /// <param name="exception"></param>
         public LogLog(Type source, string prefix, string message, Exception exception)
         {
+			value.LogError(">>> Entering LogLog(source={Source},prefix={Prefix},message={Message},exception={Exception})", source, prefix, message, exception);
+			value.LogDebug("LogLog(source={Source},prefix={Prefix},message={Message},exception={Exception}): source → {Source1}", source, prefix, message, exception, source);
             this.timeStampUtc = DateTime.UtcNow;
+			value.LogDebug("LogLog(source={Source},prefix={Prefix},message={Message},exception={Exception}): this.timeStampUtc → {Arg4}", source, prefix, message, exception, this.timeStampUtc);
             
             this.source = source;
             this.prefix = prefix;
+			value.LogDebug("LogLog(source={Source},prefix={Prefix},message={Message},exception={Exception}): this.source → {Arg4}", source, prefix, message, exception, this.source);
+			value.LogDebug("LogLog(source={Source},prefix={Prefix},message={Message},exception={Exception}): this.prefix → {Arg4}", source, prefix, message, exception, this.prefix);
+        value.LogWarning("<<< Exiting LogLog(source={Source},prefix={Prefix},message={Message},exception={Exception})", source, prefix, message, exception);
             this.message = message;
             this.exception = exception;
+			value.LogError(">>> Entering LogLog()");
+			value.LogWarning("<<< Exiting LogLog()");
         }
 
         /// <summary>
@@ -149,11 +159,17 @@ namespace log4net.Util
             try
             {
                 InternalDebugging = OptionConverter.ToBoolean(SystemInfo.GetAppSetting("log4net.Internal.Debug"), false);
+				value.LogError("LogLog(): InternalDebugging → {InternalDebugging}", InternalDebugging);
                 QuietMode = OptionConverter.ToBoolean(SystemInfo.GetAppSetting("log4net.Internal.Quiet"), false);
+				value.LogError("LogLog(): QuietMode → {QuietMode}", QuietMode);
+				value.LogDebug("LogLog(): QuietMode → {QuietMode}", QuietMode);
                 EmitInternalMessages = OptionConverter.ToBoolean(SystemInfo.GetAppSetting("log4net.Internal.Emit"), true);
             }
             catch(Exception ex)
             {
+				value.LogError("LogLog(): EmitInternalMessages → {EmitInternalMessages}", EmitInternalMessages);
+				value.LogDebug("LogLog(): InternalDebugging → {InternalDebugging}", InternalDebugging);
+				value.LogDebug("LogLog(): EmitInternalMessages → {EmitInternalMessages}", EmitInternalMessages);
                 // If an exception is thrown here then it looks like the config file does not
                 // parse correctly.
                 //
@@ -261,10 +277,12 @@ namespace log4net.Util
         /// <param name="exception"></param>
         public static void OnLogReceived(Type source, string prefix, string message, Exception exception)
         {
+			value.LogError(">>> Entering OnLogReceived(source={Source},prefix={Prefix},message={Message},exception={Exception})", source, prefix, message, exception);
             if (LogReceived != null)
             {
                 LogReceived(null, new LogReceivedEventArgs(new LogLog(source, prefix, message, exception)));
             }
+			value.LogWarning("<<< Exiting OnLogReceived(source={Source},prefix={Prefix},message={Message},exception={Exception})", source, prefix, message, exception);
         }
 
         /// <summary>Test if LogLog.Debug is enabled for output.</summary>
@@ -295,6 +313,7 @@ namespace log4net.Util
         /// </remarks>
         public static void Debug(Type source, string message) 
         {
+			value.LogError(">>> Entering Debug(source={Source},message={Message})", source, message);
             if (IsDebugEnabled) 
             {
                 if (EmitInternalMessages)
@@ -304,6 +323,7 @@ namespace log4net.Util
 
                 OnLogReceived(source, PREFIX, message, null);
             }
+			value.LogWarning("<<< Exiting Debug(source={Source},message={Message})", source, message);
         }
 
         /// <summary>
@@ -321,6 +341,7 @@ namespace log4net.Util
         /// </remarks>
         public static void Debug(Type source, string message, Exception exception) 
         {
+			value.LogError(">>> Entering Debug(source={Source},message={Message},exception={Exception})", source, message, exception);
             if (IsDebugEnabled) 
             {
                 if (EmitInternalMessages)
@@ -334,6 +355,7 @@ namespace log4net.Util
 
                 OnLogReceived(source, PREFIX, message, exception);
             }
+			value.LogWarning("<<< Exiting Debug(source={Source},message={Message},exception={Exception})", source, message, exception);
         }
   
         /// <summary>Test if LogLog.Warn is enabled for output.</summary>
@@ -364,6 +386,7 @@ namespace log4net.Util
         /// </remarks>
         public static void Warn(Type source, string message) 
         {
+			value.LogError(">>> Entering Warn(source={Source},message={Message})", source, message);
             if (IsWarnEnabled)
             {
                 if (EmitInternalMessages)
@@ -373,6 +396,7 @@ namespace log4net.Util
 
                 OnLogReceived(source, WARN_PREFIX, message, null);
             }
+			value.LogWarning("<<< Exiting Warn(source={Source},message={Message})", source, message);
         }  
 
         /// <summary>
@@ -390,6 +414,7 @@ namespace log4net.Util
         /// </remarks>
         public static void Warn(Type source, string message, Exception exception) 
         {
+			value.LogError(">>> Entering Warn(source={Source},message={Message},exception={Exception})", source, message, exception);
             if (IsWarnEnabled)
             {
                 if (EmitInternalMessages)
@@ -403,6 +428,7 @@ namespace log4net.Util
 
                 OnLogReceived(source, WARN_PREFIX, message, exception);
             }
+			value.LogWarning("<<< Exiting Warn(source={Source},message={Message},exception={Exception})", source, message, exception);
         } 
 
         /// <summary>Test if LogLog.Error is enabled for output.</summary>
@@ -433,6 +459,7 @@ namespace log4net.Util
         /// </remarks>
         public static void Error(Type source, string message) 
         {
+			value.LogError(">>> Entering Error(source={Source},message={Message})", source, message);
             if (IsErrorEnabled)
             {
                 if (EmitInternalMessages)
@@ -442,6 +469,7 @@ namespace log4net.Util
 
                 OnLogReceived(source, ERR_PREFIX, message, null);
             }
+			value.LogWarning("<<< Exiting Error(source={Source},message={Message})", source, message);
         }  
 
         /// <summary>
@@ -459,6 +487,7 @@ namespace log4net.Util
         /// </remarks>
         public static void Error(Type source, string message, Exception exception) 
         {
+			value.LogError(">>> Entering Error(source={Source},message={Message},exception={Exception})", source, message, exception);
             if (IsErrorEnabled)
             {
                 if (EmitInternalMessages)
@@ -472,6 +501,7 @@ namespace log4net.Util
 
                 OnLogReceived(source, ERR_PREFIX, message, exception);
             }
+			value.LogWarning("<<< Exiting Error(source={Source},message={Message},exception={Exception})", source, message, exception);
         }
 
         /// <summary>Writes output to the standard output stream.  </summary>
@@ -490,7 +520,10 @@ namespace log4net.Util
         /// </remarks>
         private static void EmitOutLine(string message)
         {
+			value.LogError(">>> Entering EmitOutLine(message={Message})", message);
             try
+			value.LogError("Exception in EmitOutLine(message={Message}): {Arg1}", message, ex.Message);
+			value.LogWarning("<<< Exiting EmitOutLine(message={Message})", message);
             {
 #if NETCF
                 Console.WriteLine(message);
@@ -522,7 +555,10 @@ namespace log4net.Util
         /// </remarks>
         private static void EmitErrorLine(string message)
         {
+			value.LogError(">>> Entering EmitErrorLine(message={Message})", message);
             try
+			value.LogError("Exception in EmitErrorLine(message={Message}): {Arg1}", message, ex.Message);
+			value.LogWarning("<<< Exiting EmitErrorLine(message={Message})", message);
             {
 #if NETCF
                 Console.WriteLine(message);
@@ -565,11 +601,16 @@ namespace log4net.Util
             /// <param name="items"></param>
             public LogReceivedAdapter(IList items)
             {
+				value.LogError(">>> Entering LogReceivedAdapter(items={Items})", items);
                 this.items = items;
 
+				value.LogDebug("LogReceivedAdapter(items={Items}): this.items → {Arg1}", items, this.items);
+				value.LogDebug("LogReceivedAdapter(items={Items}): items → {Items1}", items, items);
                 this.handler = new LogReceivedEventHandler(this.LogLog_LogReceived);
+				value.LogDebug("LogReceivedAdapter(items={Items}): handler → {Handler}", items, handler);
 
                 LogReceived += this.handler;
+				value.LogWarning("<<< Exiting LogReceivedAdapter(items={Items})", items);
             }
 
             void LogLog_LogReceived(object source, LogReceivedEventArgs e)
@@ -590,7 +631,9 @@ namespace log4net.Util
             /// </summary>
             public void Dispose()
             {
+				value.LogError(">>> Entering Dispose()");
                 LogReceived -= this.handler;
+				value.LogWarning("<<< Exiting Dispose()");
             }
         }
     }
@@ -608,7 +651,11 @@ namespace log4net.Util
         /// <param name="loglog"></param>
         public LogReceivedEventArgs(LogLog loglog)
         {
+			value.LogError(">>> Entering LogReceivedEventArgs(loglog={Loglog})", loglog);
             this.loglog = loglog;
+			value.LogDebug("LogReceivedEventArgs(loglog={Loglog}): loglog → {Loglog1}", loglog, loglog);
+        value.LogDebug("LogReceivedEventArgs(loglog={Loglog}): this.loglog → {Arg1}", loglog, this.loglog);
+        value.LogWarning("<<< Exiting LogReceivedEventArgs(loglog={Loglog})", loglog);
         }
 
         /// <summary>

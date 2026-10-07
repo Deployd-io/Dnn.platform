@@ -16,6 +16,7 @@ import {
 } from "../../../actions";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 
 const re = /^[1-9][0-9]?[0-9]?[0-9]?[0-9]?[0-9]?$/;
 let retainHistoryNumOptions = [];
@@ -26,6 +27,7 @@ let catchUpEnabledOptions = [];
 class SchedulerEditor extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
 
         this.state = {
             error: {
@@ -38,6 +40,7 @@ class SchedulerEditor extends Component {
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const { props } = this;
         if (props.scheduleId) {
             props.dispatch(TaskActions.getGetScheduleItem({
@@ -76,6 +79,7 @@ class SchedulerEditor extends Component {
         if (catchUpEnabledOptions.length === 0) {
             catchUpEnabledOptions.push({ "value": "false", "label": resx.get("Disabled") });
             catchUpEnabledOptions.push({ "value": "true", "label": resx.get("Enabled.Label") });
+			logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
         }
 
         this.setState({
@@ -85,27 +89,34 @@ class SchedulerEditor extends Component {
     }
 
     runSchedule() {
+		logger.error('>>> Entering runSchedule()', { "event.action": "runSchedule" });
         const { props } = this;
         let { scheduleItemDetail } = props;
         props.dispatch(TaskActions.runScheduleItem(scheduleItemDetail, () => {
             util.utilities.notify(resx.get("RunNow"));
         }, () => {
             util.utilities.notify(resx.get("RunNowError"));
+			logger.warn('<<< Exiting runSchedule()', { "event.action": "runSchedule" });
         }));
     }
 
     isEmptyDate(date) {
+		logger.error(`>>> Entering isEmptyDate(date=${date})`, { "event.action": "isEmptyDate", "logrite.date": date });
+		logger.warn(`<<< Exiting isEmptyDate(date=${date})`, { "event.action": "isEmptyDate", "logrite.date": date });
         return !date || new Date(date).getFullYear() < 1970;
     }
 
     getDefaultIfNull(obj, key, defaultValue) {
+		logger.error(`>>> Entering getDefaultIfNull(obj=${obj},key=${key},defaultValue=${defaultValue})`, { "event.action": "getDefaultIfNull", "logrite.obj": obj, "logrite.key": key, "logrite.defaultValue": defaultValue });
         if (obj && key && obj[key]) {
             return obj[key].toString();
         }
+		logger.warn(`<<< Exiting getDefaultIfNull(obj=${obj},key=${key},defaultValue=${defaultValue})`, { "event.action": "getDefaultIfNull", "logrite.obj": obj, "logrite.key": key, "logrite.defaultValue": defaultValue });
         return defaultValue;
     }
 
     getValue(selectKey) {
+		logger.error(`>>> Entering getValue(selectKey=${selectKey})`, { "event.action": "getValue", "logrite.selectKey": selectKey });
         const { props } = this;
         switch (selectKey) {
             case "FriendlyName":
@@ -142,14 +153,18 @@ class SchedulerEditor extends Component {
             default:
                 break;
         }
+		logger.warn(`<<< Exiting getValue(selectKey=${selectKey})`, { "event.action": "getValue", "logrite.selectKey": selectKey });
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let { state, props } = this;
         let scheduleItemDetail = Object.assign({}, props.scheduleItemDetail);
+		logger.error(`onSettingChange(key=${key},event=${event}): scheduleItemDetail → ${scheduleItemDetail}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
 
         if (key === "ScheduleStartDate") {
             scheduleItemDetail[key] = event;
+			logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         }
         else if (key === "CatchUpEnabled") {
             scheduleItemDetail[key] = event.value === "true" ? true : false;
@@ -194,6 +209,7 @@ class SchedulerEditor extends Component {
     }
 
     onUpdateItem(event) {
+		logger.error(`>>> Entering onUpdateItem(event=${event})`, { "event.action": "onUpdateItem", "logrite.event": event });
         event.preventDefault();
         const { props, state } = this;
         this.setState({
@@ -204,18 +220,25 @@ class SchedulerEditor extends Component {
         }
 
         this.handleRecommendedServers(() => props.onUpdate(props.scheduleItemDetail));
+		logger.warn(`<<< Exiting onUpdateItem(event=${event})`, { "event.action": "onUpdateItem", "logrite.event": event });
     }
 
     compareIgnoreCase(prev, next) {
+		logger.error(`>>> Entering compareIgnoreCase(prev=${prev},next=${next})`, { "event.action": "compareIgnoreCase", "logrite.prev": prev, "logrite.next": next });
+		logger.warn(`<<< Exiting compareIgnoreCase(prev=${prev},next=${next})`, { "event.action": "compareIgnoreCase", "logrite.prev": prev, "logrite.next": next });
         return prev.toLowerCase().localeCompare(next.toLowerCase());
     }
 
     uniqueIgnoreCase(value, index, self) {
+		logger.error(`>>> Entering uniqueIgnoreCase(value=${value},index=${index},self=${self})`, { "event.action": "uniqueIgnoreCase", "logrite.value": value, "logrite.index": index });
         const lower = self.map(x => (x || "").toLowerCase());
+		logger.error(`uniqueIgnoreCase(value=${value},index=${index},self=${self}): lower → ${lower}`, { "event.action": "uniqueIgnoreCase", "logrite.value": value, "logrite.index": index });
         return lower.indexOf(value.toLowerCase()) === index;
     }
 
     normalizeServers(commaSeparatedServers) {
+		logger.error(`>>> Entering normalizeServers(commaSeparatedServers=${commaSeparatedServers})`, { "event.action": "normalizeServers", "logrite.commaSeparatedServers": commaSeparatedServers });
+		logger.warn(`<<< Exiting normalizeServers(commaSeparatedServers=${commaSeparatedServers})`, { "event.action": "normalizeServers", "logrite.commaSeparatedServers": commaSeparatedServers });
         return (commaSeparatedServers || "")
             .split(",")
             .map(x => x.trim())
@@ -226,42 +249,54 @@ class SchedulerEditor extends Component {
     }
 
     onServersBlur() {
+		logger.error('>>> Entering onServersBlur()', { "event.action": "onServersBlur" });
         const { scheduleItemDetail } = this.props;
         this.onSettingChange("Servers", {
             target: {
                 value: this.normalizeServers(scheduleItemDetail.Servers)
             }
         });
+		logger.warn('<<< Exiting onServersBlur()', { "event.action": "onServersBlur" });
     }
 
     handleRecommendedServers(callback) {
+		logger.error(`>>> Entering handleRecommendedServers(callback=${callback})`, { "event.action": "handleRecommendedServers", "logrite.callback": callback });
         const { scheduleItemDetail } = this.props;
         const recommendedServers = scheduleItemDetail.RecommendedServers || [];
 
         const proceed = () => {
+			logger.error('>>> Entering proceed()', { "event.action": "proceed" });
             if (callback && typeof(callback) === "function") {
                 callback();
             }
+			logger.warn('<<< Exiting proceed()', { "event.action": "proceed" });
         };
 
         if (scheduleItemDetail.Enabled && recommendedServers.length > 0) {
             const servers = this.normalizeServers(scheduleItemDetail.Servers);
+			logger.error(`handleRecommendedServers(callback=${callback}): servers → ${servers}`, { "event.action": "handleRecommendedServers", "logrite.callback": callback });
             const recommended = this.normalizeServers(recommendedServers.join(", "));
+			logger.error(`handleRecommendedServers(callback=${callback}): recommended → ${recommended}`, { "event.action": "handleRecommendedServers", "logrite.callback": callback });
 
             if (this.compareIgnoreCase(servers, recommended) !== 0) {
                 const message = util.formatString(resx.get("RecommendServers"), recommended);
+				logger.error(`handleRecommendedServers(callback=${callback}): message → ${message}`, { "event.action": "handleRecommendedServers", "logrite.callback": callback });
                 const yes = resx.get("Yes");
+				logger.error(`handleRecommendedServers(callback=${callback}): yes → ${yes}`, { "event.action": "handleRecommendedServers", "logrite.callback": callback });
                 const no = resx.get("No");
+				logger.error(`handleRecommendedServers(callback=${callback}): no → ${no}`, { "event.action": "handleRecommendedServers", "logrite.callback": callback });
                 util.utilities.confirm(message, yes, no, () => proceed());
             } else {
                 proceed();
             }
         } else {
             proceed();
+			logger.warn(`<<< Exiting handleRecommendedServers(callback=${callback})`, { "event.action": "handleRecommendedServers", "logrite.callback": callback });
         }
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const { props } = this;
         if (props.settingsClientModified) {
             util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
@@ -271,11 +306,13 @@ class SchedulerEditor extends Component {
         }
         else {
             props.Collapse();
+			logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
         }
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props, state } = this;
         if (props.panelIndex === 1) {
             return <History pageSize={5} scheduleId={props.scheduleId} title={resx.get("HistoryModalTitle")} />;
@@ -459,6 +496,8 @@ SchedulerEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         scheduleItemDetail: state.task.scheduleItemDetail,
         settingsClientModified: state.task.settingsClientModified

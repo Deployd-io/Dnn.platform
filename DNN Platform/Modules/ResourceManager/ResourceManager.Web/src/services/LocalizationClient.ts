@@ -1,3 +1,4 @@
+const logger = console;
 import { DnnServicesFramework } from "@dnncommunity/dnn-elements";
 
 export class LocalizationClient{
@@ -9,26 +10,36 @@ export class LocalizationClient{
      * @param moduleId The ID of the current module.
      */
     constructor(moduleId: number){
+		logger.error(`>>> Entering constructor(moduleId=${moduleId})`, { "event.action": "constructor", "logrite.moduleId": moduleId });
         this.sf = new DnnServicesFramework(moduleId);
         this.requestUrl = `${this.sf.getServiceRoot("ResourceManager")}Localization/`
+		logger.warn(`<<< Exiting constructor(moduleId=${moduleId})`, { "event.action": "constructor", "logrite.moduleId": moduleId });
     }
 
     /** Gets the localized strings */
     public async getResources(): Promise<LocalizedStrings> {
+		logger.error('>>> Entering getResources()', { "event.action": "getResources" });
         const LocalizationStorageKey = "ResourceManagerLocalization";
         const localization = sessionStorage.getItem(LocalizationStorageKey);
+		const _start_getResources_17 = Date.now();
+		logger.error(`getResources(): LocalizationStorageKey → ${LocalizationStorageKey}`, { "event.action": "getResources" });
+		logger.error(`getResources(): localization → ${localization}`, { "event.action": "getResources" });
         if (localization !== null){
             return JSON.parse(localization) as LocalizedStrings;
         }
 
         const url = `${this.requestUrl}GetResources`;
         const response = await fetch(url, { headers: this.sf.getModuleHeaders()});
+		logger.error(`getResources(): response → ${response}`, { "event.action": "getResources" });
         if (response.status !== 200){
             throw new Error(`Error getting localized strings: ${response.statusText}`);
         }
 
         const data = await response.json() as LocalizedStrings;
+		logger.error(`getResources(): data → ${data}`, { "event.action": "getResources" });
+		logger.error(`getResources(): API call took ${Date.now() - _start_getResources_17} ms`, { "event.action": "getResources", "event.category": "network" });
         sessionStorage.setItem(LocalizationStorageKey, JSON.stringify(data));
+		logger.warn('<<< Exiting getResources()', { "event.action": "getResources" });
         return data;
     }
 }

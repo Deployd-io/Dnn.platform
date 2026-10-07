@@ -48,7 +48,9 @@ namespace log4net.Layout
         /// </remarks>
         public bool CanConvertFrom(Type sourceType) 
         {
+			value.LogError(">>> Entering CanConvertFrom(sourceType={SourceType})", sourceType);
             // Accept an ILayout object
+			value.LogWarning("<<< Exiting CanConvertFrom(sourceType={SourceType})", sourceType);
             return (typeof(ILayout).IsAssignableFrom(sourceType));
         }
 

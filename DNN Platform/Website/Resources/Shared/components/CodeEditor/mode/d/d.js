@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -25,9 +26,12 @@ CodeMirror.defineMode("d", function(config, parserConfig) {
   var curPunc;
 
   function tokenBase(stream, state) {
+	logger.error(`>>> Entering tokenBase(stream=${stream},state=${state})`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.next();
     if (hooks[ch]) {
+	logger.error(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       var result = hooks[ch](stream, state);
+	logger.error(`tokenBase(stream=${stream},state=${state}): result → ${result}`, { "event.action": "tokenBase", "logrite.stream": stream, "logrite.state": state });
       if (result !== false) return result;
     }
     if (ch == '"' || ch == "'" || ch == "`") {

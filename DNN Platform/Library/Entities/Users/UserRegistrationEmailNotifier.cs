@@ -13,15 +13,19 @@ namespace DotNetNuke.Entities.Users
 
     public class UserRegistrationEmailNotifier
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserRegistrationEmailNotifier));
         /// <summary>Initializes a new instance of the <see cref="UserRegistrationEmailNotifier"/> class.</summary>
         public UserRegistrationEmailNotifier()
         {
+		Logger.LogError(">>> Entering UserRegistrationEmailNotifier()");
+        Logger.LogWarning("<<< Exiting UserRegistrationEmailNotifier()");
         }
 
         private static UserInfo CurrentUser => UserController.Instance.GetCurrentUserInfo();
 
         public static void NotifyAdministrator(UserInfo user)
         {
+			Logger.LogError(">>> Entering NotifyAdministrator(user={User})", user);
             // avoid self-notification (i.e. on site installation/super user creation)
             if (CurrentUser != null &&
                 (CurrentUser.UserID == Null.NullInteger || CurrentUser.UserID == user.UserID))
@@ -36,10 +40,12 @@ namespace DotNetNuke.Entities.Users
             {
                 NotifyUser(user, MessageType.UserRegistrationAdmin);
             }
+			Logger.LogWarning("<<< Exiting NotifyAdministrator(user={User})", user);
         }
 
         public static void NotifyUser(UserInfo user)
         {
+			Logger.LogError(">>> Entering NotifyUser(user={User})", user);
             switch (PortalSettings.Current.UserRegistration)
             {
                 case (int)PortalRegistrationType.PrivateRegistration:
@@ -59,11 +65,14 @@ namespace DotNetNuke.Entities.Users
                     NotifyUser(user, MessageType.UserRegistrationPublic);
                     break;
             }
+			Logger.LogWarning("<<< Exiting NotifyUser(user={User})", user);
         }
 
         public static void NotifyUser(UserInfo user, MessageType type)
         {
+			Logger.LogError(">>> Entering NotifyUser(user={User},type={Type})", user, type);
             Mail.SendMail(user, type, PortalSettings.Current);
+			Logger.LogWarning("<<< Exiting NotifyUser(user={User},type={Type})", user, type);
         }
     }
 }

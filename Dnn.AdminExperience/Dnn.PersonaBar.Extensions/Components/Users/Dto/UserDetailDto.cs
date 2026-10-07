@@ -29,13 +29,22 @@ namespace Dnn.PersonaBar.Users.Components.Dto
         public UserDetailDto(UserInfo user)
             : base(user)
         {
+			eventLogger.LogError(">>> Entering UserDetailDto(user={User})", user);
             this.LastLogin = user.Membership.LastLoginDate;
+			eventLogger.LogDebug("UserDetailDto(user={User}): this.LastLogin → {Arg1}", user, this.LastLogin);
             this.LastActivity = user.Membership.LastActivityDate;
             this.LastPasswordChange = user.Membership.LastPasswordChangeDate;
+			eventLogger.LogDebug("UserDetailDto(user={User}): this.UserFolderId → {Arg1}", user, this.UserFolderId);
+        eventLogger.LogDebug("UserDetailDto(user={User}): this.HasAgreedToTermsOn → {Arg1}", user, this.HasAgreedToTermsOn);
+        eventLogger.LogWarning("<<< Exiting UserDetailDto(user={User})", user);
             this.LastLockout = user.Membership.LastLockoutDate;
 #pragma warning disable CS0618 // Type or member is obsolete
+			eventLogger.LogDebug("UserDetailDto(user={User}): this.LastActivity → {Arg1}", user, this.LastActivity);
             this.IsOnline = user.Membership.IsOnLine;
 #pragma warning restore CS0618 // Type or member is obsolete
+			eventLogger.LogDebug("UserDetailDto(user={User}): this.LastPasswordChange → {Arg1}", user, this.LastPasswordChange);
+			eventLogger.LogDebug("UserDetailDto(user={User}): this.LastLockout → {Arg1}", user, this.LastLockout);
+			eventLogger.LogDebug("UserDetailDto(user={User}): this.IsOnline → {Arg1}", user, this.IsOnline);
             this.IsLocked = user.Membership.LockedOut;
             this.NeedUpdatePassword = user.Membership.UpdatePassword;
             this.PortalId = user.PortalID;
@@ -43,6 +52,10 @@ namespace Dnn.PersonaBar.Users.Components.Dto
             var userFolder = FolderManager.Instance.GetUserFolder(user);
             if (userFolder != null)
             {
+				eventLogger.LogDebug("UserDetailDto(user={User}): this.IsLocked → {Arg1}", user, this.IsLocked);
+				eventLogger.LogError("UserDetailDto(user={User}): userFolder → {UserFolder}", user, userFolder);
+				eventLogger.LogDebug("UserDetailDto(user={User}): this.NeedUpdatePassword → {Arg1}", user, this.NeedUpdatePassword);
+				eventLogger.LogDebug("UserDetailDto(user={User}): this.PortalId → {Arg1}", user, this.PortalId);
                 this.UserFolderId = userFolder.FolderID;
 
                 // check whether user had upload files
@@ -101,6 +114,7 @@ namespace Dnn.PersonaBar.Users.Components.Dto
 
         private static string GetSettingUrl(int portalId, int userId)
         {
+			eventLogger.LogError(">>> Entering GetSettingUrl(portalId={PortalId},userId={UserId})", portalId, userId);
             var module = ModuleController.Instance.GetModulesByDefinition(UserController.Instance.GetUserById(portalId, userId).IsSuperUser ? -1 : portalId, "User Accounts")
                 .Cast<ModuleInfo>().FirstOrDefault();
             if (module == null)
@@ -109,14 +123,18 @@ namespace Dnn.PersonaBar.Users.Components.Dto
             }
 
             var tabId = TabController.Instance.GetTabsByModuleID(module.ModuleID).Keys.FirstOrDefault();
+			eventLogger.LogError("GetSettingUrl(portalId={PortalId},userId={UserId}): tabId → {TabId}", portalId, userId, tabId);
             if (tabId <= 0)
             {
                 return string.Empty;
             }
 
             var extraParams = new Dictionary<string, string>();
+			eventLogger.LogError("GetSettingUrl(portalId={PortalId},userId={UserId}): extraParams → {ExtraParams}", portalId, userId, extraParams);
             var skinSrc = Globals.HostPath + "Skins/_default/popUpSkin";
+			eventLogger.LogError("GetSettingUrl(portalId={PortalId},userId={UserId}): skinSrc → {SkinSrc}", portalId, userId, skinSrc);
             var containerSrc = Globals.HostPath + "Containers/_default/popUpContainer";
+			eventLogger.LogError("GetSettingUrl(portalId={PortalId},userId={UserId}): containerSrc → {ContainerSrc}", portalId, userId, containerSrc);
             extraParams.Add("SkinSrc", skinSrc);
             extraParams.Add("ContainerSrc", containerSrc);
             extraParams.Add("mid", module.ModuleID.ToString(CultureInfo.InvariantCulture));
@@ -125,6 +143,7 @@ namespace Dnn.PersonaBar.Users.Components.Dto
             extraParams.Add("editprofile", "true");
 
             // ctl/Edit/mid/345/packageid/52
+			eventLogger.LogWarning("<<< Exiting GetSettingUrl(portalId={PortalId},userId={UserId})", portalId, userId);
             return NavigationManager.NavigateURL(
                 tabId,
                 PortalSettings.Current,

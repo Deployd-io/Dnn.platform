@@ -60,7 +60,11 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <param name="userControllerWrapper">The user controller.</param>
         public SetUser(IUserValidator userValidator, IUsersController usersController, IUserControllerWrapper userControllerWrapper)
         {
+			eventLogger.LogError(">>> Entering SetUser(userValidator={UserValidator},usersController={UsersController},userControllerWrapper={UserControllerWrapper})", userValidator, usersController, userControllerWrapper);
+			eventLogger.LogDebug("SetUser(userValidator={UserValidator},usersController={UsersController},userControllerWrapper={UserControllerWrapper}): usersController → {UsersController1}", userValidator, usersController, userControllerWrapper, usersController);
             this.userValidator = userValidator;
+			eventLogger.LogWarning("<<< Exiting SetUser(userValidator={UserValidator},usersController={UsersController},userControllerWrapper={UserControllerWrapper})", userValidator, usersController, userControllerWrapper);
+			eventLogger.LogDebug("SetUser(userValidator={UserValidator},usersController={UsersController},userControllerWrapper={UserControllerWrapper}): this.userValidator → {Arg3}", userValidator, usersController, userControllerWrapper, this.userValidator);
             this.usersController = usersController;
             this.userControllerWrapper = userControllerWrapper;
         }
@@ -87,9 +91,13 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.UserId = this.GetFlagValue(FlagId, "User Id", -1, true, true, true);
             this.Email = this.GetFlagValue(FlagEmail, "Email", string.Empty);
+			eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): Email → {Email}", args, portalSettings, userInfo, activeTabId, Email);
+			eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): UserId → {UserId}", args, portalSettings, userInfo, activeTabId, UserId);
             this.Username = this.GetFlagValue(FlagUsername, "Username", string.Empty);
+			eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): Username → {Username}", args, portalSettings, userInfo, activeTabId, Username);
             this.DisplayName = this.GetFlagValue(FlagDisplayname, "DisplayName", string.Empty);
             this.FirstName = this.GetFlagValue(FlagFirstname, "FirstName", string.Empty);
             this.LastName = this.GetFlagValue(FlagLastname, "LastName", string.Empty);
@@ -107,13 +115,16 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             {
                 this.AddMessage(this.LocalizeString("Prompt_NothingToSetUser"));
             }
+			eventLogger.LogWarning("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             var sbResults = new StringBuilder();
 
+			eventLogger.LogError("Run(): sbResults → {SbResults}", sbResults);
             ConsoleErrorResultModel errorResultModel;
             UserInfo userInfo;
 
@@ -138,6 +149,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                 }
                 catch (Exception ex)
                 {
+					eventLogger.LogError("Exception in Run(): {Arg0}", ex.Message);
                     return new ConsoleErrorResultModel(ex.Message);
                 }
             }
@@ -149,6 +161,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             }
 
             var basicUpdated = !string.IsNullOrEmpty(this.Username) || !string.IsNullOrEmpty(this.DisplayName) || !string.IsNullOrEmpty(this.FirstName) || !string.IsNullOrEmpty(this.LastName) || !string.IsNullOrEmpty(this.Email);
+			eventLogger.LogError("Run(): basicUpdated → {BasicUpdated}", basicUpdated);
             var userBasicDto = new UserBasicDto
             {
                 Displayname = userInfo.DisplayName,
@@ -164,27 +177,32 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             if (!string.IsNullOrEmpty(this.Username))
             {
                 userBasicDto.Username = this.Username;
+				eventLogger.LogDebug("Run(): userBasicDto.Username → {Arg0}", userBasicDto.Username);
             }
 
             // Update other properties
             if (!string.IsNullOrEmpty(this.DisplayName))
             {
                 userBasicDto.Displayname = this.DisplayName;
+				eventLogger.LogDebug("Run(): userBasicDto.Displayname → {Arg0}", userBasicDto.Displayname);
             }
 
             if (!string.IsNullOrEmpty(this.FirstName))
             {
                 userBasicDto.Firstname = this.FirstName;
+				eventLogger.LogDebug("Run(): userBasicDto.Firstname → {Arg0}", userBasicDto.Firstname);
             }
 
             if (!string.IsNullOrEmpty(this.LastName))
             {
                 userBasicDto.Lastname = this.LastName;
+				eventLogger.LogDebug("Run(): userBasicDto.Lastname → {Arg0}", userBasicDto.Lastname);
             }
 
             if (!string.IsNullOrEmpty(this.Email))
             {
                 userBasicDto.Email = this.Email;
+				eventLogger.LogDebug("Run(): userBasicDto.Email → {Arg0}", userBasicDto.Email);
             }
 
             if (basicUpdated)
@@ -195,6 +213,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                 }
                 catch (SqlException)
                 {
+					eventLogger.LogError("Exception in Run(): {Arg0}", SqlException.Message);
                     return new ConsoleErrorResultModel(this.LocalizeString("UsernameNotUnique") + "\n" + sbResults);
                 }
                 catch (Exception ex)
@@ -205,9 +224,12 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
 
             // retrieve the updated user
             var updatedUser = this.userControllerWrapper.GetUserById(userInfo.PortalID, userInfo.UserID);
+			eventLogger.LogError("Run(): updatedUser → {UpdatedUser}", updatedUser);
 
             var lst = new List<UserModel> { new UserModel(updatedUser) };
+			eventLogger.LogError("Run(): lst → {Lst}", lst);
 
+			eventLogger.LogWarning("<<< Exiting Run()");
             return new ConsoleResultModel(string.Empty)
             {
                 Data = lst,

@@ -18,6 +18,7 @@ namespace DotNetNuke.Modules.Groups
     {
         public GroupsModuleBase()
         {
+			eventLogger.LogError(">>> Entering GroupsModuleBase()");
             this.NavigationManager = this.DependencyProvider.GetRequiredService<INavigationManager>();
         }
 
@@ -276,16 +277,22 @@ namespace DotNetNuke.Modules.Groups
 
         public string GetCreateUrl()
         {
+			eventLogger.LogError(">>> Entering GetCreateUrl()");
+            eventLogger.LogWarning("<<< Exiting GetCreateUrl()");
             return this.ModuleContext.EditUrl("Create"); ////.NavigateUrl(GroupCreateTabId,"",true,null);
         }
 
         public string GetClearFilterUrl()
         {
+			eventLogger.LogError(">>> Entering GetClearFilterUrl()");
+            eventLogger.LogWarning("<<< Exiting GetClearFilterUrl()");
             return this.NavigationManager.NavigateURL(this.TabId, string.Empty);
         }
 
         public string GetEditUrl()
         {
+			eventLogger.LogError(">>> Entering GetEditUrl()");
+            eventLogger.LogWarning("<<< Exiting GetEditUrl()");
             return this.ModuleContext.EditUrl("GroupId", this.GroupId.ToString("D"), "Edit");
         }
     }

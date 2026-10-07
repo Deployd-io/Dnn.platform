@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -29,6 +30,7 @@ CodeMirror.defineMode('tiki', function(config) {
   }
 
   function inLine(style) {
+	logger.error(`>>> Entering inLine(style=${style})`, { "event.action": "inLine", "logrite.style": style });
     return function(stream, state) {
       while(!stream.eol()) {
         stream.next();
@@ -40,7 +42,9 @@ CodeMirror.defineMode('tiki', function(config) {
 
   function inText(stream, state) {
     function chain(parser) {
+	logger.error(`>>> Entering chain(parser=${parser})`, { "event.action": "chain", "logrite.parser": parser });
       state.tokenize = parser;
+	logger.warn(`<<< Exiting chain(parser=${parser})`, { "event.action": "chain", "logrite.parser": parser });
       return parser(stream, state);
     }
 
@@ -131,11 +135,15 @@ CodeMirror.defineMode('tiki', function(config) {
   // Return variables for tokenizers
   var pluginName, type;
   function inPlugin(stream, state) {
+	logger.error(`>>> Entering inPlugin(stream=${stream},state=${state})`, { "event.action": "inPlugin", "logrite.stream": stream, "logrite.state": state });
     var ch = stream.next();
     var peek = stream.peek();
+	logger.error(`inPlugin(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "inPlugin", "logrite.stream": stream, "logrite.state": state });
+	logger.error(`inPlugin(stream=${stream},state=${state}): peek → ${peek}`, { "event.action": "inPlugin", "logrite.stream": stream, "logrite.state": state });
 
     if (ch == "}") {
       state.tokenize = inText;
+	logger.debug(`inPlugin(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`, { "event.action": "inPlugin", "logrite.stream": stream, "logrite.state": state });
       //type = ch == ")" ? "endPlugin" : "selfclosePlugin"; inPlugin
       return "tag";
     } else if (ch == "(" || ch == ")") {
@@ -160,11 +168,13 @@ CodeMirror.defineMode('tiki', function(config) {
       return state.tokenize(stream, state);
     } else {
       stream.eatWhile(/[^\s\u00a0=\"\'\/?]/);
+	logger.warn(`<<< Exiting inPlugin(stream=${stream},state=${state})`, { "event.action": "inPlugin", "logrite.stream": stream, "logrite.state": state });
       return "keyword";
     }
   }
 
   function inAttribute(quote) {
+	logger.error(`>>> Entering inAttribute(quote=${quote})`, { "event.action": "inAttribute", "logrite.quote": quote });
     return function(stream, state) {
       while (!stream.eol()) {
         if (stream.next() == quote) {
@@ -177,6 +187,7 @@ CodeMirror.defineMode('tiki', function(config) {
   }
 
   function inAttributeNoQuote() {
+	logger.error('>>> Entering inAttributeNoQuote()', { "event.action": "inAttributeNoQuote" });
     return function(stream, state) {
       while (!stream.eol()) {
         var ch = stream.next();
@@ -184,6 +195,7 @@ CodeMirror.defineMode('tiki', function(config) {
         if (ch == " " || ch == "," || /[ )}]/.test(peek)) {
       state.tokenize = inPlugin;
       break;
+	logger.warn('<<< Exiting inAttributeNoQuote()', { "event.action": "inAttributeNoQuote" });
     }
   }
   return "string";
@@ -192,15 +204,20 @@ CodeMirror.defineMode('tiki', function(config) {
 
 var curState, setStyle;
 function pass() {
+logger.error('>>> Entering pass()', { "event.action": "pass" });
   for (var i = arguments.length - 1; i >= 0; i--) curState.cc.push(arguments[i]);
+logger.warn('<<< Exiting pass()', { "event.action": "pass" });
 }
 
 function cont() {
+logger.error('>>> Entering cont()', { "event.action": "cont" });
   pass.apply(null, arguments);
+logger.warn('<<< Exiting cont()', { "event.action": "cont" });
   return true;
 }
 
 function pushContext(pluginName, startOfLine) {
+logger.error(`>>> Entering pushContext(pluginName=${pluginName},startOfLine=${startOfLine})`, { "event.action": "pushContext", "logrite.pluginName": pluginName, "logrite.startOfLine": startOfLine });
   var noIndent = curState.context && curState.context.noIndent;
   curState.context = {
     prev: curState.context,
@@ -209,13 +226,17 @@ function pushContext(pluginName, startOfLine) {
     startOfLine: startOfLine,
     noIndent: noIndent
   };
+logger.warn(`<<< Exiting pushContext(pluginName=${pluginName},startOfLine=${startOfLine})`, { "event.action": "pushContext", "logrite.pluginName": pluginName, "logrite.startOfLine": startOfLine });
 }
 
 function popContext() {
+logger.error('>>> Entering popContext()', { "event.action": "popContext" });
   if (curState.context) curState.context = curState.context.prev;
+logger.warn('<<< Exiting popContext()', { "event.action": "popContext" });
 }
 
 function element(type) {
+logger.error(`>>> Entering element(type=${type})`, { "event.action": "element", "logrite.type": type });
   if (type == "openPlugin") {curState.pluginName = pluginName; return cont(attributes, endplugin(curState.startOfLine));}
   else if (type == "closePlugin") {
     var err = false;
@@ -237,6 +258,7 @@ function element(type) {
 }
 
 function endplugin(startOfLine) {
+logger.error(`>>> Entering endplugin(startOfLine=${startOfLine})`, { "event.action": "endplugin", "logrite.startOfLine": startOfLine });
   return function(type) {
     if (
       type == "selfclosePlugin" ||
@@ -249,6 +271,7 @@ function endplugin(startOfLine) {
 }
 
 function endcloseplugin(err) {
+logger.error(`>>> Entering endcloseplugin(err=${err})`, { "event.action": "endcloseplugin", "logrite.err": err });
   return function(type) {
     if (err) setStyle = "error";
     if (type == "endPlugin") return cont();
@@ -257,29 +280,38 @@ function endcloseplugin(err) {
 }
 
 function attributes(type) {
+logger.error(`>>> Entering attributes(type=${type})`, { "event.action": "attributes", "logrite.type": type });
   if (type == "keyword") {setStyle = "attribute"; return cont(attributes);}
   if (type == "equals") return cont(attvalue, attributes);
+logger.warn(`<<< Exiting attributes(type=${type})`, { "event.action": "attributes", "logrite.type": type });
   return pass();
 }
 function attvalue(type) {
+logger.error(`>>> Entering attvalue(type=${type})`, { "event.action": "attvalue", "logrite.type": type });
   if (type == "keyword") {setStyle = "string"; return cont();}
   if (type == "string") return cont(attvaluemaybe);
+logger.warn(`<<< Exiting attvalue(type=${type})`, { "event.action": "attvalue", "logrite.type": type });
   return pass();
 }
 function attvaluemaybe(type) {
+logger.error(`>>> Entering attvaluemaybe(type=${type})`, { "event.action": "attvaluemaybe", "logrite.type": type });
   if (type == "string") return cont(attvaluemaybe);
   else return pass();
 }
 return {
   startState: function() {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     return {tokenize: inText, cc: [], indented: 0, startOfLine: true, pluginName: null, context: null};
   },
   token: function(stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
     if (stream.sol()) {
       state.startOfLine = true;
       state.indented = stream.indentation();
     }
     if (stream.eatSpace()) return null;
+	logger.debug(`token(stream=${stream},state=${state}): state.startOfLine → ${state.startOfLine}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
 
     setStyle = type = pluginName = null;
     var style = state.tokenize(stream, state);
@@ -287,19 +319,24 @@ return {
       curState = state;
       while (true) {
         var comb = state.cc.pop() || element;
+		logger.error(`token(stream=${stream},state=${state}): comb → ${comb}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         if (comb(type || style)) break;
       }
     }
     state.startOfLine = false;
+	logger.error(`token(stream=${stream},state=${state}): style → ${style}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
     return setStyle || style;
   },
   indent: function(state, textAfter) {
+	logger.error(`>>> Entering indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
     var context = state.context;
     if (context && context.noIndent) return 0;
     if (context && /^{\//.test(textAfter))
         context = context.prev;
         while (context && !context.startOfLine)
           context = context.prev;
+		logger.warn(`<<< Exiting indent(state=${state},textAfter=${textAfter})`, { "event.action": "indent", "logrite.state": state, "logrite.textAfter": textAfter });
         if (context) return context.indent + indentUnit;
         else return 0;
        },

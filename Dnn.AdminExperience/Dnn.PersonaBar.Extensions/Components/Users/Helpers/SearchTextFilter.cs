@@ -12,15 +12,19 @@ namespace Dnn.PersonaBar.Users.Components.Helpers
     {
         public static string CleanWildcards(string searchText)
         {
+			eventLogger.LogError(">>> Entering CleanWildcards(searchText={SearchText})", searchText);
             if (string.IsNullOrEmpty(searchText) || searchText.Equals("*", StringComparison.Ordinal) || searchText.Equals("%", StringComparison.Ordinal))
             {
                 return null;
             }
 
             var pattern = string.Empty;
+			eventLogger.LogError("CleanWildcards(searchText={SearchText}): pattern → {Pattern}", searchText, pattern);
 
             var prefixWildcard = searchText.StartsWith("%", StringComparison.Ordinal) || searchText.StartsWith("*", StringComparison.Ordinal);
+			eventLogger.LogError("CleanWildcards(searchText={SearchText}): prefixWildcard → {PrefixWildcard}", searchText, prefixWildcard);
             var suffixWildcard = searchText.EndsWith("%", StringComparison.Ordinal) || searchText.EndsWith("*", StringComparison.Ordinal);
+			eventLogger.LogError("CleanWildcards(searchText={SearchText}): suffixWildcard → {SuffixWildcard}", searchText, suffixWildcard);
 
             bool inString = prefixWildcard && suffixWildcard;
             bool prefix = prefixWildcard && !suffixWildcard;
@@ -44,14 +48,19 @@ namespace Dnn.PersonaBar.Users.Components.Helpers
                 pattern = GetSuffixSearchPattern(searchText);
             }
 
+			eventLogger.LogWarning("<<< Exiting CleanWildcards(searchText={SearchText})", searchText);
             return pattern;
         }
 
         private static string GetInStringSearchPattern(string searchText)
         {
+			eventLogger.LogError(">>> Entering GetInStringSearchPattern(searchText={SearchText})", searchText);
             var pattern = new StringBuilder();
             var regex = new Regex(@"^(\*|%)?([\w\-_\s\*\%\.\@]+)(\*|%)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+			eventLogger.LogError("GetInStringSearchPattern(searchText={SearchText}): regex → {Regex}", searchText, regex);
             var matches = regex.Matches(searchText);
+			eventLogger.LogError("GetInStringSearchPattern(searchText={SearchText}): matches → {Matches}", searchText, matches);
+			eventLogger.LogError("GetInStringSearchPattern(searchText={SearchText}): pattern → {Pattern}", searchText, pattern);
 
             if (matches.Count > 0)
             {
@@ -64,14 +73,19 @@ namespace Dnn.PersonaBar.Users.Components.Helpers
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting GetInStringSearchPattern(searchText={SearchText})", searchText);
             return pattern.ToString();
         }
 
         private static string GetPrefixSearchPattern(string searchText)
         {
+			eventLogger.LogError(">>> Entering GetPrefixSearchPattern(searchText={SearchText})", searchText);
             var pattern = new StringBuilder();
             var regex = new Regex(@"^(\*|%)?([\w\-_\s\*\%\.\@]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+			eventLogger.LogError("GetPrefixSearchPattern(searchText={SearchText}): regex → {Regex}", searchText, regex);
             var matches = regex.Matches(searchText);
+			eventLogger.LogError("GetPrefixSearchPattern(searchText={SearchText}): matches → {Matches}", searchText, matches);
+			eventLogger.LogError("GetPrefixSearchPattern(searchText={SearchText}): pattern → {Pattern}", searchText, pattern);
 
             if (matches.Count > 0)
             {
@@ -83,14 +97,19 @@ namespace Dnn.PersonaBar.Users.Components.Helpers
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting GetPrefixSearchPattern(searchText={SearchText})", searchText);
             return pattern.ToString();
         }
 
         private static string GetSuffixSearchPattern(string searchText)
         {
+			eventLogger.LogError(">>> Entering GetSuffixSearchPattern(searchText={SearchText})", searchText);
             var pattern = new StringBuilder();
             var regex = new Regex(@"([\w\-_\*\s\%\.\@]+)(\*|%)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+			eventLogger.LogError("GetSuffixSearchPattern(searchText={SearchText}): regex → {Regex}", searchText, regex);
             var matches = regex.Matches(searchText);
+			eventLogger.LogError("GetSuffixSearchPattern(searchText={SearchText}): matches → {Matches}", searchText, matches);
+			eventLogger.LogError("GetSuffixSearchPattern(searchText={SearchText}): pattern → {Pattern}", searchText, pattern);
 
             if (matches.Count > 0)
             {
@@ -102,6 +121,7 @@ namespace Dnn.PersonaBar.Users.Components.Helpers
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting GetSuffixSearchPattern(searchText={SearchText})", searchText);
             return pattern.ToString();
         }
     }

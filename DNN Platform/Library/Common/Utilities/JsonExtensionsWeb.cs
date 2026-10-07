@@ -9,13 +9,17 @@ namespace DotNetNuke.Common.Utilities
     /// <summary>JSON Extensions based on the JavaScript Serializer in System.web.</summary>
     public static class JsonExtensionsWeb
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JsonExtensionsWeb));
         /// <summary>Serializes a type to JSON. Note the type must be marked Serializable or include a DataContract attribute.</summary>
         /// <param name="value">The value to serialize.</param>
         /// <returns>The JSON string.</returns>
         public static string ToJsonString(object value)
         {
+			Logger.LogError(">>> Entering ToJsonString(value={Value})", value);
             var ser = SerializerFactory();
             string json = ser.Serialize(value);
+			Logger.LogError("ToJsonString(value={Value}): ser → {Ser}", value, ser);
+			Logger.LogWarning("<<< Exiting ToJsonString(value={Value})", value);
             return json;
         }
 
@@ -24,6 +28,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The JSON string.</returns>
         public static string ToJson(this object value)
         {
+			Logger.LogError(">>> Entering ToJson(value={Value})", value);
+            Logger.LogWarning("<<< Exiting ToJson(value={Value})", value);
             return ToJsonString(value);
         }
 
@@ -33,10 +39,14 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The deserialized value.</returns>
         public static object FromJsonString(string json, Type type)
         {
+			Logger.LogError(">>> Entering FromJsonString(json={Json},type={Type})", json, type);
             // *** Have to use Reflection with a 'dynamic' non constant type instance
             var ser = SerializerFactory();
+			Logger.LogError("FromJsonString(json={Json},type={Type}): ser → {Ser}", json, type, ser);
 
             object result = ser.GetType().GetMethod("Deserialize").MakeGenericMethod(type).Invoke(ser, new object[1] { json });
+			Logger.LogError("FromJsonString(json={Json},type={Type}): result → {Result}", json, type, result);
+			Logger.LogWarning("<<< Exiting FromJsonString(json={Json},type={Type})", json, type);
             return result;
         }
 
@@ -46,6 +56,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The deserialized value.</returns>
         public static object FromJson(this string json, Type type)
         {
+			Logger.LogError(">>> Entering FromJson(json={Json},type={Type})", json, type);
+			Logger.LogWarning("<<< Exiting FromJson(json={Json})", json);
             return FromJsonString(json, type);
         }
 
@@ -63,7 +75,9 @@ namespace DotNetNuke.Common.Utilities
 
         private static JavaScriptSerializer SerializerFactory()
         {
+			Logger.LogError(">>> Entering SerializerFactory()");
             // Allow large JSON strings to be serialized and deserialized.
+			Logger.LogWarning("<<< Exiting SerializerFactory()");
             return new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
         }
     }

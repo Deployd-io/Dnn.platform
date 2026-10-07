@@ -28,6 +28,7 @@ namespace DotNetNuke.Web.UI
     /// <summary>Provides utility methods for UI elements within DNN.</summary>
     public partial class Utilities
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Utilities));
         /// <summary>Applies a custom CSS file for a control using a consistent naming pattern.</summary>
         /// <param name="targetControl">The control that should have a skin injected.</param>
         /// <param name="controlSubSkinName">An optional sub-skin.</param>
@@ -43,25 +44,36 @@ namespace DotNetNuke.Web.UI
         /// <param name="controlName">An optional control name that might differ from the type.</param>
         public static void ApplyControlSkin(IClientResourceController clientResourceController, Control targetControl, string controlSubSkinName = "", string controlName = "")
         {
+			Logger.LogError(">>> Entering ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName})", targetControl, controlSubSkinName, controlName);
             string fallBackEmbeddedSkinName = string.Empty;
             PropertyInfo skinProperty = null;
+			Logger.LogError("ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): fallBackEmbeddedSkinName → {FallBackEmbeddedSkinName}", targetControl, controlSubSkinName, controlName, fallBackEmbeddedSkinName);
+			Logger.LogError("ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): fallBackEmbeddedSkinName → {FallBackEmbeddedSkinName}", clientResourceController, targetControl, controlSubSkinName, controlName, fallBackEmbeddedSkinName);
+			Logger.LogError("ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): skinProperty → {SkinProperty}", targetControl, controlSubSkinName, controlName, skinProperty);
             PropertyInfo enableEmbeddedSkinsProperty = null;
             bool skinApplied = false;
 
             try
             {
+				Logger.LogError("ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): enableEmbeddedSkinsProperty → {EnableEmbeddedSkinsProperty}", targetControl, controlSubSkinName, controlName, enableEmbeddedSkinsProperty);
+				Logger.LogError("ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): enableEmbeddedSkinsProperty → {EnableEmbeddedSkinsProperty}", clientResourceController, targetControl, controlSubSkinName, controlName, enableEmbeddedSkinsProperty);
+				Logger.LogError("ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): skinApplied → {SkinApplied}", targetControl, controlSubSkinName, controlName, skinApplied);
                 skinProperty = targetControl.GetType().GetProperty("Skin");
+				Logger.LogError("ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): skinProperty → {SkinProperty}", clientResourceController, targetControl, controlSubSkinName, controlName, skinProperty);
                 enableEmbeddedSkinsProperty = targetControl.GetType().GetProperty("EnableEmbeddedSkins");
 
                 if (string.IsNullOrEmpty(controlName))
                 {
+					Logger.LogError("ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): skinApplied → {SkinApplied}", clientResourceController, targetControl, controlSubSkinName, controlName, skinApplied);
                     controlName = targetControl.GetType().BaseType.Name;
+					Logger.LogError("ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): controlName → {ControlName1}", targetControl, controlSubSkinName, controlName, controlName);
                     if (controlName.StartsWith("Rad", StringComparison.Ordinal) || controlName.StartsWith("Dnn", StringComparison.Ordinal))
                     {
                         controlName = controlName.Substring(3);
                     }
                 }
 
+				Logger.LogError("ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): controlName → {ControlName1}", clientResourceController, targetControl, controlSubSkinName, controlName, controlName);
                 string skinVirtualFolder = string.Empty;
                 if (PortalSettings.Current != null)
                 {
@@ -70,16 +82,23 @@ namespace DotNetNuke.Web.UI
                 else
                 {
                     skinVirtualFolder = targetControl.ResolveUrl("~/Portals/_default/skins/_default/Aphelia"); // developer skin Aphelia
+					Logger.LogError("ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): skinVirtualFolder → {SkinVirtualFolder}", targetControl, controlSubSkinName, controlName, skinVirtualFolder);
+					Logger.LogError("ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): skinVirtualFolder → {SkinVirtualFolder}", clientResourceController, targetControl, controlSubSkinName, controlName, skinVirtualFolder);
                 }
 
                 string skinName = string.Empty;
                 string webControlSkinName = string.Empty;
                 if (skinProperty != null)
                 {
+					Logger.LogError("ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): skinName → {SkinName}", targetControl, controlSubSkinName, controlName, skinName);
+					Logger.LogError("ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): skinName → {SkinName}", clientResourceController, targetControl, controlSubSkinName, controlName, skinName);
                     var v = skinProperty.GetValue(targetControl, null);
                     if (v != null)
                     {
                         webControlSkinName = v.ToString();
+						Logger.LogError("ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): webControlSkinName → {WebControlSkinName}", targetControl, controlSubSkinName, controlName, webControlSkinName);
+						Logger.LogError("ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): webControlSkinName → {WebControlSkinName}", clientResourceController, targetControl, controlSubSkinName, controlName, webControlSkinName);
+						Logger.LogError("ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): v → {V}", targetControl, controlSubSkinName, controlName, v);
                     }
                 }
 
@@ -94,12 +113,15 @@ namespace DotNetNuke.Web.UI
                 }
 
                 int lastIndex = skinVirtualFolder.LastIndexOf("/", StringComparison.Ordinal);
+				Logger.LogError("ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): lastIndex → {LastIndex}", targetControl, controlSubSkinName, controlName, lastIndex);
                 if (lastIndex > -1 && skinVirtualFolder.Length > lastIndex)
                 {
+					Logger.LogError("ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): lastIndex → {LastIndex}", clientResourceController, targetControl, controlSubSkinName, controlName, lastIndex);
                     skinName = skinVirtualFolder.Substring(skinVirtualFolder.LastIndexOf("/", StringComparison.Ordinal) + 1);
                 }
 
                 string systemWebControlSkin = string.Empty;
+				Logger.LogError("ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): systemWebControlSkin → {SystemWebControlSkin}", targetControl, controlSubSkinName, controlName, systemWebControlSkin);
                 if (!string.IsNullOrEmpty(skinName) && !string.IsNullOrEmpty(skinVirtualFolder))
                 {
                     systemWebControlSkin = HttpContext.Current.Server.MapPath(skinVirtualFolder);
@@ -107,6 +129,7 @@ namespace DotNetNuke.Web.UI
                     systemWebControlSkin = Path.Combine(systemWebControlSkin, skinName);
                     systemWebControlSkin = Path.Combine(systemWebControlSkin, controlSubSkinName);
                     systemWebControlSkin = Path.Combine(systemWebControlSkin, $"{controlName}.{webControlSkinName}.css");
+					Logger.LogError("ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): systemWebControlSkin → {SystemWebControlSkin}", clientResourceController, targetControl, controlSubSkinName, controlName, systemWebControlSkin);
 
                     // Check if the selected skin has the webcontrol skin
                     if (!File.Exists(systemWebControlSkin))
@@ -148,6 +171,8 @@ namespace DotNetNuke.Web.UI
                     filePath = Path.Combine(filePath, controlSubSkinName);
                     filePath = Path.Combine(filePath, $"{controlName}.{webControlSkinName}.css");
                     filePath = filePath.Replace('\\', '/').Replace("//", "/").TrimEnd('/');
+					Logger.LogError("ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): filePath → {FilePath}", clientResourceController, targetControl, controlSubSkinName, controlName, filePath);
+					Logger.LogError("ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): filePath → {FilePath}", targetControl, controlSubSkinName, controlName, filePath);
 
                     if (HttpContext.Current != null && HttpContext.Current.Handler is Page)
                     {
@@ -164,7 +189,9 @@ namespace DotNetNuke.Web.UI
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in ApplyControlSkin(targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): {Arg3}", targetControl, controlSubSkinName, controlName, ex.Message);
                 Exceptions.LogException(ex);
+				Logger.LogError("Exception in ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName}): {Arg4}", clientResourceController, targetControl, controlSubSkinName, controlName, ex.Message);
             }
 
             if (skinProperty != null && enableEmbeddedSkinsProperty != null && !skinApplied)
@@ -178,6 +205,7 @@ namespace DotNetNuke.Web.UI
                 skinProperty.SetValue(targetControl, fallBackEmbeddedSkinName, null);
                 enableEmbeddedSkinsProperty.SetValue(targetControl, true, null);
             }
+			Logger.LogWarning("<<< Exiting ApplyControlSkin(clientResourceController={ClientResourceController},targetControl={TargetControl},controlSubSkinName={ControlSubSkinName},controlName={ControlName})", clientResourceController, targetControl, controlSubSkinName, controlName);
         }
 
         /// <summary>Create a thumbnail of an image.</summary>
@@ -187,18 +215,21 @@ namespace DotNetNuke.Web.UI
         /// <param name="maxHeight">The maximum height in pixels.</param>
         public static void CreateThumbnail(FileInfo image, Image img, int maxWidth, int maxHeight)
         {
+			Logger.LogError(">>> Entering CreateThumbnail(image={Image},img={Img},maxWidth={MaxWidth},maxHeight={MaxHeight})", image, img, maxWidth, maxHeight);
             if (image.Width > image.Height)
             {
                 // Landscape
                 if (image.Width > maxWidth)
                 {
                     img.Width = maxWidth;
+					Logger.LogDebug("CreateThumbnail(image={Image},img={Img},maxWidth={MaxWidth},maxHeight={MaxHeight}): img.Width → {Arg4}", image, img, maxWidth, maxHeight, img.Width);
                     img.Height = Convert.ToInt32((image.Height * maxWidth) / (float)image.Width);
                 }
                 else
                 {
                     img.Width = image.Width;
                     img.Height = image.Height;
+					Logger.LogDebug("CreateThumbnail(image={Image},img={Img},maxWidth={MaxWidth},maxHeight={MaxHeight}): img.Height → {Arg4}", image, img, maxWidth, maxHeight, img.Height);
                 }
             }
             else
@@ -215,6 +246,7 @@ namespace DotNetNuke.Web.UI
                     img.Height = image.Height;
                 }
             }
+			Logger.LogWarning("<<< Exiting CreateThumbnail(image={Image},img={Img},maxWidth={MaxWidth},maxHeight={MaxHeight})", image, img, maxWidth, maxHeight);
         }
 
         /// <summary>Gets a script to display an alert.</summary>
@@ -223,6 +255,7 @@ namespace DotNetNuke.Web.UI
         /// <returns>A script.</returns>
         public static string GetClientAlert(Control ctrl, string message)
         {
+			Logger.LogWarning("<<< Exiting GetClientAlert(ctrl={Ctrl},message={Message})", ctrl, message);
             return GetClientAlert(ctrl, new MessageWindowParameters(message));
         }
 
@@ -240,7 +273,9 @@ namespace DotNetNuke.Web.UI
         /// <returns>The localized text.</returns>
         public static string GetLocalizedString(string key)
         {
+			Logger.LogError(">>> Entering GetLocalizedString(key={Key})", key);
             string resourceFile = "/App_GlobalResources/WebControls.resx";
+			Logger.LogWarning("<<< Exiting GetLocalizedString(key={Key})", key);
             return Localization.GetString(key, resourceFile);
         }
 
@@ -249,6 +284,8 @@ namespace DotNetNuke.Web.UI
         /// <returns>The path to the resource file.</returns>
         public static string GetLocalResourceFile(Control ctrl)
         {
+			Logger.LogError(">>> Entering GetLocalResourceFile(ctrl={Ctrl})", ctrl);
+            Logger.LogWarning("<<< Exiting GetLocalResourceFile(ctrl={Ctrl})", ctrl);
             return UIUtilities.GetLocalResourceFile(ctrl);
         }
 
@@ -258,14 +295,17 @@ namespace DotNetNuke.Web.UI
         /// <returns>The localized text.</returns>
         public static string GetLocalizedStringFromParent(string key, Control control)
         {
+			Logger.LogError(">>> Entering GetLocalizedStringFromParent(key={Key},control={Control})", key, control);
             string returnValue = key;
             string resourceFileName = GetLocalResourceFile(control.Parent);
+			Logger.LogError("GetLocalizedStringFromParent(key={Key},control={Control}): returnValue → {ReturnValue}", key, control, returnValue);
 
             if (!string.IsNullOrEmpty(resourceFileName))
             {
                 returnValue = Localization.GetString(key, resourceFileName);
             }
 
+			Logger.LogWarning("<<< Exiting GetLocalizedStringFromParent(key={Key},control={Control})", key, control);
             return returnValue;
         }
 
@@ -300,6 +340,7 @@ namespace DotNetNuke.Web.UI
         /// <returns>A script.</returns>
         public static string GetOnClientClickConfirm(IClientResourceController clientResourceController, Control ctrl, MessageWindowParameters message)
         {
+			Logger.LogError(">>> Entering GetOnClientClickConfirm(ctrl={Ctrl},message={Message})", ctrl, message);
             AddMessageWindow(clientResourceController, ctrl);
 
             // function(text, mozEvent, oWidth, oHeight, callerObj, oTitle)
@@ -318,11 +359,13 @@ namespace DotNetNuke.Web.UI
         /// <returns>The string.</returns>
         public static string GetViewStateAsString(object value, string defaultValue)
         {
+			Logger.LogError(">>> Entering GetViewStateAsString(value={Value},defaultValue={DefaultValue})", value, defaultValue);
             if (value != null)
             {
                 return Convert.ToString(value, CultureInfo.InvariantCulture);
             }
 
+			Logger.LogWarning("<<< Exiting GetViewStateAsString(value={Value},defaultValue={DefaultValue})", value, defaultValue);
             return defaultValue;
         }
 
@@ -332,6 +375,8 @@ namespace DotNetNuke.Web.UI
         public static void RegisterAlertOnPageLoad(Control ctrl, string message)
         {
             RegisterAlertOnPageLoad(ctrl, new MessageWindowParameters(message));
+			Logger.LogError(">>> Entering RegisterAlertOnPageLoad(ctrl={Ctrl},message={Message})", ctrl, message);
+			Logger.LogWarning("<<< Exiting RegisterAlertOnPageLoad(ctrl={Ctrl},message={Message})", ctrl, message);
         }
 
         /// <summary>Register a client script to display an alert.</summary>
@@ -344,7 +389,9 @@ namespace DotNetNuke.Web.UI
 
         private static void AddMessageWindow(IClientResourceController clientResourceController, Control ctrl)
         {
+			Logger.LogError(">>> Entering AddMessageWindow(clientResourceController={ClientResourceController},ctrl={Ctrl})", clientResourceController, ctrl);
             clientResourceController.RegisterScript(ctrl.ResolveUrl("~/js/dnn.postbackconfirm.js"));
+			Logger.LogWarning("<<< Exiting AddMessageWindow(clientResourceController={ClientResourceController},ctrl={Ctrl})", clientResourceController, ctrl);
         }
     }
 }

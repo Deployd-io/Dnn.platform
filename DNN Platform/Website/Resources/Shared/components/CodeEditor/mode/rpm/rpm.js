@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -18,12 +19,14 @@ CodeMirror.defineMode("rpm-changes", function() {
 
   return {
     token: function(stream) {
+	logger.error(`>>> Entering token(stream=${stream})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.sol()) {
         if (stream.match(headerSeperator)) { return 'tag'; }
         if (stream.match(headerLine)) { return 'tag'; }
       }
       if (stream.match(simpleEmail)) { return 'string'; }
       stream.next();
+	logger.warn(`<<< Exiting token(stream=${stream})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return null;
     }
   };
@@ -44,16 +47,20 @@ CodeMirror.defineMode("rpm-spec", function() {
 
   return {
     startState: function () {
+		logger.error('>>> Entering startState()', { "event.action": "startState" });
         return {
           controlFlow: false,
           macroParameters: false,
           section: false
         };
+		logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     token: function (stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       var ch = stream.peek();
       if (ch == "#") { stream.skipToEnd(); return "comment"; }
 
+	logger.error(`token(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       if (stream.sol()) {
         if (stream.match(preamble)) { return "preamble"; }
         if (stream.match(section)) { return "section"; }
@@ -65,6 +72,7 @@ CodeMirror.defineMode("rpm-spec", function() {
       if (stream.match(control_flow_simple)) { return "keyword"; }
       if (stream.match(control_flow_complex)) {
         state.controlFlow = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.controlFlow → ${state.controlFlow}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
         return "keyword";
       }
       if (state.controlFlow) {
@@ -84,6 +92,7 @@ CodeMirror.defineMode("rpm-spec", function() {
         if (stream.match(/^\d+/)) { return "number";}
         if (stream.match(/^\)/)) {
           state.macroParameters = false;
+		logger.debug(`token(stream=${stream},state=${state}): state.macroParameters → ${state.macroParameters}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
           return "macro";
         }
       }
@@ -91,6 +100,7 @@ CodeMirror.defineMode("rpm-spec", function() {
 
       //TODO: Include bash script sub-parser (CodeMirror supports that)
       stream.next();
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return null;
     }
   };

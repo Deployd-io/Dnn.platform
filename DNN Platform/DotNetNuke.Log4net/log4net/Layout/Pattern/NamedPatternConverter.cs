@@ -61,10 +61,13 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         public void ActivateOptions()
         {
+			value.LogError(">>> Entering ActivateOptions()");
             this.m_precision = 0;
 
+			value.LogDebug("ActivateOptions(): m_precision → {M_precision}", m_precision);
             if (this.Option != null) 
             {
+				value.LogDebug("ActivateOptions(): this.m_precision → {Arg0}", this.m_precision);
                 string optStr = this.Option.Trim();
                 if (optStr.Length > 0)
                 {
@@ -86,6 +89,7 @@ namespace log4net.Layout.Pattern
                     }
                 }
             }
+			value.LogWarning("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>Get the fully qualified string data</summary>
@@ -111,7 +115,9 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected sealed override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			value.LogError(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             string name = this.GetFullyQualifiedName(loggingEvent);
+			value.LogError("Convert(writer={Writer},loggingEvent={LoggingEvent}): name → {Name}", writer, loggingEvent, name);
             if (this.m_precision <= 0 || name == null || name.Length < 2)
             {
                 writer.Write(name);
@@ -120,6 +126,7 @@ namespace log4net.Layout.Pattern
             {
                 int len = name.Length;
                 string trailingDot = string.Empty;
+				value.LogError("Convert(writer={Writer},loggingEvent={LoggingEvent}): trailingDot → {TrailingDot}", writer, loggingEvent, trailingDot);
                 if (name.EndsWith(DOT))
                 {
                     trailingDot = DOT;
@@ -128,6 +135,7 @@ namespace log4net.Layout.Pattern
                 }
 
                 int end = name.LastIndexOf(DOT);
+				value.LogError("Convert(writer={Writer},loggingEvent={LoggingEvent}): end → {End}", writer, loggingEvent, end);
                 for(int i = 1; end > 0 && i < this.m_precision; i++) 
                 {
                     end = name.LastIndexOf('.', end - 1);
@@ -141,6 +149,7 @@ namespace log4net.Layout.Pattern
                     writer.Write(name.Substring(end + 1, len - end - 1) + trailingDot);
                 }
             }	  
+			value.LogWarning("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
 
         /// <summary>The fully qualified type of the NamedPatternConverter class.</summary>

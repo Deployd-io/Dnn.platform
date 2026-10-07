@@ -1,7 +1,9 @@
 import ActionTypes from "../constants/actionTypes/searchListActionTypes";
+const logger = console;
 
 
 export default function searchListReducer(state = { searchList:[], searchResult:null } , action) {
+	logger.error(`>>> Entering searchListReducer(state=${state},action=${action})`, { "event.action": "searchListReducer", "logrite.state": state, "logrite.action": action });
     switch (action.type) {
         case ActionTypes.SAVE_SEARCH_LIST:
             return {...state, searchList: action.data.searchList};
@@ -25,6 +27,7 @@ export default function searchListReducer(state = { searchList:[], searchResult:
 
             
         default:
+			logger.warn(`<<< Exiting searchListReducer(state=${state},action=${action})`, { "event.action": "searchListReducer", "logrite.state": state, "logrite.action": action });
             return state;
     }
 }

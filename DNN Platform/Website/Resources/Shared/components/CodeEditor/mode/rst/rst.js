@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -187,7 +188,10 @@ CodeMirror.defineMode('rst-base', function (config) {
       case 2:
         change(state, to_normal, context(rx_role_pre, 3));
         stream.match(/^:`/);
+		logger.error(`>>> Entering to_normal(stream=${stream},state=${state})`, { "event.action": "to_normal", "logrite.stream": stream, "logrite.state": state });
+		logger.debug(`to_normal(stream=${stream},state=${state}): state.tmp_stex → ${state.tmp_stex}`, { "event.action": "to_normal", "logrite.stream": stream, "logrite.state": state });
         token = 'meta';
+		logger.warn(`<<< Exiting to_normal(stream=${stream},state=${state})`, { "event.action": "to_normal", "logrite.stream": stream, "logrite.state": state });
         break;
       case 3:
         if (state.tmp_stex) {
@@ -214,6 +218,7 @@ CodeMirror.defineMode('rst-base', function (config) {
       case 4:
         change(state, to_normal, context(rx_role_pre, 5));
         stream.match(/^`/);
+		logger.debug(`to_normal(stream=${stream},state=${state}): state.tmp → ${state.tmp}`, { "event.action": "to_normal", "logrite.stream": stream, "logrite.state": state });
         token = 'meta';
         break;
       case 5:
@@ -347,6 +352,8 @@ CodeMirror.defineMode('rst-base', function (config) {
       if (stream.next()) change(state, to_normal);
     }
 
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     return token;
   }
 
@@ -354,6 +361,7 @@ CodeMirror.defineMode('rst-base', function (config) {
   ///////////////////////////////////////////////////////////////////////////
 
   function to_explicit(stream, state) {
+	logger.error(`>>> Entering to_explicit(stream=${stream},state=${state})`, { "event.action": "to_explicit", "logrite.stream": stream, "logrite.state": state });
     var token = null;
 
     if (phase(state) == rx_substitution ||
@@ -454,6 +462,7 @@ CodeMirror.defineMode('rst-base', function (config) {
       }
     }
 
+	logger.warn(`<<< Exiting to_explicit(stream=${stream},state=${state})`, { "event.action": "to_explicit", "logrite.stream": stream, "logrite.state": state });
     return token;
   }
 
@@ -461,10 +470,14 @@ CodeMirror.defineMode('rst-base', function (config) {
   ///////////////////////////////////////////////////////////////////////////
 
   function to_comment(stream, state) {
+	logger.error(`>>> Entering to_comment(stream=${stream},state=${state})`, { "event.action": "to_comment", "logrite.stream": stream, "logrite.state": state });
+	logger.warn(`<<< Exiting to_comment(stream=${stream},state=${state})`, { "event.action": "to_comment", "logrite.stream": stream, "logrite.state": state });
     return as_block(stream, state, 'comment');
   }
 
   function to_verbatim(stream, state) {
+	logger.error(`>>> Entering to_verbatim(stream=${stream},state=${state})`, { "event.action": "to_verbatim", "logrite.stream": stream, "logrite.state": state });
+	logger.warn(`<<< Exiting to_verbatim(stream=${stream},state=${state})`, { "event.action": "to_verbatim", "logrite.stream": stream, "logrite.state": state });
     return as_block(stream, state, 'meta');
   }
 
@@ -482,6 +495,7 @@ CodeMirror.defineMode('rst-base', function (config) {
   ///////////////////////////////////////////////////////////////////////////
 
   function to_mode(stream, state) {
+logger.error(`>>> Entering to_mode(stream=${stream},state=${state})`, { "event.action": "to_mode", "logrite.stream": stream, "logrite.state": state });
 
     if (state.ctx.mode && state.ctx.local) {
 
@@ -494,6 +508,7 @@ CodeMirror.defineMode('rst-base', function (config) {
     }
 
     change(state, to_normal);
+	logger.warn(`<<< Exiting to_mode(stream=${stream},state=${state})`, { "event.action": "to_mode", "logrite.stream": stream, "logrite.state": state });
     return null;
   }
 
@@ -501,19 +516,27 @@ CodeMirror.defineMode('rst-base', function (config) {
   ///////////////////////////////////////////////////////////////////////////
 
   function context(phase, stage, mode, local) {
+	logger.error(`>>> Entering context(phase=${phase},stage=${stage},mode=${mode},local=${local})`, { "event.action": "context", "logrite.phase": phase, "logrite.stage": stage, "logrite.mode": mode, "logrite.local": local });
+	logger.warn(`<<< Exiting context(phase=${phase},stage=${stage},mode=${mode},local=${local})`, { "event.action": "context", "logrite.phase": phase, "logrite.stage": stage, "logrite.mode": mode, "logrite.local": local });
     return {phase: phase, stage: stage, mode: mode, local: local};
   }
 
   function change(state, tok, ctx) {
+	logger.error(`>>> Entering change(state=${state},tok=${tok},ctx=${ctx})`, { "event.action": "change", "logrite.state": state, "logrite.tok": tok, "logrite.ctx": ctx });
     state.tok = tok;
     state.ctx = ctx || {};
+	logger.warn(`<<< Exiting change(state=${state},tok=${tok},ctx=${ctx})`, { "event.action": "change", "logrite.state": state, "logrite.tok": tok, "logrite.ctx": ctx });
   }
 
   function stage(state) {
+	logger.error(`>>> Entering stage(state=${state})`, { "event.action": "stage", "logrite.state": state });
+	logger.warn(`<<< Exiting stage(state=${state})`, { "event.action": "stage", "logrite.state": state });
     return state.ctx.stage || 0;
   }
 
   function phase(state) {
+	logger.error(`>>> Entering phase(state=${state})`, { "event.action": "phase", "logrite.state": state });
+	logger.warn(`<<< Exiting phase(state=${state})`, { "event.action": "phase", "logrite.state": state });
     return state.ctx.phase;
   }
 
@@ -526,21 +549,27 @@ CodeMirror.defineMode('rst-base', function (config) {
     },
 
     copyState: function (state) {
+	logger.error(`>>> Entering copyState(state=${state})`, { "event.action": "copyState", "logrite.state": state });
       var ctx = state.ctx, tmp = state.tmp;
       if (ctx.local)
         ctx = {mode: ctx.mode, local: CodeMirror.copyState(ctx.mode, ctx.local)};
       if (tmp)
         tmp = {mode: tmp.mode, local: CodeMirror.copyState(tmp.mode, tmp.local)};
+	logger.warn(`<<< Exiting copyState(state=${state})`, { "event.action": "copyState", "logrite.state": state });
       return {tok: state.tok, ctx: ctx, tmp: tmp};
     },
 
     innerMode: function (state) {
+	logger.error(`>>> Entering innerMode(state=${state})`, { "event.action": "innerMode", "logrite.state": state });
       return state.tmp      ? {state: state.tmp.local, mode: state.tmp.mode}
       : state.ctx.mode ? {state: state.ctx.local, mode: state.ctx.mode}
       : null;
+	logger.warn(`<<< Exiting innerMode(state=${state})`, { "event.action": "innerMode", "logrite.state": state });
     },
 
     token: function (stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
+	logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       return state.tok(stream, state);
     }
   };

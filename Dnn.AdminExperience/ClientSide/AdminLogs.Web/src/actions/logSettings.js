@@ -1,8 +1,11 @@
 import {logSettings as ActionTypes}  from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
+const logger = console;
 
 const logSettingsActions = {
     getKeepMostRecentOptions(callback) {
+		logger.error(`>>> Entering getKeepMostRecentOptions(callback=${callback})`, { "event.action": "getKeepMostRecentOptions", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getKeepMostRecentOptions(callback=${callback})`, { "event.action": "getKeepMostRecentOptions", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getKeepMostRecentOptions(data => {
                 dispatch({
@@ -18,6 +21,8 @@ const logSettingsActions = {
         };
     },
     getOccurrenceOptions(callback) {
+		logger.error(`>>> Entering getOccurrenceOptions(callback=${callback})`, { "event.action": "getOccurrenceOptions", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getOccurrenceOptions(callback=${callback})`, { "event.action": "getOccurrenceOptions", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getOccurrenceOptions(data => {
                 dispatch({
@@ -35,6 +40,8 @@ const logSettingsActions = {
         };
     },
     getLogSettings(callback) {
+		logger.error(`>>> Entering getLogSettings(callback=${callback})`, { "event.action": "getLogSettings", "logrite.callback": callback });
+		logger.warn(`<<< Exiting getLogSettings(callback=${callback})`, { "event.action": "getLogSettings", "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getLogSettings(data => {
                 dispatch({
@@ -50,6 +57,8 @@ const logSettingsActions = {
         };
     },
     getLogSettingById(parameters, callback) {
+		logger.error(`>>> Entering getLogSettingById(parameters=${parameters},callback=${callback})`, { "event.action": "getLogSettingById", "logrite.parameters": parameters, "logrite.callback": callback });
+		logger.warn(`<<< Exiting getLogSettingById(parameters=${parameters},callback=${callback})`, { "event.action": "getLogSettingById", "logrite.parameters": parameters, "logrite.callback": callback });
         return (dispatch) => {
             ApplicationService.getLogSettingById(parameters, data => {
                 dispatch({
@@ -65,6 +74,8 @@ const logSettingsActions = {
         };
     },
     updateLogSetting(payload, callback, failureCallback) {
+		logger.error(`>>> Entering updateLogSetting(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateLogSetting", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting updateLogSetting(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "updateLogSetting", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.updateLogSetting(payload, data => {
                 dispatch({
@@ -85,6 +96,8 @@ const logSettingsActions = {
         };
     },
     addLogSetting(payload, callback, failureCallback) {
+		logger.error(`>>> Entering addLogSetting(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "addLogSetting", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting addLogSetting(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "addLogSetting", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.addLogSetting(payload, data => {
                 dispatch({
@@ -105,6 +118,8 @@ const logSettingsActions = {
         };
     },
     deleteLogSetting(payload, callback, failureCallback) {
+		logger.error(`>>> Entering deleteLogSetting(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "deleteLogSetting", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
+		logger.warn(`<<< Exiting deleteLogSetting(payload=${payload},callback=${callback},failureCallback=${failureCallback})`, { "event.action": "deleteLogSetting", "logrite.payload": payload, "logrite.callback": callback, "logrite.failureCallback": failureCallback });
         return (dispatch) => {
             ApplicationService.deleteLogSetting(payload, data => {
                 dispatch({

@@ -8,24 +8,31 @@ import LogsTabActions from "../../actions/logsTab";
 import utils from "../../utils";
 
 import "./tabs.less";
+const logger = console;
 
 class Logs extends Component {
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         if (this.props.logs.length > 0) {
             return;
         }
         this.props.onRetrieveLogsServerInfo();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     UNSAFE_componentWillReceiveProps(newProps) {
+		logger.error(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.newProps": newProps });
         if (this.props.errorMessage !== newProps.errorMessage && newProps.errorMessage) {
             utils.notifyError(newProps.errorMessage);
+			logger.warn(`<<< Exiting UNSAFE_componentWillReceiveProps(newProps=${newProps})`, { "event.action": "UNSAFE_componentWillReceiveProps", "logrite.newProps": newProps });
         }
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const { props } = this;
 
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className="dnn-servers-info-panel-big logsTab">
                 <div className="logContainer">
@@ -82,6 +89,8 @@ Logs.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         logs: state.logsTab.logs,
         errorMessage: state.logsTab.errorMessage,
@@ -91,6 +100,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.error(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
+	logger.warn(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`, { "event.action": "mapDispatchToProps", "logrite.dispatch": dispatch });
     return {
         ...bindActionCreators({
             onRetrieveLogsServerInfo: LogsTabActions.loadLogsServerInfo,

@@ -29,6 +29,8 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         public DeleteUser()
             : this(new UserValidator(), new UserControllerWrapper())
         {
+		eventLogger.LogError(">>> Entering DeleteUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper})", userValidator, userControllerWrapper);
+		eventLogger.LogWarning("<<< Exiting DeleteUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper})", userValidator, userControllerWrapper);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DeleteUser"/> class.</summary>
@@ -36,7 +38,10 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <param name="userControllerWrapper">The user controller.</param>
         public DeleteUser(IUserValidator userValidator, IUserControllerWrapper userControllerWrapper)
         {
+			eventLogger.LogError(">>> Entering DeleteUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper})", userValidator, userControllerWrapper);
             this.userValidator = userValidator;
+			eventLogger.LogWarning("<<< Exiting DeleteUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper})", userValidator, userControllerWrapper);
+			eventLogger.LogDebug("DeleteUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper}): this.userValidator → {Arg2}", userValidator, userControllerWrapper, this.userValidator);
             this.userControllerWrapper = userControllerWrapper;
         }
 
@@ -50,6 +55,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.UserId = this.GetFlagValue(FlagId, "User Id", -1, true, true, true);
             this.Notify = this.GetFlagValue(FlagNotify, "Notify", false);
         }
@@ -57,6 +63,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             ConsoleErrorResultModel errorResultModel;
             UserInfo userInfo;
 
@@ -66,6 +73,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             }
 
             var userModels = new List<UserModel> { new UserModel(userInfo) };
+			eventLogger.LogError("Run(): userModels → {UserModels}", userModels);
 
             if (userInfo.IsDeleted)
             {
@@ -84,7 +92,10 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
 
             // attempt to retrieve the user from the dB
             userInfo = this.userControllerWrapper.GetUserById(validPortalId, userInfo.UserID);
+			eventLogger.LogError("Run(): userInfo → {UserInfo}", userInfo);
             userModels = new List<UserModel> { new UserModel(userInfo) };
+			eventLogger.LogDebug("Run(): userInfo → {UserInfo}", userInfo);
+			eventLogger.LogWarning("<<< Exiting Run()");
             return new ConsoleResultModel(this.LocalizeString("UserDeleted")) { Data = userModels, Records = userModels.Count };
         }
     }

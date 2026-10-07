@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21,8 +22,11 @@ CodeMirror.defineMode("scheme", function () {
     var INDENT_WORD_SKIP = 2;
 
     function makeKeywords(str) {
+		logger.error(`>>> Entering makeKeywords(str=${str})`, { "event.action": "makeKeywords", "logrite.str": str });
         var obj = {}, words = str.split(" ");
         for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+		logger.error(`makeKeywords(str=${str}): obj → ${obj}`, { "event.action": "makeKeywords", "logrite.str": str });
+		logger.warn(`<<< Exiting makeKeywords(str=${str})`, { "event.action": "makeKeywords", "logrite.str": str });
         return obj;
     }
 
@@ -30,17 +34,23 @@ CodeMirror.defineMode("scheme", function () {
     var indentKeys = makeKeywords("define let letrec let* lambda");
 
     function stateStack(indent, type, prev) { // represents a state stack object
+		logger.error(`>>> Entering stateStack(indent=${indent},type=${type},prev=${prev})`, { "event.action": "stateStack", "logrite.indent": indent, "logrite.type": type, "logrite.prev": prev });
         this.indent = indent;
         this.type = type;
         this.prev = prev;
+		logger.debug(`stateStack(indent=${indent},type=${type},prev=${prev}): this.prev → ${this.prev}`, { "event.action": "stateStack", "logrite.indent": indent, "logrite.type": type, "logrite.prev": prev });
     }
 
     function pushStack(state, indent, type) {
+		logger.error(`>>> Entering pushStack(state=${state},indent=${indent},type=${type})`, { "event.action": "pushStack", "logrite.state": state, "logrite.indent": indent, "logrite.type": type });
         state.indentStack = new stateStack(indent, type, state.indentStack);
+		logger.warn(`<<< Exiting pushStack(state=${state},indent=${indent},type=${type})`, { "event.action": "pushStack", "logrite.state": state, "logrite.indent": indent, "logrite.type": type });
     }
 
     function popStack(state) {
+		logger.error(`>>> Entering popStack(state=${state})`, { "event.action": "popStack", "logrite.state": state });
         state.indentStack = state.indentStack.prev;
+		logger.warn(`<<< Exiting popStack(state=${state})`, { "event.action": "popStack", "logrite.state": state });
     }
 
     var binaryMatcher = new RegExp(/^(?:[-+]i|[-+][01]+#*(?:\/[01]+#*)?i|[-+]?[01]+#*(?:\/[01]+#*)?@[-+]?[01]+#*(?:\/[01]+#*)?|[-+]?[01]+#*(?:\/[01]+#*)?[-+](?:[01]+#*(?:\/[01]+#*)?)?i|[-+]?[01]+#*(?:\/[01]+#*)?)(?=[()\s;"]|$)/i);
@@ -49,35 +59,46 @@ CodeMirror.defineMode("scheme", function () {
     var decimalMatcher = new RegExp(/^(?:[-+]i|[-+](?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)i|[-+]?(?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)@[-+]?(?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)|[-+]?(?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)[-+](?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)?i|(?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*))(?=[()\s;"]|$)/i);
 
     function isBinaryNumber (stream) {
+		logger.error(`>>> Entering isBinaryNumber(stream=${stream})`, { "event.action": "isBinaryNumber", "logrite.stream": stream });
+		logger.warn(`<<< Exiting isBinaryNumber(stream=${stream})`, { "event.action": "isBinaryNumber", "logrite.stream": stream });
         return stream.match(binaryMatcher);
     }
 
     function isOctalNumber (stream) {
+		logger.error(`>>> Entering isOctalNumber(stream=${stream})`, { "event.action": "isOctalNumber", "logrite.stream": stream });
+		logger.warn(`<<< Exiting isOctalNumber(stream=${stream})`, { "event.action": "isOctalNumber", "logrite.stream": stream });
         return stream.match(octalMatcher);
     }
 
     function isDecimalNumber (stream, backup) {
+		logger.error(`>>> Entering isDecimalNumber(stream=${stream},backup=${backup})`, { "event.action": "isDecimalNumber", "logrite.stream": stream, "logrite.backup": backup });
         if (backup === true) {
             stream.backUp(1);
         }
+		logger.warn(`<<< Exiting isDecimalNumber(stream=${stream},backup=${backup})`, { "event.action": "isDecimalNumber", "logrite.stream": stream, "logrite.backup": backup });
         return stream.match(decimalMatcher);
     }
 
     function isHexNumber (stream) {
+		logger.error(`>>> Entering isHexNumber(stream=${stream})`, { "event.action": "isHexNumber", "logrite.stream": stream });
+		logger.warn(`<<< Exiting isHexNumber(stream=${stream})`, { "event.action": "isHexNumber", "logrite.stream": stream });
         return stream.match(hexMatcher);
     }
 
     return {
         startState: function () {
+			logger.error('>>> Entering startState()', { "event.action": "startState" });
             return {
                 indentStack: null,
                 indentation: 0,
                 mode: false,
                 sExprComment: false
             };
+			logger.warn('<<< Exiting startState()', { "event.action": "startState" });
         },
 
         token: function (stream, state) {
+			logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
             if (state.indentStack == null && stream.sol()) {
                 // update indentation, but only if indentStack is empty
                 state.indentation = stream.indentation();
@@ -96,6 +117,7 @@ CodeMirror.defineMode("scheme", function () {
                         if (next == "\"" && !escaped) {
 
                             state.mode = false;
+							logger.debug(`token(stream=${stream},state=${state}): state.mode → ${state.mode}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
                             break;
                         }
                         escaped = !escaped && next == "\\";
@@ -127,6 +149,7 @@ CodeMirror.defineMode("scheme", function () {
                     }
                 default: // default parsing mode
                     var ch = stream.next();
+					logger.error(`token(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
 
                     if (ch == "\"") {
                         state.mode = "string";
@@ -181,6 +204,7 @@ CodeMirror.defineMode("scheme", function () {
                         returnType = COMMENT;
                     } else if (ch == "(" || ch == "[") {
                       var keyWord = ''; var indentTemp = stream.column(), letter;
+						logger.error(`token(stream=${stream},state=${state}): keyWord → ${keyWord}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
                         /**
                         Either
                         (indent-word ..
@@ -229,13 +253,16 @@ CodeMirror.defineMode("scheme", function () {
                         if (keywords && keywords.propertyIsEnumerable(stream.current())) {
                             returnType = BUILTIN;
                         } else returnType = "variable";
+						logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
                     }
             }
             return (typeof state.sExprComment == "number") ? COMMENT : returnType;
         },
 
         indent: function (state) {
+			logger.error(`>>> Entering indent(state=${state})`, { "event.action": "indent", "logrite.state": state });
             if (state.indentStack == null) return state.indentation;
+			logger.warn(`<<< Exiting indent(state=${state})`, { "event.action": "indent", "logrite.state": state });
             return state.indentStack.indent;
         },
 

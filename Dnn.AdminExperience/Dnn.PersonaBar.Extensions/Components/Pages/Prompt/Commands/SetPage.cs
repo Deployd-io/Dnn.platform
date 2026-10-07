@@ -57,7 +57,10 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         /// <param name="pagesController">The pages controller.</param>
         public SetPage(IPagesController pagesController)
         {
+			eventLogger.LogError(">>> Entering SetPage(pagesController={PagesController})", pagesController);
             this.pagesController = pagesController;
+			eventLogger.LogDebug("SetPage(pagesController={PagesController}): pagesController → {PagesController1}", pagesController, pagesController);
+        eventLogger.LogWarning("<<< Exiting SetPage(pagesController={PagesController})", pagesController);
         }
 
         /// <inheritdoc />
@@ -81,6 +84,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
 
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogError(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.PageId = this.GetFlagValue(FlagId, "Page Id", -1, true, true, true);
             this.ParentId = this.GetFlagValue<int?>(FlagParentId, "Parent Id", null);
             this.Title = this.GetFlagValue(FlagTitle, "Title", string.Empty);
@@ -93,13 +97,16 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
             {
                 this.AddMessage(string.Format(CultureInfo.InvariantCulture, this.LocalizeString("Prompt_NothingToUpdate"), FlagTitle, FlagDescription, FlagName, FlagVisible));
             }
+			eventLogger.LogWarning("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogError(">>> Entering Run()");
             try
             {
                 var pageSettings = this.pagesController.GetPageSettings(this.PageId, this.PortalSettings);
+				eventLogger.LogError("Run(): pageSettings → {PageSettings}", pageSettings);
                 if (pageSettings == null)
                 {
                     return new ConsoleErrorResultModel(this.LocalizeString("PageNotFound"));
@@ -111,6 +118,8 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
                 pageSettings.Description = !string.IsNullOrEmpty(this.Description) ? this.Description : pageSettings.Description;
                 pageSettings.Keywords = !string.IsNullOrEmpty(this.Keywords) ? this.Keywords : pageSettings.Keywords;
                 pageSettings.ParentId = this.ParentId.HasValue ? this.ParentId : pageSettings.ParentId;
+				eventLogger.LogDebug("Run(): pageSettings.ParentId → {Arg0}", pageSettings.ParentId);
+				eventLogger.LogDebug("Run(): pageSettings.IncludeInMenu → {Arg0}", pageSettings.IncludeInMenu);
                 pageSettings.IncludeInMenu = this.Visible ?? pageSettings.IncludeInMenu;
                 if (!SecurityService.Instance.CanSavePageDetails(pageSettings))
                 {
@@ -118,16 +127,21 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
                 }
 
                 var updatedTab = this.pagesController.SavePageDetails(this.PortalSettings, pageSettings);
+				eventLogger.LogError("Run(): updatedTab → {UpdatedTab}", updatedTab);
 
                 var lstResults = new List<PageModel> { new PageModel(updatedTab) };
+				eventLogger.LogError("Run(): lstResults → {LstResults}", lstResults);
                 return new ConsoleResultModel(this.LocalizeString("PageUpdatedMessage")) { Data = lstResults, Records = lstResults.Count };
             }
             catch (PageNotFoundException)
             {
+				eventLogger.LogError("Exception in Run(): {Arg0}", PageNotFoundException.Message);
                 return new ConsoleErrorResultModel(this.LocalizeString("PageNotFound"));
             }
             catch (PageValidationException ex)
             {
+				eventLogger.LogError("Exception in Run(): {Arg0}", ex.Message);
+				eventLogger.LogWarning("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(ex.Message);
             }
         }

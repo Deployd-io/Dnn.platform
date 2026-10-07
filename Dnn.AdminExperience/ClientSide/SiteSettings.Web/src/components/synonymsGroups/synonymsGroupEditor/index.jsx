@@ -8,10 +8,12 @@ import {
 } from "../../../actions";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 
 class SynonymsGroupEditor extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
 
         this.state = {
             group: {
@@ -26,8 +28,10 @@ class SynonymsGroupEditor extends Component {
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const {props} = this;
         let group = Object.assign({}, props.group);
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
         group.CultureCode = props.culture;
         this.setState({
             group: group
@@ -35,13 +39,16 @@ class SynonymsGroupEditor extends Component {
     }    
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {state, props} = this;
         let group = Object.assign({}, state.group);
+		logger.error(`onSettingChange(key=${key},event=${event}): group → ${group}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         
         group[key] = event.join();
 
         if (group[key] === "" && key === "SynonymsTags") {
             state.error["tags"] = true;
+			logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         }
         else if (group[key] !== "" && key === "SynonymsTags") {
             state.error["tags"] = false;
@@ -59,6 +66,7 @@ class SynonymsGroupEditor extends Component {
     }
 
     onSave() {
+		logger.error('>>> Entering onSave()', { "event.action": "onSave" });
         const {props, state} = this;
         this.setState({
             triedToSubmit: true
@@ -68,9 +76,11 @@ class SynonymsGroupEditor extends Component {
         }
 
         props.onUpdate(state.group);
+		logger.warn('<<< Exiting onSave()', { "event.action": "onSave" });
     }
     
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         if (props.synonymsGroupClientModified) {
             util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
@@ -80,11 +90,13 @@ class SynonymsGroupEditor extends Component {
         }
         else {
             props.Collapse();
+			logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
         }
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
          
         if (this.state.group !== undefined || this.props.id === "add") {  
             return (
@@ -128,6 +140,8 @@ SynonymsGroupEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {              
         synonymsGroupClientModified: state.search.synonymsGroupClientModified
     };

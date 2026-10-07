@@ -16,11 +16,14 @@ namespace Dnn.AuthServices.Jwt.Services
     [DnnAuthorize(AuthTypes = "JWT")]
     public class MobileController : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MobileController));
         /// <summary>Clients that used JWT login should use this API call to log out and invalidate the tokens.</summary>
         /// <returns>An asynchronous HTTP response.</returns>
         [HttpGet]
         public IHttpActionResult Logout()
         {
+			Logger.LogError(">>> Entering Logout()");
+            Logger.LogWarning("<<< Exiting Logout()");
             return JwtController.Instance.LogoutUser(this.Request)
                 ? this.Ok(new { success = true, })
                 : this.Unauthorized();
@@ -39,7 +42,10 @@ namespace Dnn.AuthServices.Jwt.Services
         [AllowAnonymous]
         public IHttpActionResult Login(LoginData loginData)
         {
+			Logger.LogError(">>> Entering Login(loginData={LoginData})", loginData);
             var result = JwtController.Instance.LoginUser(this.Request, loginData);
+			Logger.LogError("Login(loginData={LoginData}): result → {Result}", loginData, result);
+			Logger.LogWarning("<<< Exiting Login(loginData={LoginData})", loginData);
             return this.ReplyWith(result);
         }
 
@@ -58,7 +64,10 @@ namespace Dnn.AuthServices.Jwt.Services
         [AllowAnonymous]
         public IHttpActionResult ExtendToken(RenewalDto rtoken)
         {
+			Logger.LogError(">>> Entering ExtendToken(rtoken=<redacted>)");
             var result = JwtController.Instance.RenewToken(this.Request, rtoken.RenewalToken);
+			Logger.LogError("ExtendToken(rtoken=<redacted>): result → {Result}", result);
+			Logger.LogWarning("<<< Exiting ExtendToken(rtoken=<redacted>)");
             return this.ReplyWith(result);
         }
 
@@ -67,8 +76,11 @@ namespace Dnn.AuthServices.Jwt.Services
         [HttpGet]
         public IHttpActionResult TestGet()
         {
+			Logger.LogError(">>> Entering TestGet()");
             var identity = System.Threading.Thread.CurrentPrincipal.Identity;
             var reply = $"Hello {identity.Name}! You are authenticated through {identity.AuthenticationType}.";
+			Logger.LogError("TestGet(): reply → {Reply}", reply);
+			Logger.LogWarning("<<< Exiting TestGet()");
             return this.Ok(new { reply, });
         }
 
@@ -79,14 +91,17 @@ namespace Dnn.AuthServices.Jwt.Services
         [ValidateAntiForgeryToken]
         public IHttpActionResult TestPost(TestPostData something)
         {
+			Logger.LogError(">>> Entering TestPost(something={Something})", something);
             var identity = System.Threading.Thread.CurrentPrincipal.Identity;
             var reply = $"Hello {identity.Name}! You are authenticated through {identity.AuthenticationType}." +
                         $" You said: ({something.Text})";
+			Logger.LogWarning("<<< Exiting TestPost(something={Something})", something);
             return this.Ok(new { reply, });
         }
 
         private IHttpActionResult ReplyWith(LoginResultData result)
         {
+			Logger.LogError(">>> Entering ReplyWith(result={Result})", result);
             if (result == null)
             {
                 return this.Unauthorized();
@@ -98,6 +113,7 @@ namespace Dnn.AuthServices.Jwt.Services
                 return this.Unauthorized(new AuthenticationHeaderValue(JwtController.AuthScheme, result.Error));
             }
 
+			Logger.LogWarning("<<< Exiting ReplyWith(result={Result})", result);
             return this.Ok(result);
         }
 

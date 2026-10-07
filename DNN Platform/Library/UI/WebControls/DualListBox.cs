@@ -18,6 +18,7 @@ namespace DotNetNuke.UI.WebControls
 
     public class DualListBox : WebControl, IPostBackEventHandler, IPostBackDataHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DualListBox));
         private readonly Style availableListBoxStyle = new Style();
         private readonly Style buttonStyle = new Style();
         private readonly TableStyle containerStyle = new TableStyle();
@@ -29,9 +30,13 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>Initializes a new instance of the <see cref="DualListBox"/> class.</summary>
         public DualListBox()
         {
+			Logger.LogError(">>> Entering DualListBox()");
             this.ShowAddButton = true;
+			Logger.LogDebug("DualListBox(): this.ShowAddButton → {Arg0}", this.ShowAddButton);
             this.ShowAddAllButton = true;
             this.ShowRemoveButton = true;
+			Logger.LogDebug("DualListBox(): this.ShowAddAllButton → {Arg0}", this.ShowAddAllButton);
+        Logger.LogWarning("<<< Exiting DualListBox()");
             this.ShowRemoveAllButton = true;
         }
 
@@ -181,11 +186,14 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         public bool LoadPostData(string postDataKey, NameValueCollection postCollection)
         {
+			Logger.LogError(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             bool retValue = Null.NullBoolean;
             string addItems = postCollection[postDataKey + "_Available"];
+			Logger.LogError("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): retValue → {RetValue}", postDataKey, postCollection, retValue);
             if (!string.IsNullOrEmpty(addItems))
             {
                 this.addValues = new List<string>();
+				Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): addValues → {AddValues}", postDataKey, postCollection, addValues);
                 foreach (string addItem in addItems.Split(','))
                 {
                     this.addValues.Add(addItem);
@@ -198,6 +206,7 @@ namespace DotNetNuke.UI.WebControls
             if (!string.IsNullOrEmpty(removeItems))
             {
                 this.removeValues = new List<string>();
+				Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): removeValues → {RemoveValues}", postDataKey, postCollection, removeValues);
                 foreach (string removeItem in removeItems.Split(','))
                 {
                     this.removeValues.Add(removeItem);
@@ -206,17 +215,21 @@ namespace DotNetNuke.UI.WebControls
                 retValue = true;
             }
 
+			Logger.LogWarning("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             return retValue;
         }
 
         /// <inheritdoc />
         public void RaisePostDataChangedEvent()
         {
+		Logger.LogError(">>> Entering RaisePostDataChangedEvent()");
+        Logger.LogWarning("<<< Exiting RaisePostDataChangedEvent()");
         }
 
         /// <inheritdoc />
         public void RaisePostBackEvent(string eventArgument)
         {
+			Logger.LogError(">>> Entering RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
             switch (eventArgument)
             {
                 case "Add":
@@ -232,66 +245,83 @@ namespace DotNetNuke.UI.WebControls
                     this.OnRemoveAllButtonClick(new EventArgs());
                     break;
             }
+			Logger.LogWarning("<<< Exiting RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
         }
 
         protected virtual PostBackOptions GetPostBackOptions(string argument)
         {
+			Logger.LogError(">>> Entering GetPostBackOptions(argument={Argument})", argument);
             var postBackOptions = new PostBackOptions(this, argument) { RequiresJavaScriptProtocol = true };
 
+			Logger.LogError("GetPostBackOptions(argument={Argument}): postBackOptions → {PostBackOptions}", argument, postBackOptions);
             if (this.CausesValidation && this.Page.GetValidators(this.ValidationGroup).Count > 0)
             {
                 postBackOptions.PerformValidation = true;
+				Logger.LogDebug("GetPostBackOptions(argument={Argument}): postBackOptions.PerformValidation → {Arg1}", argument, postBackOptions.PerformValidation);
                 postBackOptions.ValidationGroup = this.ValidationGroup;
+				Logger.LogDebug("GetPostBackOptions(argument={Argument}): postBackOptions.ValidationGroup → {Arg1}", argument, postBackOptions.ValidationGroup);
             }
 
+			Logger.LogWarning("<<< Exiting GetPostBackOptions(argument={Argument})", argument);
             return postBackOptions;
         }
 
         protected void OnAddButtonClick(DualListBoxEventArgs e)
         {
+			Logger.LogError(">>> Entering OnAddButtonClick(e={E})", e);
             if (this.AddButtonClick != null)
             {
                 this.AddButtonClick(this, e);
             }
+			Logger.LogWarning("<<< Exiting OnAddButtonClick(e={E})", e);
         }
 
         protected void OnAddAllButtonClick(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnAddAllButtonClick(e={E})", e);
             if (this.AddAllButtonClick != null)
             {
                 this.AddAllButtonClick(this, e);
             }
+			Logger.LogWarning("<<< Exiting OnAddAllButtonClick(e={E})", e);
         }
 
         protected void OnRemoveButtonClick(DualListBoxEventArgs e)
         {
+			Logger.LogError(">>> Entering OnRemoveButtonClick(e={E})", e);
             if (this.RemoveButtonClick != null)
             {
                 this.RemoveButtonClick(this, e);
             }
+			Logger.LogWarning("<<< Exiting OnRemoveButtonClick(e={E})", e);
         }
 
         protected void OnRemoveAllButtonClick(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnRemoveAllButtonClick(e={E})", e);
             if (this.RemoveAllButtonClick != null)
             {
                 this.RemoveAllButtonClick(this, e);
             }
+			Logger.LogWarning("<<< Exiting OnRemoveAllButtonClick(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
             if (this.Page != null)
             {
                 this.Page.RegisterRequiresPostBack(this);
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void RenderContents(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderContents(writer={Writer})", writer);
             // render table
             if (this.ContainerStyle != null)
             {
@@ -308,14 +338,19 @@ namespace DotNetNuke.UI.WebControls
 
             // Render end of table
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderContents(writer={Writer})", writer);
         }
 
         private NameValueCollection GetList(string listType, object dataSource)
         {
+			Logger.LogError(">>> Entering GetList(listType={ListType},dataSource={DataSource})", listType, dataSource);
             var dataList = dataSource as IEnumerable;
             var list = new NameValueCollection();
+			Logger.LogError("GetList(listType={ListType},dataSource={DataSource}): dataList → {DataList}", listType, dataSource, dataList);
             if (dataList == null)
             {
+				Logger.LogError("GetList(listType={ListType},dataSource={DataSource}): list → {List}", listType, dataSource, list);
+				Logger.LogError("Throwing ArgumentException from GetList(listType={ListType},dataSource={DataSource})", listType, dataSource);
                 throw new ArgumentException("The " + listType + "DataSource must implement the IEnumerable Interface");
             }
             else
@@ -324,7 +359,9 @@ namespace DotNetNuke.UI.WebControls
                 {
                     const BindingFlags bindings = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
                     PropertyInfo objTextProperty = item.GetType().GetProperty(this.DataTextField, bindings);
+					Logger.LogError("GetList(listType={ListType},dataSource={DataSource}): objTextProperty → {ObjTextProperty}", listType, dataSource, objTextProperty);
                     PropertyInfo objValueProperty = item.GetType().GetProperty(this.DataValueField, bindings);
+					Logger.LogError("GetList(listType={ListType},dataSource={DataSource}): objValueProperty → {ObjValueProperty}", listType, dataSource, objValueProperty);
                     string objValue = Convert.ToString(objValueProperty.GetValue(item, null), CultureInfo.InvariantCulture);
                     string objText = Convert.ToString(objTextProperty.GetValue(item, null), CultureInfo.InvariantCulture);
 
@@ -332,13 +369,16 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetList(listType={ListType},dataSource={DataSource})", listType, dataSource);
             return list;
         }
 
         private void RenderButton(string buttonType, HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderButton(buttonType={ButtonType},writer={Writer})", buttonType, writer);
             string buttonText = Null.NullString;
             string imageUrl = Null.NullString;
+			Logger.LogError("RenderButton(buttonType={ButtonType},writer={Writer}): imageUrl → {ImageUrl}", buttonType, writer, imageUrl);
 
             // Begin Button Row
             writer.RenderBeginTag(HtmlTextWriterTag.Tr);
@@ -400,10 +440,12 @@ namespace DotNetNuke.UI.WebControls
 
             // Render end of Button Row
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderButton(buttonType={ButtonType},writer={Writer})", buttonType, writer);
         }
 
         private void RenderButtons(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderButtons(writer={Writer})", writer);
             // render table
             writer.RenderBeginTag(HtmlTextWriterTag.Table);
 
@@ -443,13 +485,16 @@ namespace DotNetNuke.UI.WebControls
 
             // Render end of table
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderButtons(writer={Writer})", writer);
         }
 
         private void RenderListBox(string listType, object dataSource, Style style, HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderListBox(listType={ListType},dataSource={DataSource},style={Style},writer={Writer})", listType, dataSource, style, writer);
             if (dataSource != null)
             {
                 NameValueCollection list = this.GetList(listType, dataSource);
+				Logger.LogError("RenderListBox(listType={ListType},dataSource={DataSource},style={Style},writer={Writer}): list → {List}", listType, dataSource, style, writer, list);
                 if (list != null)
                 {
                     if (style != null)
@@ -474,10 +519,12 @@ namespace DotNetNuke.UI.WebControls
                     writer.RenderEndTag();
                 }
             }
+			Logger.LogWarning("<<< Exiting RenderListBox(listType={ListType},dataSource={DataSource},style={Style},writer={Writer})", listType, dataSource, style, writer);
         }
 
         private void RenderHeader(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderHeader(writer={Writer})", writer);
             // render Header row
             writer.RenderBeginTag(HtmlTextWriterTag.Tr);
             if (this.HeaderStyle != null)
@@ -502,10 +549,12 @@ namespace DotNetNuke.UI.WebControls
 
             // Render end of Header Row
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderHeader(writer={Writer})", writer);
         }
 
         private void RenderListBoxes(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderListBoxes(writer={Writer})", writer);
             // render List Boxes row
             writer.RenderBeginTag(HtmlTextWriterTag.Tr);
 
@@ -523,6 +572,7 @@ namespace DotNetNuke.UI.WebControls
 
             // Render end of List Boxes Row
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderListBoxes(writer={Writer})", writer);
         }
     }
 }

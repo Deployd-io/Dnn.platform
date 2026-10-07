@@ -5,12 +5,14 @@ import {formatDate, sort} from "../../../helpers";
 import UserMenu from "../UserMenu";
 import Localization from "localization";
 import ColumnSizes from "../columnSizes";
+const logger = console;
 import {canManageRoles, canManageProfile, canViewSettings} from "../../permissionHelpers.js";
 import { SvgIcons, GridCell, Collapsible, TextOverflowWrapper } from "@dnnsoftware/dnn-react-common";
 
 class DetailsRow extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.rootElement = React.createRef();
         this.state = {
             opened: false,
@@ -18,18 +20,23 @@ class DetailsRow extends Component {
         };
     }
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this._isMounted = true;
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         this._isMounted = false;
+		logger.warn('<<< Exiting componentWillUnmount()', { "event.action": "componentWillUnmount" });
     }
 
     handleClick(event) {
+		logger.error(`>>> Entering handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
         // the "findDOMNode was called on an unmounted component." error we need to check if the component is mounted before execute this code
@@ -38,25 +45,32 @@ class DetailsRow extends Component {
             && !(event.target.id === "confirmbtn" || event.target.id === "cancelbtn") && this.props.openId !== "add") {
             if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
                 this.props.Collapse();
+				logger.warn(`<<< Exiting handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
             }
         }
     }
     toggle(index) {
+		logger.error(`>>> Entering toggle(index=${index})`, { "event.action": "toggle", "logrite.index": index });
         if ((this.props.openId !== "" && this.props.id === this.props.openId) && this.props.currentIndex === index) {
             this.props.Collapse();
         } else {
             this.props.OpenCollapse(this.props.id, index);
+			logger.warn(`<<< Exiting toggle(index=${index})`, { "event.action": "toggle", "logrite.index": index });
         }
     }
     toggleUserMenu() {
+		logger.error('>>> Entering toggleUserMenu()', { "event.action": "toggleUserMenu" });
         const show = !this.state.showMenu;
         this.setState({ showMenu: show });
+		logger.warn('<<< Exiting toggleUserMenu()', { "event.action": "toggleUserMenu" });
     }
     
     /* eslint-disable react/no-danger */
     getUserActions(user, opened) {
+		logger.error(`>>> Entering getUserActions(user=${user},opened=${opened})`, { "event.action": "getUserActions", "user.name": String(user), "logrite.opened": opened });
         let actionIcons = [];
         actionIcons = actionIcons.concat((this.props.getUserTabsIcons && this.props.getUserTabsIcons(user)) || []);
+		logger.error(`getUserActions(user=${user},opened=${opened}): actionIcons → ${actionIcons}`, { "event.action": "getUserActions", "user.name": String(user), "logrite.opened": opened });
 
         if (canManageProfile(this.props.appSettings.applicationSettings.settings))
         {
@@ -87,7 +101,9 @@ class DetailsRow extends Component {
         let userActions = sort(actionIcons, "index", "desc").map((actionIcon) => {
             let Icon = actionIcon.icon;
             let element = <div key={`user_action_${i}`} title={actionIcon.title} className={ "extension-action " + !(opened && this.props.currentIndex === i) } onClick={ this.toggle.bind(this, i) } ><Icon /></div>;
+			logger.error(`getUserActions(user=${user},opened=${opened}): element → ${element}`, { "event.action": "getUserActions", "user.name": String(user), "logrite.opened": opened });
             i++;
+		logger.warn(`<<< Exiting getUserActions(user=${user},opened=${opened})`, { "event.action": "getUserActions", "user.name": String(user), "logrite.opened": opened });
             return element;
         });
         return ([<div key={`user_action_wrapper_${user.userId}`} style={{ position: "relative" }}>
@@ -100,14 +116,18 @@ class DetailsRow extends Component {
         </div>]).concat(userActions);
     }
     getUserColumns(user, id, opened) {
+		logger.error(`>>> Entering getUserColumns(user=${user},id=${id},opened=${opened})`, { "event.action": "getUserColumns", "user.name": String(user), "logrite.id": id, "logrite.opened": opened });
         let userActions = this.getUserActions(user, opened);
         let extraColumns = this.props.getUserColumns && this.props.getUserColumns(user);
+		logger.error(`getUserColumns(user=${user},id=${id},opened=${opened}): extraColumns → ${extraColumns}`, { "event.action": "getUserColumns", "user.name": String(user), "logrite.id": id, "logrite.opened": opened });
         let columnSizes =this.props.columnSizes!==undefined? this.props.columnSizes: ColumnSizes;
         let userColumns = [];
         if (this.props.appSettings.applicationSettings.settings.dataConsentActive) {
             let statusClass = "black";
+			logger.error(`getUserColumns(user=${user},id=${id},opened=${opened}): statusClass → ${statusClass}`, { "event.action": "getUserColumns", "user.name": String(user), "logrite.id": id, "logrite.opened": opened });
             let StatusIcon = SvgIcons.Signature;
             let hoverText = Localization.get("HasAgreedToTerms.title");
+			logger.error(`getUserColumns(user=${user},id=${id},opened=${opened}): hoverText → ${hoverText}`, { "event.action": "getUserColumns", "user.name": String(user), "logrite.id": id, "logrite.opened": opened });
             if (user.requestsRemoval) {
                 statusClass = "red";
                 StatusIcon = SvgIcons.UserSlash;
@@ -169,16 +189,21 @@ class DetailsRow extends Component {
             }
         ]).concat((extraColumns) || []);
 
+		logger.warn(`<<< Exiting getUserColumns(user=${user},id=${id},opened=${opened})`, { "event.action": "getUserColumns", "user.name": String(user), "logrite.id": id, "logrite.opened": opened });
         return sort(userColumns, "index").map((column) => {
             return column.content;
         });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         let {user} = this.props;
+		logger.debug(`render(): user → ${user}`, { "event.action": "render" });
         let opened = (props.openId !== "" && props.id === props.openId);
+		logger.error(`render(): opened → ${opened}`, { "event.action": "render" });
         let uniqueId = "userRow-" + Math.random() + Date.now();
+		logger.error(`render(): uniqueId → ${uniqueId}`, { "event.action": "render" });
         if (user === undefined) {
             user = {
                 avatar: "-",
@@ -190,6 +215,7 @@ class DetailsRow extends Component {
             };
         }
         let userColumns = this.getUserColumns(user, props.id, opened);
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             /* eslint-disable react/no-danger */
             <GridCell className={"collapsible-component-users"} id={uniqueId} ref={(node) => this.rootElement = node}>

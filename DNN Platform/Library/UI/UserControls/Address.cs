@@ -24,6 +24,7 @@ namespace DotNetNuke.UI.UserControls
     /// <summary>The Address UserControl is used to manage User Addresses.</summary>
     public abstract class Address(ListController listController, IPortalController portalController) : UserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Address));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         protected CountryListBox cboCountry;
@@ -190,6 +191,8 @@ namespace DotNetNuke.UI.UserControls
         protected Address()
             : this(null, null)
         {
+		Logger.LogError(">>> Entering Address()");
+        Logger.LogWarning("<<< Exiting Address()");
         }
 
         public string LocalResourceFile => Localization.GetResourceFile(this, MyFileName);
@@ -386,6 +389,7 @@ namespace DotNetNuke.UI.UserControls
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cboCountry.SelectedIndexChanged += this.OnCountryIndexChanged;
@@ -426,6 +430,7 @@ namespace DotNetNuke.UI.UserControls
                     ////cboCountry.DataSource = objRegionalController.GetCountries
                     // <this test using method 2: get empty collection then get each entry list on demand & store into cache
                     var entryCollection = this.ListController.GetListEntryInfoItems("Country");
+					Logger.LogError("OnLoad(e={E}): entryCollection → {EntryCollection}", e, entryCollection);
 
                     this.cboCountry.DataSource = entryCollection;
                     this.cboCountry.DataBind();
@@ -531,126 +536,158 @@ namespace DotNetNuke.UI.UserControls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         protected void OnCountryIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnCountryIndexChanged(sender={Sender},e={E})", sender, e);
             try
             {
                 this.Localize();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnCountryIndexChanged(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnCountryIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnCityCheckChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnCityCheckChanged(sender={Sender},e={E})", sender, e);
             try
             {
                 this.UpdateRequiredFields();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnCityCheckChanged(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnCityCheckChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnCountryCheckChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnCountryCheckChanged(sender={Sender},e={E})", sender, e);
             try
             {
                 this.UpdateRequiredFields();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnCountryCheckChanged(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnCountryCheckChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnPostalCheckChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPostalCheckChanged(sender={Sender},e={E})", sender, e);
             try
             {
                 this.UpdateRequiredFields();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnPostalCheckChanged(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnPostalCheckChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnRegionCheckChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnRegionCheckChanged(sender={Sender},e={E})", sender, e);
             try
             {
                 this.UpdateRequiredFields();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnRegionCheckChanged(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnRegionCheckChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnStreetCheckChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnStreetCheckChanged(sender={Sender},e={E})", sender, e);
             try
             {
                 this.UpdateRequiredFields();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnStreetCheckChanged(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnStreetCheckChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnTelephoneCheckChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnTelephoneCheckChanged(sender={Sender},e={E})", sender, e);
             try
             {
                 this.UpdateRequiredFields();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnTelephoneCheckChanged(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnTelephoneCheckChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnCellCheckChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnCellCheckChanged(sender={Sender},e={E})", sender, e);
             try
             {
                 this.UpdateRequiredFields();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnCellCheckChanged(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnCellCheckChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnFaxCheckChanged(object sender, EventArgs e)
         {
+			Logger.LogError(">>> Entering OnFaxCheckChanged(sender={Sender},e={E})", sender, e);
             try
             {
                 this.UpdateRequiredFields();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnFaxCheckChanged(sender={Sender},e={E}): {Arg2}", sender, e, exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogWarning("<<< Exiting OnFaxCheckChanged(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Localize correctly sets up the control for US/Canada/Other Countries.</summary>
         private void Localize()
         {
+			Logger.LogError(">>> Entering Localize()");
             var countryCode = this.cboCountry.SelectedItem.Value;
 
             // listKey in format "Country.US:Region"
             var listKey = $"Country.{countryCode}";
+			Logger.LogError("Localize(): listKey → {ListKey}", listKey);
             var entryCollection = this.ListController.GetListEntryInfoItems("Region", listKey);
+			Logger.LogError("Localize(): entryCollection → {EntryCollection}", entryCollection);
 
             if (entryCollection.Any())
             {
@@ -700,24 +737,35 @@ namespace DotNetNuke.UI.UserControls
             }
 
             var reqRegion = DotNetNuke.Entities.Portals.PortalController.GetPortalSettingAsBoolean(this.PortalController, "addressregion", this.PortalSettings.PortalId, true);
+			Logger.LogError("Localize(): reqRegion → {ReqRegion}", reqRegion);
             if (reqRegion)
             {
                 this.valRegion1.Enabled = false;
                 this.valRegion2.Enabled = false;
             }
+			Logger.LogWarning("<<< Exiting Localize()");
         }
 
         /// <summary>ShowRequiredFields sets up displaying which fields are required.</summary>
         private void ShowRequiredFields()
         {
+			Logger.LogError(">>> Entering ShowRequiredFields()");
             var reqStreet = DotNetNuke.Entities.Portals.PortalController.GetPortalSettingAsBoolean(this.PortalController, "addressstreet", this.PortalSettings.PortalId, true);
             var reqCity = DotNetNuke.Entities.Portals.PortalController.GetPortalSettingAsBoolean(this.PortalController, "addresscity", this.PortalSettings.PortalId, true);
+			Logger.LogError("ShowRequiredFields(): reqCity → {ReqCity}", reqCity);
             var reqCountry = DotNetNuke.Entities.Portals.PortalController.GetPortalSettingAsBoolean(this.PortalController, "addresscountry", this.PortalSettings.PortalId, true);
+			Logger.LogError("ShowRequiredFields(): reqCountry → {ReqCountry}", reqCountry);
             var reqRegion = DotNetNuke.Entities.Portals.PortalController.GetPortalSettingAsBoolean(this.PortalController, "addressregion", this.PortalSettings.PortalId, true);
+			Logger.LogError("ShowRequiredFields(): reqRegion → {ReqRegion}", reqRegion);
             var reqPostal = DotNetNuke.Entities.Portals.PortalController.GetPortalSettingAsBoolean(this.PortalController, "addresspostal", this.PortalSettings.PortalId, true);
+			Logger.LogError("ShowRequiredFields(): reqPostal → {ReqPostal}", reqPostal);
             var reqTelephone = DotNetNuke.Entities.Portals.PortalController.GetPortalSettingAsBoolean(this.PortalController, "addresstelephone", this.PortalSettings.PortalId, true);
+			Logger.LogError("ShowRequiredFields(): reqTelephone → {ReqTelephone}", reqTelephone);
             var reqCell = DotNetNuke.Entities.Portals.PortalController.GetPortalSettingAsBoolean(this.PortalController, "addresscell", this.PortalSettings.PortalId, true);
+			Logger.LogError("ShowRequiredFields(): reqCell → {ReqCell}", reqCell);
             var reqFax = DotNetNuke.Entities.Portals.PortalController.GetPortalSettingAsBoolean(this.PortalController, "addressfax", this.PortalSettings.PortalId, true);
+			Logger.LogError("ShowRequiredFields(): reqFax → {ReqFax}", reqFax);
+			Logger.LogError("ShowRequiredFields(): reqStreet → {ReqStreet}", reqStreet);
 
             if (TabPermissionController.CanAdminPage())
             {
@@ -830,11 +878,13 @@ namespace DotNetNuke.UI.UserControls
                     this.txtFax.CssClass = string.Empty;
                 }
             }
+			Logger.LogWarning("<<< Exiting ShowRequiredFields()");
         }
 
         /// <summary>UpdateRequiredFields updates which fields are required.</summary>
         private void UpdateRequiredFields()
         {
+			Logger.LogError(">>> Entering UpdateRequiredFields()");
             if (!this.chkCountry.Checked)
             {
                 this.chkRegion.Checked = false;
@@ -850,6 +900,7 @@ namespace DotNetNuke.UI.UserControls
             DotNetNuke.Entities.Portals.PortalController.UpdatePortalSetting(this.PortalController, this.PortalSettings.PortalId, "addressfax", this.chkFax.Checked ? string.Empty : "N");
 
             this.ShowRequiredFields();
+			Logger.LogWarning("<<< Exiting UpdateRequiredFields()");
         }
     }
 }

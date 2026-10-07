@@ -8,6 +8,7 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The ProviderInstaller installs Provider Components to a DotNetNuke site.</summary>
     public class ProviderInstaller : ComponentInstallerBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ProviderInstaller));
         /// <summary>Gets a list of allowable file extensions (in addition to the Host's List).</summary>
         /// <value>A String.</value>
         public override string AllowableFiles
@@ -21,29 +22,35 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <inheritdoc />
         public override void Commit()
         {
+			Logger.LogError(">>> Entering Commit()");
             this.Completed = true;
         }
 
         /// <inheritdoc />
         public override void Install()
         {
+			Logger.LogError(">>> Entering Install()");
             this.Completed = true;
         }
 
         /// <inheritdoc />
         public override void ReadManifest(XPathNavigator manifestNav)
         {
+		Logger.LogError(">>> Entering ReadManifest(manifestNav={ManifestNav})", manifestNav);
+        Logger.LogWarning("<<< Exiting ReadManifest(manifestNav={ManifestNav})", manifestNav);
         }
 
         /// <inheritdoc />
         public override void Rollback()
         {
+			Logger.LogError(">>> Entering Rollback()");
             this.Completed = true;
         }
 
         /// <inheritdoc />
         public override void UnInstall()
         {
+			Logger.LogError(">>> Entering UnInstall()");
             this.Completed = true;
         }
     }

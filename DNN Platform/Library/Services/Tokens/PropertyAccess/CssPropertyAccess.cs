@@ -14,20 +14,27 @@ namespace DotNetNuke.Services.Tokens
 
     public class CssPropertyAccess : JsonPropertyAccess<StylesheetDto>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CssPropertyAccess));
         private readonly Page page;
 
         /// <summary>Initializes a new instance of the <see cref="CssPropertyAccess"/> class.</summary>
         /// <param name="page">The page to which the CSS should be registered.</param>
         public CssPropertyAccess(Page page)
         {
+			Logger.LogError(">>> Entering CssPropertyAccess(page={Page})", page);
             this.page = page;
+			Logger.LogDebug("CssPropertyAccess(page={Page}): page → {Page1}", page, page);
+        Logger.LogDebug("CssPropertyAccess(page={Page}): this.page → {Arg1}", page, this.page);
+        Logger.LogWarning("<<< Exiting CssPropertyAccess(page={Page})", page);
         }
 
         /// <inheritdoc />
         protected override string ProcessToken(StylesheetDto model, UserInfo accessingUser, Scope accessLevel)
         {
+			Logger.LogError(">>> Entering ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel})", model, accessingUser, accessLevel);
             if (string.IsNullOrEmpty(model.Path))
             {
+				Logger.LogError("Throwing ArgumentException from ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel})", model, accessingUser, accessLevel);
                 throw new ArgumentException("The Css token must specify a path or property.");
             }
 
@@ -45,6 +52,7 @@ namespace DotNetNuke.Services.Tokens
                 ClientResourceManager.RegisterStyleSheet(this.page, model.Path, model.Priority, model.Provider);
             }
 
+			Logger.LogWarning("<<< Exiting ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel})", model, accessingUser, accessLevel);
             return string.Empty;
         }
     }

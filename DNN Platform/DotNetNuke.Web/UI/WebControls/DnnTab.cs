@@ -10,10 +10,13 @@ namespace DotNetNuke.Web.UI.WebControls
     [ParseChildren(true)]
     public class DnnTab : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnTab));
         /// <summary>Initializes a new instance of the <see cref="DnnTab"/> class.</summary>
         public DnnTab()
             : base("div")
         {
+		Logger.LogError(">>> Entering DnnTab()");
+        Logger.LogWarning("<<< Exiting DnnTab()");
         }
 
         /// <inheritdoc />
@@ -37,27 +40,33 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public override Control FindControl(string id)
         {
+			Logger.LogError(">>> Entering FindControl(id={Id})", id);
             this.EnsureChildControls();
+			Logger.LogWarning("<<< Exiting FindControl(id={Id})", id);
             return base.FindControl(id);
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			Logger.LogError(">>> Entering CreateChildControls()");
             this.Controls.Clear();
 
             if (this.Content != null)
             {
                 this.Content.InstantiateIn(this);
             }
+			Logger.LogWarning("<<< Exiting CreateChildControls()");
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering Render(writer={Writer})", writer);
             this.RenderBeginTag(writer);
             this.RenderChildren(writer);
             this.RenderEndTag(writer);
+			Logger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

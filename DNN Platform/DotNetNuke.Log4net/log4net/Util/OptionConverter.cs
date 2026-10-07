@@ -47,6 +47,8 @@ namespace log4net.Util
         /// </remarks>
         private OptionConverter()
         {
+		value.LogError(">>> Entering OptionConverter()");
+        value.LogWarning("<<< Exiting OptionConverter()");
         }
 
         //		/// <summary>
@@ -135,6 +137,7 @@ namespace log4net.Util
         /// </remarks>
         public static bool ToBoolean(string argValue, bool defaultValue) 
         {
+			value.LogError(">>> Entering ToBoolean(argValue={ArgValue},defaultValue={DefaultValue})", argValue, defaultValue);
             if (argValue != null && argValue.Length > 0)
             {
                 try
@@ -146,6 +149,7 @@ namespace log4net.Util
                     LogLog.Error(declaringType, "[" + argValue + "] is not in proper bool form.", e);
                 }
             }
+			value.LogWarning("<<< Exiting ToBoolean(argValue={ArgValue},defaultValue={DefaultValue})", argValue, defaultValue);
             return defaultValue;
         }
 
@@ -194,13 +198,16 @@ namespace log4net.Util
         /// </remarks>
         public static long ToFileSize(string argValue, long defaultValue) 
         {
+			value.LogError(">>> Entering ToFileSize(argValue={ArgValue},defaultValue={DefaultValue})", argValue, defaultValue);
             if (argValue == null)
             {
                 return defaultValue;
             }
     
             string s = argValue.Trim().ToUpperInvariant();
+			value.LogError("ToFileSize(argValue={ArgValue},defaultValue={DefaultValue}): s → {S}", argValue, defaultValue, s);
             long multiplier = 1;
+			value.LogError("ToFileSize(argValue={ArgValue},defaultValue={DefaultValue}): multiplier → {Multiplier}", argValue, defaultValue, multiplier);
             int index;
     
             if ((index = s.IndexOf("KB")) != -1) 
@@ -233,6 +240,7 @@ namespace log4net.Util
                     LogLog.Error(declaringType, "OptionConverter: [" + s + "] is not in the correct file size syntax.");
                 }
             }
+			value.LogWarning("<<< Exiting ToFileSize(argValue={ArgValue},defaultValue={DefaultValue})", argValue, defaultValue);
             return defaultValue;
         }
 
@@ -251,8 +259,10 @@ namespace log4net.Util
         /// </remarks>
         public static object ConvertStringTo(Type target, string txt)
         {
+			value.LogError(">>> Entering ConvertStringTo(target={Target},txt={Txt})", target, txt);
             if (target == null)
             {
+				value.LogError("Throwing ArgumentNullException from ConvertStringTo(target={Target},txt={Txt})", target, txt);
                 throw new ArgumentNullException("target");
             }
 
@@ -264,6 +274,7 @@ namespace log4net.Util
 
             // First lets try to find a type converter
             IConvertFrom typeConverter = ConverterRegistry.GetConvertFrom(target);
+			value.LogError("ConvertStringTo(target={Target},txt={Txt}): typeConverter → {TypeConverter}", target, txt, typeConverter);
             if (typeConverter != null && typeConverter.CanConvertFrom(typeof(string)))
             {
                 // Found appropriate converter
@@ -289,6 +300,7 @@ namespace log4net.Util
                     // that will take an argument of type string. i.e. T.Parse(string)->T we call this
                     // method to convert the string to the type required by the property.
                     MethodInfo meth = target.GetMethod("Parse", new Type[] {typeof(string)});
+					value.LogError("ConvertStringTo(target={Target},txt={Txt}): meth → {Meth}", target, txt, meth);
                     if (meth != null)
                     {
                         // Call the Parse method
@@ -333,6 +345,7 @@ namespace log4net.Util
         /// </remarks>
         public static bool CanConvertTypeTo(Type sourceType, Type targetType)
         {
+			value.LogError(">>> Entering CanConvertTypeTo(sourceType={SourceType},targetType={TargetType})", sourceType, targetType);
             if (sourceType == null || targetType == null)
             {
                 return false;
@@ -346,6 +359,7 @@ namespace log4net.Util
 
             // Look for a To converter
             IConvertTo tcSource = ConverterRegistry.GetConvertTo(sourceType, targetType);
+			value.LogError("CanConvertTypeTo(sourceType={SourceType},targetType={TargetType}): tcSource → {TcSource}", sourceType, targetType, tcSource);
             if (tcSource != null)
             {
                 if (tcSource.CanConvertTo(targetType))
@@ -356,6 +370,7 @@ namespace log4net.Util
 
             // Look for a From converter
             IConvertFrom tcTarget = ConverterRegistry.GetConvertFrom(targetType);
+			value.LogError("CanConvertTypeTo(sourceType={SourceType},targetType={TargetType}): tcTarget → {TcTarget}", sourceType, targetType, tcTarget);
             if (tcTarget != null)
             {
                 if (tcTarget.CanConvertFrom(sourceType))
@@ -364,6 +379,7 @@ namespace log4net.Util
                 }
             }
 
+			value.LogWarning("<<< Exiting CanConvertTypeTo(sourceType={SourceType},targetType={TargetType})", sourceType, targetType);
             return false;
         }
 
@@ -458,12 +474,15 @@ namespace log4net.Util
         /// </remarks>
         public static object InstantiateByClassName(string className, Type superClass, object defaultValue) 
         {
+			value.LogError(">>> Entering InstantiateByClassName(className=<redacted>,superClass={SuperClass},defaultValue={DefaultValue})", superClass, defaultValue);
             if (className != null) 
             {
                 try 
+			value.LogWarning("<<< Exiting InstantiateByClassName(className=<redacted>,superClass={SuperClass},defaultValue={DefaultValue})", superClass, defaultValue);
                 {
 #if NETSTANDARD1_3
                     Type classObj = SystemInfo.GetTypeFromString(superClass.GetTypeInfo().Assembly, className, true, true);
+					value.LogError("InstantiateByClassName(className=<redacted>,superClass={SuperClass},defaultValue={DefaultValue}): classObj → {ClassObj}", superClass, defaultValue, classObj);
 #else
                     Type classObj = SystemInfo.GetTypeFromString(className, true, true);
 #endif
@@ -527,8 +546,10 @@ namespace log4net.Util
         /// </remarks>
         public static string SubstituteVariables(string value, IDictionary props) 
         {
+			value.LogError(">>> Entering SubstituteVariables(value={Value},props={Props})", value, props);
             StringBuilder buf = new StringBuilder();
 
+			value.LogError("SubstituteVariables(value={Value},props={Props}): buf → {Buf}", value, props, buf);
             int i = 0;
             int j, k;
     
@@ -553,6 +574,7 @@ namespace log4net.Util
                     k = value.IndexOf(DELIM_STOP, j);
                     if (k == -1) 
                     {
+						value.LogError("Throwing LogException from SubstituteVariables(value={Value},props={Props})", value, props);
                         throw new LogException("[" + value + "] has no closing brace. Opening brace at position [" + j + "]");
                     }
                     else 
@@ -570,6 +592,7 @@ namespace log4net.Util
                     }
                 }
             }
+			value.LogWarning("<<< Exiting SubstituteVariables(value={Value},props={Props})", value, props);
         }
 
         /// <summary>
@@ -583,6 +606,9 @@ namespace log4net.Util
         private static object ParseEnum(Type enumType, string value, bool ignoreCase) 
         {
 #if !NETCF
+			value.LogError(">>> Entering ParseEnum(enumType={EnumType},value={Value},ignoreCase={IgnoreCase})", enumType, value, ignoreCase);
+			value.LogError("Exception in ParseEnum(enumType={EnumType},value={Value},ignoreCase={IgnoreCase})", enumType, value, ignoreCase);
+			value.LogWarning("<<< Exiting ParseEnum(enumType={EnumType},value={Value},ignoreCase={IgnoreCase})", enumType, value, ignoreCase);
             return Enum.Parse(enumType, value, ignoreCase);
 #else
             FieldInfo[] fields = enumType.GetFields(BindingFlags.Public | BindingFlags.Static);
@@ -616,6 +642,7 @@ namespace log4net.Util
                 }
                 if (!found) 
                 {
+					value.LogError("Throwing ArgumentException from ParseEnum(enumType={EnumType},value={Value},ignoreCase={IgnoreCase})", enumType, value, ignoreCase);
                     throw new ArgumentException("Failed to lookup member [" + name + "] from Enum type [" + enumType.Name + "]");
                 }
             }

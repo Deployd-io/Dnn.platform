@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Modal from "react-modal";
+const logger = console;
 import { SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 const modalStyles = {
@@ -29,16 +30,22 @@ const modalStyles = {
 class MessageBox extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     onClose() {
+		logger.error('>>> Entering onClose()', { "event.action": "onClose" });
         const {props} = this;
         props.onClose();
+		logger.warn('<<< Exiting onClose()', { "event.action": "onClose" });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <Modal
                 isOpen={props.isOpened}

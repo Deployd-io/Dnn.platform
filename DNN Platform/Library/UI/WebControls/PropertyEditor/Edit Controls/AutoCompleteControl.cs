@@ -22,17 +22,22 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:TextEditControl runat=server></{0}:TextEditControl>")]
     internal class AutoCompleteControl : TextEditControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AutoCompleteControl));
         /// <summary>Initializes a new instance of the <see cref="AutoCompleteControl"/> class.</summary>
         public AutoCompleteControl()
         {
+			Logger.LogError(">>> Entering AutoCompleteControl()");
             this.Init += this.AutoCompleteControl_Init;
             this.Load += this.AutoCompleteControl_Load;
+			Logger.LogWarning("<<< Exiting AutoCompleteControl()");
         }
 
         /// <inheritdoc />
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering RenderEditMode(writer={Writer})", writer);
             int length = Null.NullInteger;
+			Logger.LogError("RenderEditMode(writer={Writer}): length → {Length}", writer, length);
             if (this.CustomAttributes != null)
             {
                 foreach (Attribute attribute in this.CustomAttributes)
@@ -40,6 +45,7 @@ namespace DotNetNuke.UI.WebControls
                     if (attribute is MaxLengthAttribute)
                     {
                         var lengthAtt = (MaxLengthAttribute)attribute;
+						Logger.LogError("RenderEditMode(writer={Writer}): lengthAtt → {LengthAtt}", writer, lengthAtt);
                         length = lengthAtt.Length;
                         break;
                     }
@@ -61,18 +67,23 @@ namespace DotNetNuke.UI.WebControls
             writer.AddAttribute("data-editor", "AutoCompleteControl");
             writer.RenderBeginTag(HtmlTextWriterTag.Input);
             writer.RenderEndTag();
+			Logger.LogWarning("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
 
         private void AutoCompleteControl_Init(object sender, System.EventArgs e)
         {
+			Logger.LogError(">>> Entering AutoCompleteControl_Init(sender={Sender},e={E})", sender, e);
             ClientResourceManager.RegisterScript(this.Page, "~/Resources/Shared/components/ProfileAutoComplete/dnn.ProfileAutoComplete.js");
             ClientResourceManager.RegisterFeatureStylesheet(this.Page, "~/Resources/Shared/components/ProfileAutoComplete/dnn.AutoComplete.css");
             JavaScript.RequestRegistration(CommonJs.jQuery);
             JavaScript.RequestRegistration(CommonJs.jQueryUI);
+			Logger.LogWarning("<<< Exiting AutoCompleteControl_Init(sender={Sender},e={E})", sender, e);
         }
 
         private void AutoCompleteControl_Load(object sender, System.EventArgs e)
         {
+		Logger.LogError(">>> Entering AutoCompleteControl_Load(sender={Sender},e={E})", sender, e);
+        Logger.LogWarning("<<< Exiting AutoCompleteControl_Load(sender={Sender},e={E})", sender, e);
         }
     }
 }

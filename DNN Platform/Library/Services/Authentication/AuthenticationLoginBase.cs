@@ -18,10 +18,13 @@ namespace DotNetNuke.Services.Authentication
     /// </summary>
     public abstract partial class AuthenticationLoginBase : UserModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AuthenticationLoginBase));
         /// <summary>Initializes a new instance of the <see cref="AuthenticationLoginBase"/> class.</summary>
         protected AuthenticationLoginBase()
         {
+			Logger.LogError(">>> Entering AuthenticationLoginBase()");
             this.RedirectURL = Null.NullString;
+			Logger.LogDebug("AuthenticationLoginBase(): this.RedirectURL → {Arg0}", this.RedirectURL);
             this.AuthenticationType = Null.NullString;
             this.Mode = AuthMode.Login;
         }
@@ -68,15 +71,19 @@ namespace DotNetNuke.Services.Authentication
         [DnnDeprecated(9, 2, 0, "Use UserRequestIPAddressController.Instance.GetUserRequestIPAddress")]
         public static partial string GetIPAddress()
         {
+			Logger.LogError(">>> Entering GetIPAddress()");
+            Logger.LogWarning("<<< Exiting GetIPAddress()");
             return UserRequestIPAddressController.Instance.GetUserRequestIPAddress(new HttpRequestWrapper(HttpContext.Current.Request));
         }
 
         protected virtual void OnUserAuthenticated(UserAuthenticatedEventArgs ea)
         {
+			Logger.LogError(">>> Entering OnUserAuthenticated(ea={Ea})", ea);
             if (this.UserAuthenticated != null)
             {
                 this.UserAuthenticated(null, ea);
             }
+			Logger.LogWarning("<<< Exiting OnUserAuthenticated(ea={Ea})", ea);
         }
     }
 }

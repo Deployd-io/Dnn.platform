@@ -13,9 +13,11 @@ namespace DotNetNuke.Services.Search.Entities
     [Serializable]
     public class SearchDocumentToDelete
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchDocumentToDelete));
         /// <summary>Initializes a new instance of the <see cref="SearchDocumentToDelete"/> class.</summary>
         public SearchDocumentToDelete()
         {
+			Logger.LogError(">>> Entering SearchDocumentToDelete()");
             this.Keywords = new Dictionary<string, string>();
             this.NumericKeys = new Dictionary<string, int>();
             this.CultureCode = string.Empty;
@@ -26,6 +28,11 @@ namespace DotNetNuke.Services.Search.Entities
                 this.ModuleId =
                 this.TabId =
                 this.AuthorUserId = 0;
+				Logger.LogDebug("SearchDocumentToDelete(): this.CultureCode → {Arg0}", this.CultureCode);
+        Logger.LogDebug("SearchDocumentToDelete(): this.RoleId → {Arg0}", this.RoleId);
+        Logger.LogDebug("SearchDocumentToDelete(): AuthorUserId → {AuthorUserId}", AuthorUserId);
+        Logger.LogDebug("SearchDocumentToDelete(): this.AuthorUserId → {Arg0}", this.AuthorUserId);
+        Logger.LogWarning("<<< Exiting SearchDocumentToDelete()");
         }
 
         /// <summary>Gets or sets a key to uniquely identify a document in the Index.</summary>
@@ -88,6 +95,8 @@ namespace DotNetNuke.Services.Search.Entities
         /// <returns>A JSON string.</returns>
         public string ToJsonString()
         {
+			Logger.LogError(">>> Entering ToJsonString()");
+            Logger.LogWarning("<<< Exiting ToJsonString()");
             return JsonConvert.SerializeObject(this);
         }
 
@@ -95,6 +104,8 @@ namespace DotNetNuke.Services.Search.Entities
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogError(">>> Entering ToString()");
+            Logger.LogWarning("<<< Exiting ToString()");
             return this.ToJsonString();
         }
     }

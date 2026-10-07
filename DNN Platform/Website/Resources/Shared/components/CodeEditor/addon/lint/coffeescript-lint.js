@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -18,11 +19,13 @@
 CodeMirror.registerHelper("lint", "coffeescript", function(text) {
   var found = [];
   var parseError = function(err) {
+	logger.error(`>>> Entering parseError(err=${err})`, { "event.action": "parseError", "logrite.err": err });
     var loc = err.lineNumber;
     found.push({from: CodeMirror.Pos(loc-1, 0),
                 to: CodeMirror.Pos(loc, 0),
                 severity: err.level,
                 message: err.message});
+				logger.warn(`<<< Exiting parseError(err=${err})`, { "event.action": "parseError", "logrite.err": err });
   };
   try {
     var res = coffeelint.lint(text);

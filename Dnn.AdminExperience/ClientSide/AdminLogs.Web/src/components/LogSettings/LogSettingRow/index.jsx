@@ -2,30 +2,40 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import { GridCell, Collapsible as Collapse, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
+const logger = console;
 
 
 class LogSettingRow extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.handleClick = this.handleClick.bind(this);
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         document.addEventListener("click", this.handleClick);
         this._isMounted = true;
+		logger.debug(`componentDidMount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentDidMount" });
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         document.removeEventListener("click", this.handleClick);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentWillUnmount" });
     }
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     handleClick(event) {
+		logger.error(`>>> Entering handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
         // the "findDOMNode was called on an unmounted component." error we need to check if the component is mounted before execute this code
@@ -40,21 +50,28 @@ class LogSettingRow extends Component {
         } else {
 
             this.timeout = 0;
+			logger.warn(`<<< Exiting handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         }
     }
     toggle() {
+		logger.error('>>> Entering toggle()', { "event.action": "toggle" });
         if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
             this.props.Collapse();
         } else {
             this.props.OpenCollapse(this.props.id);
+			logger.warn('<<< Exiting toggle()', { "event.action": "toggle" });
         }
     }
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
+		logger.error(`render(): opened → ${opened}`, { "event.action": "render" });
         let uniqueId = "settingrow-" + Math.random() + Date.now();
+		logger.error(`render(): uniqueId → ${uniqueId}`, { "event.action": "render" });
         
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div ref={node => this.node = node} className={"collapsible-component-log" + (opened ? " row-opened" : "") } id={uniqueId}>
                 {props.visible && <div className={"collapsible-header-log " + !opened} >

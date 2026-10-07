@@ -55,6 +55,7 @@ namespace DotNetNuke.Entities.Portals
     [Serializable]
     public class PortalInfo : BaseEntityInfo, IHydratable, IPortalInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalInfo));
         private string administratorRoleName;
         private int pages = Null.NullInteger;
         private string registeredRoleName;
@@ -75,6 +76,7 @@ namespace DotNetNuke.Entities.Portals
         /// </remarks>
         public PortalInfo()
         {
+			Logger.LogError(">>> Entering PortalInfo()");
             this.Users = Null.NullInteger;
         }
 
@@ -424,6 +426,7 @@ namespace DotNetNuke.Entities.Portals
         /// <seealso cref="KeyID"></seealso></remarks>
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.ThisAsInterface.PortalId = Null.SetNullInteger(dr["PortalID"]);
 
             try
@@ -432,6 +435,7 @@ namespace DotNetNuke.Entities.Portals
             }
             catch (IndexOutOfRangeException)
             {
+				Logger.LogError("Exception in Fill(dr={Dr}): {Arg1}", dr, IndexOutOfRangeException.Message);
                 if (Globals.Status == Globals.UpgradeStatus.None)
                 {
                     // this should not happen outside of an upgrade situation
@@ -463,6 +467,7 @@ namespace DotNetNuke.Entities.Portals
             this.PaymentProcessor = Null.SetNullString(dr["PaymentProcessor"]);
             this.ProcessorUserId = Null.SetNullString(dr["ProcessorUserId"]);
             var p = Null.SetNullString(dr["ProcessorPassword"]);
+			Logger.LogError("Fill(dr={Dr}): p → {P}", dr, p);
             try
             {
                 this.ProcessorPassword = string.IsNullOrEmpty(p)
@@ -471,9 +476,11 @@ namespace DotNetNuke.Entities.Portals
             }
             catch (Exception ex) when (ex is FormatException or CryptographicException)
             {
+				Logger.LogError("Exception in Fill(dr={Dr}): {Arg1}", dr, ex.Message);
                 // for backward compatibility
                 this.ProcessorPassword = p;
             }
+			Logger.LogDebug("Fill(dr={Dr}): this.ProcessorPassword → {Arg1}", dr, this.ProcessorPassword);
 
             this.SplashTabId = Null.SetNullInteger(dr["SplashTabID"]);
             this.HomeTabId = Null.SetNullInteger(dr["HomeTabID"]);
@@ -483,9 +490,11 @@ namespace DotNetNuke.Entities.Portals
             this.SearchTabId = Null.SetNullInteger(dr["SearchTabID"]);
 
             this.Custom404TabId = this.Custom500TabId = Null.NullInteger;
+			Logger.LogDebug("Fill(dr={Dr}): this.Custom404TabId → {Arg1}", dr, this.Custom404TabId);
             var schema = dr.GetSchemaTable();
             if (schema != null)
             {
+				Logger.LogError("Fill(dr={Dr}): schema → {Schema}", dr, schema);
                 if (schema.Select("ColumnName = 'Custom404TabId'").Length > 0)
                 {
                     this.Custom404TabId = Null.SetNullInteger(dr["Custom404TabId"]);
@@ -501,15 +510,19 @@ namespace DotNetNuke.Entities.Portals
             this.PrivacyTabId = Null.SetNullInteger(dr["PrivacyTabId"]);
 
             this.DefaultLanguage = Null.SetNullString(dr["DefaultLanguage"]);
+			Logger.LogDebug("Fill(dr={Dr}): this.Users → {Arg1}", dr, this.Users);
             this.AdminTabId = Null.SetNullInteger(dr["AdminTabID"]);
             this.HomeDirectory = Null.SetNullString(dr["HomeDirectory"]);
             this.SuperTabId = Null.SetNullInteger(dr["SuperTabId"]);
             this.CultureCode = Null.SetNullString(dr["CultureCode"]);
 
+			Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
             this.FillInternal(dr);
             this.AdministratorRoleName = Null.NullString;
+			Logger.LogDebug("Fill(dr={Dr}): this.AdministratorRoleName → {Arg1}", dr, this.AdministratorRoleName);
             this.RegisteredRoleName = Null.NullString;
 
+			Logger.LogDebug("Fill(dr={Dr}): this.RegisteredRoleName → {Arg1}", dr, this.RegisteredRoleName);
             this.Users = Null.NullInteger;
             this.Pages = Null.NullInteger;
         }

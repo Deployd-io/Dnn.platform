@@ -33,11 +33,15 @@ namespace DotNetNuke.Services.FileSystem
         /// <param name="context">System.Web.HttpContext.</param>
         public void ProcessRequest(HttpContext context)
         {
+			Logger.LogError(">>> Entering ProcessRequest(context={Context})", context);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var tabId = -1;
+			Logger.LogError("ProcessRequest(context={Context}): tabId → {TabId}", context, tabId);
+			Logger.LogError("ProcessRequest(context={Context}): portalSettings → {PortalSettings}", context, portalSettings);
             var moduleId = -1;
             try
             {
+				Logger.LogError("ProcessRequest(context={Context}): moduleId → {ModuleId}", context, moduleId);
                 // get TabId
                 if (context.Request.QueryString["tabid"] != null)
                 {
@@ -58,12 +62,14 @@ namespace DotNetNuke.Services.FileSystem
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in ProcessRequest(context={Context}): {Arg1}", context, Exception.Message);
                 // The TabId or ModuleId are incorrectly formatted (potential DOS)
                 Handle404Exception(context, context.Request.RawUrl);
             }
 
             // get Language
             string language = portalSettings.DefaultLanguage;
+			Logger.LogError("ProcessRequest(context={Context}): language → {Language}", context, language);
             if (context.Request.QueryString["language"] != null)
             {
                 language = context.Request.QueryString["language"];
@@ -84,6 +90,7 @@ namespace DotNetNuke.Services.FileSystem
 
             // get the URL
             string url = string.Empty;
+			Logger.LogError("ProcessRequest(context={Context}): url → {Url}", context, url);
             if (context.Request.QueryString["fileticket"] != null)
             {
                 url = "FileID=" + FileLinkClickController.Instance.GetFileIdFromLinkClick(context.Request.QueryString);
@@ -114,8 +121,10 @@ namespace DotNetNuke.Services.FileSystem
                 if (urlType == TabType.Tab)
                 {
                     // verify whether the tab exists, otherwise throw out 404.
+					Logger.LogError("ProcessRequest(context={Context}): objUrls → {ObjUrls}", context, objUrls);
                     if (TabController.Instance.GetTab(int.Parse(url, CultureInfo.InvariantCulture), portalSettings.PortalId, false) == null)
                     {
+						Logger.LogError("ProcessRequest(context={Context}): urlType → {UrlType}", context, urlType);
                         Handle404Exception(context, context.Request.RawUrl);
                     }
                 }
@@ -129,11 +138,15 @@ namespace DotNetNuke.Services.FileSystem
                 {
                     // to handle legacy scenarios before the introduction of the FileServerHandler
                     var fileName = Path.GetFileName(url);
+					Logger.LogError("ProcessRequest(context={Context}): fileName → {FileName}", context, fileName);
 
                     var folderPath = url.Substring(0, url.LastIndexOf(fileName, StringComparison.InvariantCulture));
+					Logger.LogError("ProcessRequest(context={Context}): folderPath → {FolderPath}", context, folderPath);
                     var folder = FolderManager.Instance.GetFolder(portalSettings.PortalId, folderPath);
+					Logger.LogError("ProcessRequest(context={Context}): folder → {Folder}", context, folder);
 
                     var file = FileManager.Instance.GetFile(folder, fileName);
+					Logger.LogError("ProcessRequest(context={Context}): file → {File}", context, file);
 
                     url = "FileID=" + file.FileId;
                 }
@@ -145,6 +158,7 @@ namespace DotNetNuke.Services.FileSystem
                     if (!bool.TryParse(context.Request.QueryString["forcedownload"], out blnForceDownload))
                     {
                         blnForceDownload = false;
+						Logger.LogError("ProcessRequest(context={Context}): blnForceDownload → {BlnForceDownload}", context, blnForceDownload);
                     }
                 }
 
@@ -159,6 +173,7 @@ namespace DotNetNuke.Services.FileSystem
                     {
                         case TabType.File:
                             var download = false;
+							Logger.LogError("ProcessRequest(context={Context}): download → {Download}", context, download);
                             var file = fileManager.GetFile(int.Parse(UrlUtils.GetParameterValue(url), CultureInfo.InvariantCulture));
                             if (file != null)
                             {
@@ -177,7 +192,9 @@ namespace DotNetNuke.Services.FileSystem
                                 try
                                 {
                                     var folderMapping = FolderMappingController.Instance.GetFolderMapping(file.PortalId, file.FolderMappingID);
+									Logger.LogError("ProcessRequest(context={Context}): folderMapping → {FolderMapping}", context, folderMapping);
                                     var directUrl = fileManager.GetUrl(file);
+									Logger.LogError("ProcessRequest(context={Context}): directUrl → {DirectUrl}", context, directUrl);
 
                                     EventManager.Instance.OnFileDownloaded(new FileDownloadedEventArgs()
                                     {
@@ -197,6 +214,7 @@ namespace DotNetNuke.Services.FileSystem
                                 }
                                 catch (PermissionsNotMetException)
                                 {
+									Logger.LogError("Exception in ProcessRequest(context={Context}): {Arg1}", context, PermissionsNotMetException.Message);
                                     if (context.Request.IsAuthenticated)
                                     {
                                         context.Response.Redirect(Globals.AccessDeniedURL(Localization.GetString("FileAccess.Error")), true);
@@ -238,6 +256,7 @@ namespace DotNetNuke.Services.FileSystem
                 }
                 catch (ThreadAbortException)
                 {
+				Logger.LogError("Exception in ProcessRequest(context={Context}): {Arg1}", context, ThreadAbortException.Message);
                 }
                 catch (Exception)
                 {
@@ -248,10 +267,12 @@ namespace DotNetNuke.Services.FileSystem
             {
                 Handle404Exception(context, url);
             }
+			Logger.LogWarning("<<< Exiting ProcessRequest(context={Context})", context);
         }
 
         private static bool HasAPublishedVersion(IFileInfo file)
         {
+			Logger.LogError(">>> Entering HasAPublishedVersion(file={File})", file);
             if (file.HasBeenPublished)
             {
                 return true;
@@ -259,19 +280,24 @@ namespace DotNetNuke.Services.FileSystem
 
             // We should allow creator to see the file that is pending to be approved
             var user = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogError("HasAPublishedVersion(file={File}): user → {User}", file, user);
+			Logger.LogWarning("<<< Exiting HasAPublishedVersion(file={File})", file);
             return user != null && user.UserID == file.CreatedByUserID;
         }
 
         private static void Handle404Exception(HttpContext context, string url)
         {
+			Logger.LogError(">>> Entering Handle404Exception(context={Context},url={Url})", context, url);
             try
             {
                 Exceptions.Exceptions.ProcessHttpException(url);
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in Handle404Exception(context={Context},url={Url}): {Arg2}", context, url, Exception.Message);
                 UrlUtils.Handle404Exception(context.Response, PortalSettings.Current);
             }
+			Logger.LogWarning("<<< Exiting Handle404Exception(context={Context},url={Url})", context, url);
         }
     }
 }

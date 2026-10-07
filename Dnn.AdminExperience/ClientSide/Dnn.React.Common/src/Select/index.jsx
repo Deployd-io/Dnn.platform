@@ -1,12 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
 import "./style.less";
+const logger = console;
 
 function getHandler(handler, enabled) {
+	logger.error(`>>> Entering getHandler(handler=${handler},enabled=${enabled})`, { "event.action": "getHandler", "logrite.handler": handler, "logrite.enabled": enabled });
+	logger.warn(`<<< Exiting getHandler(handler=${handler},enabled=${enabled})`, { "event.action": "getHandler", "logrite.handler": handler, "logrite.enabled": enabled });
     return handler && enabled ? handler : null; 
 }
 
 function getOpts(enabled, multipleSelect) {
+	logger.error(`>>> Entering getOpts(enabled=${enabled},multipleSelect=${multipleSelect})`, { "event.action": "getOpts", "logrite.enabled": enabled, "logrite.multipleSelect": multipleSelect });
     const opts = {};
     if (!enabled) {
         opts["disabled"] = "disabled"; 
@@ -14,10 +18,13 @@ function getOpts(enabled, multipleSelect) {
     if (multipleSelect) {
         opts["multiple"] = "multiple"; 
     }
+	logger.warn(`<<< Exiting getOpts(enabled=${enabled},multipleSelect=${multipleSelect})`, { "event.action": "getOpts", "logrite.enabled": enabled, "logrite.multipleSelect": multipleSelect });
     return opts;
 }
 
 function getOptionsList(options) {
+	logger.error(`>>> Entering getOptionsList(options=${options})`, { "event.action": "getOptionsList", "logrite.options": options });
+	logger.warn(`<<< Exiting getOptionsList(options=${options})`, { "event.action": "getOptionsList", "logrite.options": options });
     return options.map((option, index) => {
         return <option key={option.value + "_" + index} value={option.value}>{option.label}</option>;
     });  

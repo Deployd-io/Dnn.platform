@@ -14,6 +14,7 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class UserRoleInfo : RoleInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserRoleInfo));
         public int UserRoleID { get; set; }
 
         public int UserID { get; set; }
@@ -35,6 +36,7 @@ namespace DotNetNuke.Entities.Users
         /// <inheritdoc />
         public override void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             // Fill base class properties
             base.Fill(dr);
 
@@ -49,7 +51,9 @@ namespace DotNetNuke.Entities.Users
             this.IsTrialUsed = Null.SetNullBoolean(dr["IsTrialUsed"]);
             if (this.UserRoleID > Null.NullInteger)
             {
+				Logger.LogWarning("<<< Exiting Fill(dr={Dr})", dr);
                 this.Subscribed = true;
+				Logger.LogDebug("Fill(dr={Dr}): this.Subscribed → {Arg1}", dr, this.Subscribed);
             }
         }
     }

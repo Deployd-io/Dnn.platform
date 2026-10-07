@@ -3,34 +3,45 @@ import PropTypes from "prop-types";
 import Collapse from "react-collapse";
 import Button from "../Button";
 import "./style.less";
+const logger = console;
 
 export default class CollapsibleRow extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = { collapsed: props.collapsed ? props.collapsed : true };
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`, { "event.action": "constructor", "logrite.props": props });
         this.handleClick = this.handleClick.bind(this);
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const {props} = this;
         if (props.closeOnBlur) {
             document.addEventListener("click", this.handleClick);
             this._isMounted = true;
+			logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
         }
     }
 
     componentDidUpdate(prevProps) {
+		logger.error(`>>> Entering componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         if (this.props.collapsed !== prevProps.collapsed) {
             this.setState({ collapsed: this.props.collapsed });
+			logger.warn(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`, { "event.action": "componentDidUpdate", "logrite.prevProps": prevProps });
         }
     }
     
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         document.removeEventListener("click", this.handleClick);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`, { "event.action": "componentWillUnmount" });
     }
 
     handleClick(event) {
+		logger.error(`>>> Entering handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         const {props} = this;
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
@@ -39,25 +50,33 @@ export default class CollapsibleRow extends Component {
 
         if (!this.node.contains(event.target)) {
             this.collapse();
+			logger.warn(`<<< Exiting handleClick(event=${event})`, { "event.action": "handleClick", "logrite.event": event });
         }
     }
     uncollapse() {
+		logger.error('>>> Entering uncollapse()', { "event.action": "uncollapse" });
         this.setState({
             collapsed: false
         });
+		logger.warn('<<< Exiting uncollapse()', { "event.action": "uncollapse" });
     }
     collapse() {
+		logger.error('>>> Entering collapse()', { "event.action": "collapse" });
         this.setState({
             collapsed: true
         });
+		logger.warn('<<< Exiting collapse()', { "event.action": "collapse" });
     }
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         this.collapse();
         if (this.props.onChange) {
             this.props.onChange(true);
+			logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
         }
     }
     toggle() {
+		logger.error('>>> Entering toggle()', { "event.action": "toggle" });
         if (this.props.onChange) {
             this.props.onChange(this.state.collapsed);
         }
@@ -65,10 +84,13 @@ export default class CollapsibleRow extends Component {
             this.uncollapse();
         } else {
             this.collapse();
+			logger.warn('<<< Exiting toggle()', { "event.action": "toggle" });
         }
     }
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div className={"dnn-collapsible-component" + (props.className ? (" " + props.className) : "") }>
                 <div className="collapsible-header" onClick={this.toggle.bind(this) }>{props.label}

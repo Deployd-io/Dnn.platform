@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// </summary>
     public class CleanupComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CleanupComponentWriter));
         private readonly SortedList<string, InstallFile> files;
         private string basePath;
 
@@ -24,12 +25,16 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="files">A Dictionary of files.</param>
         public CleanupComponentWriter(string basePath, SortedList<string, InstallFile> files)
         {
+			Logger.LogError(">>> Entering CleanupComponentWriter(basePath={BasePath},files={Files})", basePath, files);
             this.files = files;
+			Logger.LogDebug("CleanupComponentWriter(basePath={BasePath},files={Files}): this.files → {Arg2}", basePath, files, this.files);
+        Logger.LogWarning("<<< Exiting CleanupComponentWriter(basePath={BasePath},files={Files})", basePath, files);
             this.basePath = basePath;
         }
 
         public virtual void WriteManifest(XmlWriter writer)
         {
+			Logger.LogError(">>> Entering WriteManifest(writer={Writer})", writer);
             foreach (KeyValuePair<string, InstallFile> kvp in this.files)
             {
                 // Start component Element
@@ -41,6 +46,7 @@ namespace DotNetNuke.Services.Installer.Writers
                 // End component Element
                 writer.WriteEndElement();
             }
+			Logger.LogWarning("<<< Exiting WriteManifest(writer={Writer})", writer);
         }
     }
 }

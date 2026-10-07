@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import helper from "./helper";
+const logger = console;
 
 const KEY = {
     ENTER: 13,
@@ -10,17 +11,24 @@ const KEY = {
 export default class LinkInput extends Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         const url = this.props.linkPath; 
         this.state = {url};
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`, { "event.action": "constructor", "logrite.props": props });
         this.onKeyDown = this.onKeyDown.bind(this);
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         document.addEventListener("keyup", this.onKeyDown, false);
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         document.removeEventListener("keyup", this.onKeyDown, false);
+		logger.warn('<<< Exiting componentWillUnmount()', { "event.action": "componentWillUnmount" });
     }
 
     onKeyDown(event) {
@@ -33,9 +41,11 @@ export default class LinkInput extends Component {
     }
 
     onSave() {
+		logger.error('>>> Entering onSave()', { "event.action": "onSave" });
         const { state } = this;
         const url = state.url;
         if (url === undefined || url === null || url === "" || !url.startsWith("http")) {
+			logger.warn('<<< Exiting onSave()', { "event.action": "onSave" });
             return this.props.onCancel();
         }
         this.props.onSave(url, true);
@@ -47,8 +57,10 @@ export default class LinkInput extends Component {
     }
 
     renderActions() {
+		logger.error('>>> Entering renderActions()', { "event.action": "renderActions" });
         const {props} = this;
 
+		logger.warn('<<< Exiting renderActions()', { "event.action": "renderActions" });
         return helper.renderActions(props.linkInputActionText, {
             "save": this.onSave.bind(this),
             "cancel": this.props.onCancel
@@ -56,6 +68,8 @@ export default class LinkInput extends Component {
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return <div className="file-upload-container">
             <h4>{this.props.linkInputTitleText}</h4>
             <div className="textarea-container">

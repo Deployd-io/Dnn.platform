@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.Syndication
     [DefaultProperty("Url")]
     public class RssDataSource : DataSourceControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RssDataSource));
         private GenericRssChannel channel;
         private RssDataSourceView itemsView;
         private string url;
@@ -56,11 +57,14 @@ namespace DotNetNuke.Services.Syndication
         /// <inheritdoc />
         protected override DataSourceView GetView(string viewName)
         {
+			Logger.LogError(">>> Entering GetView(viewName={ViewName})", viewName);
             if (this.itemsView == null)
             {
                 this.itemsView = new RssDataSourceView(this, viewName);
+				Logger.LogDebug("GetView(viewName={ViewName}): itemsView → {ItemsView}", viewName, itemsView);
             }
 
+			Logger.LogWarning("<<< Exiting GetView(viewName={ViewName})", viewName);
             return this.itemsView;
         }
     }

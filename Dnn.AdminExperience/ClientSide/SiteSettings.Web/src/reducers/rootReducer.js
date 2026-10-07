@@ -6,8 +6,10 @@ import siteBehavior from "./siteBehaviorReducer";
 import languages from "./languagesReducer";
 import search from "./searchReducer";
 import languageEditor from "./languageEditorReducer";
+const logger = console;
 
 function getExtraReducers() {
+	logger.error('>>> Entering getExtraReducers()', { "event.action": "getExtraReducers" });
     let extraReducers = {};
     if (window.dnn.SiteSettings && window.dnn.SiteSettings.SiteBehaviorExtras) {
         window.dnn.SiteSettings.SiteBehaviorExtras.forEach((extra) => {
@@ -19,6 +21,7 @@ function getExtraReducers() {
             extraReducers[extra.ReducerKey] = extra.Reducer;
         });
     }
+	logger.warn('<<< Exiting getExtraReducers()', { "event.action": "getExtraReducers" });
     return extraReducers;
 }
 

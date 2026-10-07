@@ -33,6 +33,7 @@ namespace DotNetNuke.Web.DDRMenu
         public DDRMenuNavigationProvider()
             : this(null, null, null)
         {
+		eventLogger.LogWarning("<<< Exiting DDRMenuNavigationProvider(localiser={Localiser},hostSettings={HostSettings},tabController={TabController})", localiser, hostSettings, tabController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DDRMenuNavigationProvider"/> class.</summary>
@@ -41,6 +42,8 @@ namespace DotNetNuke.Web.DDRMenu
         public DDRMenuNavigationProvider(ILocaliser localiser)
             : this(localiser, null, null)
         {
+		eventLogger.LogError(">>> Entering DDRMenuNavigationProvider(localiser={Localiser})", localiser);
+        eventLogger.LogWarning("<<< Exiting DDRMenuNavigationProvider(localiser={Localiser})", localiser);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DDRMenuNavigationProvider"/> class.</summary>
@@ -49,6 +52,9 @@ namespace DotNetNuke.Web.DDRMenu
         /// <param name="tabController">The tab controller.</param>
         public DDRMenuNavigationProvider(ILocaliser localiser, IHostSettings hostSettings, ITabController tabController)
         {
+			eventLogger.LogError(">>> Entering DDRMenuNavigationProvider(localiser={Localiser},hostSettings={HostSettings},tabController={TabController})", localiser, hostSettings, tabController);
+			eventLogger.LogDebug("DDRMenuNavigationProvider(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): hostSettings → {HostSettings1}", localiser, hostSettings, tabController, hostSettings);
+			eventLogger.LogDebug("DDRMenuNavigationProvider(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): tabController → {TabController1}", localiser, hostSettings, tabController, tabController);
             this.localiser = localiser ?? Globals.GetCurrentServiceProvider().GetRequiredService<ILocaliser>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.tabController = tabController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITabController>();
@@ -312,14 +318,19 @@ namespace DotNetNuke.Web.DDRMenu
         /// <inheritdoc />
         public override void Initialize()
         {
+			eventLogger.LogError(">>> Entering Initialize()");
             this.menuControl = new DDRMenuControl(this.localiser, this.hostSettings, this.tabController) { ID = this.ControlID, EnableViewState = false, };
+			eventLogger.LogWarning("<<< Exiting Initialize()");
+			eventLogger.LogDebug("Initialize(): menuControl → {MenuControl}", menuControl);
             this.menuControl.NodeClick += this.RaiseEvent_NodeClick;
         }
 
         /// <inheritdoc />
         public override void Bind(DNNNodeCollection objNodes)
         {
+			eventLogger.LogError(">>> Entering Bind(objNodes={ObjNodes})", objNodes);
             this.Bind(objNodes, true);
+			eventLogger.LogWarning("<<< Exiting Bind(objNodes={ObjNodes})", objNodes);
         }
 
         /// <summary>Binds the menu nodes.</summary>
@@ -327,8 +338,10 @@ namespace DotNetNuke.Web.DDRMenu
         /// <param name="localise">A value indicating whether the menu should be localized.</param>
         public void Bind(DNNNodeCollection objNodes, bool localise)
         {
+			eventLogger.LogError(">>> Entering Bind(objNodes={ObjNodes},localise={Localise})", objNodes, localise);
             var clientOptions = new List<ClientOption>();
 
+			eventLogger.LogError("Bind(objNodes={ObjNodes},localise={Localise}): clientOptions → {ClientOptions}", objNodes, localise, clientOptions);
             var ignoreProperties = new List<string>
                                    {
                                     "CustomAttributes",
@@ -342,6 +355,7 @@ namespace DotNetNuke.Web.DDRMenu
                                     "ExcludeNodes",
                                     "NodeManipulator",
                                    };
+								eventLogger.LogWarning("<<< Exiting Bind(objNodes={ObjNodes})", objNodes);
 
             foreach (var prop in
                 typeof(NavigationProvider).GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance))
@@ -349,6 +363,7 @@ namespace DotNetNuke.Web.DDRMenu
                 if (!string.IsNullOrEmpty(prop.Name) && !ignoreProperties.Contains(prop.Name))
                 {
                     var propValue = prop.GetValue(this, null);
+					eventLogger.LogError("Bind(objNodes={ObjNodes},localise={Localise}): propValue → {PropValue}", objNodes, localise, propValue);
                     if (propValue != null)
                     {
                         if (propValue is bool)
@@ -381,6 +396,7 @@ namespace DotNetNuke.Web.DDRMenu
             if (localise)
             {
                 objNodes = this.localiser.LocaliseDNNNodeCollection(objNodes);
+				eventLogger.LogError("Bind(objNodes={ObjNodes},localise={Localise}): objNodes → {ObjNodes1}", objNodes, localise, objNodes);
             }
 
             this.menuControl.RootNode = new MenuNode(objNodes);
@@ -402,16 +418,20 @@ namespace DotNetNuke.Web.DDRMenu
 
         private string GetCustomAttribute(string attributeName)
         {
+			eventLogger.LogError(">>> Entering GetCustomAttribute(attributeName={AttributeName})", attributeName);
             string xmlValue = null;
+			eventLogger.LogError("GetCustomAttribute(attributeName={AttributeName}): xmlValue → {XmlValue}", attributeName, xmlValue);
             if (this.CustomAttributes != null)
             {
                 var xmlAttr = this.CustomAttributes.Find(a => a.Name.Equals(attributeName, StringComparison.InvariantCultureIgnoreCase));
+				eventLogger.LogError("GetCustomAttribute(attributeName={AttributeName}): xmlAttr → {XmlAttr}", attributeName, xmlAttr);
                 if (xmlAttr != null)
                 {
                     xmlValue = xmlAttr.Value;
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting GetCustomAttribute(attributeName={AttributeName})", attributeName);
             return xmlValue;
         }
     }

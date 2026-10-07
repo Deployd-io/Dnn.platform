@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -14,22 +15,27 @@
 CodeMirror.defineMode("toml", function () {
   return {
     startState: function () {
+	logger.error('>>> Entering startState()', { "event.action": "startState" });
       return {
         inString: false,
         stringType: "",
         lhs: true,
         inArray: 0
       };
+	logger.warn('<<< Exiting startState()', { "event.action": "startState" });
     },
     token: function (stream, state) {
+	logger.error(`>>> Entering token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       //check for state changes
       if (!state.inString && ((stream.peek() == '"') || (stream.peek() == "'"))) {
         state.stringType = stream.peek();
         stream.next(); // Skip quote
         state.inString = true; // Update state
+		logger.debug(`token(stream=${stream},state=${state}): state.inString → ${state.inString}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       }
       if (stream.sol() && state.inArray === 0) {
         state.lhs = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.lhs → ${state.lhs}`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       }
       //return state
       if (state.inString) {
@@ -77,6 +83,7 @@ CodeMirror.defineMode("toml", function () {
         return 'number';
       } else if (!stream.eatSpace()) {
         stream.next();
+		logger.warn(`<<< Exiting token(stream=${stream},state=${state})`, { "event.action": "token", "logrite.stream": stream, "logrite.state": state });
       }
       return null;
     }

@@ -11,6 +11,7 @@ namespace Dnn.PersonaBar.Library.Common
 
     public class Utilities
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Utilities));
         // test sample
         // "&agrave;&aacute;&acirc;&atilde;&auml;&aring;&aelig;&ccedil;&egrave;&eacute;&ecirc;&euml;&igrave;&iacute;&icirc;&iuml;&Alpha;
         // &ETH;&ntilde;&ograve;&oacute;&ocirc;&otilde;&ouml;&oslash;&ugrave;&uacute;&ucirc;&uuml;&yacute;&yuml;&szlig;&thorn;&omicron;"
@@ -28,7 +29,11 @@ namespace Dnn.PersonaBar.Library.Common
         /// <returns>An image URL.</returns>
         public static string GetProfileAvatar(UserInfo user, int width = Constants.AvatarWidth, int height = Constants.AvatarHeight, bool showSuperUsers = true)
         {
+			Logger.LogError(">>> Entering GetProfileAvatar(user={User},width={Width},height={Height},showSuperUsers={ShowSuperUsers})", user, width, height, showSuperUsers);
             var userId = user != null && user.UserID > 0 && !user.IsDeleted && (showSuperUsers || !user.IsSuperUser) ? user.UserID : 0;
+			Logger.LogError("GetProfileAvatar(user={User},width={Width},height={Height},showSuperUsers={ShowSuperUsers}): userId → {UserId}", user, width, height, showSuperUsers, userId);
+			Logger.LogWarning("<<< Exiting GetProfileAvatar(user={User},width={Width},height={Height},showSuperUsers={ShowSuperUsers})", user, width, height, showSuperUsers);
+			Logger.LogWarning("<<< Exiting GetProfileAvatar(userId={UserId})", userId);
             return UserController.Instance.GetUserProfilePictureUrl(userId, width, height);
         }
 
@@ -38,11 +43,14 @@ namespace Dnn.PersonaBar.Library.Common
         public static string GetProfileAvatar(int userId)
         {
             var url = UserController.Instance.GetUserProfilePictureUrl(userId, Constants.AvatarWidth, Constants.AvatarHeight);
+			Logger.LogError("GetProfileAvatar(userId={UserId}): url → {Url}", userId, url);
             return Globals.ResolveUrl(url);
         }
 
         public static string FixDoublEntityEncoding(string document)
         {
+			Logger.LogError(">>> Entering FixDoublEntityEncoding(document={Document})", document);
+            Logger.LogWarning("<<< Exiting FixDoublEntityEncoding(document={Document})", document);
             return string.IsNullOrEmpty(document)
                        ? document
                        : HtmlEntitiesPatternRegex.Replace(document, "&$1;");

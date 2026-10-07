@@ -8,25 +8,32 @@ import { InputGroup, MultiLineInputWithError, PagePicker, GridSystem, Label, But
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let isHost = false;
 
 class DefaultPagesSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this._mounted = false;
+		logger.debug(`constructor(): this._mounted → ${this._mounted}`, { "event.action": "constructor" });
         this.state = {
             defaultPagesSettings: undefined
         };
         isHost = util.settings.isHost;
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
     }
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         this._mounted = true;
         this.loadData();
+		logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
     }
 
     componentDidUpdate() {
+		logger.error('>>> Entering componentDidUpdate()', { "event.action": "componentDidUpdate" });
         let { props} = this;
         if (props.defaultPagesSettings) {
             let portalIdChanged = props.portalId !== undefined && props.defaultPagesSettings.PortalId !== props.portalId;
@@ -34,18 +41,23 @@ class DefaultPagesSettingsPanelBody extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.warn('<<< Exiting componentDidUpdate()', { "event.action": "componentDidUpdate" });
             }
         }
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         this._mounted = false;
+		logger.warn('<<< Exiting componentWillUnmount()', { "event.action": "componentWillUnmount" });
     }
 
     loadData() {
+		logger.error('>>> Entering loadData()', { "event.action": "loadData" });
         const { props } = this;
         props.dispatch(SiteBehaviorActions.getDefaultPagesSettings(props.portalId, props.cultureCode, (data) => {
             if (this._mounted) {
+				logger.warn('<<< Exiting loadData()', { "event.action": "loadData" });
                 this.setState({
                     defaultPagesSettings: Object.assign({}, data.Settings)
                 });
@@ -54,9 +66,11 @@ class DefaultPagesSettingsPanelBody extends Component {
     }
 
     onSettingChange(key, event, value) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event},value=${value})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event, "logrite.value": value });
         let {state, props} = this;
 
         let defaultPagesSettings = Object.assign({}, state.defaultPagesSettings);
+		logger.error(`onSettingChange(key=${key},event=${event},value=${value}): defaultPagesSettings → ${defaultPagesSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event, "logrite.value": value });
 
         if (key === "SplashTabId" || key === "HomeTabId" || key === "LoginTabId" || key === "RegisterTabId" ||
             key === "UserTabId" || key === "SearchTabId" || key === "Custom404TabId" || key === "Custom500TabId" ||
@@ -78,9 +92,11 @@ class DefaultPagesSettingsPanelBody extends Component {
         });
 
         props.dispatch(SiteBehaviorActions.defaultPagesSettingsClientModified(defaultPagesSettings));
+		logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event},value=${value})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event, "logrite.value": value });
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
 
@@ -88,13 +104,16 @@ class DefaultPagesSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         }));
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SiteBehaviorActions.getDefaultPagesSettings(props.portalId, props.cultureCode, (data) => {
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
                 let defaultPagesSettings = Object.assign({}, data.Settings);
                 this.setState({
                     defaultPagesSettings
@@ -105,8 +124,10 @@ class DefaultPagesSettingsPanelBody extends Component {
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         const noneSpecifiedText = "<" + resx.get("NoneSpecified") + ">";
+		logger.error(`render(): noneSpecifiedText → ${noneSpecifiedText}`, { "event.action": "render" });
         const TabParameters = {
             portalId: props.portalId !== undefined ? props.portalId : -2,
             cultureCode: props.cultureCode || "",
@@ -116,9 +137,13 @@ class DefaultPagesSettingsPanelBody extends Component {
             sortOrder: 0
         };
         let TabParameters_1 = Object.assign(Object.assign({}, TabParameters), { disabledNotSelectable: false });
+		logger.error(`render(): TabParameters_1 → ${TabParameters_1}`, { "event.action": "render" });
         let TabParameters_2 = Object.assign(Object.assign({}, TabParameters), { disabledNotSelectable: true });
+		logger.error(`render(): TabParameters_2 → ${TabParameters_2}`, { "event.action": "render" });
         let TabParameters_Login = Object.assign(Object.assign({}, TabParameters), { disabledNotSelectable: false, validateTab: "Account Login" });
+		logger.error(`render(): TabParameters_Login → ${TabParameters_Login}`, { "event.action": "render" });
         let TabParameters_Search = Object.assign(Object.assign({}, TabParameters), { disabledNotSelectable: false, validateTab: "Search Results" });
+		logger.error(`render(): TabParameters_Search → ${TabParameters_Search}`, { "event.action": "render" });
         let TabParameters_Anonymous = Object.assign(Object.assign({}, TabParameters), { disabledNotSelectable: true, roles: "-1" });
         if (state.defaultPagesSettings) {
             const columnOne = <div key="column-one" className="left-column">
@@ -385,6 +410,8 @@ DefaultPagesSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         defaultPagesSettings: state.siteBehavior.defaultPagesSettings,

@@ -42,6 +42,8 @@ namespace log4net.Util
         /// </summary>
         public ConverterInfo()
         {
+		value.LogError(">>> Entering ConverterInfo()");
+        value.LogWarning("<<< Exiting ConverterInfo()");
         }
 
         /// <summary>
@@ -79,7 +81,9 @@ namespace log4net.Util
         /// <param name="entry"></param>
         public void AddProperty(PropertyEntry entry)
         {
+			value.LogError(">>> Entering AddProperty(entry={Entry})", entry);
             this.properties[entry.Key] = entry.Value;
+			value.LogWarning("<<< Exiting AddProperty(entry={Entry})", entry);
         }
 
         /// <summary>

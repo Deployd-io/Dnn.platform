@@ -12,14 +12,17 @@ namespace DotNetNuke.Services.Syndication
     /// <summary>A helper class for handling RSS XML.</summary>
     internal sealed class RssXmlHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RssXmlHelper));
         /// <summary>Internal helper class for XML to RSS conversion (and for generating XML from RSS).</summary>
         /// <param name="doc">The XML document.</param>
         /// <returns>A new <see cref="RssChannelDom"/> instance.</returns>
         internal static RssChannelDom ParseChannelXml(XmlDocument doc)
         {
+			Logger.LogError(">>> Entering ParseChannelXml(doc={Doc})", doc);
             Dictionary<string, string> channelAttributes = null;
             Dictionary<string, string> imageAttributes = null;
             var itemsAttributesList = new List<Dictionary<string, string>>();
+			Logger.LogError("ParseChannelXml(doc={Doc}): itemsAttributesList → {ItemsAttributesList}", doc, itemsAttributesList);
 
             try
             {
@@ -42,11 +45,13 @@ namespace DotNetNuke.Services.Syndication
                                     else if (n.Name == "image")
                                     {
                                         imageAttributes = ParseAttributesFromXml(n);
+										Logger.LogError("ParseChannelXml(doc={Doc}): imageAttributes → {ImageAttributes}", doc, imageAttributes);
                                     }
                                 }
                             }
 
                             channelAttributes = ParseAttributesFromXml(c);
+							Logger.LogError("ParseChannelXml(doc={Doc}): channelAttributes → {ChannelAttributes}", doc, channelAttributes);
                             break;
                         }
                     }
@@ -77,6 +82,7 @@ namespace DotNetNuke.Services.Syndication
                 }
                 else
                 {
+					Logger.LogError("Throwing InvalidOperationException from ParseChannelXml(doc={Doc})", doc);
                     throw new InvalidOperationException("Unexpected root node");
                 }
 
@@ -87,6 +93,8 @@ namespace DotNetNuke.Services.Syndication
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in ParseChannelXml(doc={Doc}): {Arg1}", doc, ex.Message);
+			Logger.LogWarning("<<< Exiting ParseChannelXml(doc={Doc})", doc);
                 throw new ArgumentException("Failed to parse RSS channel", ex);
             }
 
@@ -97,6 +105,7 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>A new <see cref="XmlDocument"/>.</returns>
         internal static XmlDocument CreateEmptyRssXml()
         {
+			Logger.LogError(">>> Entering CreateEmptyRssXml()");
             const string EmptyRssXml = """
                                        <?xml version="1.0" encoding="utf-8"?>
                                        <rss version="2.0">
@@ -104,7 +113,9 @@ namespace DotNetNuke.Services.Syndication
                                        """;
             var doc = new XmlDocument { XmlResolver = null };
             using var xmlReader = XmlReader.Create(new StringReader(EmptyRssXml), new XmlReaderSettings { XmlResolver = null, });
+			Logger.LogError("CreateEmptyRssXml(): xmlReader → {XmlReader}", xmlReader);
             doc.Load(xmlReader);
+			Logger.LogWarning("<<< Exiting CreateEmptyRssXml()");
             return doc;
         }
 
@@ -115,17 +126,21 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>The new XML element.</returns>
         internal static XmlNode SaveRssElementAsXml(XmlNode parentNode, RssElementBase element, string elementName)
         {
+			Logger.LogError(">>> Entering SaveRssElementAsXml(parentNode={ParentNode},element={Element},elementName={ElementName})", parentNode, element, elementName);
             var doc = parentNode.OwnerDocument;
             var node = doc.CreateElement(elementName);
+			Logger.LogError("SaveRssElementAsXml(parentNode={ParentNode},element={Element},elementName={ElementName}): node → {Node}", parentNode, element, elementName, node);
             parentNode.AppendChild(node);
 
             foreach (var attr in element.Attributes)
             {
                 var attrNode = doc.CreateElement(attr.Key);
+				Logger.LogError("SaveRssElementAsXml(parentNode={ParentNode},element={Element},elementName={ElementName}): attrNode → {AttrNode}", parentNode, element, elementName, attrNode);
                 attrNode.InnerText = ResolveAppRelativeLinkToUrl(attr.Value);
                 node.AppendChild(attrNode);
             }
 
+			Logger.LogWarning("<<< Exiting SaveRssElementAsXml(parentNode={ParentNode},element={Element},elementName={ElementName})", parentNode, element, elementName);
             return node;
         }
 
@@ -153,6 +168,7 @@ namespace DotNetNuke.Services.Syndication
 
         private static bool NodeHasSubElements(XmlNode node)
         {
+			Logger.LogError(">>> Entering NodeHasSubElements(node={Node})", node);
             for (XmlNode n = node.FirstChild; n != null; n = n.NextSibling)
             {
                 if (n.NodeType == XmlNodeType.Element)
@@ -161,11 +177,13 @@ namespace DotNetNuke.Services.Syndication
                 }
             }
 
+			Logger.LogWarning("<<< Exiting NodeHasSubElements(node={Node})", node);
             return false;
         }
 
         private static string ResolveAppRelativeLinkToUrl(string link)
         {
+			Logger.LogError(">>> Entering ResolveAppRelativeLinkToUrl(link={Link})", link);
             if (!string.IsNullOrEmpty(link) && link.StartsWith("~/", StringComparison.Ordinal))
             {
                 HttpContext context = HttpContext.Current;
@@ -173,12 +191,15 @@ namespace DotNetNuke.Services.Syndication
                 if (context != null)
                 {
                     string query = null;
+					Logger.LogError("ResolveAppRelativeLinkToUrl(link={Link}): query → {Query}", link, query);
                     int iquery = link.IndexOf('?');
+					Logger.LogError("ResolveAppRelativeLinkToUrl(link={Link}): iquery → {Iquery}", link, iquery);
 
                     if (iquery >= 0)
                     {
                         query = link.Substring(iquery);
                         link = link.Substring(0, iquery);
+						Logger.LogError("ResolveAppRelativeLinkToUrl(link={Link}): link → {Link1}", link, link);
                     }
 
                     link = VirtualPathUtility.ToAbsolute(link);
@@ -191,6 +212,7 @@ namespace DotNetNuke.Services.Syndication
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ResolveAppRelativeLinkToUrl(link={Link})", link);
             return link;
         }
     }

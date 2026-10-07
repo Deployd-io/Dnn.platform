@@ -9,13 +9,16 @@ import { InputGroup, SingleLineInputWithError, DropdownWithError, NumberSlider, 
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 const re = /^[1-9]\d*$/;
 
 class BasicSearchSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this._mounted = false;
+		logger.debug(`constructor(): this._mounted → ${this._mounted}`, { "event.action": "constructor" });
         this.state = {
             basicSearchSettings: undefined,
             error: {
@@ -29,11 +32,14 @@ class BasicSearchSettingsPanelBody extends Component {
 
 
     componentDidMount() {
+		logger.error('>>> Entering componentDidMount()', { "event.action": "componentDidMount" });
         const {props} = this;
         this._mounted = true;
         if (this.isHost()) {
+			logger.debug(`componentDidMount(): this._mounted → ${this._mounted}`, { "event.action": "componentDidMount" });
             props.dispatch(SearchActions.getBasicSearchSettings((data) => {
                 if (this._mounted) {
+					logger.warn('<<< Exiting componentDidMount()', { "event.action": "componentDidMount" });
                     this.setState({
                         basicSearchSettings: Object.assign({}, data.Settings)
                     });
@@ -43,20 +49,27 @@ class BasicSearchSettingsPanelBody extends Component {
     }
 
     componentWillUnmount() {
+		logger.error('>>> Entering componentWillUnmount()', { "event.action": "componentWillUnmount" });
         this._mounted = false;
+		logger.warn('<<< Exiting componentWillUnmount()', { "event.action": "componentWillUnmount" });
     }
 
     isHost() {
+		logger.error('>>> Entering isHost()', { "event.action": "isHost" });
+		logger.warn('<<< Exiting isHost()', { "event.action": "isHost" });
         return util.settings.isHost;
     }
 
     onSettingChange(key, event) {
+		logger.error(`>>> Entering onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         let {state, props} = this;
         let basicSearchSettings = Object.assign({}, state.basicSearchSettings);
+		logger.error(`onSettingChange(key=${key},event=${event}): basicSearchSettings → ${basicSearchSettings}`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         const error = {};
 
         if (key === "TitleBoost" || key === "TagBoost" || key === "ContentBoost" || key === "DescriptionBoost" || key === "AuthorBoost") {
             basicSearchSettings[key] = event;
+			logger.warn(`<<< Exiting onSettingChange(key=${key},event=${event})`, { "event.action": "onSettingChange", "logrite.key": key, "logrite.event": event });
         }
         else if (key === "SearchCustomAnalyzer") {
             basicSearchSettings[key] = event.value;
@@ -98,6 +111,7 @@ class BasicSearchSettingsPanelBody extends Component {
     }
 
     getAnalyzerTypeOptions() {
+		logger.error('>>> Entering getAnalyzerTypeOptions()', { "event.action": "getAnalyzerTypeOptions" });
         let options = [];
         const noneSpecifiedText = "<" + resx.get("NoneSpecified") + ">";
         if (this.props.searchCustomAnalyzers !== undefined) {
@@ -106,10 +120,12 @@ class BasicSearchSettingsPanelBody extends Component {
             });
             options.unshift({ label: noneSpecifiedText, value: "" });
         }
+		logger.error(`getAnalyzerTypeOptions(): noneSpecifiedText → ${noneSpecifiedText}`, { "event.action": "getAnalyzerTypeOptions" });
         return options;
     }
 
     onUpdate(event) {
+		logger.error(`>>> Entering onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -120,13 +136,16 @@ class BasicSearchSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.warn(`<<< Exiting onUpdate(event=${event})`, { "event.action": "onUpdate", "logrite.event": event });
         }));
     }
 
     onCancel() {
+		logger.error('>>> Entering onCancel()', { "event.action": "onCancel" });
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SearchActions.getBasicSearchSettings((data) => {
+				logger.warn('<<< Exiting onCancel()', { "event.action": "onCancel" });
                 this.setState({
                     basicSearchSettings: Object.assign({}, data.Settings)
                 });
@@ -135,28 +154,35 @@ class BasicSearchSettingsPanelBody extends Component {
     }
 
     onReindexContent() {
+		logger.error('>>> Entering onReindexContent()', { "event.action": "onReindexContent" });
         const {props} = this;
         util.utilities.confirm(resx.get("ReIndexConfirmationMessage"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SearchActions.portalSearchReindex(props.portalId));
         });
+		logger.warn('<<< Exiting onReindexContent()', { "event.action": "onReindexContent" });
     }
 
     onReindexHostContent() {
+		logger.error('>>> Entering onReindexHostContent()', { "event.action": "onReindexHostContent" });
         const {props} = this;
         util.utilities.confirm(resx.get("ReIndexConfirmationMessage"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SearchActions.hostSearchReindex());
         });
+		logger.warn('<<< Exiting onReindexHostContent()', { "event.action": "onReindexHostContent" });
     }
 
     onCompactIndex() {
+		logger.error('>>> Entering onCompactIndex()', { "event.action": "onCompactIndex" });
         const {props} = this;
         util.utilities.confirm(resx.get("CompactIndexConfirmationMessage"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SearchActions.compactSearchIndex());
         });
+		logger.warn('<<< Exiting onCompactIndex()', { "event.action": "onCompactIndex" });
     }
 
      
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {state} = this;
         if (this.isHost()) {
             if (state.basicSearchSettings) {
@@ -502,6 +528,7 @@ class BasicSearchSettingsPanelBody extends Component {
             else return <div />;
         }
         else {
+			logger.warn('<<< Exiting render()', { "event.action": "render" });
             return (<div className={styles.basicSearchSettings}>
                 <div className="sectionTitle">{resx.get("SearchIndex")}</div>
                 <div className="searchIndexWrapper">
@@ -532,6 +559,8 @@ BasicSearchSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         tabIndex: state.pagination.tabIndex,
         basicSearchSettings: state.search.basicSearchSettings,

@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A text link control.</summary>
     public class DnnTextLink : WebControl, ILocalizable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnTextLink));
         private bool localize = true;
         private HyperLink textHyperlinkControl;
 
@@ -20,7 +21,10 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnTextLink()
             : base("span")
         {
+			Logger.LogError(">>> Entering DnnTextLink()");
             this.CssClass = "dnnTextLink";
+			Logger.LogDebug("DnnTextLink(): this.CssClass → {Arg0}", this.CssClass);
+        Logger.LogWarning("<<< Exiting DnnTextLink()");
             this.DisabledCssClass = "dnnTextLink disabled";
         }
 
@@ -147,6 +151,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public virtual void LocalizeStrings()
         {
+			Logger.LogError(">>> Entering LocalizeStrings()");
             if (this.Localize)
             {
                 if (!string.IsNullOrEmpty(this.ToolTip))
@@ -167,27 +172,34 @@ namespace DotNetNuke.Web.UI.WebControls
                     {
                         this.ToolTip = this.Text;
                     }
+					Logger.LogDebug("LocalizeStrings(): this.ToolTip → {Arg0}", this.ToolTip);
                 }
             }
+			Logger.LogWarning("<<< Exiting LocalizeStrings()");
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			Logger.LogError(">>> Entering CreateChildControls()");
             this.Controls.Clear();
             this.Controls.Add(this.TextHyperlinkControl);
+			Logger.LogWarning("<<< Exiting CreateChildControls()");
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
             this.LocalResourceFile = Utilities.GetLocalResourceFile(this);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogError(">>> Entering Render(writer={Writer})", writer);
             this.LocalizeStrings();
 
             if (!this.Enabled)
@@ -195,6 +207,7 @@ namespace DotNetNuke.Web.UI.WebControls
                 if (!string.IsNullOrEmpty(this.DisabledCssClass))
                 {
                     this.CssClass = this.DisabledCssClass;
+					Logger.LogDebug("Render(writer={Writer}): this.CssClass → {Arg1}", writer, this.CssClass);
                 }
 
                 this.NavigateUrl = "javascript:void(0);";
@@ -203,6 +216,7 @@ namespace DotNetNuke.Web.UI.WebControls
             this.RenderBeginTag(writer);
             this.RenderChildren(writer);
             this.RenderEndTag(writer);
+			Logger.LogWarning("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

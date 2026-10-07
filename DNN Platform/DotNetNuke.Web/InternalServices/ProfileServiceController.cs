@@ -50,6 +50,8 @@ namespace DotNetNuke.Web.InternalServices
         public ProfileServiceController()
             : this(null, null, null, null, null, null)
         {
+		eventLogger.LogError(">>> Entering ProfileServiceController()");
+        eventLogger.LogWarning("<<< Exiting ProfileServiceController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ProfileServiceController"/> class.</summary>
@@ -81,7 +83,10 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage Search(string q)
         {
+			eventLogger.LogError(">>> Entering Search(q={Q})", q);
             var results = RegistrationProfileController.Instance.Search(PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, this.PortalSettings.PortalId), q);
+			eventLogger.LogError("Search(q={Q}): results → {Results}", q, results);
+			eventLogger.LogWarning("<<< Exiting Search(q={Q})", q);
             return this.Request.CreateResponse(
                 HttpStatusCode.OK,
                 results.OrderBy(sr => sr)
@@ -95,9 +100,12 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateVanityUrl(VanityUrlDTO vanityUrl)
         {
+			eventLogger.LogError(">>> Entering UpdateVanityUrl(vanityUrl={VanityUrl})", vanityUrl);
             // Clean Url
             var options = UrlRewriterUtils.GetOptionsFromSettings(new FriendlyUrlSettings(this.portalController, this.hostSettings, this.hostSettingsService, this.PortalSettings.PortalId));
+			eventLogger.LogError("UpdateVanityUrl(vanityUrl={VanityUrl}): options → {Options}", vanityUrl, options);
             var cleanUrl = FriendlyUrlController.CleanNameForUrl(vanityUrl.Url, options, out var modified);
+			eventLogger.LogError("UpdateVanityUrl(vanityUrl={VanityUrl}): cleanUrl → {CleanUrl}", vanityUrl, cleanUrl);
 
             if (modified)
             {
@@ -114,6 +122,7 @@ namespace DotNetNuke.Web.InternalServices
 
             // Validate for uniqueness
             var uniqueUrl = FriendlyUrlController.ValidateUrl(cleanUrl, -1, this.PortalSettings, out modified);
+			eventLogger.LogError("UpdateVanityUrl(vanityUrl={VanityUrl}): uniqueUrl → {UniqueUrl}", vanityUrl, uniqueUrl);
 
             if (modified)
             {
@@ -130,11 +139,13 @@ namespace DotNetNuke.Web.InternalServices
 
             var user = this.PortalSettings.UserInfo;
             user.VanityUrl = uniqueUrl;
+			eventLogger.LogDebug("UpdateVanityUrl(vanityUrl={VanityUrl}): user.VanityUrl → {Arg1}", vanityUrl, user.VanityUrl);
             UserController.UpdateUser(this.eventLogger, this.PortalSettings.PortalId, user);
 
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, CacheController.VanityUrlLookupKey, this.PortalSettings.PortalId));
 
             // Url is clean and validated so we can update the User
+			eventLogger.LogWarning("<<< Exiting UpdateVanityUrl(vanityUrl={VanityUrl})", vanityUrl);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
         }
 
@@ -144,9 +155,12 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage ProfilePropertyValues()
         {
+			eventLogger.LogError(">>> Entering ProfilePropertyValues()");
             string searchString = HttpContext.Current.Request.Params["SearchString"].NormalizeString();
             string propertyName = HttpContext.Current.Request.Params["PropName"].NormalizeString();
             int portalId = int.Parse(HttpContext.Current.Request.Params["PortalId"], CultureInfo.InvariantCulture);
+			eventLogger.LogError("ProfilePropertyValues(): portalId → {PortalId}", portalId);
+			eventLogger.LogWarning("<<< Exiting ProfilePropertyValues()");
             return this.Request.CreateResponse(HttpStatusCode.OK, Entities.Profile.ProfileController.SearchProfilePropertyValues(this.listController, this.hostSettings, this.portalController, this.appStatus, this.portalGroupController, portalId, propertyName, searchString));
         }
 

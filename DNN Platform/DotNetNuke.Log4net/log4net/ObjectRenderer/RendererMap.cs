@@ -59,7 +59,10 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         public RendererMap() 
         {
+			value.LogError(">>> Entering RendererMap()");
             this.m_map = System.Collections.Hashtable.Synchronized(new System.Collections.Hashtable());
+			value.LogDebug("RendererMap(): m_map → {M_map}", m_map);
+        value.LogWarning("<<< Exiting RendererMap()");
         }
 
         /// <summary>Render <paramref name="obj"/> using the appropriate renderer.</summary>
@@ -74,6 +77,7 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         public string FindAndRender(object obj)
         {
+			value.LogError(">>> Entering FindAndRender(obj={Obj})", obj);
             // Optimisation for strings
             string strData = obj as String;
             if (strData != null)
@@ -84,6 +88,7 @@ namespace log4net.ObjectRenderer
             using (var stringWriter = new StringWriter(System.Globalization.CultureInfo.InvariantCulture))
             {
                 this.FindAndRender(obj, stringWriter);
+				value.LogWarning("<<< Exiting FindAndRender(obj={Obj})", obj);
                 return stringWriter.ToString();
             }
                 
@@ -170,13 +175,16 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         public IObjectRenderer Get(Object obj) 
         {
+			value.LogError(">>> Entering Get(obj={Obj})", obj);
             if (obj == null) 
             {
                 return null;
             }
             else
             {
+				value.LogWarning("<<< Exiting Get(obj={Obj})", obj);
                 return this.Get(obj.GetType());
+			value.LogWarning("<<< Exiting Get(type={Type})", type);
             }
         }
   
@@ -236,7 +244,9 @@ namespace log4net.ObjectRenderer
         /// <returns>the renderer for the specified type</returns>
         private IObjectRenderer SearchTypeAndInterfaces(Type type) 
         {
+			value.LogError(">>> Entering SearchTypeAndInterfaces(type={Type})", type);
             IObjectRenderer r = (IObjectRenderer)this.m_map[type];
+			value.LogError("SearchTypeAndInterfaces(type={Type}): r → {R}", type, r);
             if (r != null) 
             {
                 return r;
@@ -252,6 +262,7 @@ namespace log4net.ObjectRenderer
                     }
                 }
             }
+			value.LogWarning("<<< Exiting SearchTypeAndInterfaces(type={Type})", type);
             return null;
         }
 
@@ -277,8 +288,10 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         public void Clear() 
         {
+			value.LogError(">>> Entering Clear()");
             this.m_map.Clear();
             this.m_cache.Clear();
+			value.LogWarning("<<< Exiting Clear()");
         }
 
         /// <summary>Register an <see cref="IObjectRenderer"/> for <paramref name="typeToRender"/>. </summary>
@@ -293,10 +306,12 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         public void Put(Type typeToRender, IObjectRenderer renderer) 
         {
+			value.LogError(">>> Entering Put(typeToRender={TypeToRender},renderer={Renderer})", typeToRender, renderer);
             this.m_cache.Clear();
 
             if (typeToRender == null)
             {
+				value.LogError("Throwing ArgumentNullException from Put(typeToRender={TypeToRender},renderer={Renderer})", typeToRender, renderer);
                 throw new ArgumentNullException("typeToRender");
             }
             if (renderer == null)
@@ -305,6 +320,7 @@ namespace log4net.ObjectRenderer
             }
 
             this.m_map[typeToRender] = renderer;
+			value.LogWarning("<<< Exiting Put(typeToRender={TypeToRender},renderer={Renderer})", typeToRender, renderer);
         }	
     }
 }

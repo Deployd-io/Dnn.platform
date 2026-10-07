@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.Search.Controllers
     [Serializable]
     public class TabResultController : BaseResultController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabResultController));
         private const string LocalizedResxFile = "~/DesktopModules/Admin/SearchResults/App_LocalResources/SearchableModules.resx";
 
         /// <inheritdoc />
@@ -26,23 +27,30 @@ namespace DotNetNuke.Services.Search.Controllers
         /// <inheritdoc />
         public override bool HasViewPermission(SearchResult searchResult)
         {
+			Logger.LogError(">>> Entering HasViewPermission(searchResult={SearchResult})", searchResult);
             var viewable = true;
 
+			Logger.LogError("HasViewPermission(searchResult={SearchResult}): viewable → {Viewable}", searchResult, viewable);
             if (searchResult.TabId > 0)
             {
                 var tab = TabController.Instance.GetTab(searchResult.TabId, searchResult.PortalId, false);
+				Logger.LogError("HasViewPermission(searchResult={SearchResult}): tab → {Tab}", searchResult, tab);
                 viewable = tab != null && !tab.IsDeleted && !tab.DisableLink && TabPermissionController.CanViewPage(tab);
             }
 
+			Logger.LogWarning("<<< Exiting HasViewPermission(searchResult={SearchResult})", searchResult);
             return viewable;
         }
 
         /// <inheritdoc />
         public override string GetDocUrl(SearchResult searchResult)
         {
+			Logger.LogError(">>> Entering GetDocUrl(searchResult={SearchResult})", searchResult);
             var url = Localization.GetString("SEARCH_NoLink");
 
+			Logger.LogError("GetDocUrl(searchResult={SearchResult}): url → {Url}", searchResult, url);
             var tab = TabController.Instance.GetTab(searchResult.TabId, searchResult.PortalId, false);
+			Logger.LogError("GetDocUrl(searchResult={SearchResult}): tab → {Tab}", searchResult, tab);
             if (TabPermissionController.CanViewPage(tab))
             {
                 if (searchResult.PortalId != PortalSettings.Current.PortalId)
@@ -54,6 +62,7 @@ namespace DotNetNuke.Services.Search.Controllers
                     if (alias != null)
                     {
                         var portalSettings = new PortalSettings(searchResult.PortalId, alias);
+						Logger.LogError("GetDocUrl(searchResult={SearchResult}): portalSettings → {PortalSettings}", searchResult, portalSettings);
                         url = TestableGlobals.Instance.NavigateURL(searchResult.TabId, portalSettings, string.Empty, searchResult.QueryString);
                     }
                 }
@@ -63,6 +72,7 @@ namespace DotNetNuke.Services.Search.Controllers
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetDocUrl(searchResult={SearchResult})", searchResult);
             return url;
         }
     }

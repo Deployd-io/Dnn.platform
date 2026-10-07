@@ -4,6 +4,7 @@
 
 using System.ComponentModel;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Dnn.ContactList.Mvc.Models
 {
@@ -13,13 +14,18 @@ namespace Dnn.ContactList.Mvc.Models
     [JsonObject(MemberSerialization.OptIn)]
     public class Settings
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Settings constructor
         /// </summary>
         public Settings()
         {
+			_logger.LogError(">>> Entering Settings()");
             PageSize = 10;
+			_logger.LogWarning("<<< Exiting Settings()");
+			_logger.LogDebug("Settings(): PageSize → {PageSize}", PageSize);
             AllowContactCreation = true;
+			_logger.LogDebug("Settings(): AllowContactCreation → {AllowContactCreation}", AllowContactCreation);
             
         }
 

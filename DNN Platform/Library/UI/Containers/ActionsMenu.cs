@@ -32,6 +32,7 @@ namespace DotNetNuke.UI.Containers
         public ActionsMenu()
             : this(Globals.GetCurrentServiceProvider())
         {
+		eventLogger.LogWarning("<<< Exiting ActionsMenu(serviceProvider={ServiceProvider},eventLogger={EventLogger})", serviceProvider, eventLogger);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ActionsMenu"/> class.</summary>
@@ -40,6 +41,8 @@ namespace DotNetNuke.UI.Containers
         public ActionsMenu(IServiceProvider serviceProvider)
             : this(serviceProvider, null)
         {
+		eventLogger.LogError(">>> Entering ActionsMenu(serviceProvider={ServiceProvider})", serviceProvider);
+        eventLogger.LogWarning("<<< Exiting ActionsMenu(serviceProvider={ServiceProvider})", serviceProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ActionsMenu"/> class.</summary>
@@ -47,7 +50,9 @@ namespace DotNetNuke.UI.Containers
         /// <param name="eventLogger">The event logger.</param>
         public ActionsMenu(IServiceProvider serviceProvider, IEventLogger eventLogger)
         {
+			eventLogger.LogError(">>> Entering ActionsMenu(serviceProvider={ServiceProvider},eventLogger={EventLogger})", serviceProvider, eventLogger);
             this.serviceProvider = serviceProvider;
+			eventLogger.LogDebug("ActionsMenu(serviceProvider={ServiceProvider},eventLogger={EventLogger}): this.serviceProvider → {Arg2}", serviceProvider, eventLogger, this.serviceProvider);
             this.eventLogger = eventLogger ?? serviceProvider.GetRequiredService<IEventLogger>();
         }
 
@@ -111,32 +116,39 @@ namespace DotNetNuke.UI.Containers
         /// <summary>BindMenu binds the Navigation Provider to the Node Collection.</summary>
         protected void BindMenu()
         {
+			eventLogger.LogError(">>> Entering BindMenu()");
             this.BindMenu(Navigation.GetActionNodes(this.ActionRoot, this, this.ExpandDepth));
+			eventLogger.LogWarning("<<< Exiting BindMenu()");
         }
 
         /// <summary>OnAction raises the <see cref="Action"/> Event.</summary>
         /// <param name="e">The event arguments.</param>
         protected virtual void OnAction(ActionEventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnAction(e={E})", e);
             this.Action?.Invoke(this, e);
+			eventLogger.LogWarning("<<< Exiting OnAction(e={E})", e);
         }
 
         /// <summary>OnInit runs during the controls initialization phase.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnInit(e={E})", e);
             this.ProviderControl = NavigationProvider.Instance(this.serviceProvider, this.ProviderName);
             this.ProviderControl.PopulateOnDemand += this.ProviderControl_PopulateOnDemand;
             base.OnInit(e);
             this.ProviderControl.ControlID = "ctl" + this.ID;
             this.ProviderControl.Initialize();
             this.Controls.Add(this.ProviderControl.NavigationControl);
+			eventLogger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>OnLoad runs during the controls load phase.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             // Add the Actions to the Action Root
@@ -144,20 +156,24 @@ namespace DotNetNuke.UI.Containers
 
             // Set Menu Defaults
             this.SetMenuDefaults();
+			eventLogger.LogWarning("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>OnPreRender runs during the controls pre-render phase.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
             this.BindMenu();
+			eventLogger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>BindMenu binds the Navigation Provider to the Node Collection.</summary>
         /// <param name="objNodes">The Nodes collection to bind.</param>
         private void BindMenu(DNNNodeCollection objNodes)
         {
+			eventLogger.LogError(">>> Entering BindMenu(objNodes={ObjNodes})", objNodes);
             this.Visible = this.ActionManager.DisplayControl(objNodes);
             if (this.Visible)
             {
@@ -170,15 +186,18 @@ namespace DotNetNuke.UI.Containers
 
                 this.ProviderControl.Bind(objNodes);
             }
+			eventLogger.LogWarning("<<< Exiting BindMenu(objNodes={ObjNodes})", objNodes);
         }
 
         /// <summary>ProcessNodes processes a single node and its children.</summary>
         /// <param name="objParent">The Node to process.</param>
         private void ProcessNodes(DNNNode objParent)
         {
+			eventLogger.LogError(">>> Entering ProcessNodes(objParent={ObjParent})", objParent);
             if (!string.IsNullOrEmpty(objParent.JSFunction))
             {
                 var postBackEventReference = this.Page.ClientScript.GetPostBackEventReference(this.ProviderControl.NavigationControl, objParent.ID);
+				eventLogger.LogError("ProcessNodes(objParent={ObjParent}): postBackEventReference → {PostBackEventReference}", objParent, postBackEventReference);
                 objParent.JSFunction = $"if({objParent.JSFunction}){{{postBackEventReference}}};";
             }
 
@@ -186,11 +205,13 @@ namespace DotNetNuke.UI.Containers
             {
                 this.ProcessNodes(objNode);
             }
+			eventLogger.LogWarning("<<< Exiting ProcessNodes(objParent={ObjParent})", objParent);
         }
 
         /// <summary>SetMenuDefaults sets up the default values.</summary>
         private void SetMenuDefaults()
         {
+			eventLogger.LogError(">>> Entering SetMenuDefaults()");
             try
             {
                 //--- original page set attributes ---
@@ -219,30 +240,37 @@ namespace DotNetNuke.UI.Containers
             }
             catch (Exception exc)
             {
+				eventLogger.LogError("Exception in SetMenuDefaults(): {Arg0}", exc.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			eventLogger.LogWarning("<<< Exiting SetMenuDefaults()");
         }
 
         /// <summary>MenuItem_Click handles the Menu Click event.</summary>
         private void MenuItem_Click(NavigationEventArgs args)
         {
+			eventLogger.LogError(">>> Entering MenuItem_Click(args={Args})", args);
             if (Globals.NumberMatchRegex.IsMatch(args.ID))
             {
                 var action = this.ModuleControl.ModuleContext.Actions.GetActionByID(Convert.ToInt32(args.ID, CultureInfo.InvariantCulture));
+				eventLogger.LogError("MenuItem_Click(args={Args}): action → {Action}", args, action);
                 if (!this.ActionManager.ProcessAction(action))
                 {
                     this.OnAction(new ActionEventArgs(action, this.ModuleControl.ModuleContext.Configuration));
                 }
             }
+			eventLogger.LogWarning("<<< Exiting MenuItem_Click(args={Args})", args);
         }
 
         /// <summary>ProviderControl_PopulateOnDemand handles the Populate On Demand Event.</summary>
         private void ProviderControl_PopulateOnDemand(NavigationEventArgs args)
         {
+			eventLogger.LogError(">>> Entering ProviderControl_PopulateOnDemand(args={Args})", args);
             this.SetMenuDefaults();
             this.ActionRoot.Actions.AddRange(this.ModuleControl.ModuleContext.Actions); // Modules how add custom actions in control lifecycle will not have those actions populated...
 
             var objAction = this.ActionRoot;
+			eventLogger.LogError("ProviderControl_PopulateOnDemand(args={Args}): objAction → {ObjAction}", args, objAction);
             if (this.ActionRoot.ID != Convert.ToInt32(args.ID, CultureInfo.InvariantCulture))
             {
                 objAction = this.ModuleControl.ModuleContext.Actions.GetActionByID(Convert.ToInt32(args.ID, CultureInfo.InvariantCulture));
@@ -255,6 +283,7 @@ namespace DotNetNuke.UI.Containers
 
             this.ProviderControl.ClearNodes(); // since we always bind we need to clear the nodes for providers that maintain their state
             this.BindMenu(Navigation.GetActionNodes(objAction, args.Node, this, this.ExpandDepth));
+			eventLogger.LogWarning("<<< Exiting ProviderControl_PopulateOnDemand(args={Args})", args);
         }
     }
 }

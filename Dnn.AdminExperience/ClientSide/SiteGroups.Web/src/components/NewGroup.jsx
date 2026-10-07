@@ -1,26 +1,33 @@
 import PropTypes from "prop-types";
 import React from "react";
 import Resx from "../localization";
+const logger = console;
 import { Button } from "@dnnsoftware/dnn-react-common";
 
 export default class NewSiteGroup extends React.Component {
     constructor(props) {
         super(props);
+		logger.error(`>>> Entering constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
         this.state = {
             siteId: null
         };
+		logger.warn(`<<< Exiting constructor(props=${props})`, { "event.action": "constructor", "logrite.props": props });
     }
 
     onNew() {
+		logger.error('>>> Entering onNew()', { "event.action": "onNew" });
         this.props.onNewGroup(this.state.siteId);
         this.setState({
             siteId: null
         });
+		logger.warn('<<< Exiting onNew()', { "event.action": "onNew" });
     }
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         if (this.props.disabled && this.state.sitedId)
             this.setState({ siteId: null });
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <div style={{ float: "right" }}>
                 <select

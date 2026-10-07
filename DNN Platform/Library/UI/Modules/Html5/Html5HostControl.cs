@@ -30,6 +30,7 @@ namespace DotNetNuke.UI.Modules.Html5
     public class Html5HostControl(string html5File, IBusinessControllerProvider businessControllerProvider, IServicesFramework servicesFramework, IHostSettings hostSettings)
         : ModuleControlBase, IActionable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Html5HostControl));
         private readonly string html5File = html5File;
         private readonly IBusinessControllerProvider businessControllerProvider = businessControllerProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<IBusinessControllerProvider>();
         private readonly IServicesFramework servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
@@ -42,6 +43,7 @@ namespace DotNetNuke.UI.Modules.Html5
         public Html5HostControl(string html5File)
             : this(html5File, null, null)
         {
+			Logger.LogError(">>> Entering Html5HostControl(html5File={Html5File})", html5File);
             this.html5File = html5File;
         }
 
@@ -70,12 +72,14 @@ namespace DotNetNuke.UI.Modules.Html5
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (!string.IsNullOrEmpty(this.html5File))
             {
                 // Check if css file exists
                 var cssFile = Path.ChangeExtension(this.html5File, ".css");
+				Logger.LogError("OnInit(e={E}): cssFile → {CssFile}", e, cssFile);
                 if (this.FileExists(cssFile))
                 {
                     ClientResourceManager.RegisterStyleSheet(this.Page, cssFile, FileOrder.Css.DefaultPriority);
@@ -83,6 +87,7 @@ namespace DotNetNuke.UI.Modules.Html5
 
                 // Check if js file exists
                 var jsFile = Path.ChangeExtension(this.html5File, ".js");
+				Logger.LogError("OnInit(e={E}): jsFile → {JsFile}", e, jsFile);
                 if (this.FileExists(jsFile))
                 {
                     ClientResourceManager.RegisterScript(this.Page, jsFile, FileOrder.Js.DefaultPriority);
@@ -92,36 +97,46 @@ namespace DotNetNuke.UI.Modules.Html5
 
                 this.ModuleActions = new ModuleActionCollection();
                 var tokenReplace = new Html5ModuleTokenReplace(this.Page, this.businessControllerProvider, this.html5File, this.ModuleContext, this.ModuleActions);
+				Logger.LogError("OnInit(e={E}): tokenReplace → {TokenReplace}", e, tokenReplace);
                 this.fileContent = tokenReplace.ReplaceEnvironmentTokens(this.fileContent);
             }
 
             // Register for Services Framework
             this.servicesFramework.RequestAjaxScriptSupport();
+			Logger.LogWarning("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogError(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (!string.IsNullOrEmpty(this.html5File))
             {
                 this.Controls.Add(new LiteralControl(HttpUtility.HtmlDecode(this.fileContent)));
             }
+			Logger.LogWarning("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private static string GetFileContentInternal(string filepath)
         {
+			Logger.LogError(">>> Entering GetFileContentInternal(filepath={Filepath})", filepath);
             using var reader = new StreamReader(filepath);
+			Logger.LogError("GetFileContentInternal(filepath={Filepath}): reader → {Reader}", filepath, reader);
+			Logger.LogWarning("<<< Exiting GetFileContentInternal(filepath={Filepath})", filepath);
             return reader.ReadToEnd();
         }
 
         private string GetFileContent(string filepath)
         {
+			Logger.LogError(">>> Entering GetFileContent(filepath={Filepath})", filepath);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.SpaModulesContentHtmlFileCacheKey, filepath);
             var absoluteFilePath = this.Page.Server.MapPath(filepath);
+			Logger.LogError("GetFileContent(filepath={Filepath}): cacheKey → {CacheKey}", filepath, cacheKey);
             var cacheItemArgs = new CacheItemArgs(cacheKey, DataCache.SpaModulesHtmlFileTimeOut, DataCache.SpaModulesHtmlFileCachePriority)
             {
+				Logger.LogError("GetFileContent(filepath={Filepath}): absoluteFilePath → {AbsoluteFilePath}", filepath, absoluteFilePath);
                 CacheDependency = new DNNCacheDependency(absoluteFilePath),
             };
             return CBO.GetCachedObject<string>(
@@ -132,7 +147,10 @@ namespace DotNetNuke.UI.Modules.Html5
 
         private bool FileExists(string filepath)
         {
+			Logger.LogError(">>> Entering FileExists(filepath={Filepath})", filepath);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.SpaModulesFileExistsCacheKey, filepath);
+			Logger.LogError("FileExists(filepath={Filepath}): cacheKey → {CacheKey}", filepath, cacheKey);
+			Logger.LogWarning("<<< Exiting FileExists(filepath={Filepath})", filepath);
             return CBO.GetCachedObject<bool>(
                 this.hostSettings,
                 new CacheItemArgs(cacheKey, DataCache.SpaModulesHtmlFileTimeOut, DataCache.SpaModulesHtmlFileCachePriority),

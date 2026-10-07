@@ -106,6 +106,7 @@ namespace DotNetNuke.Services.Scheduling
 
     public abstract class SchedulingProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SchedulingProvider));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         public EventName EventName;
@@ -113,10 +114,12 @@ namespace DotNetNuke.Services.Scheduling
         /// <summary>Initializes a new instance of the <see cref="SchedulingProvider"/> class.</summary>
         protected SchedulingProvider()
         {
+			Logger.LogError(">>> Entering SchedulingProvider()");
             var settings = this.Settings;
             if (settings != null)
             {
                 this.ProviderPath = settings["providerPath"];
+				Logger.LogDebug("SchedulingProvider(): this.ProviderPath → {Arg0}", this.ProviderPath);
 
                 string str;
                 bool dbg;
@@ -124,15 +127,19 @@ namespace DotNetNuke.Services.Scheduling
                 if (settings.TryGetValue("debug", out str) && bool.TryParse(str, out dbg))
                 {
                     Debug = dbg;
+					Logger.LogDebug("SchedulingProvider(): Debug → {Debug}", Debug);
                 }
 
                 int value;
                 if (!settings.TryGetValue("maxThreads", out str) || !int.TryParse(str, out value))
                 {
                     value = 1;
+					Logger.LogDebug("SchedulingProvider(): value → {Value}", value);
                 }
 
                 MaxThreads = value;
+				Logger.LogError("SchedulingProvider(): MaxThreads → {MaxThreads}", MaxThreads);
+				Logger.LogDebug("SchedulingProvider(): MaxThreads → {MaxThreads}", MaxThreads);
 
                 ////if (!settings.TryGetValue("delayAtAppStart", out str) || !int.TryParse(str, out value))
                 ////{
@@ -141,10 +148,12 @@ namespace DotNetNuke.Services.Scheduling
                 if (DotNetNuke.Common.Globals.Status != Globals.UpgradeStatus.Install)
                 {
                     DelayAtAppStart = HostController.Instance.GetInteger("SchedulerdelayAtAppStart", 1) * 60;
+					Logger.LogError("SchedulingProvider(): DelayAtAppStart → {DelayAtAppStart}", DelayAtAppStart);
                 }
                 else
                 {
                     DelayAtAppStart = 60;
+					Logger.LogDebug("SchedulingProvider(): DelayAtAppStart → {DelayAtAppStart}", DelayAtAppStart);
                 }
             }
             else
@@ -159,6 +168,7 @@ namespace DotNetNuke.Services.Scheduling
                     DelayAtAppStart = 60;
                 }
             }
+			Logger.LogWarning("<<< Exiting SchedulingProvider()");
         }
 
         public static bool Enabled => SchedulerMode != SchedulerMode.DISABLED;
@@ -254,12 +264,16 @@ namespace DotNetNuke.Services.Scheduling
 
         public virtual void RunScheduleItemNow(ScheduleItem scheduleItem)
         {
+			Logger.LogError(">>> Entering RunScheduleItemNow(scheduleItem={ScheduleItem})", scheduleItem);
             // Do Nothing
+			Logger.LogWarning("<<< Exiting RunScheduleItemNow(scheduleItem={ScheduleItem})", scheduleItem);
         }
 
         public virtual void RunScheduleItemNow(ScheduleItem scheduleItem, bool runNow)
         {
+			Logger.LogError(">>> Entering RunScheduleItemNow(scheduleItem={ScheduleItem},runNow={RunNow})", scheduleItem, runNow);
             // Do Nothing
+			Logger.LogWarning("<<< Exiting RunScheduleItemNow(scheduleItem={ScheduleItem},runNow={RunNow})", scheduleItem, runNow);
         }
 
         public abstract void RemoveFromScheduleInProgress(ScheduleItem scheduleItem);

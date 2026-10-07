@@ -27,7 +27,11 @@ namespace Dnn.PersonaBar.Pages.Components.Security
         /// <summary>Initializes a new instance of the <see cref="SecurityService"/> class.</summary>
         public SecurityService()
         {
+			eventLogger.LogError(">>> Entering SecurityService()");
             this.tabController = TabController.Instance;
+			eventLogger.LogDebug("SecurityService(): tabController → {TabController}", tabController);
+        eventLogger.LogDebug("SecurityService(): this.tabController → {Arg0}", this.tabController);
+        eventLogger.LogWarning("<<< Exiting SecurityService()");
         }
 
         public static ISecurityService Instance
@@ -47,19 +51,25 @@ namespace Dnn.PersonaBar.Pages.Components.Security
         /// <inheritdoc />
         public virtual bool IsPageAdminUser()
         {
+			eventLogger.LogError(">>> Entering IsPageAdminUser()");
             var user = UserController.Instance.GetCurrentUserInfo();
+			eventLogger.LogError("IsPageAdminUser(): user → {User}", user);
+			eventLogger.LogWarning("<<< Exiting IsPageAdminUser()");
             return user.IsSuperUser || user.IsInRole(PortalSettings.Current?.AdministratorRoleName);
         }
 
         /// <inheritdoc />
         public virtual bool IsVisible(MenuItem menuItem)
         {
+			eventLogger.LogError(">>> Entering IsVisible(menuItem={MenuItem})", menuItem);
+            eventLogger.LogWarning("<<< Exiting IsVisible(menuItem={MenuItem})", menuItem);
             return this.IsPageAdminUser() || this.CanViewPageList(menuItem.MenuId);
         }
 
         /// <inheritdoc />
         public virtual JObject GetCurrentPagePermissions()
         {
+			eventLogger.LogError(">>> Entering GetCurrentPagePermissions()");
             var permissions = new JObject
             {
                 { "addContentToPage", TabPermissionController.CanAddContentToPage() },
@@ -72,12 +82,14 @@ namespace Dnn.PersonaBar.Pages.Components.Security
                 { "managePage", TabPermissionController.CanManagePage() },
             };
 
+			eventLogger.LogWarning("<<< Exiting GetCurrentPagePermissions()");
             return permissions;
         }
 
         /// <inheritdoc />
         public virtual JObject GetPagePermissions(TabInfo tab)
         {
+			eventLogger.LogError(">>> Entering GetPagePermissions(tab={Tab})", tab);
             var permissions = new JObject
             {
                 { "addContentToPage", TabPermissionController.CanAddContentToPage(tab) },
@@ -90,72 +102,93 @@ namespace Dnn.PersonaBar.Pages.Components.Security
                 { "managePage", TabPermissionController.CanManagePage(tab) },
             };
 
+			eventLogger.LogWarning("<<< Exiting GetPagePermissions(tab={Tab})", tab);
             return permissions;
         }
 
         /// <inheritdoc />
         public virtual bool CanAdminPage(int tabId)
         {
+			eventLogger.LogError(">>> Entering CanAdminPage(tabId={TabId})", tabId);
+            eventLogger.LogWarning("<<< Exiting CanAdminPage(tabId={TabId})", tabId);
             return this.IsPageAdminUser() || TabPermissionController.CanAdminPage(this.GetTabById(tabId));
         }
 
         /// <inheritdoc />
         public virtual bool CanManagePage(int tabId)
         {
+			eventLogger.LogError(">>> Entering CanManagePage(tabId={TabId})", tabId);
+            eventLogger.LogWarning("<<< Exiting CanManagePage(tabId={TabId})", tabId);
             return this.CanAdminPage(tabId) || TabPermissionController.CanManagePage(this.GetTabById(tabId));
         }
 
         /// <inheritdoc />
         public virtual bool CanDeletePage(int tabId)
         {
+			eventLogger.LogError(">>> Entering CanDeletePage(tabId={TabId})", tabId);
+            eventLogger.LogWarning("<<< Exiting CanDeletePage(tabId={TabId})", tabId);
             return this.CanAdminPage(tabId) || TabPermissionController.CanDeletePage(this.GetTabById(tabId));
         }
 
         /// <inheritdoc />
         public virtual bool CanAddPage(int tabId)
         {
+			eventLogger.LogError(">>> Entering CanAddPage(tabId={TabId})", tabId);
+            eventLogger.LogWarning("<<< Exiting CanAddPage(tabId={TabId})", tabId);
             return this.CanAdminPage(tabId) || TabPermissionController.CanAddPage(this.GetTabById(tabId));
         }
 
         /// <inheritdoc />
         public virtual bool CanCopyPage(int tabId)
         {
+			eventLogger.LogError(">>> Entering CanCopyPage(tabId={TabId})", tabId);
+            eventLogger.LogWarning("<<< Exiting CanCopyPage(tabId={TabId})", tabId);
             return this.CanAdminPage(tabId) || TabPermissionController.CanCopyPage(this.GetTabById(tabId));
         }
 
         /// <inheritdoc />
         public virtual bool CanExportPage(int tabId)
         {
+			eventLogger.LogError(">>> Entering CanExportPage(tabId={TabId})", tabId);
+            eventLogger.LogWarning("<<< Exiting CanExportPage(tabId={TabId})", tabId);
             return this.CanAdminPage(tabId) || TabPermissionController.CanExportPage(this.GetTabById(tabId));
         }
 
         /// <inheritdoc />
         public virtual bool CanViewPageList(int menuId)
         {
+			eventLogger.LogError(">>> Entering CanViewPageList(menuId={MenuId})", menuId);
             var permissions = MenuPermissionController.GetMenuPermissions(PortalSettings.Current.PortalId, menuId);
+			eventLogger.LogError("CanViewPageList(menuId={MenuId}): permissions → {Permissions}", menuId, permissions);
+			eventLogger.LogWarning("<<< Exiting CanViewPageList(menuId={MenuId})", menuId);
             return MenuPermissionController.HasMenuPermission(new MenuPermissionCollection(permissions), "VIEW_PAGE_LIST") || IsPageAdmin();
         }
 
         /// <inheritdoc />
         public virtual bool CanSavePageDetails(PageSettings pageSettings)
         {
+			eventLogger.LogError(">>> Entering CanSavePageDetails(pageSettings={PageSettings})", pageSettings);
             var tabId = pageSettings.TabId;
             var pageType = pageSettings.PageType;
             var parentId = pageSettings.ParentId ?? 0;
             var creatingPage = tabId <= 0;
             var updatingPage = tabId > 0;
             var creatingTemplate = tabId <= 0 && pageSettings.TemplateTabId > 0 && pageType == "template";
+			eventLogger.LogError("CanSavePageDetails(pageSettings={PageSettings}): creatingTemplate → {CreatingTemplate}", pageSettings, creatingTemplate);
             var duplicatingPage = tabId <= 0 && pageSettings.TemplateTabId > 0;
             var updatingParentPage = false;
+			eventLogger.LogError("CanSavePageDetails(pageSettings={PageSettings}): updatingParentPage → {UpdatingParentPage}", pageSettings, updatingParentPage);
             if (updatingPage)
             {
                 var tab = TabController.Instance.GetTab(tabId, PortalSettings.Current.PortalId);
+				eventLogger.LogError("CanSavePageDetails(pageSettings={PageSettings}): tab → {Tab}", pageSettings, tab);
                 if (tab != null && tab.ParentId != parentId)
                 {
                     updatingParentPage = true;
                 }
             }
 
+				eventLogger.LogWarning("<<< Exiting CanSavePageDetails(pageSettings={PageSettings})", pageSettings);
             return
                 this.IsPageAdminUser() ||
                 (creatingPage && this.CanAddPage(parentId) && !creatingTemplate) ||
@@ -168,12 +201,16 @@ namespace Dnn.PersonaBar.Pages.Components.Security
         /// <inheritdoc />
         public virtual bool IsAdminHostSystemPage()
         {
+			eventLogger.LogError(">>> Entering IsAdminHostSystemPage()");
+			eventLogger.LogWarning("<<< Exiting IsAdminHostSystemPage()");
             return PortalSettings.Current.ActiveTab.IsSystem || PortalSettings.Current.ActiveTab.IsSuperTab ||
                 PortalSettings.Current.ActiveTab.ParentId == PortalSettings.Current.AdminTabId || PortalSettings.Current.ActiveTab.TabID == PortalSettings.Current.AdminTabId;
         }
 
         private static bool IsPageAdmin()
         {
+			eventLogger.LogError(">>> Entering IsPageAdmin()");
+            eventLogger.LogWarning("<<< Exiting IsPageAdmin()");
             return ////TabPermissionController.CanAddContentToPage() ||
                 TabPermissionController.CanAddPage()
                 || TabPermissionController.CanAdminPage()
@@ -186,7 +223,10 @@ namespace Dnn.PersonaBar.Pages.Components.Security
 
         private TabInfo GetTabById(int pageId)
         {
+			eventLogger.LogError(">>> Entering GetTabById(pageId={PageId})", pageId);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			eventLogger.LogError("GetTabById(pageId={PageId}): portalSettings → {PortalSettings}", pageId, portalSettings);
+			eventLogger.LogWarning("<<< Exiting GetTabById(pageId={PageId})", pageId);
             return pageId <= 0 ? new TabInfo { PortalID = portalSettings.PortalId, } : this.tabController.GetTab(pageId, portalSettings.PortalId, false);
         }
     }

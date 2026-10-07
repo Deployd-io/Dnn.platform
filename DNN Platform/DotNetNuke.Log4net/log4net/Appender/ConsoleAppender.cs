@@ -62,6 +62,7 @@ namespace log4net.Appender
         /// </remarks>
         public ConsoleAppender() 
         {
+		value.LogWarning("<<< Exiting ConsoleAppender(layout={Layout},writeToErrorStream={WriteToErrorStream})", layout, writeToErrorStream);
         }
 
         /// <summary>
@@ -76,6 +77,8 @@ namespace log4net.Appender
         [Obsolete("Instead use the default constructor and set the Layout property")]
         public ConsoleAppender(ILayout layout) : this(layout, false)
         {
+		value.LogError(">>> Entering ConsoleAppender(layout={Layout})", layout);
+        value.LogWarning("<<< Exiting ConsoleAppender(layout={Layout})", layout);
         }
 
         /// <summary>
@@ -92,7 +95,10 @@ namespace log4net.Appender
         [Obsolete("Instead use the default constructor and set the Layout & Target properties")]
         public ConsoleAppender(ILayout layout, bool writeToErrorStream) 
         {
+			value.LogError(">>> Entering ConsoleAppender(layout={Layout},writeToErrorStream={WriteToErrorStream})", layout, writeToErrorStream);
             this.Layout = layout;
+			value.LogWarning("<<< Exiting ConsoleAppender(layout={Layout},writeToErrorStream={WriteToErrorStream})", layout, writeToErrorStream);
+			value.LogDebug("ConsoleAppender(layout={Layout},writeToErrorStream={WriteToErrorStream}): this.Layout → {Arg2}", layout, writeToErrorStream, this.Layout);
             this.m_writeToErrorStream = writeToErrorStream;
         }
 
@@ -143,7 +149,9 @@ namespace log4net.Appender
         protected override void Append(LoggingEvent loggingEvent) 
         {
 #if NETCF_1_0
+			value.LogError(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             // Write to the output stream
+			value.LogWarning("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
             Console.Write(RenderLoggingEvent(loggingEvent));
 #else
             if (this.m_writeToErrorStream)

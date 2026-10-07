@@ -18,11 +18,13 @@ namespace DotNetNuke.Entities.Modules.Actions
     /// <seealso cref="ModuleActionCollection" /></remarks>
     public class ModuleAction
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleAction));
         /// <summary>Initializes a new instance of the <see cref="ModuleAction"/> class.</summary>
         /// <param name="id">This is the identifier to use for this action.</param>
         public ModuleAction(int id)
             : this(id, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, false, SecurityAccessLevel.Anonymous, true, false)
         {
+		Logger.LogWarning("<<< Exiting ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url},clientScript={ClientScript},useActionEvent={UseActionEvent},secure={Secure},visible={Visible},newWindow={NewWindow})", id, title, cmdName, cmdArg, icon, url, clientScript, useActionEvent, secure, visible, newWindow);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleAction"/> class.</summary>
@@ -32,6 +34,8 @@ namespace DotNetNuke.Entities.Modules.Actions
         public ModuleAction(int id, string title, string cmdName)
             : this(id, title, cmdName, string.Empty, string.Empty, string.Empty, string.Empty, false, SecurityAccessLevel.Anonymous, true, false)
         {
+		Logger.LogError(">>> Entering ModuleAction(id={Id},title={Title},cmdName={CmdName})", id, title, cmdName);
+        Logger.LogWarning("<<< Exiting ModuleAction(id={Id},title={Title},cmdName={CmdName})", id, title, cmdName);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleAction"/> class.</summary>
@@ -42,6 +46,8 @@ namespace DotNetNuke.Entities.Modules.Actions
         public ModuleAction(int id, string title, string cmdName, string cmdArg)
             : this(id, title, cmdName, cmdArg, string.Empty, string.Empty, string.Empty, false, SecurityAccessLevel.Anonymous, true, false)
         {
+		Logger.LogError(">>> Entering ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg})", id, title, cmdName, cmdArg);
+        Logger.LogWarning("<<< Exiting ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg})", id, title, cmdName, cmdArg);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleAction"/> class.</summary>
@@ -53,6 +59,8 @@ namespace DotNetNuke.Entities.Modules.Actions
         public ModuleAction(int id, string title, string cmdName, string cmdArg, string icon)
             : this(id, title, cmdName, cmdArg, icon, string.Empty, string.Empty, false, SecurityAccessLevel.Anonymous, true, false)
         {
+		Logger.LogError(">>> Entering ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon})", id, title, cmdName, cmdArg, icon);
+        Logger.LogWarning("<<< Exiting ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon})", id, title, cmdName, cmdArg, icon);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleAction"/> class.</summary>
@@ -65,6 +73,8 @@ namespace DotNetNuke.Entities.Modules.Actions
         public ModuleAction(int id, string title, string cmdName, string cmdArg, string icon, string url)
             : this(id, title, cmdName, cmdArg, icon, url, string.Empty, false, SecurityAccessLevel.Anonymous, true, false)
         {
+		Logger.LogError(">>> Entering ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url})", id, title, cmdName, cmdArg, icon, url);
+        Logger.LogWarning("<<< Exiting ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url})", id, title, cmdName, cmdArg, icon, url);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleAction"/> class.</summary>
@@ -78,6 +88,8 @@ namespace DotNetNuke.Entities.Modules.Actions
         public ModuleAction(int id, string title, string cmdName, string cmdArg, string icon, string url, string clientScript)
             : this(id, title, cmdName, cmdArg, icon, url, clientScript, false, SecurityAccessLevel.Anonymous, true, false)
         {
+		Logger.LogError(">>> Entering ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url},clientScript={ClientScript})", id, title, cmdName, cmdArg, icon, url, clientScript);
+        Logger.LogWarning("<<< Exiting ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url},clientScript={ClientScript})", id, title, cmdName, cmdArg, icon, url, clientScript);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleAction"/> class.</summary>
@@ -92,6 +104,8 @@ namespace DotNetNuke.Entities.Modules.Actions
         public ModuleAction(int id, string title, string cmdName, string cmdArg, string icon, string url, string clientScript, bool useActionEvent)
             : this(id, title, cmdName, cmdArg, icon, url, clientScript, useActionEvent, SecurityAccessLevel.Anonymous, true, false)
         {
+		Logger.LogError(">>> Entering ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url},clientScript={ClientScript},useActionEvent={UseActionEvent})", id, title, cmdName, cmdArg, icon, url, clientScript, useActionEvent);
+        Logger.LogWarning("<<< Exiting ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url},clientScript={ClientScript},useActionEvent={UseActionEvent})", id, title, cmdName, cmdArg, icon, url, clientScript, useActionEvent);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleAction"/> class.</summary>
@@ -143,12 +157,18 @@ namespace DotNetNuke.Entities.Modules.Actions
         public ModuleAction(int id, string title, string cmdName, string cmdArg, string icon, string url, string clientScript, bool useActionEvent, SecurityAccessLevel secure, bool visible, bool newWindow)
         {
             this.ID = id;
+			Logger.LogDebug("ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url},clientScript={ClientScript},useActionEvent={UseActionEvent},secure={Secure},visible={Visible},newWindow={NewWindow}): this.ID → {Arg11}", id, title, cmdName, cmdArg, icon, url, clientScript, useActionEvent, secure, visible, newWindow, this.ID);
             this.Title = title;
             this.CommandName = cmdName;
+			Logger.LogDebug("ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url},clientScript={ClientScript},useActionEvent={UseActionEvent},secure={Secure},visible={Visible},newWindow={NewWindow}): this.Title → {Arg11}", id, title, cmdName, cmdArg, icon, url, clientScript, useActionEvent, secure, visible, newWindow, this.Title);
+			Logger.LogDebug("ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url},clientScript={ClientScript},useActionEvent={UseActionEvent},secure={Secure},visible={Visible},newWindow={NewWindow}): this.CommandName → {Arg11}", id, title, cmdName, cmdArg, icon, url, clientScript, useActionEvent, secure, visible, newWindow, this.CommandName);
             this.CommandArgument = cmdArg;
             this.Icon = icon;
             this.Url = url;
             this.ClientScript = clientScript;
+			Logger.LogDebug("ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url},clientScript={ClientScript},useActionEvent={UseActionEvent},secure={Secure},visible={Visible},newWindow={NewWindow}): this.CommandArgument → {Arg11}", id, title, cmdName, cmdArg, icon, url, clientScript, useActionEvent, secure, visible, newWindow, this.CommandArgument);
+			Logger.LogDebug("ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url},clientScript={ClientScript},useActionEvent={UseActionEvent},secure={Secure},visible={Visible},newWindow={NewWindow}): this.Icon → {Arg11}", id, title, cmdName, cmdArg, icon, url, clientScript, useActionEvent, secure, visible, newWindow, this.Icon);
+			Logger.LogDebug("ModuleAction(id={Id},title={Title},cmdName={CmdName},cmdArg={CmdArg},icon={Icon},url={Url},clientScript={ClientScript},useActionEvent={UseActionEvent},secure={Secure},visible={Visible},newWindow={NewWindow}): this.Url → {Arg11}", id, title, cmdName, cmdArg, icon, url, clientScript, useActionEvent, secure, visible, newWindow, this.Url);
             this.UseActionEvent = useActionEvent;
             this.Secure = secure;
             this.Visible = visible;
@@ -323,6 +343,8 @@ namespace DotNetNuke.Entities.Modules.Actions
         /// shown as sub-menus.</remarks>
         public bool HasChildren()
         {
+			Logger.LogError(">>> Entering HasChildren()");
+            Logger.LogWarning("<<< Exiting HasChildren()");
             return this.Actions.Count > 0;
         }
     }

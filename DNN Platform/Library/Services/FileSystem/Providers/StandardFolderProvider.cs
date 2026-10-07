@@ -54,6 +54,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public override void CopyFile(string folderPath, string fileName, string newFolderPath, FolderMappingInfo folderMapping)
         {
+			Logger.LogError(">>> Entering CopyFile(folderPath={FolderPath},fileName={FileName},newFolderPath={NewFolderPath},folderMapping=<redacted>)", folderPath, fileName, newFolderPath);
             Requires.PropertyNotNull("folderPath", folderPath);
             Requires.NotNullOrEmpty("fileName", fileName);
             Requires.PropertyNotNull("newFolderPath", newFolderPath);
@@ -65,69 +66,86 @@ namespace DotNetNuke.Services.FileSystem
             }
 
             var filePath = this.GetActualPath(folderMapping, folderPath, fileName);
+			Logger.LogError("CopyFile(folderPath={FolderPath},fileName={FileName},newFolderPath={NewFolderPath},folderMapping=<redacted>): filePath → {FilePath}", folderPath, fileName, newFolderPath, filePath);
             var newFilePath = this.GetActualPath(folderMapping, newFolderPath, fileName);
+			Logger.LogError("CopyFile(folderPath={FolderPath},fileName={FileName},newFolderPath={NewFolderPath},folderMapping=<redacted>): newFilePath → {NewFilePath}", folderPath, fileName, newFolderPath, newFilePath);
 
             if (FileWrapper.Instance.Exists(filePath))
             {
                 FileWrapper.Instance.Copy(filePath, newFilePath, true);
             }
+			Logger.LogWarning("<<< Exiting CopyFile(folderPath={FolderPath},fileName={FileName},newFolderPath={NewFolderPath},folderMapping=<redacted>)", folderPath, fileName, newFolderPath);
         }
 
         /// <inheritdoc />
         public override void AddFile(IFolderInfo folder, string fileName, Stream content)
         {
+			Logger.LogError(">>> Entering AddFile(folder={Folder},fileName={FileName},content={Content})", folder, fileName, content);
             Requires.NotNull("folder", folder);
             Requires.NotNullOrEmpty("fileName", fileName);
             Requires.NotNull("content", content);
 
             this.UpdateFile(folder, fileName, content);
+			Logger.LogWarning("<<< Exiting AddFile(folder={Folder},fileName={FileName},content={Content})", folder, fileName, content);
         }
 
         /// <inheritdoc />
         public override void AddFolder(string folderPath, FolderMappingInfo folderMapping)
         {
+		Logger.LogError(">>> Entering AddFolder(folderPath={FolderPath},folderMapping=<redacted>)", folderPath);
+        Logger.LogWarning("<<< Exiting AddFolder(folderPath={FolderPath},folderMapping=<redacted>)", folderPath);
         }
 
         /// <inheritdoc />
         public override void DeleteFile(IFileInfo file)
         {
+			Logger.LogError(">>> Entering DeleteFile(file={File})", file);
             Requires.NotNull("file", file);
 
             var path = this.GetActualPath(file);
+			Logger.LogError("DeleteFile(file={File}): path → {Path}", file, path);
 
             if (FileWrapper.Instance.Exists(path))
             {
                 FileWrapper.Instance.SetAttributes(path, FileAttributes.Normal);
                 FileWrapper.Instance.Delete(path);
             }
+			Logger.LogWarning("<<< Exiting DeleteFile(file={File})", file);
         }
 
         /// <inheritdoc />
         public override void DeleteFolder(IFolderInfo folder)
         {
+		Logger.LogError(">>> Entering DeleteFolder(folder={Folder})", folder);
+        Logger.LogWarning("<<< Exiting DeleteFolder(folder={Folder})", folder);
         }
 
         /// <inheritdoc />
         public override bool FileExists(IFolderInfo folder, string fileName)
         {
+			Logger.LogError(">>> Entering FileExists(folder={Folder},fileName={FileName})", folder, fileName);
             Requires.NotNull("folder", folder);
             Requires.PropertyNotNull("fileName", fileName);
 
+			Logger.LogWarning("<<< Exiting FileExists(folder={Folder},fileName={FileName})", folder, fileName);
             return FileWrapper.Instance.Exists(this.GetActualPath(folder, fileName));
         }
 
         /// <inheritdoc />
         public override bool FolderExists(string folderPath, FolderMappingInfo folderMapping)
         {
+			Logger.LogError(">>> Entering FolderExists(folderPath={FolderPath},folderMapping=<redacted>)", folderPath);
             Requires.PropertyNotNull("folderPath", folderPath);
             Requires.NotNull("folderMapping", folderMapping);
 
+			Logger.LogWarning("<<< Exiting FolderExists(folderPath={FolderPath},folderMapping=<redacted>)", folderPath);
             return DirectoryWrapper.Instance.Exists(this.GetActualPath(folderMapping, folderPath));
         }
 
         /// <inheritdoc />
         public override FileAttributes? GetFileAttributes(IFileInfo file)
         {
+			Logger.LogError(">>> Entering GetFileAttributes(file={File})", file);
             Requires.NotNull("file", file);
 
             FileAttributes? fileAttributes = null;
@@ -135,45 +153,57 @@ namespace DotNetNuke.Services.FileSystem
             try
             {
                 fileAttributes = FileWrapper.Instance.GetAttributes(this.GetActualPath(file));
+				Logger.LogError("GetFileAttributes(file={File}): fileAttributes → {FileAttributes}", file, fileAttributes);
             }
             catch (Exception ex)
             {
+				Logger.LogDebug("GetFileAttributes(file={File}): fileAttributes → {FileAttributes}", file, fileAttributes);
                 Logger.Error(ex);
             }
 
+			Logger.LogWarning("<<< Exiting GetFileAttributes(file={File})", file);
             return fileAttributes;
         }
 
         /// <inheritdoc />
         public override string[] GetFiles(IFolderInfo folder)
         {
+			Logger.LogError(">>> Entering GetFiles(folder={Folder})", folder);
             Requires.NotNull("folder", folder);
 
             var fileNames = DirectoryWrapper.Instance.GetFiles(this.GetActualPath(folder));
+			Logger.LogError("GetFiles(folder={Folder}): fileNames → {FileNames}", folder, fileNames);
 
             for (var i = 0; i < fileNames.Length; i++)
             {
                 fileNames[i] = Path.GetFileName(fileNames[i]);
             }
 
+			Logger.LogWarning("<<< Exiting GetFiles(folder={Folder})", folder);
             return fileNames;
         }
 
         /// <inheritdoc />
         public override long GetFileSize(IFileInfo file)
         {
+			Logger.LogError(">>> Entering GetFileSize(file={File})", file);
             Requires.NotNull("file", file);
 
             var physicalFile = new System.IO.FileInfo(this.GetActualPath(file));
+			Logger.LogError("GetFileSize(file={File}): physicalFile → {PhysicalFile}", file, physicalFile);
 
+			Logger.LogWarning("<<< Exiting GetFileSize(file={File})", file);
             return physicalFile.Length;
         }
 
         /// <inheritdoc />
         public override Stream GetFileStream(IFileInfo file)
         {
+			Logger.LogError(">>> Entering GetFileStream(file={File})", file);
             Requires.NotNull("file", file);
 
+			Logger.LogWarning("<<< Exiting GetFileStream(file={File})", file);
+			Logger.LogWarning("<<< Exiting GetFileStream(folder={Folder},fileName={FileName})", folder, fileName);
             return this.GetFileStreamInternal(this.GetActualPath(file));
         }
 
@@ -188,6 +218,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public override string GetFileUrl(IFileInfo file)
         {
+			Logger.LogError(">>> Entering GetFileUrl(file={File})", file);
             Requires.NotNull("file", file);
 
             var portalSettings = file.PortalId == PortalSettings.Current?.PortalId ?
@@ -222,21 +253,26 @@ namespace DotNetNuke.Services.FileSystem
                 return TestableGlobals.Instance.ResolveUrl(fullPath + "?ver=" + cacheBusterToken);
             }
 
+			Logger.LogWarning("<<< Exiting GetFileUrl(file={File})", file);
             return TestableGlobals.Instance.ResolveUrl(fullPath);
         }
 
         /// <inheritdoc />
         public override string GetFolderProviderIconPath()
         {
+			Logger.LogError(">>> Entering GetFolderProviderIconPath()");
+            Logger.LogWarning("<<< Exiting GetFolderProviderIconPath()");
             return IconControllerWrapper.Instance.IconURL("FolderStandard", "32x32");
         }
 
         /// <inheritdoc />
         public override DateTime GetLastModificationTime(IFileInfo file)
         {
+			Logger.LogError(">>> Entering GetLastModificationTime(file={File})", file);
             Requires.NotNull("file", file);
 
             var lastModificationTime = Null.NullDate;
+			Logger.LogError("GetLastModificationTime(file={File}): lastModificationTime → {LastModificationTime}", file, lastModificationTime);
 
             try
             {
@@ -247,15 +283,18 @@ namespace DotNetNuke.Services.FileSystem
                 Logger.Error(ex);
             }
 
+			Logger.LogWarning("<<< Exiting GetLastModificationTime(file={File})", file);
             return lastModificationTime;
         }
 
         /// <inheritdoc />
         public override IEnumerable<string> GetSubFolders(string folderPath, FolderMappingInfo folderMapping)
         {
+			Logger.LogError(">>> Entering GetSubFolders(folderPath={FolderPath},folderMapping=<redacted>)", folderPath);
             Requires.PropertyNotNull("folderPath", folderPath);
             Requires.NotNull("folderMapping", folderMapping);
 
+			Logger.LogWarning("<<< Exiting GetSubFolders(folderPath={FolderPath},folderMapping=<redacted>)", folderPath);
             return DirectoryWrapper.Instance.GetDirectories(this.GetActualPath(folderMapping, folderPath))
                 .Select(directory => this.GetRelativePath(folderMapping, directory));
         }
@@ -263,14 +302,17 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public override bool IsInSync(IFileInfo file)
         {
+			Logger.LogError(">>> Entering IsInSync(file={File})", file);
             Requires.NotNull("file", file);
 
+			Logger.LogWarning("<<< Exiting IsInSync(file={File})", file);
             return Convert.ToInt32((file.LastModificationTime - this.GetLastModificationTime(file)).TotalSeconds) == 0;
         }
 
         /// <inheritdoc />
         public override void MoveFile(IFileInfo file, IFolderInfo destinationFolder)
         {
+			Logger.LogError(">>> Entering MoveFile(file={File},destinationFolder={DestinationFolder})", file, destinationFolder);
             Requires.NotNull("file", file);
             Requires.NotNull("destinationFolder", destinationFolder);
 
@@ -280,67 +322,83 @@ namespace DotNetNuke.Services.FileSystem
                 string newName = this.GetActualPath(destinationFolder, file.FileName);
                 FileWrapper.Instance.Move(oldName, newName);
             }
+			Logger.LogWarning("<<< Exiting MoveFile(file={File},destinationFolder={DestinationFolder})", file, destinationFolder);
         }
 
         /// <inheritdoc />
         public override void MoveFolder(string folderPath, string newFolderPath, FolderMappingInfo folderMapping)
         {
+			Logger.LogError(">>> Entering MoveFolder(folderPath={FolderPath},newFolderPath={NewFolderPath},folderMapping=<redacted>)", folderPath, newFolderPath);
             // The folder has already been moved in filesystem
+			Logger.LogWarning("<<< Exiting MoveFolder(folderPath={FolderPath},newFolderPath={NewFolderPath},folderMapping=<redacted>)", folderPath, newFolderPath);
         }
 
         /// <inheritdoc />
         public override void RenameFile(IFileInfo file, string newFileName)
         {
+			Logger.LogError(">>> Entering RenameFile(file={File},newFileName={NewFileName})", file, newFileName);
             Requires.NotNull("file", file);
             Requires.NotNullOrEmpty("newFileName", newFileName);
 
             if (file.FileName != newFileName)
             {
                 IFolderInfo folder = FolderManager.Instance.GetFolder(file.FolderId);
+				Logger.LogError("RenameFile(file={File},newFileName={NewFileName}): folder → {Folder}", file, newFileName, folder);
                 string oldName = this.GetActualPath(file);
                 string newName = this.GetActualPath(folder, newFileName);
                 FileWrapper.Instance.Move(oldName, newName);
             }
+			Logger.LogWarning("<<< Exiting RenameFile(file={File},newFileName={NewFileName})", file, newFileName);
         }
 
         /// <inheritdoc />
         public override void RenameFolder(IFolderInfo folder, string newFolderName)
         {
+			Logger.LogError(">>> Entering RenameFolder(folder={Folder},newFolderName={NewFolderName})", folder, newFolderName);
             // The folder has already been moved in filesystem
+			Logger.LogWarning("<<< Exiting RenameFolder(folder={Folder},newFolderName={NewFolderName})", folder, newFolderName);
         }
 
         /// <inheritdoc />
         public override void SetFileAttributes(IFileInfo file, FileAttributes fileAttributes)
         {
+			Logger.LogError(">>> Entering SetFileAttributes(file={File},fileAttributes={FileAttributes})", file, fileAttributes);
             Requires.NotNull("file", file);
 
             FileWrapper.Instance.SetAttributes(this.GetActualPath(file), fileAttributes);
+			Logger.LogWarning("<<< Exiting SetFileAttributes(file={File},fileAttributes={FileAttributes})", file, fileAttributes);
         }
 
         /// <inheritdoc />
         public override bool SupportsFileAttributes()
         {
+			Logger.LogError(">>> Entering SupportsFileAttributes()");
+			Logger.LogWarning("<<< Exiting SupportsFileAttributes()");
             return true;
         }
 
         /// <inheritdoc />
         public override void UpdateFile(IFileInfo file, Stream content)
         {
+			Logger.LogError(">>> Entering UpdateFile(file={File},content={Content})", file, content);
             Requires.NotNull("file", file);
             Requires.NotNull("content", content);
 
             this.UpdateFile(FolderManager.Instance.GetFolder(file.FolderId), file.FileName, content);
+			Logger.LogWarning("<<< Exiting UpdateFile(file={File},content={Content})", file, content);
         }
 
         /// <inheritdoc />
         public override void UpdateFile(IFolderInfo folder, string fileName, Stream content)
         {
+			Logger.LogError(">>> Entering UpdateFile(folder={Folder},fileName={FileName},content={Content})", folder, fileName, content);
             Requires.NotNull("folder", folder);
             Requires.NotNullOrEmpty("fileName", fileName);
             Requires.NotNull("content", content);
 
             var arrData = new byte[2048];
             var actualPath = this.GetActualPath(folder, fileName);
+			Logger.LogError("UpdateFile(folder={Folder},fileName={FileName},content={Content}): actualPath → {ActualPath}", folder, fileName, content, actualPath);
 
             if (FileWrapper.Instance.Exists(actualPath))
             {
@@ -352,10 +410,12 @@ namespace DotNetNuke.Services.FileSystem
             {
                 var originalPosition = content.Position;
                 content.Position = 0;
+				Logger.LogDebug("UpdateFile(folder={Folder},fileName={FileName},content={Content}): content.Position → {Arg3}", folder, fileName, content, content.Position);
 
                 try
                 {
                     var intLength = content.Read(arrData, 0, arrData.Length);
+					Logger.LogError("UpdateFile(folder={Folder},fileName={FileName},content={Content}): intLength → {IntLength}", folder, fileName, content, intLength);
 
                     while (intLength > 0)
                     {
@@ -368,16 +428,22 @@ namespace DotNetNuke.Services.FileSystem
                     content.Position = originalPosition;
                 }
             }
+			Logger.LogWarning("<<< Exiting UpdateFile(folder={Folder},fileName={FileName},content={Content})", folder, fileName, content);
         }
 
         internal virtual string GetHash(IFileInfo file)
         {
+			Logger.LogError(">>> Entering GetHash(file={File})", file);
             var fileManager = new FileManager();
+			Logger.LogError("GetHash(file={File}): fileManager → {FileManager}", file, fileManager);
+			Logger.LogWarning("<<< Exiting GetHash(file={File})", file);
             return fileManager.GetHash(file);
         }
 
         internal virtual PortalSettings GetPortalSettings(int portalId)
         {
+			Logger.LogError(">>> Entering GetPortalSettings(portalId={PortalId})", portalId);
+            Logger.LogWarning("<<< Exiting GetPortalSettings(portalId={PortalId})", portalId);
             return new PortalSettings(portalId);
         }
 
@@ -388,7 +454,10 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>A windows supported path to the file.</returns>
         protected virtual string GetActualPath(FolderMappingInfo folderMapping, string folderPath, string fileName)
         {
+			Logger.LogError(">>> Entering GetActualPath(folderMapping=<redacted>,folderPath={FolderPath},fileName={FileName})", folderPath, fileName);
             var actualFolderPath = this.GetActualPath(folderMapping, folderPath);
+			Logger.LogError("GetActualPath(folderMapping=<redacted>,folderPath={FolderPath},fileName={FileName}): actualFolderPath → {ActualFolderPath}", folderPath, fileName, actualFolderPath);
+			Logger.LogWarning("<<< Exiting GetActualPath(folderMapping=<redacted>,folderPath={FolderPath},fileName={FileName})", folderPath, fileName);
             return Path.Combine(actualFolderPath, fileName);
         }
 
@@ -429,8 +498,11 @@ namespace DotNetNuke.Services.FileSystem
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected Stream GetFileStreamInternal(string filePath)
         {
+			Logger.LogError(">>> Entering GetFileStreamInternal(filePath={FilePath})", filePath);
+            var __logStart = System.Diagnostics.Stopwatch.StartNew();
             Stream stream = null;
 
+			Logger.LogError("GetFileStreamInternal(filePath={FilePath}): stream → {Stream}", filePath, stream);
             try
             {
                 stream = FileWrapper.Instance.OpenRead(filePath);
@@ -444,6 +516,8 @@ namespace DotNetNuke.Services.FileSystem
                 Logger.Error(ex);
             }
 
+			Logger.LogError("GetFileStreamInternal(filePath)={FilePath}: external service call took {Arg1} ms", filePath, __logStart.ElapsedMilliseconds);
+			Logger.LogWarning("<<< Exiting GetFileStreamInternal(filePath={FilePath})", filePath);
             return stream;
         }
 
@@ -453,6 +527,8 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>A relative path.</returns>
         protected virtual string GetRelativePath(FolderMappingInfo folderMapping, string path)
         {
+			Logger.LogError(">>> Entering GetRelativePath(folderMapping=<redacted>,path={Path})", path);
+            Logger.LogWarning("<<< Exiting GetRelativePath(folderMapping=<redacted>,path={Path})", path);
             return PathUtils.Instance.GetRelativePath(folderMapping.PortalID, path);
         }
     }

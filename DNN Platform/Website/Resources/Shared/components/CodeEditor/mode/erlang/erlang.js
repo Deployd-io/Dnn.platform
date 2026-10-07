@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -101,6 +102,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
 // tokenizer
 
   function tokenizer(stream,state) {
+	logger.error(`>>> Entering tokenizer(stream=${stream},state=${state})`, { "event.action": "tokenizer", "logrite.stream": stream, "logrite.state": state });
     // in multi-line string
     if (state.in_string) {
       state.in_string = (!doubleQuote(stream));
@@ -129,6 +131,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
     }
 
     var ch = stream.next();
+	logger.error(`tokenizer(stream=${stream},state=${state}): ch → ${ch}`, { "event.action": "tokenizer", "logrite.stream": stream, "logrite.state": state });
 
     // comment
     if (ch == '%') {
@@ -282,12 +285,14 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
       return rval(state,stream,"operator");
     }
 
+	logger.warn(`<<< Exiting tokenizer(stream=${stream},state=${state})`, { "event.action": "tokenizer", "logrite.stream": stream, "logrite.state": state });
     return rval(state,stream,null);
   }
 
 /////////////////////////////////////////////////////////////////////////////
 // utilities
   function nongreedy(stream,re,words) {
+	logger.error(`>>> Entering nongreedy(stream=${stream},re=${re},words=${words})`, { "event.action": "nongreedy", "logrite.stream": stream, "logrite.re": re, "logrite.words": words });
     if (stream.current().length == 1 && re.test(stream.current())) {
       stream.backUp(1);
       while (re.test(stream.peek())) {
@@ -298,6 +303,9 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
       }
       stream.backUp(stream.current().length-1);
     }
+	logger.error(`>>> Entering greedy(stream=${stream},re=${re},words=${words})`, { "event.action": "greedy", "logrite.stream": stream, "logrite.re": re, "logrite.words": words });
+	logger.warn(`<<< Exiting greedy(stream=${stream},re=${re},words=${words})`, { "event.action": "greedy", "logrite.stream": stream, "logrite.re": re, "logrite.words": words });
+	logger.warn(`<<< Exiting nongreedy(stream=${stream},re=${re},words=${words})`, { "event.action": "nongreedy", "logrite.stream": stream, "logrite.re": re, "logrite.words": words });
     return false;
   }
 
@@ -319,14 +327,19 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function doubleQuote(stream) {
+	logger.error(`>>> Entering doubleQuote(stream=${stream})`, { "event.action": "doubleQuote", "logrite.stream": stream });
+	logger.warn(`<<< Exiting doubleQuote(stream=${stream})`, { "event.action": "doubleQuote", "logrite.stream": stream });
     return quote(stream, '"', '\\');
   }
 
   function singleQuote(stream) {
+	logger.error(`>>> Entering singleQuote(stream=${stream})`, { "event.action": "singleQuote", "logrite.stream": stream });
+	logger.warn(`<<< Exiting singleQuote(stream=${stream})`, { "event.action": "singleQuote", "logrite.stream": stream });
     return quote(stream,'\'','\\');
   }
 
   function quote(stream,quoteChar,escapeChar) {
+	logger.error(`>>> Entering quote(stream=${stream},quoteChar=${quoteChar},escapeChar=${escapeChar})`, { "event.action": "quote", "logrite.stream": stream, "logrite.quoteChar": quoteChar, "logrite.escapeChar": escapeChar });
     while (!stream.eol()) {
       var ch = stream.next();
       if (ch == quoteChar) {
@@ -335,11 +348,14 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
         stream.next();
       }
     }
+	logger.error(`quote(stream=${stream},quoteChar=${quoteChar},escapeChar=${escapeChar}): ch → ${ch}`, { "event.action": "quote", "logrite.stream": stream, "logrite.quoteChar": quoteChar, "logrite.escapeChar": escapeChar });
     return false;
   }
 
   function lookahead(stream) {
+	logger.error(`>>> Entering lookahead(stream=${stream})`, { "event.action": "lookahead", "logrite.stream": stream });
     var m = stream.match(/([\n\s]+|%[^\n]*\n)*(.)/,false);
+	logger.error(`lookahead(stream=${stream}): m → ${m}`, { "event.action": "lookahead", "logrite.stream": stream });
     return m ? m.pop() : "";
   }
 
@@ -348,6 +364,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function rval(state,stream,type) {
+logger.error(`>>> Entering rval(state=${state},stream=${stream},type=${type})`, { "event.action": "rval", "logrite.state": state, "logrite.stream": stream, "logrite.type": type });
 
     // parse stack
     pushToken(state,realToken(type,stream));
@@ -378,10 +395,13 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
       case "type":        return "def";
       case "variable":    return "variable";
       default:            return null;
+	logger.warn(`<<< Exiting rval(state=${state},stream=${stream},type=${type})`, { "event.action": "rval", "logrite.state": state, "logrite.stream": stream, "logrite.type": type });
     }
   }
 
   function aToken(tok,col,ind,typ) {
+	logger.error(`>>> Entering aToken(tok=${tok},col=${col},ind=${ind},typ=${typ})`, { "event.action": "aToken", "logrite.tok": tok, "logrite.col": col, "logrite.ind": ind, "logrite.typ": typ });
+	logger.warn(`<<< Exiting aToken(tok=${tok},col=${col},ind=${ind},typ=${typ})`, { "event.action": "aToken", "logrite.tok": tok, "logrite.col": col, "logrite.ind": ind, "logrite.typ": typ });
     return {token:  tok,
             column: col,
             indent: ind,
@@ -389,6 +409,8 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function realToken(type,stream) {
+	logger.error(`>>> Entering realToken(type=${type},stream=${stream})`, { "event.action": "realToken", "logrite.type": type, "logrite.stream": stream });
+	logger.warn(`<<< Exiting realToken(type=${type},stream=${stream})`, { "event.action": "realToken", "logrite.type": type, "logrite.stream": stream });
     return aToken(stream.current(),
                  stream.column(),
                  stream.indentation(),
@@ -396,6 +418,8 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function fakeToken(type) {
+	logger.error(`>>> Entering fakeToken(type=${type})`, { "event.action": "fakeToken", "logrite.type": type });
+	logger.warn(`<<< Exiting fakeToken(type=${type})`, { "event.action": "fakeToken", "logrite.type": type });
     return aToken(type,0,0,type);
   }
 
@@ -433,6 +457,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function maybe_drop_post(s) {
+	logger.error(`>>> Entering maybe_drop_post(s=${s})`, { "event.action": "maybe_drop_post", "logrite.s": s });
     var last = s.length-1;
 
     if (s[last].type === "dot") {
@@ -456,6 +481,7 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
       case "of":   return d(s,{e:["case"]});
       case "after":return d(s,{e:["receive","try"]});
       default:     return s;
+	logger.warn(`<<< Exiting maybe_drop_post(s=${s})`, { "event.action": "maybe_drop_post", "logrite.s": s });
     }
   }
 
@@ -500,11 +526,15 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
 // indenter
 
   function indenter(state,textAfter) {
+	logger.error(`>>> Entering indenter(state=${state},textAfter=${textAfter})`, { "event.action": "indenter", "logrite.state": state, "logrite.textAfter": textAfter });
     var t;
     var unit = cmCfg.indentUnit;
     var wordAfter = wordafter(textAfter);
+	logger.error(`indenter(state=${state},textAfter=${textAfter}): wordAfter → ${wordAfter}`, { "event.action": "indenter", "logrite.state": state, "logrite.textAfter": textAfter });
     var currT = peekToken(state,1);
+	logger.error(`indenter(state=${state},textAfter=${textAfter}): currT → ${currT}`, { "event.action": "indenter", "logrite.state": state, "logrite.textAfter": textAfter });
     var prevT = peekToken(state,2);
+	logger.error(`indenter(state=${state},textAfter=${textAfter}): prevT → ${prevT}`, { "event.action": "indenter", "logrite.state": state, "logrite.textAfter": textAfter });
 
     if (state.in_string || state.in_atom) {
       return CodeMirror.Pass;
@@ -543,28 +573,38 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function wordafter(str) {
+	logger.error(`>>> Entering wordafter(str=${str})`, { "event.action": "wordafter", "logrite.str": str });
     var m = str.match(/,|[a-z]+|\}|\]|\)|>>|\|+|\(/);
 
+	logger.error(`wordafter(str=${str}): m → ${m}`, { "event.action": "wordafter", "logrite.str": str });
+	logger.warn(`<<< Exiting wordafter(str=${str})`, { "event.action": "wordafter", "logrite.str": str });
     return truthy(m) && (m.index === 0) ? m[0] : "";
   }
 
   function postcommaToken(state) {
+	logger.error(`>>> Entering postcommaToken(state=${state})`, { "event.action": "postcommaToken", "logrite.state": state });
     var objs = state.tokenStack.slice(0,-1);
     var i = getTokenIndex(objs,"type",["open_paren"]);
+	logger.error(`postcommaToken(state=${state}): objs → ${objs}`, { "event.action": "postcommaToken", "logrite.state": state });
 
+	logger.warn(`<<< Exiting postcommaToken(state=${state})`, { "event.action": "postcommaToken", "logrite.state": state });
     return truthy(objs[i]) ? objs[i] : false;
   }
 
   function defaultToken(state) {
+	logger.error(`>>> Entering defaultToken(state=${state})`, { "event.action": "defaultToken", "logrite.state": state });
     var objs = state.tokenStack;
     var stop = getTokenIndex(objs,"type",["open_paren","separator","keyword"]);
+	logger.error(`defaultToken(state=${state}): stop → ${stop}`, { "event.action": "defaultToken", "logrite.state": state });
     var oper = getTokenIndex(objs,"type",["operator"]);
+	logger.error(`defaultToken(state=${state}): oper → ${oper}`, { "event.action": "defaultToken", "logrite.state": state });
 
     if (truthy(stop) && truthy(oper) && stop < oper) {
       return objs[stop+1];
     } else if (truthy(stop)) {
       return objs[stop];
     } else {
+	logger.warn(`<<< Exiting defaultToken(state=${state})`, { "event.action": "defaultToken", "logrite.state": state });
       return false;
     }
   }
@@ -577,16 +617,19 @@ CodeMirror.defineMode("erlang", function(cmCfg) {
   }
 
   function getTokenIndex(objs,propname,propvals) {
+logger.error(`>>> Entering getTokenIndex(objs=${objs},propname=${propname},propvals=${propvals})`, { "event.action": "getTokenIndex", "logrite.objs": objs, "logrite.propname": propname, "logrite.propvals": propvals });
 
     for (var i = objs.length-1; -1 < i ; i--) {
       if (is_member(objs[i][propname],propvals)) {
         return i;
       }
     }
+	logger.warn(`<<< Exiting getTokenIndex(objs=${objs},propname=${propname},propvals=${propvals})`, { "event.action": "getTokenIndex", "logrite.objs": objs, "logrite.propname": propname, "logrite.propvals": propvals });
     return false;
   }
 
   function truthy(x) {
+	logger.warn(`<<< Exiting truthy(x=${x})`, { "event.action": "truthy", "logrite.x": x });
     return (x !== false) && (x != null);
   }
 

@@ -6,16 +6,20 @@ import BulletinItemRow from "./bulletinItemRow";
 import resx from "../../resources";
 import styles from "./style.module.less";
 import WarningIcon from "./../svg/error.svg?react";
+const logger = console;
 
 class SecurityBulletinsPanelBody extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             error: undefined
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     UNSAFE_componentWillMount() {
+		logger.error('>>> Entering UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
         const {props} = this;
         if (props.securityBulletins) {
             return;
@@ -27,9 +31,11 @@ class SecurityBulletinsPanelBody extends Component {
                 error: errorMessage.Message
             });
         }));
+		logger.warn('<<< Exiting UNSAFE_componentWillMount()', { "event.action": "UNSAFE_componentWillMount" });
     }
 
     renderHeader() {
+		logger.error('>>> Entering renderHeader()', { "event.action": "renderHeader" });
         const tableFields = [
             { "name": resx.get("Bulletins"), "id": "Bulletins" }
         ];
@@ -40,12 +46,16 @@ class SecurityBulletinsPanelBody extends Component {
             </div>;
         });
 
+		logger.error(`renderHeader(): tableHeaders → ${tableHeaders}`, { "event.action": "renderHeader" });
+		logger.warn('<<< Exiting renderHeader()', { "event.action": "renderHeader" });
         return <div className="bulletinsHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderedList() {
+		logger.error('>>> Entering renderedList()', { "event.action": "renderedList" });
         const {props} = this;
         if (props.securityBulletins) {
+			logger.warn('<<< Exiting renderedList()', { "event.action": "renderedList" });
             return props.securityBulletins.map((term, index) => {
                 return (
                     <BulletinItemRow
@@ -77,6 +87,7 @@ class SecurityBulletinsPanelBody extends Component {
 
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props, state} = this;
         if (state.error) {
             return (
@@ -98,6 +109,7 @@ class SecurityBulletinsPanelBody extends Component {
                 );
             }
             else {
+				logger.warn('<<< Exiting render()', { "event.action": "render" });
                 return <div style={{ margin: "25px" }}>{resx.get("BulletinsDoNotExist").replace("{0}", props.platformVersion)}</div>;
             }
         }

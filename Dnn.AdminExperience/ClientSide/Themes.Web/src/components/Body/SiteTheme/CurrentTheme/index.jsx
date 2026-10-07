@@ -4,15 +4,19 @@ import { connect } from "react-redux";
 import SvgIcon from "../../SvgIcon";
 
 import "./style.less";
+const logger = console;
 
 class CurrentTheme extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {};
+		logger.debug(`constructor(): this.state → ${this.state}`, { "event.action": "constructor" });
     }
 
 
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {props} = this;
 
         return (
@@ -29,6 +33,7 @@ class CurrentTheme extends Component {
                 }
             </div>
         );
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
     }
 }
 
@@ -38,6 +43,8 @@ CurrentTheme.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.error(`>>> Entering mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
+	logger.warn(`<<< Exiting mapStateToProps(state=${state})`, { "event.action": "mapStateToProps", "logrite.state": state });
     return {
         currentTheme: state.theme.currentTheme
     };

@@ -40,6 +40,8 @@ namespace DotNetNuke.Common.Lists
         public ListController()
             : this(null, null)
         {
+		eventLogger.LogError(">>> Entering ListController()");
+        eventLogger.LogWarning("<<< Exiting ListController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ListController"/> class.</summary>
@@ -62,6 +64,7 @@ namespace DotNetNuke.Common.Lists
         /// <returns>The entry id.</returns>
         public int AddListEntry(ListEntryInfo listEntry)
         {
+			eventLogger.LogError(">>> Entering AddListEntry(listEntry={ListEntry})", listEntry);
             bool enableSortOrder = listEntry.SortOrder > 0;
             ClearListCache(listEntry.PortalID);
             int entryId = DataProvider.Instance().AddListEntry(
@@ -116,6 +119,7 @@ namespace DotNetNuke.Common.Lists
             }
 
             ClearEntriesCache(listEntry.ListName, listEntry.PortalID);
+			eventLogger.LogWarning("<<< Exiting AddListEntry(listEntry={ListEntry})", listEntry);
             return entryId;
         }
 
@@ -124,7 +128,9 @@ namespace DotNetNuke.Common.Lists
         /// <param name="parentKey">The parent key for the list to delete.</param>
         public void DeleteList(string listName, string parentKey)
         {
+			eventLogger.LogError(">>> Entering DeleteList(listName={ListName},parentKey={ParentKey})", listName, parentKey);
             this.DeleteList(listName, parentKey, Null.NullInteger);
+			eventLogger.LogWarning("<<< Exiting DeleteList(listName={ListName},parentKey={ParentKey})", listName, parentKey);
         }
 
         /// <summary>Deletes a list.</summary>
@@ -133,14 +139,17 @@ namespace DotNetNuke.Common.Lists
         /// <param name="portalId">The id of the site (portal) on which to delete the list.</param>
         public void DeleteList(string listName, string parentKey, int portalId)
         {
+			eventLogger.LogError(">>> Entering DeleteList(listName={ListName},parentKey={ParentKey},portalId={PortalId})", listName, parentKey, portalId);
             ListInfo list = this.GetListInfo(listName, parentKey, portalId);
 
+			eventLogger.LogError("DeleteList(listName={ListName},parentKey={ParentKey},portalId={PortalId}): list → {List}", listName, parentKey, portalId, list);
             this.eventLogger.AddLog(
                 "ListName",
                 listName,
                 PortalController.Instance.GetCurrentSettings(),
                 UserController.Instance.GetCurrentUserInfo().UserID,
                 EventLogType.LISTENTRY_DELETED);
+				eventLogger.LogWarning("<<< Exiting DeleteList(listName={ListName},parentKey={ParentKey})", listName, parentKey);
 
             DataProvider.Instance().DeleteList(listName, parentKey);
             if (list != null)
@@ -148,6 +157,7 @@ namespace DotNetNuke.Common.Lists
                 ClearListCache(list.PortalID);
                 ClearEntriesCache(list.Name, list.PortalID);
             }
+			eventLogger.LogWarning("<<< Exiting DeleteList(listName={ListName},parentKey={ParentKey},portalId={PortalId})", listName, parentKey, portalId);
         }
 
         /// <summary>Deletes a list.</summary>
@@ -155,6 +165,7 @@ namespace DotNetNuke.Common.Lists
         /// <param name="includeChildren">A value indicating whether to also delete the children items for this list.</param>
         public void DeleteList(ListInfo list, bool includeChildren)
         {
+			eventLogger.LogError(">>> Entering DeleteList(list={List},includeChildren={IncludeChildren})", list, includeChildren);
             if (list == null)
             {
                 return;
@@ -186,10 +197,12 @@ namespace DotNetNuke.Common.Lists
         /// <param name="deleteChild">A value indicating whether to also delete the children of that item.</param>
         public void DeleteListEntryByID(int entryId, bool deleteChild)
         {
+			eventLogger.LogError(">>> Entering DeleteListEntryByID(entryId={EntryId},deleteChild={DeleteChild})", entryId, deleteChild);
             ListEntryInfo entry = this.GetListEntryInfo(entryId);
             DataProvider.Instance().DeleteListEntryByID(entryId, deleteChild);
             ClearListCache(entry.PortalID);
             ClearEntriesCache(entry.ListName, entry.PortalID);
+			eventLogger.LogWarning("<<< Exiting DeleteListEntryByID(entryId={EntryId},deleteChild={DeleteChild})", entryId, deleteChild);
         }
 
         /// <summary>Deletes a list entry by its name.</summary>
@@ -198,10 +211,12 @@ namespace DotNetNuke.Common.Lists
         /// <param name="deleteChild">A value indicating whether to also delete the children of that item.</param>
         public void DeleteListEntryByListName(string listName, string listValue, bool deleteChild)
         {
+			eventLogger.LogError(">>> Entering DeleteListEntryByListName(listName={ListName},listValue={ListValue},deleteChild={DeleteChild})", listName, listValue, deleteChild);
             ListEntryInfo entry = this.GetListEntryInfo(listName, listValue);
             DataProvider.Instance().DeleteListEntryByListName(listName, listValue, deleteChild);
             ClearListCache(entry.PortalID);
             ClearEntriesCache(listName, entry.PortalID);
+			eventLogger.LogWarning("<<< Exiting DeleteListEntryByListName(listName={ListName},listValue={ListValue},deleteChild={DeleteChild})", listName, listValue, deleteChild);
         }
 
         /// <summary>Gets a list entry information.</summary>
@@ -210,6 +225,10 @@ namespace DotNetNuke.Common.Lists
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public ListEntryInfo GetListEntryInfo(int entryId)
         {
+			eventLogger.LogError(">>> Entering GetListEntryInfo(entryId={EntryId})", entryId);
+            eventLogger.LogWarning("<<< Exiting GetListEntryInfo(entryId={EntryId})", entryId);
+			eventLogger.LogWarning("<<< Exiting GetListEntryInfo(listName={ListName},entryId={EntryId})", listName, entryId);
+			eventLogger.LogWarning("<<< Exiting GetListEntryInfo(listName={ListName},listValue={ListValue})", listName, listValue);
             return CBO.FillObject<ListEntryInfo>(DataProvider.Instance().GetListEntry(entryId));
         }
 
@@ -239,6 +258,10 @@ namespace DotNetNuke.Common.Lists
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public IEnumerable<ListEntryInfo> GetListEntryInfoItems(string listName)
         {
+			eventLogger.LogError(">>> Entering GetListEntryInfoItems(listName={ListName})", listName);
+            eventLogger.LogWarning("<<< Exiting GetListEntryInfoItems(listName={ListName})", listName);
+			eventLogger.LogWarning("<<< Exiting GetListEntryInfoItems(listName={ListName},parentKey={ParentKey})", listName, parentKey);
+			eventLogger.LogWarning("<<< Exiting GetListEntryInfoItems(listName={ListName},parentKey={ParentKey},portalId={PortalId})", listName, parentKey, portalId);
             return GetListEntries(this.hostSettings, listName, Null.NullInteger);
         }
 
@@ -295,6 +318,9 @@ namespace DotNetNuke.Common.Lists
         /// <returns><see cref="ListInfo"/>.</returns>
         public ListInfo GetListInfo(string listName)
         {
+			eventLogger.LogError(">>> Entering GetListInfo(listName={ListName})", listName);
+            eventLogger.LogWarning("<<< Exiting GetListInfo(listName={ListName})", listName);
+			eventLogger.LogWarning("<<< Exiting GetListInfo(listName={ListName},parentKey={ParentKey},portalId={PortalId})", listName, parentKey, portalId);
             return this.GetListInfo(listName, string.Empty);
         }
 
@@ -344,6 +370,9 @@ namespace DotNetNuke.Common.Lists
         /// <returns><see cref="ListInfoCollection"/>.</returns>
         public ListInfoCollection GetListInfoCollection()
         {
+			eventLogger.LogError(">>> Entering GetListInfoCollection()");
+            eventLogger.LogWarning("<<< Exiting GetListInfoCollection()");
+			eventLogger.LogWarning("<<< Exiting GetListInfoCollection(listName={ListName},parentKey={ParentKey},portalId={PortalId})", listName, parentKey, portalId);
             return this.GetListInfoCollection(string.Empty);
         }
 
@@ -394,6 +423,7 @@ namespace DotNetNuke.Common.Lists
         /// <param name="listEntry">The list entry info item to update.</param>
         public void UpdateListEntry(ListEntryInfo listEntry)
         {
+			eventLogger.LogError(">>> Entering UpdateListEntry(listEntry={ListEntry})", listEntry);
             if (Thread.CurrentThread.CurrentCulture.Name == Localization.SystemLocale || UnLocalizableLists.Contains(listEntry.ListName))
             {
                 DataProvider.Instance().UpdateListEntry(listEntry.EntryID, listEntry.Value, listEntry.TextNonLocalized, listEntry.Description, UserController.Instance.GetCurrentUserInfo().UserID);
@@ -401,6 +431,7 @@ namespace DotNetNuke.Common.Lists
             else
             {
                 var oldItem = this.GetListEntryInfo(listEntry.EntryID); // look up existing db record to be able to just update the value or description and not touch the en-US text value
+				eventLogger.LogError("UpdateListEntry(listEntry={ListEntry}): oldItem → {OldItem}", listEntry, oldItem);
                 DataProvider.Instance().UpdateListEntry(listEntry.EntryID, listEntry.Value, oldItem.TextNonLocalized, listEntry.Description, UserController.Instance.GetCurrentUserInfo().UserID);
 
                 var key = string.IsNullOrEmpty(listEntry.ParentKey)
@@ -427,6 +458,7 @@ namespace DotNetNuke.Common.Lists
 
             ClearListCache(listEntry.PortalID);
             ClearEntriesCache(listEntry.ListName, listEntry.PortalID);
+			eventLogger.LogWarning("<<< Exiting UpdateListEntry(listEntry={ListEntry})", listEntry);
         }
 
         /// <summary>Updates a list sort order.</summary>
@@ -434,10 +466,13 @@ namespace DotNetNuke.Common.Lists
         /// <param name="moveUp">The entry is moved up if <see langword="true"/> or moved down if <see langword="false"/>.</param>
         public void UpdateListSortOrder(int entryID, bool moveUp)
         {
+			eventLogger.LogError(">>> Entering UpdateListSortOrder(entryID={EntryID},moveUp={MoveUp})", entryID, moveUp);
             DataProvider.Instance().UpdateListSortOrder(entryID, moveUp);
             ListEntryInfo entry = this.GetListEntryInfo(entryID);
+			eventLogger.LogError("UpdateListSortOrder(entryID={EntryID},moveUp={MoveUp}): entry → {Entry}", entryID, moveUp, entry);
             ClearListCache(entry.PortalID);
             ClearEntriesCache(entry.ListName, entry.PortalID);
+			eventLogger.LogWarning("<<< Exiting UpdateListSortOrder(entryID={EntryID},moveUp={MoveUp})", entryID, moveUp);
         }
 
         private static Dictionary<string, ListEntryInfo> ListEntryInfoItemsToDictionary(IEnumerable<ListEntryInfo> items)
@@ -450,21 +485,28 @@ namespace DotNetNuke.Common.Lists
 
         private static void ClearListCache(int portalId)
         {
+			eventLogger.LogError(">>> Entering ClearListCache(portalId={PortalId})", portalId);
             DataCache.ClearListsCache(portalId);
+			eventLogger.LogWarning("<<< Exiting ClearListCache(portalId={PortalId})", portalId);
         }
 
         private static void ClearEntriesCache(string listName, int portalId)
         {
+			eventLogger.LogError(">>> Entering ClearEntriesCache(listName={ListName},portalId={PortalId})", listName, portalId);
             string cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.ListEntriesCacheKey, portalId, listName);
+			eventLogger.LogWarning("<<< Exiting ClearEntriesCache(listName={ListName},portalId={PortalId})", listName, portalId);
             DataCache.RemoveCache(cacheKey);
         }
 
         private static ListInfo FillListInfo(IDataReader dr, bool checkForOpenDataReader)
         {
+			eventLogger.LogError(">>> Entering FillListInfo(dr={Dr},checkForOpenDataReader={CheckForOpenDataReader})", dr, checkForOpenDataReader);
             ListInfo list = null;
 
+			eventLogger.LogError("FillListInfo(dr={Dr},checkForOpenDataReader={CheckForOpenDataReader}): list → {List}", dr, checkForOpenDataReader, list);
             // read datareader
             bool canContinue = true;
+			eventLogger.LogError("FillListInfo(dr={Dr},checkForOpenDataReader={CheckForOpenDataReader}): canContinue → {CanContinue}", dr, checkForOpenDataReader, canContinue);
             if (checkForOpenDataReader)
             {
                 canContinue = false;
@@ -491,6 +533,7 @@ namespace DotNetNuke.Common.Lists
                 }
             }
 
+			eventLogger.LogWarning("<<< Exiting FillListInfo(dr={Dr},checkForOpenDataReader={CheckForOpenDataReader})", dr, checkForOpenDataReader);
             return list;
         }
 
@@ -533,7 +576,9 @@ namespace DotNetNuke.Common.Lists
 
         private static IEnumerable<ListEntryInfo> GetListEntries(IHostSettings hostSettings, string listName, int portalId)
         {
+			eventLogger.LogError(">>> Entering GetListEntries(hostSettings={HostSettings},listName={ListName},portalId={PortalId})", hostSettings, listName, portalId);
             string cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.ListEntriesCacheKey, portalId, listName);
+			eventLogger.LogWarning("<<< Exiting GetListEntries(hostSettings={HostSettings},listName={ListName},portalId={PortalId})", hostSettings, listName, portalId);
             return CBO.GetCachedObject<IEnumerable<ListEntryInfo>>(
                 hostSettings,
                 new CacheItemArgs(cacheKey, DataCache.ListsCacheTimeOut, DataCache.ListsCachePriority),

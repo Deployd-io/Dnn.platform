@@ -29,6 +29,7 @@ namespace DotNetNuke.Services.Installer
     /// </summary>
     public class Util
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Util));
         // ReSharper disable InconsistentNaming
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1310:FieldNamesMustNotContainUnderscore", Justification = "Breaking Change")]
         [SuppressMessage("Microsoft.Design", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Breaking change")]
@@ -577,7 +578,9 @@ namespace DotNetNuke.Services.Installer
         /// <param name="log">A Logger to log the result.</param>
         public static void DeleteFile(InstallFile installFile, string basePath, Logger log)
         {
+			Logger.LogError(">>> Entering DeleteFile(installFile={InstallFile},basePath={BasePath},log={Log})", installFile, basePath, log);
             DeleteFile(installFile.FullName, basePath, log);
+			Logger.LogWarning("<<< Exiting DeleteFile(installFile={InstallFile},basePath={BasePath},log={Log})", installFile, basePath, log);
         }
 
         /// <summary>The DeleteFile method deletes a file.</summary>
@@ -586,15 +589,18 @@ namespace DotNetNuke.Services.Installer
         /// <param name="log">A Logger to log the result.</param>
         public static void DeleteFile(string fileName, string basePath, Logger log)
         {
+			Logger.LogError(">>> Entering DeleteFile(fileName={FileName},basePath={BasePath},log={Log})", fileName, basePath, log);
             string fullFileName = Path.Combine(basePath, fileName);
             if (File.Exists(fullFileName))
             {
+				Logger.LogWarning("<<< Exiting DeleteFile(installFile={InstallFile},basePath={BasePath},log={Log})", installFile, basePath, log);
                 RetryableAction.RetryEverySecondFor30Seconds(() => FileSystemUtils.DeleteFile(fullFileName), "Delete file " + fullFileName);
                 log.AddInfo(string.Format(CultureInfo.InvariantCulture, FILE_Deleted, fileName));
                 string folderName = Path.GetDirectoryName(fullFileName);
                 if (folderName != null)
                 {
                     var folder = new DirectoryInfo(folderName);
+					Logger.LogError("DeleteFile(fileName={FileName},basePath={BasePath},log={Log}): folder → {Folder}", fileName, basePath, log, folder);
                     TryDeleteFolder(folder, log);
                 }
             }
@@ -608,11 +614,14 @@ namespace DotNetNuke.Services.Installer
         /// <returns>The localized string.</returns>
         public static string GetLocalizedString(string key)
         {
+			Logger.LogError(">>> Entering GetLocalizedString(key={Key})", key);
+            Logger.LogWarning("<<< Exiting GetLocalizedString(key={Key})", key);
             return Localization.GetString(key, Localization.SharedResourceFile);
         }
 
         public static bool IsFileValid(InstallFile file, string packageWhiteList)
         {
+			Logger.LogError(">>> Entering IsFileValid(file={File},packageWhiteList={PackageWhiteList})", file, packageWhiteList);
             // Check the White List
             FileExtensionWhitelist whiteList = Host.AllowedExtensionWhitelist;
 
@@ -624,6 +633,7 @@ namespace DotNetNuke.Services.Installer
                 || (packageWhiteList.Contains("*dataprovider", StringComparison.OrdinalIgnoreCase) && strExtension.EndsWith("dataprovider", StringComparison.OrdinalIgnoreCase)))
             {
                 // Install File is Valid
+			Logger.LogWarning("<<< Exiting IsFileValid(file={File},packageWhiteList={PackageWhiteList})", file, packageWhiteList);
                 return true;
             }
 
@@ -639,6 +649,7 @@ namespace DotNetNuke.Services.Installer
         /// <returns>The localized string.</returns>
         public static string InstallURL(int tabId, string type)
         {
+			Logger.LogError(">>> Entering InstallURL(tabId={TabId},type={Type})", tabId, type);
             var parameters = new string[2];
             parameters[0] = "rtab=" + tabId;
             if (!string.IsNullOrEmpty(type))
@@ -647,6 +658,10 @@ namespace DotNetNuke.Services.Installer
             }
 
             var context = new ModuleInstanceContext();
+			Logger.LogError("InstallURL(tabId={TabId},type={Type}): context → {Context}", tabId, type, context);
+			Logger.LogWarning("<<< Exiting InstallURL(tabId={TabId},type={Type})", tabId, type);
+			Logger.LogWarning("<<< Exiting InstallURL(tabId={TabId},returnUrl={ReturnUrl},type={Type})", tabId, returnUrl, type);
+			Logger.LogWarning("<<< Exiting InstallURL(tabId={TabId},returnUrl={ReturnUrl},type={Type},package={Package})", tabId, returnUrl, type, package);
             return context.NavigateUrl(tabId, "Install", false, parameters);
         }
 
@@ -693,11 +708,15 @@ namespace DotNetNuke.Services.Installer
 
         public static string UnInstallURL(int tabId, int packageId, string returnUrl)
         {
+			Logger.LogError(">>> Entering UnInstallURL(tabId={TabId},packageId={PackageId},returnUrl={ReturnUrl})", tabId, packageId, returnUrl);
             var parameters = new string[3];
             parameters[0] = "rtab=" + tabId;
             parameters[1] = "returnUrl=" + returnUrl;
             parameters[2] = "packageId=" + packageId;
             var context = new ModuleInstanceContext();
+			Logger.LogError("UnInstallURL(tabId={TabId},packageId={PackageId},returnUrl={ReturnUrl}): context → {Context}", tabId, packageId, returnUrl, context);
+			Logger.LogWarning("<<< Exiting UnInstallURL(tabId={TabId},packageId={PackageId},returnUrl={ReturnUrl})", tabId, packageId, returnUrl);
+			Logger.LogWarning("<<< Exiting UnInstallURL(tabId={TabId},packageId={PackageId})", tabId, packageId);
             return context.NavigateUrl(tabId, "UnInstall", true, parameters);
         }
 
@@ -710,38 +729,48 @@ namespace DotNetNuke.Services.Installer
         /// <returns>The localized string.</returns>
         public static string PackageWriterURL(ModuleInstanceContext context, int packageId)
         {
+			Logger.LogError(">>> Entering PackageWriterURL(context={Context},packageId={PackageId})", context, packageId);
             var parameters = new string[3];
             parameters[0] = "rtab=" + context.TabId;
             parameters[1] = "packageId=" + packageId;
             parameters[2] = "mid=" + context.ModuleId;
 
+			Logger.LogWarning("<<< Exiting PackageWriterURL(context={Context},packageId={PackageId})", context, packageId);
             return context.NavigateUrl(context.TabId, "PackageWriter", true, parameters);
         }
 
         public static string ParsePackageIconFileName(PackageInfo package)
         {
+			Logger.LogError(">>> Entering ParsePackageIconFileName(package={Package})", package);
             var filename = string.Empty;
+			Logger.LogError("ParsePackageIconFileName(package={Package}): filename → {Filename}", package, filename);
             if ((package.IconFile != null) && (package.PackageType.Equals("Module", StringComparison.OrdinalIgnoreCase) || package.PackageType.Equals("Auth_System", StringComparison.OrdinalIgnoreCase) || package.PackageType.Equals("Container", StringComparison.OrdinalIgnoreCase) || package.PackageType.Equals("Skin", StringComparison.OrdinalIgnoreCase)))
             {
                 filename = package.IconFile.StartsWith("~/" + package.FolderName, StringComparison.OrdinalIgnoreCase) ? package.IconFile.Remove(0, ("~/" + package.FolderName).Length).TrimStart('/') : package.IconFile;
             }
 
+			Logger.LogWarning("<<< Exiting ParsePackageIconFileName(package={Package})", package);
             return filename;
         }
 
         public static string ParsePackageIconFile(PackageInfo package)
         {
+			Logger.LogError(">>> Entering ParsePackageIconFile(package={Package})", package);
             var iconFile = string.Empty;
+			Logger.LogError("ParsePackageIconFile(package={Package}): iconFile → {IconFile}", package, iconFile);
             if ((package.IconFile != null) && (package.PackageType.Equals("Module", StringComparison.OrdinalIgnoreCase) || package.PackageType.Equals("Auth_System", StringComparison.OrdinalIgnoreCase) || package.PackageType.Equals("Container", StringComparison.OrdinalIgnoreCase) || package.PackageType.Equals("Skin", StringComparison.OrdinalIgnoreCase)))
             {
                 iconFile = !package.IconFile.StartsWith("~/", StringComparison.Ordinal) ? $"~/{package.FolderName}/{package.IconFile}" : package.IconFile;
             }
 
+			Logger.LogWarning("<<< Exiting ParsePackageIconFile(package={Package})", package);
             return iconFile;
         }
 
         public static string ReadAttribute(XPathNavigator nav, string attributeName)
         {
+			Logger.LogError(">>> Entering ReadAttribute(nav={Nav},attributeName={AttributeName})", nav, attributeName);
+            Logger.LogWarning("<<< Exiting ReadAttribute(nav={Nav},attributeName={AttributeName})", nav, attributeName);
             return ValidateNode(nav.GetAttribute(attributeName, string.Empty), false, null, string.Empty, string.Empty);
         }
 
@@ -757,34 +786,43 @@ namespace DotNetNuke.Services.Installer
 
         public static string GetPackageBackupName(PackageInfo package)
         {
+			Logger.LogError(">>> Entering GetPackageBackupName(package={Package})", package);
             var packageName = package.Name;
             var version = package.Version;
             var packageType = package.PackageType;
 
             var fileName = $"{packageType}_{packageName}_{version}.resources";
+			Logger.LogError("GetPackageBackupName(package={Package}): fileName → {FileName}", package, fileName);
             if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) > Null.NullInteger)
             {
                 fileName = Globals.CleanFileName(fileName);
             }
 
+			Logger.LogWarning("<<< Exiting GetPackageBackupName(package={Package})", package);
             return fileName;
         }
 
         public static string GetPackageBackupPath(PackageInfo package)
         {
+			Logger.LogError(">>> Entering GetPackageBackupPath(package={Package})", package);
             var fileName = GetPackageBackupName(package);
             var folderPath = Path.Combine(Globals.ApplicationMapPath, Util.BackupInstallPackageFolder);
+			Logger.LogError("GetPackageBackupPath(package={Package}): folderPath → {FolderPath}", package, folderPath);
+			Logger.LogError("GetPackageBackupPath(package={Package}): fileName → {FileName}", package, fileName);
 
             if (!Directory.Exists(folderPath))
             {
                 Directory.CreateDirectory(folderPath);
             }
 
+			Logger.LogWarning("<<< Exiting GetPackageBackupPath(package={Package})", package);
             return Path.Combine(folderPath, fileName);
         }
 
         public static string ReadElement(XPathNavigator nav, string elementName)
         {
+			Logger.LogError(">>> Entering ReadElement(nav={Nav},elementName={ElementName})", nav, elementName);
+            Logger.LogWarning("<<< Exiting ReadElement(nav={Nav},elementName={ElementName})", nav, elementName);
             return ValidateNode(XmlUtils.GetNodeValue(nav, elementName), false, null, string.Empty, string.Empty);
         }
 
@@ -809,6 +847,7 @@ namespace DotNetNuke.Services.Installer
         /// <param name="log">A Logger to log the result.</param>
         public static void RestoreFile(InstallFile installFile, string basePath, Logger log)
         {
+			Logger.LogError(">>> Entering RestoreFile(installFile={InstallFile},basePath={BasePath},log={Log})", installFile, basePath, log);
             string fullFileName = Path.Combine(basePath, installFile.FullName);
             string backupFileName = Path.Combine(installFile.BackupPath, installFile.Name + ".config");
 
@@ -816,6 +855,7 @@ namespace DotNetNuke.Services.Installer
             FileSystemUtils.CopyFile(backupFileName, fullFileName);
 
             log.AddInfo(string.Format(CultureInfo.InvariantCulture, FILE_RestoreBackup, installFile.FullName));
+			Logger.LogWarning("<<< Exiting RestoreFile(installFile={InstallFile},basePath={BasePath},log={Log})", installFile, basePath, log);
         }
 
         /// <summary>
@@ -839,7 +879,9 @@ namespace DotNetNuke.Services.Installer
         /// <param name="destFileName">The Destination file.</param>
         public static void WriteStream(Stream sourceStream, string destFileName)
         {
+			Logger.LogError(">>> Entering WriteStream(sourceStream={SourceStream},destFileName={DestFileName})", sourceStream, destFileName);
             var file = new FileInfo(destFileName);
+			Logger.LogError("WriteStream(sourceStream={SourceStream},destFileName={DestFileName}): file → {File}", sourceStream, destFileName, file);
             if (file.Directory != null && !file.Directory.Exists)
             {
                 file.Directory.Create();
@@ -847,6 +889,7 @@ namespace DotNetNuke.Services.Installer
 
             // HACK: Temporary fix, upping retry limit due to locking for existing filesystem access.  This "fixes" azure, but isn't the most elegant
             TryToCreateAndExecute(destFileName, (f) => StreamToStream(sourceStream, f), 3500);
+			Logger.LogWarning("<<< Exiting WriteStream(sourceStream={SourceStream},destFileName={DestFileName})", sourceStream, destFileName);
         }
 
         /// <summary>Try to create file and perform an action on a file until a specific amount of time.</summary>
@@ -856,11 +899,15 @@ namespace DotNetNuke.Services.Installer
         /// <returns>true if action occur and false otherwise.</returns>
         public static bool TryToCreateAndExecute(string path, Action<FileStream> action, int milliSecondMax = Timeout.Infinite)
         {
+			Logger.LogError(">>> Entering TryToCreateAndExecute(path={Path},action={Action},milliSecondMax={MilliSecondMax})", path, action, milliSecondMax);
             var started = DateTime.UtcNow;
             var fullPath = Path.GetFullPath(path);
+			Logger.LogError("TryToCreateAndExecute(path={Path},action={Action},milliSecondMax={MilliSecondMax}): fullPath → {FullPath}", path, action, milliSecondMax, fullPath);
             var directory = Path.GetDirectoryName(fullPath)!;
+			Logger.LogError("TryToCreateAndExecute(path={Path},action={Action},milliSecondMax={MilliSecondMax}): directory → {Directory}", path, action, milliSecondMax, directory);
 
             AutoResetEvent gate = null;
+			Logger.LogError("TryToCreateAndExecute(path={Path},action={Action},milliSecondMax={MilliSecondMax}): gate → {Gate}", path, action, milliSecondMax, gate);
             FileSystemWatcher watcher = null;
             FileSystemEventHandler changedHandler = null;
             RenamedEventHandler renamedHandler = null;
@@ -873,11 +920,13 @@ namespace DotNetNuke.Services.Installer
                     {
                         // Open for create with shared read/write; dispose via using
                         using var file = File.Open(fullPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+						Logger.LogError("TryToCreateAndExecute(path={Path},action={Action},milliSecondMax={MilliSecondMax}): file → {File}", path, action, milliSecondMax, file);
                         action(file);
                         return true;
                     }
                     catch (IOException)
                     {
+						Logger.LogError("Exception in TryToCreateAndExecute(path={Path},action={Action},milliSecondMax={MilliSecondMax}): {Arg3}", path, action, milliSecondMax, IOException.Message);
                         // Lazily create the wait handle + watcher once
                         if (gate is null)
                         {
@@ -918,9 +967,11 @@ namespace DotNetNuke.Services.Installer
 
                         // Compute remaining time correctly
                         int waitMs = Timeout.Infinite;
+						Logger.LogError("TryToCreateAndExecute(path={Path},action={Action},milliSecondMax={MilliSecondMax}): waitMs → {WaitMs}", path, action, milliSecondMax, waitMs);
                         if (milliSecondMax != Timeout.Infinite)
                         {
                             var elapsed = (int)(DateTime.UtcNow - started).TotalMilliseconds;
+							Logger.LogError("TryToCreateAndExecute(path={Path},action={Action},milliSecondMax={MilliSecondMax}): elapsed → {Elapsed}", path, action, milliSecondMax, elapsed);
                             var remaining = milliSecondMax - elapsed;
                             if (remaining <= 0)
                             {
@@ -953,6 +1004,9 @@ namespace DotNetNuke.Services.Installer
 
         public static WebResponse GetExternalRequest(string url, byte[] data, string username, string password, string domain, string proxyAddress, int proxyPort, bool doPOST, string userAgent, string referer, out string filename)
         {
+			Logger.LogError(">>> Entering GetExternalRequest(url={Url},data={Data},username={Username},password=<redacted>,domain={Domain},proxyAddress={ProxyAddress},proxyPort={ProxyPort},doPOST={DoPOST},userAgent={UserAgent},referer={Referer})", url, data, username, domain, proxyAddress, proxyPort, doPOST, userAgent, referer);
+            Logger.LogWarning("<<< Exiting GetExternalRequest(url={Url},data={Data},username={Username},password=<redacted>,domain={Domain},proxyAddress={ProxyAddress},proxyPort={ProxyPort},doPOST={DoPOST},userAgent={UserAgent},referer={Referer})", url, data, username, domain, proxyAddress, proxyPort, doPOST, userAgent, referer);
+			Logger.LogWarning("<<< Exiting GetExternalRequest(url={Url},data={Data},username={Username},password=<redacted>,domain={Domain},proxyAddress={ProxyAddress},proxyPort={ProxyPort},proxyUsername={ProxyUsername},proxyPassword=<redacted>,doPOST={DoPOST},userAgent={UserAgent},referer={Referer},requestTimeout={RequestTimeout})", url, data, username, domain, proxyAddress, proxyPort, proxyUsername, doPOST, userAgent, referer, requestTimeout);
             return GetExternalRequest(url, data, username, password, domain, proxyAddress, proxyPort, doPOST, userAgent, referer, out filename, Host.WebRequestTimeout);
         }
 
@@ -1044,8 +1098,11 @@ namespace DotNetNuke.Services.Installer
 
         public static void DeployExtension(WebResponse wr, string myfile, string installFolder)
         {
+			Logger.LogError(">>> Entering DeployExtension(wr={Wr},myfile={Myfile},installFolder={InstallFolder})", wr, myfile, installFolder);
             Stream remoteStream = null;
             FileStream localStream = null;
+			Logger.LogError("DeployExtension(wr={Wr},myfile={Myfile},installFolder={InstallFolder}): localStream → {LocalStream}", wr, myfile, installFolder, localStream);
+			Logger.LogError("DeployExtension(wr={Wr},myfile={Myfile},installFolder={InstallFolder}): remoteStream → {RemoteStream}", wr, myfile, installFolder, remoteStream);
 
             try
             {
@@ -1066,6 +1123,8 @@ namespace DotNetNuke.Services.Installer
                 {
                     // Read data (up to 1k) from the stream
                     bytesRead = remoteStream.Read(buffer, 0, buffer.Length);
+					Logger.LogError("DeployExtension(wr={Wr},myfile={Myfile},installFolder={InstallFolder}): bytesRead → {BytesRead}", wr, myfile, installFolder, bytesRead);
+					Logger.LogDebug("DeployExtension(wr={Wr},myfile={Myfile},installFolder={InstallFolder}): bytesRead → {BytesRead}", wr, myfile, installFolder, bytesRead);
 
                     // Write the data to the local file
                     localStream.Write(buffer, 0, bytesRead);
@@ -1087,6 +1146,7 @@ namespace DotNetNuke.Services.Installer
                     localStream.Close();
                 }
             }
+			Logger.LogWarning("<<< Exiting DeployExtension(wr={Wr},myfile={Myfile},installFolder={InstallFolder})", wr, myfile, installFolder);
         }
 
         /// <summary>The BackupFile method backs up a file to the backup folder.</summary>
@@ -1095,6 +1155,7 @@ namespace DotNetNuke.Services.Installer
         /// <param name="log">A Logger to log the result.</param>
         public static void BackupFile(InstallFile installFile, string basePath, Logger log)
         {
+			Logger.LogError(">>> Entering BackupFile(installFile={InstallFile},basePath={BasePath},log={Log})", installFile, basePath, log);
             string fullFileName = Path.Combine(basePath, installFile.FullName);
             string backupFileName = Path.Combine(installFile.BackupPath, installFile.Name + ".config");
 
@@ -1107,6 +1168,7 @@ namespace DotNetNuke.Services.Installer
             // Copy file to the backup location
             RetryableAction.RetryEverySecondFor30Seconds(() => FileSystemUtils.CopyFile(fullFileName, backupFileName), "Backup file " + fullFileName);
             log.AddInfo(string.Format(CultureInfo.InvariantCulture, FILE_CreateBackup, installFile.FullName));
+			Logger.LogWarning("<<< Exiting BackupFile(installFile={InstallFile},basePath={BasePath},log={Log})", installFile, basePath, log);
         }
 
         /// <summary>The CopyFile method copies a file from the temporary extract location.</summary>
@@ -1115,6 +1177,7 @@ namespace DotNetNuke.Services.Installer
         /// <param name="log">A Logger to log the result.</param>
         public static void CopyFile(InstallFile installFile, string basePath, Logger log)
         {
+			Logger.LogError(">>> Entering CopyFile(installFile={InstallFile},basePath={BasePath},log={Log})", installFile, basePath, log);
             string filePath = Path.Combine(basePath, installFile.Path);
             string fullFileName = Path.Combine(basePath, installFile.FullName);
 
@@ -1129,6 +1192,7 @@ namespace DotNetNuke.Services.Installer
             RetryableAction.RetryEverySecondFor30Seconds(() => FileSystemUtils.CopyFile(installFile.TempFileName, fullFileName), "Copy file to " + fullFileName);
 
             log.AddInfo(string.Format(CultureInfo.InvariantCulture, FILE_Created, installFile.FullName));
+			Logger.LogWarning("<<< Exiting CopyFile(installFile={InstallFile},basePath={BasePath},log={Log})", installFile, basePath, log);
         }
 
         /// <summary>The StreamToStream method reads a source stream and writes it to a destination stream.</summary>
@@ -1136,32 +1200,39 @@ namespace DotNetNuke.Services.Installer
         /// <param name="destStream">The Destination Stream.</param>
         private static void StreamToStream(Stream sourceStream, Stream destStream)
         {
+			Logger.LogError(">>> Entering StreamToStream(sourceStream={SourceStream},destStream={DestStream})", sourceStream, destStream);
             var buf = new byte[1024];
             int count;
             do
             {
                 // Read the chunk from the source
                 count = sourceStream.Read(buf, 0, 1024);
+				Logger.LogError("StreamToStream(sourceStream={SourceStream},destStream={DestStream}): count → {Count}", sourceStream, destStream, count);
+				Logger.LogDebug("StreamToStream(sourceStream={SourceStream},destStream={DestStream}): count → {Count}", sourceStream, destStream, count);
 
                 // Write the chunk to the destination
                 destStream.Write(buf, 0, count);
             }
             while (count > 0);
+			Logger.LogWarning("<<< Exiting StreamToStream(sourceStream={SourceStream},destStream={DestStream})", sourceStream, destStream);
             destStream.Flush();
         }
 
         private static void TryDeleteFolder(DirectoryInfo folder, Logger log)
         {
+			Logger.LogError(">>> Entering TryDeleteFolder(folder={Folder},log={Log})", folder, log);
             if (folder.GetFiles().Length == 0 && folder.GetDirectories().Length == 0)
             {
                 folder.Delete();
                 log.AddInfo(string.Format(CultureInfo.InvariantCulture, FOLDER_Deleted, folder.Name));
                 TryDeleteFolder(folder.Parent, log);
             }
+			Logger.LogWarning("<<< Exiting TryDeleteFolder(folder={Folder},log={Log})", folder, log);
         }
 
         private static string ValidateNode(string propValue, bool isRequired, Logger log, string logMessage, string defaultValue)
         {
+			Logger.LogError(">>> Entering ValidateNode(propValue={PropValue},isRequired={IsRequired},log={Log},logMessage={LogMessage},defaultValue={DefaultValue})", propValue, isRequired, log, logMessage, defaultValue);
             if (string.IsNullOrEmpty(propValue))
             {
                 if (isRequired)
@@ -1176,6 +1247,7 @@ namespace DotNetNuke.Services.Installer
                 }
             }
 
+			Logger.LogWarning("<<< Exiting ValidateNode(propValue={PropValue},isRequired={IsRequired},log={Log},logMessage={LogMessage},defaultValue={DefaultValue})", propValue, isRequired, log, logMessage, defaultValue);
             return propValue;
         }
     }

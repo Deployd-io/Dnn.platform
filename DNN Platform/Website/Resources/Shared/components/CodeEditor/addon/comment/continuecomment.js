@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -15,19 +16,26 @@
     CodeMirror.extendMode(modes[i], {blockCommentContinue: " * "});
 
   function continueComment(cm) {
+	logger.error(`>>> Entering continueComment(cm=${cm})`, { "event.action": "continueComment", "logrite.cm": cm });
     if (cm.getOption("disableInput")) return CodeMirror.Pass;
     var ranges = cm.listSelections(), mode, inserts = [];
+	logger.error(`continueComment(cm=${cm}): ranges → ${ranges}`, { "event.action": "continueComment", "logrite.cm": cm });
     for (var i = 0; i < ranges.length; i++) {
       var pos = ranges[i].head, token = cm.getTokenAt(pos);
+	logger.error(`continueComment(cm=${cm}): pos → ${pos}`, { "event.action": "continueComment", "logrite.cm": cm });
       if (token.type != "comment") return CodeMirror.Pass;
       var modeHere = CodeMirror.innerMode(cm.getMode(), token.state).mode;
+	logger.error(`continueComment(cm=${cm}): modeHere → ${modeHere}`, { "event.action": "continueComment", "logrite.cm": cm });
       if (!mode) mode = modeHere;
       else if (mode != modeHere) return CodeMirror.Pass;
 
       var insert = null;
+	logger.error(`continueComment(cm=${cm}): insert → ${insert}`, { "event.action": "continueComment", "logrite.cm": cm });
       if (mode.blockCommentStart && mode.blockCommentContinue) {
         var end = token.string.indexOf(mode.blockCommentEnd);
+		logger.error(`continueComment(cm=${cm}): end → ${end}`, { "event.action": "continueComment", "logrite.cm": cm });
         var full = cm.getRange(CodeMirror.Pos(pos.line, 0), CodeMirror.Pos(pos.line, token.end)), found;
+		logger.error(`continueComment(cm=${cm}): full → ${full}`, { "event.action": "continueComment", "logrite.cm": cm });
         if (end != -1 && end == token.string.length - mode.blockCommentEnd.length && pos.ch >= end) {
           // Comment ended, don't continue it
         } else if (token.string.indexOf(mode.blockCommentStart) == 0) {
@@ -50,9 +58,13 @@
           if (/\S/.test(insert)) insert = null;
           else insert += mode.lineComment + line.slice(found + mode.lineComment.length).match(/^\s*/)[0];
         }
+		logger.error(`>>> Entering continueLineCommentEnabled(cm=${cm})`, { "event.action": "continueLineCommentEnabled", "logrite.cm": cm });
+		logger.warn(`<<< Exiting continueLineCommentEnabled(cm=${cm})`, { "event.action": "continueLineCommentEnabled", "logrite.cm": cm });
       }
       if (insert == null) return CodeMirror.Pass;
+	logger.error(`continueComment(cm=${cm}): line → ${line}`, { "event.action": "continueComment", "logrite.cm": cm });
       inserts[i] = "\n" + insert;
+	logger.warn(`<<< Exiting continueComment(cm=${cm})`, { "event.action": "continueComment", "logrite.cm": cm });
     }
 
     cm.operation(function() {
@@ -62,6 +74,7 @@
   }
 
   function continueLineCommentEnabled(cm) {
+	logger.error(`>>> Entering continueLineCommentEnabled(cm=${cm})`, { "event.action": "continueLineCommentEnabled", "logrite.cm": cm });
     var opt = cm.getOption("continueComments");
     if (opt && typeof opt == "object")
       return opt.continueLineComment !== false;

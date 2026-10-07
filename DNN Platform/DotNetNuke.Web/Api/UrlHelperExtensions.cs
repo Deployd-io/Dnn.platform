@@ -16,6 +16,7 @@ namespace DotNetNuke.Web.Api
     /// <summary>Extension methods on <see cref="UrlHelper"/> for generating web API links.</summary>
     public static partial class UrlHelperExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UrlHelperExtensions));
         /// <summary>Generate WebAPI Links compatible with DNN Services Framework.</summary>
         /// <param name="urlHelper">The <see cref="UrlHelper"/>.</param>
         /// <param name="moduleFolderName">ModuleFolderName for the route.</param>
@@ -79,7 +80,10 @@ namespace DotNetNuke.Web.Api
         /// <returns>a URL.</returns>
         public static string DnnLink(this UrlHelper urlHelper, IPortalAliasService portalAliasService, string moduleFolderName, string routeName, object routeValues, IPortalAliasInfo portalAliasInfo)
         {
+			Logger.LogError(">>> Entering DnnLink(urlHelper={UrlHelper},moduleFolderName={ModuleFolderName},routeName={RouteName},routeValues={RouteValues})", urlHelper, moduleFolderName, routeName, routeValues);
             var parm = new PortalAliasRouteManager(portalAliasService);
+			Logger.LogError("DnnLink(urlHelper={UrlHelper},moduleFolderName={ModuleFolderName},routeName={RouteName},routeValues={RouteValues},portalAliasInfo={PortalAliasInfo}): parm → {Parm}", urlHelper, moduleFolderName, routeName, routeValues, portalAliasInfo, parm);
+			Logger.LogError("DnnLink(urlHelper={UrlHelper},portalAliasService={PortalAliasService},moduleFolderName={ModuleFolderName},routeName={RouteName},routeValues={RouteValues}): parm → {Parm}", urlHelper, portalAliasService, moduleFolderName, routeName, routeValues, parm);
             var fullName = parm.GetRouteName(moduleFolderName, routeName, (IPortalAliasInfo)PortalSettings.Current.PortalAlias);
             var allRouteValues = PortalAliasRouteManager.GetAllRouteValues(portalAliasInfo, routeValues);
 

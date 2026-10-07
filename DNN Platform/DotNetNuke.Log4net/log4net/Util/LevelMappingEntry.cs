@@ -43,6 +43,8 @@ namespace log4net.Util
         /// </remarks>
         protected LevelMappingEntry() 
         {
+		value.LogError(">>> Entering LevelMappingEntry()");
+        value.LogWarning("<<< Exiting LevelMappingEntry()");
         }
 
         /// <summary>The level that is the key for this mapping </summary>
@@ -69,7 +71,9 @@ namespace log4net.Util
         /// </remarks>
         public virtual void ActivateOptions()
         {
+			value.LogError(">>> Entering ActivateOptions()");
             // default implementation is to do nothing
+			value.LogWarning("<<< Exiting ActivateOptions()");
         }
 
         private Level m_level;

@@ -24,6 +24,7 @@ namespace DotNetNuke.UI.Skins.Controls
 
     public class LanguagePropertyAccess : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LanguagePropertyAccess));
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1307:AccessibleFieldsMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
@@ -40,7 +41,10 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <param name="settings">The portal settings.</param>
         public LanguagePropertyAccess(LanguageTokenReplace parent, PortalSettings settings)
         {
+			Logger.LogError(">>> Entering LanguagePropertyAccess(parent={Parent},settings={Settings})", parent, settings);
             this.objPortal = settings;
+			Logger.LogDebug("LanguagePropertyAccess(parent={Parent},settings={Settings}): this.objPortal → {Arg2}", parent, settings, this.objPortal);
+        Logger.LogWarning("<<< Exiting LanguagePropertyAccess(parent={Parent},settings={Settings})", parent, settings);
             this.objParent = parent;
         }
 
@@ -57,12 +61,14 @@ namespace DotNetNuke.UI.Skins.Controls
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope currentScope, ref bool propertyNotFound)
         {
+			Logger.LogError(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
             switch (propertyName.ToLowerInvariant())
             {
                 case "url":
                     return this.NewUrl(this.objParent.Language);
                 case "flagsrc":
                     var mappedGifFile = PathUtils.Instance.MapPath($@"{FlagIconPhysicalLocation}\{this.objParent.Language}.gif");
+					Logger.LogError("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): mappedGifFile → {MappedGifFile}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, mappedGifFile);
                     return File.Exists(mappedGifFile) ? $"/{this.objParent.Language}.gif" : $@"/{NonExistingFlagIconFileName}";
                 case "selected":
                     return (this.objParent.Language == CultureInfo.CurrentCulture.Name).ToString();
@@ -78,6 +84,7 @@ namespace DotNetNuke.UI.Skins.Controls
                     return Globals.ResolveUrl("~/portals/" + Globals.glbHostSkinFolder);
                 default:
                     propertyNotFound = true;
+					Logger.LogWarning("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
                     return string.Empty;
             }
         }
@@ -85,8 +92,11 @@ namespace DotNetNuke.UI.Skins.Controls
         private static string GetCleanUrl(string url)
         {
 #pragma warning disable CS0618 // Type or member is obsolete
+			Logger.LogError(">>> Entering GetCleanUrl(url={Url})", url);
+			Logger.LogWarning("<<< Exiting GetCleanUrl(url={Url})", url);
             var cleanUrl = PortalSecurity.Instance.InputFilter(url, PortalSecurity.FilterFlag.NoScripting);
 #pragma warning restore CS0618 // Type or member is obsolete
+			Logger.LogError("GetCleanUrl(url={Url}): cleanUrl → {CleanUrl}", url, cleanUrl);
             if (url != cleanUrl)
             {
                 return string.Empty;
@@ -107,12 +117,14 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <returns>A collection of query string segments, in <c>"key=value"</c> format.</returns>
         private string[] GetQsParams(string newLanguage, bool isLocalized)
         {
+			Logger.LogError(">>> Entering GetQsParams(newLanguage={NewLanguage},isLocalized={IsLocalized})", newLanguage, isLocalized);
             string returnValue = string.Empty;
             NameValueCollection queryStringCollection = HttpContext.Current.Request.QueryString;
             var rawQueryStringCollection =
                 HttpUtility.ParseQueryString(new Uri(HttpContext.Current.Request.Url.Scheme + "://" + HttpContext.Current.Request.Url.Authority + HttpContext.Current.Request.RawUrl).Query);
 
             var settings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogError("GetQsParams(newLanguage={NewLanguage},isLocalized={IsLocalized}): settings → {Settings}", newLanguage, isLocalized, settings);
             string[] arrKeys = queryStringCollection.AllKeys;
 
             for (int i = 0; i <= arrKeys.GetUpperBound(0); i++)
@@ -194,6 +206,7 @@ namespace DotNetNuke.UI.Skins.Controls
                                             var qsv = arrKeys[i];
                                             qsv = qsv.Replace("\"", string.Empty);
                                             qsv = qsv.Replace("'", string.Empty);
+											Logger.LogError("GetQsParams(newLanguage={NewLanguage},isLocalized={IsLocalized}): qsv → {Qsv}", newLanguage, isLocalized, qsv);
                                             returnValue += qsv + "=" + HttpUtility.UrlEncode(arrValues[j]);
                                         }
                                     }
@@ -217,6 +230,7 @@ namespace DotNetNuke.UI.Skins.Controls
             }
 
             // return the new querystring as a string array
+			Logger.LogWarning("<<< Exiting GetQsParams(newLanguage={NewLanguage},isLocalized={IsLocalized})", newLanguage, isLocalized);
             return returnValue.Split('&');
         }
 
@@ -227,24 +241,31 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <param name="newLanguage">The language for the URL.</param>
         private string NewUrl(string newLanguage)
         {
+			Logger.LogError(">>> Entering NewUrl(newLanguage={NewLanguage})", newLanguage);
             var newLocale = LocaleController.Instance.GetLocale(newLanguage);
 
+			Logger.LogError("NewUrl(newLanguage={NewLanguage}): newLocale → {NewLocale}", newLanguage, newLocale);
             // Ensure that the current ActiveTab is the culture of the new language
             var tabId = this.objPortal.ActiveTab.TabID;
+			Logger.LogError("NewUrl(newLanguage={NewLanguage}): tabId → {TabId}", newLanguage, tabId);
             var islocalized = false;
+			Logger.LogError("NewUrl(newLanguage={NewLanguage}): islocalized → {Islocalized}", newLanguage, islocalized);
 
             var localizedTab = TabController.Instance.GetTabByCulture(tabId, this.objPortal.PortalId, newLocale);
+			Logger.LogError("NewUrl(newLanguage={NewLanguage}): localizedTab → {LocalizedTab}", newLanguage, localizedTab);
             if (localizedTab != null)
             {
                 islocalized = true;
                 if (localizedTab.IsDeleted || !TabPermissionController.CanViewPage(localizedTab))
                 {
                     var localizedPortal = PortalController.Instance.GetPortal(this.objPortal.PortalId, newLocale.Code);
+					Logger.LogError("NewUrl(newLanguage={NewLanguage}): localizedPortal → {LocalizedPortal}", newLanguage, localizedPortal);
                     tabId = localizedPortal.HomeTabId;
                 }
                 else
                 {
                     var fullurl = string.Empty;
+					Logger.LogError("NewUrl(newLanguage={NewLanguage}): fullurl → {Fullurl}", newLanguage, fullurl);
                     switch (localizedTab.TabType)
                     {
                         case TabType.Normal:
@@ -273,6 +294,7 @@ namespace DotNetNuke.UI.Skins.Controls
             }
 
             var rawQueryString = string.Empty;
+			Logger.LogError("NewUrl(newLanguage={NewLanguage}): rawQueryString → {RawQueryString}", newLanguage, rawQueryString);
             if (Entities.Host.Host.UseFriendlyUrls)
             {
                 // Remove returnurl from query parameters to prevent that the language is changed back after the user has logged in
@@ -280,8 +302,10 @@ namespace DotNetNuke.UI.Skins.Controls
                 // using the language links won't change the language in the returnurl parameter and the user will be redirected to the de-de version after logging in
                 // Assumption: Loosing the returnurl information is better than confusing the user by switching the language back after the login
                 var queryParams = HttpUtility.ParseQueryString(new Uri(string.Concat(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority), HttpContext.Current.Request.RawUrl)).Query);
+				Logger.LogError("NewUrl(newLanguage={NewLanguage}): queryParams → {QueryParams}", newLanguage, queryParams);
                 queryParams.Remove("returnurl");
                 var queryString = queryParams.ToString();
+				Logger.LogError("NewUrl(newLanguage={NewLanguage}): queryString → {QueryString}", newLanguage, queryString);
                 if (queryString.Length > 0)
                 {
                     rawQueryString = string.Concat("?", queryString);
@@ -289,10 +313,14 @@ namespace DotNetNuke.UI.Skins.Controls
             }
 
             var controlKey = HttpContext.Current.Request.QueryString["ctl"];
+			Logger.LogError("NewUrl(newLanguage={NewLanguage}): controlKey → {ControlKey}", newLanguage, controlKey);
             var queryStrings = this.GetQsParams(newLocale.Code, islocalized);
+			Logger.LogError("NewUrl(newLanguage={NewLanguage}): queryStrings → {QueryStrings}", newLanguage, queryStrings);
             var isSuperTab = this.objPortal.ActiveTab.IsSuperTab;
             var url = $"{TestableGlobals.Instance.NavigateURL(tabId, isSuperTab, this.objPortal, controlKey, newLanguage, queryStrings)}{rawQueryString}";
+			Logger.LogError("NewUrl(newLanguage={NewLanguage}): url → {Url}", newLanguage, url);
 
+			Logger.LogWarning("<<< Exiting NewUrl(newLanguage={NewLanguage})", newLanguage);
             return GetCleanUrl(url);
         }
     }

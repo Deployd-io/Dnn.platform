@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import Localization from "../../../localization";
+const logger = console;
 import { Collapsible, GridCell, Button, RadioButtons, Label, Dropdown, SingleLineInputWithError } from "@dnnsoftware/dnn-react-common";
 
 const portalAliasUsageType = {
@@ -13,12 +14,15 @@ const portalAliasUsageType = {
 class EditUrl extends Component {
     constructor() {
         super();
+		logger.error('>>> Entering constructor()', { "event.action": "constructor" });
         this.state = {
             hasChanges: false
         };
+		logger.warn('<<< Exiting constructor()', { "event.action": "constructor" });
     }
 
     onChangeField(key, event) {
+		logger.error(`>>> Entering onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
         const {onChange} = this.props;
         let value = event;
         if (event.value) {
@@ -27,6 +31,7 @@ class EditUrl extends Component {
             value = event.target.value;
         }
         
+		logger.warn(`<<< Exiting onChangeField(key=${key},event=${event})`, { "event.action": "onChangeField", "logrite.key": key, "logrite.event": event });
         onChange(key, value);
 
         this.setState({
@@ -35,6 +40,8 @@ class EditUrl extends Component {
     }
     
     getUrlTypeOptions() {
+		logger.error('>>> Entering getUrlTypeOptions()', { "event.action": "getUrlTypeOptions" });
+		logger.warn('<<< Exiting getUrlTypeOptions()', { "event.action": "getUrlTypeOptions" });
         return [
             {
                 label: "Active (200)",
@@ -48,6 +55,8 @@ class EditUrl extends Component {
     }
     
     getOptions(siteAliases) {
+		logger.error(`>>> Entering getOptions(siteAliases=${siteAliases})`, { "event.action": "getOptions", "logrite.siteAliases": siteAliases });
+		logger.warn(`<<< Exiting getOptions(siteAliases=${siteAliases})`, { "event.action": "getOptions", "logrite.siteAliases": siteAliases });
         return siteAliases.map(alias => {
             return {
                 label: alias.Value,
@@ -57,6 +66,7 @@ class EditUrl extends Component {
     }
     
     getSiteAliasUsageOptions(hasParent) {
+		logger.error(`>>> Entering getSiteAliasUsageOptions(hasParent=${hasParent})`, { "event.action": "getSiteAliasUsageOptions", "logrite.hasParent": hasParent });
         let options = [
             {value: portalAliasUsageType.ChildPagesDoNotInherit, label: Localization.get("Pages_Seo_SelectedAliasUsageOptionThisPageOnly")}, 
             {value: portalAliasUsageType.ChildPagesInherit, label: Localization.get("Pages_Seo_SelectedAliasUsageOptionPageAndChildPages")}
@@ -68,12 +78,15 @@ class EditUrl extends Component {
             });
         }
         
+		logger.warn(`<<< Exiting getSiteAliasUsageOptions(hasParent=${hasParent})`, { "event.action": "getSiteAliasUsageOptions", "logrite.hasParent": hasParent });
         return options;
     }
     
     render() {
+		logger.error('>>> Entering render()', { "event.action": "render" });
         const {url, saving, pageHasParent, siteAliases, primaryAliasId, isOpened, onSave, onCancel} = this.props;
         const aliases = this.getOptions(siteAliases);
+		logger.error(`render(): aliases → ${aliases}`, { "event.action": "render" });
         const siteAliasUsageOptions = this.getSiteAliasUsageOptions(pageHasParent);
         if (
             !this.state.hasChanges &&
@@ -83,6 +96,7 @@ class EditUrl extends Component {
         {
             this.props.onChange("siteAlias", primaryAliasId); 
         }
+		logger.warn('<<< Exiting render()', { "event.action": "render" });
         return (
             <Collapsible accordion={true} isOpened={isOpened} className={"editUrl"}>
                 <div className="editUrl-body">

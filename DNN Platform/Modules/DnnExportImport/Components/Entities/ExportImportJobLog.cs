@@ -17,6 +17,7 @@ namespace Dnn.ExportImport.Components.Entities
     [PrimaryKey("JobLogId")]
     public class ExportImportJobLog : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExportImportJobLog));
         /// <summary>Gets or sets the job log ID.</summary>
         public int JobLogId { get; set; }
 
@@ -45,6 +46,7 @@ namespace Dnn.ExportImport.Components.Entities
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogError(">>> Entering Fill(dr={Dr})", dr);
             this.JobLogId = Null.SetNullInteger(dr[nameof(this.JobLogId)]);
             this.JobId = Null.SetNullInteger(dr[nameof(this.JobId)]);
             this.Name = Null.SetNullString(dr[nameof(this.Name)]);

@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.Social.Messaging.Internal
     /// <summary>Business Layer to manage Messaging. Also contains CRUD methods.</summary>
     public class InternalMessagingController : ServiceLocator<IInternalMessagingController, InternalMessagingController>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InternalMessagingController));
         /// <inheritdoc />
         protected override Func<IInternalMessagingController> GetFactory()
         {
+			Logger.LogError(">>> Entering GetFactory()");
+			Logger.LogWarning("<<< Exiting GetFactory()");
             return () => new InternalMessagingControllerImpl();
         }
     }

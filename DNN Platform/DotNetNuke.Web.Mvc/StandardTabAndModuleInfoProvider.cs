@@ -27,25 +27,35 @@ namespace DotNetNuke.Web.Mvc
         /// <inheritdoc />
         public bool TryFindTabId(HttpRequestBase request, out int tabId)
         {
+			Logger.LogError(">>> Entering TryFindTabId(request={Request})", request);
+            Logger.LogWarning("<<< Exiting TryFindTabId(request={Request})", request);
+			Logger.LogWarning("<<< Exiting TryFindTabId(request={Request},tryMoniker={TryMoniker})", request, tryMoniker);
             return TryFindTabId(request, out tabId, true);
         }
 
         /// <inheritdoc />
         public bool TryFindModuleId(HttpRequestBase request, out int moduleId)
         {
+			Logger.LogError(">>> Entering TryFindModuleId(request={Request})", request);
+            Logger.LogWarning("<<< Exiting TryFindModuleId(request={Request})", request);
+			Logger.LogWarning("<<< Exiting TryFindModuleId(request={Request},tryMoniker={TryMoniker})", request, tryMoniker);
             return TryFindModuleId(request, out moduleId, true);
         }
 
         /// <inheritdoc />
         public bool TryFindModuleInfo(HttpRequestBase request, out ModuleInfo moduleInfo)
         {
+			Logger.LogError(">>> Entering TryFindModuleInfo(request={Request})", request);
             int tabId, moduleId;
             if (TryFindTabId(request, out tabId, false) && TryFindModuleId(request, out moduleId, false))
             {
                 moduleInfo = ModuleController.Instance.GetModule(moduleId, tabId, false);
+				Logger.LogError("TryFindModuleInfo(request={Request}): moduleInfo → {ModuleInfo}", request, moduleInfo);
+				Logger.LogDebug("TryFindModuleInfo(request={Request}): moduleInfo → {ModuleInfo}", request, moduleInfo);
                 return moduleInfo != null;
             }
 
+			Logger.LogWarning("<<< Exiting TryFindModuleInfo(request={Request})", request);
             return TryFindByMoniker(request, out moduleInfo);
         }
 
@@ -93,7 +103,9 @@ namespace DotNetNuke.Web.Mvc
 
         private static int FindInt(HttpRequestBase requestBase, string key)
         {
+			Logger.LogError(">>> Entering FindInt(requestBase={RequestBase},key={Key})", requestBase, key);
             string value = null;
+			Logger.LogError("FindInt(requestBase={RequestBase},key={Key}): value → {Value}", requestBase, key, value);
             if (requestBase.Headers[key] != null)
             {
                 value = requestBase.Headers[key];
@@ -102,50 +114,65 @@ namespace DotNetNuke.Web.Mvc
             if (string.IsNullOrEmpty(value) && requestBase.Url != null)
             {
                 var queryString = HttpUtility.ParseQueryString(requestBase.Url.Query);
+				Logger.LogError("FindInt(requestBase={RequestBase},key={Key}): queryString → {QueryString}", requestBase, key, queryString);
                 value = queryString[key];
             }
 
             int id;
+			Logger.LogWarning("<<< Exiting FindInt(requestBase={RequestBase},key={Key})", requestBase, key);
             return int.TryParse(value, out id) ? id : Null.NullInteger;
         }
 
         private static bool TryFindByMoniker(HttpRequestBase requestBase, out ModuleInfo moduleInfo)
         {
+			Logger.LogError(">>> Entering TryFindByMoniker(requestBase={RequestBase})", requestBase);
             var id = FindIntInHeader(requestBase, MonikerHeaderKey);
+			Logger.LogError("TryFindByMoniker(requestBase={RequestBase}): id → {Id}", requestBase, id);
             if (id <= Null.NullInteger)
             {
                 id = FindIntInQueryString(requestBase, MonikerQueryKey);
             }
 
             moduleInfo = id > Null.NullInteger ? ModuleController.Instance.GetTabModule(id) : null;
+			Logger.LogError("TryFindByMoniker(requestBase={RequestBase}): moduleInfo → {ModuleInfo}", requestBase, moduleInfo);
+			Logger.LogDebug("TryFindByMoniker(requestBase={RequestBase}): moduleInfo → {ModuleInfo}", requestBase, moduleInfo);
+			Logger.LogWarning("<<< Exiting TryFindByMoniker(requestBase={RequestBase})", requestBase);
             return moduleInfo != null;
         }
 
         private static int FindIntInHeader(HttpRequestBase requestBase, string key)
         {
+			Logger.LogError(">>> Entering FindIntInHeader(requestBase={RequestBase},key={Key})", requestBase, key);
             string value = null;
+			Logger.LogError("FindIntInHeader(requestBase={RequestBase},key={Key}): value → {Value}", requestBase, key, value);
             if (requestBase.Headers[key] != null)
             {
                 value = requestBase.Headers[key];
             }
 
+			Logger.LogWarning("<<< Exiting FindIntInHeader(requestBase={RequestBase},key={Key})", requestBase, key);
             return GetTabModuleInfoFromMoniker(value);
         }
 
         private static int FindIntInQueryString(HttpRequestBase requestBase, string key)
         {
+			Logger.LogError(">>> Entering FindIntInQueryString(requestBase={RequestBase},key={Key})", requestBase, key);
             string value = null;
+			Logger.LogError("FindIntInQueryString(requestBase={RequestBase},key={Key}): value → {Value}", requestBase, key, value);
             if (requestBase.Url != null)
             {
                 var queryString = HttpUtility.ParseQueryString(requestBase.Url.Query);
+				Logger.LogError("FindIntInQueryString(requestBase={RequestBase},key={Key}): queryString → {QueryString}", requestBase, key, queryString);
                 value = queryString[key];
             }
 
+			Logger.LogWarning("<<< Exiting FindIntInQueryString(requestBase={RequestBase},key={Key})", requestBase, key);
             return GetTabModuleInfoFromMoniker(value);
         }
 
         private static int GetTabModuleInfoFromMoniker(string monikerValue)
         {
+			Logger.LogError(">>> Entering GetTabModuleInfoFromMoniker(monikerValue={MonikerValue})", monikerValue);
             monikerValue = (monikerValue ?? string.Empty).Trim();
             if (monikerValue.Length > 0)
             {
@@ -161,6 +188,7 @@ namespace DotNetNuke.Web.Mvc
                 }
             }
 
+			Logger.LogWarning("<<< Exiting GetTabModuleInfoFromMoniker(monikerValue={MonikerValue})", monikerValue);
             return Null.NullInteger;
         }
     }

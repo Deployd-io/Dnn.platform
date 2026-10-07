@@ -12,6 +12,7 @@ using DotNetNuke.Internal.SourceGenerators;
 internal partial class CoreCryptographyProvider : CryptographyProvider, DotNetNuke.Abstractions.Security.ICryptographyProvider
 #pragma warning restore CS0618 // Type or member is obsolete
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CoreCryptographyProvider));
     private const string InterfaceEncryptStringHashAlgorithmName = nameof(SHA512);
     private const string InterfaceEncryptStringSymmetricAlgorithmName = nameof(Aes);
 
@@ -31,7 +32,10 @@ internal partial class CoreCryptographyProvider : CryptographyProvider, DotNetNu
     [DnnDeprecated(10, 2, 2, "Use DotNetNuke.Abstractions.Security.ICryptographyProvider")]
     public override partial string EncryptParameter(string message, string passphrase)
     {
+		Logger.LogError(">>> Entering EncryptParameter(message={Message},passphrase=<redacted>)", message);
         using var des = CreateSymmetricAlgorithm(this.EncryptParameterAlgorithmName);
+		Logger.LogError("EncryptParameter(message={Message},passphrase=<redacted>): des → {Des}", message, des);
+		Logger.LogWarning("<<< Exiting EncryptParameter(message={Message},passphrase=<redacted>)", message);
         return EncryptParameter(message, passphrase, des);
     }
 
@@ -48,6 +52,8 @@ internal partial class CoreCryptographyProvider : CryptographyProvider, DotNetNu
     [DnnDeprecated(10, 2, 2, "Use DotNetNuke.Abstractions.Security.ICryptographyProvider")]
     public override partial string DecryptParameter(string message, string passphrase)
     {
+		Logger.LogError(">>> Entering DecryptParameter(message={Message},passphrase=<redacted>)", message);
+        Logger.LogWarning("<<< Exiting DecryptParameter(message={Message},passphrase=<redacted>)", message);
         return this.DecryptParameter(message, passphrase, this.EncryptParameterAlgorithmName);
     }
 
@@ -55,7 +61,10 @@ internal partial class CoreCryptographyProvider : CryptographyProvider, DotNetNu
     [DnnDeprecated(10, 2, 2, "Use DotNetNuke.Abstractions.Security.ICryptographyProvider")]
     public override partial string EncryptString(string message, string passphrase)
     {
+		Logger.LogError(">>> Entering EncryptString(message={Message},passphrase=<redacted>)", message);
         using var sha512 = CreateHashAlgorithm(this.EncryptStringHashAlgorithmName);
+		Logger.LogError("EncryptString(message={Message},passphrase=<redacted>): sha512 → {Sha512}", message, sha512);
+		Logger.LogWarning("<<< Exiting EncryptString(message={Message},passphrase=<redacted>)", message);
         return EncryptString(
                 message,
                 passphrase,
@@ -83,6 +92,8 @@ internal partial class CoreCryptographyProvider : CryptographyProvider, DotNetNu
     [DnnDeprecated(10, 2, 2, "Use DotNetNuke.Abstractions.Security.ICryptographyProvider")]
     public override partial string DecryptString(string message, string passphrase)
     {
+		Logger.LogError(">>> Entering DecryptString(message={Message},passphrase=<redacted>)", message);
+        Logger.LogWarning("<<< Exiting DecryptString(message={Message},passphrase=<redacted>)", message);
         return this.DecryptString(message, passphrase, this.EncryptStringAlgorithmName, null);
     }
 }
